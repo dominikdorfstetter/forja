@@ -1,0 +1,82 @@
+---
+import Base from "../layouts/Base.astro";
+import CvTimeline from "../components/CvTimeline.astro";
+import { fetchCvEntries, fetchSkills } from "../lib/api";
+import type { CvEntryResponse, SkillResponse } from "../lib/api";
+
+let entries: CvEntryResponse[] = [];
+let skills: SkillResponse[] = [];
+
+try {
+  entries = await fetchCvEntries();
+  // Sort by start_date descending (most recent first)
+  entries.sort(
+    (a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime(),
+  );
+} catch (e) {
+  console.warn("[CMS] Failed to fetch CV entries:", e instanceof Error ? e.message : e);
+}
+
+try {
+  skills = await fetchSkills();
+  // Sort by proficiency descending, then name
+  skills.sort((a, b) => {
+    const pa = a.proficiency_level ?? 0;
+    const pb = b.proficiency_level ?? 0;
+    if (pb !== pa) return pb - pa;
+    return a.name.localeCompare(b.name);
+  });
+} catch (e) {
+  console.warn("[CMS] Failed to fetch skills:", e instanceof Error ? e.message : e);
+}
+
+// Group skills by category
+const grouped = new Map<string, SkillResponse[]>();
+for (const skill of skills) {
+  const cat = skill.category ?? "Other";
+  const arr = grouped.get(cat) ?? [];
+  arr.push(skill);
+  grouped.set(cat, arr);
+}
+---
+
+<Base title="CV" description="Work experience, education, and skills.">
+  <div class="cv-page">
+    <h1>Curriculum Vitae</h1>
+
+    {entries.length > 0 ? (
+      <CvTimeline entries={entries} />
+    ) : (
+      <p class="text-center">No CV entries yet.</p>
+    )}
+
+    {skills.length > 0 && (
+      <section class="skills-section">
+        <h2>Skills</h2>
+        {[...grouped.entries()].map(([category, items]) => (
+          <div style="margin-bottom: var(--space-lg);">
+            <h3 style="text-transform: capitalize; margin-bottom: var(--space-sm); font-size: 1rem; color: var(--color-text-muted);">
+              {category}
+            </h3>
+            <div class="skills-grid">
+              {items.map((skill) => (
+                <span class="skill-tag">
+                  {skill.icon && <span>{skill.icon}</span>}
+                  {skill.name}
+                  {skill.proficiency_level != null && (
+                    <span class="skill-tag__bar">
+                      <span
+                        class="skill-tag__bar-fill"
+                        style={`width: ${skill.proficiency_level}%`}
+                      />
+                    </span>
+                  )}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </section>
+    )}
+  </div>
+</Base>

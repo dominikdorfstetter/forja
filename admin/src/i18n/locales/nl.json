@@ -1,0 +1,1710 @@
+{
+  "common": {
+    "appName": "OpenYapper",
+    "actions": {
+      "save": "Opslaan",
+      "cancel": "Annuleren",
+      "delete": "Verwijderen",
+      "edit": "Bewerken",
+      "create": "Aanmaken",
+      "add": "Toevoegen",
+      "close": "Sluiten",
+      "confirm": "Bevestigen",
+      "back": "Terug",
+      "refresh": "Vernieuwen",
+      "search": "Zoeken",
+      "clear": "Wissen",
+      "view": "Bekijken",
+      "manage": "Beheren",
+      "submit": "Verzenden",
+      "saving": "Opslaan...",
+      "loading": "Laden...",
+      "deleting": "Verwijderen...",
+      "clone": "Klonen",
+      "upload": "Uploaden",
+      "preview": "Voorbeeld"
+    },
+    "status": {
+      "active": "Actief",
+      "inactive": "Inactief",
+      "draft": "Concept",
+      "published": "Gepubliceerd",
+      "blocked": "Geblokkeerd",
+      "expired": "Verlopen",
+      "revoked": "Ingetrokken",
+      "healthy": "Gezond",
+      "degraded": "Verslechterd",
+      "unhealthy": "Ongezond",
+      "up": "Online",
+      "down": "Offline",
+      "scheduled": "Gepland",
+      "inReview": "In beoordeling",
+      "archived": "Gearchiveerd"
+    },
+    "table": {
+      "actions": "Acties",
+      "name": "Naam",
+      "status": "Status",
+      "created": "Aangemaakt",
+      "type": "Type",
+      "slug": "Slug",
+      "noData": "Geen gegevens"
+    },
+    "confirm": {
+      "cannotBeUndone": "Dit kan niet ongedaan worden gemaakt.",
+      "areYouSure": "Weet u het zeker?"
+    },
+    "filters": {
+      "all": "Alle",
+      "status": "Status",
+      "permission": "Machtiging",
+      "filterByType": "Filteren op type"
+    },
+    "labels": {
+      "yes": "Ja",
+      "no": "Nee",
+      "default": "Standaard",
+      "global": "Globaal",
+      "site": "Site",
+      "child": "Onderliggend",
+      "featured": "Uitgelicht",
+      "present": "Heden",
+      "never": "Nooit",
+      "none": "Geen",
+      "untitled": "Zonder titel",
+      "internal": "Intern",
+      "external": "Extern"
+    },
+    "errors": {
+      "loadFailed": "Laden van gegevens mislukt",
+      "saveFailed": "Opslaan mislukt",
+      "deleteFailed": "Verwijderen mislukt",
+      "serverUnreachable": "Server onbereikbaar",
+      "required": "Dit veld is verplicht"
+    },
+    "noSiteSelected": "Geen site geselecteerd",
+    "selectSitePrompt": "Selecteer een site in de werkbalk",
+    "selectSite": "Selecteer site...",
+    "noSiteOption": "Geen site geselecteerd",
+    "lockedByScope": "Vergrendeld door API-sleutelbereik",
+    "skipToMain": "Ga naar hoofdinhoud"
+  },
+  "scheduling": {
+    "publishAt": "Publiceren op",
+    "unpublishAt": "Depubliceren op (optioneel)",
+    "scheduledFor": "Gepland voor {{date}}",
+    "clearSchedule": "Planning wissen",
+    "expiresAt": "Verloopt {{date}}"
+  },
+  "layout": {
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "content": "Inhoud",
+      "blogs": "Blogs",
+      "pages": "Pagina's",
+      "media": "Media",
+      "documents": "Documenten",
+      "assets": "Bestanden",
+      "legal": "Juridisch",
+      "cv": "CV",
+      "siteConfig": "Site-configuratie",
+      "sites": "Sites",
+      "navigation": "Navigatie",
+      "socialLinks": "Sociale links",
+      "activity": "Activiteit",
+      "system": "Systeem",
+      "members": "Leden",
+      "apiKeys": "API-sleutels",
+      "taxonomy": "Taxonomie",
+      "apiDocs": "API-documentatie",
+      "contentTemplates": "Sjablonen",
+      "redirects": "Omleidingen",
+      "webhooks": "Webhooks",
+      "settings": "Instellingen",
+      "locales": "Talen",
+      "myDrafts": "Mijn concepten",
+      "logout": "Uitloggen"
+    },
+    "toolbar": {
+      "toggleDrawer": "Zijbalk in-/uitschakelen",
+      "account": "Account",
+      "profile": "Profiel",
+      "theme": "Thema",
+      "language": "Taal"
+    }
+  },
+  "login": {
+    "title": "OpenYapper",
+    "subtitle": "Voer uw API-sleutel in om toegang te krijgen tot het beheerdersdashboard",
+    "apiKeyLabel": "API-sleutel",
+    "apiKeyPlaceholder": "dk_xxxxxxxx_xxxxxxxxxxxxxxxx",
+    "loginButton": "Inloggen",
+    "verifying": "Verifiëren...",
+    "success": "Succesvol ingelogd",
+    "errors": {
+      "required": "API-sleutel is vereist",
+      "invalid": "Ongeldige API-sleutel"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "managing": "Beheer van {{name}}",
+    "selectSitePrompt": "Selecteer een site in de werkbalk om inhoudsstatistieken te bekijken.",
+    "readOnlyNotice": "U heeft <strong>alleen-lezen</strong> toegang. Inhoud is zichtbaar maar kan niet worden gewijzigd.",
+    "systemHealth": "Systeemstatus",
+    "overall": "Totaal: {{status}}",
+    "stats": {
+      "sites": "Sites",
+      "blogPosts": "Blogberichten",
+      "pages": "Pagina's",
+      "mediaFiles": "Mediabestanden",
+      "users": "Gebruikers",
+      "apiKeys": "API-sleutels"
+    },
+    "recentPosts": "Recente blogberichten",
+    "publishedPosts": "Gepubliceerde berichten",
+    "newPost": "Nieuw bericht",
+    "noPosts": "Nog geen blogberichten.",
+    "noPostsCreate": "Nog geen blogberichten. Maak uw eerste bericht aan!",
+    "drafts": "Concepten",
+    "noDrafts": "Geen concepten — alle inhoud is gepubliceerd of in beoordeling.",
+    "viewAllDrafts": "Alles bekijken",
+    "quickActions": "Snelle acties",
+    "byAuthor": "door {{author}}",
+    "requests": "{{count}} verzoeken",
+    "yourSites": "Uw sites",
+    "noSites": "Geen sites gevonden",
+    "noSitesCreate": "Maak uw eerste site aan om te beginnen",
+    "permissions": {
+      "master": "Systeembeheerder",
+      "owner": "Site-eigenaar",
+      "admin": "Admin",
+      "write": "Schrijven",
+      "readOnly": "Alleen-lezen"
+    }
+  },
+  "setupChecklist": {
+    "title": "Aan de slag",
+    "description": "Voltooi deze stappen om uw site in te stellen en te beginnen met publiceren.",
+    "completeTitle": "Helemaal klaar!",
+    "completeDescription": "U heeft alle instellingsstappen voltooid. U bent klaar om te publiceren!",
+    "progress": "{{completed}} van {{total}} voltooid",
+    "dismiss": "Verbergen",
+    "steps": {
+      "createSite": "Maak uw eerste site aan",
+      "addLanguage": "Voeg een taal toe",
+      "createPage": "Maak een pagina aan",
+      "writeBlog": "Schrijf een blogbericht",
+      "setupNav": "Stel de navigatie in"
+    }
+  },
+  "myDrafts": {
+    "title": "Mijn concepten",
+    "subtitle": "Alle concepten op één plek",
+    "loading": "Concepten laden...",
+    "table": {
+      "name": "Naam",
+      "type": "Type",
+      "lastModified": "Laatst gewijzigd"
+    },
+    "empty": {
+      "noSite": "Selecteer een site in de werkbalk om concepten te bekijken",
+      "title": "Geen concepten",
+      "description": "Alle inhoud is gepubliceerd of gepland — niets in concept."
+    }
+  },
+  "blogs": {
+    "title": "Blogs",
+    "subtitle": "Beheer blogberichten op uw sites",
+    "createButton": "Blog aanmaken",
+    "table": {
+      "slug": "Slug",
+      "author": "Auteur",
+      "status": "Status",
+      "featured": "Uitgelicht",
+      "published": "Gepubliceerd",
+      "actions": "Acties"
+    },
+    "viewDetail": "Details bekijken",
+    "empty": {
+      "noSite": "Selecteer een site in de werkbalk om de blogberichten te bekijken",
+      "title": "Nog geen blogberichten",
+      "description": "Blogberichten vormen de kern van uw content. Schrijf artikelen, tutorials of nieuws — elk met vertalingen, categorieën en SEO-metadata."
+    },
+    "loading": "Blogs laden...",
+    "loadError": "Blogs laden mislukt",
+    "messages": {
+      "created": "Blog aangemaakt — editor wordt geopend",
+      "updated": "Blog bijgewerkt",
+      "deleted": "Blog verwijderd",
+      "cloned": "Blog succesvol gekloond"
+    },
+    "deleteDialog": {
+      "title": "Blog verwijderen",
+      "message": "Blog \"{{slug}}\" verwijderen? Dit kan niet ongedaan worden gemaakt."
+    },
+    "moreActions": "Meer"
+  },
+  "blogDetail": {
+    "title": "Blogdetails",
+    "back": "Terug naar blogs",
+    "loading": "Blog laden...",
+    "notFound": "Blog niet gevonden",
+    "tabs": {
+      "content": "Inhoud",
+      "preview": "Voorbeeld",
+      "seo": "SEO",
+      "settings": "Instellingen",
+      "attachments": "Bijlagen",
+      "metadata": "Metadata",
+      "documents": "Documenten"
+    },
+    "toolbar": {
+      "unsavedChanges": "Niet-opgeslagen wijzigingen",
+      "saving": "Opslaan...",
+      "saved": "Alle wijzigingen opgeslagen",
+      "saveFailed": "Opslaan mislukt"
+    },
+    "seo": {
+      "serpPreview": "Zoekmachinevoorbeeld",
+      "charCount": "{{current}}/{{max}}"
+    },
+    "fields": {
+      "title": "Titel",
+      "slug": "Slug",
+      "author": "Auteur",
+      "status": "Status",
+      "locale": "Taal",
+      "excerpt": "Samenvatting",
+      "content": "Inhoud",
+      "coverImage": "Omslagafbeelding URL",
+      "publishedDate": "Publicatiedatum",
+      "featured": "Uitgelicht",
+      "tags": "Tags",
+      "categories": "Categorieën",
+      "subtitle": "Ondertitel",
+      "body": "Tekst (Markdown)",
+      "metaTitle": "Meta-titel",
+      "metaDescription": "Meta-beschrijving"
+    },
+    "messages": {
+      "saved": "Blog opgeslagen",
+      "saveFailed": "Blog opslaan mislukt"
+    },
+    "documents": {
+      "title": "Bijgevoegde documenten",
+      "attach": "Document bijvoegen",
+      "empty": "Geen documenten bijgevoegd",
+      "emptyDescription": "Voeg documenten toe aan dit blogbericht",
+      "detached": "Document losgekoppeld",
+      "attached": "Document bijgevoegd"
+    },
+    "metadata": {
+      "title": "Blog-metagegevens",
+      "slug": "Slug:",
+      "author": "Auteur:",
+      "status": "Status:",
+      "published": "Gepubliceerd:",
+      "readingTime": "Leestijd",
+      "manualOverride": "Handmatige overschrijving",
+      "autoCalculated": "Automatisch berekend op basis van inhoud",
+      "resetAuto": "Terugzetten naar automatische berekening"
+    },
+    "images": {
+      "title": "Afbeeldingen",
+      "coverImageId": "ID omslagafbeelding:",
+      "headerImageId": "ID koptekstafbeelding:"
+    },
+    "settings": {
+      "title": "Instellingen",
+      "featured": "Uitgelicht",
+      "notFeatured": "Niet uitgelicht",
+      "commentsOn": "Reacties aan",
+      "commentsOff": "Reacties uit"
+    },
+    "toc": "Inhoudsopgave",
+    "createTranslation": "{{locale}} vertaling maken",
+    "noLocalesAlert": "Geen actieve talen geconfigureerd. Ga naar <strong>Instellingen → Talen</strong> en maak ten minste één actieve taal aan (bijv. \"en\") om te beginnen met schrijven."
+  },
+  "pages": {
+    "title": "Pagina's",
+    "subtitle": "Beheer pagina's op uw sites",
+    "createButton": "Pagina aanmaken",
+    "table": {
+      "route": "Route",
+      "type": "Type",
+      "status": "Status",
+      "inNav": "In navigatie",
+      "created": "Aangemaakt",
+      "actions": "Acties"
+    },
+    "viewDetails": "Details bekijken",
+    "empty": {
+      "noSite": "Selecteer een site in de werkbalk om de pagina's te bekijken",
+      "title": "Nog geen pagina's",
+      "description": "Pagina's zijn de bouwstenen van uw site. Maak landingspagina's, over-ons-secties of aangepaste layouts met modulaire secties."
+    },
+    "loading": "Pagina's laden...",
+    "loadError": "Pagina's laden mislukt",
+    "messages": {
+      "created": "Pagina aangemaakt",
+      "updated": "Pagina bijgewerkt",
+      "deleted": "Pagina verwijderd",
+      "cloned": "Pagina succesvol gekloond"
+    },
+    "deleteDialog": {
+      "title": "Pagina verwijderen",
+      "message": "Pagina \"{{route}}\" verwijderen? Dit kan niet ongedaan worden gemaakt."
+    }
+  },
+  "pageDetail": {
+    "title": "Paginadetails",
+    "back": "Terug naar pagina's",
+    "loading": "Pagina laden...",
+    "notFound": "Pagina niet gevonden",
+    "sections": {
+      "title": "Secties",
+      "add": "Sectie toevoegen",
+      "empty": "Nog geen secties",
+      "emptyDescription": "Voeg secties toe om uw pagina op te bouwen",
+      "deleted": "Sectie verwijderd",
+      "saved": "Sectie opgeslagen",
+      "reordered": "Secties opnieuw geordend",
+      "added": "Sectie toegevoegd",
+      "loadingSections": "Secties laden...",
+      "deleteTitle": "Sectie verwijderen",
+      "deleteMessage": "Deze {{type}} sectie verwijderen? Dit kan niet ongedaan worden gemaakt."
+    },
+    "fields": {
+      "route": "Route",
+      "title": "Titel",
+      "description": "Beschrijving",
+      "status": "Status",
+      "pageType": "Paginatype",
+      "inNavigation": "In navigatie",
+      "navTitle": "Navigatietitel",
+      "navOrder": "Navigatievolgorde",
+      "metaTitle": "Metatitel",
+      "metaDescription": "Metabeschrijving",
+      "slug": "Slug",
+      "id": "ID",
+      "published": "Gepubliceerd",
+      "created": "Aangemaakt",
+      "updated": "Bijgewerkt"
+    },
+    "tabs": {
+      "info": "Info",
+      "sections": "Secties"
+    },
+    "toolbar": {
+      "saving": "Opslaan...",
+      "saved": "Alle wijzigingen opgeslagen",
+      "saveFailed": "Opslaan mislukt"
+    },
+    "messages": {
+      "saved": "Pagina opgeslagen",
+      "saveFailed": "Pagina opslaan mislukt",
+      "updated": "Pagina bijgewerkt"
+    },
+    "loadFailed": "Kan pagina niet laden",
+    "pageInfo": "Pagina-informatie",
+    "template": "Sjabloon",
+    "parentPageId": "ID bovenliggende pagina",
+    "pageSubtitle": "{{type}} pagina",
+    "metadata": "Metagegevens",
+    "contentId": "Inhoud-ID",
+    "table": {
+      "type": "Type",
+      "order": "Volgorde",
+      "localizations": "Vertalingen",
+      "coverImage": "Omslagafbeelding",
+      "ctaRoute": "CTA-route",
+      "actions": "Acties"
+    },
+    "dialog": {
+      "sectionType": "Sectietype",
+      "displayOrder": "Weergavevolgorde",
+      "displayOrderRequired": "Weergavevolgorde is verplicht",
+      "adding": "Toevoegen..."
+    }
+  },
+  "media": {
+    "title": "Media",
+    "subtitle": "Beheer mediabestanden op uw sites",
+    "registerButton": "Media registreren",
+    "uploadButton": "Bestand uploaden",
+    "folders": "Mappen",
+    "searchPlaceholder": "Zoeken op bestandsnaam, alt-tekst, bijschrift, titel...",
+    "categories": {
+      "images": "Afbeeldingen",
+      "videos": "Video's",
+      "audio": "Audio",
+      "documents": "Documenten"
+    },
+    "openUrl": "URL openen",
+    "empty": {
+      "noSite": "Selecteer een site in de werkbalk om de mediabestanden te bekijken",
+      "title": "Nog geen media",
+      "description": "Upload en beheer afbeeldingen, video's en documenten. Mediabestanden kunnen worden gekoppeld aan blogberichten, pagina's en secties.",
+      "noMatch": "Geen overeenkomende media",
+      "noMatchDescription": "Probeer uw zoekopdracht of filters aan te passen",
+      "noFilesInFolder": "Geen bestanden in deze map"
+    },
+    "loading": "Media laden...",
+    "loadError": "Media laden mislukt",
+    "messages": {
+      "registered": "Media geregistreerd",
+      "deleted": "Media verwijderd",
+      "moved": "Verplaatst naar map",
+      "folderCreated": "Map aangemaakt",
+      "folderRenamed": "Map hernoemd",
+      "folderDeleted": "Map verwijderd"
+    },
+    "deleteDialog": {
+      "title": "Media verwijderen",
+      "message": "\"{{filename}}\" verwijderen? Dit kan niet ongedaan worden gemaakt."
+    },
+    "upload": {
+      "dragDrop": "Sleep bestanden hierheen, of klik om te bladeren",
+      "uploading": "Uploaden...",
+      "progress": "Uploaden {{percent}}%",
+      "success": "Bestand succesvol geüpload",
+      "tooLarge": "Bestand overschrijdt de maximale grootte van {{maxSize}}",
+      "invalidType": "Bestandstype wordt niet ondersteund"
+    }
+  },
+  "documents": {
+    "title": "Documenten",
+    "subtitle": "Beheer downloadbare documenten",
+    "createButton": "Document toevoegen",
+    "table": {
+      "title": "Titel",
+      "slug": "Slug",
+      "type": "Type",
+      "fileSize": "Bestandsgrootte",
+      "downloads": "Downloads",
+      "status": "Status",
+      "created": "Aangemaakt",
+      "actions": "Acties"
+    },
+    "empty": {
+      "noSite": "Selecteer een site in de werkbalk om de documenten te bekijken",
+      "title": "Nog geen documenten",
+      "description": "Beheer downloadbare bestanden zoals PDF's, whitepapers of handleidingen. Documenten kunnen worden gekoppeld aan blogberichten en pagina's."
+    },
+    "loading": "Documenten laden...",
+    "loadError": "Documenten laden mislukt",
+    "messages": {
+      "created": "Document aangemaakt",
+      "updated": "Document bijgewerkt",
+      "deleted": "Document verwijderd"
+    },
+    "deleteDialog": {
+      "title": "Document verwijderen",
+      "message": "Document \"{{title}}\" verwijderen? Dit kan niet ongedaan worden gemaakt."
+    }
+  },
+  "navigation": {
+    "title": "Navigatie",
+    "subtitle": "Beheer navigatie-items voor uw sites",
+    "addItem": "Item toevoegen",
+    "table": {
+      "link": "Link",
+      "type": "Type",
+      "icon": "Icoon",
+      "newTab": "Nieuw tabblad",
+      "actions": "Acties"
+    },
+    "empty": {
+      "noSite": "Selecteer een site in de werkbalk om de navigatie te beheren",
+      "title": "Nog geen navigatie-items",
+      "description": "Bepaal hoe bezoekers door uw site navigeren. Maak menu's met links naar pagina's of externe URL's, georganiseerd in een hiërarchie."
+    },
+    "loading": "Navigatie laden...",
+    "loadError": "Navigatie laden mislukt",
+    "messages": {
+      "created": "Navigatie-item aangemaakt",
+      "updated": "Navigatie-item bijgewerkt",
+      "deleted": "Navigatie-item verwijderd"
+    },
+    "deleteDialog": {
+      "title": "Navigatie-item verwijderen",
+      "message": "Dit navigatie-item verwijderen? De bijbehorende vertalingen worden ook verwijderd."
+    }
+  },
+  "socialLinks": {
+    "title": "Sociale links",
+    "subtitle": "Beheer sociale-medialinks voor uw sites",
+    "addLink": "Link toevoegen",
+    "table": {
+      "title": "Titel",
+      "url": "URL",
+      "icon": "Icoon",
+      "actions": "Acties"
+    },
+    "empty": {
+      "noSite": "Selecteer een site in de werkbalk om de sociale links te beheren",
+      "title": "Nog geen sociale links",
+      "description": "Voeg links toe naar uw sociale media-profielen. Deze worden via de API geleverd zodat uw frontend ze overal kan tonen."
+    },
+    "loading": "Sociale links laden...",
+    "loadError": "Sociale links laden mislukt",
+    "messages": {
+      "created": "Sociale link aangemaakt",
+      "updated": "Sociale link bijgewerkt",
+      "deleted": "Sociale link verwijderd"
+    },
+    "deleteDialog": {
+      "title": "Sociale link verwijderen",
+      "message": "\"{{title}}\" verwijderen? Dit kan niet ongedaan worden gemaakt."
+    }
+  },
+  "taxonomy": {
+    "title": "Taxonomie",
+    "subtitle": "Beheer tags en categorieën voor uw sites",
+    "info": {
+      "tags": "Tags zijn platte labels die je aan content koppelt — zoals hashtags. Een artikel kan veel tags hebben (bijv. \"rust\", \"tutorial\", \"docker\"). Gebruik ze om te filteren en voor overkoepelende onderwerpen.",
+      "categories": "Categorieën vormen een hiërarchie (boomstructuur). Gebruik ze om content structureel te groeperen, bijv. \"Technologie > Webontwikkeling > React\". Elk artikel behoort doorgaans tot één categorie."
+    },
+    "tags": {
+      "title": "Tags",
+      "addTag": "Tag toevoegen",
+      "table": {
+        "slug": "Slug",
+        "scope": "Bereik",
+        "created": "Aangemaakt",
+        "actions": "Acties"
+      },
+      "empty": {
+        "title": "Nog geen tags",
+        "description": "Tags zijn platte labels voor overkoepelende onderwerpen — zoals hashtags. Wijs meerdere tags per artikel toe (bijv. \"rust\", \"tutorial\") zodat bezoekers content kunnen filteren en ontdekken."
+      },
+      "loading": "Tags laden...",
+      "messages": {
+        "created": "Tag aangemaakt",
+        "updated": "Tag bijgewerkt",
+        "deleted": "Tag verwijderd"
+      },
+      "deleteDialog": {
+        "title": "Tag verwijderen",
+        "message": "Tag \"{{slug}}\" verwijderen? De tag wordt gedeactiveerd."
+      }
+    },
+    "categories": {
+      "title": "Categorieën",
+      "addCategory": "Categorie toevoegen",
+      "table": {
+        "slug": "Slug",
+        "parent": "Bovenliggend",
+        "scope": "Bereik",
+        "created": "Aangemaakt",
+        "actions": "Acties"
+      },
+      "empty": {
+        "title": "Nog geen categorieën",
+        "description": "Categorieën creëren een boomachtige hiërarchie voor je content. Groepeer gerelateerde artikelen onder takken zoals \"Technologie > Webontwikkeling\" voor gestructureerde navigatie."
+      },
+      "loading": "Categorieën laden...",
+      "messages": {
+        "created": "Categorie aangemaakt",
+        "updated": "Categorie bijgewerkt",
+        "deleted": "Categorie verwijderd"
+      },
+      "deleteDialog": {
+        "title": "Categorie verwijderen",
+        "message": "Categorie \"{{slug}}\" verwijderen? De categorie wordt gedeactiveerd."
+      }
+    },
+    "empty": {
+      "noSite": "Selecteer een site in de werkbalk om de taxonomie te beheren"
+    }
+  },
+  "webhooks": {
+    "title": "Webhooks",
+    "subtitle": "Externe diensten melden wanneer inhoud wijzigt",
+    "addWebhook": "Webhook toevoegen",
+    "allEvents": "Alle gebeurtenissen",
+    "viewDeliveries": "Afleveringen bekijken",
+    "sendTest": "Test verzenden",
+    "testSuccess": "Test afgeleverd — {{status}}",
+    "testFailed": "Testaflevering mislukt",
+    "table": {
+      "url": "URL",
+      "events": "Gebeurtenissen",
+      "status": "Status",
+      "lastTriggered": "Laatst geactiveerd",
+      "actions": "Acties"
+    },
+    "empty": {
+      "noSite": "Selecteer een site in de werkbalk om de webhooks te beheren",
+      "title": "Nog geen webhooks",
+      "description": "Webhooks sturen HTTP POST-verzoeken naar externe diensten wanneer inhoud wijzigt. Gebruik ze om builds te activeren, caches te invalideren of gegevens te synchroniseren."
+    },
+    "loading": "Webhooks laden...",
+    "messages": {
+      "created": "Webhook aangemaakt",
+      "updated": "Webhook bijgewerkt",
+      "deleted": "Webhook verwijderd",
+      "tested": "Testgebeurtenis verzonden naar {{url}}"
+    },
+    "deleteDialog": {
+      "title": "Webhook verwijderen",
+      "message": "Webhook voor \"{{url}}\" verwijderen? Dit eindpunt ontvangt geen meldingen meer."
+    },
+    "deliveries": {
+      "title": "Webhook-afleveringen",
+      "table": {
+        "event": "Gebeurtenis",
+        "status": "Status",
+        "duration": "Duur",
+        "timestamp": "Tijdstempel"
+      },
+      "empty": "Nog geen afleveringen",
+      "success": "Geslaagd",
+      "failed": "Mislukt",
+      "pending": "In behandeling"
+    }
+  },
+  "redirects": {
+    "title": "Omleidingen",
+    "subtitle": "URL-omleidingen voor uw sites beheren",
+    "addRedirect": "Omleiding toevoegen",
+    "table": {
+      "sourcePath": "Bronpad",
+      "destination": "Doel-URL",
+      "type": "Type",
+      "status": "Status",
+      "created": "Aangemaakt",
+      "actions": "Acties",
+      "permanent": "301 Permanent",
+      "temporary": "302 Tijdelijk"
+    },
+    "empty": {
+      "noSite": "Selecteer een site in de werkbalk om omleidingen te beheren",
+      "title": "Nog geen omleidingen",
+      "description": "Omleidingen sturen bezoekers en zoekmachines automatisch door van de ene URL naar de andere. Gebruik ze na herstructureringen, domeinwijzigingen of om kapotte links te repareren."
+    },
+    "loading": "Omleidingen laden...",
+    "messages": {
+      "created": "Omleiding aangemaakt",
+      "updated": "Omleiding bijgewerkt",
+      "deleted": "Omleiding verwijderd"
+    },
+    "deleteDialog": {
+      "title": "Omleiding verwijderen",
+      "message": "Omleiding van \"{{source}}\" verwijderen? Dit kan niet ongedaan worden gemaakt."
+    }
+  },
+  "locales": {
+    "title": "Talen",
+    "subtitle": "Beheer systeembrede talen en landinstellingen",
+    "addLanguage": "Taal toevoegen",
+    "loading": "Talen laden...",
+    "columns": {
+      "code": "Code",
+      "name": "Naam",
+      "nativeName": "Eigen naam",
+      "direction": "Richting",
+      "active": "Actief",
+      "created": "Aangemaakt",
+      "actions": "Acties"
+    },
+    "empty": {
+      "title": "Nog geen talen",
+      "description": "Talen maken meertalige content mogelijk. Voeg de talen toe die u wilt ondersteunen — elk stuk content kan vervolgens worden vertaald."
+    },
+    "messages": {
+      "created": "Taal aangemaakt",
+      "updated": "Taal bijgewerkt",
+      "deleted": "Taal verwijderd"
+    },
+    "deleteDialog": {
+      "title": "Taal verwijderen",
+      "message": "Taal \"{{code}}\" verwijderen? Dit kan niet ongedaan worden gemaakt."
+    },
+    "errors": {
+      "inUse": "Kan niet verwijderen: taal is toegewezen aan een of meer sites"
+    }
+  },
+  "members": {
+    "title": "Leden",
+    "subtitle": "Beheer siteleden en hun rollen",
+    "addMember": "Lid toevoegen",
+    "table": {
+      "name": "Naam",
+      "email": "E-mail",
+      "role": "Rol",
+      "joined": "Toegetreden",
+      "actions": "Acties"
+    },
+    "roles": {
+      "owner": "Eigenaar",
+      "admin": "Beheerder",
+      "editor": "Redacteur",
+      "author": "Auteur",
+      "reviewer": "Beoordelaar",
+      "viewer": "Lezer"
+    },
+    "empty": {
+      "noSite": "Selecteer een site in de werkbalk om leden te beheren",
+      "title": "Nog geen teamleden",
+      "description": "Nodig medewerkers uit om deze site te beheren. Wijs rollen toe zoals Redacteur, Auteur of Reviewer om de toegang te beheren."
+    },
+    "loading": "Leden laden...",
+    "loadError": "Fout bij het laden van leden",
+    "messages": {
+      "added": "Lid toegevoegd",
+      "roleUpdated": "Rol van lid bijgewerkt",
+      "removed": "Lid verwijderd",
+      "ownershipTransferred": "Eigendom overgedragen"
+    },
+    "addDialog": {
+      "title": "Lid toevoegen",
+      "searchPlaceholder": "Clerk-gebruikers zoeken...",
+      "selectRole": "Rol selecteren",
+      "noResults": "Geen gebruikers gevonden"
+    },
+    "removeDialog": {
+      "title": "Lid verwijderen",
+      "message": "Dit lid van de site verwijderen? Alle toegang gaat verloren."
+    },
+    "transferDialog": {
+      "title": "Eigendom overdragen",
+      "message": "Eigendom overdragen aan {{name}}? U wordt gedegradeerd tot beheerder.",
+      "confirm": "Eigendom overdragen"
+    }
+  },
+  "apiKeys": {
+    "title": "API-sleutels",
+    "subtitle": "Beheer API-sleutels voor toegang tot de backend",
+    "createButton": "API-sleutel aanmaken",
+    "filters": {
+      "allStatuses": "Alle statussen",
+      "allPermissions": "Alle machtigingen"
+    },
+    "table": {
+      "name": "Naam",
+      "keyPrefix": "Sleutelprefix",
+      "permission": "Machtiging",
+      "site": "Site",
+      "status": "Status",
+      "requests": "Verzoeken",
+      "lastUsed": "Laatst gebruikt",
+      "actions": "Acties"
+    },
+    "empty": {
+      "title": "Nog geen API-sleutels",
+      "description": "API-sleutels stellen externe applicaties in staat om toegang te krijgen tot uw content. Maak sleutels met specifieke machtigingsniveaus en sitebereiken.",
+      "filterHint": "Probeer andere filters"
+    },
+    "loading": "API-sleutels laden...",
+    "loadError": "API-sleutels laden mislukt",
+    "messages": {
+      "created": "API-sleutel aangemaakt",
+      "blocked": "API-sleutel geblokkeerd",
+      "unblocked": "API-sleutel gedeblokkeerd",
+      "revoked": "API-sleutel ingetrokken",
+      "deleted": "API-sleutel verwijderd"
+    },
+    "blockDialog": {
+      "title": "API-sleutel blokkeren",
+      "reason": "Reden voor blokkering",
+      "reasonPlaceholder": "Waarom wordt deze sleutel geblokkeerd?",
+      "reasonRequired": "Een reden is vereist"
+    },
+    "revokeDialog": {
+      "title": "API-sleutel intrekken",
+      "message": "Weet u zeker dat u \"{{name}}\" wilt intrekken? Dit is permanent en kan niet ongedaan worden gemaakt."
+    },
+    "deleteDialog": {
+      "title": "API-sleutel verwijderen",
+      "message": "Weet u zeker dat u \"{{name}}\" permanent wilt verwijderen?"
+    },
+    "createDialog": {
+      "title": "API-sleutel aanmaken",
+      "fields": {
+        "name": "Naam",
+        "permission": "Machtiging",
+        "site": "Site",
+        "user": "Gebruiker (optioneel)",
+        "noUser": "Geen gebruiker",
+        "expiresAt": "Verloopt op (optioneel)"
+      },
+      "created": {
+        "title": "API-sleutel aangemaakt",
+        "warning": "Kopieer deze sleutel nu. U kunt hem daarna niet meer bekijken!",
+        "copied": "Sleutel gekopieerd naar klembord"
+      }
+    },
+    "usageDialog": {
+      "title": "API-sleutelgebruik",
+      "subtitle": "Gebruiksstatistieken voor {{name}}",
+      "totalRequests": "Totaal aantal verzoeken",
+      "recentRequests": "Recente verzoeken",
+      "endpoint": "Eindpunt",
+      "method": "Methode",
+      "statusCode": "Statuscode",
+      "timestamp": "Tijdstempel",
+      "noUsage": "Geen gebruiksgegevens beschikbaar"
+    },
+    "actionsMenu": {
+      "viewUsage": "Gebruik bekijken",
+      "block": "Blokkeren",
+      "unblock": "Deblokkeren",
+      "revoke": "Intrekken",
+      "delete": "Verwijderen"
+    }
+  },
+  "cv": {
+    "title": "CV / Curriculum vitae",
+    "subtitle": "Beheer CV-vermeldingen en vaardigheden voor uw sites",
+    "tabs": {
+      "entries": "Vermeldingen",
+      "skills": "Vaardigheden"
+    },
+    "entries": {
+      "addEntry": "Vermelding toevoegen",
+      "table": {
+        "company": "Bedrijf",
+        "location": "Locatie",
+        "type": "Type",
+        "dates": "Data",
+        "current": "Huidig",
+        "order": "Volgorde",
+        "actions": "Acties"
+      },
+      "empty": {
+        "title": "Nog geen CV-items",
+        "description": "Voeg werkervaring, opleiding en andere carrièremijlpalen toe. Items worden via de API geleverd voor uw portfolio."
+      },
+      "loading": "CV-vermeldingen laden...",
+      "loadError": "CV-vermeldingen laden mislukt",
+      "messages": {
+        "created": "CV-vermelding aangemaakt",
+        "updated": "CV-vermelding bijgewerkt",
+        "deleted": "CV-vermelding verwijderd"
+      },
+      "deleteDialog": {
+        "title": "CV-vermelding verwijderen",
+        "message": "Vermelding \"{{company}}\" verwijderen? Dit kan niet ongedaan worden gemaakt."
+      }
+    },
+    "skills": {
+      "addSkill": "Vaardigheid toevoegen",
+      "table": {
+        "name": "Naam",
+        "slug": "Slug",
+        "category": "Categorie",
+        "proficiency": "Vaardigheidsniveau",
+        "icon": "Icoon",
+        "actions": "Acties"
+      },
+      "empty": {
+        "title": "Nog geen vaardigheden",
+        "description": "Lijst uw technische en professionele vaardigheden met bekwaamheidsniveaus en categorieën voor uw portfolio."
+      },
+      "loading": "Vaardigheden laden...",
+      "loadError": "Vaardigheden laden mislukt",
+      "messages": {
+        "created": "Vaardigheid aangemaakt",
+        "updated": "Vaardigheid bijgewerkt",
+        "deleted": "Vaardigheid verwijderd"
+      },
+      "deleteDialog": {
+        "title": "Vaardigheid verwijderen",
+        "message": "Vaardigheid \"{{name}}\" verwijderen? Dit kan niet ongedaan worden gemaakt."
+      }
+    },
+    "empty": {
+      "noSite": "Selecteer een site in de werkbalk om de CV-gegevens te beheren"
+    }
+  },
+  "legal": {
+    "title": "Juridische documenten",
+    "subtitle": "Beheer juridische documenten voor uw sites",
+    "addDocument": "Document toevoegen",
+    "table": {
+      "cookieName": "Cookienaam",
+      "type": "Type",
+      "created": "Aangemaakt",
+      "actions": "Acties"
+    },
+    "empty": {
+      "noSite": "Selecteer een site in de werkbalk om de juridische documenten te beheren",
+      "title": "Nog geen juridische documenten",
+      "description": "Beheer cookie-toestemmingen, privacybeleid en andere juridische vereisten. Groepeer items voor gestructureerde toestemmingsbanners."
+    },
+    "loading": "Juridische documenten laden...",
+    "loadError": "Juridische documenten laden mislukt",
+    "messages": {
+      "created": "Juridisch document aangemaakt",
+      "updated": "Juridisch document bijgewerkt",
+      "deleted": "Juridisch document verwijderd"
+    },
+    "deleteDialog": {
+      "title": "Juridisch document verwijderen",
+      "message": "Juridisch document \"{{cookieName}}\" verwijderen? De bijbehorende groepen en items worden ook verwijderd."
+    }
+  },
+  "legalDetail": {
+    "title": "Juridisch documentdetail",
+    "back": "Terug naar juridische documenten",
+    "loading": "Juridisch document laden...",
+    "notFound": "Juridisch document niet gevonden",
+    "groups": {
+      "title": "Toestemmingsgroepen",
+      "add": "Groep toevoegen",
+      "empty": "Geen toestemmingsgroepen",
+      "emptyDescription": "Voeg toestemmingsgroepen toe aan dit document",
+      "messages": {
+        "created": "Groep aangemaakt",
+        "updated": "Groep bijgewerkt",
+        "deleted": "Groep verwijderd"
+      },
+      "editGroup": "Groep bewerken",
+      "deleteGroup": "Groep verwijderen",
+      "deleteMessage": "Groep \"{{name}}\" verwijderen? Hiermee worden ook alle items in deze groep verwijderd.",
+      "loadingGroups": "Groepen laden...",
+      "order": "Volgorde: {{order}}",
+      "required": "Verplicht",
+      "optional": "Optioneel",
+      "enabled": "Ingeschakeld",
+      "disabled": "Uitgeschakeld"
+    },
+    "items": {
+      "title": "Items",
+      "add": "Item toevoegen",
+      "empty": "Geen items in deze groep",
+      "messages": {
+        "created": "Item aangemaakt",
+        "updated": "Item bijgewerkt",
+        "deleted": "Item verwijderd"
+      },
+      "loadingItems": "Items laden...",
+      "deleteItem": "Item verwijderen",
+      "deleteMessage": "Item \"{{name}}\" verwijderen? Dit kan niet ongedaan worden gemaakt."
+    },
+    "editDocument": "Document bewerken",
+    "cookieName": "Cookienaam",
+    "documentType": "Documenttype",
+    "documentId": "Document-ID",
+    "updatedMessage": "Juridisch document bijgewerkt",
+    "loadGroupsFailed": "Kan groepen niet laden",
+    "dialog": {
+      "editGroup": "Groep bewerken",
+      "addGroup": "Groep toevoegen",
+      "editItem": "Item bewerken",
+      "addItem": "Item toevoegen",
+      "cookieName": "Cookienaam",
+      "cookieNameRequired": "Cookienaam is verplicht",
+      "displayOrder": "Weergavevolgorde",
+      "required": "Verplicht",
+      "defaultEnabled": "Standaard ingeschakeld"
+    }
+  },
+  "sites": {
+    "title": "Sites",
+    "subtitle": "Beheer uw websites en hun configuratie",
+    "createButton": "Site aanmaken",
+    "empty": {
+      "title": "Nog geen sites",
+      "description": "Sites zijn de basis van uw CMS. Elke site heeft eigen content, talen, navigatie en instellingen."
+    },
+    "loading": "Sites laden...",
+    "loadError": "Sites laden mislukt",
+    "messages": {
+      "created": "Site succesvol aangemaakt",
+      "updated": "Site succesvol bijgewerkt",
+      "deleted": "Site succesvol verwijderd"
+    },
+    "deleteDialog": {
+      "title": "Site verwijderen",
+      "message": "Weet u zeker dat u \"{{name}}\" wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt."
+    },
+    "card": {
+      "view": "Bekijken",
+      "edit": "Bewerken",
+      "delete": "Verwijderen"
+    }
+  },
+  "siteDetail": {
+    "title": "Sitedetails",
+    "back": "Terug naar sites",
+    "loading": "Site laden...",
+    "notFound": "Site niet gevonden",
+    "fields": {
+      "name": "Naam",
+      "slug": "Slug",
+      "description": "Beschrijving",
+      "domain": "Domein",
+      "active": "Actief",
+      "timezone": "Tijdzone",
+      "status": "Status",
+      "id": "ID",
+      "created": "Aangemaakt",
+      "updated": "Bijgewerkt"
+    },
+    "loadFailed": "Kan site niet laden",
+    "siteInfo": "Site-informatie",
+    "noDescription": "Geen beschrijving",
+    "metadata": "Metagegevens",
+    "quickLinks": "Snelkoppelingen",
+    "deleteSite": "Site verwijderen",
+    "messages": {
+      "updated": "Site bijgewerkt",
+      "deleted": "Site verwijderd"
+    }
+  },
+  "settings": {
+    "title": "Instellingen",
+    "subtitle": "Site-configuratie en systeeminformatie",
+    "tabs": {
+      "siteSettings": "Site-instellingen",
+      "systemInfo": "Systeeminformatie",
+      "preferences": "Voorkeuren",
+      "legal": "Juridisch",
+      "apiKeys": "API-sleutels"
+    },
+    "selectSiteAlert": "Selecteer een site in de koptekst om de instellingen te beheren.",
+    "loadingSiteSettings": "Site-instellingen laden...",
+    "uploadLimits": {
+      "title": "Uploadlimieten",
+      "maxDocumentSize": "Maximale documentbestandsgrootte",
+      "maxMediaSize": "Maximale mediabestandsgrootte"
+    },
+    "general": {
+      "title": "Algemeen",
+      "contactEmail": "Contact-e-mail",
+      "postsPerPage": "Berichten per pagina"
+    },
+    "featureToggles": {
+      "title": "Functieschakelaars",
+      "analytics": "Analyses",
+      "analyticsDescription": "Siteanalyse-tracking inschakelen",
+      "maintenanceMode": "Onderhoudsmodus",
+      "maintenanceModeDescription": "Onderhoudspagina tonen aan bezoekers",
+      "editorialWorkflow": "Redactionele workflow",
+      "editorialWorkflowDescription": "Inhoud laten beoordelen voor publicatie. Auteurs dienen in ter beoordeling, reviewers keuren goed of vragen wijzigingen aan."
+    },
+    "preview": {
+      "title": "Voorbeeldtemplates",
+      "description": "Configureer dev-server-URLs voor live voorbeeld",
+      "name": "Templatenaam",
+      "url": "Voorbeeld-URL",
+      "add": "Template toevoegen",
+      "openPreview": "Voorbeeld openen"
+    },
+    "saveButton": "Instellingen opslaan",
+    "messages": {
+      "saved": "Instellingen opgeslagen",
+      "saveFailed": "Instellingen opslaan mislukt"
+    },
+    "systemInfo": {
+      "serverHealth": "Serverstatus",
+      "checkingHealth": "Serverstatus controleren...",
+      "overallStatus": "Totale status:",
+      "service": "Service",
+      "status": "Status",
+      "latency": "Latentie",
+      "details": "Details",
+      "autoRefresh": "Vernieuwt automatisch elke 30 seconden",
+      "environments": "Omgevingen",
+      "loadingEnvironments": "Omgevingen laden...",
+      "noEnvironments": "Geen omgevingen geconfigureerd",
+      "envName": "Naam",
+      "envDisplayName": "Weergavenaam",
+      "envDefault": "Standaard",
+      "envCreated": "Aangemaakt",
+      "locales": "Talen",
+      "loadingLocales": "Talen laden...",
+      "noLocales": "Geen talen geconfigureerd",
+      "localeCode": "Code",
+      "localeName": "Naam",
+      "localeNativeName": "Eigen naam",
+      "localeDirection": "Richting",
+      "localeActive": "Actief",
+      "localesMovedDescription": "Talen worden nu beheerd op hun eigen pagina.",
+      "manageLocales": "Talen beheren"
+    },
+    "preferences": {
+      "title": "Voorkeuren",
+      "language": {
+        "label": "Beheerderstaal",
+        "description": "Kies de weergavetaal voor de beheerinterface"
+      }
+    }
+  },
+  "activity": {
+    "title": "Activiteit",
+    "subtitle": "Logboek van alle wijzigingen op deze site",
+    "loading": "Activiteit laden...",
+    "empty": "Nog geen activiteit",
+    "emptyDescription": "Acties zoals het aanmaken, bijwerken en verwijderen van content verschijnen hier.",
+    "columns": {
+      "timestamp": "Tijdstempel",
+      "action": "Actie",
+      "entityType": "Entiteitstype",
+      "entityId": "Entiteits-ID",
+      "userId": "Gebruiker"
+    },
+    "filters": {
+      "action": "Actie",
+      "entityType": "Entiteitstype"
+    }
+  },
+  "entityHistory": {
+    "title": "Geschiedenis",
+    "noHistory": "Nog geen geschiedenis geregistreerd",
+    "events": "Gebeurtenissen",
+    "changes": "Veldwijzigingen",
+    "oldValue": "Oud",
+    "newValue": "Nieuw",
+    "revert": "Herstellen",
+    "revertConfirmTitle": "Wijzigingen herstellen",
+    "revertConfirmMessage": "De volgende velden terugzetten naar hun vorige waarden?",
+    "reverted": "Wijzigingen hersteld",
+    "revertFailed": "Herstellen mislukt"
+  },
+  "unsavedChanges": {
+    "title": "Niet-opgeslagen wijzigingen",
+    "message": "U heeft niet-opgeslagen wijzigingen. Verwerpen en vertrekken?",
+    "stay": "Blijven",
+    "discard": "Verwerpen"
+  },
+  "inlineEdit": {
+    "clickToEdit": "Klik om te bewerken"
+  },
+  "notFound": {
+    "title": "404",
+    "subtitle": "Pagina niet gevonden",
+    "goToDashboard": "Ga naar dashboard"
+  },
+  "apiDocs": {
+    "title": "API-documentatie",
+    "subtitle": "Interactieve API-documentatie"
+  },
+  "forms": {
+    "blog": {
+      "createTitle": "Blog aanmaken",
+      "editTitle": "Blog bewerken",
+      "fields": {
+        "siteId": "Site",
+        "locale": "Taal",
+        "slug": "Slug",
+        "author": "Auteur",
+        "status": "Status",
+        "featured": "Uitgelicht bericht",
+        "publishedDate": "Publicatiedatum"
+      }
+    },
+    "page": {
+      "createTitle": "Pagina aanmaken",
+      "editTitle": "Pagina bewerken",
+      "fields": {
+        "siteId": "Site",
+        "route": "Route",
+        "pageType": "Paginatype",
+        "status": "Status",
+        "inNavigation": "Tonen in navigatie",
+        "navTitle": "Navigatietitel",
+        "navOrder": "Navigatievolgorde"
+      }
+    },
+    "site": {
+      "createTitle": "Site aanmaken",
+      "editTitle": "Site bewerken",
+      "fields": {
+        "name": "Naam",
+        "slug": "Slug",
+        "description": "Beschrijving",
+        "domain": "Domein",
+        "active": "Actief",
+        "initialLanguages": "Initiële talen",
+        "initialLanguagesHelper": "Selecteer ten minste één taal voor uw site",
+        "defaultLanguage": "Standaardtaal"
+      },
+      "validation": {
+        "minOneLocale": "Ten minste één taal is vereist",
+        "exactlyOneDefault": "Precies één taal moet als standaard worden ingesteld"
+      }
+    },
+    "navigation": {
+      "createTitle": "Navigatie-item aanmaken",
+      "editTitle": "Navigatie-item bewerken",
+      "fields": {
+        "type": "Type",
+        "page": "Pagina",
+        "externalUrl": "Externe URL",
+        "icon": "Icoon",
+        "openInNewTab": "Openen in nieuw tabblad",
+        "label": "Label",
+        "locale": "Taal"
+      }
+    },
+    "socialLink": {
+      "createTitle": "Sociale link aanmaken",
+      "editTitle": "Sociale link bewerken",
+      "fields": {
+        "title": "Titel",
+        "url": "URL",
+        "icon": "Icoon",
+        "ariaLabel": "Aria-label"
+      }
+    },
+    "locale": {
+      "createTitle": "Taal toevoegen",
+      "editTitle": "Taal bewerken",
+      "fields": {
+        "code": "Code",
+        "name": "Naam",
+        "nativeName": "Eigen naam",
+        "direction": "Richting",
+        "active": "Actief"
+      },
+      "validation": {
+        "codeFormat": "Formaat: en of en-US"
+      }
+    },
+    "tag": {
+      "createTitle": "Tag aanmaken",
+      "editTitle": "Tag bewerken",
+      "fields": {
+        "slug": "Slug",
+        "global": "Globaal (gedeeld over alle sites)",
+        "slugHelper": "URL-vriendelijke identificatie — kleine letters, cijfers en koppeltekens (bijv. \"mijn-tag\")",
+        "globalHelper": "Globale tags worden gedeeld over alle sites. Sitespecifieke tags behoren alleen tot de huidige site."
+      }
+    },
+    "category": {
+      "createTitle": "Categorie aanmaken",
+      "editTitle": "Categorie bewerken",
+      "fields": {
+        "slug": "Slug",
+        "parent": "Bovenliggende categorie",
+        "noParent": "Geen (hoogste niveau)",
+        "global": "Globaal (gedeeld over alle sites)",
+        "slugHelper": "URL-vriendelijke identificatie — kleine letters, cijfers en koppeltekens (bijv. \"webontwikkeling\")",
+        "globalHelper": "Globale categorieën worden gedeeld over alle sites. Sitespecifieke categorieën behoren alleen tot de huidige site.",
+        "parentHelper": "Nest deze categorie onder een bovenliggende om een hiërarchie op te bouwen (bijv. Technologie > Webontwikkeling)"
+      }
+    },
+    "cvEntry": {
+      "createTitle": "CV-vermelding aanmaken",
+      "editTitle": "CV-vermelding bewerken",
+      "fields": {
+        "siteId": "Site",
+        "entryType": "Type vermelding",
+        "company": "Bedrijf / Organisatie",
+        "location": "Locatie",
+        "startDate": "Startdatum",
+        "endDate": "Einddatum",
+        "isCurrent": "Momenteel werkzaam",
+        "displayOrder": "Weergavevolgorde",
+        "title": "Functietitel",
+        "description": "Beschrijving",
+        "locale": "Taal"
+      }
+    },
+    "skill": {
+      "createTitle": "Vaardigheid aanmaken",
+      "editTitle": "Vaardigheid bewerken",
+      "fields": {
+        "siteId": "Site",
+        "name": "Naam",
+        "slug": "Slug",
+        "category": "Categorie",
+        "proficiency": "Vaardigheidsniveau",
+        "icon": "Icoon",
+        "displayOrder": "Weergavevolgorde"
+      }
+    },
+    "legal": {
+      "createTitle": "Juridisch document aanmaken",
+      "editTitle": "Juridisch document bewerken",
+      "fields": {
+        "cookieName": "Cookienaam",
+        "documentType": "Documenttype"
+      }
+    },
+    "mediaUpload": {
+      "title": "Media registreren",
+      "fields": {
+        "siteId": "Site",
+        "publicUrl": "Openbare URL",
+        "filename": "Bestandsnaam",
+        "originalFilename": "Originele bestandsnaam",
+        "mimeType": "MIME-type",
+        "fileSize": "Bestandsgrootte (bytes)",
+        "width": "Breedte (px)",
+        "height": "Hoogte (px)",
+        "altText": "Alt-tekst",
+        "caption": "Bijschrift",
+        "title": "Titel",
+        "folder": "Map"
+      }
+    },
+    "mediaDetail": {
+      "title": "Mediadetails",
+      "fields": {
+        "filename": "Bestandsnaam",
+        "originalFilename": "Originele bestandsnaam",
+        "mimeType": "MIME-type",
+        "fileSize": "Bestandsgrootte",
+        "dimensions": "Afmetingen",
+        "publicUrl": "Openbare URL",
+        "altText": "Alt-tekst",
+        "caption": "Bijschrift",
+        "title": "Titel",
+        "folder": "Map",
+        "noFolder": "Geen map",
+        "created": "Aangemaakt"
+      },
+      "messages": {
+        "updated": "Media bijgewerkt",
+        "updateFailed": "Media bijwerken mislukt"
+      }
+    },
+    "document": {
+      "createTitle": "Document aanmaken",
+      "editTitle": "Document bewerken",
+      "fields": {
+        "siteId": "Site",
+        "title": "Titel",
+        "slug": "Slug",
+        "description": "Beschrijving",
+        "documentType": "Documenttype",
+        "fileUrl": "Bestands-URL",
+        "fileSize": "Bestandsgrootte (bytes)",
+        "mimeType": "MIME-type",
+        "status": "Status"
+      }
+    },
+    "webhook": {
+      "createTitle": "Webhook aanmaken",
+      "editTitle": "Webhook bewerken",
+      "fields": {
+        "url": "URL",
+        "urlHelper": "Het eindpunt dat POST-verzoeken met gebeurtenisgegevens ontvangt",
+        "description": "Beschrijving",
+        "events": "Gebeurtenissen",
+        "eventsHelper": "Leeg laten voor alle gebeurtenissen",
+        "active": "Actief"
+      }
+    },
+    "contentTemplate": {
+      "createTitle": "Sjabloon aanmaken",
+      "editTitle": "Sjabloon bewerken",
+      "sections": {
+        "metadata": "Sjablooninstellingen",
+        "content": "Standaardinhoud"
+      },
+      "fields": {
+        "name": "Naam",
+        "description": "Beschrijving",
+        "icon": "Pictogram",
+        "slugPrefix": "Slug-prefix",
+        "isFeatured": "Standaard uitgelicht",
+        "allowComments": "Standaard reacties toestaan",
+        "isActive": "Actief",
+        "title": "Titel",
+        "subtitle": "Ondertitel",
+        "excerpt": "Uittreksel",
+        "body": "Inhoud (Markdown)",
+        "metaTitle": "Meta-titel",
+        "metaDescription": "Meta-beschrijving"
+      }
+    },
+    "redirect": {
+      "createTitle": "Omleiding aanmaken",
+      "editTitle": "Omleiding bewerken",
+      "fields": {
+        "sourcePath": "Bronpad",
+        "sourcePathHelper": "Het pad dat omgeleid moet worden (bijv. /oud-pad)",
+        "destinationPath": "Doel-URL",
+        "destinationPathHelper": "De bestemmings-URL (bijv. /nieuw-pad of https://example.com)",
+        "statusCode": "Omleidingstype",
+        "permanent": "301 — Permanent",
+        "temporary": "302 — Tijdelijk",
+        "description": "Beschrijving",
+        "active": "Actief"
+      }
+    },
+    "section": {
+      "title": "Sectie bewerken",
+      "fields": {
+        "sectionType": "Sectietype",
+        "displayOrder": "Weergavevolgorde",
+        "settings": "Instellingen"
+      }
+    },
+    "undo": "Ongedaan maken",
+    "redo": "Opnieuw",
+    "validation": {
+      "required": "Dit veld is verplicht",
+      "minLength": "Minimaal {{count}} tekens",
+      "maxLength": "Maximaal {{count}} tekens",
+      "invalidEmail": "Ongeldig e-mailadres",
+      "invalidUrl": "Ongeldige URL",
+      "min": "Minimale waarde is {{value}}",
+      "max": "Maximale waarde is {{value}}"
+    }
+  },
+  "shared": {
+    "autosave": {
+      "retryFailed": "Automatisch opslaan is mislukt na meerdere pogingen. Probeer handmatig op te slaan met Ctrl+S."
+    },
+    "confirmDialog": {
+      "defaultTitle": "Bevestigen",
+      "defaultCancel": "Annuleren"
+    },
+    "loadingState": {
+      "defaultLabel": "Laden..."
+    },
+    "emptyState": {
+      "defaultTitle": "Hier is nog niets"
+    },
+    "folderTree": {
+      "allFiles": "Alle bestanden",
+      "newFolder": "Nieuwe map",
+      "rename": "Hernoemen",
+      "delete": "Verwijderen",
+      "createFolder": "Map aanmaken",
+      "folderName": "Mapnaam"
+    },
+    "pageHeader": {},
+    "statusChip": {},
+    "errorBoundary": {
+      "title": "Er is iets misgegaan",
+      "description": "Er is een onverwachte fout opgetreden op deze pagina.",
+      "showDetails": "Details tonen",
+      "hideDetails": "Details verbergen",
+      "tryAgain": "Opnieuw proberen",
+      "goToDashboard": "Naar dashboard",
+      "reloadPage": "Pagina herladen"
+    },
+    "navigationGuard": {
+      "title": "Niet-opgeslagen wijzigingen",
+      "message": "U hebt niet-opgeslagen wijzigingen. Weet u zeker dat u deze pagina wilt verlaten?",
+      "leave": "Verlaten",
+      "stay": "Blijven"
+    }
+  },
+  "profile": {
+    "title": "Profiel",
+    "subtitle": "Beheer uw account, beveiligingsinstellingen en gegevens",
+    "accountInfo": "Accountinformatie",
+    "unknownUser": "Onbekende gebruiker",
+    "manageAccount": "Account beheren",
+    "security": "Beveiliging & sessies",
+    "authMethod": "Authenticatiemethode",
+    "permissionLevel": "Machtigingsniveau",
+    "siteScope": "Sitebereik",
+    "memberSince": "Lid sinds",
+    "lastSignIn": "Laatste aanmelding",
+    "dataPrivacy": "Gegevens & privacy",
+    "dataPrivacyInfo": "U kunt al uw in het CMS opgeslagen gegevens exporteren of uw account permanent verwijderen. Geëxporteerde gegevens omvatten uw profiel, auditlogs, API-sleutels en wijzigingsgeschiedenis.",
+    "exportData": "Mijn gegevens exporteren",
+    "exporting": "Exporteren...",
+    "exportSuccess": "Gegevens succesvol geëxporteerd",
+    "exportError": "Exporteren van gegevens mislukt",
+    "deleteAccount": "Account verwijderen",
+    "deleteAccountTitle": "Account verwijderen",
+    "deleteAccountMessage": "Deze actie is permanent en kan niet ongedaan worden gemaakt. Uw Clerk-account wordt verwijderd en alle bijbehorende CMS-gegevens worden geanonimiseerd. Weet u zeker dat u wilt doorgaan?",
+    "deleteAccountConfirm": "Mijn account verwijderen",
+    "deleteSuccess": "Account succesvol verwijderd",
+    "deleteError": "Account verwijderen mislukt"
+  },
+  "siteLocales": {
+    "title": "Talen",
+    "addLanguage": "Taal toevoegen",
+    "columns": {
+      "language": "Taal",
+      "nativeName": "Eigen naam",
+      "urlPrefix": "URL-prefix",
+      "default": "Standaard",
+      "active": "Actief",
+      "actions": "Acties"
+    },
+    "addDialog": {
+      "title": "Taal toevoegen",
+      "selectLanguage": "Selecteer taal",
+      "urlPrefix": "URL-prefix",
+      "urlPrefixHelper": "bijv. en, de, fr (gebruikt in URL's)",
+      "setAsDefault": "Instellen als standaardtaal"
+    },
+    "setDefault": "Instellen als standaard",
+    "remove": "Verwijderen",
+    "empty": "Er zijn nog geen talen aan deze site toegewezen.",
+    "tooltips": {
+      "cannotRemoveDefault": "Kan de standaardtaal niet verwijderen",
+      "cannotRemoveLast": "Kan de laatste taal niet verwijderen",
+      "alreadyDefault": "Dit is al de standaardtaal"
+    },
+    "messages": {
+      "added": "Taal toegevoegd",
+      "updated": "Taal bijgewerkt",
+      "removed": "Taal verwijderd",
+      "defaultSet": "Standaardtaal bijgewerkt",
+      "addFailed": "Taal toevoegen mislukt",
+      "updateFailed": "Taal bijwerken mislukt",
+      "removeFailed": "Taal verwijderen mislukt",
+      "defaultFailed": "Standaardtaal instellen mislukt"
+    }
+  },
+  "commandPalette": {
+    "placeholder": "Zoek opdrachten...",
+    "noResults": "Geen resultaten gevonden",
+    "categories": {
+      "navigation": "Navigatie",
+      "actions": "Acties",
+      "blogs": "Blogs",
+      "pages": "Pagina's",
+      "sites": "Sites"
+    },
+    "actions": {
+      "toggleTheme": "Thema wisselen",
+      "logout": "Uitloggen"
+    },
+    "hint": "\u2318K"
+  },
+  "languages": {
+    "en": "English",
+    "de": "Deutsch",
+    "fr": "Français",
+    "es": "Español",
+    "it": "Italiano",
+    "pt": "Português",
+    "nl": "Nederlands",
+    "pl": "Polski"
+  },
+  "workflow": {
+    "submitForReview": "Ter beoordeling indienen",
+    "approve": "Goedkeuren",
+    "requestChanges": "Wijzigingen aanvragen",
+    "reviewComment": "Beoordelingsopmerking",
+    "reviewCommentPlaceholder": "Beschrijf welke wijzigingen nodig zijn...",
+    "submittedForReview": "Inhoud ter beoordeling ingediend",
+    "approved": "Inhoud goedgekeurd",
+    "changesRequested": "Wijzigingen aangevraagd",
+    "cannotPublish": "De redactionele workflow is ingeschakeld. Dien inhoud ter beoordeling in om te publiceren."
+  },
+  "notifications": {
+    "title": "Meldingen",
+    "bell": "Meldingen",
+    "empty": "Nog geen meldingen",
+    "markAllRead": "Alles als gelezen markeren",
+    "viewAll": "Alles bekijken",
+    "pageTitle": "Meldingen",
+    "pageSubtitle": "Bekijk en beheer uw meldingen",
+    "columns": {
+      "type": "Type",
+      "title": "Titel",
+      "message": "Bericht",
+      "time": "Tijd",
+      "status": "Status"
+    },
+    "read": "Gelezen",
+    "unread": "Ongelezen",
+    "noSite": "Selecteer een site om meldingen te bekijken",
+    "types": {
+      "submitted": "Ingediend ter beoordeling",
+      "approved": "Goedgekeurd",
+      "changesRequested": "Wijzigingen aangevraagd"
+    }
+  },
+  "bulk": {
+    "selectedCount": "{{count}} geselecteerd",
+    "publish": "Publiceren",
+    "unpublish": "Depubliceren",
+    "delete": "Verwijderen",
+    "clearSelection": "Selectie wissen",
+    "deleteDialog": {
+      "title": "Geselecteerde items verwijderen",
+      "message": "{{count}} geselecteerde items verwijderen? Dit kan niet ongedaan worden gemaakt."
+    },
+    "messages": {
+      "success": "{{count}} items succesvol bijgewerkt",
+      "partial": "{{succeeded}} geslaagd, {{failed}} mislukt"
+    }
+  },
+  "contentTemplates": {
+    "title": "Inhoudssjablonen",
+    "subtitle": "Beheer herbruikbare inhoudssjablonen",
+    "addTemplate": "Sjabloon toevoegen",
+    "table": {
+      "name": "Naam",
+      "description": "Beschrijving",
+      "icon": "Pictogram",
+      "active": "Actief",
+      "created": "Aangemaakt",
+      "actions": "Acties"
+    },
+    "empty": {
+      "noSite": "Selecteer een site in de werkbalk",
+      "title": "Nog geen sjablonen",
+      "description": "Maak herbruikbare inhoudssjablonen om het aanmaken van blogberichten te versnellen."
+    },
+    "loading": "Sjablonen laden...",
+    "messages": {
+      "created": "Sjabloon aangemaakt",
+      "updated": "Sjabloon bijgewerkt",
+      "deleted": "Sjabloon verwijderd"
+    },
+    "deleteDialog": {
+      "title": "Sjabloon verwijderen",
+      "message": "Sjabloon \"{{name}}\" verwijderen? Dit kan niet ongedaan worden gemaakt."
+    }
+  },
+  "templates": {
+    "fromTemplate": "Uit sjabloon",
+    "dialogTitle": "Blog maken uit sjabloon",
+    "dialogSubtitle": "Kies een sjabloon om te beginnen met een vooraf ingevulde inhoudsstructuur.",
+    "useTemplate": "Sjabloon gebruiken",
+    "searchPlaceholder": "Sjablonen zoeken...",
+    "builtIn": "Ingebouwd",
+    "custom": "Aangepast",
+    "manageTemplates": "Sjablonen beheren",
+    "noResults": "Geen sjablonen gevonden",
+    "page": "Pagina {{current}} van {{total}}",
+    "tutorial": {
+      "name": "Tutorial",
+      "description": "Stapsgewijze handleiding met vereisten, genummerde stappen en verder lezen."
+    },
+    "changelog": {
+      "name": "Changelog",
+      "description": "Releasenotities met functies, bugfixes, wijzigingen en migratiegids."
+    },
+    "review": {
+      "name": "Beoordeling",
+      "description": "Product- of toolbeoordeling met belangrijkste functies, voor- en nadelen en oordeel."
+    },
+    "announcement": {
+      "name": "Aankondiging",
+      "description": "Nieuwsbericht met betekenis, volgende stappen en oproep tot actie."
+    }
+  },
+  "markdownImport": {
+    "importButton": "Markdown importeren",
+    "dialogTitle": "Importeren uit Markdown",
+    "dialogSubtitle": "Upload een Markdown-bestand om een nieuw blogartikel te maken. De H1-kop wordt de titel.",
+    "dropZone": "Sleep een .md-bestand hierheen of klik om te bladeren",
+    "dropZoneActive": "Laat uw bestand hier vallen",
+    "preview": "Voorbeeld",
+    "titleLabel": "Titel",
+    "excerptLabel": "Uittreksel",
+    "slugLabel": "Slug",
+    "bodyPreview": "Inhoudsvoorbeeld",
+    "back": "Terug",
+    "import": "Importeren",
+    "importing": "Importeren...",
+    "errors": {
+      "invalidExtension": "Alleen .md- en .markdown-bestanden worden geaccepteerd",
+      "emptyFile": "Bestand is leeg",
+      "noH1": "Markdown moet precies één H1-kop bevatten (# Titel)",
+      "multipleH1": "Markdown bevat meerdere H1-koppen. Gebruik er slechts één.",
+      "titleTooLong": "Titel overschrijdt de maximale lengte van {{max}} tekens",
+      "bodyTooLong": "Inhoud overschrijdt de maximale lengte van {{max}} tekens",
+      "readFailed": "Kan bestand niet lezen"
+    }
+  }
+}

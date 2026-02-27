@@ -1,0 +1,41 @@
+---
+import { fetchNavTree, type NavigationTree } from "../lib/api";
+
+interface Props {
+  siteName: string;
+}
+
+const { siteName } = Astro.props;
+
+let items: NavigationTree[] = [];
+try {
+  items = await fetchNavTree("footer");
+} catch (e) {
+  console.warn("[CMS] Failed to fetch footer nav:", e instanceof Error ? e.message : e);
+}
+
+function href(item: NavigationTree): string {
+  if (item.external_url) return item.external_url;
+  if (item.page_slug) return `/${item.page_slug}`;
+  return "#";
+}
+---
+
+<footer class="site-footer">
+  {items.length > 0 && (
+    <ul class="site-footer__links">
+      {items.map((item) => (
+        <li>
+          <a
+            href={href(item)}
+            target={item.open_in_new_tab ? "_blank" : undefined}
+            rel={item.open_in_new_tab ? "noopener noreferrer" : undefined}
+          >
+            {item.title ?? "Untitled"}
+          </a>
+        </li>
+      ))}
+    </ul>
+  )}
+  <p>&copy; {new Date().getFullYear()} {siteName}. All rights reserved.</p>
+</footer>

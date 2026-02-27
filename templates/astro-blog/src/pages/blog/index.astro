@@ -1,0 +1,27 @@
+---
+import Base from "../../layouts/Base.astro";
+import BlogCard from "../../components/BlogCard.astro";
+import { fetchAllPublishedBlogs, fetchBlogDetails } from "../../lib/api";
+import type { BlogDetailResponse } from "../../lib/api";
+
+let blogs: BlogDetailResponse[] = [];
+try {
+  const items = await fetchAllPublishedBlogs();
+  blogs = await fetchBlogDetails(items.map((b) => b.id));
+} catch (e) {
+  console.warn("[CMS] Failed to fetch published blogs:", e instanceof Error ? e.message : e);
+}
+---
+
+<Base title="Blog" description="All blog posts.">
+  <h1 class="section-heading">Blog</h1>
+  {blogs.length > 0 ? (
+    <div class="blog-grid">
+      {blogs.map((blog) => (
+        <BlogCard blog={blog} />
+      ))}
+    </div>
+  ) : (
+    <p>No blog posts yet. Check back soon!</p>
+  )}
+</Base>

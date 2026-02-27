@@ -1,0 +1,58 @@
+---
+import Base from "../layouts/Base.astro";
+import PageSection from "../components/PageSection.astro";
+import {
+  fetchPageByRoute,
+  fetchPageSections,
+  fetchPageSectionLocalizations,
+} from "../lib/api";
+import type {
+  PageSectionResponse,
+  SectionLocalizationResponse,
+} from "../lib/api";
+
+const routeParam = Astro.params.route ?? "";
+const pageRoute = "/" + routeParam;
+
+// Skip routes handled by explicit pages
+const reserved = new Set(["/", "/blog", "/cv", "/rss", "/rss.xml"]);
+if (reserved.has(pageRoute) || pageRoute.startsWith("/legal/")) {
+  return new Response(null, { status: 404, statusText: "Not Found" });
+}
+
+let page;
+try {
+  page = await fetchPageByRoute(pageRoute);
+} catch (e) {
+  console.warn(`[CMS] Failed to fetch page for route ${pageRoute}:`, e instanceof Error ? e.message : e);
+  return new Response(null, { status: 404, statusText: "Not Found" });
+}
+
+if (page.status !== "Published") {
+  return new Response(null, { status: 404, statusText: "Not Found" });
+}
+
+let sections: PageSectionResponse[] = [];
+let localizations: SectionLocalizationResponse[] = [];
+try {
+  sections = await fetchPageSections(page.id);
+  sections.sort((a, b) => a.display_order - b.display_order);
+  localizations = await fetchPageSectionLocalizations(page.id);
+} catch (e) {
+  console.warn(`[CMS] Failed to fetch sections for page ${page.id}:`, e instanceof Error ? e.message : e);
+}
+
+// Derive a title from the first section's localization or the route
+const firstLoc = localizations.find((l) => l.page_section_id === sections[0]?.id);
+const title = firstLoc?.title ?? routeParam.replace(/-/g, " ") ?? "Page";
+---
+
+<Base title={title}>
+  {sections.length > 0 ? (
+    sections.map((section) => (
+      <PageSection section={section} localizations={localizations} />
+    ))
+  ) : (
+    <p>This page has no content yet.</p>
+  )}
+</Base>

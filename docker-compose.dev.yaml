@@ -1,0 +1,47 @@
+# Development infrastructure for OpenYapper
+# Usage: docker compose -f docker-compose.dev.yaml up -d
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: openyapper-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: openyapper
+      POSTGRES_PASSWORD: openyapper
+      POSTGRES_DB: openyapper
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./backend/scripts/init-extensions.sql:/docker-entrypoint-initdb.d/init-extensions.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U openyapper -d openyapper"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    container_name: openyapper-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: openyapper-pgadmin
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@openyapper.dev
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:

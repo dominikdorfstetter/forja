@@ -1,0 +1,78 @@
+---
+import { fetchNavTree, type NavigationTree } from "../lib/api";
+
+interface Props {
+  siteName: string;
+}
+
+const { siteName } = Astro.props;
+
+let items: NavigationTree[] = [];
+try {
+  items = await fetchNavTree("primary");
+} catch (e) {
+  console.warn("[CMS] Failed to fetch primary nav:", e instanceof Error ? e.message : e);
+}
+
+// If no API nav items, provide sensible defaults
+const fallbackItems: NavigationTree[] =
+  items.length > 0
+    ? []
+    : [
+        { id: "home", parent_id: null, page_id: null, external_url: null, icon: null, display_order: 0, open_in_new_tab: false, title: "Home", page_slug: "", children: [] },
+        { id: "blog", parent_id: null, page_id: null, external_url: null, icon: null, display_order: 1, open_in_new_tab: false, title: "Blog", page_slug: "blog", children: [] },
+      ];
+
+const navItems = items.length > 0 ? items : fallbackItems;
+
+function href(item: NavigationTree): string {
+  if (item.external_url) return item.external_url;
+  if (item.page_slug != null) return `/${item.page_slug}`;
+  return "#";
+}
+---
+
+<nav class="site-nav" aria-label="Main navigation">
+  <div class="site-nav__inner">
+    <a href="/" class="site-nav__brand">{siteName}</a>
+    <button class="site-nav__toggle" aria-label="Toggle navigation">&#9776;</button>
+    <ul class="site-nav__links">
+      {navItems.map((item) =>
+        item.children.length > 0 ? (
+          <li class="site-nav__dropdown">
+            <a
+              href={href(item)}
+              target={item.open_in_new_tab ? "_blank" : undefined}
+              rel={item.open_in_new_tab ? "noopener noreferrer" : undefined}
+            >
+              {item.title ?? "Untitled"}
+            </a>
+            <ul class="site-nav__dropdown-items">
+              {item.children.map((child) => (
+                <li>
+                  <a
+                    href={href(child)}
+                    target={child.open_in_new_tab ? "_blank" : undefined}
+                    rel={child.open_in_new_tab ? "noopener noreferrer" : undefined}
+                  >
+                    {child.title ?? "Untitled"}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ) : (
+          <li>
+            <a
+              href={href(item)}
+              target={item.open_in_new_tab ? "_blank" : undefined}
+              rel={item.open_in_new_tab ? "noopener noreferrer" : undefined}
+            >
+              {item.title ?? "Untitled"}
+            </a>
+          </li>
+        )
+      )}
+    </ul>
+  </div>
+</nav>

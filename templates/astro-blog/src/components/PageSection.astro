@@ -1,0 +1,44 @@
+---
+import type {
+  PageSectionResponse,
+  SectionLocalizationResponse,
+} from "../lib/api";
+import { fetchMedia } from "../lib/api";
+import { renderMarkdown } from "../lib/markdown";
+
+interface Props {
+  section: PageSectionResponse;
+  localizations: SectionLocalizationResponse[];
+}
+
+const { section, localizations } = Astro.props;
+
+// Pick the first localization for this section
+const loc = localizations.find((l) => l.page_section_id === section.id);
+const title = loc?.title;
+const text = renderMarkdown(loc?.text);
+const buttonText = loc?.button_text;
+
+let coverUrl: string | null = null;
+if (section.cover_image_id) {
+  try {
+    const media = await fetchMedia(section.cover_image_id);
+    coverUrl = media.public_url;
+  } catch {
+    // Skip cover image if not available
+  }
+}
+---
+
+<section class="page-section">
+  {title && <h2 class="page-section__title">{title}</h2>}
+  {coverUrl && (
+    <img src={coverUrl} alt={title ?? ""} loading="lazy" style="border-radius: var(--radius); margin-bottom: var(--space-md);" />
+  )}
+  {text.length > 0 && <div class="page-section__text" set:html={text} />}
+  {buttonText && section.call_to_action_route && (
+    <a href={section.call_to_action_route} class="page-section__cta">
+      {buttonText}
+    </a>
+  )}
+</section>

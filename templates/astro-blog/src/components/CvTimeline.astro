@@ -1,0 +1,43 @@
+---
+import type { CvEntryResponse } from "../lib/api";
+
+interface Props {
+  entries: CvEntryResponse[];
+}
+
+const { entries } = Astro.props;
+
+function formatDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+  });
+}
+
+function dateRange(entry: CvEntryResponse): string {
+  const start = formatDate(entry.start_date);
+  if (entry.is_current) return `${start} — Present`;
+  if (entry.end_date) return `${start} — ${formatDate(entry.end_date)}`;
+  return start;
+}
+---
+
+<div class="cv-timeline">
+  {entries.map((entry) => (
+    <div class={`cv-entry${entry.is_current ? " cv-entry--current" : ""}`}>
+      <div class="cv-entry__company">
+        {entry.company_url ? (
+          <a href={entry.company_url} target="_blank" rel="noopener noreferrer">
+            {entry.company}
+          </a>
+        ) : (
+          entry.company
+        )}
+      </div>
+      <div class="cv-entry__details">
+        {entry.location} &middot; {dateRange(entry)}
+      </div>
+      <span class="cv-entry__badge">{entry.entry_type}</span>
+    </div>
+  ))}
+</div>

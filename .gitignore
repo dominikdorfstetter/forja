@@ -1,0 +1,38 @@
+# dependencies
+node_modules
+
+# testing
+**/coverage
+
+# production
+**/dist/
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env
+.env.*
+!.env.example
+
+# editors
+.vscode/
+.idea/
+
+# claude
+.claude/
+
+# astro
+**/.astro/
+
+# lock files (managed per-project)
+package-lock.json
+
+# rust
+**/target/

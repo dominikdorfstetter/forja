@@ -1,0 +1,45 @@
+---
+import Base from "../layouts/Base.astro";
+import BlogCard from "../components/BlogCard.astro";
+import { fetchSite, fetchFeaturedBlogs, fetchBlogDetails } from "../lib/api";
+import type { BlogDetailResponse, SiteInfo } from "../lib/api";
+
+let site: SiteInfo | null = null;
+try {
+  site = await fetchSite();
+} catch (e) {
+  console.warn("[CMS] Failed to fetch site info:", e instanceof Error ? e.message : e);
+}
+
+const siteName = site?.name ?? "My Site";
+const siteDescription = site?.description ?? "A developer portfolio and blog.";
+
+let featured: BlogDetailResponse[] = [];
+try {
+  const items = await fetchFeaturedBlogs(3);
+  featured = await fetchBlogDetails(items.map((b) => b.id));
+} catch (e) {
+  console.warn("[CMS] Failed to fetch featured blogs:", e instanceof Error ? e.message : e);
+}
+---
+
+<Base title="Home" description={siteDescription}>
+  <section class="hero">
+    <h1>Welcome to {siteName}</h1>
+    <p>{siteDescription}</p>
+  </section>
+
+  {featured.length > 0 && (
+    <section>
+      <h2 class="section-heading">Featured Posts</h2>
+      <div class="blog-grid">
+        {featured.map((blog) => (
+          <BlogCard blog={blog} />
+        ))}
+      </div>
+      <p class="text-center mt-lg">
+        <a href="/blog">View all posts &rarr;</a>
+      </p>
+    </section>
+  )}
+</Base>

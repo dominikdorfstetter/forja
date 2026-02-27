@@ -1,0 +1,47 @@
+---
+import type { BlogDetailResponse } from "../lib/api";
+import { fetchMedia } from "../lib/api";
+
+interface Props {
+  blog: BlogDetailResponse;
+}
+
+const { blog } = Astro.props;
+const loc = blog.localizations[0];
+const title = loc?.title ?? "Untitled";
+const excerpt = loc?.excerpt ?? "";
+const slug = blog.slug ?? blog.id;
+
+let coverUrl: string | null = null;
+if (blog.cover_image_id) {
+  try {
+    const media = await fetchMedia(blog.cover_image_id);
+    coverUrl = media.public_url;
+  } catch {
+    // Skip cover image if not available
+  }
+}
+
+const date = new Date(blog.published_date).toLocaleDateString("en-US", {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+});
+---
+
+<article class="blog-card">
+  {coverUrl && (
+    <img src={coverUrl} alt={title} class="blog-card__img" loading="lazy" />
+  )}
+  <div class="blog-card__body">
+    <p class="blog-card__meta">
+      {date}
+      {blog.author && <> &middot; {blog.author}</>}
+      {blog.reading_time_minutes && <> &middot; {blog.reading_time_minutes} min read</>}
+    </p>
+    <h3 class="blog-card__title">
+      <a href={`/blog/${slug}`}>{title}</a>
+    </h3>
+    {excerpt && <p class="blog-card__excerpt">{excerpt}</p>}
+  </div>
+</article>

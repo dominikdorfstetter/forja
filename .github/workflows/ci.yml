@@ -1,0 +1,105 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  backend:
+    name: Backend (Rust)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: openyapper
+          POSTGRES_PASSWORD: openyapper
+          POSTGRES_DB: openyapper
+        options: >-
+          --health-cmd "pg_isready -U openyapper"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    env:
+      DATABASE_URL: postgres://openyapper:openyapper@localhost:5432/openyapper
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache cargo registry & build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            backend/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('backend/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
+
+      - name: Check formatting
+        run: cargo fmt --check
+
+      - name: Lint with Clippy
+        run: cargo clippy -- -D warnings
+
+      - name: Initialize databases
+        run: |
+          psql "$DATABASE_URL" -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
+          psql "$DATABASE_URL" -c 'CREATE EXTENSION IF NOT EXISTS "citext";'
+          psql "$DATABASE_URL" -c 'CREATE EXTENSION IF NOT EXISTS "pg_trgm";'
+          psql "$DATABASE_URL" -c 'CREATE DATABASE openyapper_test;'
+          psql "postgres://openyapper:openyapper@localhost:5432/openyapper_test" -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
+          psql "postgres://openyapper:openyapper@localhost:5432/openyapper_test" -c 'CREATE EXTENSION IF NOT EXISTS "citext";'
+          psql "postgres://openyapper:openyapper@localhost:5432/openyapper_test" -c 'CREATE EXTENSION IF NOT EXISTS "pg_trgm";'
+
+      - name: Run unit tests
+        run: cargo test --lib
+
+      - name: Run integration tests
+        run: cargo test --test integration_tests
+        env:
+          TEST_DATABASE_URL: postgres://openyapper:openyapper@localhost:5432/openyapper_test
+
+  admin:
+    name: Admin (React)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: admin
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test
+

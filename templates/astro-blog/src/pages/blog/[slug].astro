@@ -1,0 +1,71 @@
+---
+import Base from "../../layouts/Base.astro";
+import { fetchBlogBySlug, fetchMedia } from "../../lib/api";
+import { renderMarkdown } from "../../lib/markdown";
+
+const { slug } = Astro.params;
+
+if (!slug) {
+  return Astro.redirect("/blog");
+}
+
+let blog;
+try {
+  blog = await fetchBlogBySlug(slug);
+} catch (e) {
+  console.warn("[CMS] Failed to fetch blog by slug:", e instanceof Error ? e.message : e);
+  return new Response(null, { status: 404, statusText: "Not Found" });
+}
+
+const loc = blog.localizations[0];
+const title = loc?.title ?? "Untitled";
+const body = renderMarkdown(loc?.body);
+const metaTitle = loc?.meta_title ?? title;
+const metaDescription = loc?.meta_description ?? loc?.excerpt ?? "";
+
+let coverUrl: string | null = null;
+if (blog.cover_image_id) {
+  try {
+    const media = await fetchMedia(blog.cover_image_id);
+    coverUrl = media.public_url;
+  } catch (e) {
+    console.warn("[CMS] Failed to fetch cover image:", e instanceof Error ? e.message : e);
+  }
+}
+
+const date = new Date(blog.published_date).toLocaleDateString("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+---
+
+<Base title={title} metaTitle={metaTitle} metaDescription={metaDescription}>
+  <article class="blog-detail">
+    <header class="blog-detail__header">
+      <h1 class="blog-detail__title">{title}</h1>
+      <div class="blog-detail__meta">
+        <span>{date}</span>
+        {blog.author && <span>{blog.author}</span>}
+        {blog.reading_time_minutes && <span>{blog.reading_time_minutes} min read</span>}
+      </div>
+      {blog.categories.length > 0 && (
+        <div class="blog-detail__categories">
+          {blog.categories.map((cat) => (
+            <span class="blog-detail__tag">{cat.slug}</span>
+          ))}
+        </div>
+      )}
+    </header>
+
+    {coverUrl && (
+      <img
+        src={coverUrl}
+        alt={title}
+        style="width:100%; border-radius: var(--radius); margin-bottom: var(--space-lg);"
+      />
+    )}
+
+    <div class="blog-detail__body" set:html={body} />
+  </article>
+</Base>

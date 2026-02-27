@@ -1,0 +1,1708 @@
+{
+  "common": {
+    "appName": "OpenYapper",
+    "actions": {
+      "save": "Salva",
+      "cancel": "Annulla",
+      "delete": "Elimina",
+      "edit": "Modifica",
+      "create": "Crea",
+      "add": "Aggiungi",
+      "close": "Chiudi",
+      "confirm": "Conferma",
+      "back": "Indietro",
+      "refresh": "Aggiorna",
+      "search": "Cerca",
+      "clear": "Cancella",
+      "view": "Visualizza",
+      "manage": "Gestisci",
+      "submit": "Invia",
+      "saving": "Salvataggio...",
+      "loading": "Caricamento...",
+      "deleting": "Eliminazione...",
+      "clone": "Clona",
+      "upload": "Carica",
+      "preview": "Anteprima"
+    },
+    "status": {
+      "active": "Attivo",
+      "inactive": "Inattivo",
+      "draft": "Bozza",
+      "published": "Pubblicato",
+      "blocked": "Bloccato",
+      "expired": "Scaduto",
+      "revoked": "Revocato",
+      "healthy": "Integro",
+      "degraded": "Degradato",
+      "unhealthy": "Non integro",
+      "up": "Attivo",
+      "down": "Non attivo",
+      "scheduled": "Programmato",
+      "inReview": "In revisione",
+      "archived": "Archiviato"
+    },
+    "table": {
+      "actions": "Azioni",
+      "name": "Nome",
+      "status": "Stato",
+      "created": "Creato",
+      "type": "Tipo",
+      "slug": "Slug",
+      "noData": "Nessun dato"
+    },
+    "confirm": {
+      "cannotBeUndone": "Questa azione non può essere annullata.",
+      "areYouSure": "Sei sicuro?"
+    },
+    "filters": {
+      "all": "Tutti",
+      "status": "Stato",
+      "permission": "Permesso",
+      "filterByType": "Filtra per tipo"
+    },
+    "labels": {
+      "yes": "Sì",
+      "no": "No",
+      "default": "Predefinito",
+      "global": "Globale",
+      "site": "Sito",
+      "child": "Figlio",
+      "featured": "In evidenza",
+      "present": "Presente",
+      "never": "Mai",
+      "none": "Nessuno",
+      "untitled": "Senza titolo",
+      "internal": "Interno",
+      "external": "Esterno"
+    },
+    "errors": {
+      "loadFailed": "Impossibile caricare i dati",
+      "saveFailed": "Impossibile salvare",
+      "deleteFailed": "Impossibile eliminare",
+      "serverUnreachable": "Server non raggiungibile",
+      "required": "Questo campo è obbligatorio"
+    },
+    "noSiteSelected": "Nessun sito selezionato",
+    "selectSitePrompt": "Seleziona un sito dalla barra degli strumenti",
+    "selectSite": "Seleziona sito...",
+    "noSiteOption": "Nessun sito selezionato",
+    "lockedByScope": "Bloccato dall'ambito della API key",
+    "skipToMain": "Vai al contenuto principale"
+  },
+  "scheduling": {
+    "publishAt": "Pubblica il",
+    "unpublishAt": "Annulla pubblicazione il (opzionale)",
+    "scheduledFor": "Programmato per {{date}}",
+    "clearSchedule": "Cancella programmazione",
+    "expiresAt": "Scade {{date}}"
+  },
+  "layout": {
+    "sidebar": {
+      "dashboard": "Pannello di controllo",
+      "content": "Contenuti",
+      "blogs": "Blog",
+      "pages": "Pagine",
+      "media": "Media",
+      "documents": "Documenti",
+      "assets": "Risorse",
+      "legal": "Legale",
+      "cv": "CV",
+      "siteConfig": "Configurazione sito",
+      "sites": "Siti",
+      "navigation": "Navigazione",
+      "socialLinks": "Link social",
+      "activity": "Attività",
+      "system": "Sistema",
+      "members": "Membri",
+      "apiKeys": "API Keys",
+      "taxonomy": "Tassonomia",
+      "apiDocs": "Documentazione API",
+      "contentTemplates": "Modelli",
+      "redirects": "Reindirizzamenti",
+      "webhooks": "Webhooks",
+      "settings": "Impostazioni",
+      "locales": "Lingue",
+      "myDrafts": "Le mie bozze",
+      "logout": "Esci"
+    },
+    "toolbar": {
+      "toggleDrawer": "Apri/chiudi menu laterale",
+      "account": "Account",
+      "profile": "Profilo",
+      "theme": "Tema",
+      "language": "Lingua"
+    }
+  },
+  "login": {
+    "title": "OpenYapper",
+    "subtitle": "Inserisci la tua API key per accedere al pannello di amministrazione",
+    "apiKeyLabel": "API Key",
+    "apiKeyPlaceholder": "dk_xxxxxxxx_xxxxxxxxxxxxxxxx",
+    "loginButton": "Accedi",
+    "verifying": "Verifica in corso...",
+    "success": "Accesso effettuato con successo",
+    "errors": {
+      "required": "La API key è obbligatoria",
+      "invalid": "API key non valida"
+    }
+  },
+  "dashboard": {
+    "title": "Pannello di controllo",
+    "managing": "Gestione di {{name}}",
+    "selectSitePrompt": "Seleziona un sito dalla barra degli strumenti per visualizzare le statistiche dei contenuti.",
+    "readOnlyNotice": "Hai accesso in <strong>sola lettura</strong>. I contenuti sono visibili ma non possono essere modificati.",
+    "systemHealth": "Stato del sistema",
+    "overall": "Generale: {{status}}",
+    "stats": {
+      "sites": "Siti",
+      "blogPosts": "Articoli del blog",
+      "pages": "Pagine",
+      "mediaFiles": "File multimediali",
+      "users": "Utenti",
+      "apiKeys": "API Keys"
+    },
+    "recentPosts": "Articoli recenti del blog",
+    "publishedPosts": "Articoli pubblicati",
+    "newPost": "Nuovo articolo",
+    "noPosts": "Nessun articolo del blog ancora.",
+    "noPostsCreate": "Nessun articolo del blog ancora. Crea il tuo primo articolo!",
+    "drafts": "Bozze",
+    "viewAllDrafts": "Vedi tutti",
+    "noDrafts": "Nessuna bozza — tutti i contenuti sono pubblicati o in revisione.",
+    "quickActions": "Azioni rapide",
+    "byAuthor": "di {{author}}",
+    "requests": "{{count}} richieste",
+    "yourSites": "I tuoi siti",
+    "noSites": "Nessun sito trovato",
+    "noSitesCreate": "Crea il tuo primo sito per iniziare",
+    "permissions": {
+      "master": "Amministratore di sistema",
+      "owner": "Proprietario del sito",
+      "admin": "Admin",
+      "write": "Scrittura",
+      "readOnly": "Sola lettura"
+    }
+  },
+  "myDrafts": {
+    "title": "Le mie bozze",
+    "subtitle": "Tutte le bozze in un unico posto",
+    "loading": "Caricamento bozze...",
+    "table": {
+      "name": "Nome",
+      "type": "Tipo",
+      "lastModified": "Ultima modifica"
+    },
+    "empty": {
+      "noSite": "Seleziona un sito dalla barra degli strumenti per visualizzare le bozze",
+      "title": "Nessuna bozza",
+      "description": "Tutti i contenuti sono pubblicati o programmati — niente in bozza."
+    }
+  },
+  "blogs": {
+    "title": "Blog",
+    "subtitle": "Gestisci gli articoli del blog dei tuoi siti",
+    "createButton": "Crea blog",
+    "table": {
+      "slug": "Slug",
+      "author": "Autore",
+      "status": "Stato",
+      "featured": "In evidenza",
+      "published": "Pubblicato",
+      "actions": "Azioni"
+    },
+    "viewDetail": "Vedi dettaglio",
+    "empty": {
+      "noSite": "Seleziona un sito dalla barra degli strumenti per visualizzare i suoi articoli",
+      "title": "Nessun articolo del blog",
+      "description": "Gli articoli del blog sono la spina dorsale dei tuoi contenuti. Scrivi articoli, tutorial o notizie — ciascuno con traduzioni, categorie e metadati SEO."
+    },
+    "loading": "Caricamento blog...",
+    "loadError": "Impossibile caricare i blog",
+    "messages": {
+      "created": "Blog creato — apertura editor",
+      "updated": "Blog aggiornato",
+      "deleted": "Blog eliminato",
+      "cloned": "Blog clonato con successo"
+    },
+    "deleteDialog": {
+      "title": "Elimina blog",
+      "message": "Eliminare il blog \"{{slug}}\"? Questa azione non può essere annullata."
+    },
+    "moreActions": "Altro"
+  },
+  "blogDetail": {
+    "title": "Dettaglio blog",
+    "back": "Torna ai blog",
+    "loading": "Caricamento blog...",
+    "notFound": "Blog non trovato",
+    "tabs": {
+      "content": "Contenuto",
+      "preview": "Anteprima",
+      "seo": "SEO",
+      "settings": "Impostazioni",
+      "attachments": "Allegati",
+      "metadata": "Metadati",
+      "documents": "Documenti"
+    },
+    "toolbar": {
+      "unsavedChanges": "Modifiche non salvate",
+      "saving": "Salvataggio...",
+      "saved": "Tutte le modifiche salvate",
+      "saveFailed": "Salvataggio fallito"
+    },
+    "seo": {
+      "serpPreview": "Anteprima motore di ricerca",
+      "charCount": "{{current}}/{{max}}"
+    },
+    "fields": {
+      "title": "Titolo",
+      "slug": "Slug",
+      "author": "Autore",
+      "status": "Stato",
+      "locale": "Lingua",
+      "excerpt": "Estratto",
+      "content": "Contenuto",
+      "coverImage": "URL immagine di copertina",
+      "publishedDate": "Data di pubblicazione",
+      "featured": "In evidenza",
+      "tags": "Tag",
+      "categories": "Categorie",
+      "subtitle": "Sottotitolo",
+      "body": "Corpo (Markdown)",
+      "metaTitle": "Meta titolo",
+      "metaDescription": "Meta descrizione"
+    },
+    "messages": {
+      "saved": "Blog salvato",
+      "saveFailed": "Impossibile salvare il blog"
+    },
+    "documents": {
+      "title": "Documenti allegati",
+      "attach": "Allega documento",
+      "empty": "Nessun documento allegato",
+      "emptyDescription": "Allega documenti a questo articolo del blog",
+      "detached": "Documento rimosso",
+      "attached": "Documento allegato"
+    },
+    "metadata": {
+      "title": "Metadati del blog",
+      "slug": "Slug:",
+      "author": "Autore:",
+      "status": "Stato:",
+      "published": "Pubblicato:",
+      "readingTime": "Tempo di lettura",
+      "manualOverride": "Sovrascrittura manuale",
+      "autoCalculated": "Calcolato automaticamente dal contenuto",
+      "resetAuto": "Ripristina al calcolo automatico"
+    },
+    "images": {
+      "title": "Immagini",
+      "coverImageId": "ID immagine di copertina:",
+      "headerImageId": "ID immagine di intestazione:"
+    },
+    "settings": {
+      "title": "Impostazioni",
+      "featured": "In evidenza",
+      "notFeatured": "Non in evidenza",
+      "commentsOn": "Commenti attivati",
+      "commentsOff": "Commenti disattivati"
+    },
+    "toc": "Indice",
+    "createTranslation": "Crea traduzione {{locale}}",
+    "noLocalesAlert": "Nessuna locale attiva configurata. Vai su <strong>Impostazioni → Locali</strong> e crea almeno una locale attiva (es. \"en\") per iniziare a scrivere contenuti."
+  },
+  "pages": {
+    "title": "Pagine",
+    "subtitle": "Gestisci le pagine dei tuoi siti",
+    "createButton": "Crea pagina",
+    "table": {
+      "route": "Percorso",
+      "type": "Tipo",
+      "status": "Stato",
+      "inNav": "In navigazione",
+      "created": "Creato",
+      "actions": "Azioni"
+    },
+    "viewDetails": "Vedi dettagli",
+    "empty": {
+      "noSite": "Seleziona un sito dalla barra degli strumenti per visualizzare le sue pagine",
+      "title": "Nessuna pagina",
+      "description": "Le pagine sono i mattoni del tuo sito. Crea landing page, sezioni Chi siamo o qualsiasi layout personalizzato con sezioni modulari."
+    },
+    "loading": "Caricamento pagine...",
+    "loadError": "Impossibile caricare le pagine",
+    "messages": {
+      "created": "Pagina creata",
+      "updated": "Pagina aggiornata",
+      "deleted": "Pagina eliminata",
+      "cloned": "Pagina clonata con successo"
+    },
+    "deleteDialog": {
+      "title": "Elimina pagina",
+      "message": "Eliminare la pagina \"{{route}}\"? Questa azione non può essere annullata."
+    }
+  },
+  "pageDetail": {
+    "title": "Dettaglio pagina",
+    "back": "Torna alle pagine",
+    "loading": "Caricamento pagina...",
+    "notFound": "Pagina non trovata",
+    "sections": {
+      "title": "Sezioni",
+      "add": "Aggiungi sezione",
+      "empty": "Nessuna sezione ancora",
+      "emptyDescription": "Aggiungi sezioni per costruire la tua pagina",
+      "deleted": "Sezione eliminata",
+      "saved": "Sezione salvata",
+      "reordered": "Sezioni riordinate",
+      "added": "Sezione aggiunta",
+      "loadingSections": "Caricamento sezioni...",
+      "deleteTitle": "Elimina sezione",
+      "deleteMessage": "Eliminare questa sezione {{type}}? Questa azione non può essere annullata."
+    },
+    "fields": {
+      "route": "Percorso",
+      "title": "Titolo",
+      "description": "Descrizione",
+      "status": "Stato",
+      "pageType": "Tipo di pagina",
+      "inNavigation": "In navigazione",
+      "navTitle": "Titolo navigazione",
+      "navOrder": "Ordine navigazione",
+      "metaTitle": "Meta titolo",
+      "metaDescription": "Meta descrizione",
+      "slug": "Slug",
+      "id": "ID",
+      "published": "Pubblicato",
+      "created": "Creato",
+      "updated": "Aggiornato"
+    },
+    "tabs": {
+      "info": "Info",
+      "sections": "Sezioni"
+    },
+    "toolbar": {
+      "saving": "Salvataggio...",
+      "saved": "Tutte le modifiche salvate",
+      "saveFailed": "Salvataggio fallito"
+    },
+    "messages": {
+      "saved": "Pagina salvata",
+      "saveFailed": "Impossibile salvare la pagina",
+      "updated": "Pagina aggiornata"
+    },
+    "loadFailed": "Impossibile caricare la pagina",
+    "pageInfo": "Informazioni della pagina",
+    "template": "Modello",
+    "parentPageId": "ID pagina genitore",
+    "pageSubtitle": "Pagina {{type}}",
+    "metadata": "Metadati",
+    "contentId": "ID del contenuto",
+    "table": {
+      "type": "Tipo",
+      "order": "Ordine",
+      "localizations": "Localizzazioni",
+      "coverImage": "Immagine di copertina",
+      "ctaRoute": "Route CTA",
+      "actions": "Azioni"
+    },
+    "dialog": {
+      "sectionType": "Tipo di sezione",
+      "displayOrder": "Ordine di visualizzazione",
+      "displayOrderRequired": "L'ordine di visualizzazione è obbligatorio",
+      "adding": "Aggiunta in corso..."
+    }
+  },
+  "media": {
+    "title": "Media",
+    "subtitle": "Gestisci i file multimediali dei tuoi siti",
+    "registerButton": "Registra media",
+    "uploadButton": "Carica file",
+    "folders": "Cartelle",
+    "searchPlaceholder": "Cerca per nome file, testo alternativo, didascalia, titolo...",
+    "categories": {
+      "images": "Immagini",
+      "videos": "Video",
+      "audio": "Audio",
+      "documents": "Documenti"
+    },
+    "openUrl": "Apri URL",
+    "empty": {
+      "noSite": "Seleziona un sito dalla barra degli strumenti per visualizzare i suoi file multimediali",
+      "title": "Nessun media",
+      "description": "Carica e gestisci immagini, video e documenti. I file multimediali possono essere allegati ad articoli, pagine e sezioni.",
+      "noMatch": "Nessun media corrispondente",
+      "noMatchDescription": "Prova a modificare la ricerca o i filtri",
+      "noFilesInFolder": "Nessun file in questa cartella"
+    },
+    "loading": "Caricamento media...",
+    "loadError": "Impossibile caricare i media",
+    "messages": {
+      "registered": "Media registrato",
+      "deleted": "Media eliminato",
+      "moved": "Spostato nella cartella",
+      "folderCreated": "Cartella creata",
+      "folderRenamed": "Cartella rinominata",
+      "folderDeleted": "Cartella eliminata"
+    },
+    "deleteDialog": {
+      "title": "Elimina media",
+      "message": "Eliminare \"{{filename}}\"? Questa azione non può essere annullata."
+    },
+    "upload": {
+      "dragDrop": "Trascina i file qui, o clicca per sfogliare",
+      "uploading": "Caricamento in corso...",
+      "progress": "Caricamento {{percent}}%",
+      "success": "File caricato con successo",
+      "tooLarge": "Il file supera la dimensione massima di {{maxSize}}",
+      "invalidType": "Tipo di file non supportato"
+    }
+  },
+  "documents": {
+    "title": "Documenti",
+    "subtitle": "Gestisci i documenti scaricabili",
+    "createButton": "Aggiungi documento",
+    "table": {
+      "title": "Titolo",
+      "slug": "Slug",
+      "type": "Tipo",
+      "fileSize": "Dimensione file",
+      "downloads": "Download",
+      "status": "Stato",
+      "created": "Creato",
+      "actions": "Azioni"
+    },
+    "empty": {
+      "noSite": "Seleziona un sito dalla barra degli strumenti per visualizzare i suoi documenti",
+      "title": "Nessun documento",
+      "description": "Gestisci file scaricabili come PDF, white paper o guide. I documenti possono essere collegati ad articoli e pagine."
+    },
+    "loading": "Caricamento documenti...",
+    "loadError": "Impossibile caricare i documenti",
+    "messages": {
+      "created": "Documento creato",
+      "updated": "Documento aggiornato",
+      "deleted": "Documento eliminato"
+    },
+    "deleteDialog": {
+      "title": "Elimina documento",
+      "message": "Eliminare il documento \"{{title}}\"? Questa azione non può essere annullata."
+    }
+  },
+  "navigation": {
+    "title": "Navigazione",
+    "subtitle": "Gestisci gli elementi di navigazione dei tuoi siti",
+    "addItem": "Aggiungi elemento",
+    "table": {
+      "link": "Link",
+      "type": "Tipo",
+      "icon": "Icona",
+      "newTab": "Nuova scheda",
+      "actions": "Azioni"
+    },
+    "empty": {
+      "noSite": "Seleziona un sito dalla barra degli strumenti per gestire la sua navigazione",
+      "title": "Nessun elemento di navigazione",
+      "description": "Definisci come i visitatori navigano il tuo sito. Crea menu con link a pagine o URL esterni, organizzati in gerarchia."
+    },
+    "loading": "Caricamento navigazione...",
+    "loadError": "Impossibile caricare la navigazione",
+    "messages": {
+      "created": "Elemento di navigazione creato",
+      "updated": "Elemento di navigazione aggiornato",
+      "deleted": "Elemento di navigazione eliminato"
+    },
+    "deleteDialog": {
+      "title": "Elimina elemento di navigazione",
+      "message": "Eliminare questo elemento di navigazione? Verranno eliminate anche le sue localizzazioni."
+    }
+  },
+  "socialLinks": {
+    "title": "Link social",
+    "subtitle": "Gestisci i link ai social media dei tuoi siti",
+    "addLink": "Aggiungi link",
+    "table": {
+      "title": "Titolo",
+      "url": "URL",
+      "icon": "Icona",
+      "actions": "Azioni"
+    },
+    "empty": {
+      "noSite": "Seleziona un sito dalla barra degli strumenti per gestire i suoi link social",
+      "title": "Nessun link social",
+      "description": "Aggiungi link ai tuoi profili social. Vengono serviti tramite l'API per essere visualizzati ovunque nel tuo frontend."
+    },
+    "loading": "Caricamento link social...",
+    "loadError": "Impossibile caricare i link social",
+    "messages": {
+      "created": "Link social creato",
+      "updated": "Link social aggiornato",
+      "deleted": "Link social eliminato"
+    },
+    "deleteDialog": {
+      "title": "Elimina link social",
+      "message": "Eliminare \"{{title}}\"? Questa azione non può essere annullata."
+    }
+  },
+  "taxonomy": {
+    "title": "Tassonomia",
+    "subtitle": "Gestisci tag e categorie dei tuoi siti",
+    "info": {
+      "tags": "I tag sono etichette piatte che assegni ai contenuti — come hashtag. Un articolo può avere molti tag (es. \"rust\", \"tutorial\", \"docker\"). Usali per filtrare e per argomenti trasversali.",
+      "categories": "Le categorie formano una gerarchia (albero). Usale per raggruppare i contenuti strutturalmente, es. \"Tecnologia > Sviluppo Web > React\". Ogni articolo appartiene tipicamente a una categoria."
+    },
+    "tags": {
+      "title": "Tag",
+      "addTag": "Aggiungi tag",
+      "table": {
+        "slug": "Slug",
+        "scope": "Ambito",
+        "created": "Creato",
+        "actions": "Azioni"
+      },
+      "empty": {
+        "title": "Nessun tag",
+        "description": "I tag sono etichette piatte per argomenti trasversali — come hashtag. Assegna più tag per articolo (es. \"rust\", \"tutorial\") così i visitatori possono filtrare e scoprire i contenuti."
+      },
+      "loading": "Caricamento tag...",
+      "messages": {
+        "created": "Tag creato",
+        "updated": "Tag aggiornato",
+        "deleted": "Tag eliminato"
+      },
+      "deleteDialog": {
+        "title": "Elimina tag",
+        "message": "Eliminare il tag \"{{slug}}\"? Il tag verrà disattivato."
+      }
+    },
+    "categories": {
+      "title": "Categorie",
+      "addCategory": "Aggiungi categoria",
+      "table": {
+        "slug": "Slug",
+        "parent": "Genitore",
+        "scope": "Ambito",
+        "created": "Creato",
+        "actions": "Azioni"
+      },
+      "empty": {
+        "title": "Nessuna categoria",
+        "description": "Le categorie creano una gerarchia ad albero per i tuoi contenuti. Raggruppa gli articoli correlati sotto rami come \"Tecnologia > Sviluppo Web\" per una navigazione strutturata."
+      },
+      "loading": "Caricamento categorie...",
+      "messages": {
+        "created": "Categoria creata",
+        "updated": "Categoria aggiornata",
+        "deleted": "Categoria eliminata"
+      },
+      "deleteDialog": {
+        "title": "Elimina categoria",
+        "message": "Eliminare la categoria \"{{slug}}\"? La categoria verrà disattivata."
+      }
+    },
+    "empty": {
+      "noSite": "Seleziona un sito dalla barra degli strumenti per gestire la sua tassonomia"
+    }
+  },
+  "webhooks": {
+    "title": "Webhooks",
+    "subtitle": "Notifica servizi esterni quando i contenuti cambiano",
+    "addWebhook": "Aggiungi webhook",
+    "allEvents": "Tutti gli eventi",
+    "viewDeliveries": "Visualizza consegne",
+    "sendTest": "Invia test",
+    "testSuccess": "Test consegnato — {{status}}",
+    "testFailed": "Consegna di test fallita",
+    "table": {
+      "url": "URL",
+      "events": "Eventi",
+      "status": "Stato",
+      "lastTriggered": "Ultimo invio",
+      "actions": "Azioni"
+    },
+    "empty": {
+      "noSite": "Seleziona un sito dalla barra degli strumenti per gestire i suoi webhook",
+      "title": "Nessun webhook",
+      "description": "I webhook inviano richieste HTTP POST a servizi esterni quando i contenuti cambiano. Usali per attivare build, invalidare cache o sincronizzare dati."
+    },
+    "loading": "Caricamento webhook...",
+    "messages": {
+      "created": "Webhook creato",
+      "updated": "Webhook aggiornato",
+      "deleted": "Webhook eliminato",
+      "tested": "Evento di test inviato a {{url}}"
+    },
+    "deleteDialog": {
+      "title": "Elimina webhook",
+      "message": "Eliminare il webhook per \"{{url}}\"? Non verranno più inviate notifiche a questo endpoint."
+    },
+    "deliveries": {
+      "title": "Consegne webhook",
+      "table": {
+        "event": "Evento",
+        "status": "Stato",
+        "duration": "Durata",
+        "timestamp": "Data e ora"
+      },
+      "empty": "Nessuna consegna ancora",
+      "success": "Successo",
+      "failed": "Fallita",
+      "pending": "In attesa"
+    }
+  },
+  "redirects": {
+    "title": "Reindirizzamenti",
+    "subtitle": "Gestire i reindirizzamenti URL per i tuoi siti",
+    "addRedirect": "Aggiungi reindirizzamento",
+    "table": {
+      "sourcePath": "Percorso di origine",
+      "destination": "URL di destinazione",
+      "type": "Tipo",
+      "status": "Stato",
+      "created": "Creato",
+      "actions": "Azioni",
+      "permanent": "301 Permanente",
+      "temporary": "302 Temporaneo"
+    },
+    "empty": {
+      "noSite": "Seleziona un sito dalla barra degli strumenti per gestire i reindirizzamenti",
+      "title": "Nessun reindirizzamento",
+      "description": "I reindirizzamenti reindirizzano automaticamente visitatori e motori di ricerca da un URL a un altro. Usali dopo ristrutturazioni, cambi di dominio o per correggere link non funzionanti."
+    },
+    "loading": "Caricamento reindirizzamenti...",
+    "messages": {
+      "created": "Reindirizzamento creato",
+      "updated": "Reindirizzamento aggiornato",
+      "deleted": "Reindirizzamento eliminato"
+    },
+    "deleteDialog": {
+      "title": "Elimina reindirizzamento",
+      "message": "Eliminare il reindirizzamento da \"{{source}}\"? Questa azione non può essere annullata."
+    }
+  },
+  "locales": {
+    "title": "Lingue",
+    "subtitle": "Gestisci le lingue e le impostazioni regionali del sistema",
+    "addLanguage": "Aggiungi lingua",
+    "loading": "Caricamento lingue...",
+    "columns": {
+      "code": "Codice",
+      "name": "Nome",
+      "nativeName": "Nome nativo",
+      "direction": "Direzione",
+      "active": "Attivo",
+      "created": "Creato",
+      "actions": "Azioni"
+    },
+    "empty": {
+      "title": "Nessuna lingua",
+      "description": "Le lingue abilitano contenuti multilingue. Aggiungi le lingue che vuoi supportare — ogni contenuto può poi essere tradotto."
+    },
+    "messages": {
+      "created": "Lingua creata",
+      "updated": "Lingua aggiornata",
+      "deleted": "Lingua eliminata"
+    },
+    "deleteDialog": {
+      "title": "Elimina lingua",
+      "message": "Eliminare la lingua \"{{code}}\"? Questa azione non può essere annullata."
+    },
+    "errors": {
+      "inUse": "Impossibile eliminare: la lingua è assegnata a uno o più siti"
+    }
+  },
+  "members": {
+    "title": "Membri",
+    "subtitle": "Gestisci i membri del sito e i loro ruoli",
+    "addMember": "Aggiungi membro",
+    "table": {
+      "name": "Nome",
+      "email": "E-mail",
+      "role": "Ruolo",
+      "joined": "Iscritto",
+      "actions": "Azioni"
+    },
+    "roles": {
+      "owner": "Proprietario",
+      "admin": "Amministratore",
+      "editor": "Editore",
+      "author": "Autore",
+      "reviewer": "Revisore",
+      "viewer": "Lettore"
+    },
+    "empty": {
+      "noSite": "Seleziona un sito dalla barra degli strumenti per gestirne i membri",
+      "title": "Nessun membro del team",
+      "description": "Invita collaboratori per gestire questo sito. Assegna ruoli come Editore, Autore o Revisore per controllare l'accesso."
+    },
+    "loading": "Caricamento membri...",
+    "loadError": "Errore nel caricamento dei membri",
+    "messages": {
+      "added": "Membro aggiunto",
+      "roleUpdated": "Ruolo membro aggiornato",
+      "removed": "Membro rimosso",
+      "ownershipTransferred": "Proprietà trasferita"
+    },
+    "addDialog": {
+      "title": "Aggiungi membro",
+      "searchPlaceholder": "Cerca utenti Clerk...",
+      "selectRole": "Seleziona ruolo",
+      "noResults": "Nessun utente trovato"
+    },
+    "removeDialog": {
+      "title": "Rimuovi membro",
+      "message": "Rimuovere questo membro dal sito? Perderà ogni accesso."
+    },
+    "transferDialog": {
+      "title": "Trasferisci proprietà",
+      "message": "Trasferire la proprietà a {{name}}? Sarai retrocesso ad amministratore.",
+      "confirm": "Trasferisci proprietà"
+    }
+  },
+  "apiKeys": {
+    "title": "API Keys",
+    "subtitle": "Gestisci le API key per accedere al backend",
+    "createButton": "Crea API Key",
+    "filters": {
+      "allStatuses": "Tutti gli stati",
+      "allPermissions": "Tutti i permessi"
+    },
+    "table": {
+      "name": "Nome",
+      "keyPrefix": "Prefisso chiave",
+      "permission": "Permesso",
+      "site": "Sito",
+      "status": "Stato",
+      "requests": "Richieste",
+      "lastUsed": "Ultimo utilizzo",
+      "actions": "Azioni"
+    },
+    "empty": {
+      "title": "Nessuna chiave API",
+      "description": "Le chiavi API consentono alle applicazioni esterne di accedere ai tuoi contenuti. Crea chiavi con livelli di permesso e ambiti di sito specifici.",
+      "filterHint": "Prova a cambiare i filtri"
+    },
+    "loading": "Caricamento API keys...",
+    "loadError": "Impossibile caricare le API keys",
+    "messages": {
+      "created": "API key creata",
+      "blocked": "API key bloccata",
+      "unblocked": "API key sbloccata",
+      "revoked": "API key revocata",
+      "deleted": "API key eliminata"
+    },
+    "blockDialog": {
+      "title": "Blocca API Key",
+      "reason": "Motivo del blocco",
+      "reasonPlaceholder": "Perché questa chiave viene bloccata?",
+      "reasonRequired": "Il motivo è obbligatorio"
+    },
+    "revokeDialog": {
+      "title": "Revoca API Key",
+      "message": "Sei sicuro di voler revocare \"{{name}}\"? Questa azione è permanente e non può essere annullata."
+    },
+    "deleteDialog": {
+      "title": "Elimina API Key",
+      "message": "Sei sicuro di voler eliminare permanentemente \"{{name}}\"?"
+    },
+    "createDialog": {
+      "title": "Crea API Key",
+      "fields": {
+        "name": "Nome",
+        "permission": "Permesso",
+        "site": "Sito",
+        "expiresAt": "Scadenza (opzionale)"
+      },
+      "created": {
+        "title": "API Key creata",
+        "warning": "Copia questa chiave adesso. Non potrai più visualizzarla!",
+        "copied": "Chiave copiata negli appunti"
+      }
+    },
+    "usageDialog": {
+      "title": "Utilizzo API Key",
+      "subtitle": "Statistiche di utilizzo per {{name}}",
+      "totalRequests": "Richieste totali",
+      "recentRequests": "Richieste recenti",
+      "endpoint": "Endpoint",
+      "method": "Metodo",
+      "statusCode": "Codice di stato",
+      "timestamp": "Data e ora",
+      "noUsage": "Nessun dato di utilizzo disponibile"
+    },
+    "actionsMenu": {
+      "viewUsage": "Visualizza utilizzo",
+      "block": "Blocca",
+      "unblock": "Sblocca",
+      "revoke": "Revoca",
+      "delete": "Elimina"
+    }
+  },
+  "cv": {
+    "title": "CV / Curriculum",
+    "subtitle": "Gestisci le voci del CV e le competenze dei tuoi siti",
+    "tabs": {
+      "entries": "Voci",
+      "skills": "Competenze"
+    },
+    "entries": {
+      "addEntry": "Aggiungi voce",
+      "table": {
+        "company": "Azienda",
+        "location": "Luogo",
+        "type": "Tipo",
+        "dates": "Date",
+        "current": "Attuale",
+        "order": "Ordine",
+        "actions": "Azioni"
+      },
+      "empty": {
+        "title": "Nessuna voce CV",
+        "description": "Aggiungi esperienze lavorative, istruzione e altri traguardi di carriera. Le voci vengono servite tramite l'API per il tuo portfolio."
+      },
+      "loading": "Caricamento voci del CV...",
+      "loadError": "Impossibile caricare le voci del CV",
+      "messages": {
+        "created": "Voce del CV creata",
+        "updated": "Voce del CV aggiornata",
+        "deleted": "Voce del CV eliminata"
+      },
+      "deleteDialog": {
+        "title": "Elimina voce del CV",
+        "message": "Eliminare la voce \"{{company}}\"? Questa azione non può essere annullata."
+      }
+    },
+    "skills": {
+      "addSkill": "Aggiungi competenza",
+      "table": {
+        "name": "Nome",
+        "slug": "Slug",
+        "category": "Categoria",
+        "proficiency": "Livello di competenza",
+        "icon": "Icona",
+        "actions": "Azioni"
+      },
+      "empty": {
+        "title": "Nessuna competenza",
+        "description": "Elenca le tue competenze tecniche e professionali con livelli di padronanza e categorie per il tuo portfolio."
+      },
+      "loading": "Caricamento competenze...",
+      "loadError": "Impossibile caricare le competenze",
+      "messages": {
+        "created": "Competenza creata",
+        "updated": "Competenza aggiornata",
+        "deleted": "Competenza eliminata"
+      },
+      "deleteDialog": {
+        "title": "Elimina competenza",
+        "message": "Eliminare la competenza \"{{name}}\"? Questa azione non può essere annullata."
+      }
+    },
+    "empty": {
+      "noSite": "Seleziona un sito dalla barra degli strumenti per gestire i dati del CV"
+    }
+  },
+  "legal": {
+    "title": "Documenti legali",
+    "subtitle": "Gestisci i documenti legali dei tuoi siti",
+    "addDocument": "Aggiungi documento",
+    "table": {
+      "cookieName": "Nome cookie",
+      "type": "Tipo",
+      "created": "Creato",
+      "actions": "Azioni"
+    },
+    "empty": {
+      "noSite": "Seleziona un sito dalla barra degli strumenti per gestire i suoi documenti legali",
+      "title": "Nessun documento legale",
+      "description": "Gestisci consensi dei cookie, politiche sulla privacy e altri requisiti legali. Raggruppa gli elementi per banner di consenso strutturati."
+    },
+    "loading": "Caricamento documenti legali...",
+    "loadError": "Impossibile caricare i documenti legali",
+    "messages": {
+      "created": "Documento legale creato",
+      "updated": "Documento legale aggiornato",
+      "deleted": "Documento legale eliminato"
+    },
+    "deleteDialog": {
+      "title": "Elimina documento legale",
+      "message": "Eliminare il documento legale \"{{cookieName}}\"? Verranno eliminati anche i suoi gruppi e elementi."
+    }
+  },
+  "legalDetail": {
+    "title": "Dettaglio documento legale",
+    "back": "Torna ai documenti legali",
+    "loading": "Caricamento documento legale...",
+    "notFound": "Documento legale non trovato",
+    "groups": {
+      "title": "Gruppi di consenso",
+      "add": "Aggiungi gruppo",
+      "empty": "Nessun gruppo di consenso",
+      "emptyDescription": "Aggiungi gruppi di consenso a questo documento",
+      "messages": {
+        "created": "Gruppo creato",
+        "updated": "Gruppo aggiornato",
+        "deleted": "Gruppo eliminato"
+      },
+      "editGroup": "Modifica gruppo",
+      "deleteGroup": "Elimina gruppo",
+      "deleteMessage": "Eliminare il gruppo \"{{name}}\"? Verranno eliminati anche tutti gli elementi di questo gruppo.",
+      "loadingGroups": "Caricamento gruppi...",
+      "order": "Ordine: {{order}}",
+      "required": "Obbligatorio",
+      "optional": "Facoltativo",
+      "enabled": "Attivato",
+      "disabled": "Disattivato"
+    },
+    "items": {
+      "title": "Elementi",
+      "add": "Aggiungi elemento",
+      "empty": "Nessun elemento in questo gruppo",
+      "messages": {
+        "created": "Elemento creato",
+        "updated": "Elemento aggiornato",
+        "deleted": "Elemento eliminato"
+      },
+      "loadingItems": "Caricamento elementi...",
+      "deleteItem": "Elimina elemento",
+      "deleteMessage": "Eliminare l'elemento \"{{name}}\"? Questa azione non può essere annullata."
+    },
+    "editDocument": "Modifica documento",
+    "cookieName": "Nome del cookie",
+    "documentType": "Tipo di documento",
+    "documentId": "ID del documento",
+    "updatedMessage": "Documento legale aggiornato",
+    "loadGroupsFailed": "Impossibile caricare i gruppi",
+    "dialog": {
+      "editGroup": "Modifica gruppo",
+      "addGroup": "Aggiungi gruppo",
+      "editItem": "Modifica elemento",
+      "addItem": "Aggiungi elemento",
+      "cookieName": "Nome del cookie",
+      "cookieNameRequired": "Il nome del cookie è obbligatorio",
+      "displayOrder": "Ordine di visualizzazione",
+      "required": "Obbligatorio",
+      "defaultEnabled": "Attivato per impostazione predefinita"
+    }
+  },
+  "sites": {
+    "title": "Siti",
+    "subtitle": "Gestisci i tuoi siti web e la loro configurazione",
+    "createButton": "Crea sito",
+    "empty": {
+      "title": "Nessun sito ancora",
+      "description": "I siti sono la fondazione del tuo CMS. Ogni sito ha i propri contenuti, lingue, navigazione e impostazioni."
+    },
+    "loading": "Caricamento siti...",
+    "loadError": "Impossibile caricare i siti",
+    "messages": {
+      "created": "Sito creato con successo",
+      "updated": "Sito aggiornato con successo",
+      "deleted": "Sito eliminato con successo"
+    },
+    "deleteDialog": {
+      "title": "Elimina sito",
+      "message": "Sei sicuro di voler eliminare \"{{name}}\"? Questa azione non può essere annullata."
+    },
+    "card": {
+      "view": "Visualizza",
+      "edit": "Modifica",
+      "delete": "Elimina"
+    }
+  },
+  "siteDetail": {
+    "title": "Dettaglio sito",
+    "back": "Torna ai siti",
+    "loading": "Caricamento sito...",
+    "notFound": "Sito non trovato",
+    "fields": {
+      "name": "Nome",
+      "slug": "Slug",
+      "description": "Descrizione",
+      "domain": "Dominio",
+      "active": "Attivo",
+      "timezone": "Fuso orario",
+      "status": "Stato",
+      "id": "ID",
+      "created": "Creato",
+      "updated": "Aggiornato"
+    },
+    "loadFailed": "Impossibile caricare il sito",
+    "siteInfo": "Informazioni del sito",
+    "noDescription": "Nessuna descrizione",
+    "metadata": "Metadati",
+    "quickLinks": "Link rapidi",
+    "deleteSite": "Elimina sito",
+    "messages": {
+      "updated": "Sito aggiornato",
+      "deleted": "Sito eliminato"
+    }
+  },
+  "settings": {
+    "title": "Impostazioni",
+    "subtitle": "Configurazione del sito e informazioni di sistema",
+    "tabs": {
+      "siteSettings": "Impostazioni sito",
+      "systemInfo": "Informazioni di sistema",
+      "preferences": "Preferenze",
+      "legal": "Legale",
+      "apiKeys": "Chiavi API"
+    },
+    "selectSiteAlert": "Seleziona un sito dall'intestazione per gestire le sue impostazioni.",
+    "loadingSiteSettings": "Caricamento impostazioni sito...",
+    "uploadLimits": {
+      "title": "Limiti di caricamento",
+      "maxDocumentSize": "Dimensione massima file documento",
+      "maxMediaSize": "Dimensione massima file multimediale"
+    },
+    "general": {
+      "title": "Generale",
+      "contactEmail": "Email di contatto",
+      "postsPerPage": "Articoli per pagina"
+    },
+    "featureToggles": {
+      "title": "Funzionalità attivabili",
+      "analytics": "Analisi",
+      "analyticsDescription": "Abilita il tracciamento analitico del sito",
+      "maintenanceMode": "Modalità manutenzione",
+      "maintenanceModeDescription": "Mostra la pagina di manutenzione ai visitatori",
+      "editorialWorkflow": "Flusso editoriale",
+      "editorialWorkflowDescription": "Richiedere la revisione dei contenuti prima della pubblicazione. Gli autori inviano per la revisione, i revisori approvano o richiedono modifiche."
+    },
+    "preview": {
+      "title": "Modelli di anteprima",
+      "description": "Configura gli URL del server di sviluppo per l'anteprima",
+      "name": "Nome del modello",
+      "url": "URL di anteprima",
+      "add": "Aggiungi modello",
+      "openPreview": "Apri anteprima"
+    },
+    "saveButton": "Salva impostazioni",
+    "messages": {
+      "saved": "Impostazioni salvate",
+      "saveFailed": "Impossibile salvare le impostazioni"
+    },
+    "systemInfo": {
+      "serverHealth": "Stato del server",
+      "checkingHealth": "Verifica stato del server...",
+      "overallStatus": "Stato generale:",
+      "service": "Servizio",
+      "status": "Stato",
+      "latency": "Latenza",
+      "details": "Dettagli",
+      "autoRefresh": "Aggiornamento automatico ogni 30 secondi",
+      "environments": "Ambienti",
+      "loadingEnvironments": "Caricamento ambienti...",
+      "noEnvironments": "Nessun ambiente configurato",
+      "envName": "Nome",
+      "envDisplayName": "Nome visualizzato",
+      "envDefault": "Predefinito",
+      "envCreated": "Creato",
+      "locales": "Lingue",
+      "loadingLocales": "Caricamento lingue...",
+      "noLocales": "Nessuna lingua configurata",
+      "localeCode": "Codice",
+      "localeName": "Nome",
+      "localeNativeName": "Nome nativo",
+      "localeDirection": "Direzione",
+      "localeActive": "Attiva",
+      "localesMovedDescription": "Le lingue sono ora gestite nella loro pagina dedicata.",
+      "manageLocales": "Gestisci lingue"
+    },
+    "preferences": {
+      "title": "Preferenze",
+      "language": {
+        "label": "Lingua dell'amministrazione",
+        "description": "Scegli la lingua di visualizzazione per l'interfaccia di amministrazione"
+      }
+    }
+  },
+  "setupChecklist": {
+    "title": "Primi passi",
+    "description": "Completa questi passaggi per configurare il tuo sito e iniziare a pubblicare contenuti.",
+    "completeTitle": "Tutto pronto!",
+    "completeDescription": "Hai completato tutti i passaggi di configurazione. Sei pronto per pubblicare!",
+    "progress": "{{completed}} di {{total}} completati",
+    "dismiss": "Nascondi",
+    "steps": {
+      "createSite": "Crea il tuo primo sito",
+      "addLanguage": "Aggiungi una lingua",
+      "createPage": "Crea una pagina",
+      "writeBlog": "Scrivi un articolo del blog",
+      "setupNav": "Configura la navigazione"
+    }
+  },
+  "activity": {
+    "title": "Attività",
+    "subtitle": "Registro di tutte le modifiche su questo sito",
+    "loading": "Caricamento attività...",
+    "empty": "Nessuna attività",
+    "emptyDescription": "Le azioni come creazione, aggiornamento ed eliminazione di contenuti appariranno qui.",
+    "columns": {
+      "timestamp": "Timestamp",
+      "action": "Azione",
+      "entityType": "Tipo di entità",
+      "entityId": "ID entità",
+      "userId": "Utente"
+    },
+    "filters": {
+      "action": "Azione",
+      "entityType": "Tipo di entità"
+    }
+  },
+  "entityHistory": {
+    "title": "Cronologia",
+    "noHistory": "Nessuna cronologia registrata",
+    "events": "Eventi",
+    "changes": "Modifiche ai campi",
+    "oldValue": "Vecchio",
+    "newValue": "Nuovo",
+    "revert": "Ripristina",
+    "revertConfirmTitle": "Ripristina modifiche",
+    "revertConfirmMessage": "Ripristinare i seguenti campi ai valori precedenti?",
+    "reverted": "Modifiche ripristinate",
+    "revertFailed": "Ripristino non riuscito"
+  },
+  "unsavedChanges": {
+    "title": "Modifiche non salvate",
+    "message": "Hai modifiche non salvate. Scartare e uscire?",
+    "stay": "Resta",
+    "discard": "Scarta"
+  },
+  "inlineEdit": {
+    "clickToEdit": "Clicca per modificare"
+  },
+  "notFound": {
+    "title": "404",
+    "subtitle": "Pagina non trovata",
+    "goToDashboard": "Vai al pannello di controllo"
+  },
+  "apiDocs": {
+    "title": "Documentazione API",
+    "subtitle": "Documentazione API interattiva"
+  },
+  "forms": {
+    "blog": {
+      "createTitle": "Crea blog",
+      "editTitle": "Modifica blog",
+      "fields": {
+        "siteId": "Sito",
+        "locale": "Lingua",
+        "slug": "Slug",
+        "author": "Autore",
+        "status": "Stato",
+        "featured": "Articolo in evidenza",
+        "publishedDate": "Data di pubblicazione"
+      }
+    },
+    "page": {
+      "createTitle": "Crea pagina",
+      "editTitle": "Modifica pagina",
+      "fields": {
+        "siteId": "Sito",
+        "route": "Percorso",
+        "pageType": "Tipo di pagina",
+        "status": "Stato",
+        "inNavigation": "Mostra nella navigazione",
+        "navTitle": "Titolo navigazione",
+        "navOrder": "Ordine navigazione"
+      }
+    },
+    "site": {
+      "createTitle": "Crea sito",
+      "editTitle": "Modifica sito",
+      "fields": {
+        "name": "Nome",
+        "slug": "Slug",
+        "description": "Descrizione",
+        "domain": "Dominio",
+        "active": "Attivo",
+        "initialLanguages": "Lingue iniziali",
+        "initialLanguagesHelper": "Seleziona almeno una lingua per il tuo sito",
+        "defaultLanguage": "Lingua predefinita"
+      },
+      "validation": {
+        "minOneLocale": "È richiesta almeno una lingua",
+        "exactlyOneDefault": "Esattamente una lingua deve essere impostata come predefinita"
+      }
+    },
+    "navigation": {
+      "createTitle": "Crea elemento di navigazione",
+      "editTitle": "Modifica elemento di navigazione",
+      "fields": {
+        "type": "Tipo",
+        "page": "Pagina",
+        "externalUrl": "URL esterno",
+        "icon": "Icona",
+        "openInNewTab": "Apri in una nuova scheda",
+        "label": "Etichetta",
+        "locale": "Lingua"
+      }
+    },
+    "socialLink": {
+      "createTitle": "Crea link social",
+      "editTitle": "Modifica link social",
+      "fields": {
+        "title": "Titolo",
+        "url": "URL",
+        "icon": "Icona",
+        "ariaLabel": "Etichetta Aria"
+      }
+    },
+    "locale": {
+      "createTitle": "Aggiungi lingua",
+      "editTitle": "Modifica lingua",
+      "fields": {
+        "code": "Codice",
+        "name": "Nome",
+        "nativeName": "Nome nativo",
+        "direction": "Direzione",
+        "active": "Attivo"
+      },
+      "validation": {
+        "codeFormat": "Formato: en o en-US"
+      }
+    },
+    "tag": {
+      "createTitle": "Crea tag",
+      "editTitle": "Modifica tag",
+      "fields": {
+        "slug": "Slug",
+        "global": "Globale (condiviso tra tutti i siti)",
+        "slugHelper": "Identificatore URL — lettere minuscole, numeri e trattini (es. \"il-mio-tag\")",
+        "globalHelper": "I tag globali sono condivisi tra tutti i siti. I tag specifici appartengono solo al sito attuale."
+      }
+    },
+    "category": {
+      "createTitle": "Crea categoria",
+      "editTitle": "Modifica categoria",
+      "fields": {
+        "slug": "Slug",
+        "parent": "Categoria genitore",
+        "noParent": "Nessuna (livello principale)",
+        "global": "Globale (condiviso tra tutti i siti)",
+        "slugHelper": "Identificatore URL — lettere minuscole, numeri e trattini (es. \"sviluppo-web\")",
+        "globalHelper": "Le categorie globali sono condivise tra tutti i siti. Le categorie specifiche appartengono solo al sito attuale.",
+        "parentHelper": "Nidifica questa categoria sotto un genitore per costruire una gerarchia (es. Tecnologia > Sviluppo Web)"
+      }
+    },
+    "cvEntry": {
+      "createTitle": "Crea voce del CV",
+      "editTitle": "Modifica voce del CV",
+      "fields": {
+        "siteId": "Sito",
+        "entryType": "Tipo di voce",
+        "company": "Azienda / Organizzazione",
+        "location": "Luogo",
+        "startDate": "Data di inizio",
+        "endDate": "Data di fine",
+        "isCurrent": "Attualmente qui",
+        "displayOrder": "Ordine di visualizzazione",
+        "title": "Titolo professionale",
+        "description": "Descrizione",
+        "locale": "Lingua"
+      }
+    },
+    "skill": {
+      "createTitle": "Crea competenza",
+      "editTitle": "Modifica competenza",
+      "fields": {
+        "siteId": "Sito",
+        "name": "Nome",
+        "slug": "Slug",
+        "category": "Categoria",
+        "proficiency": "Livello di competenza",
+        "icon": "Icona",
+        "displayOrder": "Ordine di visualizzazione"
+      }
+    },
+    "legal": {
+      "createTitle": "Crea documento legale",
+      "editTitle": "Modifica documento legale",
+      "fields": {
+        "cookieName": "Nome cookie",
+        "documentType": "Tipo di documento"
+      }
+    },
+    "mediaUpload": {
+      "title": "Registra media",
+      "fields": {
+        "siteId": "Sito",
+        "publicUrl": "URL pubblico",
+        "filename": "Nome file",
+        "originalFilename": "Nome file originale",
+        "mimeType": "Tipo MIME",
+        "fileSize": "Dimensione file (byte)",
+        "width": "Larghezza (px)",
+        "height": "Altezza (px)",
+        "altText": "Testo alternativo",
+        "caption": "Didascalia",
+        "title": "Titolo",
+        "folder": "Cartella"
+      }
+    },
+    "mediaDetail": {
+      "title": "Dettagli media",
+      "fields": {
+        "filename": "Nome file",
+        "originalFilename": "Nome file originale",
+        "mimeType": "Tipo MIME",
+        "fileSize": "Dimensione file",
+        "dimensions": "Dimensioni",
+        "publicUrl": "URL pubblico",
+        "altText": "Testo alternativo",
+        "caption": "Didascalia",
+        "title": "Titolo",
+        "folder": "Cartella",
+        "noFolder": "Nessuna cartella",
+        "created": "Creato"
+      },
+      "messages": {
+        "updated": "Media aggiornato",
+        "updateFailed": "Impossibile aggiornare il media"
+      }
+    },
+    "document": {
+      "createTitle": "Crea documento",
+      "editTitle": "Modifica documento",
+      "fields": {
+        "siteId": "Sito",
+        "title": "Titolo",
+        "slug": "Slug",
+        "description": "Descrizione",
+        "documentType": "Tipo di documento",
+        "fileUrl": "URL del file",
+        "fileSize": "Dimensione file (byte)",
+        "mimeType": "Tipo MIME",
+        "status": "Stato"
+      }
+    },
+    "webhook": {
+      "createTitle": "Crea webhook",
+      "editTitle": "Modifica webhook",
+      "fields": {
+        "url": "URL",
+        "urlHelper": "L'endpoint che riceverà richieste POST con dati degli eventi",
+        "description": "Descrizione",
+        "events": "Eventi",
+        "eventsHelper": "Lasciare vuoto per tutti gli eventi",
+        "active": "Attivo"
+      }
+    },
+    "contentTemplate": {
+      "createTitle": "Crea modello",
+      "editTitle": "Modifica modello",
+      "sections": {
+        "metadata": "Impostazioni modello",
+        "content": "Contenuto predefinito"
+      },
+      "fields": {
+        "name": "Nome",
+        "description": "Descrizione",
+        "icon": "Icona",
+        "slugPrefix": "Prefisso slug",
+        "isFeatured": "In evidenza per impostazione predefinita",
+        "allowComments": "Commenti per impostazione predefinita",
+        "isActive": "Attivo",
+        "title": "Titolo",
+        "subtitle": "Sottotitolo",
+        "excerpt": "Estratto",
+        "body": "Corpo (Markdown)",
+        "metaTitle": "Titolo meta",
+        "metaDescription": "Descrizione meta"
+      }
+    },
+    "redirect": {
+      "createTitle": "Crea reindirizzamento",
+      "editTitle": "Modifica reindirizzamento",
+      "fields": {
+        "sourcePath": "Percorso di origine",
+        "sourcePathHelper": "Il percorso da reindirizzare (es. /vecchio-percorso)",
+        "destinationPath": "URL di destinazione",
+        "destinationPathHelper": "L'URL di destinazione (es. /nuovo-percorso o https://example.com)",
+        "statusCode": "Tipo di reindirizzamento",
+        "permanent": "301 — Permanente",
+        "temporary": "302 — Temporaneo",
+        "description": "Descrizione",
+        "active": "Attivo"
+      }
+    },
+    "section": {
+      "title": "Modifica sezione",
+      "fields": {
+        "sectionType": "Tipo di sezione",
+        "displayOrder": "Ordine di visualizzazione",
+        "settings": "Impostazioni"
+      }
+    },
+    "undo": "Annulla",
+    "redo": "Ripristina",
+    "validation": {
+      "required": "Questo campo è obbligatorio",
+      "minLength": "Minimo {{count}} caratteri",
+      "maxLength": "Massimo {{count}} caratteri",
+      "invalidEmail": "Indirizzo email non valido",
+      "invalidUrl": "URL non valido",
+      "min": "Il valore minimo è {{value}}",
+      "max": "Il valore massimo è {{value}}"
+    }
+  },
+  "shared": {
+    "autosave": {
+      "retryFailed": "Il salvataggio automatico non è riuscito dopo diversi tentativi. Prova a salvare manualmente con Ctrl+S."
+    },
+    "confirmDialog": {
+      "defaultTitle": "Conferma",
+      "defaultCancel": "Annulla"
+    },
+    "loadingState": {
+      "defaultLabel": "Caricamento..."
+    },
+    "emptyState": {
+      "defaultTitle": "Niente qui ancora"
+    },
+    "folderTree": {
+      "allFiles": "Tutti i file",
+      "newFolder": "Nuova cartella",
+      "rename": "Rinomina",
+      "delete": "Elimina",
+      "createFolder": "Crea cartella",
+      "folderName": "Nome cartella"
+    },
+    "pageHeader": {},
+    "statusChip": {},
+    "errorBoundary": {
+      "title": "Qualcosa è andato storto",
+      "description": "Si è verificato un errore imprevisto in questa pagina.",
+      "showDetails": "Mostra dettagli",
+      "hideDetails": "Nascondi dettagli",
+      "tryAgain": "Riprova",
+      "goToDashboard": "Vai alla dashboard",
+      "reloadPage": "Ricarica pagina"
+    },
+    "navigationGuard": {
+      "title": "Modifiche non salvate",
+      "message": "Hai modifiche non salvate. Sei sicuro di voler lasciare questa pagina?",
+      "leave": "Esci",
+      "stay": "Resta"
+    }
+  },
+  "profile": {
+    "title": "Profilo",
+    "subtitle": "Gestisci il tuo account, le impostazioni di sicurezza e i dati",
+    "accountInfo": "Informazioni dell'account",
+    "unknownUser": "Utente sconosciuto",
+    "manageAccount": "Gestisci account",
+    "security": "Sicurezza e sessioni",
+    "authMethod": "Metodo di autenticazione",
+    "permissionLevel": "Livello di permesso",
+    "siteScope": "Ambito del sito",
+    "memberSince": "Membro dal",
+    "lastSignIn": "Ultimo accesso",
+    "dataPrivacy": "Dati e privacy",
+    "dataPrivacyInfo": "Puoi esportare tutti i tuoi dati memorizzati nel CMS o eliminare permanentemente il tuo account. I dati esportati includono il tuo profilo, i registri di audit, le API key e la cronologia delle modifiche.",
+    "exportData": "Esporta i miei dati",
+    "exporting": "Esportazione...",
+    "exportSuccess": "Dati esportati con successo",
+    "exportError": "Impossibile esportare i dati",
+    "deleteAccount": "Elimina account",
+    "deleteAccountTitle": "Elimina account",
+    "deleteAccountMessage": "Questa azione è permanente e non può essere annullata. Il tuo account Clerk verrà eliminato e tutti i dati CMS associati verranno anonimizzati. Sei sicuro di voler procedere?",
+    "deleteAccountConfirm": "Elimina il mio account",
+    "deleteSuccess": "Account eliminato con successo",
+    "deleteError": "Impossibile eliminare l'account"
+  },
+  "siteLocales": {
+    "title": "Lingue",
+    "addLanguage": "Aggiungi lingua",
+    "columns": {
+      "language": "Lingua",
+      "nativeName": "Nome nativo",
+      "urlPrefix": "Prefisso URL",
+      "default": "Predefinita",
+      "active": "Attiva",
+      "actions": "Azioni"
+    },
+    "addDialog": {
+      "title": "Aggiungi lingua",
+      "selectLanguage": "Seleziona lingua",
+      "urlPrefix": "Prefisso URL",
+      "urlPrefixHelper": "es. en, de, fr (usato negli URL)",
+      "setAsDefault": "Imposta come lingua predefinita"
+    },
+    "setDefault": "Imposta come predefinita",
+    "remove": "Rimuovi",
+    "empty": "Nessuna lingua ancora assegnata a questo sito.",
+    "tooltips": {
+      "cannotRemoveDefault": "Impossibile rimuovere la lingua predefinita",
+      "cannotRemoveLast": "Impossibile rimuovere l'ultima lingua",
+      "alreadyDefault": "È già la lingua predefinita"
+    },
+    "messages": {
+      "added": "Lingua aggiunta",
+      "updated": "Lingua aggiornata",
+      "removed": "Lingua rimossa",
+      "defaultSet": "Lingua predefinita aggiornata",
+      "addFailed": "Impossibile aggiungere la lingua",
+      "updateFailed": "Impossibile aggiornare la lingua",
+      "removeFailed": "Impossibile rimuovere la lingua",
+      "defaultFailed": "Impossibile impostare la lingua predefinita"
+    }
+  },
+  "commandPalette": {
+    "placeholder": "Cerca comandi...",
+    "noResults": "Nessun risultato trovato",
+    "categories": {
+      "navigation": "Navigazione",
+      "actions": "Azioni",
+      "blogs": "Blog",
+      "pages": "Pagine",
+      "sites": "Siti"
+    },
+    "actions": {
+      "toggleTheme": "Cambia tema",
+      "logout": "Esci"
+    },
+    "hint": "\u2318K"
+  },
+  "languages": {
+    "en": "English",
+    "de": "Deutsch",
+    "fr": "Français",
+    "es": "Español",
+    "it": "Italiano",
+    "pt": "Português",
+    "nl": "Nederlands",
+    "pl": "Polski"
+  },
+  "workflow": {
+    "submitForReview": "Invia per revisione",
+    "approve": "Approva",
+    "requestChanges": "Richiedi modifiche",
+    "reviewComment": "Commento di revisione",
+    "reviewCommentPlaceholder": "Descrivi le modifiche necessarie...",
+    "submittedForReview": "Contenuto inviato per revisione",
+    "approved": "Contenuto approvato",
+    "changesRequested": "Modifiche richieste",
+    "cannotPublish": "Il flusso editoriale è attivato. Invia il contenuto per la revisione per pubblicarlo."
+  },
+  "notifications": {
+    "title": "Notifiche",
+    "bell": "Notifiche",
+    "empty": "Nessuna notifica ancora",
+    "markAllRead": "Segna tutto come letto",
+    "viewAll": "Vedi tutte",
+    "pageTitle": "Notifiche",
+    "pageSubtitle": "Rivedi e gestisci le tue notifiche",
+    "columns": {
+      "type": "Tipo",
+      "title": "Titolo",
+      "message": "Messaggio",
+      "time": "Ora",
+      "status": "Stato"
+    },
+    "read": "Letta",
+    "unread": "Non letta",
+    "noSite": "Seleziona un sito per visualizzare le notifiche",
+    "types": {
+      "submitted": "Inviato per revisione",
+      "approved": "Approvato",
+      "changesRequested": "Modifiche richieste"
+    }
+  },
+  "bulk": {
+    "selectedCount": "{{count}} selezionati",
+    "publish": "Pubblica",
+    "unpublish": "Annulla pubblicazione",
+    "delete": "Elimina",
+    "clearSelection": "Cancella selezione",
+    "deleteDialog": {
+      "title": "Elimina elementi selezionati",
+      "message": "Eliminare {{count}} elementi selezionati? Questa azione non può essere annullata."
+    },
+    "messages": {
+      "success": "{{count}} elementi aggiornati con successo",
+      "partial": "{{succeeded}} riusciti, {{failed}} falliti"
+    }
+  },
+  "contentTemplates": {
+    "title": "Modelli di contenuto",
+    "subtitle": "Gestisci modelli di contenuto riutilizzabili",
+    "addTemplate": "Aggiungi modello",
+    "table": {
+      "name": "Nome",
+      "description": "Descrizione",
+      "icon": "Icona",
+      "active": "Attivo",
+      "created": "Creato",
+      "actions": "Azioni"
+    },
+    "empty": {
+      "noSite": "Seleziona un sito dalla barra degli strumenti",
+      "title": "Nessun modello ancora",
+      "description": "Crea modelli di contenuto riutilizzabili per velocizzare la creazione di articoli."
+    },
+    "loading": "Caricamento modelli...",
+    "messages": {
+      "created": "Modello creato",
+      "updated": "Modello aggiornato",
+      "deleted": "Modello eliminato"
+    },
+    "deleteDialog": {
+      "title": "Elimina modello",
+      "message": "Eliminare il modello \"{{name}}\"? Questa azione non può essere annullata."
+    }
+  },
+  "templates": {
+    "fromTemplate": "Da modello",
+    "dialogTitle": "Crea blog da modello",
+    "dialogSubtitle": "Scegli un modello per iniziare con una struttura di contenuto precompilata.",
+    "useTemplate": "Usa modello",
+    "searchPlaceholder": "Cerca modelli...",
+    "builtIn": "Integrato",
+    "custom": "Personalizzato",
+    "manageTemplates": "Gestisci modelli",
+    "noResults": "Nessun modello trovato",
+    "page": "Pagina {{current}} di {{total}}",
+    "tutorial": {
+      "name": "Tutorial",
+      "description": "Guida passo passo con prerequisiti, passaggi numerati e letture consigliate."
+    },
+    "changelog": {
+      "name": "Changelog",
+      "description": "Note di rilascio con funzionalità, correzioni, modifiche importanti e guida alla migrazione."
+    },
+    "review": {
+      "name": "Recensione",
+      "description": "Recensione di prodotto o strumento con caratteristiche principali, pro, contro e verdetto."
+    },
+    "announcement": {
+      "name": "Annuncio",
+      "description": "Annuncio con significato, prossimi passi e invito all'azione."
+    }
+  },
+  "markdownImport": {
+    "importButton": "Importa Markdown",
+    "dialogTitle": "Importa da Markdown",
+    "dialogSubtitle": "Carica un file Markdown per creare un nuovo articolo del blog. Il titolo H1 diventerà il titolo.",
+    "dropZone": "Trascina un file .md qui o clicca per sfogliare",
+    "dropZoneActive": "Rilascia il file qui",
+    "preview": "Anteprima",
+    "titleLabel": "Titolo",
+    "excerptLabel": "Estratto",
+    "slugLabel": "Slug",
+    "bodyPreview": "Anteprima del contenuto",
+    "back": "Indietro",
+    "import": "Importa",
+    "importing": "Importazione...",
+    "errors": {
+      "invalidExtension": "Sono accettati solo file .md e .markdown",
+      "emptyFile": "Il file è vuoto",
+      "noH1": "Il Markdown deve contenere esattamente un titolo H1 (# Titolo)",
+      "multipleH1": "Il Markdown contiene più titoli H1. Usane solo uno.",
+      "titleTooLong": "Il titolo supera la lunghezza massima di {{max}} caratteri",
+      "bodyTooLong": "Il contenuto supera la lunghezza massima di {{max}} caratteri",
+      "readFailed": "Impossibile leggere il file"
+    }
+  }
+}

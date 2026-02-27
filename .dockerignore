@@ -1,0 +1,13 @@
+.git
+.github
+.claude
+.idea
+.vscode
+docs
+templates
+
+# Build artifacts
+backend/target
+admin/node_modules
+admin/dist
+*.md

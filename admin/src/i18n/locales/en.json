@@ -1,0 +1,1730 @@
+{
+  "common": {
+    "appName": "OpenYapper",
+    "actions": {
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "edit": "Edit",
+      "create": "Create",
+      "add": "Add",
+      "close": "Close",
+      "confirm": "Confirm",
+      "back": "Back",
+      "refresh": "Refresh",
+      "search": "Search",
+      "clear": "Clear",
+      "view": "View",
+      "manage": "Manage",
+      "submit": "Submit",
+      "saving": "Saving...",
+      "loading": "Loading...",
+      "deleting": "Deleting...",
+      "clone": "Clone",
+      "upload": "Upload",
+      "preview": "Preview"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "draft": "Draft",
+      "published": "Published",
+      "blocked": "Blocked",
+      "expired": "Expired",
+      "revoked": "Revoked",
+      "healthy": "Healthy",
+      "degraded": "Degraded",
+      "unhealthy": "Unhealthy",
+      "up": "Up",
+      "down": "Down",
+      "scheduled": "Scheduled",
+      "inReview": "In Review",
+      "archived": "Archived"
+    },
+    "table": {
+      "actions": "Actions",
+      "name": "Name",
+      "status": "Status",
+      "created": "Created",
+      "type": "Type",
+      "slug": "Slug",
+      "noData": "No data"
+    },
+    "confirm": {
+      "cannotBeUndone": "This cannot be undone.",
+      "areYouSure": "Are you sure?"
+    },
+    "filters": {
+      "all": "All",
+      "status": "Status",
+      "permission": "Permission",
+      "filterByType": "Filter by Type"
+    },
+    "labels": {
+      "yes": "Yes",
+      "no": "No",
+      "default": "Default",
+      "global": "Global",
+      "site": "Site",
+      "child": "Child",
+      "featured": "Featured",
+      "present": "Present",
+      "never": "Never",
+      "none": "None",
+      "untitled": "Untitled",
+      "internal": "Internal",
+      "external": "External"
+    },
+    "errors": {
+      "loadFailed": "Failed to load data",
+      "saveFailed": "Failed to save",
+      "deleteFailed": "Failed to delete",
+      "serverUnreachable": "Server unreachable",
+      "required": "This field is required"
+    },
+    "noSiteSelected": "No site selected",
+    "selectSitePrompt": "Select a site from the toolbar",
+    "selectSite": "Select site...",
+    "noSiteOption": "No site selected",
+    "lockedByScope": "Locked by API key scope",
+    "skipToMain": "Skip to main content"
+  },
+  "scheduling": {
+    "publishAt": "Publish at",
+    "unpublishAt": "Unpublish at (optional)",
+    "scheduledFor": "Scheduled for {{date}}",
+    "clearSchedule": "Clear schedule",
+    "expiresAt": "Expires {{date}}"
+  },
+  "layout": {
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "content": "Content",
+      "blogs": "Blogs",
+      "pages": "Pages",
+      "media": "Media",
+      "documents": "Documents",
+      "assets": "Assets",
+      "structure": "Structure",
+      "navigation": "Navigation",
+      "taxonomy": "Taxonomy",
+      "site": "Site",
+      "socialLinks": "Social Links",
+      "activity": "Activity",
+      "legal": "Legal",
+      "cv": "CV",
+      "members": "Members",
+      "apiKeys": "API Keys",
+      "contentTemplates": "Templates",
+      "redirects": "Redirects",
+      "webhooks": "Webhooks",
+      "settings": "Settings",
+      "sites": "Sites",
+      "locales": "Languages",
+      "apiDocs": "API Docs",
+      "myDrafts": "My Drafts",
+      "logout": "Logout"
+    },
+    "toolbar": {
+      "toggleDrawer": "Toggle drawer",
+      "account": "Account",
+      "profile": "Profile",
+      "theme": "Theme",
+      "language": "Language"
+    },
+    "accountMenu": {
+      "system": "System",
+      "sites": "Manage Sites",
+      "locales": "Languages",
+      "apiDocs": "API Docs"
+    }
+  },
+  "login": {
+    "title": "OpenYapper",
+    "subtitle": "Enter your API key to access the admin dashboard",
+    "apiKeyLabel": "API Key",
+    "apiKeyPlaceholder": "dk_xxxxxxxx_xxxxxxxxxxxxxxxx",
+    "loginButton": "Login",
+    "verifying": "Verifying...",
+    "success": "Login successful",
+    "errors": {
+      "required": "API key is required",
+      "invalid": "Invalid API key"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "managing": "Managing {{name}}",
+    "selectSitePrompt": "Select a site from the toolbar to see content stats.",
+    "readOnlyNotice": "You have <strong>read-only</strong> access. Content is visible but cannot be modified.",
+    "systemHealth": "System Health",
+    "overall": "Overall: {{status}}",
+    "stats": {
+      "sites": "Sites",
+      "blogPosts": "Blog Posts",
+      "pages": "Pages",
+      "mediaFiles": "Media Files",
+      "users": "Users",
+      "apiKeys": "API Keys"
+    },
+    "recentPosts": "Recent Blog Posts",
+    "publishedPosts": "Published Posts",
+    "newPost": "New Post",
+    "noPosts": "No blog posts yet.",
+    "noPostsCreate": "No blog posts yet. Create your first post!",
+    "drafts": "Drafts",
+    "viewAllDrafts": "View all",
+    "noDrafts": "No drafts — all content is published or in review.",
+    "quickActions": "Quick Actions",
+    "byAuthor": "by {{author}}",
+    "requests": "{{count}} requests",
+    "yourSites": "Your Sites",
+    "noSites": "No sites found",
+    "noSitesCreate": "Create your first site to get started",
+    "permissions": {
+      "master": "System Admin",
+      "owner": "Site Owner",
+      "admin": "Admin",
+      "write": "Write",
+      "readOnly": "Read-only"
+    }
+  },
+  "myDrafts": {
+    "title": "My Drafts",
+    "subtitle": "All draft content in one place",
+    "loading": "Loading drafts...",
+    "table": {
+      "name": "Name",
+      "type": "Type",
+      "lastModified": "Last Modified"
+    },
+    "empty": {
+      "noSite": "Select a site from the toolbar to view drafts",
+      "title": "No drafts",
+      "description": "All your content is published or scheduled — nothing in draft."
+    }
+  },
+  "blogs": {
+    "title": "Blogs",
+    "subtitle": "Manage blog posts across your sites",
+    "createButton": "Create Blog",
+    "table": {
+      "slug": "Slug",
+      "author": "Author",
+      "status": "Status",
+      "featured": "Featured",
+      "published": "Published",
+      "actions": "Actions"
+    },
+    "viewDetail": "View Detail",
+    "empty": {
+      "noSite": "Select a site from the toolbar to view its blog posts",
+      "title": "No blog posts yet",
+      "description": "Blog posts are the backbone of your content. Write articles, tutorials, or news — each with translations, categories, and SEO metadata."
+    },
+    "loading": "Loading blogs...",
+    "loadError": "Failed to load blogs",
+    "messages": {
+      "created": "Blog created — opening editor",
+      "updated": "Blog updated",
+      "deleted": "Blog deleted",
+      "cloned": "Blog cloned successfully"
+    },
+    "deleteDialog": {
+      "title": "Delete Blog",
+      "message": "Delete blog \"{{slug}}\"? This cannot be undone."
+    },
+    "moreActions": "More"
+  },
+  "blogDetail": {
+    "title": "Blog Detail",
+    "back": "Back to Blogs",
+    "loading": "Loading blog...",
+    "notFound": "Blog not found",
+    "tabs": {
+      "content": "Content",
+      "preview": "Preview",
+      "seo": "SEO",
+      "settings": "Settings",
+      "attachments": "Attachments",
+      "metadata": "Metadata",
+      "documents": "Documents"
+    },
+    "toolbar": {
+      "unsavedChanges": "Unsaved changes",
+      "saving": "Saving...",
+      "saved": "All changes saved",
+      "saveFailed": "Save failed"
+    },
+    "seo": {
+      "serpPreview": "Search Engine Preview",
+      "charCount": "{{current}}/{{max}}"
+    },
+    "fields": {
+      "title": "Title",
+      "subtitle": "Subtitle",
+      "slug": "Slug",
+      "author": "Author",
+      "status": "Status",
+      "locale": "Locale",
+      "excerpt": "Excerpt",
+      "content": "Content",
+      "body": "Body (Markdown)",
+      "coverImage": "Cover Image URL",
+      "publishedDate": "Published Date",
+      "featured": "Featured",
+      "tags": "Tags",
+      "categories": "Categories",
+      "metaTitle": "Meta Title",
+      "metaDescription": "Meta Description"
+    },
+    "metadata": {
+      "title": "Blog Metadata",
+      "slug": "Slug:",
+      "author": "Author:",
+      "status": "Status:",
+      "published": "Published:",
+      "readingTime": "Reading Time",
+      "manualOverride": "Manual override",
+      "autoCalculated": "Auto-calculated from content",
+      "resetAuto": "Reset to auto-calculated"
+    },
+    "images": {
+      "title": "Images",
+      "coverImageId": "Cover Image ID:",
+      "headerImageId": "Header Image ID:"
+    },
+    "settings": {
+      "title": "Settings",
+      "featured": "Featured",
+      "notFeatured": "Not Featured",
+      "commentsOn": "Comments On",
+      "commentsOff": "Comments Off"
+    },
+    "toc": "Table of Contents",
+    "createTranslation": "Create {{locale}} Translation",
+    "noLocalesAlert": "No active locales configured. Go to <strong>Settings → Locales</strong> and create at least one active locale (e.g. \"en\") to start writing blog content.",
+    "messages": {
+      "saved": "Blog saved",
+      "saveFailed": "Failed to save blog"
+    },
+    "documents": {
+      "title": "Attached Documents",
+      "attach": "Attach Document",
+      "empty": "No documents attached",
+      "emptyDescription": "Attach documents to this blog post",
+      "detached": "Document detached",
+      "attached": "Document attached"
+    }
+  },
+  "pages": {
+    "title": "Pages",
+    "subtitle": "Manage pages across your sites",
+    "createButton": "Create Page",
+    "table": {
+      "route": "Route",
+      "type": "Type",
+      "status": "Status",
+      "inNav": "In Nav",
+      "created": "Created",
+      "actions": "Actions"
+    },
+    "viewDetails": "View Details",
+    "empty": {
+      "noSite": "Select a site from the toolbar to view its pages",
+      "title": "No pages yet",
+      "description": "Pages are the building blocks of your site. Create landing pages, about sections, or any custom layout with modular sections."
+    },
+    "loading": "Loading pages...",
+    "loadError": "Failed to load pages",
+    "messages": {
+      "created": "Page created",
+      "updated": "Page updated",
+      "deleted": "Page deleted",
+      "cloned": "Page cloned successfully"
+    },
+    "deleteDialog": {
+      "title": "Delete Page",
+      "message": "Delete page \"{{route}}\"? This cannot be undone."
+    }
+  },
+  "pageDetail": {
+    "title": "Page Detail",
+    "back": "Back to Pages",
+    "loading": "Loading page...",
+    "loadFailed": "Failed to load page",
+    "notFound": "Page not found",
+    "pageInfo": "Page Information",
+    "parentPageId": "Parent Page ID",
+    "pageSubtitle": "{{type}} page",
+    "metadata": "Metadata",
+    "contentId": "Content ID",
+    "template": "Template",
+    "sections": {
+      "title": "Sections",
+      "add": "Add Section",
+      "empty": "No sections yet",
+      "emptyDescription": "Add sections to build your page layout",
+      "deleted": "Section deleted",
+      "saved": "Section saved",
+      "reordered": "Sections reordered",
+      "added": "Section added",
+      "loadingSections": "Loading sections...",
+      "deleteTitle": "Delete Section",
+      "deleteMessage": "Delete this {{type}} section? This cannot be undone."
+    },
+    "table": {
+      "type": "Type",
+      "order": "Order",
+      "localizations": "Localizations",
+      "coverImage": "Cover Image",
+      "ctaRoute": "CTA Route",
+      "actions": "Actions"
+    },
+    "dialog": {
+      "sectionType": "Section Type",
+      "displayOrder": "Display Order",
+      "displayOrderRequired": "Display order is required",
+      "adding": "Adding..."
+    },
+    "fields": {
+      "route": "Route",
+      "title": "Title",
+      "description": "Description",
+      "status": "Status",
+      "pageType": "Page Type",
+      "inNavigation": "In Navigation",
+      "navTitle": "Navigation Title",
+      "navOrder": "Navigation Order",
+      "metaTitle": "Meta Title",
+      "metaDescription": "Meta Description",
+      "slug": "Slug",
+      "id": "ID",
+      "published": "Published",
+      "created": "Created",
+      "updated": "Updated"
+    },
+    "tabs": {
+      "info": "Info",
+      "sections": "Sections"
+    },
+    "toolbar": {
+      "saving": "Saving...",
+      "saved": "All changes saved",
+      "saveFailed": "Save failed"
+    },
+    "messages": {
+      "saved": "Page saved",
+      "saveFailed": "Failed to save page",
+      "updated": "Page updated"
+    }
+  },
+  "media": {
+    "title": "Media",
+    "subtitle": "Manage media files across your sites",
+    "registerButton": "Register Media",
+    "uploadButton": "Upload File",
+    "folders": "Folders",
+    "searchPlaceholder": "Search by filename, alt text, caption, title...",
+    "categories": {
+      "images": "Images",
+      "videos": "Videos",
+      "audio": "Audio",
+      "documents": "Documents"
+    },
+    "openUrl": "Open URL",
+    "empty": {
+      "noSite": "Select a site from the toolbar to view its media files",
+      "title": "No media yet",
+      "description": "Upload and manage images, videos, and documents. Media files can be attached to blog posts, pages, and sections.",
+      "noMatch": "No matching media",
+      "noMatchDescription": "Try adjusting your search or filters",
+      "noFilesInFolder": "No files in this folder"
+    },
+    "loading": "Loading media...",
+    "loadError": "Failed to load media",
+    "messages": {
+      "registered": "Media registered",
+      "deleted": "Media deleted",
+      "moved": "Moved to folder",
+      "folderCreated": "Folder created",
+      "folderRenamed": "Folder renamed",
+      "folderDeleted": "Folder deleted"
+    },
+    "deleteDialog": {
+      "title": "Delete Media",
+      "message": "Delete \"{{filename}}\"? This cannot be undone."
+    },
+    "upload": {
+      "dragDrop": "Drag and drop files here, or click to browse",
+      "uploading": "Uploading...",
+      "progress": "Uploading {{percent}}%",
+      "success": "File uploaded successfully",
+      "tooLarge": "File exceeds maximum size of {{maxSize}}",
+      "invalidType": "File type not supported"
+    }
+  },
+  "documents": {
+    "title": "Documents",
+    "subtitle": "Manage downloadable documents",
+    "createButton": "Add Document",
+    "table": {
+      "title": "Title",
+      "slug": "Slug",
+      "type": "Type",
+      "fileSize": "File Size",
+      "downloads": "Downloads",
+      "status": "Status",
+      "created": "Created",
+      "actions": "Actions"
+    },
+    "empty": {
+      "noSite": "Select a site from the toolbar to view its documents",
+      "title": "No documents yet",
+      "description": "Manage downloadable files like PDFs, whitepapers, or guides. Documents can be linked to blog posts and pages."
+    },
+    "loading": "Loading documents...",
+    "loadError": "Failed to load documents",
+    "messages": {
+      "created": "Document created",
+      "updated": "Document updated",
+      "deleted": "Document deleted"
+    },
+    "deleteDialog": {
+      "title": "Delete Document",
+      "message": "Delete document \"{{title}}\"? This cannot be undone."
+    }
+  },
+  "navigation": {
+    "title": "Navigation",
+    "subtitle": "Manage navigation items for your sites",
+    "addItem": "Add Item",
+    "table": {
+      "link": "Link",
+      "type": "Type",
+      "icon": "Icon",
+      "newTab": "New Tab",
+      "actions": "Actions"
+    },
+    "empty": {
+      "noSite": "Select a site from the toolbar to manage its navigation",
+      "title": "No navigation items yet",
+      "description": "Define how visitors navigate your site. Create menus with links to pages or external URLs, organized in a hierarchy."
+    },
+    "loading": "Loading navigation...",
+    "loadError": "Failed to load navigation",
+    "messages": {
+      "created": "Navigation item created",
+      "updated": "Navigation item updated",
+      "deleted": "Navigation item deleted"
+    },
+    "deleteDialog": {
+      "title": "Delete Navigation Item",
+      "message": "Delete this navigation item? This will also delete its localizations."
+    }
+  },
+  "socialLinks": {
+    "title": "Social Links",
+    "subtitle": "Manage social media links for your sites",
+    "addLink": "Add Link",
+    "table": {
+      "title": "Title",
+      "url": "URL",
+      "icon": "Icon",
+      "actions": "Actions"
+    },
+    "empty": {
+      "noSite": "Select a site from the toolbar to manage its social links",
+      "title": "No social links yet",
+      "description": "Add links to your social media profiles. These are served via the API so your frontend can display them anywhere."
+    },
+    "loading": "Loading social links...",
+    "loadError": "Failed to load social links",
+    "messages": {
+      "created": "Social link created",
+      "updated": "Social link updated",
+      "deleted": "Social link deleted"
+    },
+    "deleteDialog": {
+      "title": "Delete Social Link",
+      "message": "Delete \"{{title}}\"? This cannot be undone."
+    }
+  },
+  "taxonomy": {
+    "title": "Taxonomy",
+    "subtitle": "Manage tags and categories for your sites",
+    "info": {
+      "tags": "Tags are flat labels you attach to content — like hashtags. A post can have many tags (e.g. \"rust\", \"tutorial\", \"docker\"). Use them for filtering and cross-cutting topics.",
+      "categories": "Categories form a hierarchy (tree). Use them to group content structurally, e.g. \"Technology > Web Development > React\". Each post typically belongs to one category."
+    },
+    "tags": {
+      "title": "Tags",
+      "addTag": "Add Tag",
+      "table": {
+        "slug": "Slug",
+        "scope": "Scope",
+        "created": "Created",
+        "actions": "Actions"
+      },
+      "empty": {
+        "title": "No tags yet",
+        "description": "Tags are flat labels for cross-cutting topics — like hashtags. Assign multiple tags per post (e.g. \"rust\", \"tutorial\") so visitors can filter and discover content."
+      },
+      "loading": "Loading tags...",
+      "messages": {
+        "created": "Tag created",
+        "updated": "Tag updated",
+        "deleted": "Tag deleted"
+      },
+      "deleteDialog": {
+        "title": "Delete Tag",
+        "message": "Delete tag \"{{slug}}\"? This will deactivate the tag."
+      }
+    },
+    "categories": {
+      "title": "Categories",
+      "addCategory": "Add Category",
+      "table": {
+        "slug": "Slug",
+        "parent": "Parent",
+        "scope": "Scope",
+        "created": "Created",
+        "actions": "Actions"
+      },
+      "empty": {
+        "title": "No categories yet",
+        "description": "Categories create a tree-like hierarchy for your content. Group related posts under branches like \"Technology > Web Development\" for structured navigation."
+      },
+      "loading": "Loading categories...",
+      "messages": {
+        "created": "Category created",
+        "updated": "Category updated",
+        "deleted": "Category deleted"
+      },
+      "deleteDialog": {
+        "title": "Delete Category",
+        "message": "Delete category \"{{slug}}\"? This will deactivate the category."
+      }
+    },
+    "empty": {
+      "noSite": "Select a site from the toolbar to manage its taxonomy"
+    }
+  },
+  "webhooks": {
+    "title": "Webhooks",
+    "subtitle": "Notify external services when content changes",
+    "addWebhook": "Add Webhook",
+    "allEvents": "All events",
+    "viewDeliveries": "View deliveries",
+    "sendTest": "Send test",
+    "testSuccess": "Test delivered — {{status}}",
+    "testFailed": "Test delivery failed",
+    "table": {
+      "url": "URL",
+      "events": "Events",
+      "status": "Status",
+      "created": "Created",
+      "actions": "Actions"
+    },
+    "empty": {
+      "noSite": "Select a site from the toolbar to manage its webhooks",
+      "title": "No webhooks yet",
+      "description": "Webhooks notify external services when content is created, updated, or deleted. Use them to trigger builds, sync data, or send notifications."
+    },
+    "loading": "Loading webhooks...",
+    "messages": {
+      "created": "Webhook created",
+      "updated": "Webhook updated",
+      "deleted": "Webhook deleted"
+    },
+    "deleteDialog": {
+      "title": "Delete Webhook",
+      "message": "Delete webhook for \"{{url}}\"? This cannot be undone."
+    },
+    "deliveries": {
+      "title": "Delivery Log",
+      "loading": "Loading deliveries...",
+      "empty": "No deliveries yet",
+      "emptyDescription": "Deliveries will appear here after the webhook fires.",
+      "table": {
+        "event": "Event",
+        "status": "Status",
+        "attempt": "Attempt",
+        "timestamp": "Timestamp",
+        "error": "Error"
+      }
+    }
+  },
+  "redirects": {
+    "title": "Redirects",
+    "subtitle": "Manage URL redirects for your sites",
+    "addRedirect": "Add Redirect",
+    "table": {
+      "sourcePath": "Source Path",
+      "destination": "Destination",
+      "type": "Type",
+      "status": "Status",
+      "created": "Created",
+      "actions": "Actions",
+      "permanent": "301 Permanent",
+      "temporary": "302 Temporary"
+    },
+    "empty": {
+      "noSite": "Select a site from the toolbar to manage its redirects",
+      "title": "No redirects yet",
+      "description": "Set up URL redirects to keep old links working when content moves. Use 301 for permanent moves and 302 for temporary ones."
+    },
+    "loading": "Loading redirects...",
+    "messages": {
+      "created": "Redirect created",
+      "updated": "Redirect updated",
+      "deleted": "Redirect deleted"
+    },
+    "deleteDialog": {
+      "title": "Delete Redirect",
+      "message": "Delete redirect for \"{{source}}\"? This cannot be undone."
+    }
+  },
+  "locales": {
+    "title": "Languages",
+    "subtitle": "Manage system-wide languages and locales",
+    "addLanguage": "Add Language",
+    "loading": "Loading languages...",
+    "columns": {
+      "code": "Code",
+      "name": "Name",
+      "nativeName": "Native Name",
+      "direction": "Direction",
+      "active": "Active",
+      "created": "Created",
+      "actions": "Actions"
+    },
+    "empty": {
+      "title": "No languages yet",
+      "description": "Languages enable multilingual content. Add the languages you want to support — each piece of content can then be translated."
+    },
+    "messages": {
+      "created": "Language created",
+      "updated": "Language updated",
+      "deleted": "Language deleted"
+    },
+    "deleteDialog": {
+      "title": "Delete Language",
+      "message": "Delete language \"{{code}}\"? This cannot be undone."
+    },
+    "errors": {
+      "inUse": "Cannot delete: language is assigned to one or more sites"
+    }
+  },
+  "members": {
+    "title": "Members",
+    "subtitle": "Manage site members and their roles",
+    "addMember": "Add Member",
+    "table": {
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "joined": "Joined",
+      "actions": "Actions"
+    },
+    "roles": {
+      "owner": "Owner",
+      "admin": "Admin",
+      "editor": "Editor",
+      "author": "Author",
+      "reviewer": "Reviewer",
+      "viewer": "Viewer"
+    },
+    "empty": {
+      "noSite": "Select a site from the toolbar to manage its members",
+      "title": "No team members yet",
+      "description": "Invite collaborators to help manage this site. Assign roles like Editor, Author, or Reviewer to control access."
+    },
+    "loading": "Loading members...",
+    "loadError": "Failed to load members",
+    "messages": {
+      "added": "Member added",
+      "roleUpdated": "Member role updated",
+      "removed": "Member removed",
+      "ownershipTransferred": "Ownership transferred"
+    },
+    "addDialog": {
+      "title": "Add Member",
+      "searchPlaceholder": "Search Clerk users...",
+      "selectRole": "Select role",
+      "noResults": "No users found"
+    },
+    "removeDialog": {
+      "title": "Remove Member",
+      "message": "Remove this member from the site? They will lose all access."
+    },
+    "transferDialog": {
+      "title": "Transfer Ownership",
+      "message": "Transfer site ownership to {{name}}? You will be demoted to Admin.",
+      "confirm": "Transfer Ownership"
+    }
+  },
+  "apiKeys": {
+    "title": "API Keys",
+    "subtitle": "Manage API keys for accessing the backend",
+    "createButton": "Create API Key",
+    "filters": {
+      "allStatuses": "All statuses",
+      "allPermissions": "All permissions"
+    },
+    "table": {
+      "name": "Name",
+      "keyPrefix": "Key Prefix",
+      "site": "Site",
+      "permission": "Permission",
+      "status": "Status",
+      "requests": "Requests",
+      "lastUsed": "Last Used",
+      "actions": "Actions"
+    },
+    "empty": {
+      "title": "No API keys yet",
+      "description": "API keys let external applications access your content. Create keys with specific permission levels and site scopes.",
+      "filterHint": "Try changing your filters"
+    },
+    "loading": "Loading API keys...",
+    "loadError": "Failed to load API keys",
+    "messages": {
+      "created": "API key created",
+      "blocked": "API key blocked",
+      "unblocked": "API key unblocked",
+      "revoked": "API key revoked",
+      "deleted": "API key deleted"
+    },
+    "blockDialog": {
+      "title": "Block API Key",
+      "reason": "Block Reason",
+      "reasonPlaceholder": "Why is this key being blocked?",
+      "reasonRequired": "A reason is required"
+    },
+    "revokeDialog": {
+      "title": "Revoke API Key",
+      "message": "Are you sure you want to revoke \"{{name}}\"? This is permanent and cannot be undone."
+    },
+    "deleteDialog": {
+      "title": "Delete API Key",
+      "message": "Are you sure you want to permanently delete \"{{name}}\"?"
+    },
+    "createDialog": {
+      "title": "Create API Key",
+      "fields": {
+        "name": "Name",
+        "permission": "Permission",
+        "site": "Site",
+        "user": "User (optional)",
+        "noUser": "No user",
+        "expiresAt": "Expires At (optional)"
+      },
+      "created": {
+        "title": "API Key Created",
+        "warning": "Copy this key now. You won't be able to see it again!",
+        "copied": "Key copied to clipboard"
+      }
+    },
+    "usageDialog": {
+      "title": "API Key Usage",
+      "subtitle": "Usage statistics for {{name}}",
+      "totalRequests": "Total Requests",
+      "recentRequests": "Recent Requests",
+      "endpoint": "Endpoint",
+      "method": "Method",
+      "statusCode": "Status Code",
+      "timestamp": "Timestamp",
+      "noUsage": "No usage data available"
+    },
+    "actionsMenu": {
+      "viewUsage": "View Usage",
+      "block": "Block",
+      "unblock": "Unblock",
+      "revoke": "Revoke",
+      "delete": "Delete"
+    }
+  },
+  "cv": {
+    "title": "CV / Resume",
+    "subtitle": "Manage CV entries and skills for your sites",
+    "tabs": {
+      "entries": "Entries",
+      "skills": "Skills"
+    },
+    "entries": {
+      "addEntry": "Add Entry",
+      "table": {
+        "company": "Company",
+        "location": "Location",
+        "type": "Type",
+        "dates": "Dates",
+        "current": "Current",
+        "order": "Order",
+        "actions": "Actions"
+      },
+      "empty": {
+        "title": "No CV entries yet",
+        "description": "Add your work experience, education, and other career milestones. Entries are served via the API for your portfolio."
+      },
+      "loading": "Loading CV entries...",
+      "loadError": "Failed to load CV entries",
+      "messages": {
+        "created": "CV entry created",
+        "updated": "CV entry updated",
+        "deleted": "CV entry deleted"
+      },
+      "deleteDialog": {
+        "title": "Delete CV Entry",
+        "message": "Delete \"{{company}}\" entry? This cannot be undone."
+      }
+    },
+    "skills": {
+      "addSkill": "Add Skill",
+      "table": {
+        "name": "Name",
+        "slug": "Slug",
+        "category": "Category",
+        "proficiency": "Proficiency",
+        "icon": "Icon",
+        "actions": "Actions"
+      },
+      "empty": {
+        "title": "No skills yet",
+        "description": "List your technical and professional skills with proficiency levels and categories for your portfolio."
+      },
+      "loading": "Loading skills...",
+      "loadError": "Failed to load skills",
+      "messages": {
+        "created": "Skill created",
+        "updated": "Skill updated",
+        "deleted": "Skill deleted"
+      },
+      "deleteDialog": {
+        "title": "Delete Skill",
+        "message": "Delete skill \"{{name}}\"? This cannot be undone."
+      }
+    },
+    "empty": {
+      "noSite": "Select a site from the toolbar to manage its CV data"
+    }
+  },
+  "legal": {
+    "title": "Legal Documents",
+    "subtitle": "Manage legal documents for your sites",
+    "addDocument": "Add Document",
+    "table": {
+      "cookieName": "Cookie Name",
+      "type": "Type",
+      "created": "Created",
+      "actions": "Actions"
+    },
+    "empty": {
+      "noSite": "Select a site from the toolbar to manage its legal documents",
+      "title": "No legal documents yet",
+      "description": "Manage cookie consents, privacy policies, and other legal requirements. Group items for structured consent banners."
+    },
+    "loading": "Loading legal documents...",
+    "loadError": "Failed to load legal documents",
+    "messages": {
+      "created": "Legal document created",
+      "updated": "Legal document updated",
+      "deleted": "Legal document deleted"
+    },
+    "deleteDialog": {
+      "title": "Delete Legal Document",
+      "message": "Delete legal document \"{{cookieName}}\"? This will also delete its groups and items."
+    }
+  },
+  "legalDetail": {
+    "title": "Legal Document Detail",
+    "back": "Back to Legal Documents",
+    "loading": "Loading legal document...",
+    "notFound": "Legal document not found",
+    "editDocument": "Edit Document",
+    "cookieName": "Cookie Name",
+    "documentType": "Document Type",
+    "documentId": "Document ID",
+    "updatedMessage": "Legal document updated",
+    "loadGroupsFailed": "Failed to load groups",
+    "groups": {
+      "title": "Groups",
+      "add": "Add Group",
+      "empty": "No groups",
+      "emptyDescription": "Add the first group to this legal document",
+      "editGroup": "Edit Group",
+      "deleteGroup": "Delete Group",
+      "deleteMessage": "Delete group \"{{name}}\"? This will also delete all items in this group.",
+      "loadingGroups": "Loading groups...",
+      "order": "Order: {{order}}",
+      "required": "Required",
+      "optional": "Optional",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "messages": {
+        "created": "Group created",
+        "updated": "Group updated",
+        "deleted": "Group deleted"
+      }
+    },
+    "items": {
+      "title": "Items",
+      "add": "Add Item",
+      "empty": "No items in this group",
+      "loadingItems": "Loading items...",
+      "deleteItem": "Delete Item",
+      "deleteMessage": "Delete item \"{{name}}\"? This cannot be undone.",
+      "messages": {
+        "created": "Item created",
+        "updated": "Item updated",
+        "deleted": "Item deleted"
+      }
+    },
+    "dialog": {
+      "editGroup": "Edit Group",
+      "addGroup": "Add Group",
+      "editItem": "Edit Item",
+      "addItem": "Add Item",
+      "cookieName": "Cookie Name",
+      "cookieNameRequired": "Cookie name is required",
+      "displayOrder": "Display Order",
+      "required": "Required",
+      "defaultEnabled": "Default Enabled"
+    }
+  },
+  "sites": {
+    "title": "Sites",
+    "subtitle": "Manage your websites and their configuration",
+    "createButton": "Create Site",
+    "empty": {
+      "title": "No sites yet",
+      "description": "Sites are the foundation of your CMS. Each site has its own content, languages, navigation, and settings."
+    },
+    "loading": "Loading sites...",
+    "loadError": "Failed to load sites",
+    "messages": {
+      "created": "Site created successfully",
+      "updated": "Site updated successfully",
+      "deleted": "Site deleted successfully"
+    },
+    "deleteDialog": {
+      "title": "Delete Site",
+      "message": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone."
+    },
+    "card": {
+      "view": "View",
+      "edit": "Edit",
+      "delete": "Delete"
+    }
+  },
+  "siteDetail": {
+    "title": "Site Detail",
+    "back": "Back to Sites",
+    "loading": "Loading site...",
+    "loadFailed": "Failed to load site",
+    "notFound": "Site not found",
+    "siteInfo": "Site Information",
+    "noDescription": "No description",
+    "metadata": "Metadata",
+    "quickLinks": "Quick Links",
+    "deleteSite": "Delete Site",
+    "fields": {
+      "name": "Name",
+      "slug": "Slug",
+      "description": "Description",
+      "domain": "Domain",
+      "active": "Active",
+      "timezone": "Timezone",
+      "status": "Status",
+      "id": "ID",
+      "created": "Created",
+      "updated": "Updated"
+    },
+    "messages": {
+      "updated": "Site updated",
+      "deleted": "Site deleted"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Site configuration and system information",
+    "tabs": {
+      "siteSettings": "Site Settings",
+      "systemInfo": "System Info",
+      "preferences": "Preferences",
+      "legal": "Legal",
+      "apiKeys": "API Keys"
+    },
+    "selectSiteAlert": "Select a site from the header to manage its settings.",
+    "loadingSiteSettings": "Loading site settings...",
+    "uploadLimits": {
+      "title": "Upload Limits",
+      "maxDocumentSize": "Max Document File Size",
+      "maxMediaSize": "Max Media File Size"
+    },
+    "general": {
+      "title": "General",
+      "contactEmail": "Contact Email",
+      "postsPerPage": "Posts Per Page"
+    },
+    "featureToggles": {
+      "title": "Feature Toggles",
+      "analytics": "Analytics",
+      "analyticsDescription": "Enable site analytics tracking",
+      "maintenanceMode": "Maintenance Mode",
+      "maintenanceModeDescription": "Show maintenance page to visitors",
+      "editorialWorkflow": "Editorial Workflow",
+      "editorialWorkflowDescription": "Require content review before publishing. Authors must submit for review, reviewers approve or request changes."
+    },
+    "preview": {
+      "title": "Preview Templates",
+      "description": "Configure dev server URLs for live preview",
+      "name": "Template name",
+      "url": "Preview URL",
+      "add": "Add template",
+      "openPreview": "Open preview"
+    },
+    "saveButton": "Save Settings",
+    "messages": {
+      "saved": "Settings saved",
+      "saveFailed": "Failed to save settings"
+    },
+    "systemInfo": {
+      "serverHealth": "Server Health",
+      "checkingHealth": "Checking server health...",
+      "overallStatus": "Overall status:",
+      "service": "Service",
+      "status": "Status",
+      "latency": "Latency",
+      "details": "Details",
+      "autoRefresh": "Auto-refreshes every 30 seconds",
+      "environments": "Environments",
+      "loadingEnvironments": "Loading environments...",
+      "noEnvironments": "No environments configured",
+      "envName": "Name",
+      "envDisplayName": "Display Name",
+      "envDefault": "Default",
+      "envCreated": "Created",
+      "locales": "Locales",
+      "loadingLocales": "Loading locales...",
+      "noLocales": "No locales configured",
+      "localeCode": "Code",
+      "localeName": "Name",
+      "localeNativeName": "Native Name",
+      "localeDirection": "Direction",
+      "localeActive": "Active",
+      "localesMovedDescription": "Languages are now managed on their own dedicated page.",
+      "manageLocales": "Manage Languages"
+    },
+    "preferences": {
+      "title": "Preferences",
+      "language": {
+        "label": "Admin Language",
+        "description": "Choose the display language for the admin interface"
+      }
+    }
+  },
+  "onboarding": {
+    "welcome": "Welcome to OpenYapper",
+    "subtitle": "Your headless CMS for multi-site, multilingual content management.",
+    "description": "Create your first site to start managing pages, blog posts, media, and more — all served through a powerful REST API.",
+    "features": {
+      "multiSite": "Multi-Site",
+      "multiSiteDesc": "Manage multiple websites from a single dashboard with independent content and settings.",
+      "multilingual": "Multilingual",
+      "multilingualDesc": "Built-in localization with support for any language and RTL text direction.",
+      "apiFirst": "API-First",
+      "apiFirstDesc": "Headless architecture with a full REST API. Deliver content to any frontend."
+    },
+    "createSite": "Create Your First Site",
+    "stepPrefix": "Step 1 of 1"
+  },
+  "setupChecklist": {
+    "title": "Getting Started",
+    "description": "Complete these steps to set up your site and start publishing content.",
+    "completeTitle": "All Set!",
+    "completeDescription": "You've completed all setup steps. You're ready to publish!",
+    "progress": "{{completed}} of {{total}} complete",
+    "dismiss": "Dismiss",
+    "steps": {
+      "createSite": "Create your first site",
+      "addLanguage": "Add a language",
+      "createPage": "Create a page",
+      "writeBlog": "Write a blog post",
+      "setupNav": "Set up navigation"
+    }
+  },
+  "activity": {
+    "title": "Activity",
+    "subtitle": "Audit log of all changes on this site",
+    "loading": "Loading activity...",
+    "empty": "No activity yet",
+    "emptyDescription": "Actions like creating, updating, and deleting content will appear here.",
+    "columns": {
+      "timestamp": "Timestamp",
+      "action": "Action",
+      "entityType": "Entity Type",
+      "entityId": "Entity ID",
+      "userId": "User"
+    },
+    "filters": {
+      "action": "Action",
+      "entityType": "Entity Type"
+    }
+  },
+  "entityHistory": {
+    "title": "History",
+    "noHistory": "No history recorded yet",
+    "events": "Events",
+    "changes": "Field Changes",
+    "oldValue": "Old",
+    "newValue": "New",
+    "revert": "Revert",
+    "revertConfirmTitle": "Revert Changes",
+    "revertConfirmMessage": "Revert the following fields to their previous values?",
+    "reverted": "Changes reverted",
+    "revertFailed": "Failed to revert changes"
+  },
+  "unsavedChanges": {
+    "title": "Unsaved Changes",
+    "message": "You have unsaved changes. Discard and leave?",
+    "stay": "Stay",
+    "discard": "Discard"
+  },
+  "inlineEdit": {
+    "clickToEdit": "Click to edit"
+  },
+  "notFound": {
+    "title": "404",
+    "subtitle": "Page not found",
+    "goToDashboard": "Go to Dashboard"
+  },
+  "apiDocs": {
+    "title": "API Documentation",
+    "subtitle": "Interactive API documentation"
+  },
+  "forms": {
+    "blog": {
+      "createTitle": "Create Blog",
+      "editTitle": "Edit Blog",
+      "fields": {
+        "siteId": "Site",
+        "locale": "Locale",
+        "slug": "Slug",
+        "author": "Author",
+        "status": "Status",
+        "featured": "Featured post",
+        "publishedDate": "Published Date"
+      }
+    },
+    "page": {
+      "createTitle": "Create Page",
+      "editTitle": "Edit Page",
+      "fields": {
+        "siteId": "Site",
+        "route": "Route",
+        "pageType": "Page Type",
+        "status": "Status",
+        "inNavigation": "Show in navigation",
+        "navTitle": "Navigation Title",
+        "navOrder": "Navigation Order"
+      }
+    },
+    "site": {
+      "createTitle": "Create Site",
+      "editTitle": "Edit Site",
+      "fields": {
+        "name": "Name",
+        "slug": "Slug",
+        "description": "Description",
+        "domain": "Domain",
+        "active": "Active",
+        "initialLanguages": "Initial Languages",
+        "initialLanguagesHelper": "Select at least one language for your site",
+        "defaultLanguage": "Default Language"
+      },
+      "validation": {
+        "minOneLocale": "At least one language is required",
+        "exactlyOneDefault": "Exactly one language must be set as default"
+      }
+    },
+    "navigation": {
+      "createTitle": "Create Navigation Item",
+      "editTitle": "Edit Navigation Item",
+      "fields": {
+        "type": "Type",
+        "page": "Page",
+        "externalUrl": "External URL",
+        "icon": "Icon",
+        "openInNewTab": "Open in new tab",
+        "label": "Label",
+        "locale": "Locale"
+      }
+    },
+    "socialLink": {
+      "createTitle": "Create Social Link",
+      "editTitle": "Edit Social Link",
+      "fields": {
+        "title": "Title",
+        "url": "URL",
+        "icon": "Icon",
+        "ariaLabel": "Aria Label"
+      }
+    },
+    "locale": {
+      "createTitle": "Add Language",
+      "editTitle": "Edit Language",
+      "fields": {
+        "code": "Code",
+        "name": "Name",
+        "nativeName": "Native Name",
+        "direction": "Direction",
+        "active": "Active"
+      },
+      "validation": {
+        "codeFormat": "Format: en or en-US"
+      }
+    },
+    "tag": {
+      "createTitle": "Create Tag",
+      "editTitle": "Edit Tag",
+      "fields": {
+        "slug": "Slug",
+        "global": "Global (shared across all sites)",
+        "slugHelper": "URL-friendly identifier — lowercase letters, numbers, and hyphens (e.g. \"my-tag\")",
+        "globalHelper": "Global tags are shared across all sites. Site-specific tags belong only to the current site."
+      }
+    },
+    "category": {
+      "createTitle": "Create Category",
+      "editTitle": "Edit Category",
+      "fields": {
+        "slug": "Slug",
+        "parent": "Parent Category",
+        "noParent": "None (top-level)",
+        "global": "Global (shared across all sites)",
+        "slugHelper": "URL-friendly identifier — lowercase letters, numbers, and hyphens (e.g. \"web-development\")",
+        "globalHelper": "Global categories are shared across all sites. Site-specific categories belong only to the current site.",
+        "parentHelper": "Nest this category under a parent to build a hierarchy (e.g. Technology > Web Development)"
+      }
+    },
+    "cvEntry": {
+      "createTitle": "Create CV Entry",
+      "editTitle": "Edit CV Entry",
+      "fields": {
+        "siteId": "Site",
+        "entryType": "Entry Type",
+        "company": "Company / Organization",
+        "location": "Location",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "isCurrent": "Currently here",
+        "displayOrder": "Display Order",
+        "title": "Job Title",
+        "description": "Description",
+        "locale": "Locale"
+      }
+    },
+    "skill": {
+      "createTitle": "Create Skill",
+      "editTitle": "Edit Skill",
+      "fields": {
+        "siteId": "Site",
+        "name": "Name",
+        "slug": "Slug",
+        "category": "Category",
+        "proficiency": "Proficiency Level",
+        "icon": "Icon",
+        "displayOrder": "Display Order"
+      }
+    },
+    "legal": {
+      "createTitle": "Create Legal Document",
+      "editTitle": "Edit Legal Document",
+      "fields": {
+        "cookieName": "Cookie Name",
+        "documentType": "Document Type"
+      }
+    },
+    "mediaUpload": {
+      "title": "Register Media",
+      "fields": {
+        "siteId": "Site",
+        "publicUrl": "Public URL",
+        "filename": "Filename",
+        "originalFilename": "Original Filename",
+        "mimeType": "MIME Type",
+        "fileSize": "File Size (bytes)",
+        "width": "Width (px)",
+        "height": "Height (px)",
+        "altText": "Alt Text",
+        "caption": "Caption",
+        "title": "Title",
+        "folder": "Folder"
+      }
+    },
+    "mediaDetail": {
+      "title": "Media Details",
+      "fields": {
+        "filename": "Filename",
+        "originalFilename": "Original Filename",
+        "mimeType": "MIME Type",
+        "fileSize": "File Size",
+        "dimensions": "Dimensions",
+        "publicUrl": "Public URL",
+        "altText": "Alt Text",
+        "caption": "Caption",
+        "title": "Title",
+        "folder": "Folder",
+        "noFolder": "No folder",
+        "created": "Created"
+      },
+      "messages": {
+        "updated": "Media updated",
+        "updateFailed": "Failed to update media"
+      }
+    },
+    "document": {
+      "createTitle": "Create Document",
+      "editTitle": "Edit Document",
+      "fields": {
+        "siteId": "Site",
+        "title": "Title",
+        "slug": "Slug",
+        "description": "Description",
+        "documentType": "Document Type",
+        "fileUrl": "File URL",
+        "fileSize": "File Size (bytes)",
+        "mimeType": "MIME Type",
+        "status": "Status"
+      }
+    },
+    "webhook": {
+      "createTitle": "Create Webhook",
+      "editTitle": "Edit Webhook",
+      "fields": {
+        "url": "URL",
+        "urlHelper": "The endpoint that will receive POST requests with event data",
+        "description": "Description",
+        "events": "Events",
+        "eventsHelper": "Leave empty to receive all events",
+        "active": "Active"
+      }
+    },
+    "contentTemplate": {
+      "createTitle": "Create Template",
+      "editTitle": "Edit Template",
+      "sections": {
+        "metadata": "Template Settings",
+        "content": "Default Content"
+      },
+      "fields": {
+        "name": "Name",
+        "description": "Description",
+        "icon": "Icon",
+        "slugPrefix": "Slug Prefix",
+        "isFeatured": "Featured by default",
+        "allowComments": "Allow comments by default",
+        "isActive": "Active",
+        "title": "Title",
+        "subtitle": "Subtitle",
+        "excerpt": "Excerpt",
+        "body": "Body (Markdown)",
+        "metaTitle": "Meta Title",
+        "metaDescription": "Meta Description"
+      }
+    },
+    "redirect": {
+      "createTitle": "Create Redirect",
+      "editTitle": "Edit Redirect",
+      "fields": {
+        "sourcePath": "Source Path",
+        "sourcePathHelper": "The URL path to redirect from (e.g. /old-page)",
+        "destinationPath": "Destination",
+        "destinationPathHelper": "Where to redirect to (path or full URL)",
+        "statusCode": "Redirect Type",
+        "permanent": "301 — Permanent",
+        "temporary": "302 — Temporary",
+        "description": "Description",
+        "active": "Active"
+      }
+    },
+    "section": {
+      "title": "Edit Section",
+      "fields": {
+        "sectionType": "Section Type",
+        "displayOrder": "Display Order",
+        "settings": "Settings"
+      }
+    },
+    "undo": "Undo",
+    "redo": "Redo",
+    "validation": {
+      "required": "This field is required",
+      "minLength": "Minimum {{count}} characters",
+      "maxLength": "Maximum {{count}} characters",
+      "invalidEmail": "Invalid email address",
+      "invalidUrl": "Invalid URL",
+      "min": "Minimum value is {{value}}",
+      "max": "Maximum value is {{value}}"
+    }
+  },
+  "shared": {
+    "autosave": {
+      "retryFailed": "Auto-save failed after multiple attempts. Try saving manually with Ctrl+S."
+    },
+    "confirmDialog": {
+      "defaultTitle": "Confirm",
+      "defaultCancel": "Cancel"
+    },
+    "loadingState": {
+      "defaultLabel": "Loading..."
+    },
+    "emptyState": {
+      "defaultTitle": "Nothing here yet"
+    },
+    "folderTree": {
+      "allFiles": "All Files",
+      "newFolder": "New Folder",
+      "rename": "Rename",
+      "delete": "Delete",
+      "createFolder": "Create folder",
+      "folderName": "Folder name"
+    },
+    "pageHeader": {},
+    "statusChip": {},
+    "errorBoundary": {
+      "title": "Something went wrong",
+      "description": "An unexpected error occurred on this page.",
+      "showDetails": "Show details",
+      "hideDetails": "Hide details",
+      "tryAgain": "Try again",
+      "goToDashboard": "Go to Dashboard",
+      "reloadPage": "Reload page"
+    },
+    "navigationGuard": {
+      "title": "Unsaved changes",
+      "message": "You have unsaved changes. Are you sure you want to leave this page?",
+      "leave": "Leave",
+      "stay": "Stay"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "subtitle": "Manage your account, security settings, and data",
+    "accountInfo": "Account Information",
+    "unknownUser": "Unknown User",
+    "manageAccount": "Manage Account",
+    "security": "Security & Sessions",
+    "authMethod": "Authentication Method",
+    "permissionLevel": "Permission Level",
+    "siteScope": "Site Scope",
+    "memberSince": "Member Since",
+    "lastSignIn": "Last Sign-In",
+    "dataPrivacy": "Data & Privacy",
+    "dataPrivacyInfo": "You can export all your data stored in the CMS or permanently delete your account. Exported data includes your profile, audit logs, API keys, and change history.",
+    "exportData": "Export My Data",
+    "exporting": "Exporting...",
+    "exportSuccess": "Data exported successfully",
+    "exportError": "Failed to export data",
+    "deleteAccount": "Delete Account",
+    "deleteAccountTitle": "Delete Account",
+    "deleteAccountMessage": "This action is permanent and cannot be undone. Your Clerk account will be deleted and all associated CMS data will be anonymized. Are you sure you want to proceed?",
+    "deleteAccountConfirm": "Delete My Account",
+    "deleteSuccess": "Account deleted successfully",
+    "deleteError": "Failed to delete account"
+  },
+  "siteLocales": {
+    "title": "Languages",
+    "addLanguage": "Add Language",
+    "columns": {
+      "language": "Language",
+      "nativeName": "Native Name",
+      "urlPrefix": "URL Prefix",
+      "default": "Default",
+      "active": "Active",
+      "actions": "Actions"
+    },
+    "addDialog": {
+      "title": "Add Language",
+      "selectLanguage": "Select Language",
+      "urlPrefix": "URL Prefix",
+      "urlPrefixHelper": "e.g. en, de, fr (used in URLs)",
+      "setAsDefault": "Set as default language"
+    },
+    "setDefault": "Set as Default",
+    "remove": "Remove",
+    "empty": "No languages assigned to this site yet.",
+    "tooltips": {
+      "cannotRemoveDefault": "Cannot remove the default language",
+      "cannotRemoveLast": "Cannot remove the last language",
+      "alreadyDefault": "Already the default language"
+    },
+    "messages": {
+      "added": "Language added",
+      "updated": "Language updated",
+      "removed": "Language removed",
+      "defaultSet": "Default language updated",
+      "addFailed": "Failed to add language",
+      "updateFailed": "Failed to update language",
+      "removeFailed": "Failed to remove language",
+      "defaultFailed": "Failed to set default language"
+    }
+  },
+  "commandPalette": {
+    "placeholder": "Search commands...",
+    "noResults": "No results found",
+    "categories": {
+      "navigation": "Navigation",
+      "actions": "Actions",
+      "blogs": "Blogs",
+      "pages": "Pages",
+      "sites": "Sites"
+    },
+    "actions": {
+      "toggleTheme": "Toggle theme",
+      "logout": "Log out"
+    },
+    "hint": "⌘K"
+  },
+  "languages": {
+    "en": "English",
+    "de": "Deutsch",
+    "fr": "Fran\u00e7ais",
+    "es": "Espa\u00f1ol",
+    "it": "Italiano",
+    "pt": "Portugu\u00eas",
+    "nl": "Nederlands",
+    "pl": "Polski"
+  },
+  "workflow": {
+    "submitForReview": "Submit for Review",
+    "approve": "Approve",
+    "requestChanges": "Request Changes",
+    "reviewComment": "Review Comment",
+    "reviewCommentPlaceholder": "Describe what changes are needed...",
+    "submittedForReview": "Content submitted for review",
+    "approved": "Content approved",
+    "changesRequested": "Changes requested",
+    "cannotPublish": "Editorial workflow is enabled. Submit content for review to publish."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "bell": "Notifications",
+    "empty": "No notifications yet",
+    "markAllRead": "Mark all read",
+    "viewAll": "View all",
+    "pageTitle": "Notifications",
+    "pageSubtitle": "Review and manage your notifications",
+    "columns": {
+      "type": "Type",
+      "title": "Title",
+      "message": "Message",
+      "time": "Time",
+      "status": "Status"
+    },
+    "read": "Read",
+    "unread": "Unread",
+    "noSite": "Select a site to view notifications",
+    "types": {
+      "submitted": "Submitted for Review",
+      "approved": "Approved",
+      "changesRequested": "Changes Requested"
+    }
+  },
+  "bulk": {
+    "selectedCount": "{{count}} selected",
+    "publish": "Publish",
+    "unpublish": "Unpublish",
+    "delete": "Delete",
+    "clearSelection": "Clear selection",
+    "deleteDialog": {
+      "title": "Delete Selected Items",
+      "message": "Delete {{count}} selected items? This cannot be undone."
+    },
+    "messages": {
+      "success": "{{count}} items updated successfully",
+      "partial": "{{succeeded}} succeeded, {{failed}} failed"
+    }
+  },
+  "contentTemplates": {
+    "title": "Content Templates",
+    "subtitle": "Manage reusable content templates for your sites",
+    "addTemplate": "Add Template",
+    "table": {
+      "name": "Name",
+      "description": "Description",
+      "icon": "Icon",
+      "active": "Active",
+      "created": "Created",
+      "actions": "Actions"
+    },
+    "empty": {
+      "noSite": "Select a site from the toolbar to manage its templates",
+      "title": "No templates yet",
+      "description": "Create reusable content templates to speed up blog post creation. Templates include pre-filled content, metadata, and settings."
+    },
+    "loading": "Loading templates...",
+    "messages": {
+      "created": "Template created",
+      "updated": "Template updated",
+      "deleted": "Template deleted"
+    },
+    "deleteDialog": {
+      "title": "Delete Template",
+      "message": "Delete template \"{{name}}\"? This cannot be undone."
+    }
+  },
+  "templates": {
+    "fromTemplate": "From Template",
+    "dialogTitle": "Create Blog from Template",
+    "dialogSubtitle": "Choose a template to get started with pre-filled content structure.",
+    "useTemplate": "Use Template",
+    "searchPlaceholder": "Search templates...",
+    "builtIn": "Built-in",
+    "custom": "Custom",
+    "manageTemplates": "Manage Templates",
+    "noResults": "No templates match your search",
+    "page": "Page {{current}} of {{total}}",
+    "tutorial": {
+      "name": "Tutorial",
+      "description": "Step-by-step guide with prerequisites, numbered steps, and further reading."
+    },
+    "changelog": {
+      "name": "Changelog",
+      "description": "Release notes with features, bug fixes, breaking changes, and migration guide."
+    },
+    "review": {
+      "name": "Review",
+      "description": "Product or tool review with key features, pros, cons, and verdict."
+    },
+    "announcement": {
+      "name": "Announcement",
+      "description": "News announcement with significance, next steps, and call to action."
+    }
+  },
+  "markdownImport": {
+    "importButton": "Import Markdown",
+    "dialogTitle": "Import from Markdown",
+    "dialogSubtitle": "Upload a Markdown file to create a new blog post. The H1 heading will become the title.",
+    "dropZone": "Drag and drop a .md file here, or click to browse",
+    "dropZoneActive": "Drop your file here",
+    "preview": "Preview",
+    "titleLabel": "Title",
+    "excerptLabel": "Excerpt",
+    "slugLabel": "Slug",
+    "bodyPreview": "Body Preview",
+    "back": "Back",
+    "import": "Import",
+    "importing": "Importing...",
+    "errors": {
+      "invalidExtension": "Only .md and .markdown files are accepted",
+      "emptyFile": "File is empty",
+      "noH1": "Markdown must contain exactly one H1 heading (# Title)",
+      "multipleH1": "Markdown contains multiple H1 headings. Use only one.",
+      "titleTooLong": "Title exceeds maximum length of {{max}} characters",
+      "bodyTooLong": "Body exceeds maximum length of {{max}} characters",
+      "readFailed": "Failed to read file"
+    }
+  }
+}

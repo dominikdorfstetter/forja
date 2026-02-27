@@ -1,0 +1,62 @@
+---
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+import "../styles/global.css";
+import { fetchSite, type SiteInfo } from "../lib/api";
+
+interface Props {
+  title: string;
+  description?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+}
+
+const {
+  title,
+  description,
+  metaTitle,
+  metaDescription,
+} = Astro.props;
+
+let site: SiteInfo | null = null;
+try {
+  site = await fetchSite();
+} catch (e) {
+  console.warn("[CMS] Failed to fetch site info:", e instanceof Error ? e.message : e);
+}
+
+const siteName = site?.name ?? "My Site";
+const pageTitle = metaTitle ?? title;
+const fullTitle = pageTitle.includes(siteName) ? pageTitle : `${pageTitle} — ${siteName}`;
+const pageDesc = metaDescription ?? description ?? "";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    {pageDesc && <meta name="description" content={pageDesc} />}
+    {site?.favicon_url && <link rel="icon" href={site.favicon_url} />}
+    <meta name="generator" content={Astro.generator} />
+    <slot name="head" />
+  </head>
+  <body>
+    <Nav siteName={siteName} />
+    <main>
+      <slot />
+    </main>
+    <Footer siteName={siteName} />
+    <script>
+      // Mobile nav toggle
+      document.addEventListener("DOMContentLoaded", () => {
+        const toggle = document.querySelector(".site-nav__toggle");
+        const links = document.querySelector(".site-nav__links");
+        toggle?.addEventListener("click", () => {
+          links?.classList.toggle("open");
+        });
+      });
+    </script>
+  </body>
+</html>
