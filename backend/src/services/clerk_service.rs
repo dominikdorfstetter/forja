@@ -93,6 +93,22 @@ impl ClerkService {
         Ok(())
     }
 
+    /// Sanitize and validate a path parameter to prevent injection and
+    /// ensure only safe characters are included in request URLs.
+    fn sanitize_path_param(value: &str) -> Result<&str, ApiError> {
+        if !value.is_empty()
+            && value
+                .chars()
+                .all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-')
+        {
+            Ok(value)
+        } else {
+            Err(ApiError::BadRequest(
+                "Invalid identifier format".to_string(),
+            ))
+        }
+    }
+
     /// List Clerk users with pagination
     pub async fn list_users(
         &self,
@@ -132,7 +148,8 @@ impl ClerkService {
 
     /// Get a single Clerk user by ID
     pub async fn get_user(&self, user_id: &str) -> Result<ClerkApiUser, ApiError> {
-        let url = format!("{}/users/{}", self.base_url, user_id);
+        let safe_id = Self::sanitize_path_param(user_id)?;
+        let url = format!("{}/users/{}", self.base_url, safe_id);
         Self::require_https(&url)?;
         let resp = self
             .client
@@ -164,7 +181,8 @@ impl ClerkService {
         user_id: &str,
         role: &str,
     ) -> Result<ClerkApiUser, ApiError> {
-        let url = format!("{}/users/{}", self.base_url, user_id);
+        let safe_id = Self::sanitize_path_param(user_id)?;
+        let url = format!("{}/users/{}", self.base_url, safe_id);
         Self::require_https(&url)?;
         let body = serde_json::json!({
             "public_metadata": { "role": role }
@@ -197,7 +215,8 @@ impl ClerkService {
 
     /// Delete a Clerk user by ID
     pub async fn delete_user(&self, user_id: &str) -> Result<(), ApiError> {
-        let url = format!("{}/users/{}", self.base_url, user_id);
+        let safe_id = Self::sanitize_path_param(user_id)?;
+        let url = format!("{}/users/{}", self.base_url, safe_id);
         Self::require_https(&url)?;
         let resp = self
             .client
