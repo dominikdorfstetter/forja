@@ -22,7 +22,7 @@ RUN npm run build
 # ---------------------------------------------------------------------------
 # Stage 2: Build Rust backend
 # ---------------------------------------------------------------------------
-FROM rust:1.85-bookworm AS backend-build
+FROM rust:1.93-bookworm AS backend-build
 
 # Reduce memory usage during compilation
 ENV CARGO_PROFILE_RELEASE_LTO=thin
