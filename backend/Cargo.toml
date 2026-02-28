@@ -67,7 +67,7 @@ base64 = "0.22"
 
 # Image processing
 image = "0.25"
-infer = "0.16"
+infer = "0.19"
 
 # S3 storage (optional)
 aws-sdk-s3 = "1.124"
