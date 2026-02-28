@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Typography, Box, Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 export default function NotFoundPage() {
   const { t } = useTranslation();

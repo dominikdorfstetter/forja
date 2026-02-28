@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 import {
   Box,
   Paper,
@@ -372,15 +372,15 @@ export default function LegalDocumentDetailPage() {
       {/* Document info */}
       <Paper sx={{ p: 3, mb: 3 }}>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="caption" color="text.secondary">{t('legalDetail.cookieName')}</Typography>
             <Typography variant="body1" fontFamily="monospace">{document?.cookie_name || '...'}</Typography>
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="caption" color="text.secondary">{t('legalDetail.documentType')}</Typography>
             <Typography variant="body1">{document?.document_type || '...'}</Typography>
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="caption" color="text.secondary">{t('legalDetail.documentId')}</Typography>
             <Typography variant="body2" fontFamily="monospace" sx={{ wordBreak: 'break-all' }}>{id}</Typography>
           </Grid>

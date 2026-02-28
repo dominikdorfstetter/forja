@@ -31,7 +31,7 @@ import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import StarIcon from '@mui/icons-material/Star';
 import AnnouncementIcon from '@mui/icons-material/Announcement';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { blogTemplates, type BlogTemplate } from '@/data/blogTemplates';
 import type { ContentTemplate } from '@/types/api';
 import { useAuth } from '@/store/AuthContext';

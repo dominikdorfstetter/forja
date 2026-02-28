@@ -356,7 +356,7 @@ export default function MediaPage() {
               ) : (
                 <Grid container spacing={2}>
                   {mediaFiles.map((file) => (
-                    <Grid item xs={12} sm={6} md={4} lg={3} key={file.id}>
+                    <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={file.id}>
                       <DraggableMediaCard file={file}>
                         <Card
                           sx={{

@@ -18,7 +18,7 @@ export default function BlogContentTab({ control, getValues, onSnapshot }: BlogC
 
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12} md={tocItems.length > 0 ? 9 : 12}>
+      <Grid size={{ xs: 12, md: tocItems.length > 0 ? 9 : 12 }}>
         <Controller
           name="title"
           control={control}
@@ -100,7 +100,7 @@ export default function BlogContentTab({ control, getValues, onSnapshot }: BlogC
       </Grid>
 
       {tocItems.length > 0 && (
-        <Grid item xs={12} md={3}>
+        <Grid size={{ xs: 12, md: 3 }}>
           <Paper sx={{ p: 2, position: 'sticky', top: 140 }}>
             <Typography variant="subtitle2" gutterBottom>
               {t('blogDetail.toc')}

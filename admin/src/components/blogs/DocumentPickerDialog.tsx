@@ -171,7 +171,7 @@ export default function DocumentPickerDialog({
               const isSelected = selected.has(doc.id);
               const name = getDocumentName(doc);
               return (
-                <Grid item xs={12} sm={6} md={4} key={doc.id}>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={doc.id}>
                   <Card
                     variant="outlined"
                     sx={{

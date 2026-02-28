@@ -22,7 +22,7 @@ import { UserProfile } from '@clerk/clerk-react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import apiService from '@/services/api';
 import { useAuth } from '@/store/AuthContext';
 import PageHeader from '@/components/shared/PageHeader';
@@ -94,7 +94,7 @@ export default function ProfilePage() {
 
       <Grid container spacing={3}>
         {/* Account Info Card */}
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
               {t('profile.accountInfo')}
@@ -142,7 +142,7 @@ export default function ProfilePage() {
         </Grid>
 
         {/* Security & Sessions Card */}
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
               <SecurityIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
@@ -201,7 +201,7 @@ export default function ProfilePage() {
         </Grid>
 
         {/* Data & Privacy Card */}
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
               {t('profile.dataPrivacy')}

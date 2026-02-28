@@ -30,7 +30,7 @@ export default function PageInfoTab({ control, watch, page, onSnapshot }: PageIn
   return (
     <Box>
       <Grid container spacing={2}>
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Controller
             name="route"
             control={control}
@@ -47,7 +47,7 @@ export default function PageInfoTab({ control, watch, page, onSnapshot }: PageIn
             )}
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Controller
             name="slug"
             control={control}
@@ -64,7 +64,7 @@ export default function PageInfoTab({ control, watch, page, onSnapshot }: PageIn
             )}
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Controller
             name="page_type"
             control={control}
@@ -83,7 +83,7 @@ export default function PageInfoTab({ control, watch, page, onSnapshot }: PageIn
             )}
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Controller
             name="template"
             control={control}
@@ -101,7 +101,7 @@ export default function PageInfoTab({ control, watch, page, onSnapshot }: PageIn
           />
         </Grid>
 
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Controller
             name="is_in_navigation"
             control={control}
@@ -119,7 +119,7 @@ export default function PageInfoTab({ control, watch, page, onSnapshot }: PageIn
           />
         </Grid>
         {isInNavigation && (
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Controller
               name="navigation_order"
               control={control}
@@ -139,7 +139,7 @@ export default function PageInfoTab({ control, watch, page, onSnapshot }: PageIn
           </Grid>
         )}
 
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Controller
             name="parent_page_id"
             control={control}
@@ -162,29 +162,29 @@ export default function PageInfoTab({ control, watch, page, onSnapshot }: PageIn
         {t('pageDetail.metadata')}
       </Typography>
       <Grid container spacing={1}>
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Typography variant="caption" color="text.secondary">{t('pageDetail.fields.id')}</Typography>
           <Typography variant="body2" fontFamily="monospace" sx={{ wordBreak: 'break-all' }}>
             {page.id}
           </Typography>
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Typography variant="caption" color="text.secondary">{t('pageDetail.contentId')}</Typography>
           <Typography variant="body2" fontFamily="monospace" sx={{ wordBreak: 'break-all' }}>
             {page.content_id}
           </Typography>
         </Grid>
         {page.published_at && (
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="caption" color="text.secondary">{t('pageDetail.fields.published')}</Typography>
             <Typography variant="body2">{format(new Date(page.published_at), 'PPpp')}</Typography>
           </Grid>
         )}
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Typography variant="caption" color="text.secondary">{t('pageDetail.fields.created')}</Typography>
           <Typography variant="body2">{format(new Date(page.created_at), 'PPpp')}</Typography>
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Typography variant="caption" color="text.secondary">{t('pageDetail.fields.updated')}</Typography>
           <Typography variant="body2">{format(new Date(page.updated_at), 'PPpp')}</Typography>
         </Grid>

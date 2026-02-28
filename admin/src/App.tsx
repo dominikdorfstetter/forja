@@ -1,5 +1,5 @@
 import 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router';
 import { SignUp } from '@clerk/clerk-react';
 import { SnackbarProvider, MaterialDesignContent } from 'notistack';
 import { styled } from '@mui/material/styles';

@@ -41,7 +41,7 @@ export default function BlogSettingsTab({
   return (
     <Box>
       <Grid container spacing={3}>
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Controller
             name="author"
             control={control}
@@ -56,7 +56,7 @@ export default function BlogSettingsTab({
             )}
           />
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Controller
             name="published_date"
             control={control}
@@ -154,7 +154,7 @@ export default function BlogSettingsTab({
           {t('blogDetail.images.title')}
         </Typography>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="body2" color="text.secondary">
               {t('blogDetail.images.coverImageId')}
             </Typography>
@@ -162,7 +162,7 @@ export default function BlogSettingsTab({
               {coverImageId || '\u2014'}
             </Typography>
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="body2" color="text.secondary">
               {t('blogDetail.images.headerImageId')}
             </Typography>

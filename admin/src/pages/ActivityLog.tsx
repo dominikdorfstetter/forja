@@ -20,7 +20,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { format, formatDistanceToNow } from 'date-fns';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router';
 import { v5 as uuidv5 } from 'uuid';
 import apiService from '@/services/api';
 import { useSiteContext } from '@/store/SiteContext';

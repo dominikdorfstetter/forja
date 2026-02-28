@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, forwardRef, useImperativeHandle } from 'react';
+import { useState, useMemo, useCallback, useImperativeHandle, type Ref } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
@@ -128,7 +128,7 @@ export interface DocumentsPageHandle {
   openCreate: () => void;
 }
 
-const DocumentsPage = forwardRef<DocumentsPageHandle, { embedded?: boolean }>(function DocumentsPage({ embedded = false }, ref) {
+function DocumentsPage({ embedded = false, ref }: { embedded?: boolean; ref?: Ref<DocumentsPageHandle> }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { enqueueSnackbar } = useSnackbar();
@@ -575,7 +575,7 @@ const DocumentsPage = forwardRef<DocumentsPageHandle, { embedded?: boolean }>(fu
               ) : (
                 <Grid container spacing={2}>
                   {filteredDocuments.map((doc) => (
-                    <Grid item xs={12} sm={6} md={4} lg={3} key={doc.id}>
+                    <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={doc.id}>
                       <DraggableDocumentCard document={doc}>
                         <Card
                           sx={{
@@ -767,6 +767,6 @@ const DocumentsPage = forwardRef<DocumentsPageHandle, { embedded?: boolean }>(fu
       />
     </Box>
   );
-});
+}
 
 export default DocumentsPage;

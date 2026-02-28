@@ -1,5 +1,5 @@
 import { createContext, useContext, useCallback, useRef, useState, type ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 

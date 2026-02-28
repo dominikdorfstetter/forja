@@ -45,7 +45,7 @@ import { z } from 'zod';
 import { format } from 'date-fns';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import apiService from '@/services/api';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
@@ -184,7 +184,7 @@ function SiteSettingsTab() {
     <form onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={3}>
         {/* Upload Limits */}
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Paper sx={{ p: 3, height: '100%' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
               <CloudUploadIcon color="primary" fontSize="small" />
@@ -239,7 +239,7 @@ function SiteSettingsTab() {
         </Grid>
 
         {/* General Settings */}
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Paper sx={{ p: 3, height: '100%' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
               <SettingsIcon color="primary" fontSize="small" />
@@ -286,7 +286,7 @@ function SiteSettingsTab() {
         </Grid>
 
         {/* Toggles */}
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Paper sx={{ p: 3 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
               <TuneIcon color="primary" fontSize="small" />
@@ -295,7 +295,7 @@ function SiteSettingsTab() {
             <Divider sx={{ mb: 2 }} />
 
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <Controller
                   name="analytics_enabled"
                   control={control}
@@ -313,7 +313,7 @@ function SiteSettingsTab() {
                 />
               </Grid>
 
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <Controller
                   name="maintenance_mode"
                   control={control}
@@ -343,7 +343,7 @@ function SiteSettingsTab() {
                 />
               </Grid>
 
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <Controller
                   name="editorial_workflow_enabled"
                   control={control}
@@ -365,7 +365,7 @@ function SiteSettingsTab() {
         </Grid>
 
         {/* Preview Templates */}
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Paper sx={{ p: 3 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
               <VisibilityIcon color="primary" fontSize="small" />
@@ -426,7 +426,7 @@ function SiteSettingsTab() {
         </Grid>
 
         {/* Save */}
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Button
               type="submit"
@@ -475,7 +475,7 @@ function SystemInfoTab() {
   return (
     <Grid container spacing={3}>
       {/* Server Health */}
-      <Grid item xs={12}>
+      <Grid size={12}>
         <Paper sx={{ p: 3 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -583,7 +583,7 @@ function SystemInfoTab() {
       </Grid>
 
       {/* Environments & Locales side by side */}
-      <Grid item xs={12} md={6}>
+      <Grid size={{ xs: 12, md: 6 }}>
         <Paper sx={{ p: 3, height: '100%' }}>
           <Typography variant="h6" component="h2" gutterBottom>{t('settings.systemInfo.environments')}</Typography>
           <Divider sx={{ mb: 2 }} />
@@ -623,7 +623,7 @@ function SystemInfoTab() {
         </Paper>
       </Grid>
 
-      <Grid item xs={12} md={6}>
+      <Grid size={{ xs: 12, md: 6 }}>
         <Paper sx={{ p: 3, height: '100%' }}>
           <Typography variant="h6" component="h2" gutterBottom>{t('settings.systemInfo.locales')}</Typography>
           <Divider sx={{ mb: 2 }} />
@@ -651,7 +651,7 @@ function PreferencesTab() {
 
   return (
     <Grid container spacing={3}>
-      <Grid item xs={12} md={6}>
+      <Grid size={{ xs: 12, md: 6 }}>
         <Paper sx={{ p: 3 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
             <LanguageIcon color="primary" fontSize="small" />

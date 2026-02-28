@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router';
 import {
   Box,
   Paper,
@@ -87,7 +87,7 @@ export default function SiteDetailPage() {
       />
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={8}>
+        <Grid size={{ xs: 12, md: 8 }}>
           <Paper sx={{ p: 3 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
               <Typography variant="h6">{t('siteDetail.siteInfo')}</Typography>
@@ -96,7 +96,7 @@ export default function SiteDetailPage() {
             <Divider sx={{ mb: 2 }} />
 
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <Typography variant="caption" color="text.secondary">{t('siteDetail.fields.name')}</Typography>
                 <InlineEditField
                   value={site.name}
@@ -109,11 +109,11 @@ export default function SiteDetailPage() {
                   }}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <Typography variant="caption" color="text.secondary">{t('siteDetail.fields.slug')}</Typography>
                 <Typography variant="body1" fontFamily="monospace">{site.slug}</Typography>
               </Grid>
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <Typography variant="caption" color="text.secondary">{t('siteDetail.fields.description')}</Typography>
                 <InlineEditField
                   value={site.description || ''}
@@ -126,11 +126,11 @@ export default function SiteDetailPage() {
                   }}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <Typography variant="caption" color="text.secondary">{t('siteDetail.fields.timezone')}</Typography>
                 <Typography variant="body1">{site.timezone}</Typography>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <Typography variant="caption" color="text.secondary">{t('siteDetail.fields.status')}</Typography>
                 <Box>
                   <FormControlLabel
@@ -153,7 +153,7 @@ export default function SiteDetailPage() {
           </Box>
         </Grid>
 
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Paper sx={{ p: 3, mb: 3 }}>
             <Typography variant="h6" gutterBottom>{t('siteDetail.metadata')}</Typography>
             <Divider sx={{ mb: 2 }} />

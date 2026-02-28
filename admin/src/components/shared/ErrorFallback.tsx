@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Box, Typography, Button, Collapse, Paper } from '@mui/material';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 interface ErrorFallbackProps {
   error: Error | null;

@@ -172,7 +172,7 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
       <DialogContent dividers>
         <Grid container spacing={3}>
           {/* Left panel: Localized content (60%) */}
-          <Grid item xs={12} md={7}>
+          <Grid size={{ xs: 12, md: 7 }}>
             <Typography variant="subtitle1" gutterBottom fontWeight={600}>
               Localized Content
             </Typography>
@@ -272,7 +272,7 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
           </Grid>
 
           {/* Right panel: Section configuration (40%) */}
-          <Grid item xs={12} md={5}>
+          <Grid size={{ xs: 12, md: 5 }}>
             <Typography variant="subtitle1" gutterBottom fontWeight={600}>
               Section Configuration
             </Typography>

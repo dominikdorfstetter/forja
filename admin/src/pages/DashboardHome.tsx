@@ -31,7 +31,7 @@ import EditNoteIcon from '@mui/icons-material/EditNote';
 import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useSnackbar } from 'notistack';
 import apiService from '@/services/api';
@@ -362,7 +362,7 @@ export default function DashboardHome() {
       {/* ================================================================ */}
       <Grid container spacing={3} sx={{ mb: 3 }}>
         {/* All roles: Sites */}
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
             icon={<WebIcon color="primary" />}
             label={t('dashboard.stats.sites')}
@@ -374,7 +374,7 @@ export default function DashboardHome() {
 
         {/* All roles with site selected: Blogs */}
         {hasSite && (
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <StatCard
               icon={<ArticleIcon color="primary" />}
               label={t('dashboard.stats.blogPosts')}
@@ -387,7 +387,7 @@ export default function DashboardHome() {
 
         {/* All roles with site selected: Pages */}
         {hasSite && (
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <StatCard
               icon={<DescriptionIcon color="primary" />}
               label={t('dashboard.stats.pages')}
@@ -400,7 +400,7 @@ export default function DashboardHome() {
 
         {/* All roles with site selected: Media */}
         {hasSite && (
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <StatCard
               icon={<ImageIcon color="primary" />}
               label={t('dashboard.stats.mediaFiles')}
@@ -413,7 +413,7 @@ export default function DashboardHome() {
 
         {/* Admin+: API Keys */}
         {isAdmin && (
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <StatCard
               icon={<KeyIcon color="primary" />}
               label={t('dashboard.stats.apiKeys')}
@@ -431,7 +431,7 @@ export default function DashboardHome() {
       <Grid container spacing={3}>
         {/* ---- Left column: Recent / Draft blogs ---- */}
         {hasSite && (
-          <Grid item xs={12} md={canWrite ? 6 : 12}>
+          <Grid size={{ xs: 12, md: canWrite ? 6 : 12 }}>
             <Paper sx={{ p: 3, height: '100%' }}>
               <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
                 <Typography variant="h6" component="h2">
@@ -501,7 +501,7 @@ export default function DashboardHome() {
 
         {/* ---- Right column: role-specific panels ---- */}
         {canWrite && hasSite && (
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Stack spacing={3}>
               {/* Drafts needing attention (Write+) */}
               <Paper sx={{ p: 3 }}>
@@ -592,7 +592,7 @@ export default function DashboardHome() {
 
         {/* Admin+: API Keys overview */}
         {isAdmin && (
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Paper sx={{ p: 3 }}>
               <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
                 <Typography variant="h6" component="h2">{t('dashboard.stats.apiKeys')}</Typography>
@@ -638,7 +638,7 @@ export default function DashboardHome() {
         )}
 
         {/* Your Sites — all roles */}
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" component="h2" sx={{ mb: 1 }}>
               {t('dashboard.yourSites')}

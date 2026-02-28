@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { Box, Grid, Alert } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import WebIcon from '@mui/icons-material/Web';
@@ -82,7 +82,7 @@ export default function SitesPage() {
       {sites && sites.length > 0 ? (
         <Grid container spacing={3}>
           {sites.map((site) => (
-            <Grid item xs={12} sm={6} md={4} key={site.id}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={site.id}>
               <SiteCard
                 site={site}
                 onView={(s) => navigate(`/sites/${s.id}`)}
