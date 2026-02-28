@@ -7,11 +7,11 @@ A multi-site CMS platform with a Rust backend API, React admin dashboard, and pl
 
 ## Architecture
 
-| Component             | Stack                                         | Directory              |
-|-----------------------|-----------------------------------------------|------------------------|
-| **Backend API**       | Rust (Rocket 0.5) + SQLx + PostgreSQL         | `backend/`             |
-| **Admin Dashboard**   | React (Vite) + MUI + React Query + Clerk Auth | `admin/`               |
-| **Frontend Templates**| Astro, more to come                           | `templates/astro-blog/`|
+| Component              | Stack                                         | Directory               |
+|------------------------|-----------------------------------------------|-------------------------|
+| **Backend API**        | Rust (Rocket 0.5) + SQLx + PostgreSQL         | `backend/`              |
+| **Admin Dashboard**    | React (Vite) + MUI + React Query + Clerk Auth | `admin/`                |
+| **Frontend Templates** | Astro, more to come                           | `templates/astro-blog/` |
 
 ### Key Features
 
@@ -213,11 +213,21 @@ TLS_KEY_PATH=/etc/letsencrypt/live/yourdomain.com/privkey.pem
 
 When both are set, the server starts with HTTPS. When unset (the default), the server runs plain HTTP. Works with Let's Encrypt, self-signed, or commercially purchased PEM certificates.
 
+## Documentation
+
+Full documentation is available at **[dominikdorfstetter.github.io/openyapper](https://dominikdorfstetter.github.io/openyapper/)**.
+
+The docs cover getting started, architecture, API reference, admin guide, deployment, and developer guides. To run the docs locally:
+
+```bash
+cd docs && npm install && npm start
+```
+
 ## Deploy
 
 Deploy OpenYapper to a cloud platform with managed Postgres and Redis:
 
-- **[Railway](docs/deploy-railway.md)** &mdash; auto-detects Dockerfile, managed addons, free tier available
+- **[Railway](docs/docs/deployment/railway.md)** &mdash; auto-detects Dockerfile, managed addons, free tier available
 
 ## Development
 

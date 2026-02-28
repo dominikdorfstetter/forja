@@ -31,8 +31,15 @@ yarn-error.log*
 # astro
 **/.astro/
 
-# lock files (managed per-project)
-package-lock.json
+# lock files (root only — subproject lockfiles should be committed)
+/package-lock.json
 
 # rust
 **/target/
+
+# admin build artifacts
+backend/static/dashboard/
+
+# docusaurus
+docs/.docusaurus/
+docs/build/

@@ -16,7 +16,7 @@ use crate::AppState;
 )]
 #[get("/")]
 pub fn index() -> &'static str {
-    "OpenYapper API v0.1.0"
+    "OpenYapper API v1.0.0"
 }
 
 #[utoipa::path(
