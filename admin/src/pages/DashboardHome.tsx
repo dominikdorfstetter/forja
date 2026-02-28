@@ -353,6 +353,13 @@ export default function DashboardHome() {
               color={healthData.status === 'healthy' ? 'success' : 'warning'}
               size="small"
             />
+            {healthData.version && (
+              <Chip
+                label={`v${healthData.version}`}
+                size="small"
+                variant="outlined"
+              />
+            )}
           </Stack>
         </Paper>
       )}

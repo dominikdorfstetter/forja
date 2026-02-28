@@ -498,6 +498,9 @@ function SystemInfoTab() {
             <Stack spacing={2}>
               <Alert severity={statusCfg!.color} icon={statusCfg!.icon}>
                 {t('settings.systemInfo.overallStatus')} <strong>{t(statusCfg!.labelKey)}</strong>
+                {health.version && (
+                  <Chip label={`v${health.version}`} size="small" variant="outlined" sx={{ ml: 1.5, height: 22 }} />
+                )}
               </Alert>
 
               <TableContainer>

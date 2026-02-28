@@ -173,6 +173,7 @@ export interface UpdateContentTemplateRequest {
 // Health check response (matches backend HealthResponse struct)
 export interface HealthResponse {
   status: 'healthy' | 'degraded' | 'unhealthy';
+  version: string;
   services: ServiceHealth[];
   storage?: StorageHealth;
 }

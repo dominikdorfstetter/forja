@@ -16,7 +16,7 @@ use crate::AppState;
 )]
 #[get("/")]
 pub fn index() -> &'static str {
-    "OpenYapper API v1.0.0"
+    concat!("OpenYapper API v", env!("CARGO_PKG_VERSION"))
 }
 
 #[utoipa::path(
@@ -168,6 +168,7 @@ pub async fn health(
         http_status,
         Json(HealthResponse {
             status: overall_status.to_string(),
+            version: env!("CARGO_PKG_VERSION").to_string(),
             services,
             storage: Some(storage_health),
         }),

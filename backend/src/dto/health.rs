@@ -9,6 +9,9 @@ pub struct HealthResponse {
     /// Overall status: "healthy", "degraded", or "unhealthy"
     #[schema(example = "healthy")]
     pub status: String,
+    /// API version from Cargo.toml
+    #[schema(example = "1.0.1")]
+    pub version: String,
     /// Individual service health checks
     pub services: Vec<ServiceHealth>,
     /// Storage backend health (if available)

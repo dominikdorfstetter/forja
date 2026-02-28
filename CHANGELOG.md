@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.0.1 (Unreleased)
+
+### Infrastructure
+
+- Docker publish now triggers only on version tags (`v*`) instead of every push to main
+- Documentation deploy now triggers only on version tags with version displayed in navbar
+- CI uses path filtering to skip unrelated jobs (backend skips on admin-only changes and vice versa)
+- CI concurrency groups cancel superseded PR runs
+- Added `CI Pass` gate job for branch protection compatibility
+
 ## v1.0.0 - Initial Release
 
 The first public release of OpenYapper, a multi-site CMS platform with a Rust backend, React admin dashboard, and pluggable frontend templates.
