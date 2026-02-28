@@ -56,7 +56,7 @@ utoipa-swagger-ui = { version = "9.0.2", features = ["rocket"] }
 
 # Security
 sha2 = "0.11.0-rc.5"
-jsonwebtoken = "10"
+jsonwebtoken = { version = "10", features = ["aws_lc_rs"] }
 reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
 
 # Redis (rate limiting)
