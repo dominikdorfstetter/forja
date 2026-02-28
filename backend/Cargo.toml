@@ -70,7 +70,7 @@ image = "0.25"
 infer = "0.16"
 
 # S3 storage (optional)
-aws-sdk-s3 = "1.82"
+aws-sdk-s3 = "1.124"
 aws-config = "1.6"
 
 # Filesystem stats (disk usage for health checks)
