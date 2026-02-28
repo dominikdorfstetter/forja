@@ -2,6 +2,8 @@ import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
+const version = process.env.OPENYAPPER_VERSION || 'dev';
+
 const config: Config = {
   title: 'OpenYapper',
   tagline: 'A multi-site CMS platform built with Rust and React',
@@ -51,6 +53,11 @@ const config: Config = {
           sidebarId: 'docsSidebar',
           position: 'left',
           label: 'Docs',
+        },
+        {
+          type: 'html',
+          position: 'right',
+          value: `<span style="font-size:0.8rem;color:var(--ifm-color-emphasis-600)">${version}</span>`,
         },
         {
           href: 'https://github.com/dominikdorfstetter/openyapper',

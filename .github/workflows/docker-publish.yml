@@ -2,7 +2,7 @@ name: Docker Publish
 
 on:
   push:
-    branches: [main]
+    tags: ['v*']
 
 permissions:
   contents: read
@@ -11,17 +11,9 @@ env:
   DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/openyapper
 
 jobs:
-  ci-check:
-    name: Wait for CI
-    runs-on: ubuntu-latest
-    steps:
-      - name: CI gates are enforced via branch protection
-        run: echo "CI must pass before merging to main"
-
   docker:
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
-    needs: ci-check
     steps:
       - uses: actions/checkout@v6
 
@@ -43,8 +35,9 @@ jobs:
         with:
           images: ${{ env.DOCKER_IMAGE }}
           tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
             type=raw,value=latest
-            type=sha,prefix=
 
       - name: Build and push
         uses: docker/build-push-action@v6
