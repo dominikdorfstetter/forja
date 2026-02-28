@@ -28,6 +28,8 @@ import type { MediaListItem, MediaFolder, MediaMetadataResponse, Locale } from '
 import { useTranslation } from 'react-i18next';
 import { useSiteContext } from '@/store/SiteContext';
 
+const EMPTY_METADATA: MediaMetadataResponse[] = [];
+
 interface MediaDetailDialogProps {
   open: boolean;
   media: MediaListItem | null;
@@ -62,7 +64,7 @@ export default function MediaDetailDialog({ open, media, folders, onClose }: Med
     .filter((sl) => sl.is_active)
     .map((sl) => ({ id: sl.locale_id, code: sl.code, name: sl.name, native_name: sl.native_name, direction: sl.direction, is_active: sl.is_active, created_at: sl.created_at }));
 
-  const { data: metadata = [] } = useQuery({
+  const { data: metadata = EMPTY_METADATA } = useQuery({
     queryKey: ['media-metadata', media?.id],
     queryFn: () => apiService.getMediaMetadata(media!.id),
     enabled: !!media?.id,
@@ -184,7 +186,7 @@ export default function MediaDetailDialog({ open, media, folders, onClose }: Med
 
             <FormControl fullWidth size="small" sx={{ mt: 2 }}>
               <InputLabel>{t('forms.mediaDetail.fields.folder')}</InputLabel>
-              <Select value={selectedFolderId} label={t('forms.mediaDetail.fields.folder')} onChange={(e) => handleFolderChange(e.target.value)}>
+              <Select value={folders.some((f) => f.id === selectedFolderId) ? selectedFolderId : ''} label={t('forms.mediaDetail.fields.folder')} onChange={(e) => handleFolderChange(e.target.value)}>
                 <MenuItem value="">{t('forms.mediaDetail.fields.noFolder')}</MenuItem>
                 {folders.map((f) => (
                   <MenuItem key={f.id} value={f.id}>{f.name}</MenuItem>
