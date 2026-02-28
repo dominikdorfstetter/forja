@@ -71,11 +71,26 @@ impl ClerkApiUser {
 
 impl ClerkService {
     pub fn new(secret_key: String) -> Self {
+        let base_url = "https://api.clerk.com/v1".to_string();
+        assert!(
+            base_url.starts_with("https://"),
+            "Clerk API base URL must use HTTPS"
+        );
         Self {
             secret_key,
             client: reqwest::Client::new(),
-            base_url: "https://api.clerk.com/v1".to_string(),
+            base_url,
         }
+    }
+
+    /// Validate that a URL uses HTTPS before sending credentials
+    fn require_https(url: &str) -> Result<(), ApiError> {
+        if !url.starts_with("https://") {
+            return Err(ApiError::Internal(
+                "Refusing to send credentials over non-HTTPS connection".to_string(),
+            ));
+        }
+        Ok(())
     }
 
     /// List Clerk users with pagination
@@ -84,22 +99,20 @@ impl ClerkService {
         limit: i64,
         offset: i64,
     ) -> Result<(Vec<ClerkApiUser>, i64), ApiError> {
+        let url = format!("{}/users", self.base_url);
+        Self::require_https(&url)?;
         let resp = self
             .client
-            .get(format!("{}/users", self.base_url))
+            .get(&url)
             .bearer_auth(&self.secret_key)
             .query(&[("limit", limit.to_string()), ("offset", offset.to_string())])
             .send()
             .await
-            .map_err(|e| ApiError::Internal(format!("Clerk API error: {}", e)))?;
+            .map_err(|_| ApiError::Internal("Clerk API request failed".to_string()))?;
 
         if !resp.status().is_success() {
             let status = resp.status();
-            let body = resp.text().await.unwrap_or_default();
-            return Err(ApiError::Internal(format!(
-                "Clerk API returned {}: {}",
-                status, body
-            )));
+            return Err(ApiError::Internal(format!("Clerk API returned {}", status)));
         }
 
         let total_count: i64 = resp
@@ -119,33 +132,28 @@ impl ClerkService {
 
     /// Get a single Clerk user by ID
     pub async fn get_user(&self, user_id: &str) -> Result<ClerkApiUser, ApiError> {
+        let url = format!("{}/users/{}", self.base_url, user_id);
+        Self::require_https(&url)?;
         let resp = self
             .client
-            .get(format!("{}/users/{}", self.base_url, user_id))
+            .get(&url)
             .bearer_auth(&self.secret_key)
             .send()
             .await
-            .map_err(|e| ApiError::Internal(format!("Clerk API error: {}", e)))?;
+            .map_err(|_| ApiError::Internal("Clerk API request failed".to_string()))?;
 
         if !resp.status().is_success() {
             let status = resp.status();
-            let body = resp.text().await.unwrap_or_default();
             if status.as_u16() == 404 {
-                return Err(ApiError::NotFound(format!(
-                    "Clerk user {} not found",
-                    user_id
-                )));
+                return Err(ApiError::NotFound("Clerk user not found".to_string()));
             }
-            return Err(ApiError::Internal(format!(
-                "Clerk API returned {}: {}",
-                status, body
-            )));
+            return Err(ApiError::Internal(format!("Clerk API returned {}", status)));
         }
 
         let user: ClerkApiUser = resp
             .json()
             .await
-            .map_err(|e| ApiError::Internal(format!("Failed to parse Clerk user: {}", e)))?;
+            .map_err(|_| ApiError::Internal("Failed to parse Clerk user response".to_string()))?;
 
         Ok(user)
     }
@@ -156,65 +164,55 @@ impl ClerkService {
         user_id: &str,
         role: &str,
     ) -> Result<ClerkApiUser, ApiError> {
+        let url = format!("{}/users/{}", self.base_url, user_id);
+        Self::require_https(&url)?;
         let body = serde_json::json!({
             "public_metadata": { "role": role }
         });
 
         let resp = self
             .client
-            .patch(format!("{}/users/{}", self.base_url, user_id))
+            .patch(&url)
             .bearer_auth(&self.secret_key)
             .json(&body)
             .send()
             .await
-            .map_err(|e| ApiError::Internal(format!("Clerk API error: {}", e)))?;
+            .map_err(|_| ApiError::Internal("Clerk API request failed".to_string()))?;
 
         if !resp.status().is_success() {
             let status = resp.status();
-            let body = resp.text().await.unwrap_or_default();
             if status.as_u16() == 404 {
-                return Err(ApiError::NotFound(format!(
-                    "Clerk user {} not found",
-                    user_id
-                )));
+                return Err(ApiError::NotFound("Clerk user not found".to_string()));
             }
-            return Err(ApiError::Internal(format!(
-                "Clerk API returned {}: {}",
-                status, body
-            )));
+            return Err(ApiError::Internal(format!("Clerk API returned {}", status)));
         }
 
         let user: ClerkApiUser = resp
             .json()
             .await
-            .map_err(|e| ApiError::Internal(format!("Failed to parse Clerk user: {}", e)))?;
+            .map_err(|_| ApiError::Internal("Failed to parse Clerk user response".to_string()))?;
 
         Ok(user)
     }
 
     /// Delete a Clerk user by ID
     pub async fn delete_user(&self, user_id: &str) -> Result<(), ApiError> {
+        let url = format!("{}/users/{}", self.base_url, user_id);
+        Self::require_https(&url)?;
         let resp = self
             .client
-            .delete(format!("{}/users/{}", self.base_url, user_id))
+            .delete(&url)
             .bearer_auth(&self.secret_key)
             .send()
             .await
-            .map_err(|e| ApiError::Internal(format!("Clerk API error: {}", e)))?;
+            .map_err(|_| ApiError::Internal("Clerk API request failed".to_string()))?;
 
         if !resp.status().is_success() {
             let status = resp.status();
-            let body = resp.text().await.unwrap_or_default();
             if status.as_u16() == 404 {
-                return Err(ApiError::NotFound(format!(
-                    "Clerk user {} not found",
-                    user_id
-                )));
+                return Err(ApiError::NotFound("Clerk user not found".to_string()));
             }
-            return Err(ApiError::Internal(format!(
-                "Clerk API returned {}: {}",
-                status, body
-            )));
+            return Err(ApiError::Internal(format!("Clerk API returned {}", status)));
         }
 
         Ok(())
@@ -222,14 +220,18 @@ impl ClerkService {
 
     /// Lightweight health check - list 1 user to verify Clerk API connectivity
     pub async fn health_check(&self) -> Result<(), String> {
+        let url = format!("{}/users", self.base_url);
+        if !url.starts_with("https://") {
+            return Err("Clerk API base URL must use HTTPS".to_string());
+        }
         let resp = self
             .client
-            .get(format!("{}/users", self.base_url))
+            .get(&url)
             .bearer_auth(&self.secret_key)
             .query(&[("limit", "1")])
             .send()
             .await
-            .map_err(|e| format!("Clerk API unreachable: {}", e))?;
+            .map_err(|_| "Clerk API unreachable".to_string())?;
 
         if !resp.status().is_success() {
             let status = resp.status();

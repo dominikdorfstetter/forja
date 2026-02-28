@@ -20,18 +20,19 @@ pub fn notify_content_submitted(
 ) {
     let entity_type = entity_type.to_string();
     let slug = slug.to_string();
-    let actor = actor_clerk_id.clone();
     tokio::spawn(async move {
-        if let Err(e) = notify_submitted_inner(
+        let result = notify_submitted_inner(
             &pool,
             site_id,
             &entity_type,
             entity_id,
             &slug,
-            actor.as_deref(),
+            actor_clerk_id.as_deref(),
         )
-        .await
-        {
+        .await;
+        // Drop sensitive identifier before logging to prevent cleartext exposure
+        drop(actor_clerk_id);
+        if let Err(e) = result {
             tracing::warn!("Notification dispatch (submitted) failed: {e}");
         }
     });
@@ -52,22 +53,24 @@ pub fn notify_content_approved(
     };
     let entity_type = entity_type.to_string();
     let slug = slug.to_string();
-    let actor = actor_clerk_id.clone();
     tokio::spawn(async move {
-        if let Err(e) = notify_review_result_inner(
+        let title = format!("{} '{}' has been approved", capitalize(&entity_type), slug);
+        let result = notify_review_result_inner(
             &pool,
             site_id,
             &entity_type,
             entity_id,
             &slug,
             creator_id,
-            actor.as_deref(),
+            actor_clerk_id.as_deref(),
             "content_approved",
-            &format!("{} '{}' has been approved", capitalize(&entity_type), slug),
+            &title,
             None,
         )
-        .await
-        {
+        .await;
+        // Drop sensitive identifier before logging to prevent cleartext exposure
+        drop(actor_clerk_id);
+        if let Err(e) = result {
             tracing::warn!("Notification dispatch (approved) failed: {e}");
         }
     });
@@ -90,22 +93,24 @@ pub fn notify_changes_requested(
     };
     let entity_type = entity_type.to_string();
     let slug = slug.to_string();
-    let actor = actor_clerk_id.clone();
     tokio::spawn(async move {
-        if let Err(e) = notify_review_result_inner(
+        let title = format!("Changes requested on {} '{}'", &entity_type, slug);
+        let result = notify_review_result_inner(
             &pool,
             site_id,
             &entity_type,
             entity_id,
             &slug,
             creator_id,
-            actor.as_deref(),
+            actor_clerk_id.as_deref(),
             "changes_requested",
-            &format!("Changes requested on {} '{}'", &entity_type, slug),
+            &title,
             comment.as_deref(),
         )
-        .await
-        {
+        .await;
+        // Drop sensitive identifier before logging to prevent cleartext exposure
+        drop(actor_clerk_id);
+        if let Err(e) = result {
             tracing::warn!("Notification dispatch (changes_requested) failed: {e}");
         }
     });

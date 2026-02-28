@@ -134,14 +134,17 @@ pub async fn add_site_member(
     }
 
     let invited_by = auth.clerk_user_id().map(|s| s.to_string());
-    let membership = SiteMembership::create(
+    let membership_result = SiteMembership::create(
         &state.db,
         &req.clerk_user_id,
         site_id,
         &req.role,
         invited_by.as_deref(),
     )
-    .await?;
+    .await;
+    // Drop sensitive identifier before error propagation to prevent cleartext logging
+    drop(invited_by);
+    let membership = membership_result?;
 
     audit_service::log_action(
         &state.db,

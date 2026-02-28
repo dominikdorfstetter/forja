@@ -196,8 +196,8 @@ async fn rocket() -> _ {
             .await;
 
             match result {
-                Ok(_) => tracing::info!("System admin seeded: {}", clerk_id),
-                Err(e) => tracing::warn!("Failed to seed system admin {}: {}", clerk_id, e),
+                Ok(_) => tracing::info!("System admin seeded successfully"),
+                Err(e) => tracing::warn!("Failed to seed system admin: {}", e),
             }
         }
     }
