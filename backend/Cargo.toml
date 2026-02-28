@@ -74,7 +74,7 @@ aws-sdk-s3 = "1.124"
 aws-config = "1.6"
 
 # Filesystem stats (disk usage for health checks)
-nix = { version = "0.29", features = ["fs"] }
+nix = { version = "0.31", features = ["fs"] }
 
 # RSS feed
 rss = "2"
