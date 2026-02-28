@@ -48,7 +48,7 @@ tracing-subscriber = { version = "0.3.22", features = ["env-filter", "json"] }
 
 # Error Handling
 thiserror = "2.0.18"
-anyhow = "1.0.101"
+anyhow = "1.0.102"
 
 # API Documentation
 utoipa = { version = "5.4.0", features = ["rocket_extras", "uuid", "chrono"] }
