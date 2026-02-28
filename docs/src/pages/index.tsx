@@ -49,13 +49,13 @@ function HomepageHeader() {
         <div>
           <Link
             className="button button--secondary button--lg"
-            to="/docs/getting-started/prerequisites">
+            to="docs/getting-started/prerequisites">
             Get Started
           </Link>
           {' '}
           <Link
             className="button button--outline button--secondary button--lg"
-            to="/docs/api/overview">
+            to="docs/api/overview">
             API Reference
           </Link>
         </div>

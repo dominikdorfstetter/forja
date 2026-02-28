@@ -65,24 +65,24 @@ const config: Config = {
         {
           title: 'Docs',
           items: [
-            {label: 'Getting Started', to: '/docs/getting-started/prerequisites'},
-            {label: 'API Reference', to: '/docs/api/overview'},
-            {label: 'Admin Guide', to: '/docs/admin-guide/overview'},
+            {label: 'Getting Started', to: 'docs/getting-started/prerequisites'},
+            {label: 'API Reference', to: 'docs/api/overview'},
+            {label: 'Admin Guide', to: 'docs/admin-guide/overview'},
           ],
         },
         {
           title: 'Developer',
           items: [
-            {label: 'Architecture', to: '/docs/architecture/overview'},
-            {label: 'Contributing', to: '/docs/developer/contributing'},
-            {label: 'Deployment', to: '/docs/deployment/docker'},
+            {label: 'Architecture', to: 'docs/architecture/overview'},
+            {label: 'Contributing', to: 'docs/developer/contributing'},
+            {label: 'Deployment', to: 'docs/deployment/docker'},
           ],
         },
         {
           title: 'More',
           items: [
             {label: 'GitHub', href: 'https://github.com/dominikdorfstetter/openyapper'},
-            {label: 'Changelog', to: '/docs/changelog'},
+            {label: 'Changelog', to: 'docs/changelog'},
           ],
         },
       ],
