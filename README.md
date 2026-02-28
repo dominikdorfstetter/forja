@@ -223,6 +223,57 @@ The docs cover getting started, architecture, API reference, admin guide, deploy
 cd docs && npm install && npm start
 ```
 
+## Docker
+
+OpenYapper is available on [Docker Hub](https://hub.docker.com/r/dominikdorfstetter/openyapper):
+
+```bash
+docker pull dominikdorfstetter/openyapper
+```
+
+Run with Docker Compose (requires PostgreSQL and Redis):
+
+```yaml
+services:
+  app:
+    image: dominikdorfstetter/openyapper
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgres://openyapper:openyapper@postgres:5432/openyapper
+      REDIS_URL: redis://redis:6379
+      CLERK_SECRET_KEY: sk_test_...
+      CLERK_PUBLISHABLE_KEY: pk_test_...
+      CLERK_JWKS_URL: https://your-instance.clerk.accounts.dev/.well-known/jwks.json
+      SYSTEM_ADMIN_CLERK_IDS: user_...
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: openyapper
+      POSTGRES_PASSWORD: openyapper
+      POSTGRES_DB: openyapper
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+
+volumes:
+  pgdata:
+```
+
+```bash
+docker compose up -d
+```
+
+The API is available at `http://localhost:8000` and the admin dashboard at `http://localhost:8000/dashboard`.
+
+See the full [Docker deployment guide](https://dominikdorfstetter.github.io/openyapper/deployment/docker) for health checks, environment variables, and production configuration.
+
 ## Deploy
 
 Deploy OpenYapper to a cloud platform with managed Postgres and Redis:

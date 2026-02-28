@@ -6,6 +6,18 @@ sidebar_position: 1
 
 OpenYapper ships with a multi-stage Dockerfile that builds both the React admin dashboard and the Rust backend into a single, minimal production image.
 
+## Docker Hub
+
+Pre-built images are published to [Docker Hub](https://hub.docker.com/r/dominikdorfstetter/openyapper) on every push to `main`. Multi-platform images are available for `linux/amd64` and `linux/arm64`.
+
+```bash
+docker pull dominikdorfstetter/openyapper
+```
+
+Images are tagged with:
+- `latest` &mdash; the most recent build from `main`
+- Git SHA (e.g. `bf3df6d`) &mdash; for pinning to a specific commit
+
 ## Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/) 20.10 or later
@@ -18,7 +30,7 @@ The Dockerfile uses three stages to keep the final image small:
 | Stage | Base Image | Purpose |
 |-------|-----------|---------|
 | **admin-build** | `node:20-alpine` | Installs npm dependencies and builds the React admin dashboard |
-| **backend-build** | `rust:1.82-bookworm` | Compiles the Rust backend in release mode, embedding the admin static files |
+| **backend-build** | `rust:1.93-bookworm` | Compiles the Rust backend in release mode, embedding the admin static files |
 | **runtime** | `debian:bookworm-slim` | Minimal runtime with only `ca-certificates`, `libssl3`, and `libpq5` |
 
 The final image contains a single binary (`openyapper`), the compiled admin dashboard static files, and the SQLx migration files.
@@ -51,8 +63,7 @@ For production deployments, create a `docker-compose.yaml` that includes the app
 ```yaml
 services:
   app:
-    image: openyapper
-    build: .
+    image: dominikdorfstetter/openyapper
     ports:
       - "8000:8000"
     environment:
@@ -175,16 +186,18 @@ SQLx database migrations run automatically when the application starts. The migr
 
 ## Updating
 
-To update a running deployment:
+To update a running deployment using the Docker Hub image:
 
 ```bash
-# Pull latest source code
+docker pull dominikdorfstetter/openyapper
+docker compose up -d
+```
+
+Or if building from source:
+
+```bash
 git pull
-
-# Rebuild the image
 docker build -t openyapper .
-
-# Restart the stack
 docker compose up -d
 ```
 
