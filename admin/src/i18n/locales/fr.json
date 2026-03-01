@@ -105,23 +105,23 @@
       "media": "Médias",
       "documents": "Documents",
       "assets": "Ressources",
-      "legal": "Juridique",
-      "cv": "CV",
-      "siteConfig": "Configuration du site",
-      "sites": "Sites",
+      "structure": "Structure",
       "navigation": "Navigation",
+      "taxonomy": "Taxonomie",
+      "site": "Site",
       "socialLinks": "Liens sociaux",
       "activity": "Activité",
-      "system": "Système",
+      "legal": "Juridique",
+      "cv": "CV",
       "members": "Membres",
       "apiKeys": "Clés API",
-      "taxonomy": "Taxonomie",
-      "apiDocs": "Documentation API",
       "contentTemplates": "Modèles",
       "redirects": "Redirections",
       "webhooks": "Webhooks",
       "settings": "Paramètres",
+      "sites": "Sites",
       "locales": "Langues",
+      "apiDocs": "Documentation API",
       "myDrafts": "Mes brouillons",
       "logout": "Déconnexion"
     },
@@ -131,6 +131,12 @@
       "profile": "Profil",
       "theme": "Thème",
       "language": "Langue"
+    },
+    "accountMenu": {
+      "system": "Système",
+      "sites": "Gérer les sites",
+      "locales": "Langues",
+      "apiDocs": "Documentation API"
     }
   },
   "login": {
@@ -167,8 +173,8 @@
     "noPosts": "Aucun article de blog pour le moment.",
     "noPostsCreate": "Aucun article de blog pour le moment. Créez votre premier article !",
     "drafts": "Brouillons",
-    "noDrafts": "Aucun brouillon — tout le contenu est publié ou en cours de révision.",
     "viewAllDrafts": "Voir tout",
+    "noDrafts": "Aucun brouillon — tout le contenu est publié ou en cours de révision.",
     "quickActions": "Actions rapides",
     "byAuthor": "par {{author}}",
     "requests": "{{count}} requêtes",
@@ -256,33 +262,21 @@
     },
     "fields": {
       "title": "Titre",
+      "subtitle": "Sous-titre",
       "slug": "Slug",
       "author": "Auteur",
       "status": "Statut",
       "locale": "Langue",
       "excerpt": "Extrait",
       "content": "Contenu",
+      "body": "Corps (Markdown)",
       "coverImage": "URL de l'image de couverture",
       "publishedDate": "Date de publication",
       "featured": "En vedette",
       "tags": "Tags",
       "categories": "Catégories",
-      "subtitle": "Sous-titre",
-      "body": "Corps (Markdown)",
       "metaTitle": "Méta titre",
       "metaDescription": "Méta description"
-    },
-    "messages": {
-      "saved": "Article enregistré",
-      "saveFailed": "Échec de l'enregistrement de l'article"
-    },
-    "documents": {
-      "title": "Documents joints",
-      "attach": "Joindre un document",
-      "empty": "Aucun document joint",
-      "emptyDescription": "Joignez des documents à cet article de blog",
-      "detached": "Document détaché",
-      "attached": "Document joint"
     },
     "metadata": {
       "title": "Métadonnées du blog",
@@ -298,7 +292,11 @@
     "images": {
       "title": "Images",
       "coverImageId": "ID de l'image de couverture :",
-      "headerImageId": "ID de l'image d'en-tête :"
+      "headerImageId": "ID de l'image d'en-tête :",
+      "selectImage": "Sélectionner une image",
+      "changeImage": "Modifier",
+      "removeImage": "Supprimer",
+      "noImage": "Aucune image sélectionnée"
     },
     "settings": {
       "title": "Paramètres",
@@ -309,7 +307,19 @@
     },
     "toc": "Table des matières",
     "createTranslation": "Créer la traduction {{locale}}",
-    "noLocalesAlert": "Aucune locale active configurée. Allez dans <strong>Paramètres → Locales</strong> et créez au moins une locale active (par ex. « en ») pour commencer à écrire du contenu."
+    "noLocalesAlert": "Aucune locale active configurée. Allez dans <strong>Paramètres → Locales</strong> et créez au moins une locale active (par ex. « en ») pour commencer à écrire du contenu.",
+    "messages": {
+      "saved": "Article enregistré",
+      "saveFailed": "Échec de l'enregistrement de l'article"
+    },
+    "documents": {
+      "title": "Documents joints",
+      "attach": "Joindre un document",
+      "empty": "Aucun document joint",
+      "emptyDescription": "Joignez des documents à cet article de blog",
+      "detached": "Document détaché",
+      "attached": "Document joint"
+    }
   },
   "pages": {
     "title": "Pages",
@@ -346,7 +356,14 @@
     "title": "Détail de la page",
     "back": "Retour aux pages",
     "loading": "Chargement de la page...",
+    "loadFailed": "Échec du chargement de la page",
     "notFound": "Page non trouvée",
+    "pageInfo": "Informations de la page",
+    "parentPageId": "ID de la page parente",
+    "pageSubtitle": "Page {{type}}",
+    "metadata": "Métadonnées",
+    "contentId": "ID du contenu",
+    "template": "Modèle",
     "sections": {
       "title": "Sections",
       "coverImage": "Image de couverture",
@@ -360,6 +377,20 @@
       "loadingSections": "Chargement des sections...",
       "deleteTitle": "Supprimer la section",
       "deleteMessage": "Supprimer cette section {{type}} ? Cette action est irréversible."
+    },
+    "table": {
+      "type": "Type",
+      "order": "Ordre",
+      "localizations": "Localisations",
+      "coverImage": "Image de couverture",
+      "ctaRoute": "Route CTA",
+      "actions": "Actions"
+    },
+    "dialog": {
+      "sectionType": "Type de section",
+      "displayOrder": "Ordre d'affichage",
+      "displayOrderRequired": "L'ordre d'affichage est requis",
+      "adding": "Ajout en cours..."
     },
     "fields": {
       "route": "Route",
@@ -391,27 +422,6 @@
       "saved": "Page enregistrée",
       "saveFailed": "Échec de l'enregistrement de la page",
       "updated": "Page mise à jour"
-    },
-    "loadFailed": "Échec du chargement de la page",
-    "pageInfo": "Informations de la page",
-    "template": "Modèle",
-    "parentPageId": "ID de la page parente",
-    "pageSubtitle": "Page {{type}}",
-    "metadata": "Métadonnées",
-    "contentId": "ID du contenu",
-    "table": {
-      "type": "Type",
-      "order": "Ordre",
-      "localizations": "Localisations",
-      "coverImage": "Image de couverture",
-      "ctaRoute": "Route CTA",
-      "actions": "Actions"
-    },
-    "dialog": {
-      "sectionType": "Type de section",
-      "displayOrder": "Ordre d'affichage",
-      "displayOrderRequired": "L'ordre d'affichage est requis",
-      "adding": "Ajout en cours..."
     }
   },
   "media": {
@@ -426,6 +436,13 @@
       "videos": "Vidéos",
       "audio": "Audio",
       "documents": "Documents"
+    },
+    "picker": {
+      "title": "Sélectionner une image",
+      "search": "Rechercher des images...",
+      "noResults": "Aucune image trouvée",
+      "select": "Sélectionner",
+      "clear": "Effacer la sélection"
     },
     "openUrl": "Ouvrir l'URL",
     "empty": {
@@ -614,12 +631,41 @@
     "sendTest": "Envoyer un test",
     "testSuccess": "Test livré — {{status}}",
     "testFailed": "Échec de la livraison de test",
-    "table": { "url": "URL", "events": "Événements", "status": "Statut", "created": "Créé", "actions": "Actions" },
-    "empty": { "noSite": "Sélectionnez un site dans la barre d'outils pour gérer ses webhooks", "title": "Aucun webhook", "description": "Les webhooks notifient les services externes lorsque du contenu est créé, modifié ou supprimé." },
+    "table": {
+      "url": "URL",
+      "events": "Événements",
+      "status": "Statut",
+      "created": "Créé",
+      "actions": "Actions"
+    },
+    "empty": {
+      "noSite": "Sélectionnez un site dans la barre d'outils pour gérer ses webhooks",
+      "title": "Aucun webhook",
+      "description": "Les webhooks notifient les services externes lorsque du contenu est créé, modifié ou supprimé."
+    },
     "loading": "Chargement des webhooks...",
-    "messages": { "created": "Webhook créé", "updated": "Webhook mis à jour", "deleted": "Webhook supprimé" },
-    "deleteDialog": { "title": "Supprimer le webhook", "message": "Supprimer le webhook pour \"{{url}}\" ? Cette action est irréversible." },
-    "deliveries": { "title": "Journal de livraison", "loading": "Chargement des livraisons...", "empty": "Aucune livraison", "emptyDescription": "Les livraisons apparaîtront ici après le déclenchement du webhook.", "table": { "event": "Événement", "status": "Statut", "attempt": "Tentative", "timestamp": "Horodatage", "error": "Erreur" } }
+    "messages": {
+      "created": "Webhook créé",
+      "updated": "Webhook mis à jour",
+      "deleted": "Webhook supprimé"
+    },
+    "deleteDialog": {
+      "title": "Supprimer le webhook",
+      "message": "Supprimer le webhook pour \"{{url}}\" ? Cette action est irréversible."
+    },
+    "deliveries": {
+      "title": "Journal de livraison",
+      "loading": "Chargement des livraisons...",
+      "empty": "Aucune livraison",
+      "emptyDescription": "Les livraisons apparaîtront ici après le déclenchement du webhook.",
+      "table": {
+        "event": "Événement",
+        "status": "Statut",
+        "attempt": "Tentative",
+        "timestamp": "Horodatage",
+        "error": "Erreur"
+      }
+    }
   },
   "redirects": {
     "title": "Redirections",
@@ -741,8 +787,8 @@
     "table": {
       "name": "Nom",
       "keyPrefix": "Préfixe de clé",
-      "permission": "Permission",
       "site": "Site",
+      "permission": "Permission",
       "status": "Statut",
       "requests": "Requêtes",
       "lastUsed": "Dernière utilisation",
@@ -907,16 +953,17 @@
     "back": "Retour aux documents juridiques",
     "loading": "Chargement du document juridique...",
     "notFound": "Document juridique non trouvé",
+    "editDocument": "Modifier le document",
+    "cookieName": "Nom du cookie",
+    "documentType": "Type de document",
+    "documentId": "ID du document",
+    "updatedMessage": "Document juridique mis à jour",
+    "loadGroupsFailed": "Échec du chargement des groupes",
     "groups": {
       "title": "Groupes de consentement",
       "add": "Ajouter un groupe",
       "empty": "Aucun groupe de consentement",
       "emptyDescription": "Ajoutez des groupes de consentement à ce document",
-      "messages": {
-        "created": "Groupe créé",
-        "updated": "Groupe mis à jour",
-        "deleted": "Groupe supprimé"
-      },
       "editGroup": "Modifier le groupe",
       "deleteGroup": "Supprimer le groupe",
       "deleteMessage": "Supprimer le groupe « {{name}} » ? Cela supprimera également tous les éléments de ce groupe.",
@@ -925,27 +972,26 @@
       "required": "Obligatoire",
       "optional": "Facultatif",
       "enabled": "Activé",
-      "disabled": "Désactivé"
+      "disabled": "Désactivé",
+      "messages": {
+        "created": "Groupe créé",
+        "updated": "Groupe mis à jour",
+        "deleted": "Groupe supprimé"
+      }
     },
     "items": {
       "title": "Éléments",
       "add": "Ajouter un élément",
       "empty": "Aucun élément dans ce groupe",
+      "loadingItems": "Chargement des éléments...",
+      "deleteItem": "Supprimer l'élément",
+      "deleteMessage": "Supprimer l'élément « {{name}} » ? Cette action est irréversible.",
       "messages": {
         "created": "Élément créé",
         "updated": "Élément mis à jour",
         "deleted": "Élément supprimé"
-      },
-      "loadingItems": "Chargement des éléments...",
-      "deleteItem": "Supprimer l'élément",
-      "deleteMessage": "Supprimer l'élément « {{name}} » ? Cette action est irréversible."
+      }
     },
-    "editDocument": "Modifier le document",
-    "cookieName": "Nom du cookie",
-    "documentType": "Type de document",
-    "documentId": "ID du document",
-    "updatedMessage": "Document juridique mis à jour",
-    "loadGroupsFailed": "Échec du chargement des groupes",
     "dialog": {
       "editGroup": "Modifier le groupe",
       "addGroup": "Ajouter un groupe",
@@ -987,7 +1033,13 @@
     "title": "Détail du site",
     "back": "Retour aux sites",
     "loading": "Chargement du site...",
+    "loadFailed": "Échec du chargement du site",
     "notFound": "Site non trouvé",
+    "siteInfo": "Informations du site",
+    "noDescription": "Aucune description",
+    "metadata": "Métadonnées",
+    "quickLinks": "Liens rapides",
+    "deleteSite": "Supprimer le site",
     "fields": {
       "name": "Nom",
       "slug": "Slug",
@@ -1000,12 +1052,6 @@
       "created": "Créé",
       "updated": "Mis à jour"
     },
-    "loadFailed": "Échec du chargement du site",
-    "siteInfo": "Informations du site",
-    "noDescription": "Aucune description",
-    "metadata": "Métadonnées",
-    "quickLinks": "Liens rapides",
-    "deleteSite": "Supprimer le site",
     "messages": {
       "updated": "Site mis à jour",
       "deleted": "Site supprimé"
@@ -1089,6 +1135,21 @@
         "description": "Choisissez la langue d'affichage de l'interface d'administration"
       }
     }
+  },
+  "onboarding": {
+    "welcome": "Bienvenue sur OpenYapper",
+    "subtitle": "Votre CMS headless pour la gestion de contenu multi-site et multilingue.",
+    "description": "Créez votre premier site pour commencer à gérer des pages, des articles de blog, des médias et plus encore — le tout via une API REST puissante.",
+    "features": {
+      "multiSite": "Multi-Site",
+      "multiSiteDesc": "Gérez plusieurs sites web depuis un seul tableau de bord avec des contenus et paramètres indépendants.",
+      "multilingual": "Multilingue",
+      "multilingualDesc": "Localisation intégrée avec prise en charge de toute langue et de la direction de texte RTL.",
+      "apiFirst": "API-First",
+      "apiFirstDesc": "Architecture headless avec une API REST complète. Diffusez votre contenu vers n'importe quel frontend."
+    },
+    "createSite": "Créer votre premier site",
+    "stepPrefix": "Étape 1 sur 1"
   },
   "setupChecklist": {
     "title": "Premiers pas",

@@ -105,23 +105,23 @@
       "media": "Medios",
       "documents": "Documentos",
       "assets": "Activos",
-      "legal": "Legal",
-      "cv": "CV",
-      "siteConfig": "Configuración del sitio",
-      "sites": "Sitios",
+      "structure": "Estructura",
       "navigation": "Navegación",
+      "taxonomy": "Taxonomía",
+      "site": "Sitio",
       "socialLinks": "Redes sociales",
       "activity": "Actividad",
-      "system": "Sistema",
+      "legal": "Legal",
+      "cv": "CV",
       "members": "Miembros",
       "apiKeys": "API Keys",
-      "taxonomy": "Taxonomía",
-      "apiDocs": "Documentación API",
       "contentTemplates": "Plantillas",
       "redirects": "Redirecciones",
       "webhooks": "Webhooks",
       "settings": "Configuración",
+      "sites": "Sitios",
       "locales": "Idiomas",
+      "apiDocs": "Documentación API",
       "myDrafts": "Mis borradores",
       "logout": "Cerrar sesión"
     },
@@ -131,6 +131,12 @@
       "profile": "Perfil",
       "theme": "Tema",
       "language": "Idioma"
+    },
+    "accountMenu": {
+      "system": "Sistema",
+      "sites": "Gestionar sitios",
+      "locales": "Idiomas",
+      "apiDocs": "Documentación API"
     }
   },
   "login": {
@@ -181,21 +187,6 @@
       "admin": "Administrador",
       "write": "Escritura",
       "readOnly": "Solo lectura"
-    }
-  },
-  "setupChecklist": {
-    "title": "Primeros pasos",
-    "description": "Complete estos pasos para configurar su sitio y empezar a publicar contenido.",
-    "completeTitle": "¡Todo listo!",
-    "completeDescription": "Ha completado todos los pasos de configuración. ¡Está listo para publicar!",
-    "progress": "{{completed}} de {{total}} completados",
-    "dismiss": "Ocultar",
-    "steps": {
-      "createSite": "Crear su primer sitio",
-      "addLanguage": "Añadir un idioma",
-      "createPage": "Crear una página",
-      "writeBlog": "Escribir una entrada de blog",
-      "setupNav": "Configurar la navegación"
     }
   },
   "myDrafts": {
@@ -271,33 +262,21 @@
     },
     "fields": {
       "title": "Título",
+      "subtitle": "Subtítulo",
       "slug": "Slug",
       "author": "Autor",
       "status": "Estado",
       "locale": "Idioma",
       "excerpt": "Extracto",
       "content": "Contenido",
+      "body": "Cuerpo (Markdown)",
       "coverImage": "URL de la imagen de portada",
       "publishedDate": "Fecha de publicación",
       "featured": "Destacado",
       "tags": "Etiquetas",
       "categories": "Categorías",
-      "subtitle": "Subtítulo",
-      "body": "Cuerpo (Markdown)",
       "metaTitle": "Meta título",
       "metaDescription": "Meta descripción"
-    },
-    "messages": {
-      "saved": "Blog guardado",
-      "saveFailed": "Error al guardar el blog"
-    },
-    "documents": {
-      "title": "Documentos adjuntos",
-      "attach": "Adjuntar documento",
-      "empty": "Sin documentos adjuntos",
-      "emptyDescription": "Adjunte documentos a esta publicación del blog",
-      "detached": "Documento desvinculado",
-      "attached": "Documento adjuntado"
     },
     "metadata": {
       "title": "Metadatos del blog",
@@ -313,7 +292,11 @@
     "images": {
       "title": "Imágenes",
       "coverImageId": "ID de imagen de portada:",
-      "headerImageId": "ID de imagen de encabezado:"
+      "headerImageId": "ID de imagen de encabezado:",
+      "selectImage": "Seleccionar imagen",
+      "changeImage": "Cambiar",
+      "removeImage": "Eliminar",
+      "noImage": "Ninguna imagen seleccionada"
     },
     "settings": {
       "title": "Configuración",
@@ -324,7 +307,19 @@
     },
     "toc": "Tabla de contenidos",
     "createTranslation": "Crear traducción {{locale}}",
-    "noLocalesAlert": "No hay locales activos configurados. Vaya a <strong>Configuración → Locales</strong> y cree al menos un locale activo (por ej. \"en\") para comenzar a escribir contenido."
+    "noLocalesAlert": "No hay locales activos configurados. Vaya a <strong>Configuración → Locales</strong> y cree al menos un locale activo (por ej. \"en\") para comenzar a escribir contenido.",
+    "messages": {
+      "saved": "Blog guardado",
+      "saveFailed": "Error al guardar el blog"
+    },
+    "documents": {
+      "title": "Documentos adjuntos",
+      "attach": "Adjuntar documento",
+      "empty": "Sin documentos adjuntos",
+      "emptyDescription": "Adjunte documentos a esta publicación del blog",
+      "detached": "Documento desvinculado",
+      "attached": "Documento adjuntado"
+    }
   },
   "pages": {
     "title": "Páginas",
@@ -361,7 +356,14 @@
     "title": "Detalle de la página",
     "back": "Volver a páginas",
     "loading": "Cargando página...",
+    "loadFailed": "Error al cargar la página",
     "notFound": "Página no encontrada",
+    "pageInfo": "Información de la página",
+    "parentPageId": "ID de la página padre",
+    "pageSubtitle": "Página {{type}}",
+    "metadata": "Metadatos",
+    "contentId": "ID del contenido",
+    "template": "Plantilla",
     "sections": {
       "title": "Secciones",
       "coverImage": "Imagen de portada",
@@ -375,6 +377,20 @@
       "loadingSections": "Cargando secciones...",
       "deleteTitle": "Eliminar sección",
       "deleteMessage": "¿Eliminar esta sección {{type}}? Esta acción no se puede deshacer."
+    },
+    "table": {
+      "type": "Tipo",
+      "order": "Orden",
+      "localizations": "Localizaciones",
+      "coverImage": "Imagen de portada",
+      "ctaRoute": "Ruta CTA",
+      "actions": "Acciones"
+    },
+    "dialog": {
+      "sectionType": "Tipo de sección",
+      "displayOrder": "Orden de visualización",
+      "displayOrderRequired": "El orden de visualización es obligatorio",
+      "adding": "Añadiendo..."
     },
     "fields": {
       "route": "Ruta",
@@ -406,27 +422,6 @@
       "saved": "Página guardada",
       "saveFailed": "Error al guardar la página",
       "updated": "Página actualizada"
-    },
-    "loadFailed": "Error al cargar la página",
-    "pageInfo": "Información de la página",
-    "template": "Plantilla",
-    "parentPageId": "ID de la página padre",
-    "pageSubtitle": "Página {{type}}",
-    "metadata": "Metadatos",
-    "contentId": "ID del contenido",
-    "table": {
-      "type": "Tipo",
-      "order": "Orden",
-      "localizations": "Localizaciones",
-      "coverImage": "Imagen de portada",
-      "ctaRoute": "Ruta CTA",
-      "actions": "Acciones"
-    },
-    "dialog": {
-      "sectionType": "Tipo de sección",
-      "displayOrder": "Orden de visualización",
-      "displayOrderRequired": "El orden de visualización es obligatorio",
-      "adding": "Añadiendo..."
     }
   },
   "media": {
@@ -441,6 +436,13 @@
       "videos": "Videos",
       "audio": "Audio",
       "documents": "Documentos"
+    },
+    "picker": {
+      "title": "Seleccionar imagen",
+      "search": "Buscar imágenes...",
+      "noResults": "No se encontraron imágenes",
+      "select": "Seleccionar",
+      "clear": "Borrar selección"
     },
     "openUrl": "Abrir URL",
     "empty": {
@@ -629,12 +631,41 @@
     "sendTest": "Enviar prueba",
     "testSuccess": "Prueba entregada — {{status}}",
     "testFailed": "Error en la entrega de prueba",
-    "table": { "url": "URL", "events": "Eventos", "status": "Estado", "created": "Creado", "actions": "Acciones" },
-    "empty": { "noSite": "Selecciona un sitio de la barra de herramientas para gestionar sus webhooks", "title": "Sin webhooks", "description": "Los webhooks notifican a servicios externos cuando se crea, actualiza o elimina contenido." },
+    "table": {
+      "url": "URL",
+      "events": "Eventos",
+      "status": "Estado",
+      "created": "Creado",
+      "actions": "Acciones"
+    },
+    "empty": {
+      "noSite": "Selecciona un sitio de la barra de herramientas para gestionar sus webhooks",
+      "title": "Sin webhooks",
+      "description": "Los webhooks notifican a servicios externos cuando se crea, actualiza o elimina contenido."
+    },
     "loading": "Cargando webhooks...",
-    "messages": { "created": "Webhook creado", "updated": "Webhook actualizado", "deleted": "Webhook eliminado" },
-    "deleteDialog": { "title": "Eliminar webhook", "message": "¿Eliminar webhook para \"{{url}}\"? Esta acción no se puede deshacer." },
-    "deliveries": { "title": "Registro de entregas", "loading": "Cargando entregas...", "empty": "Sin entregas", "emptyDescription": "Las entregas aparecerán aquí después de que se active el webhook.", "table": { "event": "Evento", "status": "Estado", "attempt": "Intento", "timestamp": "Marca de tiempo", "error": "Error" } }
+    "messages": {
+      "created": "Webhook creado",
+      "updated": "Webhook actualizado",
+      "deleted": "Webhook eliminado"
+    },
+    "deleteDialog": {
+      "title": "Eliminar webhook",
+      "message": "¿Eliminar webhook para \"{{url}}\"? Esta acción no se puede deshacer."
+    },
+    "deliveries": {
+      "title": "Registro de entregas",
+      "loading": "Cargando entregas...",
+      "empty": "Sin entregas",
+      "emptyDescription": "Las entregas aparecerán aquí después de que se active el webhook.",
+      "table": {
+        "event": "Evento",
+        "status": "Estado",
+        "attempt": "Intento",
+        "timestamp": "Marca de tiempo",
+        "error": "Error"
+      }
+    }
   },
   "redirects": {
     "title": "Redirecciones",
@@ -756,8 +787,8 @@
     "table": {
       "name": "Nombre",
       "keyPrefix": "Prefijo de clave",
-      "permission": "Permiso",
       "site": "Sitio",
+      "permission": "Permiso",
       "status": "Estado",
       "requests": "Solicitudes",
       "lastUsed": "Último uso",
@@ -922,16 +953,17 @@
     "back": "Volver a documentos legales",
     "loading": "Cargando documento legal...",
     "notFound": "Documento legal no encontrado",
+    "editDocument": "Editar documento",
+    "cookieName": "Nombre de cookie",
+    "documentType": "Tipo de documento",
+    "documentId": "ID del documento",
+    "updatedMessage": "Documento legal actualizado",
+    "loadGroupsFailed": "Error al cargar los grupos",
     "groups": {
       "title": "Grupos de consentimiento",
       "add": "Agregar grupo",
       "empty": "Sin grupos de consentimiento",
       "emptyDescription": "Agregue grupos de consentimiento a este documento",
-      "messages": {
-        "created": "Grupo creado",
-        "updated": "Grupo actualizado",
-        "deleted": "Grupo eliminado"
-      },
       "editGroup": "Editar grupo",
       "deleteGroup": "Eliminar grupo",
       "deleteMessage": "¿Eliminar el grupo \"{{name}}\"? Esto también eliminará todos los elementos de este grupo.",
@@ -940,27 +972,26 @@
       "required": "Obligatorio",
       "optional": "Opcional",
       "enabled": "Activado",
-      "disabled": "Desactivado"
+      "disabled": "Desactivado",
+      "messages": {
+        "created": "Grupo creado",
+        "updated": "Grupo actualizado",
+        "deleted": "Grupo eliminado"
+      }
     },
     "items": {
       "title": "Elementos",
       "add": "Agregar elemento",
       "empty": "Sin elementos en este grupo",
+      "loadingItems": "Cargando elementos...",
+      "deleteItem": "Eliminar elemento",
+      "deleteMessage": "¿Eliminar el elemento \"{{name}}\"? Esta acción no se puede deshacer.",
       "messages": {
         "created": "Elemento creado",
         "updated": "Elemento actualizado",
         "deleted": "Elemento eliminado"
-      },
-      "loadingItems": "Cargando elementos...",
-      "deleteItem": "Eliminar elemento",
-      "deleteMessage": "¿Eliminar el elemento \"{{name}}\"? Esta acción no se puede deshacer."
+      }
     },
-    "editDocument": "Editar documento",
-    "cookieName": "Nombre de cookie",
-    "documentType": "Tipo de documento",
-    "documentId": "ID del documento",
-    "updatedMessage": "Documento legal actualizado",
-    "loadGroupsFailed": "Error al cargar los grupos",
     "dialog": {
       "editGroup": "Editar grupo",
       "addGroup": "Añadir grupo",
@@ -1002,7 +1033,13 @@
     "title": "Detalle del sitio",
     "back": "Volver a sitios",
     "loading": "Cargando sitio...",
+    "loadFailed": "Error al cargar el sitio",
     "notFound": "Sitio no encontrado",
+    "siteInfo": "Información del sitio",
+    "noDescription": "Sin descripción",
+    "metadata": "Metadatos",
+    "quickLinks": "Enlaces rápidos",
+    "deleteSite": "Eliminar sitio",
     "fields": {
       "name": "Nombre",
       "slug": "Slug",
@@ -1015,12 +1052,6 @@
       "created": "Creado",
       "updated": "Actualizado"
     },
-    "loadFailed": "Error al cargar el sitio",
-    "siteInfo": "Información del sitio",
-    "noDescription": "Sin descripción",
-    "metadata": "Metadatos",
-    "quickLinks": "Enlaces rápidos",
-    "deleteSite": "Eliminar sitio",
     "messages": {
       "updated": "Sitio actualizado",
       "deleted": "Sitio eliminado"
@@ -1103,6 +1134,36 @@
         "label": "Idioma del administrador",
         "description": "Elija el idioma de visualización para la interfaz de administración"
       }
+    }
+  },
+  "onboarding": {
+    "welcome": "Bienvenido a OpenYapper",
+    "subtitle": "Tu CMS headless para la gestión de contenido multisitio y multilingüe.",
+    "description": "Crea tu primer sitio para empezar a gestionar páginas, artículos de blog, medios y más — todo a través de una potente API REST.",
+    "features": {
+      "multiSite": "Multisitio",
+      "multiSiteDesc": "Gestiona múltiples sitios web desde un solo panel con contenido y configuración independientes.",
+      "multilingual": "Multilingüe",
+      "multilingualDesc": "Localización integrada con soporte para cualquier idioma y dirección de texto RTL.",
+      "apiFirst": "API-First",
+      "apiFirstDesc": "Arquitectura headless con una API REST completa. Entrega contenido a cualquier frontend."
+    },
+    "createSite": "Crear tu primer sitio",
+    "stepPrefix": "Paso 1 de 1"
+  },
+  "setupChecklist": {
+    "title": "Primeros pasos",
+    "description": "Complete estos pasos para configurar su sitio y empezar a publicar contenido.",
+    "completeTitle": "¡Todo listo!",
+    "completeDescription": "Ha completado todos los pasos de configuración. ¡Está listo para publicar!",
+    "progress": "{{completed}} de {{total}} completados",
+    "dismiss": "Ocultar",
+    "steps": {
+      "createSite": "Crear su primer sitio",
+      "addLanguage": "Añadir un idioma",
+      "createPage": "Crear una página",
+      "writeBlog": "Escribir una entrada de blog",
+      "setupNav": "Configurar la navegación"
     }
   },
   "activity": {
@@ -1241,10 +1302,10 @@
       "editTitle": "Editar etiqueta",
       "fields": {
         "slug": "Slug",
-        "global": "Global (compartido entre todos los sitios)"
-      },
-      "slugHelper": "Identificador URL — letras minúsculas, números y guiones (ej. \"mi-etiqueta\")",
-      "globalHelper": "Las etiquetas globales se comparten entre todos los sitios. Las etiquetas específicas pertenecen solo al sitio actual."
+        "global": "Global (compartido entre todos los sitios)",
+        "slugHelper": "Identificador amigable para URL — letras minúsculas, números y guiones (ej. \"mi-etiqueta\")",
+        "globalHelper": "Las etiquetas globales se comparten entre todos los sitios. Las etiquetas específicas pertenecen solo al sitio actual."
+      }
     },
     "category": {
       "createTitle": "Crear categoría",
@@ -1253,11 +1314,11 @@
         "slug": "Slug",
         "parent": "Categoría padre",
         "noParent": "Ninguna (nivel superior)",
-        "global": "Global (compartido entre todos los sitios)"
-      },
-      "slugHelper": "Identificador URL — letras minúsculas, números y guiones (ej. \"desarrollo-web\")",
-      "globalHelper": "Las categorías globales se comparten entre todos los sitios. Las categorías específicas pertenecen solo al sitio actual.",
-      "parentHelper": "Anida esta categoría bajo una padre para construir una jerarquía (ej. Tecnología > Desarrollo Web)"
+        "global": "Global (compartido entre todos los sitios)",
+        "slugHelper": "Identificador amigable para URL — letras minúsculas, números y guiones (ej. \"desarrollo-web\")",
+        "globalHelper": "Las categorías globales se comparten entre todos los sitios. Las categorías específicas pertenecen solo al sitio actual.",
+        "parentHelper": "Anida esta categoría bajo una superior para construir una jerarquía (ej. Tecnología > Desarrollo Web)"
+      }
     },
     "cvEntry": {
       "createTitle": "Crear entrada de CV",
