@@ -356,6 +356,7 @@
     "contentId": "Inhalts-ID",
     "sections": {
       "title": "Abschnitte",
+      "coverImage": "Titelbild",
       "add": "Abschnitt hinzufügen",
       "empty": "Noch keine Abschnitte",
       "emptyDescription": "Fügen Sie Abschnitte hinzu, um Ihre Seite aufzubauen",
