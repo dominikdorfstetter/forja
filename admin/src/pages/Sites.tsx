@@ -5,9 +5,8 @@ import { Box, Grid, Alert } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import WebIcon from '@mui/icons-material/Web';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSnackbar } from 'notistack';
 import apiService from '@/services/api';
-import { resolveError } from '@/utils/errorResolver';
+import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import type { Site, CreateSiteRequest } from '@/types/api';
 import { useAuth } from '@/store/AuthContext';
 import { useSiteContext } from '@/store/SiteContext';
@@ -22,7 +21,7 @@ export default function SitesPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { enqueueSnackbar } = useSnackbar();
+  const { showError, showSuccess } = useErrorSnackbar();
 
   const { isAdmin, refreshAuth } = useAuth();
   const { setSelectedSiteId } = useSiteContext();
@@ -43,9 +42,9 @@ export default function SitesPage() {
       queryClient.invalidateQueries({ queryKey: ['sites'] });
       setSelectedSiteId(newSite.id);
       setFormOpen(false);
-      enqueueSnackbar(t('sites.messages.created'), { variant: 'success' });
+      showSuccess(t('sites.messages.created'));
     },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onError: (error) => { showError(error); },
   });
 
   const updateMutation = useMutation({
@@ -53,9 +52,9 @@ export default function SitesPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sites'] });
       setEditingSite(null);
-      enqueueSnackbar(t('sites.messages.updated'), { variant: 'success' });
+      showSuccess(t('sites.messages.updated'));
     },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onError: (error) => { showError(error); },
   });
 
   const deleteMutation = useMutation({
@@ -63,9 +62,9 @@ export default function SitesPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sites'] });
       setDeletingSite(null);
-      enqueueSnackbar(t('sites.messages.deleted'), { variant: 'success' });
+      showSuccess(t('sites.messages.deleted'));
     },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onError: (error) => { showError(error); },
   });
 
   if (isLoading) return <LoadingState label={t('sites.loading')} />;

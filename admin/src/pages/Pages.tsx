@@ -5,13 +5,6 @@ import {
   Alert,
   Checkbox,
   Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TablePagination,
   Typography,
   Chip,
   IconButton,
@@ -24,11 +17,9 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DescriptionIcon from '@mui/icons-material/Description';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSnackbar } from 'notistack';
 import { useNavigate } from 'react-router';
 import { format } from 'date-fns';
 import apiService from '@/services/api';
-import { resolveError } from '@/utils/errorResolver';
 import type { PageListItem, CreatePageRequest, UpdatePageRequest, BulkContentRequest } from '@/types/api';
 import { useSiteContext } from '@/store/SiteContext';
 import { useAuth } from '@/store/AuthContext';
@@ -39,20 +30,27 @@ import StatusChip from '@/components/shared/StatusChip';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import BulkActionToolbar from '@/components/shared/BulkActionToolbar';
 import PageFormDialog from '@/components/pages/PageFormDialog';
+import DataTable, { type DataTableColumn } from '@/components/shared/DataTable';
+import { useListPageState } from '@/hooks/useListPageState';
+import { useCrudMutations } from '@/hooks/useCrudMutations';
+import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import { useBulkSelection } from '@/hooks/useBulkSelection';
 
 export default function PagesPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const { selectedSiteId } = useSiteContext();
   const { canWrite, isAdmin } = useAuth();
-  const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(25);
-  const [formOpen, setFormOpen] = useState(false);
-  const [editingPage, setEditingPage] = useState<PageListItem | null>(null);
-  const [deletingPage, setDeletingPage] = useState<PageListItem | null>(null);
+  const { showError, enqueueSnackbar } = useErrorSnackbar();
+
+  const {
+    page, perPage, formOpen, editing: editingPage, deleting: deletingPage,
+    openCreate, closeForm, openEdit: setEditingPage, closeEdit,
+    openDelete: setDeletingPage, closeDelete,
+    handlePageChange, handleRowsPerPageChange,
+  } = useListPageState<PageListItem>();
+
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
 
   const { data: pageData, isLoading, error } = useQuery({
@@ -66,28 +64,33 @@ export default function PagesPage() {
 
   const bulk = useBulkSelection([page, perPage, pageData]);
 
-  const createMutation = useMutation({
-    mutationFn: (data: CreatePageRequest) => apiService.createPage(data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['pages'] }); setFormOpen(false); enqueueSnackbar(t('pages.messages.created'), { variant: 'success' }); },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdatePageRequest }) => apiService.updatePage(id, data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['pages'] }); setEditingPage(null); enqueueSnackbar(t('pages.messages.updated'), { variant: 'success' }); },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id: string) => apiService.deletePage(id),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['pages'] }); setDeletingPage(null); enqueueSnackbar(t('pages.messages.deleted'), { variant: 'success' }); },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+  const { createMutation, updateMutation, deleteMutation } = useCrudMutations<CreatePageRequest, UpdatePageRequest>({
+    queryKey: 'pages',
+    create: {
+      mutationFn: (data) => apiService.createPage(data),
+      successMessage: t('pages.messages.created'),
+      onSuccess: () => { closeForm(); },
+    },
+    update: {
+      mutationFn: ({ id, data }) => apiService.updatePage(id, data),
+      successMessage: t('pages.messages.updated'),
+      onSuccess: () => { closeEdit(); },
+    },
+    delete: {
+      mutationFn: (id) => apiService.deletePage(id),
+      successMessage: t('pages.messages.deleted'),
+      onSuccess: () => { closeDelete(); },
+    },
   });
 
   const cloneMutation = useMutation({
     mutationFn: (id: string) => apiService.clonePage(id),
-    onSuccess: (page) => { queryClient.invalidateQueries({ queryKey: ['pages'] }); enqueueSnackbar(t('pages.messages.cloned'), { variant: 'success' }); navigate(`/pages/${page.id}`); },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onSuccess: (page) => {
+      queryClient.invalidateQueries({ queryKey: ['pages'] });
+      enqueueSnackbar(t('pages.messages.cloned'), { variant: 'success' });
+      navigate(`/pages/${page.id}`);
+    },
+    onError: showError,
   });
 
   const bulkMutation = useMutation({
@@ -102,7 +105,7 @@ export default function PagesPage() {
         enqueueSnackbar(t('bulk.messages.partial', { succeeded: resp.succeeded, failed: resp.failed }), { variant: 'warning' });
       }
     },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onError: showError,
   });
 
   const handleBulkPublish = () => bulkMutation.mutate({ ids: [...bulk.selectedIds], action: 'UpdateStatus', status: 'Published' });
@@ -110,12 +113,69 @@ export default function PagesPage() {
   const handleBulkDelete = () => setBulkDeleteOpen(true);
   const confirmBulkDelete = () => bulkMutation.mutate({ ids: [...bulk.selectedIds], action: 'Delete' });
 
+  const columns: DataTableColumn<PageListItem>[] = [
+    {
+      header: (
+        <Checkbox
+          indeterminate={bulk.count > 0 && !bulk.allSelected(pageIds)}
+          checked={bulk.allSelected(pageIds)}
+          onChange={() => bulk.selectAll(pageIds)}
+        />
+      ),
+      padding: 'checkbox',
+      render: (pg) => (
+        <Checkbox
+          checked={bulk.isSelected(pg.id)}
+          onChange={() => bulk.toggle(pg.id)}
+        />
+      ),
+    },
+    {
+      header: t('pages.table.route'),
+      scope: 'col',
+      render: (pg) => <Typography variant="body2" fontFamily="monospace">{pg.route}</Typography>,
+    },
+    {
+      header: t('pages.table.type'),
+      scope: 'col',
+      render: (pg) => <Chip label={pg.page_type} size="small" variant="outlined" />,
+    },
+    {
+      header: t('pages.table.status'),
+      scope: 'col',
+      render: (pg) => <StatusChip value={pg.status} />,
+    },
+    {
+      header: t('pages.table.inNav'),
+      scope: 'col',
+      render: (pg) => pg.is_in_navigation ? <Chip label={t('common.labels.yes')} size="small" color="primary" variant="outlined" /> : t('common.labels.no'),
+    },
+    {
+      header: t('pages.table.created'),
+      scope: 'col',
+      render: (pg) => format(new Date(pg.created_at), 'PP'),
+    },
+    {
+      header: t('pages.table.actions'),
+      scope: 'col',
+      align: 'right',
+      render: (pg) => (
+        <>
+          <Tooltip title={t('pages.viewDetails')}><IconButton size="small" aria-label={t('pages.viewDetails')} onClick={() => navigate(`/pages/${pg.id}`)}><VisibilityIcon fontSize="small" /></IconButton></Tooltip>
+          {canWrite && <Tooltip title={t('common.actions.clone')}><IconButton size="small" aria-label={t('common.actions.clone')} onClick={() => cloneMutation.mutate(pg.id)} disabled={cloneMutation.isPending}><ContentCopyIcon fontSize="small" /></IconButton></Tooltip>}
+          {canWrite && <Tooltip title={t('common.actions.edit')}><IconButton size="small" aria-label={t('common.actions.edit')} onClick={() => setEditingPage(pg)}><EditIcon fontSize="small" /></IconButton></Tooltip>}
+          {isAdmin && <Tooltip title={t('common.actions.delete')}><IconButton size="small" aria-label={t('common.actions.delete')} color="error" onClick={() => setDeletingPage(pg)}><DeleteIcon fontSize="small" /></IconButton></Tooltip>}
+        </>
+      ),
+    },
+  ];
+
   return (
     <Box>
       <PageHeader
         title={t('pages.title')}
         subtitle={t('pages.subtitle')}
-        action={selectedSiteId ? { label: t('pages.createButton'), icon: <AddIcon />, onClick: () => setFormOpen(true), hidden: !canWrite } : undefined}
+        action={selectedSiteId ? { label: t('pages.createButton'), icon: <AddIcon />, onClick: openCreate, hidden: !canWrite } : undefined}
       />
 
       {!selectedSiteId ? (
@@ -125,7 +185,7 @@ export default function PagesPage() {
       ) : error ? (
         <Alert severity="error">{t('pages.loadError')}</Alert>
       ) : !pages || pages.length === 0 ? (
-        <EmptyState icon={<DescriptionIcon sx={{ fontSize: 64 }} />} title={t('pages.empty.title')} description={t('pages.empty.description')} action={{ label: t('pages.createButton'), onClick: () => setFormOpen(true) }} />
+        <EmptyState icon={<DescriptionIcon sx={{ fontSize: 64 }} />} title={t('pages.empty.title')} description={t('pages.empty.description')} action={{ label: t('pages.createButton'), onClick: openCreate }} />
       ) : (
         <>
           <BulkActionToolbar
@@ -138,67 +198,26 @@ export default function PagesPage() {
             isAdmin={isAdmin}
             loading={bulkMutation.isPending}
           />
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      indeterminate={bulk.count > 0 && !bulk.allSelected(pageIds)}
-                      checked={bulk.allSelected(pageIds)}
-                      onChange={() => bulk.selectAll(pageIds)}
-                    />
-                  </TableCell>
-                  <TableCell scope="col">{t('pages.table.route')}</TableCell>
-                  <TableCell scope="col">{t('pages.table.type')}</TableCell>
-                  <TableCell scope="col">{t('pages.table.status')}</TableCell>
-                  <TableCell scope="col">{t('pages.table.inNav')}</TableCell>
-                  <TableCell scope="col">{t('pages.table.created')}</TableCell>
-                  <TableCell scope="col" align="right">{t('pages.table.actions')}</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {pages.map((pg) => (
-                  <TableRow key={pg.id} selected={bulk.isSelected(pg.id)}>
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={bulk.isSelected(pg.id)}
-                        onChange={() => bulk.toggle(pg.id)}
-                      />
-                    </TableCell>
-                    <TableCell><Typography variant="body2" fontFamily="monospace">{pg.route}</Typography></TableCell>
-                    <TableCell><Chip label={pg.page_type} size="small" variant="outlined" /></TableCell>
-                    <TableCell><StatusChip value={pg.status} /></TableCell>
-                    <TableCell>{pg.is_in_navigation ? <Chip label={t('common.labels.yes')} size="small" color="primary" variant="outlined" /> : t('common.labels.no')}</TableCell>
-                    <TableCell>{format(new Date(pg.created_at), 'PP')}</TableCell>
-                    <TableCell align="right">
-                      <Tooltip title={t('pages.viewDetails')}><IconButton size="small" aria-label={t('pages.viewDetails')} onClick={() => navigate(`/pages/${pg.id}`)}><VisibilityIcon fontSize="small" /></IconButton></Tooltip>
-                      {canWrite && <Tooltip title={t('common.actions.clone')}><IconButton size="small" aria-label={t('common.actions.clone')} onClick={() => cloneMutation.mutate(pg.id)} disabled={cloneMutation.isPending}><ContentCopyIcon fontSize="small" /></IconButton></Tooltip>}
-                      {canWrite && <Tooltip title={t('common.actions.edit')}><IconButton size="small" aria-label={t('common.actions.edit')} onClick={() => setEditingPage(pg)}><EditIcon fontSize="small" /></IconButton></Tooltip>}
-                      {isAdmin && <Tooltip title={t('common.actions.delete')}><IconButton size="small" aria-label={t('common.actions.delete')} color="error" onClick={() => setDeletingPage(pg)}><DeleteIcon fontSize="small" /></IconButton></Tooltip>}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          {pageData?.meta && (
-            <TablePagination
-              component="div"
-              count={pageData.meta.total_items}
-              page={pageData.meta.page - 1}
-              onPageChange={(_, p) => setPage(p + 1)}
-              rowsPerPage={pageData.meta.page_size}
-              onRowsPerPageChange={(e) => { setPerPage(+e.target.value); setPage(1); }}
-              rowsPerPageOptions={[10, 25, 50]}
+          <Paper>
+            <DataTable<PageListItem>
+              data={pages}
+              columns={columns}
+              getRowKey={(pg) => pg.id}
+              meta={pageData?.meta}
+              page={page}
+              onPageChange={handlePageChange}
+              rowsPerPage={perPage}
+              onRowsPerPageChange={handleRowsPerPageChange}
+              isRowSelected={(pg) => bulk.isSelected(pg.id)}
+              size="medium"
             />
-          )}
+          </Paper>
         </>
       )}
 
-      <PageFormDialog open={formOpen} onSubmit={(data) => createMutation.mutate(data)} onClose={() => setFormOpen(false)} loading={createMutation.isPending} />
-      <PageFormDialog open={!!editingPage} page={editingPage} onSubmit={(data) => editingPage && updateMutation.mutate({ id: editingPage.id, data })} onClose={() => setEditingPage(null)} loading={updateMutation.isPending} />
-      <ConfirmDialog open={!!deletingPage} title={t('pages.deleteDialog.title')} message={t('pages.deleteDialog.message', { route: deletingPage?.route })} confirmLabel={t('common.actions.delete')} onConfirm={() => deletingPage && deleteMutation.mutate(deletingPage.id)} onCancel={() => setDeletingPage(null)} loading={deleteMutation.isPending} />
+      <PageFormDialog open={formOpen} onSubmit={(data) => createMutation.mutate(data)} onClose={closeForm} loading={createMutation.isPending} />
+      <PageFormDialog open={!!editingPage} page={editingPage} onSubmit={(data) => editingPage && updateMutation.mutate({ id: editingPage.id, data })} onClose={closeEdit} loading={updateMutation.isPending} />
+      <ConfirmDialog open={!!deletingPage} title={t('pages.deleteDialog.title')} message={t('pages.deleteDialog.message', { route: deletingPage?.route })} confirmLabel={t('common.actions.delete')} onConfirm={() => deletingPage && deleteMutation.mutate(deletingPage.id)} onCancel={closeDelete} loading={deleteMutation.isPending} />
       <ConfirmDialog open={bulkDeleteOpen} title={t('bulk.deleteDialog.title')} message={t('bulk.deleteDialog.message', { count: bulk.count })} confirmLabel={t('common.actions.delete')} onConfirm={confirmBulkDelete} onCancel={() => setBulkDeleteOpen(false)} loading={bulkMutation.isPending} />
     </Box>
   );

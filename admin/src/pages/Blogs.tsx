@@ -5,13 +5,6 @@ import {
   Alert,
   Checkbox,
   Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TablePagination,
   Typography,
   Chip,
   IconButton,
@@ -26,11 +19,9 @@ import ArticleIcon from '@mui/icons-material/Article';
 import DescriptionIcon from '@mui/icons-material/Description';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSnackbar } from 'notistack';
 import { useNavigate } from 'react-router';
 import { format } from 'date-fns';
 import apiService from '@/services/api';
-import { resolveError } from '@/utils/errorResolver';
 import type { BlogListItem, ContentTemplate, CreateBlogRequest, UpdateBlogRequest, BulkContentRequest } from '@/types/api';
 import { useSiteContext } from '@/store/SiteContext';
 import { useAuth } from '@/store/AuthContext';
@@ -43,6 +34,10 @@ import BulkActionToolbar from '@/components/shared/BulkActionToolbar';
 import BlogFormDialog from '@/components/blogs/BlogFormDialog';
 import TemplateSelectionDialog from '@/components/blogs/TemplateSelectionDialog';
 import MarkdownImportDialog from '@/components/blogs/MarkdownImportDialog';
+import DataTable, { type DataTableColumn } from '@/components/shared/DataTable';
+import { useListPageState } from '@/hooks/useListPageState';
+import { useCrudMutations } from '@/hooks/useCrudMutations';
+import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import { useBulkSelection } from '@/hooks/useBulkSelection';
 import type { BlogTemplate } from '@/data/blogTemplates';
 import type { MarkdownParseResult } from '@/utils/markdownImport';
@@ -50,15 +45,18 @@ import type { MarkdownParseResult } from '@/utils/markdownImport';
 export default function BlogsPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const { selectedSiteId } = useSiteContext();
   const { canWrite, isAdmin, userFullName } = useAuth();
-  const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(25);
-  const [formOpen, setFormOpen] = useState(false);
-  const [editingBlog, setEditingBlog] = useState<BlogListItem | null>(null);
-  const [deletingBlog, setDeletingBlog] = useState<BlogListItem | null>(null);
+  const { showError, showSuccess, enqueueSnackbar } = useErrorSnackbar();
+
+  const {
+    page, perPage, formOpen, editing: editingBlog, deleting: deletingBlog,
+    openCreate, closeForm, openEdit: setEditingBlog, closeEdit,
+    openDelete: setDeletingBlog, closeDelete,
+    handlePageChange, handleRowsPerPageChange,
+  } = useListPageState<BlogListItem>();
+
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
@@ -85,6 +83,25 @@ export default function BlogsPage() {
   const blogIds = blogs?.map((b) => b.id) ?? [];
 
   const bulk = useBulkSelection([page, perPage, blogData]);
+
+  const { createMutation, updateMutation, deleteMutation } = useCrudMutations<CreateBlogRequest, UpdateBlogRequest>({
+    queryKey: 'blogs',
+    create: {
+      mutationFn: (data) => apiService.createBlog(data),
+      successMessage: t('blogs.messages.created'),
+      onSuccess: (blog) => { closeForm(); navigate(`/blogs/${blog.id}`); },
+    },
+    update: {
+      mutationFn: ({ id, data }) => apiService.updateBlog(id, data),
+      successMessage: t('blogs.messages.updated'),
+      onSuccess: () => { closeEdit(); },
+    },
+    delete: {
+      mutationFn: (id) => apiService.deleteBlog(id),
+      successMessage: t('blogs.messages.deleted'),
+      onSuccess: () => { closeDelete(); },
+    },
+  });
 
   const templateCreateMutation = useMutation({
     mutationFn: async ({ template, source }: { template: BlogTemplate | ContentTemplate; source: 'builtin' | 'custom' }) => {
@@ -140,10 +157,10 @@ export default function BlogsPage() {
     onSuccess: (blog) => {
       queryClient.invalidateQueries({ queryKey: ['blogs'] });
       setTemplateDialogOpen(false);
-      enqueueSnackbar(t('blogs.messages.created'), { variant: 'success' });
+      showSuccess(t('blogs.messages.created'));
       navigate(`/blogs/${blog.id}`);
     },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onError: showError,
   });
 
   const importCreateMutation = useMutation({
@@ -172,34 +189,20 @@ export default function BlogsPage() {
     onSuccess: (blog) => {
       queryClient.invalidateQueries({ queryKey: ['blogs'] });
       setImportDialogOpen(false);
-      enqueueSnackbar(t('blogs.messages.created'), { variant: 'success' });
+      showSuccess(t('blogs.messages.created'));
       navigate(`/blogs/${blog.id}`);
     },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
-  });
-
-  const createMutation = useMutation({
-    mutationFn: (data: CreateBlogRequest) => apiService.createBlog(data),
-    onSuccess: (blog) => { queryClient.invalidateQueries({ queryKey: ['blogs'] }); setFormOpen(false); enqueueSnackbar(t('blogs.messages.created'), { variant: 'success' }); navigate(`/blogs/${blog.id}`); },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateBlogRequest }) => apiService.updateBlog(id, data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['blogs'] }); setEditingBlog(null); enqueueSnackbar(t('blogs.messages.updated'), { variant: 'success' }); },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id: string) => apiService.deleteBlog(id),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['blogs'] }); setDeletingBlog(null); enqueueSnackbar(t('blogs.messages.deleted'), { variant: 'success' }); },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onError: showError,
   });
 
   const cloneMutation = useMutation({
     mutationFn: (id: string) => apiService.cloneBlog(id),
-    onSuccess: (blog) => { queryClient.invalidateQueries({ queryKey: ['blogs'] }); enqueueSnackbar(t('blogs.messages.cloned'), { variant: 'success' }); navigate(`/blogs/${blog.id}`); },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onSuccess: (blog) => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] });
+      showSuccess(t('blogs.messages.cloned'));
+      navigate(`/blogs/${blog.id}`);
+    },
+    onError: showError,
   });
 
   const bulkMutation = useMutation({
@@ -214,7 +217,7 @@ export default function BlogsPage() {
         enqueueSnackbar(t('bulk.messages.partial', { succeeded: resp.succeeded, failed: resp.failed }), { variant: 'warning' });
       }
     },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onError: showError,
   });
 
   const handleBulkPublish = () => bulkMutation.mutate({ ids: [...bulk.selectedIds], action: 'UpdateStatus', status: 'Published' });
@@ -222,12 +225,69 @@ export default function BlogsPage() {
   const handleBulkDelete = () => setBulkDeleteOpen(true);
   const confirmBulkDelete = () => bulkMutation.mutate({ ids: [...bulk.selectedIds], action: 'Delete' });
 
+  const columns: DataTableColumn<BlogListItem>[] = [
+    {
+      header: (
+        <Checkbox
+          indeterminate={bulk.count > 0 && !bulk.allSelected(blogIds)}
+          checked={bulk.allSelected(blogIds)}
+          onChange={() => bulk.selectAll(blogIds)}
+        />
+      ),
+      padding: 'checkbox',
+      render: (blog) => (
+        <Checkbox
+          checked={bulk.isSelected(blog.id)}
+          onChange={() => bulk.toggle(blog.id)}
+        />
+      ),
+    },
+    {
+      header: t('blogs.table.slug'),
+      scope: 'col',
+      render: (blog) => <Typography variant="body2" fontFamily="monospace">{blog.slug || '\u2014'}</Typography>,
+    },
+    {
+      header: t('blogs.table.author'),
+      scope: 'col',
+      render: (blog) => blog.author,
+    },
+    {
+      header: t('blogs.table.status'),
+      scope: 'col',
+      render: (blog) => <StatusChip value={blog.status} />,
+    },
+    {
+      header: t('blogs.table.featured'),
+      scope: 'col',
+      render: (blog) => blog.is_featured ? <Chip label={t('common.labels.featured')} size="small" color="primary" variant="outlined" /> : null,
+    },
+    {
+      header: t('blogs.table.published'),
+      scope: 'col',
+      render: (blog) => format(new Date(blog.published_date), 'PP'),
+    },
+    {
+      header: t('blogs.table.actions'),
+      scope: 'col',
+      align: 'right',
+      render: (blog) => (
+        <>
+          <Tooltip title={t('blogs.viewDetail')}><IconButton size="small" aria-label={t('blogs.viewDetail')} onClick={() => navigate(`/blogs/${blog.id}`)}><VisibilityIcon fontSize="small" /></IconButton></Tooltip>
+          {canWrite && <Tooltip title={t('common.actions.clone')}><IconButton size="small" aria-label={t('common.actions.clone')} onClick={() => cloneMutation.mutate(blog.id)} disabled={cloneMutation.isPending}><ContentCopyIcon fontSize="small" /></IconButton></Tooltip>}
+          {canWrite && <Tooltip title={t('common.actions.edit')}><IconButton size="small" aria-label={t('common.actions.edit')} onClick={() => setEditingBlog(blog)}><EditIcon fontSize="small" /></IconButton></Tooltip>}
+          {isAdmin && <Tooltip title={t('common.actions.delete')}><IconButton size="small" aria-label={t('common.actions.delete')} color="error" onClick={() => setDeletingBlog(blog)}><DeleteIcon fontSize="small" /></IconButton></Tooltip>}
+        </>
+      ),
+    },
+  ];
+
   return (
     <Box>
       <PageHeader
         title={t('blogs.title')}
         subtitle={t('blogs.subtitle')}
-        action={selectedSiteId ? { label: t('blogs.createButton'), icon: <AddIcon />, onClick: () => setFormOpen(true), hidden: !canWrite } : undefined}
+        action={selectedSiteId ? { label: t('blogs.createButton'), icon: <AddIcon />, onClick: openCreate, hidden: !canWrite } : undefined}
         secondaryActions={selectedSiteId ? [
           { label: t('templates.fromTemplate'), icon: <DescriptionIcon />, onClick: () => setTemplateDialogOpen(true), hidden: !canWrite },
           { label: t('markdownImport.importButton'), icon: <UploadFileIcon />, onClick: () => setImportDialogOpen(true), hidden: !canWrite },
@@ -242,7 +302,7 @@ export default function BlogsPage() {
       ) : error ? (
         <Alert severity="error">{t('blogs.loadError')}</Alert>
       ) : !blogs || blogs.length === 0 ? (
-        <EmptyState icon={<ArticleIcon sx={{ fontSize: 64 }} />} title={t('blogs.empty.title')} description={t('blogs.empty.description')} action={{ label: t('blogs.createButton'), onClick: () => setFormOpen(true) }} />
+        <EmptyState icon={<ArticleIcon sx={{ fontSize: 64 }} />} title={t('blogs.empty.title')} description={t('blogs.empty.description')} action={{ label: t('blogs.createButton'), onClick: openCreate }} />
       ) : (
         <>
           <BulkActionToolbar
@@ -255,67 +315,26 @@ export default function BlogsPage() {
             isAdmin={isAdmin}
             loading={bulkMutation.isPending}
           />
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      indeterminate={bulk.count > 0 && !bulk.allSelected(blogIds)}
-                      checked={bulk.allSelected(blogIds)}
-                      onChange={() => bulk.selectAll(blogIds)}
-                    />
-                  </TableCell>
-                  <TableCell scope="col">{t('blogs.table.slug')}</TableCell>
-                  <TableCell scope="col">{t('blogs.table.author')}</TableCell>
-                  <TableCell scope="col">{t('blogs.table.status')}</TableCell>
-                  <TableCell scope="col">{t('blogs.table.featured')}</TableCell>
-                  <TableCell scope="col">{t('blogs.table.published')}</TableCell>
-                  <TableCell scope="col" align="right">{t('blogs.table.actions')}</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {blogs.map((blog) => (
-                  <TableRow key={blog.id} selected={bulk.isSelected(blog.id)}>
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={bulk.isSelected(blog.id)}
-                        onChange={() => bulk.toggle(blog.id)}
-                      />
-                    </TableCell>
-                    <TableCell><Typography variant="body2" fontFamily="monospace">{blog.slug || '—'}</Typography></TableCell>
-                    <TableCell>{blog.author}</TableCell>
-                    <TableCell><StatusChip value={blog.status} /></TableCell>
-                    <TableCell>{blog.is_featured && <Chip label={t('common.labels.featured')} size="small" color="primary" variant="outlined" />}</TableCell>
-                    <TableCell>{format(new Date(blog.published_date), 'PP')}</TableCell>
-                    <TableCell align="right">
-                      <Tooltip title={t('blogs.viewDetail')}><IconButton size="small" aria-label={t('blogs.viewDetail')} onClick={() => navigate(`/blogs/${blog.id}`)}><VisibilityIcon fontSize="small" /></IconButton></Tooltip>
-                      {canWrite && <Tooltip title={t('common.actions.clone')}><IconButton size="small" aria-label={t('common.actions.clone')} onClick={() => cloneMutation.mutate(blog.id)} disabled={cloneMutation.isPending}><ContentCopyIcon fontSize="small" /></IconButton></Tooltip>}
-                      {canWrite && <Tooltip title={t('common.actions.edit')}><IconButton size="small" aria-label={t('common.actions.edit')} onClick={() => setEditingBlog(blog)}><EditIcon fontSize="small" /></IconButton></Tooltip>}
-                      {isAdmin && <Tooltip title={t('common.actions.delete')}><IconButton size="small" aria-label={t('common.actions.delete')} color="error" onClick={() => setDeletingBlog(blog)}><DeleteIcon fontSize="small" /></IconButton></Tooltip>}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          {blogData?.meta && (
-            <TablePagination
-              component="div"
-              count={blogData.meta.total_items}
-              page={blogData.meta.page - 1}
-              onPageChange={(_, p) => setPage(p + 1)}
-              rowsPerPage={blogData.meta.page_size}
-              onRowsPerPageChange={(e) => { setPerPage(+e.target.value); setPage(1); }}
-              rowsPerPageOptions={[10, 25, 50]}
+          <Paper>
+            <DataTable<BlogListItem>
+              data={blogs}
+              columns={columns}
+              getRowKey={(blog) => blog.id}
+              meta={blogData?.meta}
+              page={page}
+              onPageChange={handlePageChange}
+              rowsPerPage={perPage}
+              onRowsPerPageChange={handleRowsPerPageChange}
+              isRowSelected={(blog) => bulk.isSelected(blog.id)}
+              size="medium"
             />
-          )}
+          </Paper>
         </>
       )}
 
-      <BlogFormDialog open={formOpen} onSubmit={(data) => createMutation.mutate(data)} onClose={() => setFormOpen(false)} loading={createMutation.isPending} />
-      <BlogFormDialog open={!!editingBlog} blog={editingBlog} onSubmit={(data) => editingBlog && updateMutation.mutate({ id: editingBlog.id, data })} onClose={() => setEditingBlog(null)} loading={updateMutation.isPending} />
-      <ConfirmDialog open={!!deletingBlog} title={t('blogs.deleteDialog.title')} message={t('blogs.deleteDialog.message', { slug: deletingBlog?.slug })} confirmLabel={t('common.actions.delete')} onConfirm={() => deletingBlog && deleteMutation.mutate(deletingBlog.id)} onCancel={() => setDeletingBlog(null)} loading={deleteMutation.isPending} />
+      <BlogFormDialog open={formOpen} onSubmit={(data) => createMutation.mutate(data)} onClose={closeForm} loading={createMutation.isPending} />
+      <BlogFormDialog open={!!editingBlog} blog={editingBlog} onSubmit={(data) => editingBlog && updateMutation.mutate({ id: editingBlog.id, data })} onClose={closeEdit} loading={updateMutation.isPending} />
+      <ConfirmDialog open={!!deletingBlog} title={t('blogs.deleteDialog.title')} message={t('blogs.deleteDialog.message', { slug: deletingBlog?.slug })} confirmLabel={t('common.actions.delete')} onConfirm={() => deletingBlog && deleteMutation.mutate(deletingBlog.id)} onCancel={closeDelete} loading={deleteMutation.isPending} />
       <ConfirmDialog open={bulkDeleteOpen} title={t('bulk.deleteDialog.title')} message={t('bulk.deleteDialog.message', { count: bulk.count })} confirmLabel={t('common.actions.delete')} onConfirm={confirmBulkDelete} onCancel={() => setBulkDeleteOpen(false)} loading={bulkMutation.isPending} />
       <TemplateSelectionDialog open={templateDialogOpen} onSelect={(template, source) => templateCreateMutation.mutate({ template, source })} onClose={() => setTemplateDialogOpen(false)} loading={templateCreateMutation.isPending} siteTemplates={siteTemplatesData?.data} siteTemplatesLoading={siteTemplatesLoading} />
       <MarkdownImportDialog open={importDialogOpen} onImport={(parsed) => importCreateMutation.mutate(parsed)} onClose={() => setImportDialogOpen(false)} loading={importCreateMutation.isPending} />

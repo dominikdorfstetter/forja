@@ -1,13 +1,12 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useParams } from 'react-router';
 import { Box, Alert, Tabs, Tab, Paper } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import apiService from '@/services/api';
-import { resolveError } from '@/utils/errorResolver';
+import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import type { UpdatePageRequest, ContentStatus, ReviewActionRequest } from '@/types/api';
 import { useAuth } from '@/store/AuthContext';
 import { useSiteContext } from '@/store/SiteContext';
@@ -55,7 +54,7 @@ export default function PageDetailPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const queryClient = useQueryClient();
-  const { enqueueSnackbar } = useSnackbar();
+  const { showError, showSuccess } = useErrorSnackbar();
   const { canWrite, isAdmin } = useAuth();
   const { selectedSiteId } = useSiteContext();
 
@@ -130,10 +129,7 @@ export default function PageDetailPage() {
       queryClient.invalidateQueries({ queryKey: ['page', id] });
       queryClient.invalidateQueries({ queryKey: ['pages'] });
     },
-    onError: (err) => {
-      const { detail, title } = resolveError(err);
-      enqueueSnackbar(detail || title, { variant: 'error' });
-    },
+    onError: (err) => showError(err),
   });
 
   const createSectionMutation = useMutation({
@@ -141,12 +137,9 @@ export default function PageDetailPage() {
       apiService.createPageSection(id!, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['page-sections', id] });
-      enqueueSnackbar(t('pageDetail.sections.added'), { variant: 'success' });
+      showSuccess(t('pageDetail.sections.added'));
     },
-    onError: (err) => {
-      const { detail, title } = resolveError(err);
-      enqueueSnackbar(detail || title, { variant: 'error' });
-    },
+    onError: (err) => showError(err),
   });
 
   const deleteSectionMutation = useMutation({
@@ -154,12 +147,9 @@ export default function PageDetailPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['page-sections', id] });
       queryClient.invalidateQueries({ queryKey: ['page-section-localizations', id] });
-      enqueueSnackbar(t('pageDetail.sections.deleted'), { variant: 'success' });
+      showSuccess(t('pageDetail.sections.deleted'));
     },
-    onError: (err) => {
-      const { detail, title } = resolveError(err);
-      enqueueSnackbar(detail || title, { variant: 'error' });
-    },
+    onError: (err) => showError(err),
   });
 
   const reviewPageMutation = useMutation({
@@ -167,12 +157,9 @@ export default function PageDetailPage() {
     onSuccess: (resp) => {
       queryClient.invalidateQueries({ queryKey: ['page', id] });
       queryClient.invalidateQueries({ queryKey: ['pages'] });
-      enqueueSnackbar(resp.message, { variant: 'success' });
+      showSuccess(resp.message);
     },
-    onError: (err) => {
-      const { detail, title } = resolveError(err);
-      enqueueSnackbar(detail || title, { variant: 'error' });
-    },
+    onError: (err) => showError(err),
   });
 
   // Unified save
@@ -206,8 +193,8 @@ export default function PageDetailPage() {
     }
 
     reset(values);
-    enqueueSnackbar(t('pageDetail.messages.saved'), { variant: 'success' });
-  }, [page, getValues, reset, updatePageMutation, enqueueSnackbar, t]);
+    showSuccess(t('pageDetail.messages.saved'));
+  }, [page, getValues, reset, updatePageMutation, showSuccess, t]);
 
   // Autosave
   const { status: autosaveStatus, flush } = useAutosave({
@@ -215,19 +202,20 @@ export default function PageDetailPage() {
     onSave: handleSave,
     enabled: canWrite,
     formVersion,
-    onError: (err) => {
-      const { detail, title } = resolveError(err);
-      enqueueSnackbar(detail || title || t('shared.autosave.retryFailed'), { variant: 'error' });
-    },
+    onError: (err) => showError(err),
   });
 
-  // Initialize form when page data loads
+  // Initialize form when page data loads (guarded by ID to prevent resetting on background refetch)
+  const formSyncKey = useRef('');
   useEffect(() => {
     if (!page) return;
+    const key = page.id;
+    if (formSyncKey.current === key) return;
+    formSyncKey.current = key;
     reset(buildFormDefaults(page));
     formHistory.clear();
     formHistory.snapshot();
-  }, [page?.id]);
+  }, [page, reset, formHistory]);
 
   // Keyboard shortcuts
   useEffect(() => {

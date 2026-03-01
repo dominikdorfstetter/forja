@@ -326,7 +326,7 @@ export default function Layout() {
         </Toolbar>
       </AppBar>
 
-      <Drawer variant="permanent" open={open} PaperProps={{ component: 'nav', 'aria-label': 'Main navigation' } as any}>
+      <Drawer variant="permanent" open={open} PaperProps={{ component: 'nav' as const, 'aria-label': 'Main navigation' }}>
         <DrawerHeader />
         <Divider />
         {menuSections.map((section, idx) => (

@@ -15,7 +15,7 @@ import {
   Typography,
   MenuItem,
 } from '@mui/material';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { optionalUrl, optionalString, nonNegativeInt } from '@/utils/validation';
@@ -69,7 +69,7 @@ export default function NavigationFormDialog({
 }: NavigationFormDialogProps) {
   const { t } = useTranslation();
   const { register, handleSubmit, reset, control, watch, formState: { errors, isValid } } = useForm<NavigationFormData>({
-    resolver: zodResolver(navigationSchema) as any,
+    resolver: zodResolver(navigationSchema) as Resolver<NavigationFormData>,
     defaultValues: { link_type: 'page', page_id: '', external_url: '', icon: '', display_order: 0, open_in_new_tab: false, parent_id: '' },
     mode: 'onChange',
   });

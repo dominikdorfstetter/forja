@@ -1,0 +1,51 @@
+import { useState, useCallback } from 'react';
+
+interface UseListPageStateOptions {
+  initialPage?: number;
+  initialPerPage?: number;
+}
+
+export function useListPageState<T>(options?: UseListPageStateOptions) {
+  const [page, setPage] = useState(options?.initialPage ?? 1);
+  const [perPage, setPerPage] = useState(options?.initialPerPage ?? 25);
+  const [formOpen, setFormOpen] = useState(false);
+  const [editing, setEditing] = useState<T | null>(null);
+  const [deleting, setDeleting] = useState<T | null>(null);
+
+  const openCreate = useCallback(() => setFormOpen(true), []);
+  const closeForm = useCallback(() => setFormOpen(false), []);
+  const openEdit = useCallback((item: T) => setEditing(item), []);
+  const closeEdit = useCallback(() => setEditing(null), []);
+  const openDelete = useCallback((item: T) => setDeleting(item), []);
+  const closeDelete = useCallback(() => setDeleting(null), []);
+
+  const handlePageChange = useCallback((_: unknown, p: number) => setPage(p + 1), []);
+  const handleRowsPerPageChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setPerPage(+e.target.value);
+      setPage(1);
+    },
+    [],
+  );
+
+  return {
+    page,
+    setPage,
+    perPage,
+    setPerPage,
+    formOpen,
+    setFormOpen,
+    editing,
+    setEditing,
+    deleting,
+    setDeleting,
+    openCreate,
+    closeForm,
+    openEdit,
+    closeEdit,
+    openDelete,
+    closeDelete,
+    handlePageChange,
+    handleRowsPerPageChange,
+  };
+}

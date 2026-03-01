@@ -22,9 +22,8 @@ import ImageIcon from '@mui/icons-material/Image';
 import SaveIcon from '@mui/icons-material/Save';
 import MDEditor, { commands } from '@uiw/react-md-editor';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSnackbar } from 'notistack';
 import apiService from '@/services/api';
-import { resolveError } from '@/utils/errorResolver';
+import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import type {
   PageSectionResponse,
   UpdatePageSectionRequest,
@@ -45,7 +44,7 @@ interface SectionEditorDialogProps {
 export default function SectionEditorDialog({ open, section, onClose }: SectionEditorDialogProps) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const { enqueueSnackbar } = useSnackbar();
+  const { showError, showSuccess } = useErrorSnackbar();
   const { selectedSiteId } = useSiteContext();
 
   // Locale tab state
@@ -104,7 +103,7 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
       setSettings(section.settings ? { ...section.settings } : {});
       setActiveTab(0);
     }
-  }, [open, section?.id]);
+  }, [open, section]);
 
   // Initialize localization form when data loads
   useMemo(() => {
@@ -112,7 +111,7 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
       const loc = localizations.find((l) => l.locale_id === currentLocale.id);
       populateLocForm(loc);
     }
-  }, [localizations, currentLocale?.id]);
+  }, [localizations, currentLocale]);
 
   // Mutations
   const upsertLocMutation = useMutation({
@@ -121,12 +120,9 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['section-localizations', section?.id] });
       queryClient.invalidateQueries({ queryKey: ['page-section-localizations'] });
-      enqueueSnackbar('Localization saved', { variant: 'success' });
+      showSuccess('Localization saved');
     },
-    onError: (error) => {
-      const { detail, title: errTitle } = resolveError(error);
-      enqueueSnackbar(detail || errTitle, { variant: 'error' });
-    },
+    onError: (error) => showError(error),
   });
 
   const updateSectionMutation = useMutation({
@@ -134,12 +130,9 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
       apiService.updatePageSection(section!.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['page-sections', section?.page_id] });
-      enqueueSnackbar('Section settings saved', { variant: 'success' });
+      showSuccess('Section settings saved');
     },
-    onError: (error) => {
-      const { detail, title: errTitle } = resolveError(error);
-      enqueueSnackbar(detail || errTitle, { variant: 'error' });
-    },
+    onError: (error) => showError(error),
   });
 
   const handleSaveLocalization = () => {

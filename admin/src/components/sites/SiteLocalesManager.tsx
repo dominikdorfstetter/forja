@@ -29,10 +29,9 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
 import apiService from '@/services/api';
-import { resolveError } from '@/utils/errorResolver';
+import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import type { Locale, SiteLocaleResponse } from '@/types/api';
 
 interface SiteLocalesManagerProps {
@@ -42,7 +41,7 @@ interface SiteLocalesManagerProps {
 export default function SiteLocalesManager({ siteId }: SiteLocalesManagerProps) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const { enqueueSnackbar } = useSnackbar();
+  const { showError, showSuccess } = useErrorSnackbar();
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [selectedLocale, setSelectedLocale] = useState<Locale | null>(null);
   const [urlPrefix, setUrlPrefix] = useState('');
@@ -73,12 +72,9 @@ export default function SiteLocalesManager({ siteId }: SiteLocalesManagerProps) 
       invalidateLocales();
       setAddDialogOpen(false);
       resetAddForm();
-      enqueueSnackbar(t('siteLocales.messages.added'), { variant: 'success' });
+      showSuccess(t('siteLocales.messages.added'));
     },
-    onError: (error) => {
-      const { detail, title } = resolveError(error);
-      enqueueSnackbar(detail || title || t('siteLocales.messages.addFailed'), { variant: 'error' });
-    },
+    onError: (error) => showError(error),
   });
 
   const updateMutation = useMutation({
@@ -86,36 +82,27 @@ export default function SiteLocalesManager({ siteId }: SiteLocalesManagerProps) 
       apiService.updateSiteLocale(siteId, localeId, data),
     onSuccess: () => {
       invalidateLocales();
-      enqueueSnackbar(t('siteLocales.messages.updated'), { variant: 'success' });
+      showSuccess(t('siteLocales.messages.updated'));
     },
-    onError: (error) => {
-      const { detail, title } = resolveError(error);
-      enqueueSnackbar(detail || title || t('siteLocales.messages.updateFailed'), { variant: 'error' });
-    },
+    onError: (error) => showError(error),
   });
 
   const removeMutation = useMutation({
     mutationFn: (localeId: string) => apiService.removeSiteLocale(siteId, localeId),
     onSuccess: () => {
       invalidateLocales();
-      enqueueSnackbar(t('siteLocales.messages.removed'), { variant: 'success' });
+      showSuccess(t('siteLocales.messages.removed'));
     },
-    onError: (error) => {
-      const { detail, title } = resolveError(error);
-      enqueueSnackbar(detail || title || t('siteLocales.messages.removeFailed'), { variant: 'error' });
-    },
+    onError: (error) => showError(error),
   });
 
   const setDefaultMutation = useMutation({
     mutationFn: (localeId: string) => apiService.setSiteDefaultLocale(siteId, localeId),
     onSuccess: () => {
       invalidateLocales();
-      enqueueSnackbar(t('siteLocales.messages.defaultSet'), { variant: 'success' });
+      showSuccess(t('siteLocales.messages.defaultSet'));
     },
-    onError: (error) => {
-      const { detail, title } = resolveError(error);
-      enqueueSnackbar(detail || title || t('siteLocales.messages.defaultFailed'), { variant: 'error' });
-    },
+    onError: (error) => showError(error),
   });
 
   const resetAddForm = () => {

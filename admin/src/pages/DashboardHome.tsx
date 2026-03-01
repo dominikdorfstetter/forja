@@ -33,9 +33,8 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { useSnackbar } from 'notistack';
 import apiService from '@/services/api';
-import { resolveError } from '@/utils/errorResolver';
+import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import { useAuth } from '@/store/AuthContext';
 import { useSiteContext } from '@/store/SiteContext';
 import Onboarding from '@/components/Onboarding';
@@ -106,7 +105,7 @@ export default function DashboardHome() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { enqueueSnackbar } = useSnackbar();
+  const { showError, showSuccess } = useErrorSnackbar();
   const { permission, isMaster, isAdmin, canWrite, isSystemAdmin, currentSiteRole, isOwner, refreshAuth } = useAuth();
   const { selectedSiteId, selectedSite, sites, isLoading: sitesLoading2 } = useSiteContext();
   const { setSelectedSiteId } = useSiteContext();
@@ -123,11 +122,10 @@ export default function DashboardHome() {
       queryClient.invalidateQueries({ queryKey: ['sites'] });
       setSelectedSiteId(newSite.id);
       setSiteFormOpen(false);
-      enqueueSnackbar(t('sites.messages.created'), { variant: 'success' });
+      showSuccess(t('sites.messages.created'));
     },
     onError: (error) => {
-      const { detail, title } = resolveError(error);
-      enqueueSnackbar(detail || title, { variant: 'error' });
+      showError(error);
     },
   });
 

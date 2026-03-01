@@ -30,29 +30,34 @@ import {
   verticalListSortingStrategy,
   arrayMove,
 } from '@dnd-kit/sortable';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSnackbar } from 'notistack';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import apiService from '@/services/api';
-import { resolveError } from '@/utils/errorResolver';
 import type { SocialLink, CreateSocialLinkRequest, UpdateSocialLinkRequest, ReorderItem } from '@/types/api';
 import { useSiteContext } from '@/store/SiteContext';
 import { useAuth } from '@/store/AuthContext';
+import { useListPageState } from '@/hooks/useListPageState';
+import { useCrudMutations } from '@/hooks/useCrudMutations';
+import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import SocialLinkFormDialog from '@/components/social/SocialLinkFormDialog';
 import SortableSocialRow from '@/components/social/SortableSocialRow';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function SocialLinksPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const { enqueueSnackbar } = useSnackbar();
   const { selectedSiteId } = useSiteContext();
   const { canWrite, isAdmin } = useAuth();
-  const [formOpen, setFormOpen] = useState(false);
-  const [editingLink, setEditingLink] = useState<SocialLink | null>(null);
-  const [deletingLink, setDeletingLink] = useState<SocialLink | null>(null);
+  const { showError } = useErrorSnackbar();
+
+  const {
+    formOpen, editing, deleting,
+    openCreate, closeForm, openEdit, closeEdit, openDelete, closeDelete,
+  } = useListPageState<SocialLink>();
+
   const [orderedLinks, setOrderedLinks] = useState<SocialLink[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
 
@@ -62,7 +67,6 @@ export default function SocialLinksPage() {
     enabled: !!selectedSiteId,
   });
 
-  // Sync ordered list from query data
   useEffect(() => {
     if (links) setOrderedLinks(links);
   }, [links]);
@@ -71,30 +75,31 @@ export default function SocialLinksPage() {
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
   );
 
-  const createMutation = useMutation({
-    mutationFn: (data: CreateSocialLinkRequest) => apiService.createSocialLink(selectedSiteId, data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['social-links'] }); setFormOpen(false); enqueueSnackbar(t('socialLinks.messages.created'), { variant: 'success' }); },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
-  });
-
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateSocialLinkRequest }) => apiService.updateSocialLink(id, data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['social-links'] }); setEditingLink(null); enqueueSnackbar(t('socialLinks.messages.updated'), { variant: 'success' }); },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: (id: string) => apiService.deleteSocialLink(id),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['social-links'] }); setDeletingLink(null); enqueueSnackbar(t('socialLinks.messages.deleted'), { variant: 'success' }); },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+  const { createMutation, updateMutation, deleteMutation } = useCrudMutations<
+    CreateSocialLinkRequest, UpdateSocialLinkRequest
+  >({
+    queryKey: 'social-links',
+    create: {
+      mutationFn: (data) => apiService.createSocialLink(selectedSiteId, data),
+      successMessage: t('socialLinks.messages.created'),
+      onSuccess: () => closeForm(),
+    },
+    update: {
+      mutationFn: ({ id, data }) => apiService.updateSocialLink(id, data),
+      successMessage: t('socialLinks.messages.updated'),
+      onSuccess: () => closeEdit(),
+    },
+    delete: {
+      mutationFn: (id) => apiService.deleteSocialLink(id),
+      successMessage: t('socialLinks.messages.deleted'),
+      onSuccess: () => closeDelete(),
+    },
   });
 
   const reorderMutation = useMutation({
     mutationFn: (items: ReorderItem[]) => apiService.reorderSocialLinks(selectedSiteId, items),
-    onError: (error) => {
-      const { detail, title } = resolveError(error);
-      enqueueSnackbar(detail || title, { variant: 'error' });
-      // Rollback: refetch from server
+    onError: (err) => {
+      showError(err);
       queryClient.invalidateQueries({ queryKey: ['social-links'] });
     },
   });
@@ -112,14 +117,11 @@ export default function SocialLinksPage() {
       const oldIndex = prev.findIndex((l) => l.id === active.id);
       const newIndex = prev.findIndex((l) => l.id === over.id);
       const reordered = arrayMove(prev, oldIndex, newIndex);
-
-      // Build reorder items with new display_order based on position
       const items: ReorderItem[] = reordered.map((link, index) => ({
         id: link.id,
         display_order: index,
       }));
       reorderMutation.mutate(items);
-
       return reordered;
     });
   }, [reorderMutation]);
@@ -131,7 +133,7 @@ export default function SocialLinksPage() {
       <PageHeader
         title={t('socialLinks.title')}
         subtitle={t('socialLinks.subtitle')}
-        action={selectedSiteId ? { label: t('socialLinks.addLink'), icon: <AddIcon />, onClick: () => setFormOpen(true), hidden: !canWrite } : undefined}
+        action={selectedSiteId ? { label: t('socialLinks.addLink'), icon: <AddIcon />, onClick: openCreate, hidden: !canWrite } : undefined}
       />
 
       {!selectedSiteId ? (
@@ -141,14 +143,9 @@ export default function SocialLinksPage() {
       ) : error ? (
         <Alert severity="error">{t('socialLinks.loadError')}</Alert>
       ) : !orderedLinks || orderedLinks.length === 0 ? (
-        <EmptyState icon={<ShareIcon sx={{ fontSize: 64 }} />} title={t('socialLinks.empty.title')} description={t('socialLinks.empty.description')} action={{ label: t('socialLinks.addLink'), onClick: () => setFormOpen(true) }} />
+        <EmptyState icon={<ShareIcon sx={{ fontSize: 64 }} />} title={t('socialLinks.empty.title')} description={t('socialLinks.empty.description')} action={{ label: t('socialLinks.addLink'), onClick: openCreate }} />
       ) : (
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-        >
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
           <TableContainer component={Paper}>
             <Table>
               <TableHead>
@@ -163,14 +160,7 @@ export default function SocialLinksPage() {
               <SortableContext items={orderedLinks.map((l) => l.id)} strategy={verticalListSortingStrategy}>
                 <TableBody>
                   {orderedLinks.map((link) => (
-                    <SortableSocialRow
-                      key={link.id}
-                      link={link}
-                      canWrite={canWrite}
-                      isAdmin={isAdmin}
-                      onEdit={setEditingLink}
-                      onDelete={setDeletingLink}
-                    />
+                    <SortableSocialRow key={link.id} link={link} canWrite={canWrite} isAdmin={isAdmin} onEdit={openEdit} onDelete={openDelete} />
                   ))}
                 </TableBody>
               </SortableContext>
@@ -178,21 +168,7 @@ export default function SocialLinksPage() {
           </TableContainer>
           <DragOverlay dropAnimation={{ duration: 200, easing: 'ease' }}>
             {activeLink ? (
-              <Paper
-                elevation={12}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  px: 2,
-                  py: 1,
-                  borderRadius: 2,
-                  bgcolor: 'background.paper',
-                  border: '1px solid',
-                  borderColor: 'primary.main',
-                  pointerEvents: 'none',
-                }}
-              >
+              <Paper elevation={12} sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 1, borderRadius: 2, bgcolor: 'background.paper', border: '1px solid', borderColor: 'primary.main', pointerEvents: 'none' }}>
                 <DragIndicatorIcon fontSize="small" color="primary" />
                 <Typography variant="body2" fontWeight={500} noWrap>{activeLink.title}</Typography>
               </Paper>
@@ -201,9 +177,9 @@ export default function SocialLinksPage() {
         </DndContext>
       )}
 
-      <SocialLinkFormDialog open={formOpen} siteId={selectedSiteId} onSubmit={(data) => createMutation.mutate(data)} onClose={() => setFormOpen(false)} loading={createMutation.isPending} />
-      <SocialLinkFormDialog open={!!editingLink} siteId={selectedSiteId} link={editingLink} onSubmit={(data) => editingLink && updateMutation.mutate({ id: editingLink.id, data })} onClose={() => setEditingLink(null)} loading={updateMutation.isPending} />
-      <ConfirmDialog open={!!deletingLink} title={t('socialLinks.deleteDialog.title')} message={t('socialLinks.deleteDialog.message', { title: deletingLink?.title })} confirmLabel={t('common.actions.delete')} onConfirm={() => deletingLink && deleteMutation.mutate(deletingLink.id)} onCancel={() => setDeletingLink(null)} loading={deleteMutation.isPending} />
+      <SocialLinkFormDialog open={formOpen} siteId={selectedSiteId} onSubmit={(data) => createMutation.mutate(data)} onClose={closeForm} loading={createMutation.isPending} />
+      <SocialLinkFormDialog open={!!editing} siteId={selectedSiteId} link={editing} onSubmit={(data) => editing && updateMutation.mutate({ id: editing.id, data })} onClose={closeEdit} loading={updateMutation.isPending} />
+      <ConfirmDialog open={!!deleting} title={t('socialLinks.deleteDialog.title')} message={t('socialLinks.deleteDialog.message', { title: deleting?.title })} confirmLabel={t('common.actions.delete')} onConfirm={() => deleting && deleteMutation.mutate(deleting.id)} onCancel={closeDelete} loading={deleteMutation.isPending} />
     </Box>
   );
 }

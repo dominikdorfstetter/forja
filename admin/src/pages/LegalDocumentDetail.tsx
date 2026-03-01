@@ -33,11 +33,10 @@ import AddIcon from '@mui/icons-material/Add';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import GavelIcon from '@mui/icons-material/Gavel';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller } from 'react-hook-form';
 import apiService from '@/services/api';
-import { resolveError } from '@/utils/errorResolver';
+import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import type {
   LegalDocType,
   LegalGroupResponse,
@@ -194,7 +193,7 @@ interface GroupItemsSectionProps {
 function GroupItemsSection({ groupId }: GroupItemsSectionProps) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const { enqueueSnackbar } = useSnackbar();
+  const { showError, showSuccess } = useErrorSnackbar();
   const { canWrite, isAdmin } = useAuth();
   const [itemFormOpen, setItemFormOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<LegalItemResponse | null>(null);
@@ -208,20 +207,20 @@ function GroupItemsSection({ groupId }: GroupItemsSectionProps) {
 
   const createItemMutation = useMutation({
     mutationFn: (data: CreateLegalItemRequest) => apiService.createLegalItem(groupId, data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['legalItems', groupId] }); setItemFormOpen(false); enqueueSnackbar(t('legalDetail.items.messages.created'), { variant: 'success' }); },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['legalItems', groupId] }); setItemFormOpen(false); showSuccess(t('legalDetail.items.messages.created')); },
+    onError: (error) => showError(error),
   });
 
   const updateItemMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateLegalItemRequest }) => apiService.updateLegalItem(id, data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['legalItems', groupId] }); setEditingItem(null); enqueueSnackbar(t('legalDetail.items.messages.updated'), { variant: 'success' }); },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['legalItems', groupId] }); setEditingItem(null); showSuccess(t('legalDetail.items.messages.updated')); },
+    onError: (error) => showError(error),
   });
 
   const deleteItemMutation = useMutation({
     mutationFn: (id: string) => apiService.deleteLegalItem(id),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['legalItems', groupId] }); setDeletingItem(null); enqueueSnackbar(t('legalDetail.items.messages.deleted'), { variant: 'success' }); },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['legalItems', groupId] }); setDeletingItem(null); showSuccess(t('legalDetail.items.messages.deleted')); },
+    onError: (error) => showError(error),
   });
 
   return (
@@ -274,7 +273,7 @@ export default function LegalDocumentDetailPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const queryClient = useQueryClient();
-  const { enqueueSnackbar } = useSnackbar();
+  const { showError, showSuccess } = useErrorSnackbar();
 
   const { canWrite, isAdmin } = useAuth();
   const [editDocOpen, setEditDocOpen] = useState(false);
@@ -325,7 +324,7 @@ export default function LegalDocumentDetailPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['legal'] });
       setEditDocOpen(false);
-      enqueueSnackbar(t('legalDetail.updatedMessage'), { variant: 'success' });
+      showSuccess(t('legalDetail.updatedMessage'));
       // Refresh document info
       if (sites) {
         for (const site of sites) {
@@ -336,25 +335,25 @@ export default function LegalDocumentDetailPage() {
         }
       }
     },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onError: (error) => showError(error),
   });
 
   const createGroupMutation = useMutation({
     mutationFn: (data: CreateLegalGroupRequest) => apiService.createLegalGroup(id!, data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['legalGroups', id] }); setGroupFormOpen(false); enqueueSnackbar(t('legalDetail.groups.messages.created'), { variant: 'success' }); },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['legalGroups', id] }); setGroupFormOpen(false); showSuccess(t('legalDetail.groups.messages.created')); },
+    onError: (error) => showError(error),
   });
 
   const updateGroupMutation = useMutation({
     mutationFn: ({ groupId, data }: { groupId: string; data: UpdateLegalGroupRequest }) => apiService.updateLegalGroup(groupId, data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['legalGroups', id] }); setEditingGroup(null); enqueueSnackbar(t('legalDetail.groups.messages.updated'), { variant: 'success' }); },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['legalGroups', id] }); setEditingGroup(null); showSuccess(t('legalDetail.groups.messages.updated')); },
+    onError: (error) => showError(error),
   });
 
   const deleteGroupMutation = useMutation({
     mutationFn: (groupId: string) => apiService.deleteLegalGroup(groupId),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['legalGroups', id] }); setDeletingGroup(null); enqueueSnackbar(t('legalDetail.groups.messages.deleted'), { variant: 'success' }); },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['legalGroups', id] }); setDeletingGroup(null); showSuccess(t('legalDetail.groups.messages.deleted')); },
+    onError: (error) => showError(error),
   });
 
   return (
@@ -431,7 +430,7 @@ export default function LegalDocumentDetailPage() {
       <LegalDocumentFormDialog
         open={editDocOpen}
         siteId=""
-        document={document ? { id: id!, cookie_name: document.cookie_name, document_type: document.document_type as any, created_at: '', updated_at: '' } : null}
+        document={document ? { id: id!, cookie_name: document.cookie_name, document_type: document.document_type, created_at: '', updated_at: '' } : null}
         onSubmit={(data) => updateDocMutation.mutate({ cookie_name: data.cookie_name, document_type: data.document_type })}
         onClose={() => setEditDocOpen(false)}
         loading={updateDocMutation.isPending}
