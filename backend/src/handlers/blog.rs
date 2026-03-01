@@ -871,10 +871,8 @@ pub async fn rss_feed(
         let pub_date = blog
             .published_date
             .and_hms_opt(0, 0, 0)
-            .and_then(|dt| {
-                dt.and_local_timezone(chrono::FixedOffset::east_opt(0).unwrap())
-                    .single()
-            })
+            .zip(chrono::FixedOffset::east_opt(0))
+            .and_then(|(dt, utc)| dt.and_local_timezone(utc).single())
             .map(|dt| dt.to_rfc2822());
 
         let item = ItemBuilder::default()
