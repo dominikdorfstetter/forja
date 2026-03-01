@@ -12,7 +12,7 @@ use crate::dto::page::{
     PaginatedPages, SectionLocalizationResponse, UpdatePageRequest, UpdatePageSectionRequest,
     UpsertSectionLocalizationRequest,
 };
-use crate::dto::review::{ReviewAction, ReviewActionRequest, ReviewActionResponse};
+use crate::dto::review::{ReviewActionRequest, ReviewActionResponse};
 use crate::errors::{ApiError, ProblemDetails};
 use crate::guards::auth_guard::ReadKey;
 use crate::models::audit::AuditAction;
@@ -20,8 +20,11 @@ use crate::models::content::{Content, ContentStatus};
 use crate::models::page::{Page, PageSection, PageSectionLocalization};
 use crate::models::site_membership::SiteRole;
 use crate::services::{
-    audit_service, bulk_content_service::BulkContentService, content_service::ContentService,
-    notification_service, webhook_service, workflow_service,
+    audit_service,
+    bulk_content_service::BulkContentService,
+    notification_service,
+    review_service::{ReviewContext, ReviewService},
+    webhook_service, workflow_service,
 };
 use crate::utils::pagination::PaginationParams;
 use crate::AppState;
@@ -728,109 +731,29 @@ pub async fn review_page(
             .await?;
     }
 
-    // Content must be InReview
-    if page.status != ContentStatus::InReview {
-        return Err(ApiError::BadRequest(
-            "Content must be in 'InReview' status to perform a review action.".to_string(),
-        ));
-    }
-
-    let req = body.into_inner();
-    let site_id = site_ids.into_iter().next();
-
-    let is_approve = matches!(req.action, ReviewAction::Approve);
-    let (new_status, audit_action, message) = if is_approve {
-        let status = if page
+    let slug = page.slug.clone().unwrap_or_else(|| page.route.clone());
+    let ctx = ReviewContext {
+        content_id: page.content_id,
+        entity_type: "page",
+        entity_id: id,
+        entity_slug: &slug,
+        current_status: &page.status,
+        has_future_publish_start: page
             .publish_start
             .map(|s| s > chrono::Utc::now())
-            .unwrap_or(false)
-        {
-            ContentStatus::Scheduled
-        } else {
-            ContentStatus::Published
-        };
-        (
-            status,
-            AuditAction::Approve,
-            "Content approved and published.",
-        )
-    } else {
-        (
-            ContentStatus::Draft,
-            AuditAction::RequestChanges,
-            "Changes requested. Content moved back to Draft.",
-        )
+            .unwrap_or(false),
     };
 
-    ContentService::update_content(
+    let response = ReviewService::review_content(
         &state.db,
-        page.content_id,
-        None,
-        Some(&new_status),
-        None,
-        None,
+        &ctx,
+        site_ids.into_iter().next(),
+        body.into_inner(),
+        auth.0.id,
     )
     .await?;
 
-    let metadata = req
-        .comment
-        .as_ref()
-        .map(|c| serde_json::json!({ "comment": c }));
-    audit_service::log_action(
-        &state.db,
-        site_id,
-        Some(auth.0.id),
-        audit_action,
-        "page",
-        id,
-        metadata,
-    )
-    .await;
-
-    if let Some(sid) = site_id {
-        webhook_service::dispatch(
-            state.db.clone(),
-            sid,
-            "page.reviewed",
-            id,
-            serde_json::json!({
-                "status": new_status,
-                "message": message,
-            }),
-        );
-
-        // Notify the content creator about the review result
-        let content = Content::find_by_id(&state.db, page.content_id).await?;
-        let slug = page.slug.clone().unwrap_or_else(|| page.route.clone());
-        let actor_clerk_id = auth.0.clerk_user_id().map(String::from);
-        if is_approve {
-            notification_service::notify_content_approved(
-                state.db.clone(),
-                sid,
-                "page",
-                id,
-                &slug,
-                content.created_by,
-                actor_clerk_id,
-            );
-        } else {
-            notification_service::notify_changes_requested(
-                state.db.clone(),
-                sid,
-                "page",
-                id,
-                &slug,
-                content.created_by,
-                actor_clerk_id,
-                req.comment,
-            );
-        }
-    }
-
-    Ok(Json(ReviewActionResponse {
-        status: new_status,
-        message: message.to_string(),
-    }))
+    Ok(Json(response))
 }
 
 /// Bulk action on pages for a site
@@ -873,98 +796,25 @@ pub async fn bulk_pages(
         ));
     }
 
+    // Resolve page IDs → (page_id, content_id) pairs
     let mut pairs = Vec::with_capacity(req.ids.len());
     for page_id in &req.ids {
         match Page::find_by_id(&state.db, *page_id).await {
             Ok(page) => pairs.push((*page_id, page.content_id)),
-            Err(_) => {
-                pairs.push((*page_id, Uuid::nil()));
-            }
+            Err(_) => pairs.push((*page_id, Uuid::nil())),
         }
     }
 
-    let response = match req.action {
-        BulkAction::UpdateStatus => {
-            let target_status = req.status.as_ref().unwrap();
-            let valid_pairs: Vec<_> = pairs
-                .iter()
-                .filter(|(_, cid)| !cid.is_nil())
-                .copied()
-                .collect();
-            let mut resp =
-                BulkContentService::bulk_update_status(&state.db, &valid_pairs, target_status)
-                    .await;
-
-            for &(page_id, content_id) in &pairs {
-                if content_id.is_nil() {
-                    resp.failed += 1;
-                    resp.results.push(crate::dto::bulk::BulkItemResult {
-                        id: page_id,
-                        success: false,
-                        error: Some(format!("Page {} not found", page_id)),
-                    });
-                }
-            }
-            resp.total = pairs.len();
-
-            for result in &resp.results {
-                if result.success {
-                    audit_service::log_action(&state.db, Some(site_id), Some(auth.0.id), AuditAction::Update, "page", result.id, Some(serde_json::json!({"bulk_action": "update_status", "status": target_status}))).await;
-                    webhook_service::dispatch(
-                        state.db.clone(),
-                        site_id,
-                        "page.updated",
-                        result.id,
-                        serde_json::json!({"bulk": true, "status": target_status}),
-                    );
-                }
-            }
-            resp
-        }
-        BulkAction::Delete => {
-            let valid_pairs: Vec<_> = pairs
-                .iter()
-                .filter(|(_, cid)| !cid.is_nil())
-                .copied()
-                .collect();
-            let mut resp = BulkContentService::bulk_delete(&state.db, &valid_pairs).await;
-
-            for &(page_id, content_id) in &pairs {
-                if content_id.is_nil() {
-                    resp.failed += 1;
-                    resp.results.push(crate::dto::bulk::BulkItemResult {
-                        id: page_id,
-                        success: false,
-                        error: Some(format!("Page {} not found", page_id)),
-                    });
-                }
-            }
-            resp.total = pairs.len();
-
-            for result in &resp.results {
-                if result.success {
-                    audit_service::log_action(
-                        &state.db,
-                        Some(site_id),
-                        Some(auth.0.id),
-                        AuditAction::Delete,
-                        "page",
-                        result.id,
-                        Some(serde_json::json!({"bulk_action": "delete"})),
-                    )
-                    .await;
-                    webhook_service::dispatch(
-                        state.db.clone(),
-                        site_id,
-                        "page.deleted",
-                        result.id,
-                        serde_json::json!({"id": result.id, "bulk": true}),
-                    );
-                }
-            }
-            resp
-        }
-    };
+    let response = BulkContentService::process_bulk_operation(
+        &state.db,
+        "page",
+        site_id,
+        &req.action,
+        req.status.as_ref(),
+        &pairs,
+        auth.0.id,
+    )
+    .await;
 
     Ok(Json(response))
 }
