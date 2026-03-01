@@ -291,8 +291,12 @@
     },
     "images": {
       "title": "Images",
-      "coverImageId": "Cover Image ID:",
-      "headerImageId": "Header Image ID:"
+      "coverImageId": "Cover Image",
+      "headerImageId": "Header Image",
+      "selectImage": "Select Image",
+      "changeImage": "Change",
+      "removeImage": "Remove",
+      "noImage": "No image selected"
     },
     "settings": {
       "title": "Settings",
@@ -431,6 +435,13 @@
       "videos": "Videos",
       "audio": "Audio",
       "documents": "Documents"
+    },
+    "picker": {
+      "title": "Select Image",
+      "search": "Search images...",
+      "noResults": "No images found",
+      "select": "Select",
+      "clear": "Clear Selection"
     },
     "openUrl": "Open URL",
     "empty": {

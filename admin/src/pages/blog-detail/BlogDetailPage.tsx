@@ -57,6 +57,8 @@ function buildFormDefaults(
     reading_time_override: false,
     publish_start: blog?.publish_start ?? null,
     publish_end: blog?.publish_end ?? null,
+    cover_image_id: blog?.cover_image_id ?? null,
+    header_image_id: blog?.header_image_id ?? null,
   };
 }
 
@@ -208,6 +210,12 @@ export default function BlogDetailPage() {
     const formEnd = values.publish_end || null;
     if (formStart !== (blogDetail.publish_start ?? null)) blogUpdates.publish_start = formStart;
     if (formEnd !== (blogDetail.publish_end ?? null)) blogUpdates.publish_end = formEnd;
+
+    // Image fields
+    const formCoverImage = values.cover_image_id || null;
+    const formHeaderImage = values.header_image_id || null;
+    if (formCoverImage !== (blogDetail.cover_image_id ?? null)) blogUpdates.cover_image_id = formCoverImage;
+    if (formHeaderImage !== (blogDetail.header_image_id ?? null)) blogUpdates.header_image_id = formHeaderImage;
 
     if (Object.keys(blogUpdates).length > 0) {
       await updateBlogMutation.mutateAsync({ blogId: blogDetail.id, data: blogUpdates as Parameters<typeof apiService.updateBlog>[1] });
@@ -448,8 +456,7 @@ export default function BlogDetailPage() {
                   watch={watch}
                   setValue={setValue}
                   onSnapshot={() => formHistory.snapshot()}
-                  coverImageId={blogDetail.cover_image_id}
-                  headerImageId={blogDetail.header_image_id}
+                  siteId={selectedSiteId}
                 />
               )}
               {activeContentTab === 4 && (
