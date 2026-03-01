@@ -1,6 +1,22 @@
 # Changelog
 
-## v1.0.1 (Unreleased)
+## v1.0.2 (Unreleased)
+
+### Backend
+
+- Extracted shared ReviewService and BulkContentService to reduce handler duplication (~25% reduction in blog.rs/page.rs)
+- Replaced unsafe `.unwrap()` in RSS date parsing with safe `.zip()` chain
+- Centralized hardcoded constants (featured limits, RSS limits, webhook timeouts)
+- Added composite database index on `audit_logs(site_id, created_at DESC)` for pagination
+- Pinned Rust toolchain to 1.93 via `rust-toolchain.toml`
+- Resolved CodeQL cleartext-logging findings by internalizing clerk_user_id resolution in ReviewService
+
+### Admin Dashboard
+
+- Reduced CRUD boilerplate with shared `DataTable`, `useCrudMutations`, and `useListPageState` hooks
+- Removed all `as any` casts — replaced with proper types (`as const`, `as Resolver<T>`)
+- Fixed 14 ESLint warnings (stabilized hook dependencies, ref-guard pattern for form-sync effects)
+- Synced frontend `Site` type with backend DTO (added `created_by` field)
 
 ### Infrastructure
 
@@ -9,6 +25,9 @@
 - CI uses path filtering to skip unrelated jobs (backend skips on admin-only changes and vice versa)
 - CI concurrency groups cancel superseded PR runs
 - Added `CI Pass` gate job for branch protection compatibility
+- Added Docker build test to CI pipeline
+- Replaced CodeQL default setup with path-filtered custom workflow (Rust/JS/Actions analyzed independently)
+- Added `.nvmrc` pinning Node.js to 20
 
 ## v1.0.0 - Initial Release
 
