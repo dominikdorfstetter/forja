@@ -20,7 +20,7 @@ use crate::dto::content::{
     CreateLocalizationRequest, LocalizationResponse, UpdateLocalizationRequest,
 };
 use crate::dto::document::BlogDocumentResponse;
-use crate::dto::review::{ReviewAction, ReviewActionRequest, ReviewActionResponse};
+use crate::dto::review::{ReviewActionRequest, ReviewActionResponse};
 use crate::dto::taxonomy::CategoryResponse;
 use crate::errors::{ApiError, ProblemDetails};
 use crate::guards::auth_guard::ReadKey;
@@ -32,11 +32,19 @@ use crate::models::site::Site;
 use crate::models::site_membership::SiteRole;
 use crate::models::taxonomy::Category;
 use crate::services::{
-    audit_service, bulk_content_service::BulkContentService, content_service::ContentService,
-    notification_service, webhook_service, workflow_service,
+    audit_service,
+    bulk_content_service::BulkContentService,
+    notification_service,
+    review_service::{ReviewContext, ReviewService},
+    webhook_service, workflow_service,
 };
 use crate::utils::pagination::PaginationParams;
 use crate::AppState;
+
+const DEFAULT_FEATURED_LIMIT: i64 = 5;
+const MAX_FEATURED_LIMIT: i64 = 20;
+const RSS_MAX_ITEMS: i64 = 50;
+const RSS_BODY_TRUNCATE_LEN: usize = 500;
 
 /// Custom responder for RSS XML feeds
 pub struct RssResponse(pub String);
@@ -158,7 +166,9 @@ pub async fn list_featured_blogs(
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)
         .await?;
-    let limit = limit.unwrap_or(5).min(20);
+    let limit = limit
+        .unwrap_or(DEFAULT_FEATURED_LIMIT)
+        .min(MAX_FEATURED_LIMIT);
     let blogs = Blog::find_featured_for_site(&state.db, site_id, limit).await?;
     let items: Vec<BlogListItem> = blogs.into_iter().map(BlogListItem::from).collect();
     Ok(Json(items))
@@ -760,112 +770,29 @@ pub async fn review_blog(
             .await?;
     }
 
-    // Content must be InReview
-    if blog.status != ContentStatus::InReview {
-        return Err(ApiError::BadRequest(
-            "Content must be in 'InReview' status to perform a review action.".to_string(),
-        ));
-    }
-
-    let req = body.into_inner();
-    let site_id = site_ids.into_iter().next();
-
-    let is_approve = matches!(req.action, ReviewAction::Approve);
-    let (new_status, audit_action, message) = if is_approve {
-        // If publish_start is in the future, set Scheduled instead of Published
-        let status = if blog
+    let slug = blog.slug.clone().unwrap_or_else(|| id.to_string());
+    let ctx = ReviewContext {
+        content_id: blog.content_id,
+        entity_type: "blog",
+        entity_id: id,
+        entity_slug: &slug,
+        current_status: &blog.status,
+        has_future_publish_start: blog
             .publish_start
             .map(|s| s > chrono::Utc::now())
-            .unwrap_or(false)
-        {
-            ContentStatus::Scheduled
-        } else {
-            ContentStatus::Published
-        };
-        (
-            status,
-            AuditAction::Approve,
-            "Content approved and published.",
-        )
-    } else {
-        (
-            ContentStatus::Draft,
-            AuditAction::RequestChanges,
-            "Changes requested. Content moved back to Draft.",
-        )
+            .unwrap_or(false),
     };
 
-    // Update content status
-    ContentService::update_content(
+    let response = ReviewService::review_content(
         &state.db,
-        blog.content_id,
-        None,
-        Some(&new_status),
-        None,
-        None,
+        &ctx,
+        site_ids.into_iter().next(),
+        body.into_inner(),
+        auth.0.id,
     )
     .await?;
 
-    // Log audit with optional comment in metadata
-    let metadata = req
-        .comment
-        .as_ref()
-        .map(|c| serde_json::json!({ "comment": c }));
-    audit_service::log_action(
-        &state.db,
-        site_id,
-        Some(auth.0.id),
-        audit_action,
-        "blog",
-        id,
-        metadata,
-    )
-    .await;
-
-    if let Some(sid) = site_id {
-        webhook_service::dispatch(
-            state.db.clone(),
-            sid,
-            "blog.reviewed",
-            id,
-            serde_json::json!({
-                "status": new_status,
-                "message": message,
-            }),
-        );
-
-        // Notify the content creator about the review result
-        let content = Content::find_by_id(&state.db, blog.content_id).await?;
-        let slug = blog.slug.clone().unwrap_or_else(|| id.to_string());
-        let actor_clerk_id = auth.0.clerk_user_id().map(String::from);
-        if is_approve {
-            notification_service::notify_content_approved(
-                state.db.clone(),
-                sid,
-                "blog",
-                id,
-                &slug,
-                content.created_by,
-                actor_clerk_id,
-            );
-        } else {
-            notification_service::notify_changes_requested(
-                state.db.clone(),
-                sid,
-                "blog",
-                id,
-                &slug,
-                content.created_by,
-                actor_clerk_id,
-                req.comment,
-            );
-        }
-    }
-
-    Ok(Json(ReviewActionResponse {
-        status: new_status,
-        message: message.to_string(),
-    }))
+    Ok(Json(response))
 }
 
 /// RSS feed for a site's published blog posts
@@ -904,7 +831,7 @@ pub async fn rss_feed(
     let base_url = domain.map(|d| format!("https://{d}")).unwrap_or_default();
 
     // Fetch last 50 published posts
-    let blogs = Blog::find_published_for_site(&state.db, site_id, 50, 0).await?;
+    let blogs = Blog::find_published_for_site(&state.db, site_id, RSS_MAX_ITEMS, 0).await?;
 
     // Build RSS items
     let mut items = Vec::with_capacity(blogs.len());
@@ -921,8 +848,8 @@ pub async fn rss_feed(
             .clone()
             .or_else(|| {
                 loc.body.as_ref().map(|b| {
-                    if b.len() > 500 {
-                        format!("{}…", &b[..500])
+                    if b.len() > RSS_BODY_TRUNCATE_LEN {
+                        format!("{}…", &b[..RSS_BODY_TRUNCATE_LEN])
                     } else {
                         b.clone()
                     }
@@ -1010,7 +937,6 @@ pub async fn bulk_blogs(
         .authorize_site_action(&state.db, site_id, &required_role)
         .await?;
 
-    // Validate: UpdateStatus requires a status field
     if matches!(req.action, BulkAction::UpdateStatus) && req.status.is_none() {
         return Err(ApiError::BadRequest(
             "status field is required for UpdateStatus action".to_string(),
@@ -1022,98 +948,20 @@ pub async fn bulk_blogs(
     for blog_id in &req.ids {
         match Blog::find_by_id(&state.db, *blog_id).await {
             Ok(blog) => pairs.push((*blog_id, blog.content_id)),
-            Err(_) => {
-                // Will be reported as a failure in the response
-                pairs.push((*blog_id, Uuid::nil()));
-            }
+            Err(_) => pairs.push((*blog_id, Uuid::nil())),
         }
     }
 
-    let response = match req.action {
-        BulkAction::UpdateStatus => {
-            let target_status = req.status.as_ref().unwrap();
-            // Filter out entries with nil content_id (not found)
-            let valid_pairs: Vec<_> = pairs
-                .iter()
-                .filter(|(_, cid)| !cid.is_nil())
-                .copied()
-                .collect();
-            let mut resp =
-                BulkContentService::bulk_update_status(&state.db, &valid_pairs, target_status)
-                    .await;
-
-            // Add not-found entries as failures
-            for &(blog_id, content_id) in &pairs {
-                if content_id.is_nil() {
-                    resp.failed += 1;
-                    resp.results.push(crate::dto::bulk::BulkItemResult {
-                        id: blog_id,
-                        success: false,
-                        error: Some(format!("Blog {} not found", blog_id)),
-                    });
-                }
-            }
-            resp.total = pairs.len();
-
-            // Audit + webhooks for successful items
-            for result in &resp.results {
-                if result.success {
-                    audit_service::log_action(&state.db, Some(site_id), Some(auth.0.id), AuditAction::Update, "blog", result.id, Some(serde_json::json!({"bulk_action": "update_status", "status": target_status}))).await;
-                    webhook_service::dispatch(
-                        state.db.clone(),
-                        site_id,
-                        "blog.updated",
-                        result.id,
-                        serde_json::json!({"bulk": true, "status": target_status}),
-                    );
-                }
-            }
-            resp
-        }
-        BulkAction::Delete => {
-            let valid_pairs: Vec<_> = pairs
-                .iter()
-                .filter(|(_, cid)| !cid.is_nil())
-                .copied()
-                .collect();
-            let mut resp = BulkContentService::bulk_delete(&state.db, &valid_pairs).await;
-
-            for &(blog_id, content_id) in &pairs {
-                if content_id.is_nil() {
-                    resp.failed += 1;
-                    resp.results.push(crate::dto::bulk::BulkItemResult {
-                        id: blog_id,
-                        success: false,
-                        error: Some(format!("Blog {} not found", blog_id)),
-                    });
-                }
-            }
-            resp.total = pairs.len();
-
-            for result in &resp.results {
-                if result.success {
-                    audit_service::log_action(
-                        &state.db,
-                        Some(site_id),
-                        Some(auth.0.id),
-                        AuditAction::Delete,
-                        "blog",
-                        result.id,
-                        Some(serde_json::json!({"bulk_action": "delete"})),
-                    )
-                    .await;
-                    webhook_service::dispatch(
-                        state.db.clone(),
-                        site_id,
-                        "blog.deleted",
-                        result.id,
-                        serde_json::json!({"id": result.id, "bulk": true}),
-                    );
-                }
-            }
-            resp
-        }
-    };
+    let response = BulkContentService::process_bulk_operation(
+        &state.db,
+        "blog",
+        site_id,
+        &req.action,
+        req.status.as_ref(),
+        &pairs,
+        auth.0.id,
+    )
+    .await;
 
     Ok(Json(response))
 }

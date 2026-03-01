@@ -8,6 +8,9 @@ use uuid::Uuid;
 
 use crate::models::webhook::{Webhook, WebhookDelivery};
 
+const MAX_DELIVERY_ATTEMPTS: i16 = 3;
+const DELIVERY_TIMEOUT_SECS: u64 = 10;
+
 /// Dispatch webhooks for a content event (fire-and-forget via tokio::spawn).
 pub fn dispatch(
     pool: PgPool,
@@ -64,11 +67,11 @@ pub async fn deliver(
     let signature = compute_hmac_sha256(&webhook.secret, &body);
 
     let client = reqwest::Client::builder()
-        .timeout(std::time::Duration::from_secs(10))
+        .timeout(std::time::Duration::from_secs(DELIVERY_TIMEOUT_SECS))
         .build()
         .unwrap_or_default();
 
-    for attempt in 1..=3i16 {
+    for attempt in 1..=MAX_DELIVERY_ATTEMPTS {
         let result = client
             .post(&webhook.url)
             .header("Content-Type", "application/json")
@@ -113,7 +116,7 @@ pub async fn deliver(
             }
         }
 
-        if attempt < 3 {
+        if attempt < MAX_DELIVERY_ATTEMPTS {
             let backoff = std::time::Duration::from_secs(1 << (attempt - 1)); // 1s, 2s
             tokio::time::sleep(backoff).await;
         }
