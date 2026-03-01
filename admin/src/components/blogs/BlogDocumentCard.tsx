@@ -19,9 +19,8 @@ import LinkIcon from '@mui/icons-material/Link';
 import DownloadIcon from '@mui/icons-material/Download';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSnackbar } from 'notistack';
 import apiService from '@/services/api';
-import { resolveError } from '@/utils/errorResolver';
+import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import type { BlogDocumentResponse } from '@/types/api';
 import DocumentPickerDialog from './DocumentPickerDialog';
 import { useTranslation } from 'react-i18next';
@@ -34,7 +33,7 @@ interface BlogDocumentCardProps {
 export default function BlogDocumentCard({ blogId, documents }: BlogDocumentCardProps) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const { enqueueSnackbar } = useSnackbar();
+  const { showError, showSuccess } = useErrorSnackbar();
   const [pickerOpen, setPickerOpen] = useState(false);
 
   const invalidate = () => {
@@ -53,11 +52,9 @@ export default function BlogDocumentCard({ blogId, documents }: BlogDocumentCard
       ),
     onSuccess: () => {
       invalidate();
-      enqueueSnackbar('Document(s) attached successfully', { variant: 'success' });
+      showSuccess('Document(s) attached successfully');
     },
-    onError: () => {
-      enqueueSnackbar('Failed to attach document(s)', { variant: 'error' });
-    },
+    onError: (error) => showError(error),
   });
 
   const unassignMutation = useMutation({
@@ -65,11 +62,9 @@ export default function BlogDocumentCard({ blogId, documents }: BlogDocumentCard
       apiService.unassignBlogDocument(blogId, documentId),
     onSuccess: () => {
       invalidate();
-      enqueueSnackbar('Document detached', { variant: 'success' });
+      showSuccess('Document detached');
     },
-    onError: () => {
-      enqueueSnackbar('Failed to detach document', { variant: 'error' });
-    },
+    onError: (error) => showError(error),
   });
 
   const getDocumentName = (doc: BlogDocumentResponse): string => {
@@ -104,8 +99,7 @@ export default function BlogDocumentCard({ blogId, documents }: BlogDocumentCard
       window.document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (error) {
-      const { detail, title } = resolveError(error);
-      enqueueSnackbar(detail || title, { variant: 'error' });
+      showError(error);
     }
   };
 

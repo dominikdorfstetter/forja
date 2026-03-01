@@ -36,9 +36,8 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSnackbar } from 'notistack';
 import apiService from '@/services/api';
-import { resolveError } from '@/utils/errorResolver';
+import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import type {
   NavigationMenu,
   NavigationItem,
@@ -79,7 +78,7 @@ function flattenItemsWithDepth(items: NavigationItem[]): { item: NavigationItem;
 export default function NavigationPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const { enqueueSnackbar } = useSnackbar();
+  const { showError, showSuccess } = useErrorSnackbar();
   const { selectedSiteId } = useSiteContext();
   const { canWrite, isAdmin } = useAuth();
 
@@ -145,11 +144,11 @@ export default function NavigationPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['navigation-menus'] });
       setMenuFormOpen(false);
-      enqueueSnackbar(t('navigation.menus.messages.created', 'Menu created'), { variant: 'success' });
+      showSuccess(t('navigation.menus.messages.created', 'Menu created'));
       // Select the new menu tab
       if (menus) setSelectedMenuIndex(menus.length);
     },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onError: showError,
   });
 
   const updateMenuMutation = useMutation({
@@ -157,9 +156,9 @@ export default function NavigationPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['navigation-menus'] });
       setEditingMenu(null);
-      enqueueSnackbar(t('navigation.menus.messages.updated', 'Menu updated'), { variant: 'success' });
+      showSuccess(t('navigation.menus.messages.updated', 'Menu updated'));
     },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onError: showError,
   });
 
   const deleteMenuMutation = useMutation({
@@ -168,9 +167,9 @@ export default function NavigationPage() {
       queryClient.invalidateQueries({ queryKey: ['navigation-menus'] });
       setDeletingMenu(null);
       setSelectedMenuIndex(0);
-      enqueueSnackbar(t('navigation.menus.messages.deleted', 'Menu deleted'), { variant: 'success' });
+      showSuccess(t('navigation.menus.messages.deleted', 'Menu deleted'));
     },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onError: showError,
   });
 
   // Item mutations
@@ -185,9 +184,9 @@ export default function NavigationPage() {
       queryClient.invalidateQueries({ queryKey: ['navigation-items'] });
       queryClient.invalidateQueries({ queryKey: ['navigation-menus'] });
       setFormOpen(false);
-      enqueueSnackbar(t('navigation.messages.created'), { variant: 'success' });
+      showSuccess(t('navigation.messages.created'));
     },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onError: showError,
   });
 
   const updateItemMutation = useMutation({
@@ -195,9 +194,9 @@ export default function NavigationPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['navigation-items'] });
       setEditingItem(null);
-      enqueueSnackbar(t('navigation.messages.updated'), { variant: 'success' });
+      showSuccess(t('navigation.messages.updated'));
     },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onError: showError,
   });
 
   const deleteItemMutation = useMutation({
@@ -206,9 +205,9 @@ export default function NavigationPage() {
       queryClient.invalidateQueries({ queryKey: ['navigation-items'] });
       queryClient.invalidateQueries({ queryKey: ['navigation-menus'] });
       setDeletingItem(null);
-      enqueueSnackbar(t('navigation.messages.deleted'), { variant: 'success' });
+      showSuccess(t('navigation.messages.deleted'));
     },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onError: showError,
   });
 
   const reorderMutation = useMutation({
@@ -220,8 +219,7 @@ export default function NavigationPage() {
       return apiService.reorderNavigationItems(selectedSiteId, reorderItems.map(i => ({ id: i.id, display_order: i.display_order })));
     },
     onError: (error) => {
-      const { detail, title } = resolveError(error);
-      enqueueSnackbar(detail || title, { variant: 'error' });
+      showError(error);
       queryClient.invalidateQueries({ queryKey: ['navigation-items'] });
     },
   });
@@ -322,7 +320,7 @@ export default function NavigationPage() {
         return updated;
       }
     });
-  }, [reorderMutation, selectedMenu, isDescendant, sendReorder]);
+  }, [selectedMenu, isDescendant, sendReorder]);
 
   // Flatten items for display with depth
   const flattenedItems = useMemo(() => flattenItemsWithDepth(orderedItems), [orderedItems]);

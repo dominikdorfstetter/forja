@@ -2,12 +2,11 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useParams } from 'react-router';
 import { Box, Alert, Tabs, Tab, Chip, Paper } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import apiService from '@/services/api';
-import { resolveError } from '@/utils/errorResolver';
+import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import type {
   ContentLocalizationResponse,
   BlogDetailResponse,
@@ -66,7 +65,7 @@ export default function BlogDetailPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const queryClient = useQueryClient();
-  const { enqueueSnackbar } = useSnackbar();
+  const { showError, showSuccess } = useErrorSnackbar();
   const { canWrite } = useAuth();
   const { selectedSiteId } = useSiteContext();
 
@@ -141,20 +140,14 @@ export default function BlogDetailPage() {
     mutationFn: (data: Parameters<typeof apiService.createBlogLocalization>[1]) =>
       apiService.createBlogLocalization(id!, data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['blog-detail', id] }),
-    onError: (err) => {
-      const { detail, title } = resolveError(err);
-      enqueueSnackbar(detail || title, { variant: 'error' });
-    },
+    onError: (err) => showError(err),
   });
 
   const updateLocMutation = useMutation({
     mutationFn: ({ locId, data }: { locId: string; data: Parameters<typeof apiService.updateBlogLocalization>[1] }) =>
       apiService.updateBlogLocalization(locId, data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['blog-detail', id] }),
-    onError: (err) => {
-      const { detail, title } = resolveError(err);
-      enqueueSnackbar(detail || title, { variant: 'error' });
-    },
+    onError: (err) => showError(err),
   });
 
   const updateBlogMutation = useMutation({
@@ -164,10 +157,7 @@ export default function BlogDetailPage() {
       queryClient.invalidateQueries({ queryKey: ['blog-detail', id] });
       queryClient.invalidateQueries({ queryKey: ['blogs'] });
     },
-    onError: (err) => {
-      const { detail, title } = resolveError(err);
-      enqueueSnackbar(detail || title, { variant: 'error' });
-    },
+    onError: (err) => showError(err),
   });
 
   const reviewBlogMutation = useMutation({
@@ -175,12 +165,9 @@ export default function BlogDetailPage() {
     onSuccess: (resp) => {
       queryClient.invalidateQueries({ queryKey: ['blog-detail', id] });
       queryClient.invalidateQueries({ queryKey: ['blogs'] });
-      enqueueSnackbar(resp.message, { variant: 'success' });
+      showSuccess(resp.message);
     },
-    onError: (err) => {
-      const { detail, title } = resolveError(err);
-      enqueueSnackbar(detail || title, { variant: 'error' });
-    },
+    onError: (err) => showError(err),
   });
 
   // Unified save
@@ -238,10 +225,10 @@ export default function BlogDetailPage() {
 
     // Clear dirty state
     reset(values);
-    enqueueSnackbar(t('blogDetail.messages.saved'), { variant: 'success' });
+    showSuccess(t('blogDetail.messages.saved'));
   }, [
     currentLocale, currentLocalization, blogDetail, getValues, reset,
-    updateBlogMutation, updateLocMutation, createLocMutation, enqueueSnackbar, t,
+    updateBlogMutation, updateLocMutation, createLocMutation, showSuccess, t,
   ]);
 
   // Autosave
@@ -250,15 +237,16 @@ export default function BlogDetailPage() {
     onSave: handleSave,
     enabled: canWrite,
     formVersion,
-    onError: (err) => {
-      const { detail, title } = resolveError(err);
-      enqueueSnackbar(detail || title || t('shared.autosave.retryFailed'), { variant: 'error' });
-    },
+    onError: (err) => showError(err),
   });
 
-  // Initialize form when data loads
+  // Initialize form when data loads (guarded by ID to prevent resetting on background refetch)
+  const formSyncKey = useRef('');
   useEffect(() => {
     if (!blogDetail || !currentLocale) return;
+    const key = `${blogDetail.id}:${currentLocale.id}`;
+    if (formSyncKey.current === key) return;
+    formSyncKey.current = key;
     const cached = localeFormCache.current.get(currentLocale.id);
     if (cached) {
       reset(cached);
@@ -268,18 +256,22 @@ export default function BlogDetailPage() {
     }
     formHistory.clear();
     formHistory.snapshot();
-  }, [blogDetail?.id, currentLocale?.id]);
+  }, [blogDetail, currentLocale, reset, formHistory]);
 
   // Auto-select locale with data
+  const localeSyncKey = useRef('');
   useEffect(() => {
     if (!blogDetail || activeLocales.length === 0) return;
+    const key = `${blogDetail.id}:${activeLocales.length}`;
+    if (localeSyncKey.current === key) return;
+    localeSyncKey.current = key;
     const localesWithData = activeLocales
       .map((locale, idx) => ({ idx, locale }))
       .filter(({ locale }) => blogDetail.localizations?.some((l) => l.locale_id === locale.id));
     if (localesWithData.length === 1 && localesWithData[0].idx !== activeLocaleTab) {
       setActiveLocaleTab(localesWithData[0].idx);
     }
-  }, [blogDetail?.id, activeLocales.length]);
+  }, [blogDetail, activeLocales, activeLocaleTab]);
 
   // Locale tab switch
   const handleLocaleSwitch = async (_: unknown, newValue: number) => {

@@ -20,10 +20,9 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import KeyIcon from '@mui/icons-material/Key';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSnackbar } from 'notistack';
 import { format } from 'date-fns';
 import apiService from '@/services/api';
-import { resolveError } from '@/utils/errorResolver';
+import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import type { ApiKeyListItem, CreateApiKeyRequest, ApiKeyPermission, ApiKeyStatus, SiteRole } from '@/types/api';
 import { useAuth } from '@/store/AuthContext';
 import { useSiteContext } from '@/store/SiteContext';
@@ -53,7 +52,7 @@ function maxPermissionForRole(role: SiteRole | null, isSysAdmin: boolean): ApiKe
 export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const { enqueueSnackbar } = useSnackbar();
+  const { showError, showSuccess } = useErrorSnackbar();
 
   const { isMaster, isAdmin, currentSiteRole } = useAuth();
   const { selectedSiteId } = useSiteContext();
@@ -93,18 +92,18 @@ export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['apiKeys'] });
       setBlockingKey(null);
-      enqueueSnackbar(t('apiKeys.messages.blocked'), { variant: 'success' });
+      showSuccess(t('apiKeys.messages.blocked'));
     },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onError: (error) => { showError(error); },
   });
 
   const unblockMutation = useMutation({
     mutationFn: (id: string) => apiService.unblockApiKey(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['apiKeys'] });
-      enqueueSnackbar(t('apiKeys.messages.unblocked'), { variant: 'success' });
+      showSuccess(t('apiKeys.messages.unblocked'));
     },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onError: (error) => { showError(error); },
   });
 
   const revokeMutation = useMutation({
@@ -112,9 +111,9 @@ export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['apiKeys'] });
       setRevokingKey(null);
-      enqueueSnackbar(t('apiKeys.messages.revoked'), { variant: 'success' });
+      showSuccess(t('apiKeys.messages.revoked'));
     },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onError: (error) => { showError(error); },
   });
 
   const deleteMutation = useMutation({
@@ -122,9 +121,9 @@ export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['apiKeys'] });
       setDeletingKey(null);
-      enqueueSnackbar(t('apiKeys.messages.deleted'), { variant: 'success' });
+      showSuccess(t('apiKeys.messages.deleted'));
     },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onError: (error) => { showError(error); },
   });
 
   const handleCreateKey = async (data: CreateApiKeyRequest) => {

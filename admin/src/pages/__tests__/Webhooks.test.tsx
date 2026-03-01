@@ -60,7 +60,6 @@ const emptyPaginated: Paginated<Webhook> = {
 };
 
 // We need to import the page after mocks are set up
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 let WebhooksPage: typeof import('@/pages/Webhooks').default;
 
 beforeEach(async () => {

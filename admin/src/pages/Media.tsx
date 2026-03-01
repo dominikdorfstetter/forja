@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
@@ -42,10 +42,9 @@ import {
   type DragEndEvent,
 } from '@dnd-kit/core';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSnackbar } from 'notistack';
 import { format } from 'date-fns';
 import apiService from '@/services/api';
-import { resolveError } from '@/utils/errorResolver';
+import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import type { MediaListItem, MediaFolder } from '@/types/api';
 import { useSiteContext } from '@/store/SiteContext';
 import { useAuth } from '@/store/AuthContext';
@@ -97,7 +96,7 @@ const MIME_CATEGORIES = [
 export default function MediaPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const { enqueueSnackbar } = useSnackbar();
+  const { showError, showSuccess } = useErrorSnackbar();
   const { selectedSiteId } = useSiteContext();
   const { canWrite, isAdmin } = useAuth();
 
@@ -143,7 +142,7 @@ export default function MediaPage() {
     enabled: !!selectedSiteId,
   });
 
-  const mediaFiles = mediaData?.data || [];
+  const mediaFiles = useMemo(() => mediaData?.data || [], [mediaData?.data]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -157,14 +156,14 @@ export default function MediaPage() {
         selectedFolderId ?? undefined,
         isGlobal,
       ),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['media'] }); setUploadOpen(false); enqueueSnackbar(t('media.upload.success'), { variant: 'success' }); },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['media'] }); setUploadOpen(false); showSuccess(t('media.upload.success')); },
+    onError: (error) => { showError(error); },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => apiService.deleteMedia(id),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['media'] }); setDeletingFile(null); enqueueSnackbar(t('media.messages.deleted'), { variant: 'success' }); },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['media'] }); setDeletingFile(null); showSuccess(t('media.messages.deleted')); },
+    onError: (error) => { showError(error); },
   });
 
   const moveToFolderMutation = useMutation({
@@ -172,21 +171,21 @@ export default function MediaPage() {
       apiService.updateMedia(id, { folder_id }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['media'] });
-      enqueueSnackbar(t('media.messages.moved'), { variant: 'success' });
+      showSuccess(t('media.messages.moved'));
     },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onError: (error) => { showError(error); },
   });
 
   const createFolderMutation = useMutation({
     mutationFn: (name: string) => apiService.createMediaFolder(selectedSiteId, { name, display_order: 0 }),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['media-folders'] }); enqueueSnackbar(t('media.messages.folderCreated'), { variant: 'success' }); },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['media-folders'] }); showSuccess(t('media.messages.folderCreated')); },
+    onError: (error) => { showError(error); },
   });
 
   const renameFolderMutation = useMutation({
     mutationFn: ({ id, name }: { id: string; name: string }) => apiService.updateMediaFolder(id, { name }),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['media-folders'] }); enqueueSnackbar(t('media.messages.folderRenamed'), { variant: 'success' }); },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['media-folders'] }); showSuccess(t('media.messages.folderRenamed')); },
+    onError: (error) => { showError(error); },
   });
 
   const deleteFolderMutation = useMutation({
@@ -195,9 +194,9 @@ export default function MediaPage() {
       queryClient.invalidateQueries({ queryKey: ['media-folders'] });
       queryClient.invalidateQueries({ queryKey: ['media'] });
       if (selectedFolderId) setSelectedFolderId(null);
-      enqueueSnackbar(t('media.messages.folderDeleted'), { variant: 'success' });
+      showSuccess(t('media.messages.folderDeleted'));
     },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onError: (error) => { showError(error); },
   });
 
   const folderItems = folders.map((f: MediaFolder) => ({

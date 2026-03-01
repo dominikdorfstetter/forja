@@ -46,13 +46,12 @@ export default function MediaPickerDialog({
     enabled: open && !!siteId,
   });
 
-  const mediaList = mediaData?.data ?? [];
-
   const filteredMedia = useMemo(() => {
-    if (!search.trim()) return mediaList;
+    const list = mediaData?.data ?? [];
+    if (!search.trim()) return list;
     const lower = search.toLowerCase();
-    return mediaList.filter((m) => m.original_filename.toLowerCase().includes(lower));
-  }, [mediaList, search]);
+    return list.filter((m) => m.original_filename.toLowerCase().includes(lower));
+  }, [mediaData?.data, search]);
 
   const handleSelect = () => {
     onSelect(selected);

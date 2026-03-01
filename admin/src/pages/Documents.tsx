@@ -41,9 +41,8 @@ import {
   type DragEndEvent,
 } from '@dnd-kit/core';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSnackbar } from 'notistack';
 import apiService from '@/services/api';
-import { resolveError } from '@/utils/errorResolver';
+import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import type {
   DocumentListItem,
   DocumentResponse,
@@ -131,7 +130,7 @@ export interface DocumentsPageHandle {
 function DocumentsPage({ embedded = false, ref }: { embedded?: boolean; ref?: Ref<DocumentsPageHandle> }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const { enqueueSnackbar } = useSnackbar();
+  const { showError, showSuccess } = useErrorSnackbar();
   const { selectedSiteId } = useSiteContext();
   const { canWrite, isAdmin } = useAuth();
 
@@ -229,11 +228,10 @@ function DocumentsPage({ embedded = false, ref }: { embedded?: boolean; ref?: Re
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['document-folders'] });
-      enqueueSnackbar(t('media.messages.folderCreated'), { variant: 'success' });
+      showSuccess(t('media.messages.folderCreated'));
     },
     onError: (error) => {
-      const { detail, title } = resolveError(error);
-      enqueueSnackbar(detail || title, { variant: 'error' });
+      showError(error);
     },
   });
 
@@ -242,11 +240,10 @@ function DocumentsPage({ embedded = false, ref }: { embedded?: boolean; ref?: Re
       apiService.updateDocumentFolder(id, { name }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['document-folders'] });
-      enqueueSnackbar(t('media.messages.folderRenamed'), { variant: 'success' });
+      showSuccess(t('media.messages.folderRenamed'));
     },
     onError: (error) => {
-      const { detail, title } = resolveError(error);
-      enqueueSnackbar(detail || title, { variant: 'error' });
+      showError(error);
     },
   });
 
@@ -255,11 +252,10 @@ function DocumentsPage({ embedded = false, ref }: { embedded?: boolean; ref?: Re
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['document-folders'] });
       if (selectedFolderId) setSelectedFolderId(null);
-      enqueueSnackbar(t('media.messages.folderDeleted'), { variant: 'success' });
+      showSuccess(t('media.messages.folderDeleted'));
     },
     onError: (error) => {
-      const { detail, title } = resolveError(error);
-      enqueueSnackbar(detail || title, { variant: 'error' });
+      showError(error);
     },
   });
 
@@ -286,11 +282,10 @@ function DocumentsPage({ embedded = false, ref }: { embedded?: boolean; ref?: Re
       queryClient.invalidateQueries({ queryKey: ['documents'] });
       queryClient.invalidateQueries({ queryKey: ['document-details'] });
       setFormOpen(false);
-      enqueueSnackbar(t('documents.messages.created'), { variant: 'success' });
+      showSuccess(t('documents.messages.created'));
     },
     onError: (error) => {
-      const { detail, title } = resolveError(error);
-      enqueueSnackbar(detail || title, { variant: 'error' });
+      showError(error);
     },
   });
 
@@ -346,11 +341,10 @@ function DocumentsPage({ embedded = false, ref }: { embedded?: boolean; ref?: Re
       queryClient.invalidateQueries({ queryKey: ['documents'] });
       queryClient.invalidateQueries({ queryKey: ['document-details'] });
       setEditingDocument(null);
-      enqueueSnackbar(t('documents.messages.updated'), { variant: 'success' });
+      showSuccess(t('documents.messages.updated'));
     },
     onError: (error) => {
-      const { detail, title } = resolveError(error);
-      enqueueSnackbar(detail || title, { variant: 'error' });
+      showError(error);
     },
   });
 
@@ -360,11 +354,10 @@ function DocumentsPage({ embedded = false, ref }: { embedded?: boolean; ref?: Re
       queryClient.invalidateQueries({ queryKey: ['documents'] });
       queryClient.invalidateQueries({ queryKey: ['document-details'] });
       setDeletingDocument(null);
-      enqueueSnackbar(t('documents.messages.deleted'), { variant: 'success' });
+      showSuccess(t('documents.messages.deleted'));
     },
     onError: (error) => {
-      const { detail, title } = resolveError(error);
-      enqueueSnackbar(detail || title, { variant: 'error' });
+      showError(error);
     },
   });
 
@@ -373,11 +366,10 @@ function DocumentsPage({ embedded = false, ref }: { embedded?: boolean; ref?: Re
       apiService.updateDocument(id, { folder_id }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['documents'] });
-      enqueueSnackbar(t('media.messages.moved'), { variant: 'success' });
+      showSuccess(t('media.messages.moved'));
     },
     onError: (error) => {
-      const { detail, title } = resolveError(error);
-      enqueueSnackbar(detail || title, { variant: 'error' });
+      showError(error);
     },
   });
 
@@ -399,8 +391,7 @@ function DocumentsPage({ embedded = false, ref }: { embedded?: boolean; ref?: Re
       setEditingDocument(detail);
       setFormOpen(true);
     } catch (error) {
-      const { detail, title } = resolveError(error);
-      enqueueSnackbar(detail || title, { variant: 'error' });
+      showError(error);
     }
   };
 
@@ -432,8 +423,7 @@ function DocumentsPage({ embedded = false, ref }: { embedded?: boolean; ref?: Re
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (error) {
-      const { detail, title } = resolveError(error);
-      enqueueSnackbar(detail || title, { variant: 'error' });
+      showError(error);
     }
   };
 

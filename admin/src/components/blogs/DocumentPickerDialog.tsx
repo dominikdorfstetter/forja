@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -51,13 +51,11 @@ export default function DocumentPickerDialog({
     queryFn: () => apiService.getDocuments(selectedSiteId),
     enabled: open && !!selectedSiteId,
   });
-  const documentList = documentListData?.data ?? [];
-
   // Filter out already-attached documents
   const excludeSet = useMemo(() => new Set(excludeIds), [excludeIds]);
   const availableDocuments = useMemo(
-    () => documentList.filter((d) => !excludeSet.has(d.id)),
-    [documentList, excludeSet],
+    () => (documentListData?.data ?? []).filter((d) => !excludeSet.has(d.id)),
+    [documentListData?.data, excludeSet],
   );
 
   // Fetch details (with localizations) for available documents
@@ -78,7 +76,7 @@ export default function DocumentPickerDialog({
   }, [documentDetails]);
 
   // Get the display name for a document
-  const getDocumentName = (doc: DocumentListItem): string => {
+  const getDocumentName = useCallback((doc: DocumentListItem): string => {
     const detail = detailsMap.get(doc.id);
     if (detail && detail.localizations && detail.localizations.length > 0) {
       return detail.localizations[0].name;
@@ -90,7 +88,7 @@ export default function DocumentPickerDialog({
       return doc.url.split('/').pop() || 'Untitled';
     }
     return 'Untitled';
-  };
+  }, [detailsMap]);
 
   // Filter by search term
   const filteredDocuments = useMemo(() => {
@@ -103,7 +101,7 @@ export default function DocumentPickerDialog({
       const fileName = (doc.file_name || '').toLowerCase();
       return name.includes(lower) || url.includes(lower) || type.includes(lower) || fileName.includes(lower);
     });
-  }, [availableDocuments, search, detailsMap]);
+  }, [availableDocuments, search, getDocumentName]);
 
   const toggleSelection = (id: string) => {
     setSelected((prev) => {

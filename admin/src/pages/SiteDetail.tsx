@@ -14,11 +14,10 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import apiService from '@/services/api';
-import { resolveError } from '@/utils/errorResolver';
+import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import type { Site, CreateSiteRequest } from '@/types/api';
 import { useAuth } from '@/store/AuthContext';
 import PageHeader from '@/components/shared/PageHeader';
@@ -34,7 +33,7 @@ export default function SiteDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { enqueueSnackbar } = useSnackbar();
+  const { showError, showSuccess } = useErrorSnackbar();
 
   const { isAdmin } = useAuth();
   const [editOpen, setEditOpen] = useState(false);
@@ -53,19 +52,19 @@ export default function SiteDetailPage() {
       queryClient.invalidateQueries({ queryKey: ['site', id] });
       queryClient.invalidateQueries({ queryKey: ['sites'] });
       setEditOpen(false);
-      enqueueSnackbar(t('siteDetail.messages.updated'), { variant: 'success' });
+      showSuccess(t('siteDetail.messages.updated'));
     },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onError: (error) => { showError(error); },
   });
 
   const deleteMutation = useMutation({
     mutationFn: () => apiService.deleteSite(id!),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sites'] });
-      enqueueSnackbar(t('siteDetail.messages.deleted'), { variant: 'success' });
+      showSuccess(t('siteDetail.messages.deleted'));
       navigate('/sites');
     },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+    onError: (error) => { showError(error); },
   });
 
   const handleToggleActive = (site: Site) => {

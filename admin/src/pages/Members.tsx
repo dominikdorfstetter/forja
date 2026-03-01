@@ -24,11 +24,10 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSnackbar } from 'notistack';
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import apiService from '@/services/api';
-import { resolveError } from '@/utils/errorResolver';
+import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import type { SiteMembership, SiteRole, ClerkUser } from '@/types/api';
 import { useSiteContext } from '@/store/SiteContext';
 import { useAuth } from '@/store/AuthContext';
@@ -42,7 +41,7 @@ const ROLES: SiteRole[] = ['owner', 'admin', 'editor', 'author', 'reviewer', 'vi
 export default function MembersPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const { enqueueSnackbar } = useSnackbar();
+  const { showError, showSuccess } = useErrorSnackbar();
   const { selectedSiteId } = useSiteContext();
   const { canManageMembers, isOwner, clerkUserId } = useAuth();
 
@@ -69,45 +68,45 @@ export default function MembersPage() {
   const addMemberMutation = useMutation({
     mutationFn: () => apiService.addSiteMember(selectedSiteId, { clerk_user_id: addClerkUserId, role: addRole }),
     onSuccess: () => {
-      enqueueSnackbar(t('members.messages.added'), { variant: 'success' });
+      showSuccess(t('members.messages.added'));
       queryClient.invalidateQueries({ queryKey: ['members', selectedSiteId] });
       setAddOpen(false);
       setAddClerkUserId('');
       setAddRole('viewer');
     },
-    onError: (err) => { const e = resolveError(err); enqueueSnackbar(e.detail || e.title, { variant: 'error' }); },
+    onError: (err) => { showError(err); },
   });
 
   const updateRoleMutation = useMutation({
     mutationFn: ({ memberId, role }: { memberId: string; role: SiteRole }) =>
       apiService.updateMemberRole(selectedSiteId, memberId, { role }),
     onSuccess: () => {
-      enqueueSnackbar(t('members.messages.roleUpdated'), { variant: 'success' });
+      showSuccess(t('members.messages.roleUpdated'));
       queryClient.invalidateQueries({ queryKey: ['members', selectedSiteId] });
     },
-    onError: (err) => { const e = resolveError(err); enqueueSnackbar(e.detail || e.title, { variant: 'error' }); },
+    onError: (err) => { showError(err); },
   });
 
   const removeMemberMutation = useMutation({
     mutationFn: (memberId: string) => apiService.removeSiteMember(selectedSiteId, memberId),
     onSuccess: () => {
-      enqueueSnackbar(t('members.messages.removed'), { variant: 'success' });
+      showSuccess(t('members.messages.removed'));
       queryClient.invalidateQueries({ queryKey: ['members', selectedSiteId] });
       setRemovingMember(null);
     },
-    onError: (err) => { const e = resolveError(err); enqueueSnackbar(e.detail || e.title, { variant: 'error' }); },
+    onError: (err) => { showError(err); },
   });
 
   const transferMutation = useMutation({
     mutationFn: (newOwnerClerkUserId: string) =>
       apiService.transferOwnership(selectedSiteId, { new_owner_clerk_user_id: newOwnerClerkUserId }),
     onSuccess: () => {
-      enqueueSnackbar(t('members.messages.ownershipTransferred'), { variant: 'success' });
+      showSuccess(t('members.messages.ownershipTransferred'));
       queryClient.invalidateQueries({ queryKey: ['members', selectedSiteId] });
       queryClient.invalidateQueries({ queryKey: ['auth'] });
       setTransferTarget(null);
     },
-    onError: (err) => { const e = resolveError(err); enqueueSnackbar(e.detail || e.title, { variant: 'error' }); },
+    onError: (err) => { showError(err); },
   });
 
   if (!selectedSiteId) {

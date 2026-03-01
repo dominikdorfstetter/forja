@@ -6,29 +6,20 @@ import {
   Paper,
   Typography,
   Grid,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Chip,
   Divider,
   IconButton,
   Tooltip,
   Button,
-  TablePagination,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import CategoryIcon from '@mui/icons-material/Category';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSnackbar } from 'notistack';
+import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import apiService from '@/services/api';
-import { resolveError } from '@/utils/errorResolver';
 import type {
   Tag,
   Category,
@@ -45,32 +36,37 @@ import EmptyState from '@/components/shared/EmptyState';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import TagFormDialog from '@/components/taxonomy/TagFormDialog';
 import CategoryFormDialog from '@/components/taxonomy/CategoryFormDialog';
+import DataTable, { type DataTableColumn } from '@/components/shared/DataTable';
+import { useListPageState } from '@/hooks/useListPageState';
+import { useCrudMutations } from '@/hooks/useCrudMutations';
 
 export default function TaxonomyPage() {
   const { t } = useTranslation();
-  const queryClient = useQueryClient();
-  const { enqueueSnackbar } = useSnackbar();
   const { selectedSiteId } = useSiteContext();
   const { canWrite, isAdmin } = useAuth();
 
   // Info banner state
   const [showInfo, setShowInfo] = useState(true);
 
-  // Pagination state
-  const [tagPage, setTagPage] = useState(1);
-  const [tagPerPage, setTagPerPage] = useState(25);
-  const [catPage, setCatPage] = useState(1);
-  const [catPerPage, setCatPerPage] = useState(25);
+  // Tag list state
+  const {
+    page: tagPage, perPage: tagPerPage,
+    formOpen: tagFormOpen, editing: editingTag, deleting: deletingTag,
+    openCreate: openTagCreate, closeForm: closeTagForm,
+    openEdit: setEditingTag, closeEdit: closeTagEdit,
+    openDelete: setDeletingTag, closeDelete: closeTagDelete,
+    handlePageChange: handleTagPageChange, handleRowsPerPageChange: handleTagRowsPerPageChange,
+  } = useListPageState<Tag>();
 
-  // Tag state
-  const [tagFormOpen, setTagFormOpen] = useState(false);
-  const [editingTag, setEditingTag] = useState<Tag | null>(null);
-  const [deletingTag, setDeletingTag] = useState<Tag | null>(null);
-
-  // Category state
-  const [catFormOpen, setCatFormOpen] = useState(false);
-  const [editingCat, setEditingCat] = useState<Category | null>(null);
-  const [deletingCat, setDeletingCat] = useState<Category | null>(null);
+  // Category list state
+  const {
+    page: catPage, perPage: catPerPage,
+    formOpen: catFormOpen, editing: editingCat, deleting: deletingCat,
+    openCreate: openCatCreate, closeForm: closeCatForm,
+    openEdit: setEditingCat, closeEdit: closeCatEdit,
+    openDelete: setDeletingCat, closeDelete: closeCatDelete,
+    handlePageChange: handleCatPageChange, handleRowsPerPageChange: handleCatRowsPerPageChange,
+  } = useListPageState<Category>();
 
   const { data: tagsData, isLoading: tagsLoading } = useQuery({
     queryKey: ['tags', selectedSiteId, tagPage, tagPerPage],
@@ -87,42 +83,113 @@ export default function TaxonomyPage() {
   const categories = categoriesData?.data;
 
   // Tag mutations
-  const createTagMutation = useMutation({
-    mutationFn: (data: CreateTagRequest) => apiService.createTag(data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['tags'] }); setTagFormOpen(false); enqueueSnackbar(t('taxonomy.tags.messages.created'), { variant: 'success' }); },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
-  });
-
-  const updateTagMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateTagRequest }) => apiService.updateTag(id, data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['tags'] }); setEditingTag(null); enqueueSnackbar(t('taxonomy.tags.messages.updated'), { variant: 'success' }); },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
-  });
-
-  const deleteTagMutation = useMutation({
-    mutationFn: (id: string) => apiService.deleteTag(id),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['tags'] }); setDeletingTag(null); enqueueSnackbar(t('taxonomy.tags.messages.deleted'), { variant: 'success' }); },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+  const { createMutation: createTagMutation, updateMutation: updateTagMutation, deleteMutation: deleteTagMutation } = useCrudMutations<CreateTagRequest, UpdateTagRequest>({
+    queryKey: 'tags',
+    create: {
+      mutationFn: (data) => apiService.createTag(data),
+      successMessage: t('taxonomy.tags.messages.created'),
+      onSuccess: () => { closeTagForm(); },
+    },
+    update: {
+      mutationFn: ({ id, data }) => apiService.updateTag(id, data),
+      successMessage: t('taxonomy.tags.messages.updated'),
+      onSuccess: () => { closeTagEdit(); },
+    },
+    delete: {
+      mutationFn: (id) => apiService.deleteTag(id),
+      successMessage: t('taxonomy.tags.messages.deleted'),
+      onSuccess: () => { closeTagDelete(); },
+    },
   });
 
   // Category mutations
-  const createCatMutation = useMutation({
-    mutationFn: (data: CreateCategoryRequest) => apiService.createCategory(data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['categories'] }); setCatFormOpen(false); enqueueSnackbar(t('taxonomy.categories.messages.created'), { variant: 'success' }); },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
+  const { createMutation: createCatMutation, updateMutation: updateCatMutation, deleteMutation: deleteCatMutation } = useCrudMutations<CreateCategoryRequest, UpdateCategoryRequest>({
+    queryKey: 'categories',
+    create: {
+      mutationFn: (data) => apiService.createCategory(data),
+      successMessage: t('taxonomy.categories.messages.created'),
+      onSuccess: () => { closeCatForm(); },
+    },
+    update: {
+      mutationFn: ({ id, data }) => apiService.updateCategory(id, data),
+      successMessage: t('taxonomy.categories.messages.updated'),
+      onSuccess: () => { closeCatEdit(); },
+    },
+    delete: {
+      mutationFn: (id) => apiService.deleteCategory(id),
+      successMessage: t('taxonomy.categories.messages.deleted'),
+      onSuccess: () => { closeCatDelete(); },
+    },
   });
 
-  const updateCatMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateCategoryRequest }) => apiService.updateCategory(id, data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['categories'] }); setEditingCat(null); enqueueSnackbar(t('taxonomy.categories.messages.updated'), { variant: 'success' }); },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
-  });
+  const tagColumns: DataTableColumn<Tag>[] = [
+    {
+      header: t('taxonomy.tags.table.slug'),
+      scope: 'col',
+      render: (tag) => <Typography variant="body2" fontFamily="monospace">{tag.slug}</Typography>,
+    },
+    {
+      header: t('taxonomy.tags.table.scope'),
+      scope: 'col',
+      render: (tag) => tag.is_global
+        ? <Chip label={t('common.labels.global')} size="small" color="info" variant="outlined" />
+        : <Chip label={t('common.labels.site')} size="small" variant="outlined" />,
+    },
+    {
+      header: t('taxonomy.tags.table.created'),
+      scope: 'col',
+      render: (tag) => format(new Date(tag.created_at), 'PP'),
+    },
+    {
+      header: t('taxonomy.tags.table.actions'),
+      scope: 'col',
+      align: 'right',
+      render: (tag) => (
+        <>
+          {canWrite && <Tooltip title={t('common.actions.edit')}><IconButton size="small" aria-label={t('common.actions.edit')} onClick={() => setEditingTag(tag)}><EditIcon fontSize="small" /></IconButton></Tooltip>}
+          {isAdmin && <Tooltip title={t('common.actions.delete')}><IconButton size="small" aria-label={t('common.actions.delete')} color="error" onClick={() => setDeletingTag(tag)}><DeleteIcon fontSize="small" /></IconButton></Tooltip>}
+        </>
+      ),
+    },
+  ];
 
-  const deleteCatMutation = useMutation({
-    mutationFn: (id: string) => apiService.deleteCategory(id),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['categories'] }); setDeletingCat(null); enqueueSnackbar(t('taxonomy.categories.messages.deleted'), { variant: 'success' }); },
-    onError: (error) => { const { detail, title } = resolveError(error); enqueueSnackbar(detail || title, { variant: 'error' }); },
-  });
+  const catColumns: DataTableColumn<Category>[] = [
+    {
+      header: t('taxonomy.categories.table.slug'),
+      scope: 'col',
+      render: (cat) => <Typography variant="body2" fontFamily="monospace">{cat.slug}</Typography>,
+    },
+    {
+      header: t('taxonomy.categories.table.parent'),
+      scope: 'col',
+      render: (cat) => cat.parent_id
+        ? <Chip label={t('common.labels.child')} size="small" variant="outlined" />
+        : '\u2014',
+    },
+    {
+      header: t('taxonomy.categories.table.scope'),
+      scope: 'col',
+      render: (cat) => cat.is_global
+        ? <Chip label={t('common.labels.global')} size="small" color="info" variant="outlined" />
+        : <Chip label={t('common.labels.site')} size="small" variant="outlined" />,
+    },
+    {
+      header: t('taxonomy.categories.table.created'),
+      scope: 'col',
+      render: (cat) => format(new Date(cat.created_at), 'PP'),
+    },
+    {
+      header: t('taxonomy.categories.table.actions'),
+      scope: 'col',
+      align: 'right',
+      render: (cat) => (
+        <>
+          {canWrite && <Tooltip title={t('common.actions.edit')}><IconButton size="small" aria-label={t('common.actions.edit')} onClick={() => setEditingCat(cat)}><EditIcon fontSize="small" /></IconButton></Tooltip>}
+          {isAdmin && <Tooltip title={t('common.actions.delete')}><IconButton size="small" aria-label={t('common.actions.delete')} color="error" onClick={() => setDeletingCat(cat)}><DeleteIcon fontSize="small" /></IconButton></Tooltip>}
+        </>
+      ),
+    },
+  ];
 
   return (
     <Box>
@@ -152,7 +219,7 @@ export default function TaxonomyPage() {
                 {canWrite && <Button
                   size="small"
                   startIcon={<AddIcon />}
-                  onClick={() => setTagFormOpen(true)}
+                  onClick={openTagCreate}
                 >
                   {t('taxonomy.tags.addTag')}
                 </Button>}
@@ -166,52 +233,18 @@ export default function TaxonomyPage() {
                   icon={<LocalOfferIcon sx={{ fontSize: 48 }} />}
                   title={t('taxonomy.tags.empty.title')}
                   description={t('taxonomy.tags.empty.description')}
-                  action={{ label: t('taxonomy.tags.addTag'), onClick: () => setTagFormOpen(true) }}
+                  action={{ label: t('taxonomy.tags.addTag'), onClick: openTagCreate }}
                 />
               ) : (
-                <TableContainer>
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell scope="col">{t('taxonomy.tags.table.slug')}</TableCell>
-                        <TableCell scope="col">{t('taxonomy.tags.table.scope')}</TableCell>
-                        <TableCell scope="col">{t('taxonomy.tags.table.created')}</TableCell>
-                        <TableCell scope="col" align="right">{t('taxonomy.tags.table.actions')}</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {tags.map((tag) => (
-                        <TableRow key={tag.id}>
-                          <TableCell>
-                            <Typography variant="body2" fontFamily="monospace">{tag.slug}</Typography>
-                          </TableCell>
-                          <TableCell>
-                            {tag.is_global ? (
-                              <Chip label={t('common.labels.global')} size="small" color="info" variant="outlined" />
-                            ) : (
-                              <Chip label={t('common.labels.site')} size="small" variant="outlined" />
-                            )}
-                          </TableCell>
-                          <TableCell>{format(new Date(tag.created_at), 'PP')}</TableCell>
-                          <TableCell align="right">
-                            {canWrite && <Tooltip title={t('common.actions.edit')}><IconButton size="small" aria-label={t('common.actions.edit')} onClick={() => setEditingTag(tag)}><EditIcon fontSize="small" /></IconButton></Tooltip>}
-                            {isAdmin && <Tooltip title={t('common.actions.delete')}><IconButton size="small" aria-label={t('common.actions.delete')} color="error" onClick={() => setDeletingTag(tag)}><DeleteIcon fontSize="small" /></IconButton></Tooltip>}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              )}
-              {tagsData?.meta && (
-                <TablePagination
-                  component="div"
-                  count={tagsData.meta.total_items}
-                  page={tagsData.meta.page - 1}
-                  onPageChange={(_, p) => setTagPage(p + 1)}
-                  rowsPerPage={tagsData.meta.page_size}
-                  onRowsPerPageChange={(e) => { setTagPerPage(+e.target.value); setTagPage(1); }}
-                  rowsPerPageOptions={[10, 25, 50]}
+                <DataTable<Tag>
+                  data={tags}
+                  columns={tagColumns}
+                  getRowKey={(tag) => tag.id}
+                  meta={tagsData?.meta}
+                  page={tagPage}
+                  onPageChange={handleTagPageChange}
+                  rowsPerPage={tagPerPage}
+                  onRowsPerPageChange={handleTagRowsPerPageChange}
                 />
               )}
             </Paper>
@@ -227,7 +260,7 @@ export default function TaxonomyPage() {
                 {canWrite && <Button
                   size="small"
                   startIcon={<AddIcon />}
-                  onClick={() => setCatFormOpen(true)}
+                  onClick={openCatCreate}
                 >
                   {t('taxonomy.categories.addCategory')}
                 </Button>}
@@ -241,58 +274,18 @@ export default function TaxonomyPage() {
                   icon={<CategoryIcon sx={{ fontSize: 48 }} />}
                   title={t('taxonomy.categories.empty.title')}
                   description={t('taxonomy.categories.empty.description')}
-                  action={{ label: t('taxonomy.categories.addCategory'), onClick: () => setCatFormOpen(true) }}
+                  action={{ label: t('taxonomy.categories.addCategory'), onClick: openCatCreate }}
                 />
               ) : (
-                <TableContainer>
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell scope="col">{t('taxonomy.categories.table.slug')}</TableCell>
-                        <TableCell scope="col">{t('taxonomy.categories.table.parent')}</TableCell>
-                        <TableCell scope="col">{t('taxonomy.categories.table.scope')}</TableCell>
-                        <TableCell scope="col">{t('taxonomy.categories.table.created')}</TableCell>
-                        <TableCell scope="col" align="right">{t('taxonomy.categories.table.actions')}</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {categories.map((cat) => (
-                        <TableRow key={cat.id}>
-                          <TableCell>
-                            <Typography variant="body2" fontFamily="monospace">{cat.slug}</Typography>
-                          </TableCell>
-                          <TableCell>
-                            {cat.parent_id ? (
-                              <Chip label={t('common.labels.child')} size="small" variant="outlined" />
-                            ) : '—'}
-                          </TableCell>
-                          <TableCell>
-                            {cat.is_global ? (
-                              <Chip label={t('common.labels.global')} size="small" color="info" variant="outlined" />
-                            ) : (
-                              <Chip label={t('common.labels.site')} size="small" variant="outlined" />
-                            )}
-                          </TableCell>
-                          <TableCell>{format(new Date(cat.created_at), 'PP')}</TableCell>
-                          <TableCell align="right">
-                            {canWrite && <Tooltip title={t('common.actions.edit')}><IconButton size="small" aria-label={t('common.actions.edit')} onClick={() => setEditingCat(cat)}><EditIcon fontSize="small" /></IconButton></Tooltip>}
-                            {isAdmin && <Tooltip title={t('common.actions.delete')}><IconButton size="small" aria-label={t('common.actions.delete')} color="error" onClick={() => setDeletingCat(cat)}><DeleteIcon fontSize="small" /></IconButton></Tooltip>}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              )}
-              {categoriesData?.meta && (
-                <TablePagination
-                  component="div"
-                  count={categoriesData.meta.total_items}
-                  page={categoriesData.meta.page - 1}
-                  onPageChange={(_, p) => setCatPage(p + 1)}
-                  rowsPerPage={categoriesData.meta.page_size}
-                  onRowsPerPageChange={(e) => { setCatPerPage(+e.target.value); setCatPage(1); }}
-                  rowsPerPageOptions={[10, 25, 50]}
+                <DataTable<Category>
+                  data={categories}
+                  columns={catColumns}
+                  getRowKey={(cat) => cat.id}
+                  meta={categoriesData?.meta}
+                  page={catPage}
+                  onPageChange={handleCatPageChange}
+                  rowsPerPage={catPerPage}
+                  onRowsPerPageChange={handleCatRowsPerPageChange}
                 />
               )}
             </Paper>
@@ -304,14 +297,14 @@ export default function TaxonomyPage() {
       <TagFormDialog
         open={tagFormOpen}
         onSubmitCreate={(data) => createTagMutation.mutate(data)}
-        onClose={() => setTagFormOpen(false)}
+        onClose={closeTagForm}
         loading={createTagMutation.isPending}
       />
       <TagFormDialog
         open={!!editingTag}
         tag={editingTag}
         onSubmitUpdate={(data) => editingTag && updateTagMutation.mutate({ id: editingTag.id, data })}
-        onClose={() => setEditingTag(null)}
+        onClose={closeTagEdit}
         loading={updateTagMutation.isPending}
       />
       <ConfirmDialog
@@ -320,7 +313,7 @@ export default function TaxonomyPage() {
         message={t('taxonomy.tags.deleteDialog.message', { slug: deletingTag?.slug })}
         confirmLabel={t('common.actions.delete')}
         onConfirm={() => deletingTag && deleteTagMutation.mutate(deletingTag.id)}
-        onCancel={() => setDeletingTag(null)}
+        onCancel={closeTagDelete}
         loading={deleteTagMutation.isPending}
       />
 
@@ -329,7 +322,7 @@ export default function TaxonomyPage() {
         open={catFormOpen}
         categories={categories || []}
         onSubmitCreate={(data) => createCatMutation.mutate(data)}
-        onClose={() => setCatFormOpen(false)}
+        onClose={closeCatForm}
         loading={createCatMutation.isPending}
       />
       <CategoryFormDialog
@@ -337,7 +330,7 @@ export default function TaxonomyPage() {
         category={editingCat}
         categories={categories || []}
         onSubmitUpdate={(data) => editingCat && updateCatMutation.mutate({ id: editingCat.id, data })}
-        onClose={() => setEditingCat(null)}
+        onClose={closeCatEdit}
         loading={updateCatMutation.isPending}
       />
       <ConfirmDialog
@@ -346,7 +339,7 @@ export default function TaxonomyPage() {
         message={t('taxonomy.categories.deleteDialog.message', { slug: deletingCat?.slug })}
         confirmLabel={t('common.actions.delete')}
         onConfirm={() => deletingCat && deleteCatMutation.mutate(deletingCat.id)}
-        onCancel={() => setDeletingCat(null)}
+        onCancel={closeCatDelete}
         loading={deleteCatMutation.isPending}
       />
     </Box>
