@@ -44,8 +44,10 @@ RUN cargo build --release
 FROM debian:bookworm-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates libssl3 libpq5 \
+    ca-certificates libssl3 libpq5 curl \
     && rm -rf /var/lib/apt/lists/*
+
+RUN useradd -m -u 1000 appuser
 
 WORKDIR /app
 
@@ -53,8 +55,15 @@ COPY --from=backend-build /app/backend/target/release/openyapper ./openyapper
 COPY --from=backend-build /app/backend/static/ ./static/
 COPY --from=backend-build /app/backend/migrations/ ./migrations/
 
+RUN mkdir -p /data/uploads && chown -R appuser:appuser /app /data
+
+USER appuser
+
 ENV ROCKET_ADDRESS=0.0.0.0
 ENV ROCKET_PORT=8000
 EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD curl -f http://localhost:8000/health || exit 1
 
 CMD ["./openyapper"]
