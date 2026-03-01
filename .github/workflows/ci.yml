@@ -134,15 +134,26 @@ jobs:
       - name: Run tests
         run: npm test
 
+  docker-build:
+    name: Docker Build
+    needs: changes
+    if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.admin == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Build Docker image
+        run: docker build -t openyapper:ci-test .
+
   ci-pass:
     name: CI Pass
     if: always()
-    needs: [backend, admin]
+    needs: [backend, admin, docker-build]
     runs-on: ubuntu-latest
     steps:
       - name: Check required jobs
         run: |
-          if [[ "${{ needs.backend.result }}" == "failure" || "${{ needs.admin.result }}" == "failure" ]]; then
+          if [[ "${{ needs.backend.result }}" == "failure" || "${{ needs.admin.result }}" == "failure" || "${{ needs.docker-build.result }}" == "failure" ]]; then
             echo "One or more required jobs failed"
             exit 1
           fi

@@ -221,6 +221,7 @@ export interface Site {
   default_locale_id?: string;
   timezone: string;
   is_active: boolean;
+  created_by?: string;
   created_at: string;
   updated_at: string;
 }
