@@ -349,6 +349,7 @@
     "notFound": "Page non trouvée",
     "sections": {
       "title": "Sections",
+      "coverImage": "Image de couverture",
       "add": "Ajouter une section",
       "empty": "Aucune section pour le moment",
       "emptyDescription": "Ajoutez des sections pour construire votre page",

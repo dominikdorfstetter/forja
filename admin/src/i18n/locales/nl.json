@@ -364,6 +364,7 @@
     "notFound": "Pagina niet gevonden",
     "sections": {
       "title": "Secties",
+      "coverImage": "Omslagafbeelding",
       "add": "Sectie toevoegen",
       "empty": "Nog geen secties",
       "emptyDescription": "Voeg secties toe om uw pagina op te bouwen",

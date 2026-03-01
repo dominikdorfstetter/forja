@@ -366,6 +366,7 @@
     "template": "Template",
     "sections": {
       "title": "Sections",
+      "coverImage": "Cover Image",
       "add": "Add Section",
       "empty": "No sections yet",
       "emptyDescription": "Add sections to build your page layout",

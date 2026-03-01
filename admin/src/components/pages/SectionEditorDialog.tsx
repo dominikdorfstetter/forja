@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo } from 'react';
 import {
   Box,
   Button,
+  Card,
+  CardMedia,
   Chip,
   Dialog,
   DialogContent,
@@ -16,6 +18,7 @@ import {
   Typography,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import ImageIcon from '@mui/icons-material/Image';
 import SaveIcon from '@mui/icons-material/Save';
 import MDEditor, { commands } from '@uiw/react-md-editor';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -29,6 +32,7 @@ import type {
   UpsertSectionLocalizationRequest,
 } from '@/types/api';
 import SectionSettingsForm from './SectionSettingsForm';
+import MediaPickerDialog from '@/components/media/MediaPickerDialog';
 import { useTranslation } from 'react-i18next';
 import { useSiteContext } from '@/store/SiteContext';
 
@@ -57,6 +61,7 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
   const [coverImageId, setCoverImageId] = useState('');
   const [ctaRoute, setCtaRoute] = useState('');
   const [settings, setSettings] = useState<Record<string, unknown>>({});
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   // Queries
   const { data: siteLocalesRaw } = useQuery({
@@ -292,14 +297,58 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
                 onChange={(e) => setDisplayOrder(Number(e.target.value))}
               />
 
-              <TextField
-                label="Cover Image ID"
-                fullWidth
-                size="small"
-                value={coverImageId}
-                onChange={(e) => setCoverImageId(e.target.value)}
-                helperText="Optional media asset UUID"
-              />
+              <Box>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                  {t('pageDetail.sections.coverImage')}
+                </Typography>
+                {!coverImageId ? (
+                  <Card
+                    variant="outlined"
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      height: 100,
+                      cursor: 'pointer',
+                      bgcolor: 'action.hover',
+                    }}
+                    onClick={() => setPickerOpen(true)}
+                  >
+                    <Stack alignItems="center" spacing={0.5}>
+                      <ImageIcon sx={{ fontSize: 32, color: 'text.disabled' }} />
+                      <Typography variant="caption" color="text.secondary">
+                        {t('blogDetail.images.selectImage')}
+                      </Typography>
+                    </Stack>
+                  </Card>
+                ) : (
+                  <Box>
+                    <Card variant="outlined" sx={{ mb: 1 }}>
+                      <CardMedia
+                        component="img"
+                        height={100}
+                        image={`/api/media/${coverImageId}/file`}
+                        alt=""
+                        sx={{ objectFit: 'cover' }}
+                        onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    </Card>
+                    <Typography variant="caption" fontFamily="monospace" display="block" sx={{ mb: 0.5 }}>
+                      {coverImageId}
+                    </Typography>
+                    <Stack direction="row" spacing={1}>
+                      <Button size="small" variant="outlined" onClick={() => setPickerOpen(true)}>
+                        {t('blogDetail.images.changeImage')}
+                      </Button>
+                      <Button size="small" color="error" onClick={() => setCoverImageId('')}>
+                        {t('blogDetail.images.removeImage')}
+                      </Button>
+                    </Stack>
+                  </Box>
+                )}
+              </Box>
 
               <TextField
                 label="Call to Action Route"
@@ -330,6 +379,14 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
           </Grid>
         </Grid>
       </DialogContent>
+
+      <MediaPickerDialog
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        siteId={selectedSiteId}
+        currentValue={coverImageId || null}
+        onSelect={(mediaId) => setCoverImageId(mediaId || '')}
+      />
     </Dialog>
   );
 }
