@@ -105,23 +105,23 @@
       "media": "Medien",
       "documents": "Dokumente",
       "assets": "Dateien",
-      "legal": "Rechtliches",
-      "cv": "Lebenslauf",
-      "siteConfig": "Seitenkonfiguration",
-      "sites": "Seiten",
+      "structure": "Struktur",
       "navigation": "Navigation",
+      "taxonomy": "Taxonomie",
+      "site": "Seite",
       "socialLinks": "Social Links",
       "activity": "Aktivität",
-      "system": "System",
+      "legal": "Rechtliches",
+      "cv": "Lebenslauf",
       "members": "Mitglieder",
       "apiKeys": "API Keys",
-      "taxonomy": "Taxonomie",
-      "apiDocs": "API-Dokumentation",
       "contentTemplates": "Vorlagen",
       "redirects": "Weiterleitungen",
       "webhooks": "Webhooks",
       "settings": "Einstellungen",
+      "sites": "Seiten",
       "locales": "Sprachen",
+      "apiDocs": "API-Dokumentation",
       "myDrafts": "Meine Entwürfe",
       "logout": "Abmelden"
     },
@@ -131,6 +131,12 @@
       "profile": "Profil",
       "theme": "Design",
       "language": "Sprache"
+    },
+    "accountMenu": {
+      "system": "System",
+      "sites": "Websites verwalten",
+      "locales": "Sprachen",
+      "apiDocs": "API-Dokumentation"
     }
   },
   "login": {
@@ -167,8 +173,8 @@
     "noPosts": "Noch keine Blogbeiträge.",
     "noPostsCreate": "Noch keine Blogbeiträge. Erstellen Sie Ihren ersten Beitrag!",
     "drafts": "Entwürfe",
-    "noDrafts": "Keine Entwürfe — alle Inhalte sind veröffentlicht oder in Prüfung.",
     "viewAllDrafts": "Alle anzeigen",
+    "noDrafts": "Keine Entwürfe — alle Inhalte sind veröffentlicht oder in Prüfung.",
     "quickActions": "Schnellaktionen",
     "byAuthor": "von {{author}}",
     "requests": "{{count}} Anfragen",
@@ -286,7 +292,11 @@
     "images": {
       "title": "Bilder",
       "coverImageId": "Titelbild-ID:",
-      "headerImageId": "Headerbild-ID:"
+      "headerImageId": "Headerbild-ID:",
+      "selectImage": "Bild auswählen",
+      "changeImage": "Ändern",
+      "removeImage": "Entfernen",
+      "noImage": "Kein Bild ausgewählt"
     },
     "settings": {
       "title": "Einstellungen",
@@ -349,11 +359,11 @@
     "loadFailed": "Seite konnte nicht geladen werden",
     "notFound": "Seite nicht gefunden",
     "pageInfo": "Seiteninfo",
-    "template": "Vorlage",
     "parentPageId": "Übergeordnete Seiten-ID",
     "pageSubtitle": "Seitenuntertitel",
     "metadata": "Metadaten",
     "contentId": "Inhalts-ID",
+    "template": "Vorlage",
     "sections": {
       "title": "Abschnitte",
       "coverImage": "Titelbild",
@@ -426,6 +436,13 @@
       "videos": "Videos",
       "audio": "Audio",
       "documents": "Dokumente"
+    },
+    "picker": {
+      "title": "Bild auswählen",
+      "search": "Bilder suchen...",
+      "noResults": "Keine Bilder gefunden",
+      "select": "Auswählen",
+      "clear": "Auswahl aufheben"
     },
     "openUrl": "URL öffnen",
     "empty": {
@@ -614,12 +631,41 @@
     "sendTest": "Test senden",
     "testSuccess": "Test zugestellt — {{status}}",
     "testFailed": "Testzustellung fehlgeschlagen",
-    "table": { "url": "URL", "events": "Ereignisse", "status": "Status", "created": "Erstellt", "actions": "Aktionen" },
-    "empty": { "noSite": "Wählen Sie eine Seite aus der Symbolleiste, um Webhooks zu verwalten", "title": "Noch keine Webhooks", "description": "Webhooks benachrichtigen externe Dienste, wenn Inhalte erstellt, aktualisiert oder gelöscht werden." },
+    "table": {
+      "url": "URL",
+      "events": "Ereignisse",
+      "status": "Status",
+      "created": "Erstellt",
+      "actions": "Aktionen"
+    },
+    "empty": {
+      "noSite": "Wählen Sie eine Seite aus der Symbolleiste, um Webhooks zu verwalten",
+      "title": "Noch keine Webhooks",
+      "description": "Webhooks benachrichtigen externe Dienste, wenn Inhalte erstellt, aktualisiert oder gelöscht werden."
+    },
     "loading": "Webhooks werden geladen...",
-    "messages": { "created": "Webhook erstellt", "updated": "Webhook aktualisiert", "deleted": "Webhook gelöscht" },
-    "deleteDialog": { "title": "Webhook löschen", "message": "Webhook für \"{{url}}\" löschen? Dies kann nicht rückgängig gemacht werden." },
-    "deliveries": { "title": "Zustellungsprotokoll", "loading": "Zustellungen werden geladen...", "empty": "Noch keine Zustellungen", "emptyDescription": "Zustellungen erscheinen hier, nachdem der Webhook ausgelöst wird.", "table": { "event": "Ereignis", "status": "Status", "attempt": "Versuch", "timestamp": "Zeitstempel", "error": "Fehler" } }
+    "messages": {
+      "created": "Webhook erstellt",
+      "updated": "Webhook aktualisiert",
+      "deleted": "Webhook gelöscht"
+    },
+    "deleteDialog": {
+      "title": "Webhook löschen",
+      "message": "Webhook für \"{{url}}\" löschen? Dies kann nicht rückgängig gemacht werden."
+    },
+    "deliveries": {
+      "title": "Zustellungsprotokoll",
+      "loading": "Zustellungen werden geladen...",
+      "empty": "Noch keine Zustellungen",
+      "emptyDescription": "Zustellungen erscheinen hier, nachdem der Webhook ausgelöst wird.",
+      "table": {
+        "event": "Ereignis",
+        "status": "Status",
+        "attempt": "Versuch",
+        "timestamp": "Zeitstempel",
+        "error": "Fehler"
+      }
+    }
   },
   "redirects": {
     "title": "Weiterleitungen",
@@ -741,8 +787,8 @@
     "table": {
       "name": "Name",
       "keyPrefix": "Key-Präfix",
-      "permission": "Berechtigung",
       "site": "Seite",
+      "permission": "Berechtigung",
       "status": "Status",
       "requests": "Anfragen",
       "lastUsed": "Zuletzt verwendet",
@@ -1088,6 +1134,36 @@
         "label": "Admin-Sprache",
         "description": "Wählen Sie die Anzeigesprache für die Admin-Oberfläche"
       }
+    }
+  },
+  "onboarding": {
+    "welcome": "Willkommen bei OpenYapper",
+    "subtitle": "Ihr Headless-CMS für Multi-Site, mehrsprachiges Content-Management.",
+    "description": "Erstellen Sie Ihre erste Website, um Seiten, Blogbeiträge, Medien und mehr zu verwalten — alles über eine leistungsstarke REST-API.",
+    "features": {
+      "multiSite": "Multi-Site",
+      "multiSiteDesc": "Verwalten Sie mehrere Websites über ein einziges Dashboard mit unabhängigen Inhalten und Einstellungen.",
+      "multilingual": "Mehrsprachig",
+      "multilingualDesc": "Integrierte Lokalisierung mit Unterstützung für jede Sprache und RTL-Textrichtung.",
+      "apiFirst": "API-First",
+      "apiFirstDesc": "Headless-Architektur mit vollständiger REST-API. Liefern Sie Inhalte an jedes Frontend."
+    },
+    "createSite": "Erste Website erstellen",
+    "stepPrefix": "Schritt 1 von 1"
+  },
+  "setupChecklist": {
+    "title": "Erste Schritte",
+    "description": "Schließen Sie diese Schritte ab, um Ihre Website einzurichten und Inhalte zu veröffentlichen.",
+    "completeTitle": "Alles erledigt!",
+    "completeDescription": "Sie haben alle Einrichtungsschritte abgeschlossen. Sie können jetzt veröffentlichen!",
+    "progress": "{{completed}} von {{total}} erledigt",
+    "dismiss": "Ausblenden",
+    "steps": {
+      "createSite": "Erste Website erstellen",
+      "addLanguage": "Sprache hinzufügen",
+      "createPage": "Seite erstellen",
+      "writeBlog": "Blogbeitrag schreiben",
+      "setupNav": "Navigation einrichten"
     }
   },
   "activity": {
@@ -1532,21 +1608,6 @@
     "pt": "Português",
     "nl": "Nederlands",
     "pl": "Polski"
-  },
-  "setupChecklist": {
-    "title": "Erste Schritte",
-    "description": "Schließen Sie diese Schritte ab, um Ihre Website einzurichten und Inhalte zu veröffentlichen.",
-    "completeTitle": "Alles erledigt!",
-    "completeDescription": "Sie haben alle Einrichtungsschritte abgeschlossen. Sie können jetzt veröffentlichen!",
-    "progress": "{{completed}} von {{total}} erledigt",
-    "dismiss": "Ausblenden",
-    "steps": {
-      "createSite": "Erste Website erstellen",
-      "addLanguage": "Sprache hinzufügen",
-      "createPage": "Seite erstellen",
-      "writeBlog": "Blogbeitrag schreiben",
-      "setupNav": "Navigation einrichten"
-    }
   },
   "workflow": {
     "submitForReview": "Zur Überprüfung einreichen",

@@ -105,23 +105,23 @@
       "media": "Media",
       "documents": "Documenti",
       "assets": "Risorse",
-      "legal": "Legale",
-      "cv": "CV",
-      "siteConfig": "Configurazione sito",
-      "sites": "Siti",
+      "structure": "Struttura",
       "navigation": "Navigazione",
+      "taxonomy": "Tassonomia",
+      "site": "Sito",
       "socialLinks": "Link social",
       "activity": "Attività",
-      "system": "Sistema",
+      "legal": "Legale",
+      "cv": "CV",
       "members": "Membri",
       "apiKeys": "API Keys",
-      "taxonomy": "Tassonomia",
-      "apiDocs": "Documentazione API",
       "contentTemplates": "Modelli",
       "redirects": "Reindirizzamenti",
       "webhooks": "Webhooks",
       "settings": "Impostazioni",
+      "sites": "Siti",
       "locales": "Lingue",
+      "apiDocs": "Documentazione API",
       "myDrafts": "Le mie bozze",
       "logout": "Esci"
     },
@@ -131,6 +131,12 @@
       "profile": "Profilo",
       "theme": "Tema",
       "language": "Lingua"
+    },
+    "accountMenu": {
+      "system": "Sistema",
+      "sites": "Gestisci siti",
+      "locales": "Lingue",
+      "apiDocs": "Documentazione API"
     }
   },
   "login": {
@@ -256,33 +262,21 @@
     },
     "fields": {
       "title": "Titolo",
+      "subtitle": "Sottotitolo",
       "slug": "Slug",
       "author": "Autore",
       "status": "Stato",
       "locale": "Lingua",
       "excerpt": "Estratto",
       "content": "Contenuto",
+      "body": "Corpo (Markdown)",
       "coverImage": "URL immagine di copertina",
       "publishedDate": "Data di pubblicazione",
       "featured": "In evidenza",
       "tags": "Tag",
       "categories": "Categorie",
-      "subtitle": "Sottotitolo",
-      "body": "Corpo (Markdown)",
       "metaTitle": "Meta titolo",
       "metaDescription": "Meta descrizione"
-    },
-    "messages": {
-      "saved": "Blog salvato",
-      "saveFailed": "Impossibile salvare il blog"
-    },
-    "documents": {
-      "title": "Documenti allegati",
-      "attach": "Allega documento",
-      "empty": "Nessun documento allegato",
-      "emptyDescription": "Allega documenti a questo articolo del blog",
-      "detached": "Documento rimosso",
-      "attached": "Documento allegato"
     },
     "metadata": {
       "title": "Metadati del blog",
@@ -298,7 +292,11 @@
     "images": {
       "title": "Immagini",
       "coverImageId": "ID immagine di copertina:",
-      "headerImageId": "ID immagine di intestazione:"
+      "headerImageId": "ID immagine di intestazione:",
+      "selectImage": "Seleziona immagine",
+      "changeImage": "Cambia",
+      "removeImage": "Rimuovi",
+      "noImage": "Nessuna immagine selezionata"
     },
     "settings": {
       "title": "Impostazioni",
@@ -309,7 +307,19 @@
     },
     "toc": "Indice",
     "createTranslation": "Crea traduzione {{locale}}",
-    "noLocalesAlert": "Nessuna locale attiva configurata. Vai su <strong>Impostazioni → Locali</strong> e crea almeno una locale attiva (es. \"en\") per iniziare a scrivere contenuti."
+    "noLocalesAlert": "Nessuna locale attiva configurata. Vai su <strong>Impostazioni → Locali</strong> e crea almeno una locale attiva (es. \"en\") per iniziare a scrivere contenuti.",
+    "messages": {
+      "saved": "Blog salvato",
+      "saveFailed": "Impossibile salvare il blog"
+    },
+    "documents": {
+      "title": "Documenti allegati",
+      "attach": "Allega documento",
+      "empty": "Nessun documento allegato",
+      "emptyDescription": "Allega documenti a questo articolo del blog",
+      "detached": "Documento rimosso",
+      "attached": "Documento allegato"
+    }
   },
   "pages": {
     "title": "Pagine",
@@ -346,7 +356,14 @@
     "title": "Dettaglio pagina",
     "back": "Torna alle pagine",
     "loading": "Caricamento pagina...",
+    "loadFailed": "Impossibile caricare la pagina",
     "notFound": "Pagina non trovata",
+    "pageInfo": "Informazioni della pagina",
+    "parentPageId": "ID pagina genitore",
+    "pageSubtitle": "Pagina {{type}}",
+    "metadata": "Metadati",
+    "contentId": "ID del contenuto",
+    "template": "Modello",
     "sections": {
       "title": "Sezioni",
       "coverImage": "Immagine di copertina",
@@ -360,6 +377,20 @@
       "loadingSections": "Caricamento sezioni...",
       "deleteTitle": "Elimina sezione",
       "deleteMessage": "Eliminare questa sezione {{type}}? Questa azione non può essere annullata."
+    },
+    "table": {
+      "type": "Tipo",
+      "order": "Ordine",
+      "localizations": "Localizzazioni",
+      "coverImage": "Immagine di copertina",
+      "ctaRoute": "Route CTA",
+      "actions": "Azioni"
+    },
+    "dialog": {
+      "sectionType": "Tipo di sezione",
+      "displayOrder": "Ordine di visualizzazione",
+      "displayOrderRequired": "L'ordine di visualizzazione è obbligatorio",
+      "adding": "Aggiunta in corso..."
     },
     "fields": {
       "route": "Percorso",
@@ -391,27 +422,6 @@
       "saved": "Pagina salvata",
       "saveFailed": "Impossibile salvare la pagina",
       "updated": "Pagina aggiornata"
-    },
-    "loadFailed": "Impossibile caricare la pagina",
-    "pageInfo": "Informazioni della pagina",
-    "template": "Modello",
-    "parentPageId": "ID pagina genitore",
-    "pageSubtitle": "Pagina {{type}}",
-    "metadata": "Metadati",
-    "contentId": "ID del contenuto",
-    "table": {
-      "type": "Tipo",
-      "order": "Ordine",
-      "localizations": "Localizzazioni",
-      "coverImage": "Immagine di copertina",
-      "ctaRoute": "Route CTA",
-      "actions": "Azioni"
-    },
-    "dialog": {
-      "sectionType": "Tipo di sezione",
-      "displayOrder": "Ordine di visualizzazione",
-      "displayOrderRequired": "L'ordine di visualizzazione è obbligatorio",
-      "adding": "Aggiunta in corso..."
     }
   },
   "media": {
@@ -426,6 +436,13 @@
       "videos": "Video",
       "audio": "Audio",
       "documents": "Documenti"
+    },
+    "picker": {
+      "title": "Seleziona immagine",
+      "search": "Cerca immagini...",
+      "noResults": "Nessuna immagine trovata",
+      "select": "Seleziona",
+      "clear": "Cancella selezione"
     },
     "openUrl": "Apri URL",
     "empty": {
@@ -618,7 +635,7 @@
       "url": "URL",
       "events": "Eventi",
       "status": "Stato",
-      "lastTriggered": "Ultimo invio",
+      "created": "Creato",
       "actions": "Azioni"
     },
     "empty": {
@@ -630,8 +647,7 @@
     "messages": {
       "created": "Webhook creato",
       "updated": "Webhook aggiornato",
-      "deleted": "Webhook eliminato",
-      "tested": "Evento di test inviato a {{url}}"
+      "deleted": "Webhook eliminato"
     },
     "deleteDialog": {
       "title": "Elimina webhook",
@@ -639,16 +655,16 @@
     },
     "deliveries": {
       "title": "Consegne webhook",
+      "loading": "Caricamento consegne...",
+      "empty": "Nessuna consegna ancora",
+      "emptyDescription": "Le consegne appariranno qui dopo l'attivazione del webhook.",
       "table": {
         "event": "Evento",
         "status": "Stato",
-        "duration": "Durata",
-        "timestamp": "Data e ora"
-      },
-      "empty": "Nessuna consegna ancora",
-      "success": "Successo",
-      "failed": "Fallita",
-      "pending": "In attesa"
+        "attempt": "Tentativo",
+        "timestamp": "Data e ora",
+        "error": "Errore"
+      }
     }
   },
   "redirects": {
@@ -771,8 +787,8 @@
     "table": {
       "name": "Nome",
       "keyPrefix": "Prefisso chiave",
-      "permission": "Permesso",
       "site": "Sito",
+      "permission": "Permesso",
       "status": "Stato",
       "requests": "Richieste",
       "lastUsed": "Ultimo utilizzo",
@@ -812,6 +828,8 @@
         "name": "Nome",
         "permission": "Permesso",
         "site": "Sito",
+        "user": "Utente (opzionale)",
+        "noUser": "Nessun utente",
         "expiresAt": "Scadenza (opzionale)"
       },
       "created": {
@@ -935,16 +953,17 @@
     "back": "Torna ai documenti legali",
     "loading": "Caricamento documento legale...",
     "notFound": "Documento legale non trovato",
+    "editDocument": "Modifica documento",
+    "cookieName": "Nome del cookie",
+    "documentType": "Tipo di documento",
+    "documentId": "ID del documento",
+    "updatedMessage": "Documento legale aggiornato",
+    "loadGroupsFailed": "Impossibile caricare i gruppi",
     "groups": {
       "title": "Gruppi di consenso",
       "add": "Aggiungi gruppo",
       "empty": "Nessun gruppo di consenso",
       "emptyDescription": "Aggiungi gruppi di consenso a questo documento",
-      "messages": {
-        "created": "Gruppo creato",
-        "updated": "Gruppo aggiornato",
-        "deleted": "Gruppo eliminato"
-      },
       "editGroup": "Modifica gruppo",
       "deleteGroup": "Elimina gruppo",
       "deleteMessage": "Eliminare il gruppo \"{{name}}\"? Verranno eliminati anche tutti gli elementi di questo gruppo.",
@@ -953,27 +972,26 @@
       "required": "Obbligatorio",
       "optional": "Facoltativo",
       "enabled": "Attivato",
-      "disabled": "Disattivato"
+      "disabled": "Disattivato",
+      "messages": {
+        "created": "Gruppo creato",
+        "updated": "Gruppo aggiornato",
+        "deleted": "Gruppo eliminato"
+      }
     },
     "items": {
       "title": "Elementi",
       "add": "Aggiungi elemento",
       "empty": "Nessun elemento in questo gruppo",
+      "loadingItems": "Caricamento elementi...",
+      "deleteItem": "Elimina elemento",
+      "deleteMessage": "Eliminare l'elemento \"{{name}}\"? Questa azione non può essere annullata.",
       "messages": {
         "created": "Elemento creato",
         "updated": "Elemento aggiornato",
         "deleted": "Elemento eliminato"
-      },
-      "loadingItems": "Caricamento elementi...",
-      "deleteItem": "Elimina elemento",
-      "deleteMessage": "Eliminare l'elemento \"{{name}}\"? Questa azione non può essere annullata."
+      }
     },
-    "editDocument": "Modifica documento",
-    "cookieName": "Nome del cookie",
-    "documentType": "Tipo di documento",
-    "documentId": "ID del documento",
-    "updatedMessage": "Documento legale aggiornato",
-    "loadGroupsFailed": "Impossibile caricare i gruppi",
     "dialog": {
       "editGroup": "Modifica gruppo",
       "addGroup": "Aggiungi gruppo",
@@ -1015,7 +1033,13 @@
     "title": "Dettaglio sito",
     "back": "Torna ai siti",
     "loading": "Caricamento sito...",
+    "loadFailed": "Impossibile caricare il sito",
     "notFound": "Sito non trovato",
+    "siteInfo": "Informazioni del sito",
+    "noDescription": "Nessuna descrizione",
+    "metadata": "Metadati",
+    "quickLinks": "Link rapidi",
+    "deleteSite": "Elimina sito",
     "fields": {
       "name": "Nome",
       "slug": "Slug",
@@ -1028,12 +1052,6 @@
       "created": "Creato",
       "updated": "Aggiornato"
     },
-    "loadFailed": "Impossibile caricare il sito",
-    "siteInfo": "Informazioni del sito",
-    "noDescription": "Nessuna descrizione",
-    "metadata": "Metadati",
-    "quickLinks": "Link rapidi",
-    "deleteSite": "Elimina sito",
     "messages": {
       "updated": "Sito aggiornato",
       "deleted": "Sito eliminato"
@@ -1117,6 +1135,21 @@
         "description": "Scegli la lingua di visualizzazione per l'interfaccia di amministrazione"
       }
     }
+  },
+  "onboarding": {
+    "welcome": "Benvenuto su OpenYapper",
+    "subtitle": "Il tuo CMS headless per la gestione di contenuti multi-sito e multilingue.",
+    "description": "Crea il tuo primo sito per iniziare a gestire pagine, articoli del blog, media e altro — il tutto tramite una potente API REST.",
+    "features": {
+      "multiSite": "Multi-Sito",
+      "multiSiteDesc": "Gestisci più siti web da un'unica dashboard con contenuti e impostazioni indipendenti.",
+      "multilingual": "Multilingue",
+      "multilingualDesc": "Localizzazione integrata con supporto per qualsiasi lingua e direzione del testo RTL.",
+      "apiFirst": "API-First",
+      "apiFirstDesc": "Architettura headless con API REST completa. Distribuisci contenuti a qualsiasi frontend."
+    },
+    "createSite": "Crea il tuo primo sito",
+    "stepPrefix": "Passaggio 1 di 1"
   },
   "setupChecklist": {
     "title": "Primi passi",
@@ -1564,7 +1597,7 @@
       "toggleTheme": "Cambia tema",
       "logout": "Esci"
     },
-    "hint": "\u2318K"
+    "hint": "⌘K"
   },
   "languages": {
     "en": "English",

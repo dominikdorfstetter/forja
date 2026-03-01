@@ -105,23 +105,23 @@
       "media": "Media",
       "documents": "Dokumenty",
       "assets": "Zasoby",
-      "legal": "Dokumenty prawne",
-      "cv": "CV",
-      "siteConfig": "Konfiguracja strony",
-      "sites": "Strony",
+      "structure": "Struktura",
       "navigation": "Nawigacja",
+      "taxonomy": "Taksonomia",
+      "site": "Strona",
       "socialLinks": "Linki społecznościowe",
       "activity": "Aktywność",
-      "system": "System",
+      "legal": "Dokumenty prawne",
+      "cv": "CV",
       "members": "Członkowie",
       "apiKeys": "Klucze API",
-      "taxonomy": "Taksonomia",
-      "apiDocs": "Dokumentacja API",
       "contentTemplates": "Szablony",
       "redirects": "Przekierowania",
       "webhooks": "Webhooks",
       "settings": "Ustawienia",
+      "sites": "Strony",
       "locales": "Języki",
+      "apiDocs": "Dokumentacja API",
       "myDrafts": "Moje szkice",
       "logout": "Wyloguj"
     },
@@ -131,6 +131,12 @@
       "profile": "Profil",
       "theme": "Motyw",
       "language": "Język"
+    },
+    "accountMenu": {
+      "system": "System",
+      "sites": "Zarządzaj stronami",
+      "locales": "Języki",
+      "apiDocs": "Dokumentacja API"
     }
   },
   "login": {
@@ -167,8 +173,8 @@
     "noPosts": "Brak wpisów na blogu.",
     "noPostsCreate": "Brak wpisów na blogu. Utwórz swój pierwszy wpis!",
     "drafts": "Szkice",
-    "noDrafts": "Brak szkiców — cała treść jest opublikowana lub w recenzji.",
     "viewAllDrafts": "Zobacz wszystkie",
+    "noDrafts": "Brak szkiców — cała treść jest opublikowana lub w recenzji.",
     "quickActions": "Szybkie akcje",
     "byAuthor": "autor: {{author}}",
     "requests": "{{count}} żądań",
@@ -256,33 +262,21 @@
     },
     "fields": {
       "title": "Tytuł",
+      "subtitle": "Podtytuł",
       "slug": "Slug",
       "author": "Autor",
       "status": "Status",
       "locale": "Język",
       "excerpt": "Fragment",
       "content": "Treść",
+      "body": "Treść (Markdown)",
       "coverImage": "URL obrazu okładki",
       "publishedDate": "Data publikacji",
       "featured": "Wyróżniony",
       "tags": "Tagi",
       "categories": "Kategorie",
-      "subtitle": "Podtytuł",
-      "body": "Treść (Markdown)",
       "metaTitle": "Meta tytuł",
       "metaDescription": "Meta opis"
-    },
-    "messages": {
-      "saved": "Wpis zapisany",
-      "saveFailed": "Nie udało się zapisać wpisu"
-    },
-    "documents": {
-      "title": "Załączone dokumenty",
-      "attach": "Załącz dokument",
-      "empty": "Brak załączonych dokumentów",
-      "emptyDescription": "Załącz dokumenty do tego wpisu na blogu",
-      "detached": "Dokument odłączony",
-      "attached": "Dokument załączony"
     },
     "metadata": {
       "title": "Metadane bloga",
@@ -298,7 +292,11 @@
     "images": {
       "title": "Obrazy",
       "coverImageId": "ID obrazu okładki:",
-      "headerImageId": "ID obrazu nagłówka:"
+      "headerImageId": "ID obrazu nagłówka:",
+      "selectImage": "Wybierz obraz",
+      "changeImage": "Zmień",
+      "removeImage": "Usuń",
+      "noImage": "Nie wybrano obrazu"
     },
     "settings": {
       "title": "Ustawienia",
@@ -309,7 +307,19 @@
     },
     "toc": "Spis treści",
     "createTranslation": "Utwórz tłumaczenie {{locale}}",
-    "noLocalesAlert": "Brak skonfigurowanych aktywnych lokalizacji. Przejdź do <strong>Ustawienia → Lokalizacje</strong> i utwórz co najmniej jedną aktywną lokalizację (np. \"en\"), aby zacząć pisać treści."
+    "noLocalesAlert": "Brak skonfigurowanych aktywnych lokalizacji. Przejdź do <strong>Ustawienia → Lokalizacje</strong> i utwórz co najmniej jedną aktywną lokalizację (np. \"en\"), aby zacząć pisać treści.",
+    "messages": {
+      "saved": "Wpis zapisany",
+      "saveFailed": "Nie udało się zapisać wpisu"
+    },
+    "documents": {
+      "title": "Załączone dokumenty",
+      "attach": "Załącz dokument",
+      "empty": "Brak załączonych dokumentów",
+      "emptyDescription": "Załącz dokumenty do tego wpisu na blogu",
+      "detached": "Dokument odłączony",
+      "attached": "Dokument załączony"
+    }
   },
   "pages": {
     "title": "Strony",
@@ -346,7 +356,14 @@
     "title": "Szczegóły strony",
     "back": "Powrót do stron",
     "loading": "Ładowanie strony...",
+    "loadFailed": "Nie udało się załadować strony",
     "notFound": "Nie znaleziono strony",
+    "pageInfo": "Informacje o stronie",
+    "parentPageId": "ID strony nadrzędnej",
+    "pageSubtitle": "Strona {{type}}",
+    "metadata": "Metadane",
+    "contentId": "ID treści",
+    "template": "Szablon",
     "sections": {
       "title": "Sekcje",
       "coverImage": "Obraz okładki",
@@ -360,6 +377,20 @@
       "loadingSections": "Ładowanie sekcji...",
       "deleteTitle": "Usuń sekcję",
       "deleteMessage": "Usunąć tę sekcję {{type}}? Tej operacji nie można cofnąć."
+    },
+    "table": {
+      "type": "Typ",
+      "order": "Kolejność",
+      "localizations": "Lokalizacje",
+      "coverImage": "Obraz okładki",
+      "ctaRoute": "Trasa CTA",
+      "actions": "Akcje"
+    },
+    "dialog": {
+      "sectionType": "Typ sekcji",
+      "displayOrder": "Kolejność wyświetlania",
+      "displayOrderRequired": "Kolejność wyświetlania jest wymagana",
+      "adding": "Dodawanie..."
     },
     "fields": {
       "route": "Ścieżka",
@@ -391,27 +422,6 @@
       "saved": "Strona zapisana",
       "saveFailed": "Nie udało się zapisać strony",
       "updated": "Strona zaktualizowana"
-    },
-    "loadFailed": "Nie udało się załadować strony",
-    "pageInfo": "Informacje o stronie",
-    "template": "Szablon",
-    "parentPageId": "ID strony nadrzędnej",
-    "pageSubtitle": "Strona {{type}}",
-    "metadata": "Metadane",
-    "contentId": "ID treści",
-    "table": {
-      "type": "Typ",
-      "order": "Kolejność",
-      "localizations": "Lokalizacje",
-      "coverImage": "Obraz okładki",
-      "ctaRoute": "Trasa CTA",
-      "actions": "Akcje"
-    },
-    "dialog": {
-      "sectionType": "Typ sekcji",
-      "displayOrder": "Kolejność wyświetlania",
-      "displayOrderRequired": "Kolejność wyświetlania jest wymagana",
-      "adding": "Dodawanie..."
     }
   },
   "media": {
@@ -426,6 +436,13 @@
       "videos": "Filmy",
       "audio": "Audio",
       "documents": "Dokumenty"
+    },
+    "picker": {
+      "title": "Wybierz obraz",
+      "search": "Szukaj obrazów...",
+      "noResults": "Nie znaleziono obrazów",
+      "select": "Wybierz",
+      "clear": "Wyczyść wybór"
     },
     "openUrl": "Otwórz URL",
     "empty": {
@@ -618,7 +635,7 @@
       "url": "URL",
       "events": "Zdarzenia",
       "status": "Status",
-      "lastTriggered": "Ostatnio wywołany",
+      "created": "Utworzono",
       "actions": "Akcje"
     },
     "empty": {
@@ -630,8 +647,7 @@
     "messages": {
       "created": "Webhook utworzony",
       "updated": "Webhook zaktualizowany",
-      "deleted": "Webhook usunięty",
-      "tested": "Zdarzenie testowe wysłane do {{url}}"
+      "deleted": "Webhook usunięty"
     },
     "deleteDialog": {
       "title": "Usuń webhook",
@@ -639,16 +655,16 @@
     },
     "deliveries": {
       "title": "Dostarczenia webhooków",
+      "loading": "Ładowanie dostarczeń...",
+      "empty": "Brak dostarczeń",
+      "emptyDescription": "Dostarczenia pojawią się tutaj po uruchomieniu webhooka.",
       "table": {
         "event": "Zdarzenie",
         "status": "Status",
-        "duration": "Czas trwania",
-        "timestamp": "Znacznik czasu"
-      },
-      "empty": "Brak dostarczeń",
-      "success": "Sukces",
-      "failed": "Niepowodzenie",
-      "pending": "Oczekujące"
+        "attempt": "Próba",
+        "timestamp": "Znacznik czasu",
+        "error": "Błąd"
+      }
     }
   },
   "redirects": {
@@ -771,8 +787,8 @@
     "table": {
       "name": "Nazwa",
       "keyPrefix": "Prefiks klucza",
-      "permission": "Uprawnienie",
       "site": "Strona",
+      "permission": "Uprawnienie",
       "status": "Status",
       "requests": "Żądania",
       "lastUsed": "Ostatnio użyty",
@@ -937,16 +953,17 @@
     "back": "Powrót do dokumentów prawnych",
     "loading": "Ładowanie dokumentu prawnego...",
     "notFound": "Nie znaleziono dokumentu prawnego",
+    "editDocument": "Edytuj dokument",
+    "cookieName": "Nazwa ciasteczka",
+    "documentType": "Typ dokumentu",
+    "documentId": "ID dokumentu",
+    "updatedMessage": "Dokument prawny zaktualizowany",
+    "loadGroupsFailed": "Nie udało się załadować grup",
     "groups": {
       "title": "Grupy zgód",
       "add": "Dodaj grupę",
       "empty": "Brak grup zgód",
       "emptyDescription": "Dodaj grupy zgód do tego dokumentu",
-      "messages": {
-        "created": "Grupa utworzona",
-        "updated": "Grupa zaktualizowana",
-        "deleted": "Grupa usunięta"
-      },
       "editGroup": "Edytuj grupę",
       "deleteGroup": "Usuń grupę",
       "deleteMessage": "Usunąć grupę \"{{name}}\"? Spowoduje to również usunięcie wszystkich elementów w tej grupie.",
@@ -955,27 +972,26 @@
       "required": "Wymagany",
       "optional": "Opcjonalny",
       "enabled": "Włączony",
-      "disabled": "Wyłączony"
+      "disabled": "Wyłączony",
+      "messages": {
+        "created": "Grupa utworzona",
+        "updated": "Grupa zaktualizowana",
+        "deleted": "Grupa usunięta"
+      }
     },
     "items": {
       "title": "Elementy",
       "add": "Dodaj element",
       "empty": "Brak elementów w tej grupie",
+      "loadingItems": "Ładowanie elementów...",
+      "deleteItem": "Usuń element",
+      "deleteMessage": "Usunąć element \"{{name}}\"? Tej operacji nie można cofnąć.",
       "messages": {
         "created": "Element utworzony",
         "updated": "Element zaktualizowany",
         "deleted": "Element usunięty"
-      },
-      "loadingItems": "Ładowanie elementów...",
-      "deleteItem": "Usuń element",
-      "deleteMessage": "Usunąć element \"{{name}}\"? Tej operacji nie można cofnąć."
+      }
     },
-    "editDocument": "Edytuj dokument",
-    "cookieName": "Nazwa ciasteczka",
-    "documentType": "Typ dokumentu",
-    "documentId": "ID dokumentu",
-    "updatedMessage": "Dokument prawny zaktualizowany",
-    "loadGroupsFailed": "Nie udało się załadować grup",
     "dialog": {
       "editGroup": "Edytuj grupę",
       "addGroup": "Dodaj grupę",
@@ -1017,7 +1033,13 @@
     "title": "Szczegóły strony",
     "back": "Powrót do stron",
     "loading": "Ładowanie strony...",
+    "loadFailed": "Nie udało się załadować witryny",
     "notFound": "Nie znaleziono strony",
+    "siteInfo": "Informacje o witrynie",
+    "noDescription": "Brak opisu",
+    "metadata": "Metadane",
+    "quickLinks": "Szybkie linki",
+    "deleteSite": "Usuń witrynę",
     "fields": {
       "name": "Nazwa",
       "slug": "Slug",
@@ -1030,12 +1052,6 @@
       "created": "Utworzony",
       "updated": "Zaktualizowany"
     },
-    "loadFailed": "Nie udało się załadować witryny",
-    "siteInfo": "Informacje o witrynie",
-    "noDescription": "Brak opisu",
-    "metadata": "Metadane",
-    "quickLinks": "Szybkie linki",
-    "deleteSite": "Usuń witrynę",
     "messages": {
       "updated": "Witryna zaktualizowana",
       "deleted": "Witryna usunięta"
@@ -1119,6 +1135,21 @@
         "description": "Wybierz język wyświetlania interfejsu administracyjnego"
       }
     }
+  },
+  "onboarding": {
+    "welcome": "Witamy w OpenYapper",
+    "subtitle": "Twój headless CMS do wielostronicowego, wielojęzycznego zarządzania treścią.",
+    "description": "Utwórz swoją pierwszą stronę, aby zarządzać stronami, wpisami na blogu, mediami i nie tylko — wszystko przez potężne REST API.",
+    "features": {
+      "multiSite": "Multi-Site",
+      "multiSiteDesc": "Zarządzaj wieloma stronami z jednego panelu z niezależną treścią i ustawieniami.",
+      "multilingual": "Wielojęzyczny",
+      "multilingualDesc": "Wbudowana lokalizacja ze wsparciem dla dowolnego języka i kierunku tekstu RTL.",
+      "apiFirst": "API-First",
+      "apiFirstDesc": "Architektura headless z pełnym REST API. Dostarczaj treści do dowolnego frontendu."
+    },
+    "createSite": "Utwórz swoją pierwszą stronę",
+    "stepPrefix": "Krok 1 z 1"
   },
   "setupChecklist": {
     "title": "Pierwsze kroki",
