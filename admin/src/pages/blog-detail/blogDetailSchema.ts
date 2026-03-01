@@ -18,6 +18,8 @@ export const blogContentSchema = z.object({
   reading_time_override: z.boolean().optional(),
   publish_start: z.string().nullable().optional(),
   publish_end: z.string().nullable().optional(),
+  cover_image_id: z.string().nullable().optional(),
+  header_image_id: z.string().nullable().optional(),
 });
 
 export type BlogContentFormData = z.infer<typeof blogContentSchema>;
