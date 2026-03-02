@@ -1,8 +1,10 @@
 ---
 import Base from "../layouts/Base.astro";
 import BlogCard from "../components/BlogCard.astro";
-import { fetchSite, fetchFeaturedBlogs, fetchBlogDetails } from "../lib/api";
-import type { BlogDetailResponse, SiteInfo } from "../lib/api";
+import SeoHead from "../components/SeoHead.astro";
+import { fetchSite, fetchFeaturedBlogs, fetchBlogDetails, fetchMediaBatch, getSiteUrl } from "../lib/api";
+import type { BlogDetailResponse, MediaResponse, SiteInfo } from "../lib/api";
+import { buildSeoMeta } from "../lib/seo";
 
 let site: SiteInfo | null = null;
 try {
@@ -13,6 +15,7 @@ try {
 
 const siteName = site?.name ?? "My Site";
 const siteDescription = site?.description ?? "A developer portfolio and blog.";
+const siteUrl = getSiteUrl();
 
 let featured: BlogDetailResponse[] = [];
 try {
@@ -21,9 +24,26 @@ try {
 } catch (e) {
   console.warn("[CMS] Failed to fetch featured blogs:", e instanceof Error ? e.message : e);
 }
+
+// Batch-fetch cover images for featured posts
+const coverIds = featured.map((b) => b.cover_image_id).filter(Boolean) as string[];
+const mediaMap: Map<string, MediaResponse> = coverIds.length > 0
+  ? await fetchMediaBatch(coverIds)
+  : new Map();
+
+const seo = buildSeoMeta({
+  title: siteName,
+  description: siteDescription,
+  canonicalUrl: `${siteUrl}/`,
+  siteUrl,
+  siteName,
+});
+
+Astro.response.headers.set("Cache-Control", "public, max-age=300, s-maxage=600");
 ---
 
 <Base title="Home" description={siteDescription}>
+  <SeoHead seo={seo} slot="head" />
   <section class="hero">
     <h1>Welcome to {siteName}</h1>
     <p>{siteDescription}</p>
@@ -34,7 +54,10 @@ try {
       <h2 class="section-heading">Featured Posts</h2>
       <div class="blog-grid">
         {featured.map((blog) => (
-          <BlogCard blog={blog} />
+          <BlogCard
+            blog={blog}
+            coverMedia={blog.cover_image_id ? mediaMap.get(blog.cover_image_id) ?? null : null}
+          />
         ))}
       </div>
       <p class="text-center mt-lg">

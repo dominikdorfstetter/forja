@@ -292,7 +292,7 @@ async fn rocket() -> _ {
                 } else if path.starts_with("/dashboard") {
                     res.set_header(rocket::http::Header::new(
                         "Content-Security-Policy",
-                        "default-src 'self'; script-src 'self' 'unsafe-inline' https://clerk.com https://*.clerk.accounts.dev; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://clerk.com https://*.clerk.accounts.dev; frame-src 'self' https://clerk.com https://*.clerk.accounts.dev",
+                        "default-src 'self'; script-src 'self' 'unsafe-inline' https://clerk.com https://*.clerk.accounts.dev; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://clerk.com https://*.clerk.accounts.dev; frame-src 'self' https://clerk.com https://*.clerk.accounts.dev; worker-src 'self' blob:",
                     ));
                 } else {
                     res.set_header(rocket::http::Header::new(

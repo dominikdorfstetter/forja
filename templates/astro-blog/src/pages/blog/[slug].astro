@@ -1,7 +1,11 @@
 ---
 import Base from "../../layouts/Base.astro";
-import { fetchBlogBySlug, fetchMedia } from "../../lib/api";
+import SeoHead from "../../components/SeoHead.astro";
+import ResponsiveImage from "../../components/ResponsiveImage.astro";
+import { fetchBlogBySlug, fetchMedia, fetchSite, getSiteUrl } from "../../lib/api";
+import type { MediaResponse } from "../../lib/api";
 import { renderMarkdown } from "../../lib/markdown";
+import { buildSeoMeta } from "../../lib/seo";
 
 const { slug } = Astro.params;
 
@@ -23,11 +27,10 @@ const body = renderMarkdown(loc?.body);
 const metaTitle = loc?.meta_title ?? title;
 const metaDescription = loc?.meta_description ?? loc?.excerpt ?? "";
 
-let coverUrl: string | null = null;
+let coverMedia: MediaResponse | null = null;
 if (blog.cover_image_id) {
   try {
-    const media = await fetchMedia(blog.cover_image_id);
-    coverUrl = media.public_url;
+    coverMedia = await fetchMedia(blog.cover_image_id);
   } catch (e) {
     console.warn("[CMS] Failed to fetch cover image:", e instanceof Error ? e.message : e);
   }
@@ -38,9 +41,32 @@ const date = new Date(blog.published_date).toLocaleDateString("en-US", {
   month: "long",
   day: "numeric",
 });
+
+const site = await fetchSite().catch(() => null);
+const siteName = site?.name ?? "My Site";
+const siteUrl = getSiteUrl();
+
+const seo = buildSeoMeta({
+  title: metaTitle.includes(siteName) ? metaTitle : `${metaTitle} — ${siteName}`,
+  description: metaDescription,
+  canonicalUrl: `${siteUrl}/blog/${slug}/`,
+  siteUrl,
+  siteName,
+  ogType: "article",
+  ogImage: coverMedia?.public_url ?? undefined,
+  ogImageAlt: title,
+  article: {
+    publishedTime: blog.published_date,
+    author: blog.author,
+    tags: blog.categories.map((c) => c.slug),
+  },
+});
+
+Astro.response.headers.set("Cache-Control", "public, max-age=300, s-maxage=900");
 ---
 
 <Base title={title} metaTitle={metaTitle} metaDescription={metaDescription}>
+  <SeoHead seo={seo} slot="head" />
   <article class="blog-detail">
     <header class="blog-detail__header">
       <h1 class="blog-detail__title">{title}</h1>
@@ -52,17 +78,19 @@ const date = new Date(blog.published_date).toLocaleDateString("en-US", {
       {blog.categories.length > 0 && (
         <div class="blog-detail__categories">
           {blog.categories.map((cat) => (
-            <span class="blog-detail__tag">{cat.slug}</span>
+            <a href={`/blog/category/${cat.slug}`} class="blog-detail__tag">{cat.slug}</a>
           ))}
         </div>
       )}
     </header>
 
-    {coverUrl && (
-      <img
-        src={coverUrl}
+    {coverMedia && (
+      <ResponsiveImage
+        media={coverMedia}
         alt={title}
-        style="width:100%; border-radius: var(--radius); margin-bottom: var(--space-lg);"
+        class="blog-detail__cover"
+        sizes="(max-width: 768px) 100vw, 740px"
+        loading="eager"
       />
     )}
 

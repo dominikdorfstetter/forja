@@ -1,0 +1,40 @@
+---
+import type { SeoMeta } from "../lib/seo";
+
+interface Props {
+  seo: SeoMeta;
+}
+
+const { seo } = Astro.props;
+---
+
+<link rel="canonical" href={seo.canonicalUrl} />
+
+<!-- OpenGraph -->
+<meta property="og:type" content={seo.og.type} />
+<meta property="og:title" content={seo.og.title} />
+<meta property="og:description" content={seo.og.description} />
+<meta property="og:url" content={seo.og.url} />
+<meta property="og:site_name" content={seo.og.siteName} />
+{seo.og.image && <meta property="og:image" content={seo.og.image} />}
+{seo.og.imageAlt && <meta property="og:image:alt" content={seo.og.imageAlt} />}
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content={seo.twitter.card} />
+<meta name="twitter:title" content={seo.twitter.title} />
+<meta name="twitter:description" content={seo.twitter.description} />
+{seo.twitter.image && <meta name="twitter:image" content={seo.twitter.image} />}
+
+<!-- Article meta -->
+{seo.article && (
+  <>
+    <meta property="article:published_time" content={seo.article.publishedTime} />
+    <meta property="article:author" content={seo.article.author} />
+    {seo.article.tags.map((tag) => (
+      <meta property="article:tag" content={tag} />
+    ))}
+  </>
+)}
+
+<!-- JSON-LD structured data -->
+<script type="application/ld+json" set:html={JSON.stringify(seo.jsonLd)} />

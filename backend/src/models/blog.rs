@@ -225,6 +225,76 @@ impl Blog {
         Ok(row.0)
     }
 
+    /// Find published blogs for a site filtered by category slug
+    pub async fn find_published_for_site_by_category(
+        pool: &PgPool,
+        site_id: Uuid,
+        category_slug: &str,
+        limit: i64,
+        offset: i64,
+    ) -> Result<Vec<BlogWithContent>, ApiError> {
+        let blogs = sqlx::query_as::<_, BlogWithContent>(
+            r#"
+            SELECT
+                b.id, b.content_id, b.author, b.published_date,
+                b.reading_time_minutes, b.cover_image_id, b.header_image_id, b.is_featured, b.allow_comments,
+                c.slug, c.status, c.published_at, c.publish_start, c.publish_end,
+                b.created_at, b.updated_at
+            FROM blogs b
+            INNER JOIN contents c ON b.content_id = c.id
+            INNER JOIN content_sites cs ON c.id = cs.content_id
+            INNER JOIN content_categories cc ON c.id = cc.content_id
+            INNER JOIN categories cat ON cc.category_id = cat.id
+            WHERE cs.site_id = $1
+              AND c.is_deleted = FALSE
+              AND c.status IN ('published', 'scheduled')
+              AND (c.publish_start IS NULL OR c.publish_start <= NOW())
+              AND (c.publish_end IS NULL OR c.publish_end > NOW())
+              AND cat.slug = $4
+            ORDER BY b.published_date DESC
+            LIMIT $2 OFFSET $3
+            "#,
+        )
+        .bind(site_id)
+        .bind(limit)
+        .bind(offset)
+        .bind(category_slug)
+        .fetch_all(pool)
+        .await?;
+
+        Ok(blogs)
+    }
+
+    /// Count published blogs for a site filtered by category slug
+    pub async fn count_published_for_site_by_category(
+        pool: &PgPool,
+        site_id: Uuid,
+        category_slug: &str,
+    ) -> Result<i64, ApiError> {
+        let row: (i64,) = sqlx::query_as(
+            r#"
+            SELECT COUNT(*)
+            FROM blogs b
+            INNER JOIN contents c ON b.content_id = c.id
+            INNER JOIN content_sites cs ON c.id = cs.content_id
+            INNER JOIN content_categories cc ON c.id = cc.content_id
+            INNER JOIN categories cat ON cc.category_id = cat.id
+            WHERE cs.site_id = $1
+              AND c.is_deleted = FALSE
+              AND c.status IN ('published', 'scheduled')
+              AND (c.publish_start IS NULL OR c.publish_start <= NOW())
+              AND (c.publish_end IS NULL OR c.publish_end > NOW())
+              AND cat.slug = $2
+            "#,
+        )
+        .bind(site_id)
+        .bind(category_slug)
+        .fetch_one(pool)
+        .await?;
+
+        Ok(row.0)
+    }
+
     /// Count published blogs for a site
     pub async fn count_published_for_site(pool: &PgPool, site_id: Uuid) -> Result<i64, ApiError> {
         let row: (i64,) = sqlx::query_as(

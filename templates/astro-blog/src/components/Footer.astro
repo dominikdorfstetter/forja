@@ -1,5 +1,6 @@
 ---
 import { fetchNavTree, type NavigationTree } from "../lib/api";
+import SocialLinks from "./SocialLinks.astro";
 
 interface Props {
   siteName: string;
@@ -37,5 +38,6 @@ function href(item: NavigationTree): string {
       ))}
     </ul>
   )}
+  <SocialLinks />
   <p>&copy; {new Date().getFullYear()} {siteName}. All rights reserved.</p>
 </footer>

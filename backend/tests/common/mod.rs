@@ -33,9 +33,8 @@ pub struct TestContext {
 
 /// Connect to the `forja_test` database and run migrations.
 pub async fn test_db_pool() -> PgPool {
-    let db_url = std::env::var("TEST_DATABASE_URL").unwrap_or_else(|_| {
-        "postgres://forja:forja@localhost:5432/forja_test".to_string()
-    });
+    let db_url = std::env::var("TEST_DATABASE_URL")
+        .unwrap_or_else(|_| "postgres://forja:forja@localhost:5432/forja_test".to_string());
 
     let pool = PgPoolOptions::new()
         .max_connections(5)
@@ -187,10 +186,7 @@ pub async fn create_test_notification(
 }
 
 /// Insert a test webhook directly via the model layer.
-pub async fn create_test_webhook(
-    pool: &PgPool,
-    site_id: Uuid,
-) -> forja::models::webhook::Webhook {
+pub async fn create_test_webhook(pool: &PgPool, site_id: Uuid) -> forja::models::webhook::Webhook {
     forja::models::webhook::Webhook::create(
         pool,
         site_id,

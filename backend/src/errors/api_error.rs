@@ -144,10 +144,7 @@ impl ApiError {
     pub fn to_problem_details(&self) -> ProblemDetails {
         let status = self.status();
         ProblemDetails {
-            problem_type: format!(
-                "https://forja.dev/errors/{}",
-                self.code().to_lowercase()
-            ),
+            problem_type: format!("https://forja.dev/errors/{}", self.code().to_lowercase()),
             title: self.title().to_string(),
             status: status.code,
             detail: Some(self.to_string()),
