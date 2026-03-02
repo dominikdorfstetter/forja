@@ -1,7 +1,9 @@
 ---
 import Base from "../../layouts/Base.astro";
-import { fetchLegalDocBySlug } from "../../lib/api";
+import SeoHead from "../../components/SeoHead.astro";
+import { fetchLegalDocBySlug, fetchSite, getSiteUrl } from "../../lib/api";
 import { renderMarkdown } from "../../lib/markdown";
+import { buildSeoMeta } from "../../lib/seo";
 
 const { slug } = Astro.params;
 
@@ -20,9 +22,24 @@ try {
 const loc = doc.localizations[0];
 const title = loc?.title ?? slug.replace(/-/g, " ");
 const intro = renderMarkdown(loc?.intro);
+
+const site = await fetchSite().catch(() => null);
+const siteName = site?.name ?? "My Site";
+const siteUrl = getSiteUrl();
+
+const seo = buildSeoMeta({
+  title: `${title} — ${siteName}`,
+  description: `${title} for ${siteName}.`,
+  canonicalUrl: `${siteUrl}/legal/${slug}/`,
+  siteUrl,
+  siteName,
+});
+
+Astro.response.headers.set("Cache-Control", "public, max-age=3600, s-maxage=86400");
 ---
 
 <Base title={title}>
+  <SeoHead seo={seo} slot="head" />
   <article class="legal-page">
     <h1>{title}</h1>
     {intro.length > 0 && <div class="legal-page__intro" set:html={intro} />}

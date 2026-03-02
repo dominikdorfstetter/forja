@@ -1,27 +1,65 @@
 ---
 import Base from "../../layouts/Base.astro";
 import BlogCard from "../../components/BlogCard.astro";
-import { fetchAllPublishedBlogs, fetchBlogDetails } from "../../lib/api";
-import type { BlogDetailResponse } from "../../lib/api";
+import SeoHead from "../../components/SeoHead.astro";
+import Pagination from "../../components/Pagination.astro";
+import {
+  fetchPublishedBlogs,
+  fetchBlogDetails,
+  fetchMediaBatch,
+  fetchSite,
+  getSiteUrl,
+} from "../../lib/api";
+import type { BlogDetailResponse, MediaResponse } from "../../lib/api";
+import { buildSeoMeta } from "../../lib/seo";
+
+const PER_PAGE = 12;
 
 let blogs: BlogDetailResponse[] = [];
+let totalPages = 1;
 try {
-  const items = await fetchAllPublishedBlogs();
-  blogs = await fetchBlogDetails(items.map((b) => b.id));
+  const result = await fetchPublishedBlogs(1, PER_PAGE);
+  totalPages = result.meta.total_pages;
+  blogs = await fetchBlogDetails(result.data.map((b) => b.id));
 } catch (e) {
   console.warn("[CMS] Failed to fetch published blogs:", e instanceof Error ? e.message : e);
 }
+
+// Batch-fetch cover images
+const coverIds = blogs.map((b) => b.cover_image_id).filter(Boolean) as string[];
+const mediaMap: Map<string, MediaResponse> = coverIds.length > 0
+  ? await fetchMediaBatch(coverIds)
+  : new Map();
+
+const site = await fetchSite().catch(() => null);
+const siteName = site?.name ?? "My Site";
+const siteUrl = getSiteUrl();
+
+const seo = buildSeoMeta({
+  title: `Blog — ${siteName}`,
+  description: "All blog posts.",
+  canonicalUrl: `${siteUrl}/blog/`,
+  siteUrl,
+  siteName,
+});
+
+Astro.response.headers.set("Cache-Control", "public, max-age=300, s-maxage=600");
 ---
 
 <Base title="Blog" description="All blog posts.">
+  <SeoHead seo={seo} slot="head" />
   <h1 class="section-heading">Blog</h1>
   {blogs.length > 0 ? (
     <div class="blog-grid">
       {blogs.map((blog) => (
-        <BlogCard blog={blog} />
+        <BlogCard
+          blog={blog}
+          coverMedia={blog.cover_image_id ? mediaMap.get(blog.cover_image_id) ?? null : null}
+        />
       ))}
     </div>
   ) : (
     <p>No blog posts yet. Check back soon!</p>
   )}
+  <Pagination currentPage={1} totalPages={totalPages} baseUrl="/blog" />
 </Base>

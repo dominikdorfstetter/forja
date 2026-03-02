@@ -1,0 +1,34 @@
+---
+import type { MediaResponse } from "../lib/api";
+import { buildResponsiveImage } from "../lib/media-helpers";
+
+interface Props {
+  media: MediaResponse;
+  alt: string;
+  class?: string;
+  sizes?: string;
+  loading?: "lazy" | "eager";
+}
+
+const { media, alt, class: className, sizes, loading = "lazy" } = Astro.props;
+const img = buildResponsiveImage(media, sizes);
+---
+
+<picture class={className}>
+  {img.avifSrcset && (
+    <source type="image/avif" srcset={img.avifSrcset} sizes={img.sizes} />
+  )}
+  {img.webpSrcset && (
+    <source type="image/webp" srcset={img.webpSrcset} sizes={img.sizes} />
+  )}
+  <img
+    src={img.src}
+    srcset={img.srcset || undefined}
+    sizes={img.srcset ? img.sizes : undefined}
+    alt={alt}
+    width={img.width}
+    height={img.height}
+    loading={loading}
+    decoding="async"
+  />
+</picture>

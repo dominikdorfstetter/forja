@@ -1,8 +1,10 @@
 ---
 import Base from "../layouts/Base.astro";
 import CvTimeline from "../components/CvTimeline.astro";
-import { fetchCvEntries, fetchSkills } from "../lib/api";
+import SeoHead from "../components/SeoHead.astro";
+import { fetchCvEntries, fetchSkills, fetchSite, getSiteUrl } from "../lib/api";
 import type { CvEntryResponse, SkillResponse } from "../lib/api";
+import { buildSeoMeta } from "../lib/seo";
 
 let entries: CvEntryResponse[] = [];
 let skills: SkillResponse[] = [];
@@ -38,9 +40,24 @@ for (const skill of skills) {
   arr.push(skill);
   grouped.set(cat, arr);
 }
+
+const site = await fetchSite().catch(() => null);
+const siteName = site?.name ?? "My Site";
+const siteUrl = getSiteUrl();
+
+const seo = buildSeoMeta({
+  title: `CV — ${siteName}`,
+  description: "Work experience, education, and skills.",
+  canonicalUrl: `${siteUrl}/cv/`,
+  siteUrl,
+  siteName,
+});
+
+Astro.response.headers.set("Cache-Control", "public, max-age=600, s-maxage=1800");
 ---
 
 <Base title="CV" description="Work experience, education, and skills.">
+  <SeoHead seo={seo} slot="head" />
   <div class="cv-page">
     <h1>Curriculum Vitae</h1>
 

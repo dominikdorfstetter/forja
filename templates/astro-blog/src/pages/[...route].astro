@@ -1,22 +1,26 @@
 ---
 import Base from "../layouts/Base.astro";
 import PageSection from "../components/PageSection.astro";
+import SeoHead from "../components/SeoHead.astro";
 import {
   fetchPageByRoute,
   fetchPageSections,
   fetchPageSectionLocalizations,
+  fetchSite,
+  getSiteUrl,
 } from "../lib/api";
 import type {
   PageSectionResponse,
   SectionLocalizationResponse,
 } from "../lib/api";
+import { buildSeoMeta } from "../lib/seo";
 
 const routeParam = Astro.params.route ?? "";
 const pageRoute = "/" + routeParam;
 
 // Skip routes handled by explicit pages
-const reserved = new Set(["/", "/blog", "/cv", "/rss", "/rss.xml"]);
-if (reserved.has(pageRoute) || pageRoute.startsWith("/legal/")) {
+const reserved = new Set(["/", "/blog", "/cv", "/rss", "/rss.xml", "/sitemap.xml"]);
+if (reserved.has(pageRoute) || pageRoute.startsWith("/legal/") || pageRoute.startsWith("/blog/")) {
   return new Response(null, { status: 404, statusText: "Not Found" });
 }
 
@@ -45,9 +49,24 @@ try {
 // Derive a title from the first section's localization or the route
 const firstLoc = localizations.find((l) => l.page_section_id === sections[0]?.id);
 const title = firstLoc?.title ?? routeParam.replace(/-/g, " ") ?? "Page";
+
+const site = await fetchSite().catch(() => null);
+const siteName = site?.name ?? "My Site";
+const siteUrl = getSiteUrl();
+
+const seo = buildSeoMeta({
+  title: `${title} — ${siteName}`,
+  description: firstLoc?.text?.slice(0, 160) ?? "",
+  canonicalUrl: `${siteUrl}${pageRoute}/`,
+  siteUrl,
+  siteName,
+});
+
+Astro.response.headers.set("Cache-Control", "public, max-age=300, s-maxage=600");
 ---
 
 <Base title={title}>
+  <SeoHead seo={seo} slot="head" />
   {sections.length > 0 ? (
     sections.map((section) => (
       <PageSection section={section} localizations={localizations} />

@@ -5,6 +5,12 @@
 const API_URL = import.meta.env.CMS_API_URL as string;
 const API_KEY = import.meta.env.CMS_API_KEY as string;
 const SITE_ID = import.meta.env.CMS_SITE_ID as string;
+const SITE_URL = (import.meta.env.SITE_URL as string) || "http://localhost:4321";
+
+/** Public site URL (no trailing slash). */
+export function getSiteUrl(): string {
+  return SITE_URL.replace(/\/+$/, "");
+}
 
 // ---- Generic helpers ------------------------------------------------------
 
@@ -386,4 +392,63 @@ export interface MediaResponse {
 
 export async function fetchMedia(id: string): Promise<MediaResponse> {
   return api(`/media/${id}`);
+}
+
+/** Fetch multiple media items in parallel batches. Returns a Map keyed by media ID. */
+export async function fetchMediaBatch(
+  ids: string[],
+  batchSize = 5,
+): Promise<Map<string, MediaResponse>> {
+  const unique = [...new Set(ids.filter(Boolean))];
+  const result = new Map<string, MediaResponse>();
+  for (let i = 0; i < unique.length; i += batchSize) {
+    const batch = unique.slice(i, i + batchSize);
+    const items = await Promise.all(
+      batch.map((id) =>
+        fetchMedia(id).catch(() => null),
+      ),
+    );
+    for (let j = 0; j < batch.length; j++) {
+      if (items[j]) result.set(batch[j], items[j]!);
+    }
+  }
+  return result;
+}
+
+// ---- Social Links -----------------------------------------------------------
+
+export interface SocialLinkResponse {
+  id: string;
+  title: string;
+  url: string;
+  icon: string;
+  alt_text: string | null;
+  display_order: number;
+}
+
+let _cachedSocialLinks: SocialLinkResponse[] | null = null;
+
+/** Fetch social links for the site (cached in-process). */
+export async function fetchSocialLinks(): Promise<SocialLinkResponse[]> {
+  if (_cachedSocialLinks) return _cachedSocialLinks;
+  try {
+    _cachedSocialLinks = await api<SocialLinkResponse[]>(
+      `/sites/${SITE_ID}/social`,
+    );
+  } catch {
+    _cachedSocialLinks = [];
+  }
+  return _cachedSocialLinks;
+}
+
+// ---- Blog category filter ---------------------------------------------------
+
+export async function fetchPublishedBlogsByCategory(
+  categorySlug: string,
+  page = 1,
+  perPage = 12,
+): Promise<Paginated<BlogListItem>> {
+  return api(
+    `/sites/${SITE_ID}/blogs/published/category/${categorySlug}?page=${page}&per_page=${perPage}`,
+  );
 }
