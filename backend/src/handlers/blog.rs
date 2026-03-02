@@ -173,14 +173,9 @@ pub async fn list_published_blogs_by_category(
     let params = PaginationParams::new(page, per_page);
     let (limit, offset) = params.limit_offset();
 
-    let blogs = Blog::find_published_for_site_by_category(
-        &state.db,
-        site_id,
-        category_slug,
-        limit,
-        offset,
-    )
-    .await?;
+    let blogs =
+        Blog::find_published_for_site_by_category(&state.db, site_id, category_slug, limit, offset)
+            .await?;
     let total =
         Blog::count_published_for_site_by_category(&state.db, site_id, category_slug).await?;
 
