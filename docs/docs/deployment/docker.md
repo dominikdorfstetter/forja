@@ -4,14 +4,14 @@ sidebar_position: 1
 
 # Docker Deployment
 
-OpenYapper ships with a multi-stage Dockerfile that builds both the React admin dashboard and the Rust backend into a single, minimal production image.
+Forja ships with a multi-stage Dockerfile that builds both the React admin dashboard and the Rust backend into a single, minimal production image.
 
 ## Docker Hub
 
-Pre-built images are published to [Docker Hub](https://hub.docker.com/r/dominikdorfstetter/openyapper) on every push to `main`. Multi-platform images are available for `linux/amd64` and `linux/arm64`.
+Pre-built images are published to [Docker Hub](https://hub.docker.com/r/dominikdorfstetter/forja) on every push to `main`. Multi-platform images are available for `linux/amd64` and `linux/arm64`.
 
 ```bash
-docker pull dominikdorfstetter/openyapper
+docker pull dominikdorfstetter/forja
 ```
 
 Images are tagged with:
@@ -33,14 +33,14 @@ The Dockerfile uses three stages to keep the final image small:
 | **backend-build** | `rust:1.93-bookworm` | Compiles the Rust backend in release mode, embedding the admin static files |
 | **runtime** | `debian:bookworm-slim` | Minimal runtime with only `ca-certificates`, `libssl3`, and `libpq5` |
 
-The final image contains a single binary (`openyapper`), the compiled admin dashboard static files, and the SQLx migration files.
+The final image contains a single binary (`forja`), the compiled admin dashboard static files, and the SQLx migration files.
 
 ## Building the Image
 
 From the repository root:
 
 ```bash
-docker build -t openyapper .
+docker build -t forja .
 ```
 
 The first build takes approximately 10-15 minutes due to Rust compilation. Subsequent builds benefit from Docker layer caching.
@@ -63,11 +63,11 @@ For production deployments, create a `docker-compose.yaml` that includes the app
 ```yaml
 services:
   app:
-    image: dominikdorfstetter/openyapper
+    image: dominikdorfstetter/forja
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgres://openyapper:changeme@postgres:5432/openyapper
+      DATABASE_URL: postgres://forja:changeme@postgres:5432/forja
       REDIS_URL: redis://redis:6379
       APP__ENVIRONMENT: production
       APP__HOST: 0.0.0.0
@@ -86,14 +86,14 @@ services:
   postgres:
     image: postgres:16
     environment:
-      POSTGRES_USER: openyapper
+      POSTGRES_USER: forja
       POSTGRES_PASSWORD: changeme
-      POSTGRES_DB: openyapper
+      POSTGRES_DB: forja
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./backend/scripts/init-extensions.sql:/docker-entrypoint-initdb.d/init-extensions.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U openyapper -d openyapper"]
+      test: ["CMD-SHELL", "pg_isready -U forja -d forja"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -189,7 +189,7 @@ SQLx database migrations run automatically when the application starts. The migr
 To update a running deployment using the Docker Hub image:
 
 ```bash
-docker pull dominikdorfstetter/openyapper
+docker pull dominikdorfstetter/forja
 docker compose up -d
 ```
 
@@ -197,7 +197,7 @@ Or if building from source:
 
 ```bash
 git pull
-docker build -t openyapper .
+docker build -t forja .
 docker compose up -d
 ```
 

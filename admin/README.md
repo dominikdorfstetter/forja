@@ -1,6 +1,6 @@
-# OpenYapper Admin Dashboard
+# Forja Admin Dashboard
 
-React-based admin interface for managing OpenYapper CMS content.
+React-based admin interface for managing Forja CMS content.
 
 ## Tech Stack
 

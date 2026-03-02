@@ -31,7 +31,7 @@
 
 ## v1.0.0 - Initial Release
 
-The first public release of OpenYapper, a multi-site CMS platform with a Rust backend, React admin dashboard, and pluggable frontend templates.
+The first public release of Forja, a multi-site CMS platform with a Rust backend, React admin dashboard, and pluggable frontend templates.
 
 ### Backend API (Rust / Rocket)
 

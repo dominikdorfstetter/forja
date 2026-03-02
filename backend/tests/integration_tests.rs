@@ -1,18 +1,18 @@
 //! HTTP-level integration tests
 //!
 //! These tests exercise the full Rocket server stack (routing, auth guards,
-//! database queries, error responses) against a real `openyapper_test`
+//! database queries, error responses) against a real `forja_test`
 //! PostgreSQL database.
 //!
 //! # Prerequisites
 //!
 //! ```bash
 //! # Create the test database (one-time)
-//! psql -U openyapper -h localhost -c "CREATE DATABASE openyapper_test;"
+//! psql -U forja -h localhost -c "CREATE DATABASE forja_test;"
 //!
 //! # Run
 //! cd backend
-//! TEST_DATABASE_URL="postgres://openyapper:openyapper@localhost:5432/openyapper_test" \
+//! TEST_DATABASE_URL="postgres://forja:forja@localhost:5432/forja_test" \
 //!   cargo test --test integration_tests
 //! ```
 
@@ -22,7 +22,7 @@ use common::{
     cleanup_test_data, create_test_api_key, create_test_notification, create_test_site,
     create_test_webhook, test_context,
 };
-use openyapper::models::api_key::ApiKeyPermission;
+use forja::models::api_key::ApiKeyPermission;
 use rocket::http::{Header, Status};
 use serial_test::serial;
 
@@ -68,7 +68,7 @@ async fn test_config_endpoint() {
     assert_eq!(response.status(), Status::Ok);
 
     let body: serde_json::Value = response.into_json().await.expect("valid JSON");
-    assert_eq!(body["app_name"], "OpenYapper");
+    assert_eq!(body["app_name"], "Forja");
 }
 
 // =========================================================================
@@ -501,7 +501,7 @@ async fn test_notification_create() {
 #[rocket::async_test]
 #[serial]
 async fn test_notification_find_for_user() {
-    use openyapper::models::notification::Notification;
+    use forja::models::notification::Notification;
 
     let ctx = test_context().await;
     cleanup_test_data(&ctx.pool).await;
@@ -525,7 +525,7 @@ async fn test_notification_find_for_user() {
 #[rocket::async_test]
 #[serial]
 async fn test_notification_count_for_user() {
-    use openyapper::models::notification::Notification;
+    use forja::models::notification::Notification;
 
     let ctx = test_context().await;
     cleanup_test_data(&ctx.pool).await;
@@ -544,7 +544,7 @@ async fn test_notification_count_for_user() {
 #[rocket::async_test]
 #[serial]
 async fn test_notification_count_unread() {
-    use openyapper::models::notification::Notification;
+    use forja::models::notification::Notification;
 
     let ctx = test_context().await;
     cleanup_test_data(&ctx.pool).await;
@@ -565,7 +565,7 @@ async fn test_notification_count_unread() {
 #[rocket::async_test]
 #[serial]
 async fn test_notification_mark_read() {
-    use openyapper::models::notification::Notification;
+    use forja::models::notification::Notification;
 
     let ctx = test_context().await;
     cleanup_test_data(&ctx.pool).await;
@@ -582,7 +582,7 @@ async fn test_notification_mark_read() {
 #[rocket::async_test]
 #[serial]
 async fn test_notification_mark_all_read() {
-    use openyapper::models::notification::Notification;
+    use forja::models::notification::Notification;
 
     let ctx = test_context().await;
     cleanup_test_data(&ctx.pool).await;
@@ -625,7 +625,7 @@ async fn test_webhook_create() {
 #[rocket::async_test]
 #[serial]
 async fn test_webhook_find_by_id() {
-    use openyapper::models::webhook::Webhook;
+    use forja::models::webhook::Webhook;
 
     let ctx = test_context().await;
     cleanup_test_data(&ctx.pool).await;
@@ -641,7 +641,7 @@ async fn test_webhook_find_by_id() {
 #[rocket::async_test]
 #[serial]
 async fn test_webhook_find_all_for_site_paginated() {
-    use openyapper::models::webhook::Webhook;
+    use forja::models::webhook::Webhook;
 
     let ctx = test_context().await;
     cleanup_test_data(&ctx.pool).await;
@@ -667,7 +667,7 @@ async fn test_webhook_find_all_for_site_paginated() {
 #[rocket::async_test]
 #[serial]
 async fn test_webhook_find_active_for_site() {
-    use openyapper::models::webhook::Webhook;
+    use forja::models::webhook::Webhook;
 
     let ctx = test_context().await;
     cleanup_test_data(&ctx.pool).await;
@@ -690,7 +690,7 @@ async fn test_webhook_find_active_for_site() {
 #[rocket::async_test]
 #[serial]
 async fn test_webhook_update() {
-    use openyapper::models::webhook::Webhook;
+    use forja::models::webhook::Webhook;
 
     let ctx = test_context().await;
     cleanup_test_data(&ctx.pool).await;
@@ -717,7 +717,7 @@ async fn test_webhook_update() {
 #[rocket::async_test]
 #[serial]
 async fn test_webhook_delete() {
-    use openyapper::models::webhook::Webhook;
+    use forja::models::webhook::Webhook;
 
     let ctx = test_context().await;
     cleanup_test_data(&ctx.pool).await;
@@ -734,7 +734,7 @@ async fn test_webhook_delete() {
 #[rocket::async_test]
 #[serial]
 async fn test_webhook_delivery_create_and_find() {
-    use openyapper::models::webhook::WebhookDelivery;
+    use forja::models::webhook::WebhookDelivery;
 
     let ctx = test_context().await;
     cleanup_test_data(&ctx.pool).await;
@@ -773,7 +773,7 @@ async fn test_webhook_delivery_create_and_find() {
 #[rocket::async_test]
 #[serial]
 async fn test_site_create_defaults() {
-    use openyapper::models::site::Site;
+    use forja::models::site::Site;
 
     let ctx = test_context().await;
     cleanup_test_data(&ctx.pool).await;
@@ -789,7 +789,7 @@ async fn test_site_create_defaults() {
 #[rocket::async_test]
 #[serial]
 async fn test_site_find_by_id() {
-    use openyapper::models::site::Site;
+    use forja::models::site::Site;
 
     let ctx = test_context().await;
     cleanup_test_data(&ctx.pool).await;
@@ -802,7 +802,7 @@ async fn test_site_find_by_id() {
 #[rocket::async_test]
 #[serial]
 async fn test_site_find_by_slug() {
-    use openyapper::models::site::Site;
+    use forja::models::site::Site;
 
     let ctx = test_context().await;
     cleanup_test_data(&ctx.pool).await;
@@ -817,7 +817,7 @@ async fn test_site_find_by_slug() {
 #[rocket::async_test]
 #[serial]
 async fn test_site_find_all_excludes_deleted() {
-    use openyapper::models::site::Site;
+    use forja::models::site::Site;
 
     let ctx = test_context().await;
     cleanup_test_data(&ctx.pool).await;
@@ -836,8 +836,8 @@ async fn test_site_find_all_excludes_deleted() {
 #[rocket::async_test]
 #[serial]
 async fn test_site_update() {
-    use openyapper::dto::site::UpdateSiteRequest;
-    use openyapper::models::site::Site;
+    use forja::dto::site::UpdateSiteRequest;
+    use forja::models::site::Site;
 
     let ctx = test_context().await;
     cleanup_test_data(&ctx.pool).await;
@@ -867,7 +867,7 @@ async fn test_site_update() {
 #[rocket::async_test]
 #[serial]
 async fn test_site_soft_delete_hides_from_find() {
-    use openyapper::models::site::Site;
+    use forja::models::site::Site;
 
     let ctx = test_context().await;
     cleanup_test_data(&ctx.pool).await;
@@ -882,7 +882,7 @@ async fn test_site_soft_delete_hides_from_find() {
 #[rocket::async_test]
 #[serial]
 async fn test_site_find_by_id_nonexistent() {
-    use openyapper::models::site::Site;
+    use forja::models::site::Site;
 
     let ctx = test_context().await;
     cleanup_test_data(&ctx.pool).await;
@@ -1018,7 +1018,7 @@ async fn test_webhook_deliveries_endpoint() {
     let webhook = create_test_webhook(&ctx.pool, site_id).await;
 
     // Create a delivery record
-    openyapper::models::webhook::WebhookDelivery::create(
+    forja::models::webhook::WebhookDelivery::create(
         &ctx.pool,
         webhook.id,
         "blog.created",

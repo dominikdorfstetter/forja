@@ -1,4 +1,4 @@
-//! OpenYapper Multi-Site CMS API
+//! Forja Multi-Site CMS API
 //!
 //! A high-performance REST API built with Rust Rocket for managing
 //! multiple websites with shared content and translations.
@@ -18,10 +18,10 @@ use utoipa_swagger_ui::SwaggerUi;
 
 use rocket::fs::FileServer;
 
-use openyapper::guards::auth_guard::ClerkJwksState;
-use openyapper::middleware::rate_limit::RateLimitHeaderInfo;
-use openyapper::services::storage;
-use openyapper::{handlers, openapi::ApiDoc, AppState, Settings};
+use forja::guards::auth_guard::ClerkJwksState;
+use forja::middleware::rate_limit::RateLimitHeaderInfo;
+use forja::services::storage;
+use forja::{handlers, openapi::ApiDoc, AppState, Settings};
 
 #[launch]
 async fn rocket() -> _ {
@@ -29,12 +29,12 @@ async fn rocket() -> _ {
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "openyapper=debug,rocket=info,sqlx=warn".into()),
+                .unwrap_or_else(|_| "forja=debug,rocket=info,sqlx=warn".into()),
         )
         .with(tracing_subscriber::fmt::layer())
         .init();
 
-    tracing::info!("Starting OpenYapper API...");
+    tracing::info!("Starting Forja API...");
 
     // Load configuration
     let settings = Settings::load().expect("Failed to load configuration");
@@ -129,7 +129,7 @@ async fn rocket() -> _ {
     // Initialize Clerk service if secret key is configured
     let clerk_service = if !settings.security.clerk_secret_key.is_empty() {
         Some(std::sync::Arc::new(
-            openyapper::services::clerk_service::ClerkService::new(
+            forja::services::clerk_service::ClerkService::new(
                 settings.security.clerk_secret_key.clone(),
             ),
         ))

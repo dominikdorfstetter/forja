@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # Sites
 
-Sites are the top-level organizational unit in OpenYapper. All content, media, navigation, and configuration are scoped to a site.
+Sites are the top-level organizational unit in Forja. All content, media, navigation, and configuration are scoped to a site.
 
 ## Endpoints
 

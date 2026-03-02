@@ -49,7 +49,7 @@ pub enum ApiError {
 pub struct ProblemDetails {
     /// A URI reference that identifies the problem type
     #[serde(rename = "type")]
-    #[schema(example = "https://openyapper.dev/errors/not_found")]
+    #[schema(example = "https://forja.dev/errors/not_found")]
     pub problem_type: String,
 
     /// A short, human-readable summary of the problem type
@@ -145,7 +145,7 @@ impl ApiError {
         let status = self.status();
         ProblemDetails {
             problem_type: format!(
-                "https://openyapper.dev/errors/{}",
+                "https://forja.dev/errors/{}",
                 self.code().to_lowercase()
             ),
             title: self.title().to_string(),

@@ -4,7 +4,7 @@ sidebar_position: 2
 
 # Blogs
 
-Blog posts are the primary content type in OpenYapper. They support localization, categories, editorial workflow, document attachments, and RSS feeds.
+Blog posts are the primary content type in Forja. They support localization, categories, editorial workflow, document attachments, and RSS feeds.
 
 ## Endpoints
 

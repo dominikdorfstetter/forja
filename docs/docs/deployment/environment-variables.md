@@ -4,7 +4,7 @@ sidebar_position: 3
 
 # Environment Variables
 
-Complete reference of all environment variables used by OpenYapper. Variables are grouped by category.
+Complete reference of all environment variables used by Forja. Variables are grouped by category.
 
 ## Core Application
 
@@ -108,7 +108,7 @@ APP__HOST=127.0.0.1
 APP__PORT=8000
 
 # Database
-DATABASE_URL=postgres://openyapper:openyapper@localhost:5432/openyapper
+DATABASE_URL=postgres://forja:forja@localhost:5432/forja
 
 # Redis
 REDIS_URL=redis://localhost:6379

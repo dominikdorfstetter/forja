@@ -6,7 +6,7 @@
 
 mod common;
 
-use openyapper::errors::{ApiError, FieldError, ProblemDetails};
+use forja::errors::{ApiError, FieldError, ProblemDetails};
 use rocket::http::Status;
 
 // =========================================================================

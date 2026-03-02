@@ -4,11 +4,11 @@ sidebar_position: 5
 
 # S3 Storage Configuration
 
-By default, OpenYapper stores uploaded media files on the local filesystem. For production deployments -- especially on ephemeral platforms like Railway -- you should configure S3-compatible object storage for persistent media.
+By default, Forja stores uploaded media files on the local filesystem. For production deployments -- especially on ephemeral platforms like Railway -- you should configure S3-compatible object storage for persistent media.
 
 ## Supported Providers
 
-OpenYapper works with any S3-compatible storage provider:
+Forja works with any S3-compatible storage provider:
 
 | Provider | Endpoint Required | Notes |
 |----------|------------------|-------|
@@ -40,7 +40,7 @@ AWS credentials are read from the standard AWS SDK credential chain, which also 
 
 ```bash
 STORAGE_PROVIDER=s3
-STORAGE_S3_BUCKET=my-openyapper-media
+STORAGE_S3_BUCKET=my-forja-media
 STORAGE_S3_REGION=us-east-1
 STORAGE_S3_PREFIX=uploads/
 AWS_ACCESS_KEY_ID=AKIA...
@@ -51,7 +51,7 @@ AWS_SECRET_ACCESS_KEY=wJal...
 
 ```bash
 STORAGE_PROVIDER=s3
-STORAGE_S3_BUCKET=openyapper-media
+STORAGE_S3_BUCKET=forja-media
 STORAGE_S3_REGION=auto
 STORAGE_S3_ENDPOINT=https://<account-id>.r2.cloudflarestorage.com
 STORAGE_S3_PREFIX=media/
@@ -65,7 +65,7 @@ You can find your R2 access keys in the Cloudflare dashboard under **R2** > **Ma
 
 ```bash
 STORAGE_PROVIDER=s3
-STORAGE_S3_BUCKET=openyapper
+STORAGE_S3_BUCKET=forja
 STORAGE_S3_REGION=us-east-1
 STORAGE_S3_ENDPOINT=http://minio:9000
 STORAGE_S3_PREFIX=media/
@@ -97,14 +97,14 @@ After starting MinIO, create the bucket via the MinIO Console at `http://localho
 
 ```bash
 mc alias set local http://localhost:9000 minioadmin minioadmin
-mc mb local/openyapper
+mc mb local/forja
 ```
 
 ### DigitalOcean Spaces
 
 ```bash
 STORAGE_PROVIDER=s3
-STORAGE_S3_BUCKET=openyapper-media
+STORAGE_S3_BUCKET=forja-media
 STORAGE_S3_REGION=nyc3
 STORAGE_S3_ENDPOINT=https://nyc3.digitaloceanspaces.com
 STORAGE_S3_PREFIX=media/
@@ -139,8 +139,8 @@ Ensure the IAM user or access key has the following permissions on the bucket:
         "s3:ListBucket"
       ],
       "Resource": [
-        "arn:aws:s3:::my-openyapper-media",
-        "arn:aws:s3:::my-openyapper-media/*"
+        "arn:aws:s3:::my-forja-media",
+        "arn:aws:s3:::my-forja-media/*"
       ]
     }
   ]

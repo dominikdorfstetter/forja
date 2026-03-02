@@ -6,7 +6,7 @@ description: Redis-backed rate limiting with per-IP and per-key tracking.
 
 # Rate Limiting
 
-OpenYapper uses **Redis-backed fixed-window counters** for rate limiting. Rate limiting operates at two levels: per-IP (global) and per-API-key (individual). If Redis is unavailable, the system degrades gracefully and allows all requests through.
+Forja uses **Redis-backed fixed-window counters** for rate limiting. Rate limiting operates at two levels: per-IP (global) and per-API-key (individual). If Redis is unavailable, the system degrades gracefully and allows all requests through.
 
 ## How It Works
 
@@ -136,7 +136,7 @@ When a rate limit is exceeded, the API returns a `429 Too Many Requests` respons
 
 ```json
 {
-  "type": "https://openyapper.dev/errors/rate_limited",
+  "type": "https://forja.dev/errors/rate_limited",
   "title": "Rate Limited",
   "status": 429,
   "detail": "Rate limit exceeded: 51 requests per second exceeded (limit: 50)",

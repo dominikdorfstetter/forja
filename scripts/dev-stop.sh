@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-stop.sh — Stop OpenYapper development environment
+# dev-stop.sh — Stop Forja development environment
 #
 # Usage:
 #   ./scripts/dev-stop.sh              # Stop containers (keep volumes)
@@ -11,7 +11,7 @@ REMOVE_VOLUMES=false
 
 show_help() {
   cat <<EOF
-${BOLD}dev-stop.sh${NC} — Stop OpenYapper development environment
+${BOLD}dev-stop.sh${NC} — Stop Forja development environment
 
 ${BOLD}Usage:${NC}
   ./scripts/dev-stop.sh [options]

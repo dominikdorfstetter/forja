@@ -4,7 +4,7 @@ sidebar_position: 7
 
 # CI/CD Pipeline
 
-OpenYapper uses GitHub Actions for continuous integration. The pipeline runs on every push to `main` and on every pull request targeting `main`.
+Forja uses GitHub Actions for continuous integration. The pipeline runs on every push to `main` and on every pull request targeting `main`.
 
 ## Pipeline Overview
 
@@ -42,11 +42,11 @@ services:
   postgres:
     image: postgres:16-alpine
     env:
-      POSTGRES_USER: openyapper
-      POSTGRES_PASSWORD: openyapper
-      POSTGRES_DB: openyapper
+      POSTGRES_USER: forja
+      POSTGRES_PASSWORD: forja
+      POSTGRES_DB: forja
     options: >-
-      --health-cmd "pg_isready -U openyapper"
+      --health-cmd "pg_isready -U forja"
       --health-interval 10s
       --health-timeout 5s
       --health-retries 5
@@ -72,7 +72,7 @@ services:
    CREATE EXTENSION IF NOT EXISTS "citext";
    CREATE EXTENSION IF NOT EXISTS "pg_trgm";
    ```
-   Also creates a separate `openyapper_test` database for integration tests.
+   Also creates a separate `forja_test` database for integration tests.
 
 7. **Run unit tests** -- `cargo test --lib` runs all unit tests (no database required).
 
@@ -82,8 +82,8 @@ services:
 
 ```yaml
 env:
-  DATABASE_URL: postgres://openyapper:openyapper@localhost:5432/openyapper
-  TEST_DATABASE_URL: postgres://openyapper:openyapper@localhost:5432/openyapper_test
+  DATABASE_URL: postgres://forja:forja@localhost:5432/forja
+  TEST_DATABASE_URL: postgres://forja:forja@localhost:5432/forja_test
 ```
 
 ## Admin Job

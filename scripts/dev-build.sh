@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-build.sh — Build OpenYapper components
+# dev-build.sh — Build Forja components
 #
 # Usage:
 #   ./scripts/dev-build.sh              # Build admin + backend (debug)
@@ -15,7 +15,7 @@ RELEASE_MODE=false
 
 show_help() {
   cat <<EOF
-${BOLD}dev-build.sh${NC} — Build OpenYapper components
+${BOLD}dev-build.sh${NC} — Build Forja components
 
 ${BOLD}Usage:${NC}
   ./scripts/dev-build.sh [options]

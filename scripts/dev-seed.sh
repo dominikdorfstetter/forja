@@ -52,7 +52,7 @@ if [[ -z "${DATABASE_URL:-}" ]]; then
 fi
 
 # Verify database is reachable
-if ! docker exec "$DB_CONTAINER" pg_isready -U openyapper -d openyapper &>/dev/null; then
+if ! docker exec "$DB_CONTAINER" pg_isready -U forja -d forja &>/dev/null; then
   error "PostgreSQL is not running. Start it with: ./scripts/dev-start.sh"
   exit 1
 fi

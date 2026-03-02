@@ -1,6 +1,7 @@
-# OpenYapper
+# Forja
 
-A multi-site CMS platform with a Rust backend API, React admin dashboard, and pluggable frontend templates.
+*Forja (Spanish: forge) — an open-source multi-site CMS where you forge your content. Like a blacksmith shapes raw metal 
+into something useful, Forja lets you shape, manage, and deliver content across multiple sites from a single powerful backend.*
 
 **Author:** Dominik Dorfstetter
 **License:** AGPL-3.0-or-later
@@ -39,8 +40,8 @@ A multi-site CMS platform with a Rust backend API, React admin dashboard, and pl
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/dominikdorfstetter/openyapper.git
-cd openyapper
+git clone https://github.com/dominikdorfstetter/forja.git
+cd forja
 ```
 
 ### 2. Start infrastructure (PostgreSQL, Redis, pgAdmin)
@@ -50,15 +51,15 @@ docker compose -f docker-compose.dev.yaml up -d
 ```
 
 This starts:
-- **PostgreSQL** on `localhost:5432` (user: `openyapper`, password: `openyapper`, db: `openyapper`)
+- **PostgreSQL** on `localhost:5432` (user: `forja`, password: `forja`, db: `forja`)
 - **Redis** on `localhost:6379`
-- **pgAdmin** on `http://localhost:5050` (login: `admin@openyapper.dev` / `admin`)
+- **pgAdmin** on `http://localhost:5050` (login: `admin@forja.dev` / `admin`)
 
 PostgreSQL extensions (`uuid-ossp`, `citext`, `pg_trgm`) are created automatically on first start.
 
 ### 3. Register with Clerk (Authentication Provider)
 
-OpenYapper uses [Clerk](https://clerk.com/) for identity management in the admin dashboard.
+Forja uses [Clerk](https://clerk.com/) for identity management in the admin dashboard.
 
 1. Sign up at [clerk.com](https://clerk.com/) and create a new Application
 2. From **API Keys**, copy your **Publishable Key** (`pk_test_...`) and **Secret Key** (`sk_test_...`)
@@ -75,7 +76,7 @@ cp .env.example .env
 Edit `backend/.env` with your credentials:
 
 ```env
-DATABASE_URL=postgres://openyapper:openyapper@localhost:5432/openyapper
+DATABASE_URL=postgres://forja:forja@localhost:5432/forja
 CLERK_SECRET_KEY=sk_test_your_secret_key_here
 CLERK_PUBLISHABLE_KEY=pk_test_your_publishable_key_here
 CLERK_JWKS_URL=https://your-instance.clerk.accounts.dev/.well-known/jwks.json
@@ -187,13 +188,13 @@ Full API documentation is available at `/api-docs` when the backend is running.
 
 ## Storage
 
-OpenYapper supports **local filesystem** (default) and **S3-compatible object storage** for media uploads. Local storage works out of the box for development; for production, configure S3 via environment variables.
+Forja supports **local filesystem** (default) and **S3-compatible object storage** for media uploads. Local storage works out of the box for development; for production, configure S3 via environment variables.
 
 See [`backend/README.md`](backend/README.md) for storage configuration details and environment variables.
 
 ## Webhooks
 
-OpenYapper can notify external services when content changes via webhooks. Webhooks are configured per-site in the admin dashboard under **Site > Webhooks**.
+Forja can notify external services when content changes via webhooks. Webhooks are configured per-site in the admin dashboard under **Site > Webhooks**.
 
 - Subscribe to specific events (`blog.created`, `page.updated`, `document.deleted`, etc.) or all events
 - Payloads are signed with **HMAC-SHA256** (`X-Webhook-Signature` header)
@@ -215,7 +216,7 @@ When both are set, the server starts with HTTPS. When unset (the default), the s
 
 ## Documentation
 
-Full documentation is available at **[dominikdorfstetter.github.io/openyapper](https://dominikdorfstetter.github.io/openyapper/)**.
+Full documentation is available at **[dominikdorfstetter.github.io/forja](https://dominikdorfstetter.github.io/forja/)**.
 
 The docs cover getting started, architecture, API reference, admin guide, deployment, and developer guides. To run the docs locally:
 
@@ -225,10 +226,10 @@ cd docs && npm install && npm start
 
 ## Docker
 
-OpenYapper is available on [Docker Hub](https://hub.docker.com/r/dominikdorfstetter/openyapper):
+Forja is available on [Docker Hub](https://hub.docker.com/r/dominikdorfstetter/forja):
 
 ```bash
-docker pull dominikdorfstetter/openyapper
+docker pull dominikdorfstetter/forja
 ```
 
 Run with Docker Compose (requires PostgreSQL and Redis):
@@ -236,11 +237,11 @@ Run with Docker Compose (requires PostgreSQL and Redis):
 ```yaml
 services:
   app:
-    image: dominikdorfstetter/openyapper
+    image: dominikdorfstetter/forja
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgres://openyapper:openyapper@postgres:5432/openyapper
+      DATABASE_URL: postgres://forja:forja@postgres:5432/forja
       REDIS_URL: redis://redis:6379
       CLERK_SECRET_KEY: sk_test_...
       CLERK_PUBLISHABLE_KEY: pk_test_...
@@ -253,9 +254,9 @@ services:
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: openyapper
-      POSTGRES_PASSWORD: openyapper
-      POSTGRES_DB: openyapper
+      POSTGRES_USER: forja
+      POSTGRES_PASSWORD: forja
+      POSTGRES_DB: forja
     volumes:
       - pgdata:/var/lib/postgresql/data
 
@@ -272,11 +273,11 @@ docker compose up -d
 
 The API is available at `http://localhost:8000` and the admin dashboard at `http://localhost:8000/dashboard`.
 
-See the full [Docker deployment guide](https://dominikdorfstetter.github.io/openyapper/deployment/docker) for health checks, environment variables, and production configuration.
+See the full [Docker deployment guide](https://dominikdorfstetter.github.io/forja/deployment/docker) for health checks, environment variables, and production configuration.
 
 ## Deploy
 
-Deploy OpenYapper to a cloud platform with managed Postgres and Redis:
+Deploy Forja to a cloud platform with managed Postgres and Redis:
 
 - **[Railway](docs/docs/deployment/railway.md)** &mdash; auto-detects Dockerfile, managed addons, free tier available
 

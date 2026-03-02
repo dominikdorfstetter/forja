@@ -35,7 +35,7 @@ curl -X POST \
   -H "X-API-Key: oy_live_abc123..." \
   -H "Content-Type: application/json" \
   -d '{
-    "url": "https://example.com/webhooks/openyapper",
+    "url": "https://example.com/webhooks/forja",
     "description": "Notify on content changes",
     "events": ["blog.created", "blog.updated", "page.created"]
   }' \
@@ -47,7 +47,7 @@ curl -X POST \
 ```json
 {
   "id": "webhook-uuid",
-  "url": "https://example.com/webhooks/openyapper",
+  "url": "https://example.com/webhooks/forja",
   "secret": "auto-generated-uuid",
   "description": "Notify on content changes",
   "events": ["blog.created", "blog.updated", "page.created"],

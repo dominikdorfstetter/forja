@@ -17,7 +17,7 @@ docker compose -f docker-compose.dev.yaml up -d
 Wait for PostgreSQL to accept connections:
 
 ```bash
-docker exec openyapper-db pg_isready -U openyapper -d openyapper
+docker exec forja-db pg_isready -U forja -d forja
 # => /var/run/postgresql:5432 - accepting connections
 ```
 
@@ -160,7 +160,7 @@ If port 5432, 6379, or 8000 is already occupied, stop the conflicting service or
 
 ### SQLx migration errors
 
-Make sure `DATABASE_URL` in `backend/.env` matches the Docker Compose credentials (`openyapper:openyapper@localhost:5432/openyapper`).
+Make sure `DATABASE_URL` in `backend/.env` matches the Docker Compose credentials (`forja:forja@localhost:5432/forja`).
 
 ### Cargo build failures
 

@@ -4,7 +4,7 @@ sidebar_position: 2
 
 # Astro Blog Template
 
-A server-rendered blog and portfolio site powered by [Astro 5](https://astro.build) and the OpenYapper CMS backend. This template ships with OpenYapper in the `templates/astro-blog/` directory.
+A server-rendered blog and portfolio site powered by [Astro 5](https://astro.build) and the Forja CMS backend. This template ships with Forja in the `templates/astro-blog/` directory.
 
 ## Tech Stack
 
@@ -95,7 +95,7 @@ templates/astro-blog/
 
 ## Connecting to the API
 
-The API client in `src/lib/api.ts` provides typed functions for fetching content from OpenYapper. It reads the environment variables and constructs requests with the `X-API-Key` header:
+The API client in `src/lib/api.ts` provides typed functions for fetching content from Forja. It reads the environment variables and constructs requests with the `X-API-Key` header:
 
 ```typescript
 const API_URL = import.meta.env.CMS_API_URL;
@@ -137,7 +137,7 @@ All components live in `src/components/`. They use semantic HTML and minimal sty
 
 ## Admin Preview Integration
 
-This template integrates with the OpenYapper admin dashboard's preview feature. In the admin Settings page, add a preview template URL pointing to your dev server (e.g., `http://localhost:4321`). Then use the preview buttons in the blog and page editors to open content directly in the template.
+This template integrates with the Forja admin dashboard's preview feature. In the admin Settings page, add a preview template URL pointing to your dev server (e.g., `http://localhost:4321`). Then use the preview buttons in the blog and page editors to open content directly in the template.
 
 ## Building for Production
 

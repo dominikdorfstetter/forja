@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "OpenYapper",
+    "appName": "Forja",
     "actions": {
       "save": "Save",
       "cancel": "Cancel",
@@ -140,7 +140,7 @@
     }
   },
   "login": {
-    "title": "OpenYapper",
+    "title": "Forja",
     "subtitle": "Enter your API key to access the admin dashboard",
     "apiKeyLabel": "API Key",
     "apiKeyPlaceholder": "dk_xxxxxxxx_xxxxxxxxxxxxxxxx",
@@ -1137,7 +1137,7 @@
     }
   },
   "onboarding": {
-    "welcome": "Welcome to OpenYapper",
+    "welcome": "Welcome to Forja",
     "subtitle": "Your headless CMS for multi-site, multilingual content management.",
     "description": "Create your first site to start managing pages, blog posts, media, and more — all served through a powerful REST API.",
     "features": {

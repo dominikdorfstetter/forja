@@ -6,7 +6,7 @@ description: Rust backend architecture, directory structure, and request lifecyc
 
 # Backend Architecture
 
-The OpenYapper backend is a REST API built with **Rust**, using the **Rocket 0.5** web framework. It communicates with PostgreSQL via **SQLx** (compile-time checked queries) and uses **utoipa** for OpenAPI specification generation.
+The Forja backend is a REST API built with **Rust**, using the **Rocket 0.5** web framework. It communicates with PostgreSQL via **SQLx** (compile-time checked queries) and uses **utoipa** for OpenAPI specification generation.
 
 ## Directory Structure
 
@@ -184,7 +184,7 @@ Each variant maps to an HTTP status code and produces a JSON response:
 
 ```json
 {
-  "type": "https://openyapper.dev/errors/not_found",
+  "type": "https://forja.dev/errors/not_found",
   "title": "Resource Not Found",
   "status": 404,
   "detail": "Blog with id '550e8400' not found",

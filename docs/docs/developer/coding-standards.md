@@ -4,7 +4,7 @@ sidebar_position: 6
 
 # Coding Standards
 
-This page documents the coding standards and style conventions enforced across the OpenYapper codebase. These checks run automatically in CI and should be verified locally before pushing.
+This page documents the coding standards and style conventions enforced across the Forja codebase. These checks run automatically in CI and should be verified locally before pushing.
 
 ## Backend (Rust)
 

@@ -1,4 +1,4 @@
-# OpenYapper API
+# Forja API
 
 Multi-site CMS REST API built with Rust and Rocket.
 
@@ -109,7 +109,7 @@ cd ../admin && npm run build
 
 ## Authentication
 
-OpenYapper supports dual authentication mechanisms. Every protected endpoint accepts either method.
+Forja supports dual authentication mechanisms. Every protected endpoint accepts either method.
 
 ### API Key Authentication
 
@@ -247,7 +247,7 @@ GET    /api/v1/sites/{site_id}/cv-entries
 
 ## Storage
 
-OpenYapper supports two storage backends for media uploads: **local filesystem** (default) and **S3-compatible object storage**.
+Forja supports two storage backends for media uploads: **local filesystem** (default) and **S3-compatible object storage**.
 
 ### Local Storage (default)
 
@@ -270,7 +270,7 @@ STORAGE_LOCAL_UPLOAD_DIR=./uploads
 STORAGE_LOCAL_BASE_URL=/uploads
 
 # Production example: dedicated volume with absolute path
-STORAGE_LOCAL_UPLOAD_DIR=/var/lib/openyapper/uploads
+STORAGE_LOCAL_UPLOAD_DIR=/var/lib/forja/uploads
 STORAGE_LOCAL_BASE_URL=/uploads
 ```
 
@@ -296,7 +296,7 @@ STORAGE_S3_REGION=eu-central-1
 
 # MinIO (self-hosted S3-compatible)
 STORAGE_PROVIDER=s3
-STORAGE_S3_BUCKET=openyapper
+STORAGE_S3_BUCKET=forja
 STORAGE_S3_REGION=us-east-1
 STORAGE_S3_ENDPOINT=http://localhost:9000
 ```

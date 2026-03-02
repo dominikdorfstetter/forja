@@ -4,7 +4,7 @@ sidebar_position: 10
 
 # Webhooks
 
-Webhooks allow you to receive real-time HTTP notifications when events happen in your OpenYapper site. When a configured event occurs (e.g., a blog post is published), OpenYapper sends an HTTP POST request to your specified URL with details about the event.
+Webhooks allow you to receive real-time HTTP notifications when events happen in your Forja site. When a configured event occurs (e.g., a blog post is published), Forja sends an HTTP POST request to your specified URL with details about the event.
 
 ![Webhooks management](/img/screenshots/admin-webhooks.png)
 
@@ -35,7 +35,7 @@ Navigate to **Webhooks** in the sidebar. The page shows all configured webhooks 
 2. Fill in the webhook details:
    - **Name** -- a descriptive name (e.g., "Deploy trigger", "Slack notification").
    - **URL** -- the endpoint URL that will receive the POST request. Must be a valid HTTPS URL.
-   - **Secret** -- an optional shared secret. When provided, OpenYapper signs the payload with this secret so your endpoint can verify the request is authentic.
+   - **Secret** -- an optional shared secret. When provided, Forja signs the payload with this secret so your endpoint can verify the request is authentic.
    - **Events** -- select one or more events to listen to (see [Available Events](#available-events) below).
 3. Click **Save**. The webhook is created in an **Active** state.
 
@@ -55,7 +55,7 @@ Navigate to **Webhooks** in the sidebar. The page shows all configured webhooks 
 | `navigation.updated` | A navigation menu is updated. |
 
 :::info
-The available events may vary depending on your OpenYapper version. The webhook creation form always shows the current list of supported events.
+The available events may vary depending on your Forja version. The webhook creation form always shows the current list of supported events.
 :::
 
 ## Editing a Webhook
@@ -83,7 +83,7 @@ Each webhook maintains a delivery log showing the history of all delivery attemp
 
 ### Retry Behavior
 
-If a delivery fails (your endpoint returns an error or is unreachable), OpenYapper retries the delivery with exponential backoff.
+If a delivery fails (your endpoint returns an error or is unreachable), Forja retries the delivery with exponential backoff.
 
 ## Testing a Webhook
 
@@ -91,7 +91,7 @@ To verify your webhook is configured correctly:
 
 1. Open the webhook detail view.
 2. Click the **Test** button.
-3. OpenYapper sends a test payload to your endpoint.
+3. Forja sends a test payload to your endpoint.
 4. Check the delivery log to see the result.
 
 The test payload contains sample data and is clearly marked as a test event.

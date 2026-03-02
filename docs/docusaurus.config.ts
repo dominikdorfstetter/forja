@@ -2,18 +2,18 @@ import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
-const version = process.env.OPENYAPPER_VERSION || 'dev';
+const version = process.env.FORJA_VERSION || 'dev';
 
 const config: Config = {
-  title: 'OpenYapper',
-  tagline: 'A multi-site CMS platform built with Rust and React',
+  title: 'Forja',
+  tagline: 'Forge your content — a multi-site CMS built with Rust and React',
   favicon: 'img/favicon.ico',
 
   url: 'https://dominikdorfstetter.github.io',
-  baseUrl: '/openyapper/',
+  baseUrl: '/forja/',
 
   organizationName: 'dominikdorfstetter',
-  projectName: 'openyapper',
+  projectName: 'forja',
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -30,7 +30,7 @@ const config: Config = {
         docs: {
           sidebarPath: './sidebars.ts',
           editUrl:
-            'https://github.com/dominikdorfstetter/openyapper/tree/main/website/',
+            'https://github.com/dominikdorfstetter/forja/tree/main/website/',
         },
         blog: false,
         theme: {
@@ -42,9 +42,9 @@ const config: Config = {
 
   themeConfig: {
     navbar: {
-      title: 'OpenYapper',
+      title: 'Forja',
       logo: {
-        alt: 'OpenYapper Logo',
+        alt: 'Forja Logo',
         src: 'img/logo.svg',
       },
       items: [
@@ -60,7 +60,7 @@ const config: Config = {
           value: `<span style="font-size:0.8rem;color:var(--ifm-color-emphasis-600)">${version}</span>`,
         },
         {
-          href: 'https://github.com/dominikdorfstetter/openyapper',
+          href: 'https://github.com/dominikdorfstetter/forja',
           label: 'GitHub',
           position: 'right',
         },
@@ -88,7 +88,7 @@ const config: Config = {
         {
           title: 'More',
           items: [
-            {label: 'GitHub', href: 'https://github.com/dominikdorfstetter/openyapper'},
+            {label: 'GitHub', href: 'https://github.com/dominikdorfstetter/forja'},
             {label: 'Changelog', to: 'docs/changelog'},
           ],
         },

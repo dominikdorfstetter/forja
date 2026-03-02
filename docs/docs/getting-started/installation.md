@@ -9,13 +9,13 @@ This guide walks you through cloning the repository, starting the infrastructure
 ## 1. Clone the Repository
 
 ```bash
-git clone https://github.com/dominikdorfstetter/openyapper.git
-cd openyapper
+git clone https://github.com/dominikdorfstetter/forja.git
+cd forja
 ```
 
 ## 2. Start Docker Services
 
-OpenYapper ships with a `docker-compose.dev.yaml` that runs PostgreSQL 16, Redis 7, and pgAdmin:
+Forja ships with a `docker-compose.dev.yaml` that runs PostgreSQL 16, Redis 7, and pgAdmin:
 
 ```bash
 docker compose -f docker-compose.dev.yaml up -d
@@ -25,9 +25,9 @@ This creates three containers:
 
 | Container | Service | Port |
 |-----------|---------|------|
-| `openyapper-db` | PostgreSQL 16 | `5432` |
-| `openyapper-redis` | Redis 7 | `6379` |
-| `openyapper-pgadmin` | pgAdmin 4 | `5050` |
+| `forja-db` | PostgreSQL 16 | `5432` |
+| `forja-redis` | Redis 7 | `6379` |
+| `forja-pgadmin` | pgAdmin 4 | `5050` |
 
 Verify they are running:
 
@@ -54,7 +54,7 @@ cp .env.example .env
 The defaults work out of the box with the Docker services. The most important variable is already set:
 
 ```env
-DATABASE_URL=postgres://openyapper:openyapper@localhost:5432/openyapper
+DATABASE_URL=postgres://forja:forja@localhost:5432/forja
 ```
 
 If you have a Clerk account, add your keys now (see [Configuration](./configuration) for the full variable reference):
@@ -82,7 +82,7 @@ cd ..
 
 ## 5. Quick Start with Dev Scripts
 
-OpenYapper includes convenience scripts in the `scripts/` directory. The most common one starts everything at once:
+Forja includes convenience scripts in the `scripts/` directory. The most common one starts everything at once:
 
 ```bash
 # Start Docker infra + backend + admin in one command
@@ -115,7 +115,7 @@ Other options:
 After cloning, your directory should look like this:
 
 ```
-openyapper/
+forja/
 ├── admin/                 # React admin dashboard (Vite + MUI)
 ├── backend/               # Rust API server (Rocket 0.5 + SQLx)
 │   ├── migrations/        # SQLx database migrations

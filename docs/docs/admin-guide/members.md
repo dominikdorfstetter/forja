@@ -4,7 +4,7 @@ sidebar_position: 13
 
 # Members
 
-Members are the users who have access to a specific site within OpenYapper. The members page lets you manage who can access your site and what they can do.
+Members are the users who have access to a specific site within Forja. The members page lets you manage who can access your site and what they can do.
 
 ![Members management](/img/screenshots/admin-members.png)
 

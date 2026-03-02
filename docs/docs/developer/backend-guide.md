@@ -4,7 +4,7 @@ sidebar_position: 2
 
 # Backend Development Guide
 
-This guide explains how to add new features to the OpenYapper Rust backend. It covers the standard pattern for creating a new model, DTO, and handler, and how to register everything so it appears in the API and Swagger documentation.
+This guide explains how to add new features to the Forja Rust backend. It covers the standard pattern for creating a new model, DTO, and handler, and how to register everything so it appears in the API and Swagger documentation.
 
 ## Architecture Overview
 
@@ -289,7 +289,7 @@ Add `pub mod bookmark;` to both files (already done in steps 1 and 2).
 
 ## Auth Guards
 
-OpenYapper provides four auth guard types corresponding to the permission levels:
+Forja provides four auth guard types corresponding to the permission levels:
 
 | Guard | Permission Level | Use Case |
 |-------|-----------------|----------|

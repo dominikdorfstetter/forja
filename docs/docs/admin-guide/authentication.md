@@ -4,7 +4,7 @@ sidebar_position: 2
 
 # Authentication
 
-OpenYapper uses [Clerk](https://clerk.com) for authentication in the admin dashboard. Clerk provides a secure, hosted identity layer with support for email/password, social logins, and multi-factor authentication.
+Forja uses [Clerk](https://clerk.com) for authentication in the admin dashboard. Clerk provides a secure, hosted identity layer with support for email/password, social logins, and multi-factor authentication.
 
 ## Signing In
 
@@ -30,7 +30,7 @@ New users do not automatically have access to any site. A site owner or admin mu
 
 ## Role-Based Access Control
 
-OpenYapper uses a four-tier permission model. Each user is assigned a role that determines what they can do:
+Forja uses a four-tier permission model. Each user is assigned a role that determines what they can do:
 
 | Role | Level | Capabilities |
 |------|-------|-------------|
@@ -47,7 +47,7 @@ OpenYapper uses a four-tier permission model. Each user is assigned a role that 
 
 ### Clerk Role Mapping
 
-When authenticating via a Clerk JWT, the role claim in the token is mapped to an OpenYapper permission level. The mapping is configured in the backend and follows this flow:
+When authenticating via a Clerk JWT, the role claim in the token is mapped to an Forja permission level. The mapping is configured in the backend and follows this flow:
 
 1. User signs in via Clerk.
 2. The React app sends the JWT in the `Authorization: Bearer <token>` header.
@@ -67,7 +67,7 @@ Click your **profile avatar** in the top bar, then select **Sign out**. This cle
 
 ## API Authentication
 
-In addition to Clerk JWTs, OpenYapper supports API key authentication via the `X-API-Key` header. API keys are used for programmatic access (frontends, CI/CD pipelines, scripts). See [API Keys](./api-keys) for details on creating and managing API keys.
+In addition to Clerk JWTs, Forja supports API key authentication via the `X-API-Key` header. API keys are used for programmatic access (frontends, CI/CD pipelines, scripts). See [API Keys](./api-keys) for details on creating and managing API keys.
 
 ## Troubleshooting
 

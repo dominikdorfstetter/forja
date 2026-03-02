@@ -4,7 +4,7 @@ sidebar_position: 8
 
 # Taxonomy
 
-Taxonomy in OpenYapper refers to the classification system for your content. It consists of **tags** and **categories** that help organize blog posts and other content into logical groups.
+Taxonomy in Forja refers to the classification system for your content. It consists of **tags** and **categories** that help organize blog posts and other content into logical groups.
 
 ![Taxonomy management](/img/screenshots/admin-taxonomy.png)
 

@@ -65,7 +65,7 @@ curl -H "X-API-Key: oy_live_abc123..." \
         {
           "id": "item-uuid",
           "name": "Session Cookie",
-          "provider": "OpenYapper",
+          "provider": "Forja",
           "purpose": "User session management"
         }
       ]

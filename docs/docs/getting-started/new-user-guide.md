@@ -4,13 +4,13 @@ sidebar_position: 5
 
 # New User Guide
 
-This step-by-step guide walks you through your first session with OpenYapper: signing in, creating a site, adding languages, configuring settings, and publishing your first blog post.
+This step-by-step guide walks you through your first session with Forja: signing in, creating a site, adding languages, configuring settings, and publishing your first blog post.
 
 ## Step 1: Sign In
 
 Navigate to your dashboard URL (e.g., `http://localhost:5173/dashboard` in development). You will see the Clerk login screen.
 
-![Sign in to OpenYapper](/img/screenshots/login.png)
+![Sign in to Forja](/img/screenshots/login.png)
 
 Enter your email address, click **Continue**, then enter your password and click **Continue** again. After successful authentication, you are redirected to the dashboard.
 
@@ -20,9 +20,9 @@ If this is your first time signing in and you were not pre-configured as a syste
 
 ## Step 2: Explore the Welcome Screen
 
-As a new user with no sites, you will see the **Welcome to OpenYapper** landing page. This page introduces the key capabilities of the CMS: multi-site management, multilingual content, and the API-first architecture.
+As a new user with no sites, you will see the **Welcome to Forja** landing page. This page introduces the key capabilities of the CMS: multi-site management, multilingual content, and the API-first architecture.
 
-![Welcome to OpenYapper](/img/screenshots/onboarding-dashboard-with-site.png)
+![Welcome to Forja](/img/screenshots/onboarding-dashboard-with-site.png)
 
 Click **Create Your First Site** to get started, or navigate to **Sites** in the sidebar.
 
@@ -51,7 +51,7 @@ Click **Create** to save. Your site now appears in the sites list and is automat
 ![Sites with content](/img/screenshots/admin-sites.png)
 
 :::info
-You can create multiple sites from a single OpenYapper installation. Each site has its own content, languages, navigation, and settings. Use the site selector in the top bar to switch between them.
+You can create multiple sites from a single Forja installation. Each site has its own content, languages, navigation, and settings. Use the site selector in the top bar to switch between them.
 :::
 
 ## Step 4: Add Languages

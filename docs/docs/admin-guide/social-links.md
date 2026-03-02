@@ -46,7 +46,7 @@ Click the delete icon on a social link and confirm. The link is removed immediat
 
 ## Supported Platforms
 
-OpenYapper includes icons and labels for common platforms:
+Forja includes icons and labels for common platforms:
 
 - GitHub
 - Twitter / X

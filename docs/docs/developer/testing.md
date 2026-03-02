@@ -4,7 +4,7 @@ sidebar_position: 4
 
 # Testing
 
-OpenYapper has separate test suites for the backend (Rust) and admin dashboard (React). This guide covers how to run each suite and the available testing options.
+Forja has separate test suites for the backend (Rust) and admin dashboard (React). This guide covers how to run each suite and the available testing options.
 
 ## Quick Reference
 

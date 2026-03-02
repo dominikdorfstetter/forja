@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 env:
-  DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/openyapper
+  DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/forja
 
 jobs:
   docker:

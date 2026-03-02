@@ -36,7 +36,7 @@ jobs:
       - name: Build website
         run: npm run build
         env:
-          OPENYAPPER_VERSION: ${{ github.ref_name }}
+          FORJA_VERSION: ${{ github.ref_name }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4

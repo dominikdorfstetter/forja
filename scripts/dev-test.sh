@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-test.sh — Run tests and linting for OpenYapper
+# dev-test.sh — Run tests and linting for Forja
 #
 # Usage:
 #   ./scripts/dev-test.sh               # Run all tests + lint
@@ -17,7 +17,7 @@ COVERAGE=false
 
 show_help() {
   cat <<EOF
-${BOLD}dev-test.sh${NC} — Run tests and linting for OpenYapper
+${BOLD}dev-test.sh${NC} — Run tests and linting for Forja
 
 ${BOLD}Usage:${NC}
   ./scripts/dev-test.sh [options]
