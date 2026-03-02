@@ -1,4 +1,4 @@
-# Forja
+# Forja 🔨
 
 *Forja (Spanish: forge) — an open-source multi-site CMS where you forge your content. Like a blacksmith shapes raw metal 
 into something useful, Forja lets you shape, manage, and deliver content across multiple sites from a single powerful backend.*
