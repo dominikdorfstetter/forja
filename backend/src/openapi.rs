@@ -66,6 +66,7 @@ use utoipa::{Modify, OpenApi};
         // Blogs
         crate::handlers::blog::list_blogs,
         crate::handlers::blog::list_published_blogs,
+        crate::handlers::blog::list_published_blogs_by_category,
         crate::handlers::blog::list_featured_blogs,
         crate::handlers::blog::get_blog,
         crate::handlers::blog::get_blog_by_slug,

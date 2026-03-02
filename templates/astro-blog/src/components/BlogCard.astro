@@ -1,22 +1,24 @@
 ---
-import type { BlogDetailResponse } from "../lib/api";
+import type { BlogDetailResponse, MediaResponse } from "../lib/api";
 import { fetchMedia } from "../lib/api";
+import ResponsiveImage from "./ResponsiveImage.astro";
 
 interface Props {
   blog: BlogDetailResponse;
+  coverMedia?: MediaResponse | null;
 }
 
-const { blog } = Astro.props;
+const { blog, coverMedia } = Astro.props;
 const loc = blog.localizations[0];
 const title = loc?.title ?? "Untitled";
 const excerpt = loc?.excerpt ?? "";
 const slug = blog.slug ?? blog.id;
 
-let coverUrl: string | null = null;
-if (blog.cover_image_id) {
+// Use pre-fetched media if provided (N+1 fix), otherwise fall back to individual fetch
+let resolvedMedia: MediaResponse | null = coverMedia ?? null;
+if (!resolvedMedia && blog.cover_image_id) {
   try {
-    const media = await fetchMedia(blog.cover_image_id);
-    coverUrl = media.public_url;
+    resolvedMedia = await fetchMedia(blog.cover_image_id);
   } catch {
     // Skip cover image if not available
   }
@@ -30,8 +32,14 @@ const date = new Date(blog.published_date).toLocaleDateString("en-US", {
 ---
 
 <article class="blog-card">
-  {coverUrl && (
-    <img src={coverUrl} alt={title} class="blog-card__img" loading="lazy" />
+  {resolvedMedia && (
+    <ResponsiveImage
+      media={resolvedMedia}
+      alt={title}
+      class="blog-card__img"
+      sizes="(max-width: 768px) 100vw, 360px"
+      loading="lazy"
+    />
   )}
   <div class="blog-card__body">
     <p class="blog-card__meta">
@@ -43,5 +51,14 @@ const date = new Date(blog.published_date).toLocaleDateString("en-US", {
       <a href={`/blog/${slug}`}>{title}</a>
     </h3>
     {excerpt && <p class="blog-card__excerpt">{excerpt}</p>}
+    {blog.categories.length > 0 && (
+      <div class="blog-card__categories">
+        {blog.categories.map((cat) => (
+          <a href={`/blog/category/${cat.slug}`} class="blog-card__category">
+            {cat.slug}
+          </a>
+        ))}
+      </div>
+    )}
   </div>
 </article>

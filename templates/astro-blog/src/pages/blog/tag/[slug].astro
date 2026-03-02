@@ -1,0 +1,5 @@
+---
+// Tags are aliased to categories in the backend
+const { slug } = Astro.params;
+return Astro.redirect(`/blog/category/${slug}/`, 301);
+---

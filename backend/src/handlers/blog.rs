@@ -140,6 +140,56 @@ pub async fn list_published_blogs(
     Ok(Json(paginated))
 }
 
+/// List published blogs filtered by category slug (public endpoint)
+#[utoipa::path(
+    tag = "Blogs",
+    operation_id = "list_published_blogs_by_category",
+    description = "List published blogs filtered by category slug (public)",
+    params(
+        ("site_id" = Uuid, Path, description = "Site UUID"),
+        ("category_slug" = String, Path, description = "Category slug"),
+        ("page" = Option<i64>, Query, description = "Page number (default 1)"),
+        ("per_page" = Option<i64>, Query, description = "Items per page (default 10, max 100)")
+    ),
+    responses(
+        (status = 200, description = "Paginated published blogs in category", body = PaginatedBlogs),
+        (status = 401, description = "Unauthorized", body = ProblemDetails),
+        (status = 403, description = "Forbidden", body = ProblemDetails)
+    ),
+    security(("api_key" = []))
+)]
+#[get("/sites/<site_id>/blogs/published/category/<category_slug>?<page>&<per_page>")]
+pub async fn list_published_blogs_by_category(
+    state: &State<AppState>,
+    site_id: Uuid,
+    category_slug: &str,
+    page: Option<i64>,
+    per_page: Option<i64>,
+    auth: ReadKey,
+) -> Result<Json<PaginatedBlogs>, ApiError> {
+    auth.0
+        .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)
+        .await?;
+    let params = PaginationParams::new(page, per_page);
+    let (limit, offset) = params.limit_offset();
+
+    let blogs = Blog::find_published_for_site_by_category(
+        &state.db,
+        site_id,
+        category_slug,
+        limit,
+        offset,
+    )
+    .await?;
+    let total =
+        Blog::count_published_for_site_by_category(&state.db, site_id, category_slug).await?;
+
+    let items: Vec<BlogListItem> = blogs.into_iter().map(BlogListItem::from).collect();
+    let paginated = params.paginate(items, total);
+
+    Ok(Json(paginated))
+}
+
 /// Get featured blogs for a site
 #[utoipa::path(
     tag = "Blogs",
@@ -969,6 +1019,7 @@ pub fn routes() -> Vec<Route> {
     routes![
         list_blogs,
         list_published_blogs,
+        list_published_blogs_by_category,
         list_featured_blogs,
         get_blog,
         get_blog_by_slug,
@@ -994,6 +1045,6 @@ mod tests {
     #[test]
     fn test_routes_count() {
         let routes = routes();
-        assert_eq!(routes.len(), 17, "Should have 17 blog routes");
+        assert_eq!(routes.len(), 18, "Should have 18 blog routes");
     }
 }
