@@ -20,14 +20,29 @@
 
 ### Infrastructure
 
+- Added Docker build test to CI pipeline
+- Replaced CodeQL default setup with path-filtered custom workflow (Rust/JS/Actions analyzed independently)
+- Added `.nvmrc` pinning Node.js to 20
+
+## v1.0.1
+
+### Infrastructure
+
 - Docker publish now triggers only on version tags (`v*`) instead of every push to main
 - Documentation deploy now triggers only on version tags with version displayed in navbar
 - CI uses path filtering to skip unrelated jobs (backend skips on admin-only changes and vice versa)
 - CI concurrency groups cancel superseded PR runs
 - Added `CI Pass` gate job for branch protection compatibility
-- Added Docker build test to CI pipeline
-- Replaced CodeQL default setup with path-filtered custom workflow (Rust/JS/Actions analyzed independently)
-- Added `.nvmrc` pinning Node.js to 20
+
+### Backend
+
+- Health endpoint now returns API version (`version` field from `Cargo.toml`)
+- API root endpoint uses compile-time version constant instead of hardcoded string
+
+### Admin Dashboard
+
+- Version chip displayed in dashboard system health section (sourced from backend)
+- Version chip displayed in Settings > System Info health alert
 
 ## v1.0.0 - Initial Release
 
