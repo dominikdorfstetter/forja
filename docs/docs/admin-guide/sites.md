@@ -4,7 +4,7 @@ sidebar_position: 4
 
 # Sites
 
-OpenYapper is a multi-site CMS. Each site is an independent space with its own content, media, navigation, settings, and members. You can manage multiple sites from a single OpenYapper installation.
+Forja is a multi-site CMS. Each site is an independent space with its own content, media, navigation, settings, and members. You can manage multiple sites from a single Forja installation.
 
 ![Sites management](/img/screenshots/admin-sites.png)
 

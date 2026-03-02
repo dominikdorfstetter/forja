@@ -11,6 +11,6 @@ pub struct ConfigResponse {
     pub clerk_publishable_key: String,
 
     /// Application name
-    #[schema(example = "OpenYapper")]
+    #[schema(example = "Forja")]
     pub app_name: String,
 }

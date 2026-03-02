@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # Blogs
 
-The blog management section is where you create, edit, and publish blog posts for your site. OpenYapper provides a full-featured blog editor with markdown support, localizations, scheduling, and more.
+The blog management section is where you create, edit, and publish blog posts for your site. Forja provides a full-featured blog editor with markdown support, localizations, scheduling, and more.
 
 ![Blog management](/img/screenshots/admin-blogs.png)
 
@@ -68,7 +68,7 @@ Changes to published posts take effect immediately. If you want to make changes 
 
 ## Localizations
 
-OpenYapper supports multilingual content. To add translations for a blog post:
+Forja supports multilingual content. To add translations for a blog post:
 
 1. Open the blog post detail view.
 2. Select a locale from the locale switcher (shown near the top of the editor).
@@ -100,7 +100,7 @@ Toggle the featured flag in the post editor.
 
 ## Review Workflow
 
-For teams, OpenYapper supports a basic review workflow:
+For teams, Forja supports a basic review workflow:
 
 1. A writer creates a post and saves it as **Draft**.
 2. When ready for review, the writer changes the status to **In Review**.

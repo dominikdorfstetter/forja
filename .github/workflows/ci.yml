@@ -50,11 +50,11 @@ jobs:
       postgres:
         image: postgres:16-alpine
         env:
-          POSTGRES_USER: openyapper
-          POSTGRES_PASSWORD: openyapper
-          POSTGRES_DB: openyapper
+          POSTGRES_USER: forja
+          POSTGRES_PASSWORD: forja
+          POSTGRES_DB: forja
         options: >-
-          --health-cmd "pg_isready -U openyapper"
+          --health-cmd "pg_isready -U forja"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -62,7 +62,7 @@ jobs:
           - 5432:5432
 
     env:
-      DATABASE_URL: postgres://openyapper:openyapper@localhost:5432/openyapper
+      DATABASE_URL: postgres://forja:forja@localhost:5432/forja
 
     steps:
       - uses: actions/checkout@v6
@@ -91,10 +91,10 @@ jobs:
           psql "$DATABASE_URL" -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
           psql "$DATABASE_URL" -c 'CREATE EXTENSION IF NOT EXISTS "citext";'
           psql "$DATABASE_URL" -c 'CREATE EXTENSION IF NOT EXISTS "pg_trgm";'
-          psql "$DATABASE_URL" -c 'CREATE DATABASE openyapper_test;'
-          psql "postgres://openyapper:openyapper@localhost:5432/openyapper_test" -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
-          psql "postgres://openyapper:openyapper@localhost:5432/openyapper_test" -c 'CREATE EXTENSION IF NOT EXISTS "citext";'
-          psql "postgres://openyapper:openyapper@localhost:5432/openyapper_test" -c 'CREATE EXTENSION IF NOT EXISTS "pg_trgm";'
+          psql "$DATABASE_URL" -c 'CREATE DATABASE forja_test;'
+          psql "postgres://forja:forja@localhost:5432/forja_test" -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
+          psql "postgres://forja:forja@localhost:5432/forja_test" -c 'CREATE EXTENSION IF NOT EXISTS "citext";'
+          psql "postgres://forja:forja@localhost:5432/forja_test" -c 'CREATE EXTENSION IF NOT EXISTS "pg_trgm";'
 
       - name: Run unit tests
         run: cargo test --lib
@@ -102,7 +102,7 @@ jobs:
       - name: Run integration tests
         run: cargo test --test integration_tests
         env:
-          TEST_DATABASE_URL: postgres://openyapper:openyapper@localhost:5432/openyapper_test
+          TEST_DATABASE_URL: postgres://forja:forja@localhost:5432/forja_test
 
   admin:
     name: Admin (React)
@@ -143,7 +143,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Build Docker image
-        run: docker build -t openyapper:ci-test .
+        run: docker build -t forja:ci-test .
 
   ci-pass:
     name: CI Pass

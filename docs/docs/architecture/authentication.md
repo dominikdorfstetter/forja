@@ -6,7 +6,7 @@ description: Dual authentication system, permission levels, and Clerk integratio
 
 # Authentication & Authorization
 
-OpenYapper supports two authentication methods, evaluated in order for every protected request:
+Forja supports two authentication methods, evaluated in order for every protected request:
 
 1. **Clerk JWT** -- `Authorization: Bearer <token>` header (used by the admin dashboard)
 2. **API Key** -- `X-API-Key` header (used by frontend templates and machine clients)
@@ -114,7 +114,7 @@ The JWKS URL is configured via the `CLERK_JWKS_URL` environment variable. If not
 
 ## UUID Generation for Clerk Users
 
-Clerk users do not have UUIDs natively (their IDs are strings like `user_2abc...`). To integrate with the UUID-based data model, OpenYapper generates a deterministic UUID v5 from the Clerk user ID:
+Clerk users do not have UUIDs natively (their IDs are strings like `user_2abc...`). To integrate with the UUID-based data model, Forja generates a deterministic UUID v5 from the Clerk user ID:
 
 ```rust
 pub const CLERK_UUID_NAMESPACE: Uuid = Uuid::from_bytes([...]);

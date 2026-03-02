@@ -4,25 +4,25 @@ sidebar_position: 1
 
 # Frontend Templates
 
-OpenYapper provides pluggable frontend templates -- standalone website projects that connect to the OpenYapper API to display your content. Templates are designed to be cloned, customized, and deployed independently from the backend.
+Forja provides pluggable frontend templates -- standalone website projects that connect to the Forja API to display your content. Templates are designed to be cloned, customized, and deployed independently from the backend.
 
 ## What Are Templates?
 
 A template is a complete frontend project (HTML, CSS, JavaScript) that:
 
-- Fetches content from the OpenYapper API using a Read-level API key.
+- Fetches content from the Forja API using a Read-level API key.
 - Renders blog posts, pages, navigation, CV entries, legal documents, and other content types.
 - Can be deployed to any static hosting service, Node.js host, or edge platform.
 
-Templates are intentionally separate from the backend. You can run multiple templates against the same OpenYapper instance, each displaying a different site.
+Templates are intentionally separate from the backend. You can run multiple templates against the same Forja instance, each displaying a different site.
 
 ## Pluggable Architecture
 
-Templates connect to OpenYapper through three environment variables:
+Templates connect to Forja through three environment variables:
 
 | Variable | Description |
 |----------|-------------|
-| `CMS_API_URL` | Base URL of the OpenYapper API (e.g., `https://cms.yourdomain.com/api/v1`) |
+| `CMS_API_URL` | Base URL of the Forja API (e.g., `https://cms.yourdomain.com/api/v1`) |
 | `CMS_API_KEY` | An API key with at least Read permission |
 | `CMS_SITE_ID` | The UUID of the site whose content should be displayed |
 
@@ -47,7 +47,7 @@ This means any frontend framework can be used as a template -- Astro, Next.js, N
 
 You can create a custom template in any framework. The template needs to:
 
-1. **Fetch content** from the OpenYapper API endpoints (`/api/v1/sites/{site_id}/blogs`, `/api/v1/sites/{site_id}/pages`, etc.).
+1. **Fetch content** from the Forja API endpoints (`/api/v1/sites/{site_id}/blogs`, `/api/v1/sites/{site_id}/pages`, etc.).
 2. **Authenticate requests** by sending the API key in the `X-API-Key` header.
 3. **Render content** using the returned JSON data.
 
@@ -67,7 +67,7 @@ You can create a custom template in any framework. The template needs to:
 | `GET /sites/{site_id}/settings` | Get site settings (title, description, etc.) |
 | `GET /rss/{site_id}` | RSS 2.0 feed for blog posts |
 
-Refer to the [API Reference](../api/overview) for full endpoint documentation and the Swagger UI at `/api-docs` on your OpenYapper instance.
+Refer to the [API Reference](../api/overview) for full endpoint documentation and the Swagger UI at `/api-docs` on your Forja instance.
 
 ## Admin Preview Integration
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-status.sh — Show status of all OpenYapper development services
+# dev-status.sh — Show status of all Forja development services
 #
 # Usage:
 #   ./scripts/dev-status.sh
@@ -8,7 +8,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/_common.sh"
 
 show_help() {
   cat <<EOF
-${BOLD}dev-status.sh${NC} — Show status of all OpenYapper development services
+${BOLD}dev-status.sh${NC} — Show status of all Forja development services
 
 ${BOLD}Usage:${NC}
   ./scripts/dev-status.sh
@@ -25,7 +25,7 @@ EOF
 
 [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]] && show_help
 
-header "OpenYapper Development Status"
+header "Forja Development Status"
 
 # ── Docker containers ──────────────────────────────────────────────
 echo -e "${BOLD}Docker Containers:${NC}"
@@ -69,11 +69,11 @@ echo ""
 echo -e "${BOLD}Database:${NC}"
 
 if is_container_running "$DB_CONTAINER"; then
-  if docker exec "$DB_CONTAINER" pg_isready -U openyapper -d openyapper &>/dev/null; then
+  if docker exec "$DB_CONTAINER" pg_isready -U forja -d forja &>/dev/null; then
     echo -e "  ${GREEN}●${NC} PostgreSQL accepting connections"
 
     # Check migration status
-    TABLE_COUNT=$(docker exec "$DB_CONTAINER" psql -U openyapper -d openyapper -t -c \
+    TABLE_COUNT=$(docker exec "$DB_CONTAINER" psql -U forja -d forja -t -c \
       "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public';" 2>/dev/null | tr -d ' ')
     if [[ -n "$TABLE_COUNT" && "$TABLE_COUNT" -gt 0 ]]; then
       echo -e "  ${GREEN}●${NC} Database has $TABLE_COUNT tables"

@@ -4,7 +4,7 @@ sidebar_position: 4
 
 # Configuration
 
-OpenYapper is configured through environment variables defined in `backend/.env`. This page documents every supported variable, its default value, and what it controls.
+Forja is configured through environment variables defined in `backend/.env`. This page documents every supported variable, its default value, and what it controls.
 
 ## Quick Start
 
@@ -37,7 +37,7 @@ PostgreSQL connection settings. The `DATABASE_URL` is the only required variable
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `DATABASE_URL` | `postgres://openyapper:openyapper@localhost:5432/openyapper` | PostgreSQL connection string. Format: `postgres://user:password@host:port/database`. |
+| `DATABASE_URL` | `postgres://forja:forja@localhost:5432/forja` | PostgreSQL connection string. Format: `postgres://user:password@host:port/database`. |
 | `APP__DATABASE__MAX_CONNECTIONS` | `10` | Maximum number of connections in the SQLx connection pool. Increase for high-traffic deployments. |
 | `APP__DATABASE__MIN_CONNECTIONS` | `1` | Minimum idle connections kept open in the pool. |
 | `APP__DATABASE__CONNECT_TIMEOUT_SECONDS` | `30` | Maximum time (in seconds) to wait when acquiring a new connection. |
@@ -46,7 +46,7 @@ PostgreSQL connection settings. The `DATABASE_URL` is the only required variable
 **Example:**
 
 ```env
-DATABASE_URL=postgres://openyapper:openyapper@localhost:5432/openyapper
+DATABASE_URL=postgres://forja:forja@localhost:5432/forja
 APP__DATABASE__MAX_CONNECTIONS=10
 APP__DATABASE__MIN_CONNECTIONS=1
 APP__DATABASE__CONNECT_TIMEOUT_SECONDS=30
@@ -100,7 +100,7 @@ The backend supports dual authentication. Every API request can be authenticated
 - **API Key:** `X-API-Key: dk_...` header
 - **Clerk JWT:** `Authorization: Bearer <token>` header
 
-The Clerk JWT is validated against the JWKS endpoint, and the user's Clerk role is mapped to an OpenYapper permission level.
+The Clerk JWT is validated against the JWKS endpoint, and the user's Clerk role is mapped to an Forja permission level.
 :::
 
 ### Storage
@@ -131,7 +131,7 @@ Media uploads can be stored on the local filesystem or in an S3-compatible objec
 
 ```env
 STORAGE_PROVIDER=s3
-STORAGE_S3_BUCKET=my-openyapper-media
+STORAGE_S3_BUCKET=my-forja-media
 STORAGE_S3_REGION=eu-central-1
 STORAGE_S3_PREFIX=media/
 # For MinIO or other S3-compatible services:
@@ -153,7 +153,7 @@ In most production setups, TLS is handled by a reverse proxy (nginx, Caddy, or a
 
 ### Rocket
 
-Low-level Rocket framework settings. These are read directly by the Rocket framework, not by OpenYapper application code.
+Low-level Rocket framework settings. These are read directly by the Rocket framework, not by Forja application code.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -189,7 +189,7 @@ APP__LOG_LEVEL=debug
 APP__ENABLE_TRACING=true
 
 # Database
-DATABASE_URL=postgres://openyapper:openyapper@localhost:5432/openyapper
+DATABASE_URL=postgres://forja:forja@localhost:5432/forja
 APP__DATABASE__MAX_CONNECTIONS=10
 APP__DATABASE__MIN_CONNECTIONS=1
 APP__DATABASE__CONNECT_TIMEOUT_SECONDS=30

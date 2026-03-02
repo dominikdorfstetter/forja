@@ -4,7 +4,7 @@ sidebar_position: 2
 
 # Railway Deployment
 
-This guide walks you through deploying OpenYapper to [Railway](https://railway.app/) -- a platform that auto-detects Dockerfiles and provides managed PostgreSQL and Redis as addons.
+This guide walks you through deploying Forja to [Railway](https://railway.app/) -- a platform that auto-detects Dockerfiles and provides managed PostgreSQL and Redis as addons.
 
 ## Prerequisites
 
@@ -18,7 +18,7 @@ railway login
 
 ## 1. Create a Railway Project
 
-From the root of your OpenYapper checkout:
+From the root of your Forja checkout:
 
 ```bash
 railway init
@@ -51,7 +51,7 @@ CREATE EXTENSION IF NOT EXISTS "citext";
 CREATE EXTENSION IF NOT EXISTS "pg_trgm";
 ```
 
-These are required by OpenYapper's migrations. Without them, the application will fail to start.
+These are required by Forja's migrations. Without them, the application will fail to start.
 
 ## 4. Set Environment Variables
 
@@ -188,7 +188,7 @@ The seed file is located at `backend/scripts/dev_init.sql` in the repository.
 The Dockerfile uses `CARGO_PROFILE_RELEASE_LTO=thin` and `CARGO_PROFILE_RELEASE_CODEGEN_UNITS=2` to reduce memory usage during compilation. If builds still OOM on Railway's free tier, try upgrading to a plan with more memory, or push a pre-built image instead:
 
 ```bash
-docker build -t openyapper .
+docker build -t forja .
 # Push to a container registry and deploy from there
 ```
 

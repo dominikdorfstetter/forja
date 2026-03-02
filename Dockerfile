@@ -1,11 +1,11 @@
 # =============================================================================
-# OpenYapper — Multi-stage Production Build
+# Forja — Multi-stage Production Build
 # =============================================================================
 # Builds the admin dashboard (React) and backend API (Rust) into a single image.
 #
 # Usage:
-#   docker build -t openyapper .
-#   docker run -p 8000:8000 --env-file backend/.env openyapper
+#   docker build -t forja .
+#   docker run -p 8000:8000 --env-file backend/.env forja
 # =============================================================================
 
 # ---------------------------------------------------------------------------
@@ -51,7 +51,7 @@ RUN useradd -m -u 1000 appuser
 
 WORKDIR /app
 
-COPY --from=backend-build /app/backend/target/release/openyapper ./openyapper
+COPY --from=backend-build /app/backend/target/release/forja ./forja
 COPY --from=backend-build /app/backend/static/ ./static/
 COPY --from=backend-build /app/backend/migrations/ ./migrations/
 
@@ -66,4 +66,4 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
   CMD curl -f http://localhost:8000/health || exit 1
 
-CMD ["./openyapper"]
+CMD ["./forja"]

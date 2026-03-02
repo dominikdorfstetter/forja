@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # Prerequisites
 
-Before setting up OpenYapper, make sure the following tools are installed on your development machine.
+Before setting up Forja, make sure the following tools are installed on your development machine.
 
 ## Required
 
@@ -45,7 +45,7 @@ npm --version
 
 ### Docker & Docker Compose
 
-OpenYapper uses Docker to run PostgreSQL, Redis, and pgAdmin during development. Install [Docker Desktop](https://docs.docker.com/get-docker/) (which includes Docker Compose).
+Forja uses Docker to run PostgreSQL, Redis, and pgAdmin during development. Install [Docker Desktop](https://docs.docker.com/get-docker/) (which includes Docker Compose).
 
 Verify:
 
@@ -103,7 +103,7 @@ A pgAdmin instance is included in the Docker Compose stack and available at [loc
 
 | Field | Value |
 |-------|-------|
-| Email | `admin@openyapper.dev` |
+| Email | `admin@forja.dev` |
 | Password | `admin` |
 
 ## Summary

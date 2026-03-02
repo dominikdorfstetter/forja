@@ -4,7 +4,7 @@ sidebar_position: 15
 
 # Notifications
 
-OpenYapper includes an in-app notification system that keeps you informed about important events and updates within your sites.
+Forja includes an in-app notification system that keeps you informed about important events and updates within your sites.
 
 ![Notifications](/img/screenshots/admin-notifications.png)
 

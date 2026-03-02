@@ -6,7 +6,7 @@ description: React-based admin dashboard architecture and key patterns.
 
 # Admin Dashboard
 
-The OpenYapper admin dashboard is a React single-page application built with Vite. It is served by the backend at `/dashboard` and communicates with the API on the same origin. User authentication is handled by Clerk.
+The Forja admin dashboard is a React single-page application built with Vite. It is served by the backend at `/dashboard` and communicates with the API on the same origin. User authentication is handled by Clerk.
 
 ![Admin dashboard](/img/screenshots/admin-dashboard.png)
 

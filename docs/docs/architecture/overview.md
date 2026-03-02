@@ -1,12 +1,12 @@
 ---
 title: Architecture Overview
 sidebar_position: 1
-description: High-level architecture of the OpenYapper multi-site CMS.
+description: High-level architecture of the Forja multi-site CMS.
 ---
 
 # Architecture Overview
 
-OpenYapper is a multi-site, headless CMS built for developer portfolios and blogs. It uses a three-layer architecture that cleanly separates the API, the admin interface, and the frontend rendering.
+Forja is a multi-site, headless CMS built for developer portfolios and blogs. It uses a three-layer architecture that cleanly separates the API, the admin interface, and the frontend rendering.
 
 ## System Diagram
 
@@ -74,7 +74,7 @@ Key responsibilities:
 
 ### 3. Frontend Templates (Bring Your Own)
 
-OpenYapper is headless. Frontend sites consume the API using an API key. Any framework works -- Astro, Next.js, Hugo, or plain HTML. The frontend fetches content from the backend using `CMS_API_URL` and authenticates with `CMS_API_KEY`.
+Forja is headless. Frontend sites consume the API using an API key. Any framework works -- Astro, Next.js, Hugo, or plain HTML. The frontend fetches content from the backend using `CMS_API_URL` and authenticates with `CMS_API_KEY`.
 
 ## Request Flow
 
@@ -94,7 +94,7 @@ A typical request through the system follows this path:
 
 ## Infrastructure
 
-OpenYapper requires the following infrastructure components:
+Forja requires the following infrastructure components:
 
 | Component       | Purpose                        | Required |
 |-----------------|--------------------------------|----------|
@@ -111,8 +111,8 @@ services:
   postgres:
     image: postgres:16
     environment:
-      POSTGRES_DB: openyapper
-      POSTGRES_USER: openyapper
+      POSTGRES_DB: forja
+      POSTGRES_USER: forja
       POSTGRES_PASSWORD: secret
     ports:
       - "5432:5432"

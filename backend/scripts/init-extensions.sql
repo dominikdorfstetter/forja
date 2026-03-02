@@ -1,4 +1,4 @@
--- Required PostgreSQL extensions for OpenYapper
+-- Required PostgreSQL extensions for Forja
 -- This file runs automatically via docker-entrypoint-initdb.d on first container start.
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";

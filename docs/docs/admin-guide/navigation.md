@@ -4,7 +4,7 @@ sidebar_position: 7
 
 # Navigation
 
-The navigation system in OpenYapper lets you build and manage hierarchical menus for your site. Each site can have multiple named menus (e.g., primary navigation, footer links, sidebar menu), and each menu consists of a tree of navigation items.
+The navigation system in Forja lets you build and manage hierarchical menus for your site. Each site can have multiple named menus (e.g., primary navigation, footer links, sidebar menu), and each menu consists of a tree of navigation items.
 
 ![Navigation management](/img/screenshots/admin-navigation.png)
 

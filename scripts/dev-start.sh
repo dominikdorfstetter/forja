@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dev-start.sh — Start OpenYapper development environment
+# dev-start.sh — Start Forja development environment
 #
 # Usage:
 #   ./scripts/dev-start.sh              # Start Docker infra only
@@ -14,7 +14,7 @@ START_ADMIN=false
 
 show_help() {
   cat <<EOF
-${BOLD}dev-start.sh${NC} — Start OpenYapper development environment
+${BOLD}dev-start.sh${NC} — Start Forja development environment
 
 ${BOLD}Usage:${NC}
   ./scripts/dev-start.sh [options]
@@ -53,7 +53,7 @@ success "Docker services started"
 # Wait for Postgres to be healthy
 info "Waiting for PostgreSQL to be ready..."
 for i in $(seq 1 30); do
-  if docker exec "$DB_CONTAINER" pg_isready -U openyapper -d openyapper &>/dev/null; then
+  if docker exec "$DB_CONTAINER" pg_isready -U forja -d forja &>/dev/null; then
     success "PostgreSQL is ready"
     break
   fi

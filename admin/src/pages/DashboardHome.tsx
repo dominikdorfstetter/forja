@@ -200,9 +200,9 @@ export default function DashboardHome() {
     enabled: hasSite,
   });
 
-  const checklistKey = `openyapper_checklist_dismissed_${selectedSiteId}`;
+  const checklistKey = `forja_checklist_dismissed_${selectedSiteId}`;
   const [checklistDismissed, setChecklistDismissed] = useState(
-    () => !!selectedSiteId && localStorage.getItem(`openyapper_checklist_dismissed_${selectedSiteId}`) === '1',
+    () => !!selectedSiteId && localStorage.getItem(`forja_checklist_dismissed_${selectedSiteId}`) === '1',
   );
 
   // Sync dismissed state when switching sites

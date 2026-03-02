@@ -35,7 +35,7 @@ You can also drag files directly from your file manager and drop them onto the m
 
 ### Supported File Types
 
-OpenYapper accepts common web file formats:
+Forja accepts common web file formats:
 
 | Category | Formats |
 |----------|---------|
@@ -98,7 +98,7 @@ When editing a blog post or page, you can insert media files from the library:
 
 ## Storage Backends
 
-OpenYapper supports two storage backends for media files:
+Forja supports two storage backends for media files:
 
 - **Local storage** -- files are stored on the server's filesystem.
 - **S3-compatible storage** -- files are stored in an S3 bucket (AWS S3, MinIO, DigitalOcean Spaces, etc.).

@@ -4,15 +4,15 @@ sidebar_position: 8
 
 # Contributing
 
-Thank you for your interest in contributing to OpenYapper. This guide covers the contribution workflow, from setting up your environment to submitting a pull request.
+Thank you for your interest in contributing to Forja. This guide covers the contribution workflow, from setting up your environment to submitting a pull request.
 
 ## Getting Started
 
 1. **Fork** the repository on GitHub.
 2. **Clone** your fork locally:
    ```bash
-   git clone https://github.com/YOUR-USERNAME/openyapper.git
-   cd openyapper
+   git clone https://github.com/YOUR-USERNAME/forja.git
+   cd forja
    ```
 3. **Set up the development environment** by following the [Prerequisites](../getting-started/prerequisites) and [Installation](../getting-started/installation) guides.
 4. **Start the dev environment**:
@@ -135,4 +135,4 @@ This project follows the [Contributor Covenant Code of Conduct](https://www.cont
 
 ## License
 
-By contributing to OpenYapper, you agree that your contributions will be licensed under the [AGPL-3.0-or-later](https://www.gnu.org/licenses/agpl-3.0.html) license.
+By contributing to Forja, you agree that your contributions will be licensed under the [AGPL-3.0-or-later](https://www.gnu.org/licenses/agpl-3.0.html) license.

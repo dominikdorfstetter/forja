@@ -4,7 +4,7 @@ sidebar_position: 5
 
 # Database Migrations
 
-OpenYapper uses [SQLx](https://github.com/launchbadge/sqlx) for database migrations. Migrations are plain SQL files that run in order to create and modify the database schema.
+Forja uses [SQLx](https://github.com/launchbadge/sqlx) for database migrations. Migrations are plain SQL files that run in order to create and modify the database schema.
 
 ## Migration Files
 
@@ -63,7 +63,7 @@ CREATE TRIGGER set_bookmarks_updated_at
 
 ### Automatic (on Application Start)
 
-Migrations run automatically when the OpenYapper application starts. No manual step is required in production. The application checks the `_sqlx_migrations` table and applies any pending migrations before accepting requests.
+Migrations run automatically when the Forja application starts. No manual step is required in production. The application checks the `_sqlx_migrations` table and applies any pending migrations before accepting requests.
 
 ### Manual (CLI)
 
@@ -155,7 +155,7 @@ The CI pipeline creates the test database and extensions automatically before ru
 
 ## Required PostgreSQL Extensions
 
-OpenYapper requires three PostgreSQL extensions. These are created by the first migration (`20240101000000_extensions_and_enums.sql`), but on managed PostgreSQL services they may need to be created manually:
+Forja requires three PostgreSQL extensions. These are created by the first migration (`20240101000000_extensions_and_enums.sql`), but on managed PostgreSQL services they may need to be created manually:
 
 | Extension | Purpose |
 |-----------|---------|

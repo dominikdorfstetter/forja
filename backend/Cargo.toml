@@ -1,11 +1,11 @@
 [package]
-name = "openyapper"
+name = "forja"
 version = "1.0.2"
 edition = "2021"
-authors = ["OpenYapper Contributors"]
-description = "OpenYapper - Multi-site CMS API built with Rust Rocket"
+authors = ["Forja Contributors"]
+description = "Forja - Multi-site CMS API built with Rust Rocket"
 license = "AGPL-3.0-or-later"
-repository = "https://github.com/dominikdorfstetter/openyapper"
+repository = "https://github.com/dominikdorfstetter/forja"
 
 [dependencies]
 # Web Framework

@@ -1,7 +1,7 @@
 //! Test infrastructure for integration tests
 //!
-//! Provides helpers to spin up a real Rocket test client backed by an
-//! `openyapper_test` PostgreSQL database.
+//! Provides helpers to spin up a real Rocket test client backed by a
+//! `forja_test` PostgreSQL database.
 
 #![allow(dead_code)]
 
@@ -13,11 +13,11 @@ use sqlx::PgPool;
 use tempfile::TempDir;
 use uuid::Uuid;
 
-use openyapper::config::{DatabaseConfig, SecurityConfig, Settings, StorageConfig};
-use openyapper::models::api_key::{ApiKeyPermission, CreateApiKeyResult};
-use openyapper::models::site::Site;
-use openyapper::services::storage::LocalStorage;
-use openyapper::AppState;
+use forja::config::{DatabaseConfig, SecurityConfig, Settings, StorageConfig};
+use forja::models::api_key::{ApiKeyPermission, CreateApiKeyResult};
+use forja::models::site::Site;
+use forja::services::storage::LocalStorage;
+use forja::AppState;
 
 /// Everything a test function needs.
 pub struct TestContext {
@@ -31,17 +31,17 @@ pub struct TestContext {
 // Database helpers
 // ---------------------------------------------------------------------------
 
-/// Connect to the `openyapper_test` database and run migrations.
+/// Connect to the `forja_test` database and run migrations.
 pub async fn test_db_pool() -> PgPool {
     let db_url = std::env::var("TEST_DATABASE_URL").unwrap_or_else(|_| {
-        "postgres://openyapper:openyapper@localhost:5432/openyapper_test".to_string()
+        "postgres://forja:forja@localhost:5432/forja_test".to_string()
     });
 
     let pool = PgPoolOptions::new()
         .max_connections(5)
         .connect(&db_url)
         .await
-        .expect("Failed to connect to test database. Is openyapper_test created?");
+        .expect("Failed to connect to test database. Is forja_test created?");
 
     sqlx::migrate!("./migrations")
         .run(&pool)
@@ -75,7 +75,7 @@ pub fn test_app_state(pool: PgPool, temp_dir: &TempDir) -> AppState {
         ..Settings::default()
     };
 
-    let storage: Arc<dyn openyapper::services::storage::StorageBackend> =
+    let storage: Arc<dyn forja::services::storage::StorageBackend> =
         Arc::new(LocalStorage::new(upload_dir, "/uploads".to_string()));
 
     AppState {
@@ -99,8 +99,8 @@ pub async fn test_context() -> TestContext {
 
     let rocket = rocket::build()
         .manage(app_state)
-        .mount("/", openyapper::handlers::system::routes())
-        .mount("/api/v1", openyapper::handlers::routes());
+        .mount("/", forja::handlers::system::routes())
+        .mount("/api/v1", forja::handlers::routes());
 
     let client = Client::tracked(rocket)
         .await
@@ -120,7 +120,7 @@ pub async fn test_context() -> TestContext {
 /// Insert a site directly via the model layer. Returns the site ID.
 pub async fn create_test_site(pool: &PgPool) -> Uuid {
     let slug = format!("test-site-{}", &Uuid::new_v4().to_string()[..8]);
-    let req = openyapper::dto::site::CreateSiteRequest {
+    let req = forja::dto::site::CreateSiteRequest {
         name: format!("Test Site {}", &slug),
         slug,
         description: Some("Integration test site".to_string()),
@@ -145,7 +145,7 @@ pub async fn create_test_api_key(
     site_id: Uuid,
     permission: ApiKeyPermission,
 ) -> String {
-    let result: CreateApiKeyResult = openyapper::models::api_key::ApiKey::create(
+    let result: CreateApiKeyResult = forja::models::api_key::ApiKey::create(
         pool,
         &format!("test-{:?}-key", permission),
         Some("integration test key"),
@@ -170,8 +170,8 @@ pub async fn create_test_notification(
     pool: &PgPool,
     site_id: Uuid,
     recipient_clerk_id: &str,
-) -> openyapper::models::notification::Notification {
-    openyapper::models::notification::Notification::create(
+) -> forja::models::notification::Notification {
+    forja::models::notification::Notification::create(
         pool,
         site_id,
         recipient_clerk_id,
@@ -190,8 +190,8 @@ pub async fn create_test_notification(
 pub async fn create_test_webhook(
     pool: &PgPool,
     site_id: Uuid,
-) -> openyapper::models::webhook::Webhook {
-    openyapper::models::webhook::Webhook::create(
+) -> forja::models::webhook::Webhook {
+    forja::models::webhook::Webhook::create(
         pool,
         site_id,
         "https://example.com/hook",

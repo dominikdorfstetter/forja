@@ -3,13 +3,15 @@ sidebar_position: 1
 slug: /
 ---
 
-# Introduction to OpenYapper
+# Introduction to Forja
 
-OpenYapper is an open-source, multi-site content management system built with a **Rust backend** (Rocket 0.5), a **React admin dashboard** (Vite + MUI), and pluggable **frontend templates** (Astro, Next.js, etc.). It is designed for developers who want a fast, type-safe CMS they can self-host, extend, and integrate into their own stack.
+*Forja (Spanish: forge) — an open-source multi-site CMS where you forge your content. Like a blacksmith shapes raw metal into something useful, Forja lets you shape, manage, and deliver content across multiple sites from a single powerful backend.*
 
-## Why OpenYapper?
+Forja is built with a **Rust backend** (Rocket 0.5), a **React admin dashboard** (Vite + MUI), and pluggable **frontend templates** (Astro, Next.js, etc.). It is designed for developers who want a fast, type-safe CMS they can self-host, extend, and integrate into their own stack.
 
-Most headless CMS platforms are either too heavy, too opinionated, or too expensive for developers who just need a solid API behind their portfolio or blog. OpenYapper fills that gap:
+## Why Forja?
+
+Most headless CMS platforms are either too heavy, too opinionated, or too expensive for developers who just need a solid API behind their portfolio or blog. Forja fills that gap:
 
 - **Built in Rust** -- the backend compiles to a single binary, starts in milliseconds, and handles thousands of requests per second with minimal resource usage.
 - **Multi-tenant by design** -- run multiple sites from a single instance, each with its own content, navigation, and settings.
@@ -82,4 +84,4 @@ Most headless CMS platforms are either too heavy, too opinionated, or too expens
 
 ## License
 
-OpenYapper is released under the [**AGPL-3.0-or-later**](https://www.gnu.org/licenses/agpl-3.0.html) license. You are free to use, modify, and distribute it, provided that any modified versions you deploy as a network service also make their source code available under the same license.
+Forja is released under the [**AGPL-3.0-or-later**](https://www.gnu.org/licenses/agpl-3.0.html) license. You are free to use, modify, and distribute it, provided that any modified versions you deploy as a network service also make their source code available under the same license.

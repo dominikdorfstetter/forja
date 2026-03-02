@@ -4,7 +4,7 @@ sidebar_position: 3
 
 # Admin Dashboard Development Guide
 
-This guide explains how to add new features to the OpenYapper React admin dashboard. The admin is built with Vite, Material UI, React Query, react-hook-form, and zod.
+This guide explains how to add new features to the Forja React admin dashboard. The admin is built with Vite, Material UI, React Query, react-hook-form, and zod.
 
 ## Architecture Overview
 

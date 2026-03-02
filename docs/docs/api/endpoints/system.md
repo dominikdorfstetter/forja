@@ -25,7 +25,7 @@ curl https://your-domain.com/api/v1/
 **Response** `200 OK`
 
 ```
-OpenYapper API v0.1.0
+Forja API v0.1.0
 ```
 
 ## Health Check
@@ -100,6 +100,6 @@ curl https://your-domain.com/api/v1/config
 ```json
 {
   "clerk_publishable_key": "pk_live_abc123...",
-  "app_name": "OpenYapper"
+  "app_name": "Forja"
 }
 ```

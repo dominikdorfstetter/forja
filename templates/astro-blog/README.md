@@ -1,6 +1,6 @@
-# OpenYapper Astro Blog Template
+# Forja Astro Blog Template
 
-A server-rendered blog and portfolio site powered by [Astro](https://astro.build) and the OpenYapper CMS backend.
+A server-rendered blog and portfolio site powered by [Astro](https://astro.build) and the Forja CMS backend.
 
 Note: the template now uses SSR (server rendering with @astrojs/node), NOT static site generation.
 
@@ -93,7 +93,7 @@ templates/astro-blog/
 
 ## Admin Integration
 
-This template is designed to work with the OpenYapper admin's **Preview** feature. In the admin Settings page, add a preview template pointing to your local dev server URL (e.g., `http://localhost:4321`). Then use the preview buttons in the blog and page editors to open content in this template.
+This template is designed to work with the Forja admin's **Preview** feature. In the admin Settings page, add a preview template pointing to your local dev server URL (e.g., `http://localhost:4321`). Then use the preview buttons in the blog and page editors to open content in this template.
 
 ## Customization
 

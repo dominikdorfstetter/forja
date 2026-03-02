@@ -6,7 +6,7 @@ description: Media file storage with local filesystem and S3-compatible backends
 
 # Storage Architecture
 
-OpenYapper supports two storage backends for media files: **local filesystem** (default) and **S3-compatible object storage**. Both implement the same `StorageBackend` trait, making them interchangeable via configuration.
+Forja supports two storage backends for media files: **local filesystem** (default) and **S3-compatible object storage**. Both implement the same `StorageBackend` trait, making them interchangeable via configuration.
 
 ## StorageBackend Trait
 
@@ -69,7 +69,7 @@ The local storage health check uses `statvfs` to report disk usage:
 
 ## S3-Compatible Storage
 
-For production deployments, OpenYapper supports S3-compatible object storage (AWS S3, MinIO, DigitalOcean Spaces, etc.) via the AWS SDK for Rust.
+For production deployments, Forja supports S3-compatible object storage (AWS S3, MinIO, DigitalOcean Spaces, etc.) via the AWS SDK for Rust.
 
 ### How It Works
 

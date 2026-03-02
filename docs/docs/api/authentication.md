@@ -4,7 +4,7 @@ sidebar_position: 2
 
 # Authentication
 
-All API requests (except public system endpoints) require authentication. OpenYapper supports two authentication methods that can be used interchangeably.
+All API requests (except public system endpoints) require authentication. Forja supports two authentication methods that can be used interchangeably.
 
 ## API Key Authentication
 

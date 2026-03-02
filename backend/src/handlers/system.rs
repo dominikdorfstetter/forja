@@ -16,7 +16,7 @@ use crate::AppState;
 )]
 #[get("/")]
 pub fn index() -> &'static str {
-    concat!("OpenYapper API v", env!("CARGO_PKG_VERSION"))
+    concat!("Forja API v", env!("CARGO_PKG_VERSION"))
 }
 
 #[utoipa::path(

@@ -1,6 +1,6 @@
-//! OpenYapper Multi-Site CMS API Library
+//! Forja Multi-Site CMS API Library
 //!
-//! This crate provides the core functionality for the OpenYapper multi-site CMS API.
+//! This crate provides the core functionality for the Forja multi-site CMS API.
 
 #[macro_use]
 extern crate rocket;

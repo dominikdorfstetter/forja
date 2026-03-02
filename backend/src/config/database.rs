@@ -44,7 +44,7 @@ fn default_idle_timeout() -> u64 {
 impl Default for DatabaseConfig {
     fn default() -> Self {
         Self {
-            url: String::from("postgres://postgres:postgres@localhost:5432/openyapper"),
+            url: String::from("postgres://postgres:postgres@localhost:5432/forja"),
             max_connections: default_max_connections(),
             min_connections: default_min_connections(),
             connect_timeout_seconds: default_connect_timeout(),

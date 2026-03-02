@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// OpenYapper API Client — build-time data fetching for Astro SSG
+// Forja API Client — build-time data fetching for Astro SSG
 // ---------------------------------------------------------------------------
 
 const API_URL = import.meta.env.CMS_API_URL as string;

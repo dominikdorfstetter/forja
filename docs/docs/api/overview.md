@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # API Overview
 
-The OpenYapper CMS exposes a RESTful JSON API for managing sites, content, media, and configuration. All endpoints are versioned under the `/api/v1` prefix.
+The Forja CMS exposes a RESTful JSON API for managing sites, content, media, and configuration. All endpoints are versioned under the `/api/v1` prefix.
 
 ## Base URL
 

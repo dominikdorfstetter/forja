@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # Admin Guide Overview
 
-The OpenYapper admin dashboard is a React-based single-page application that gives you full control over your sites, content, media, and settings. It is accessible at `/dashboard` in production and at `localhost:5173` during local development.
+The Forja admin dashboard is a React-based single-page application that gives you full control over your sites, content, media, and settings. It is accessible at `/dashboard` in production and at `localhost:5173` during local development.
 
 ## Accessing the Dashboard
 
@@ -68,7 +68,7 @@ The main content area renders the page you selected from the sidebar. Most pages
 
 ## Site Context
 
-OpenYapper is a multi-site CMS. Before you can manage content, you need to select a site from the site selector in the top bar. All content operations (blogs, pages, media, navigation, etc.) are scoped to the currently active site.
+Forja is a multi-site CMS. Before you can manage content, you need to select a site from the site selector in the top bar. All content operations (blogs, pages, media, navigation, etc.) are scoped to the currently active site.
 
 If you have not created any sites yet, the dashboard will guide you through the setup process.
 

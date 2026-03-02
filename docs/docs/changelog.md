@@ -4,11 +4,11 @@ sidebar_position: 100
 
 # Changelog
 
-This page tracks the release history of OpenYapper. For the most up-to-date changelog, see the [CHANGELOG.md](https://github.com/openyapper/openyapper/blob/main/CHANGELOG.md) file in the repository.
+This page tracks the release history of Forja. For the most up-to-date changelog, see the [CHANGELOG.md](https://github.com/dominikdorfstetter/forja/blob/main/CHANGELOG.md) file in the repository.
 
 ## v1.0.0 -- Initial Release
 
-The first public release of OpenYapper, a complete multi-site CMS built with Rust and React.
+The first public release of Forja, a complete multi-site CMS built with Rust and React.
 
 ### Backend
 

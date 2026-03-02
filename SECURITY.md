@@ -9,13 +9,13 @@
 
 ## Reporting a Vulnerability
 
-We take security seriously. If you discover a security vulnerability in OpenYapper, please report it responsibly.
+We take security seriously. If you discover a security vulnerability in Forja, please report it responsibly.
 
 ### How to Report
 
 **Do NOT open a public GitHub issue for security vulnerabilities.**
 
-Instead, please report vulnerabilities via [GitHub Security Advisories](https://github.com/dominikdorfstetter/openyapper/security/advisories/new).
+Instead, please report vulnerabilities via [GitHub Security Advisories](https://github.com/dominikdorfstetter/forja/security/advisories/new).
 
 Alternatively, you can email security concerns to the repository maintainer directly (see profile contact information).
 

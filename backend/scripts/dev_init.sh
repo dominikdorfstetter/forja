@@ -10,7 +10,7 @@
 #   DATABASE_URL - PostgreSQL connection string (required)
 #
 # Example:
-#   DATABASE_URL=postgres://user:pass@localhost/openyapper ./scripts/dev_init.sh
+#   DATABASE_URL=postgres://user:pass@localhost/forja ./scripts/dev_init.sh
 
 set -e
 
@@ -22,7 +22,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-echo -e "${YELLOW}=== OpenYapper API Development Initialization ===${NC}"
+echo -e "${YELLOW}=== Forja API Development Initialization ===${NC}"
 echo ""
 
 # Check for DATABASE_URL
@@ -37,7 +37,7 @@ if [ -z "$DATABASE_URL" ]; then
     echo -e "${RED}Error: DATABASE_URL environment variable is not set${NC}"
     echo ""
     echo "Please set DATABASE_URL or create a .env file in the backend directory"
-    echo "Example: DATABASE_URL=postgres://user:pass@localhost/openyapper"
+    echo "Example: DATABASE_URL=postgres://user:pass@localhost/forja"
     exit 1
 fi
 

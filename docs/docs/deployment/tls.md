@@ -4,7 +4,7 @@ sidebar_position: 4
 
 # TLS / HTTPS Configuration
 
-OpenYapper supports native TLS termination using Rocket's built-in `rustls` integration. This allows the application to serve HTTPS directly without a reverse proxy.
+Forja supports native TLS termination using Rocket's built-in `rustls` integration. This allows the application to serve HTTPS directly without a reverse proxy.
 
 ## When to Use Application-Level TLS
 
@@ -14,7 +14,7 @@ In most deployments, TLS is handled by the infrastructure layer:
 - **Reverse proxy (nginx, Caddy, Traefik)** -- terminates TLS before traffic reaches the application.
 - **Load balancers (AWS ALB, Cloudflare)** -- terminate TLS upstream.
 
-You only need application-level TLS when the OpenYapper binary is directly exposed to the internet without any proxy or platform handling HTTPS for you.
+You only need application-level TLS when the Forja binary is directly exposed to the internet without any proxy or platform handling HTTPS for you.
 
 ## Configuration
 
@@ -26,15 +26,15 @@ Set two environment variables pointing to your certificate and private key files
 | `TLS_KEY_PATH` | Absolute path to the TLS private key file (PEM format) |
 
 ```bash
-export TLS_CERT_PATH=/etc/ssl/certs/openyapper.pem
-export TLS_KEY_PATH=/etc/ssl/private/openyapper-key.pem
+export TLS_CERT_PATH=/etc/ssl/certs/forja.pem
+export TLS_KEY_PATH=/etc/ssl/private/forja-key.pem
 ```
 
 When both variables are set, the application starts with HTTPS enabled. When either variable is absent, the application starts in plain HTTP mode.
 
 ## Supported Certificate Types
 
-Any PEM-encoded X.509 certificate chain works with OpenYapper's TLS configuration.
+Any PEM-encoded X.509 certificate chain works with Forja's TLS configuration.
 
 ### Let's Encrypt (Certbot)
 
@@ -93,7 +93,7 @@ When using Docker, mount the certificate files into the container:
 ```yaml
 services:
   app:
-    image: openyapper
+    image: forja
     ports:
       - "443:8000"
     environment:

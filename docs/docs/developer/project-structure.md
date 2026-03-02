@@ -4,12 +4,12 @@ sidebar_position: 1
 
 # Project Structure
 
-OpenYapper is organized as a monorepo with clearly separated concerns. This page describes the top-level layout and the purpose of each directory.
+Forja is organized as a monorepo with clearly separated concerns. This page describes the top-level layout and the purpose of each directory.
 
 ## Top-Level Layout
 
 ```
-openyapper/
+forja/
 ├── backend/                # Rust API server (Rocket 0.5 + SQLx)
 ├── admin/                  # React admin dashboard (Vite + MUI)
 ├── templates/              # Frontend templates that consume the API
@@ -27,7 +27,7 @@ openyapper/
 
 ## Backend (`backend/`)
 
-The Rust backend is the core of OpenYapper. It serves the JSON API, the admin dashboard static files, and handles all business logic.
+The Rust backend is the core of Forja. It serves the JSON API, the admin dashboard static files, and handles all business logic.
 
 ```
 backend/
@@ -106,7 +106,7 @@ admin/
 
 ## Templates (`templates/`)
 
-Frontend templates are standalone projects that consume the OpenYapper API. They are designed to be cloned and customized.
+Frontend templates are standalone projects that consume the Forja API. They are designed to be cloned and customized.
 
 ```
 templates/

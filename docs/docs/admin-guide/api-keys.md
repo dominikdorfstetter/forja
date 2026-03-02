@@ -4,7 +4,7 @@ sidebar_position: 12
 
 # API Keys
 
-API keys provide programmatic access to the OpenYapper API. They are used by frontend templates, CI/CD pipelines, scripts, and external integrations to authenticate requests without a Clerk user session.
+API keys provide programmatic access to the Forja API. They are used by frontend templates, CI/CD pipelines, scripts, and external integrations to authenticate requests without a Clerk user session.
 
 ![API keys management](/img/screenshots/admin-api-keys.png)
 
@@ -45,7 +45,7 @@ Include the API key in the `X-API-Key` header of your HTTP requests:
 
 ```bash
 curl -H "X-API-Key: your-api-key-here" \
-  https://your-openyapper-instance.com/api/v1/sites
+  https://your-forja-instance.com/api/v1/sites
 ```
 
 ## Permission Levels

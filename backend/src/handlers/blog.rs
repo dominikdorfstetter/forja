@@ -893,7 +893,7 @@ pub async fn rss_feed(
         .description(site.description.unwrap_or_default())
         .language(Some("en".to_string()))
         .last_build_date(Some(Utc::now().to_rfc2822()))
-        .generator(Some("OpenYapper".to_string()))
+        .generator(Some("Forja".to_string()))
         .items(items)
         .build();
 

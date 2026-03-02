@@ -10,7 +10,7 @@ The legal section helps you manage legal documents for your site, such as privac
 
 ## Structure
 
-Legal content in OpenYapper follows a two-level hierarchy:
+Legal content in Forja follows a two-level hierarchy:
 
 - **Legal groups** -- top-level categories that organize your legal documents (e.g., "Privacy Policy", "Terms of Service", "Cookie Consent").
 - **Legal items** -- individual sections or clauses within a group. Each item has its own title and content.

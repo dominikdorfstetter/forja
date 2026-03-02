@@ -21,7 +21,7 @@ use crate::AppState;
 pub async fn get_config(state: &State<AppState>) -> Json<ConfigResponse> {
     Json(ConfigResponse {
         clerk_publishable_key: state.settings.security.clerk_publishable_key.clone(),
-        app_name: "OpenYapper".to_string(),
+        app_name: "Forja".to_string(),
     })
 }
 

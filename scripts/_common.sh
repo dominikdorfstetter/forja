@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# _common.sh — Shared library for OpenYapper dev scripts
+# _common.sh — Shared library for Forja dev scripts
 # Source this file: source "$(dirname "${BASH_SOURCE[0]}")/_common.sh"
 
 set -euo pipefail
@@ -21,9 +21,9 @@ ADMIN_DIR="$PROJECT_ROOT/admin"
 COMPOSE_FILE="$PROJECT_ROOT/docker-compose.dev.yaml"
 
 # ── Docker container names (from docker-compose.dev.yaml) ──────────
-DB_CONTAINER="openyapper-db"
-REDIS_CONTAINER="openyapper-redis"
-PGADMIN_CONTAINER="openyapper-pgadmin"
+DB_CONTAINER="forja-db"
+REDIS_CONTAINER="forja-redis"
+PGADMIN_CONTAINER="forja-pgadmin"
 
 # ── Output helpers ──────────────────────────────────────────────────
 info()    { echo -e "${BLUE}[INFO]${NC} $*"; }

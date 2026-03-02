@@ -44,7 +44,7 @@ Pages can be assigned a type that defines their purpose and structure. Common pa
 
 ## Page Sections
 
-Pages in OpenYapper are composed of **sections**. Each section is a content block within the page, allowing you to build complex page layouts:
+Pages in Forja are composed of **sections**. Each section is a content block within the page, allowing you to build complex page layouts:
 
 ### Adding a Section
 

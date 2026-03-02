@@ -6,7 +6,7 @@ description: PostgreSQL schema design, multi-tenancy, and localization patterns.
 
 # Database Schema
 
-OpenYapper uses **PostgreSQL 16** as its primary data store. Database access is handled through **SQLx** with compile-time checked queries. Migrations are managed by SQLx's built-in migration runner.
+Forja uses **PostgreSQL 16** as its primary data store. Database access is handled through **SQLx** with compile-time checked queries. Migrations are managed by SQLx's built-in migration runner.
 
 ## Required Extensions
 
@@ -43,7 +43,7 @@ The schema uses PostgreSQL enums for type-safe status fields:
 
 ## Multi-Tenancy
 
-All content in OpenYapper is scoped to a **site**. The `sites` table is the root of the tenant hierarchy, and nearly every content table has a `site_id` foreign key with `ON DELETE CASCADE`.
+All content in Forja is scoped to a **site**. The `sites` table is the root of the tenant hierarchy, and nearly every content table has a `site_id` foreign key with `ON DELETE CASCADE`.
 
 ```
 sites
@@ -162,7 +162,7 @@ This design means:
 
 ## Localization Pattern
 
-OpenYapper uses a **content + localization table** pattern for multilingual content. The base table holds language-independent fields (slug, status, timestamps), while a companion `*_localizations` table holds the translated fields (title, body, excerpt).
+Forja uses a **content + localization table** pattern for multilingual content. The base table holds language-independent fields (slug, status, timestamps), while a companion `*_localizations` table holds the translated fields (title, body, excerpt).
 
 ```
 blogs                          blog_localizations
