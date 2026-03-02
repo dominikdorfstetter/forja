@@ -1,6 +1,30 @@
 # Changelog
 
-## v1.0.2 (Unreleased)
+## v1.0.3
+
+### Astro Blog Template
+
+- **SEO meta tags**: Added `SeoHead` component with OpenGraph, Twitter Cards, JSON-LD structured data, and canonical URLs on all pages (#10)
+- **Pagination**: Added `Pagination` component with smart ellipsis navigation; blog listing paginated at `/blog/page/[page]` (#11)
+- **Tag & category archives**: Added category archive pages at `/blog/category/[slug]` with pagination; tag pages redirect to categories (#12)
+- **Responsive images**: Added `ResponsiveImage` component with `<picture>`, `srcset`, AVIF/WebP variant support (#15)
+- **N+1 cover image fix**: Added `fetchMediaBatch()` for parallel batch fetching; `BlogCard` accepts pre-fetched `coverMedia` prop (#17)
+- **HTTP cache headers**: Set `Cache-Control` on all SSR pages (300s–3600s browser, longer CDN) (#18)
+- **Social links**: Added `SocialLinks` component with 13 platform SVG icons, integrated into Footer (#19)
+- **Sitemap**: Added `sitemap.xml.ts` route with blog posts, CMS pages, priorities, and lastmod dates (#20)
+
+### Backend
+
+- Added blog category filter endpoint (`GET /sites/{id}/blogs/category/{slug}`)
+- Raised default API key rate limits 10x (100/s, 1000/m, 10000/h, 100000/d) to support SSR workloads
+- Added `worker-src 'self' blob:` to dashboard Content-Security-Policy for Clerk workers
+
+### Infrastructure
+
+- Fixed CI workflow permissions: added `pull-requests: read` for `dorny/paths-filter`
+- Fixed CodeQL workflow permissions: added `actions: read` for telemetry access
+
+## v1.0.2
 
 ### Backend
 
