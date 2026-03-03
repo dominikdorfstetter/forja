@@ -1466,8 +1466,15 @@
       "fields": {
         "sectionType": "Tipo de Secção",
         "displayOrder": "Ordem de Apresentação",
-        "settings": "Definições"
-      }
+        "settings": "Definições",
+        "buttonText": "Texto do botão",
+        "ctaRoute": "Rota de chamada para ação",
+        "ctaHelperText": "Link CTA opcional"
+      },
+      "localizedContent": "Conteúdo localizado",
+      "sectionConfiguration": "Configuração da seção",
+      "noActiveLocales": "Nenhum idioma ativo configurado",
+      "localeExists": "existe"
     },
     "undo": "Desfazer",
     "redo": "Refazer",
@@ -1737,6 +1744,44 @@
       "titleTooLong": "O título excede o comprimento máximo de {{max}} caracteres",
       "bodyTooLong": "O conteúdo excede o comprimento máximo de {{max}} caracteres",
       "readFailed": "Falha ao ler o arquivo"
+    }
+  },
+  "editor": {
+    "placeholder": "Digite / para inserir blocos...",
+    "sectionPlaceholder": "Conteúdo da seção...",
+    "toolbar": {
+      "bold": "Negrito (Ctrl+B)",
+      "italic": "Itálico (Ctrl+I)",
+      "underline": "Sublinhado (Ctrl+U)",
+      "strikethrough": "Tachado",
+      "heading1": "Título 1",
+      "heading2": "Título 2",
+      "heading3": "Título 3",
+      "blockquote": "Citação",
+      "bulletList": "Lista com marcadores",
+      "orderedList": "Lista numerada",
+      "taskList": "Lista de tarefas",
+      "horizontalRule": "Linha horizontal",
+      "link": "Link",
+      "image": "Imagem",
+      "codeBlock": "Bloco de código",
+      "insertTable": "Inserir tabela",
+      "undo": "Desfazer (Ctrl+Z)",
+      "redo": "Refazer (Ctrl+Y)"
+    },
+    "commands": {
+      "paragraph": "Parágrafo",
+      "heading1": "Título 1",
+      "heading2": "Título 2",
+      "heading3": "Título 3",
+      "bulletList": "Lista com marcadores",
+      "orderedList": "Lista numerada",
+      "taskList": "Lista de tarefas",
+      "blockquote": "Citação",
+      "codeBlock": "Bloco de código",
+      "horizontalRule": "Linha horizontal",
+      "image": "Imagem",
+      "table": "Tabela"
     }
   }
 }

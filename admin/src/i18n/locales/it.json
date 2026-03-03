@@ -1466,8 +1466,15 @@
       "fields": {
         "sectionType": "Tipo di sezione",
         "displayOrder": "Ordine di visualizzazione",
-        "settings": "Impostazioni"
-      }
+        "settings": "Impostazioni",
+        "buttonText": "Testo del pulsante",
+        "ctaRoute": "Percorso call-to-action",
+        "ctaHelperText": "Collegamento CTA opzionale"
+      },
+      "localizedContent": "Contenuto localizzato",
+      "sectionConfiguration": "Configurazione della sezione",
+      "noActiveLocales": "Nessuna lingua attiva configurata",
+      "localeExists": "presente"
     },
     "undo": "Annulla",
     "redo": "Ripristina",
@@ -1737,6 +1744,44 @@
       "titleTooLong": "Il titolo supera la lunghezza massima di {{max}} caratteri",
       "bodyTooLong": "Il contenuto supera la lunghezza massima di {{max}} caratteri",
       "readFailed": "Impossibile leggere il file"
+    }
+  },
+  "editor": {
+    "placeholder": "Digita / per inserire blocchi...",
+    "sectionPlaceholder": "Contenuto della sezione...",
+    "toolbar": {
+      "bold": "Grassetto (Ctrl+B)",
+      "italic": "Corsivo (Ctrl+I)",
+      "underline": "Sottolineato (Ctrl+U)",
+      "strikethrough": "Barrato",
+      "heading1": "Titolo 1",
+      "heading2": "Titolo 2",
+      "heading3": "Titolo 3",
+      "blockquote": "Citazione",
+      "bulletList": "Elenco puntato",
+      "orderedList": "Elenco numerato",
+      "taskList": "Lista attività",
+      "horizontalRule": "Linea orizzontale",
+      "link": "Collegamento",
+      "image": "Immagine",
+      "codeBlock": "Blocco di codice",
+      "insertTable": "Inserisci tabella",
+      "undo": "Annulla (Ctrl+Z)",
+      "redo": "Ripristina (Ctrl+Y)"
+    },
+    "commands": {
+      "paragraph": "Paragrafo",
+      "heading1": "Titolo 1",
+      "heading2": "Titolo 2",
+      "heading3": "Titolo 3",
+      "bulletList": "Elenco puntato",
+      "orderedList": "Elenco numerato",
+      "taskList": "Lista attività",
+      "blockquote": "Citazione",
+      "codeBlock": "Blocco di codice",
+      "horizontalRule": "Linea orizzontale",
+      "image": "Immagine",
+      "table": "Tabella"
     }
   }
 }

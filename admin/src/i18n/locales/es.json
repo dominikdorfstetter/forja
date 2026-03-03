@@ -1466,8 +1466,15 @@
       "fields": {
         "sectionType": "Tipo de sección",
         "displayOrder": "Orden de visualización",
-        "settings": "Configuración"
-      }
+        "settings": "Configuración",
+        "buttonText": "Texto del botón",
+        "ctaRoute": "Ruta de llamada a la acción",
+        "ctaHelperText": "Enlace CTA opcional"
+      },
+      "localizedContent": "Contenido localizado",
+      "sectionConfiguration": "Configuración de la sección",
+      "noActiveLocales": "No hay idiomas activos configurados",
+      "localeExists": "existe"
     },
     "undo": "Deshacer",
     "redo": "Rehacer",
@@ -1737,6 +1744,44 @@
       "titleTooLong": "El título excede la longitud máxima de {{max}} caracteres",
       "bodyTooLong": "El contenido excede la longitud máxima de {{max}} caracteres",
       "readFailed": "No se pudo leer el archivo"
+    }
+  },
+  "editor": {
+    "placeholder": "Escribe / para insertar bloques...",
+    "sectionPlaceholder": "Contenido de la sección...",
+    "toolbar": {
+      "bold": "Negrita (Ctrl+B)",
+      "italic": "Cursiva (Ctrl+I)",
+      "underline": "Subrayado (Ctrl+U)",
+      "strikethrough": "Tachado",
+      "heading1": "Encabezado 1",
+      "heading2": "Encabezado 2",
+      "heading3": "Encabezado 3",
+      "blockquote": "Cita",
+      "bulletList": "Lista con viñetas",
+      "orderedList": "Lista numerada",
+      "taskList": "Lista de tareas",
+      "horizontalRule": "Línea horizontal",
+      "link": "Enlace",
+      "image": "Imagen",
+      "codeBlock": "Bloque de código",
+      "insertTable": "Insertar tabla",
+      "undo": "Deshacer (Ctrl+Z)",
+      "redo": "Rehacer (Ctrl+Y)"
+    },
+    "commands": {
+      "paragraph": "Párrafo",
+      "heading1": "Encabezado 1",
+      "heading2": "Encabezado 2",
+      "heading3": "Encabezado 3",
+      "bulletList": "Lista con viñetas",
+      "orderedList": "Lista numerada",
+      "taskList": "Lista de tareas",
+      "blockquote": "Cita",
+      "codeBlock": "Bloque de código",
+      "horizontalRule": "Línea horizontal",
+      "image": "Imagen",
+      "table": "Tabla"
     }
   }
 }

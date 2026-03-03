@@ -1,7 +1,7 @@
 import { Grid, List, ListItem, ListItemText, Paper, TextField, Typography } from '@mui/material';
 import { Controller, type Control, type UseFormGetValues } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import MDEditor, { commands } from '@uiw/react-md-editor';
+import { ForjaEditor } from '@/components/editor';
 import type { BlogContentFormData } from './blogDetailSchema';
 import { parseToc } from './blogDetailSchema';
 
@@ -9,9 +9,10 @@ interface BlogContentTabProps {
   control: Control<BlogContentFormData>;
   getValues: UseFormGetValues<BlogContentFormData>;
   onSnapshot: () => void;
+  siteId?: string;
 }
 
-export default function BlogContentTab({ control, getValues, onSnapshot }: BlogContentTabProps) {
+export default function BlogContentTab({ control, getValues, onSnapshot, siteId }: BlogContentTabProps) {
   const { t } = useTranslation();
   const body = getValues('body');
   const tocItems = parseToc(body);
@@ -64,37 +65,18 @@ export default function BlogContentTab({ control, getValues, onSnapshot }: BlogC
           )}
         />
 
-        <Typography variant="subtitle2" sx={{ mb: 1 }}>
-          {t('blogDetail.fields.body')}
-        </Typography>
         <Controller
           name="body"
           control={control}
           render={({ field }) => (
-            <div data-color-mode="light">
-              <MDEditor
-                value={field.value}
-                onChange={(val) => field.onChange(val || '')}
-                onBlur={() => { field.onBlur(); onSnapshot(); }}
-                height={500}
-                commands={[
-                  commands.bold, commands.italic, commands.strikethrough,
-                  commands.divider,
-                  commands.heading, commands.quote, commands.link, commands.image,
-                  commands.divider,
-                  commands.unorderedListCommand, commands.orderedListCommand, commands.checkedListCommand,
-                  commands.divider,
-                  commands.code, commands.codeBlock,
-                  commands.divider,
-                  commands.table, commands.hr,
-                ]}
-                extraCommands={[
-                  commands.codeEdit, commands.codeLive, commands.codePreview,
-                  commands.divider,
-                  commands.fullscreen,
-                ]}
-              />
-            </div>
+            <ForjaEditor
+              value={field.value}
+              onChange={(val) => field.onChange(val)}
+              onBlur={() => { field.onBlur(); onSnapshot(); }}
+              height={500}
+              placeholder={t('editor.placeholder')}
+              siteId={siteId}
+            />
           )}
         />
       </Grid>

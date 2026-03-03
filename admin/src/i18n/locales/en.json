@@ -1466,8 +1466,15 @@
       "fields": {
         "sectionType": "Section Type",
         "displayOrder": "Display Order",
-        "settings": "Settings"
-      }
+        "settings": "Settings",
+        "buttonText": "Button Text",
+        "ctaRoute": "Call to Action Route",
+        "ctaHelperText": "Optional CTA link route"
+      },
+      "localizedContent": "Localized Content",
+      "sectionConfiguration": "Section Configuration",
+      "noActiveLocales": "No active locales configured",
+      "localeExists": "exists"
     },
     "undo": "Undo",
     "redo": "Redo",
@@ -1602,10 +1609,10 @@
   "languages": {
     "en": "English",
     "de": "Deutsch",
-    "fr": "Fran\u00e7ais",
-    "es": "Espa\u00f1ol",
+    "fr": "Français",
+    "es": "Español",
     "it": "Italiano",
-    "pt": "Portugu\u00eas",
+    "pt": "Português",
     "nl": "Nederlands",
     "pl": "Polski"
   },
@@ -1737,6 +1744,44 @@
       "titleTooLong": "Title exceeds maximum length of {{max}} characters",
       "bodyTooLong": "Body exceeds maximum length of {{max}} characters",
       "readFailed": "Failed to read file"
+    }
+  },
+  "editor": {
+    "placeholder": "Type / to insert blocks...",
+    "sectionPlaceholder": "Section content...",
+    "toolbar": {
+      "bold": "Bold (Ctrl+B)",
+      "italic": "Italic (Ctrl+I)",
+      "underline": "Underline (Ctrl+U)",
+      "strikethrough": "Strikethrough",
+      "heading1": "Heading 1",
+      "heading2": "Heading 2",
+      "heading3": "Heading 3",
+      "blockquote": "Blockquote",
+      "bulletList": "Bullet List",
+      "orderedList": "Ordered List",
+      "taskList": "Task List",
+      "horizontalRule": "Horizontal Rule",
+      "link": "Link",
+      "image": "Image",
+      "codeBlock": "Code Block",
+      "insertTable": "Insert Table",
+      "undo": "Undo (Ctrl+Z)",
+      "redo": "Redo (Ctrl+Y)"
+    },
+    "commands": {
+      "paragraph": "Paragraph",
+      "heading1": "Heading 1",
+      "heading2": "Heading 2",
+      "heading3": "Heading 3",
+      "bulletList": "Bullet List",
+      "orderedList": "Ordered List",
+      "taskList": "Task List",
+      "blockquote": "Blockquote",
+      "codeBlock": "Code Block",
+      "horizontalRule": "Horizontal Rule",
+      "image": "Image",
+      "table": "Table"
     }
   }
 }
