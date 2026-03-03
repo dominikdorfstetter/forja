@@ -47,7 +47,7 @@ vi.mock('@/store/AuthContext', () => ({
 const mockPage1: PageListItem = {
   id: 'page-1',
   route: '/about',
-  page_type: 'Standard',
+  page_type: 'Static',
   slug: 'about',
   is_in_navigation: true,
   status: 'Published',
@@ -189,7 +189,7 @@ describe('PagesPage', () => {
     vi.mocked(apiService.getPages).mockResolvedValue(mockPaginatedPages);
     renderWithProviders(<PagesPage />);
     await waitFor(() => {
-      expect(screen.getByText('Standard')).toBeInTheDocument();
+      expect(screen.getByText('Static')).toBeInTheDocument();
     });
     expect(screen.getByText('Contact')).toBeInTheDocument();
   });
