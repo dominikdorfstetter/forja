@@ -63,6 +63,33 @@ vi.mock('@/services/api', () => {
     getSiteSettings: vi.fn(),
     getNotifications: vi.fn(),
     getUnreadCount: vi.fn(),
+    // Blog methods
+    getBlogs: vi.fn(),
+    createBlog: vi.fn(),
+    updateBlog: vi.fn(),
+    deleteBlog: vi.fn(),
+    cloneBlog: vi.fn(),
+    bulkBlogs: vi.fn(),
+    createBlogLocalization: vi.fn(),
+    // Page methods
+    getPages: vi.fn(),
+    createPage: vi.fn(),
+    updatePage: vi.fn(),
+    deletePage: vi.fn(),
+    clonePage: vi.fn(),
+    bulkPages: vi.fn(),
+    // Media methods
+    getMedia: vi.fn(),
+    uploadMediaFile: vi.fn(),
+    updateMedia: vi.fn(),
+    deleteMedia: vi.fn(),
+    getMediaFolders: vi.fn(),
+    createMediaFolder: vi.fn(),
+    updateMediaFolder: vi.fn(),
+    deleteMediaFolder: vi.fn(),
+    // Locale & template methods
+    getSiteLocales: vi.fn(),
+    getContentTemplates: vi.fn(),
   };
   return { default: apiService, ApiService: vi.fn(() => apiService) };
 });
