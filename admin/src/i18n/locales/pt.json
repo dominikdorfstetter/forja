@@ -319,6 +319,21 @@
       "emptyDescription": "Anexe documentos a este artigo do blogue",
       "detached": "Documento desanexado",
       "attached": "Documento anexado"
+    },
+    "sections": {
+      "media": "Mídia",
+      "seo": "SEO & Metadados",
+      "settings": "Configurações",
+      "categoriesAndTags": "Categorias & Tags",
+      "attachments": "Anexos",
+      "preview": "Pré-visualização"
+    },
+    "sidebar": {
+      "toggle": "Barra lateral",
+      "seo": "SEO",
+      "general": "Geral",
+      "media": "Mídia",
+      "relations": "Relações"
     }
   },
   "pages": {

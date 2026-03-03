@@ -319,6 +319,21 @@
       "emptyDescription": "Allega documenti a questo articolo del blog",
       "detached": "Documento rimosso",
       "attached": "Documento allegato"
+    },
+    "sections": {
+      "media": "Media",
+      "seo": "SEO & Metadati",
+      "settings": "Impostazioni",
+      "categoriesAndTags": "Categorie & Tag",
+      "attachments": "Allegati",
+      "preview": "Anteprima"
+    },
+    "sidebar": {
+      "toggle": "Barra laterale",
+      "seo": "SEO",
+      "general": "Generale",
+      "media": "Media",
+      "relations": "Relazioni"
     }
   },
   "pages": {

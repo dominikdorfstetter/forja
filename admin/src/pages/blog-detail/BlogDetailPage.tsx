@@ -1,9 +1,25 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useParams } from 'react-router';
-import { Box, Alert, Tabs, Tab, Chip, Paper } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Chip,
+  Drawer,
+  Grid,
+  List,
+  ListItem,
+  ListItemText,
+  Paper,
+  Tabs,
+  Tab,
+  TextField,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import apiService from '@/services/api';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
@@ -23,18 +39,18 @@ import { useAutosave } from '@/hooks/useAutosave';
 import { usePreviewUrl } from '@/hooks/usePreviewUrl';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
+import { ForjaEditor } from '@/components/editor';
 import {
   blogContentSchema,
   type BlogContentFormData,
   calculateReadingTime,
+  parseToc,
 } from './blogDetailSchema';
 import BlogEditorToolbar from './BlogEditorToolbar';
-import BlogContentTab from './BlogContentTab';
-import BlogSeoTab from './BlogSeoTab';
-import BlogSettingsTab from './BlogSettingsTab';
-import BlogAttachmentsTab from './BlogAttachmentsTab';
-import BlogPreviewTab from './BlogPreviewTab';
+import BlogEditorSidebar from './BlogEditorSidebar';
 import HistoryDrawer from '@/components/shared/HistoryDrawer';
+
+const SIDEBAR_WIDTH = 380;
 
 function buildFormDefaults(
   blog: BlogDetailResponse | undefined,
@@ -68,12 +84,15 @@ export default function BlogDetailPage() {
   const { showError, showSuccess } = useErrorSnackbar();
   const { canWrite } = useAuth();
   const { selectedSiteId } = useSiteContext();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const [activeLocaleTab, setActiveLocaleTab] = useState(0);
-  const [activeContentTab, setActiveContentTab] = useState(0);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const [formVersion, setFormVersion] = useState(0);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarTab, setSidebarTab] = useState(0);
 
   const { templates: previewTemplates, openPreview } = usePreviewUrl();
 
@@ -333,13 +352,27 @@ export default function BlogDetailPage() {
   if (error) return <Alert severity="error">{t('blogDetail.messages.saveFailed')}</Alert>;
   if (!blogDetail) return <Alert severity="warning">{t('blogDetail.notFound')}</Alert>;
 
-  const contentTabs = [
-    { key: 'content', label: t('blogDetail.tabs.content') },
-    { key: 'preview', label: t('blogDetail.tabs.preview') },
-    { key: 'seo', label: t('blogDetail.tabs.seo') },
-    { key: 'settings', label: t('blogDetail.tabs.settings') },
-    { key: 'attachments', label: t('blogDetail.tabs.attachments') },
-  ];
+  // ToC from body
+  const body = getValues('body');
+  const tocItems = parseToc(body);
+
+  const sidebarContent = (
+    <BlogEditorSidebar
+      activeTab={sidebarTab}
+      onTabChange={setSidebarTab}
+      control={control}
+      watch={watch}
+      setValue={setValue}
+      onSnapshot={() => formHistory.snapshot()}
+      blogId={blogDetail.id}
+      slug={blogDetail.slug || ''}
+      canWrite={canWrite}
+      siteId={selectedSiteId}
+      contentId={blogDetail.content_id}
+      categories={blogDetail.categories || []}
+      documents={blogDetail.documents || []}
+    />
+  );
 
   return (
     <Box>
@@ -373,6 +406,8 @@ export default function BlogDetailPage() {
         onRequestChanges={handleRequestChanges}
         previewTemplates={previewTemplates}
         onPreview={(url) => openPreview('/blog/' + (blogDetail.slug || ''), url)}
+        sidebarOpen={sidebarOpen}
+        onToggleSidebar={() => setSidebarOpen((o) => !o)}
       />
 
       {/* Locale Tabs */}
@@ -409,59 +444,114 @@ export default function BlogDetailPage() {
             })}
           </Tabs>
 
-          {/* Content Tabs */}
-          <Paper sx={{ mb: 2 }}>
-            <Tabs
-              value={activeContentTab}
-              onChange={(_, v) => setActiveContentTab(v)}
-              sx={{ borderBottom: 1, borderColor: 'divider' }}
-            >
-              {contentTabs.map((tab) => (
-                <Tab key={tab.key} label={tab.label} />
-              ))}
-            </Tabs>
+          <Box sx={{ display: 'flex', gap: 0 }}>
+            {/* Editor area */}
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Paper sx={{ p: 3, mb: 2 }}>
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 12, md: tocItems.length > 0 ? 9 : 12 }}>
+                    <Controller
+                      name="title"
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          label={t('blogDetail.fields.title')}
+                          fullWidth
+                          required
+                          onBlur={() => { field.onBlur(); formHistory.snapshot(); }}
+                          sx={{ mb: 2 }}
+                        />
+                      )}
+                    />
 
-            <Box sx={{ p: 3 }}>
-              {activeContentTab === 0 && (
-                <BlogContentTab
-                  control={control}
-                  getValues={getValues}
-                  onSnapshot={() => formHistory.snapshot()}
-                  siteId={selectedSiteId}
-                />
-              )}
-              {activeContentTab === 1 && (
-                <BlogPreviewTab getValues={getValues} />
-              )}
-              {activeContentTab === 2 && (
-                <BlogSeoTab
-                  control={control}
-                  watch={watch}
-                  onSnapshot={() => formHistory.snapshot()}
-                  blogId={blogDetail.id}
-                  slug={blogDetail.slug || ''}
-                  canWrite={canWrite}
-                />
-              )}
-              {activeContentTab === 3 && (
-                <BlogSettingsTab
-                  control={control}
-                  watch={watch}
-                  setValue={setValue}
-                  onSnapshot={() => formHistory.snapshot()}
-                  siteId={selectedSiteId}
-                />
-              )}
-              {activeContentTab === 4 && (
-                <BlogAttachmentsTab
-                  contentId={blogDetail.content_id}
-                  blogId={blogDetail.id}
-                  categories={blogDetail.categories || []}
-                  documents={blogDetail.documents || []}
-                />
-              )}
+                    <Controller
+                      name="subtitle"
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          label={t('blogDetail.fields.subtitle')}
+                          fullWidth
+                          onBlur={() => { field.onBlur(); formHistory.snapshot(); }}
+                          sx={{ mb: 2 }}
+                        />
+                      )}
+                    />
+
+                    <Controller
+                      name="body"
+                      control={control}
+                      render={({ field }) => (
+                        <ForjaEditor
+                          value={field.value}
+                          onChange={(val) => field.onChange(val)}
+                          onBlur={() => { field.onBlur(); formHistory.snapshot(); }}
+                          height={500}
+                          placeholder={t('editor.placeholder')}
+                          siteId={selectedSiteId}
+                        />
+                      )}
+                    />
+                  </Grid>
+
+                  {tocItems.length > 0 && (
+                    <Grid size={{ xs: 12, md: 3 }}>
+                      <Paper sx={{ p: 2, position: 'sticky', top: 140 }}>
+                        <Typography variant="subtitle2" gutterBottom>
+                          {t('blogDetail.toc')}
+                        </Typography>
+                        <List dense>
+                          {tocItems.map((item, idx) => (
+                            <ListItem key={idx} sx={{ pl: (item.level - 1) * 2 }}>
+                              <ListItemText
+                                primary={item.text}
+                                primaryTypographyProps={{
+                                  variant: 'body2',
+                                  fontWeight: item.level === 1 ? 600 : 400,
+                                }}
+                              />
+                            </ListItem>
+                          ))}
+                        </List>
+                      </Paper>
+                    </Grid>
+                  )}
+                </Grid>
+              </Paper>
             </Box>
-          </Paper>
+
+            {/* Sidebar — desktop: inline sticky, mobile: Drawer */}
+            {isMobile ? (
+              <Drawer
+                anchor="right"
+                open={sidebarOpen}
+                onClose={() => setSidebarOpen(false)}
+                PaperProps={{ sx: { width: SIDEBAR_WIDTH, maxWidth: '90vw' } }}
+              >
+                {sidebarContent}
+              </Drawer>
+            ) : (
+              sidebarOpen && (
+                <Box
+                  sx={{
+                    width: SIDEBAR_WIDTH,
+                    flexShrink: 0,
+                    borderLeft: 1,
+                    borderColor: 'divider',
+                    position: 'sticky',
+                    top: 128,
+                    height: 'calc(100vh - 128px)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    ml: 0,
+                  }}
+                >
+                  {sidebarContent}
+                </Box>
+              )
+            )}
+          </Box>
         </>
       ) : (
         <Alert severity="info">

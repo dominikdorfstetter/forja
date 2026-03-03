@@ -319,6 +319,21 @@
       "emptyDescription": "Joignez des documents à cet article de blog",
       "detached": "Document détaché",
       "attached": "Document joint"
+    },
+    "sections": {
+      "media": "Médias",
+      "seo": "SEO & Métadonnées",
+      "settings": "Paramètres",
+      "categoriesAndTags": "Catégories & Tags",
+      "attachments": "Pièces jointes",
+      "preview": "Aperçu"
+    },
+    "sidebar": {
+      "toggle": "Barre latérale",
+      "seo": "SEO",
+      "general": "Général",
+      "media": "Médias",
+      "relations": "Relations"
     }
   },
   "pages": {

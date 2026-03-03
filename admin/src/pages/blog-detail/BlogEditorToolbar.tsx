@@ -16,6 +16,7 @@ import {
 import UndoIcon from '@mui/icons-material/Undo';
 import RedoIcon from '@mui/icons-material/Redo';
 import HistoryIcon from '@mui/icons-material/History';
+import ViewSidebarIcon from '@mui/icons-material/ViewSidebar';
 import SaveIcon from '@mui/icons-material/Save';
 import ScheduleIcon from '@mui/icons-material/CalendarMonth';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -55,6 +56,8 @@ interface BlogEditorToolbarProps {
   onRequestChanges?: () => void;
   previewTemplates?: PreviewTemplate[];
   onPreview?: (templateUrl: string) => void;
+  sidebarOpen?: boolean;
+  onToggleSidebar?: () => void;
 }
 
 export default function BlogEditorToolbar({
@@ -79,6 +82,8 @@ export default function BlogEditorToolbar({
   onRequestChanges,
   previewTemplates,
   onPreview,
+  sidebarOpen,
+  onToggleSidebar,
 }: BlogEditorToolbarProps) {
   const { t } = useTranslation();
   const [scheduleAnchor, setScheduleAnchor] = useState<HTMLElement | null>(null);
@@ -322,6 +327,18 @@ export default function BlogEditorToolbar({
             </>
           )}
         </>
+      )}
+
+      {onToggleSidebar && (
+        <Tooltip title={t('blogDetail.sidebar.toggle')}>
+          <IconButton
+            size="small"
+            onClick={onToggleSidebar}
+            color={sidebarOpen ? 'primary' : 'default'}
+          >
+            <ViewSidebarIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
       )}
 
       <Tooltip title={t('entityHistory.title')}>
