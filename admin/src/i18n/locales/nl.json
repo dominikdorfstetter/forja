@@ -319,6 +319,21 @@
       "emptyDescription": "Voeg documenten toe aan dit blogbericht",
       "detached": "Document losgekoppeld",
       "attached": "Document bijgevoegd"
+    },
+    "sections": {
+      "media": "Media",
+      "seo": "SEO & Metadata",
+      "settings": "Instellingen",
+      "categoriesAndTags": "Categorieën & Tags",
+      "attachments": "Bijlagen",
+      "preview": "Voorbeeld"
+    },
+    "sidebar": {
+      "toggle": "Zijbalk",
+      "seo": "SEO",
+      "general": "Algemeen",
+      "media": "Media",
+      "relations": "Relaties"
     }
   },
   "pages": {

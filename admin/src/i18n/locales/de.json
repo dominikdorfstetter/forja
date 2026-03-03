@@ -319,6 +319,21 @@
       "emptyDescription": "Hängen Sie Dokumente an diesen Blogbeitrag an",
       "detached": "Dokument entfernt",
       "attached": "Dokument angehängt"
+    },
+    "sections": {
+      "media": "Medien",
+      "seo": "SEO & Metadaten",
+      "settings": "Einstellungen",
+      "categoriesAndTags": "Kategorien & Tags",
+      "attachments": "Anhänge",
+      "preview": "Vorschau"
+    },
+    "sidebar": {
+      "toggle": "Seitenleiste",
+      "seo": "SEO",
+      "general": "Allgemein",
+      "media": "Medien",
+      "relations": "Verknüpfungen"
     }
   },
   "pages": {

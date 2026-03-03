@@ -58,35 +58,38 @@ const commands: CommandItem[] = [
     key: 'bulletList',
     icon: <FormatListBulletedIcon fontSize="small" />,
     command: ({ editor, range }) => {
-      editor.chain().focus().deleteRange(range).toggleBulletList().run();
+      editor.chain().focus().deleteRange(range).run();
+      editor.chain().focus().toggleBulletList().run();
     },
   },
   {
     key: 'orderedList',
     icon: <FormatListNumberedIcon fontSize="small" />,
     command: ({ editor, range }) => {
-      editor.chain().focus().deleteRange(range).toggleOrderedList().run();
+      editor.chain().focus().deleteRange(range).run();
+      editor.chain().focus().toggleOrderedList().run();
     },
   },
   {
     key: 'taskList',
     icon: <ChecklistIcon fontSize="small" />,
     command: ({ editor, range }) => {
-      editor.chain().focus().deleteRange(range).toggleTaskList().run();
+      editor.chain().focus().deleteRange(range).run();
+      editor.chain().focus().toggleTaskList().run();
     },
   },
   {
     key: 'blockquote',
     icon: <FormatQuoteIcon fontSize="small" />,
     command: ({ editor, range }) => {
-      editor.chain().focus().deleteRange(range).toggleBlockquote().run();
+      editor.chain().focus().deleteRange(range).setBlockquote().run();
     },
   },
   {
     key: 'codeBlock',
     icon: <CodeIcon fontSize="small" />,
     command: ({ editor, range }) => {
-      editor.chain().focus().deleteRange(range).toggleCodeBlock().run();
+      editor.chain().focus().deleteRange(range).setCodeBlock().run();
     },
   },
   {
@@ -181,6 +184,9 @@ CommandList.displayName = 'CommandList';
 
 const suggestionConfig: Omit<SuggestionOptions<CommandItem>, 'editor'> = {
   char: '/',
+  command: ({ editor, range, props }) => {
+    props.command({ editor, range });
+  },
   items: ({ query }) => {
     return commands.filter((item) => item.key.toLowerCase().includes(query.toLowerCase()));
   },

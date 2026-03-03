@@ -84,15 +84,31 @@ export default function ForjaEditor({
       if (debounceRef.current) clearTimeout(debounceRef.current);
       debounceRef.current = setTimeout(() => onChange(md), 100);
     },
-    onBlur: () => {
+    onBlur: ({ editor }) => {
+      // Flush any pending debounced onChange so the form value is up-to-date
+      // before external onBlur (e.g. formHistory.snapshot()) reads it
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+        debounceRef.current = undefined;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const md = ((editor.storage as any).markdown as MarkdownStorage).getMarkdown();
+        lastSerializedRef.current = md;
+        onChange(md);
+      }
       onBlur?.();
     },
   });
 
-  // Sync external value changes (e.g., form reset) without resetting cursor
+  // Sync external value changes (e.g., form reset / undo) without resetting cursor
   useEffect(() => {
     if (!editor || editor.isDestroyed) return;
     if (value !== lastSerializedRef.current) {
+      // Cancel any pending debounced onChange to prevent it from overwriting
+      // the restored value with stale content
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+        debounceRef.current = undefined;
+      }
       lastSerializedRef.current = value;
       editor.commands.setContent(value);
     }

@@ -319,6 +319,21 @@
       "emptyDescription": "Attach documents to this blog post",
       "detached": "Document detached",
       "attached": "Document attached"
+    },
+    "sections": {
+      "media": "Media",
+      "seo": "SEO & Metadata",
+      "settings": "Settings",
+      "categoriesAndTags": "Categories & Tags",
+      "attachments": "Attachments",
+      "preview": "Preview"
+    },
+    "sidebar": {
+      "toggle": "Toggle sidebar",
+      "seo": "SEO",
+      "general": "General",
+      "media": "Media",
+      "relations": "Relations"
     }
   },
   "pages": {

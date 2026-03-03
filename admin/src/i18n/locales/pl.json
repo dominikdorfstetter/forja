@@ -319,6 +319,21 @@
       "emptyDescription": "Załącz dokumenty do tego wpisu na blogu",
       "detached": "Dokument odłączony",
       "attached": "Dokument załączony"
+    },
+    "sections": {
+      "media": "Media",
+      "seo": "SEO i metadane",
+      "settings": "Ustawienia",
+      "categoriesAndTags": "Kategorie i tagi",
+      "attachments": "Załączniki",
+      "preview": "Podgląd"
+    },
+    "sidebar": {
+      "toggle": "Panel boczny",
+      "seo": "SEO",
+      "general": "Ogólne",
+      "media": "Media",
+      "relations": "Relacje"
     }
   },
   "pages": {

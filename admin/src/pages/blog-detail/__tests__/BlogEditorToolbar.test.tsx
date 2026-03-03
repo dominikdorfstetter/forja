@@ -26,6 +26,8 @@ interface WrapperProps {
   onApprove?: () => void;
   onRequestChanges?: () => void;
   defaultStatus?: BlogContentFormData['status'];
+  sidebarOpen?: boolean;
+  onToggleSidebar?: () => void;
 }
 
 function ToolbarWrapper({
@@ -43,6 +45,8 @@ function ToolbarWrapper({
   onApprove,
   onRequestChanges,
   defaultStatus = 'Draft',
+  sidebarOpen = true,
+  onToggleSidebar = vi.fn(),
 }: WrapperProps) {
   const methods = useForm<BlogContentFormData>({
     resolver: zodResolver(blogContentSchema),
@@ -85,6 +89,8 @@ function ToolbarWrapper({
         onSubmitForReview={onSubmitForReview}
         onApprove={onApprove}
         onRequestChanges={onRequestChanges}
+        sidebarOpen={sidebarOpen}
+        onToggleSidebar={onToggleSidebar}
       />
     </FormProvider>
   );
@@ -160,6 +166,26 @@ describe('BlogEditorToolbar', () => {
       (b) => b.querySelector('[data-testid="SendIcon"]'),
     );
     expect(submitBtn).toBeDefined();
+  });
+
+  it('renders sidebar toggle button', () => {
+    renderWithProviders(<ToolbarWrapper />);
+    const sidebarBtn = screen.getAllByRole('button').find(
+      (b) => b.querySelector('[data-testid="ViewSidebarIcon"]'),
+    );
+    expect(sidebarBtn).toBeDefined();
+  });
+
+  it('calls onToggleSidebar when sidebar button is clicked', async () => {
+    const user = userEvent.setup();
+    const onToggleSidebar = vi.fn();
+    renderWithProviders(<ToolbarWrapper onToggleSidebar={onToggleSidebar} />);
+    const sidebarBtn = screen.getAllByRole('button').find(
+      (b) => b.querySelector('[data-testid="ViewSidebarIcon"]'),
+    );
+    expect(sidebarBtn).toBeDefined();
+    await user.click(sidebarBtn!);
+    expect(onToggleSidebar).toHaveBeenCalledOnce();
   });
 
   it('shows approve button when canApprove and status is InReview', () => {

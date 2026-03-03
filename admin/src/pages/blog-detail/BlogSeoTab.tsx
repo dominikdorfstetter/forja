@@ -74,6 +74,27 @@ export default function BlogSeoTab({
         )}
       />
 
+      <Controller
+        name="excerpt"
+        control={control}
+        render={({ field }) => (
+          <Box sx={{ mb: 2 }}>
+            <TextField
+              {...field}
+              label={t('blogDetail.fields.excerpt')}
+              fullWidth
+              multiline
+              rows={2}
+              onBlur={() => { field.onBlur(); onSnapshot(); }}
+              inputProps={{ maxLength: 300 }}
+            />
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 0.5 }}>
+              <CharCounter current={field.value?.length || 0} max={300} />
+            </Box>
+          </Box>
+        )}
+      />
+
       <Box sx={{ mb: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <strong>{t('blogDetail.metadata.slug')}</strong>
