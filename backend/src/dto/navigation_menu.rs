@@ -126,7 +126,8 @@ impl From<NavigationMenuWithCount> for NavigationMenuResponse {
 }
 
 lazy_static::lazy_static! {
-    static ref SLUG_REGEX: regex::Regex = regex::Regex::new(r"^[a-z0-9][a-z0-9-]*$").unwrap();
+    static ref SLUG_REGEX: regex::Regex = regex::Regex::new(r"^[a-z0-9][a-z0-9-]*$")
+        .expect("SLUG_REGEX is a valid regex literal");
 }
 
 #[cfg(test)]
