@@ -5,28 +5,36 @@ use validator::ValidationError;
 
 lazy_static::lazy_static! {
     /// Valid slug pattern: lowercase letters, numbers, and hyphens
-    static ref SLUG_REGEX: Regex = Regex::new(r"^[a-z0-9]+(?:-[a-z0-9]+)*$").unwrap();
+    static ref SLUG_REGEX: Regex = Regex::new(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+        .expect("SLUG_REGEX is a valid regex literal");
 
     /// Valid route pattern: starts with /, contains valid path characters
-    static ref ROUTE_REGEX: Regex = Regex::new(r"^/[a-z0-9\-_/]*$").unwrap();
+    static ref ROUTE_REGEX: Regex = Regex::new(r"^/[a-z0-9\-_/]*$")
+        .expect("ROUTE_REGEX is a valid regex literal");
 
     /// Valid locale code pattern: language[-region]
-    static ref LOCALE_REGEX: Regex = Regex::new(r"^[a-z]{2}(-[A-Z]{2})?$").unwrap();
+    static ref LOCALE_REGEX: Regex = Regex::new(r"^[a-z]{2}(-[A-Z]{2})?$")
+        .expect("LOCALE_REGEX is a valid regex literal");
 
     /// Valid timezone pattern (simplified)
-    static ref TIMEZONE_REGEX: Regex = Regex::new(r"^[A-Za-z_]+/[A-Za-z_]+$|^UTC$").unwrap();
+    static ref TIMEZONE_REGEX: Regex = Regex::new(r"^[A-Za-z_]+/[A-Za-z_]+$|^UTC$")
+        .expect("TIMEZONE_REGEX is a valid regex literal");
 
     /// Valid hex color pattern
-    static ref HEX_COLOR_REGEX: Regex = Regex::new(r"^#[0-9A-Fa-f]{6}$").unwrap();
+    static ref HEX_COLOR_REGEX: Regex = Regex::new(r"^#[0-9A-Fa-f]{6}$")
+        .expect("HEX_COLOR_REGEX is a valid regex literal");
 
     /// Valid icon name pattern (alphanumeric and hyphens)
-    static ref ICON_REGEX: Regex = Regex::new(r"^[a-z0-9\-]+$").unwrap();
+    static ref ICON_REGEX: Regex = Regex::new(r"^[a-z0-9\-]+$")
+        .expect("ICON_REGEX is a valid regex literal");
 
     /// XSS prevention - dangerous HTML characters
-    static ref DANGEROUS_HTML_REGEX: Regex = Regex::new(r"<script|javascript:|on\w+=").unwrap();
+    static ref DANGEROUS_HTML_REGEX: Regex = Regex::new(r"<script|javascript:|on\w+=")
+        .expect("DANGEROUS_HTML_REGEX is a valid regex literal");
 
     /// Basic email format validation
-    static ref EMAIL_REGEX: Regex = Regex::new(r"^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$").unwrap();
+    static ref EMAIL_REGEX: Regex = Regex::new(r"^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$")
+        .expect("EMAIL_REGEX is a valid regex literal");
 }
 
 /// Validate a slug format

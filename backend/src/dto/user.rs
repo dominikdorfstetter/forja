@@ -11,7 +11,8 @@ use crate::utils::validation::validate_url;
 
 lazy_static::lazy_static! {
     /// Valid username pattern: letters, numbers, underscores, dots, hyphens
-    static ref USERNAME_REGEX: regex::Regex = regex::Regex::new(r"^[a-zA-Z0-9_.\-]+$").unwrap();
+    static ref USERNAME_REGEX: regex::Regex = regex::Regex::new(r"^[a-zA-Z0-9_.\-]+$")
+        .expect("USERNAME_REGEX is a valid regex literal");
 }
 
 /// Validate username matches allowed pattern
