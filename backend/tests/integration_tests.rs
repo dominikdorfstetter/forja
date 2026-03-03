@@ -1191,7 +1191,7 @@ async fn test_page_crud_lifecycle() {
     let create_body = serde_json::json!({
         "route": "/about",
         "slug": "about",
-        "page_type": "Standard",
+        "page_type": "Static",
         "is_in_navigation": true,
         "status": "Draft",
         "site_ids": [site_id]
@@ -1490,8 +1490,8 @@ async fn test_category_crud_lifecycle() {
     let list: serde_json::Value = response.into_json().await.expect("valid JSON");
     assert_eq!(
         list["data"].as_array().expect("data array").len(),
-        2,
-        "Should have parent and child categories"
+        1,
+        "Should have one root category (child is nested under parent)"
     );
 
     // --- Get children of parent ---
