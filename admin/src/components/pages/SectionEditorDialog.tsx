@@ -20,7 +20,7 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import ImageIcon from '@mui/icons-material/Image';
 import SaveIcon from '@mui/icons-material/Save';
-import MDEditor, { commands } from '@uiw/react-md-editor';
+import { ForjaEditor } from '@/components/editor';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiService from '@/services/api';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
@@ -172,7 +172,7 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
           {/* Left panel: Localized content (60%) */}
           <Grid size={{ xs: 12, md: 7 }}>
             <Typography variant="subtitle1" gutterBottom fontWeight={600}>
-              Localized Content
+              {t('forms.section.localizedContent')}
             </Typography>
 
             {activeLocales.length > 0 ? (
@@ -194,7 +194,7 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
                             {locale.code.toUpperCase()}
                             {hasLoc && (
                               <Chip
-                                label="exists"
+                                label={t('forms.section.localeExists')}
                                 size="small"
                                 color="success"
                                 variant="outlined"
@@ -217,36 +217,16 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
                     onChange={(e) => setTitle(e.target.value)}
                   />
 
-                  <Box>
-                    <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: 'block' }}>
-                      Text (Markdown)
-                    </Typography>
-                    <MDEditor
-                      value={text}
-                      onChange={(val) => setText(val || '')}
-                      height={250}
-                      preview="edit"
-                      commands={[
-                        commands.bold, commands.italic, commands.strikethrough,
-                        commands.divider,
-                        commands.heading, commands.quote, commands.link, commands.image,
-                        commands.divider,
-                        commands.unorderedListCommand, commands.orderedListCommand, commands.checkedListCommand,
-                        commands.divider,
-                        commands.code, commands.codeBlock,
-                        commands.divider,
-                        commands.table, commands.hr,
-                      ]}
-                      extraCommands={[
-                        commands.codeEdit, commands.codeLive, commands.codePreview,
-                        commands.divider,
-                        commands.fullscreen,
-                      ]}
-                    />
-                  </Box>
+                  <ForjaEditor
+                    value={text}
+                    onChange={(val) => setText(val)}
+                    height={250}
+                    placeholder={t('editor.sectionPlaceholder')}
+                    siteId={selectedSiteId}
+                  />
 
                   <TextField
-                    label="Button Text"
+                    label={t('forms.section.fields.buttonText')}
                     fullWidth
 
                     size="small"
@@ -265,14 +245,14 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
                 </Stack>
               </>
             ) : (
-              <Typography color="text.secondary">No active locales configured</Typography>
+              <Typography color="text.secondary">{t('forms.section.noActiveLocales')}</Typography>
             )}
           </Grid>
 
           {/* Right panel: Section configuration (40%) */}
           <Grid size={{ xs: 12, md: 5 }}>
             <Typography variant="subtitle1" gutterBottom fontWeight={600}>
-              Section Configuration
+              {t('forms.section.sectionConfiguration')}
             </Typography>
 
             <Stack spacing={2}>
@@ -344,12 +324,12 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
               </Box>
 
               <TextField
-                label="Call to Action Route"
+                label={t('forms.section.fields.ctaRoute')}
                 fullWidth
                 size="small"
                 value={ctaRoute}
                 onChange={(e) => setCtaRoute(e.target.value)}
-                helperText="Optional CTA link route"
+                helperText={t('forms.section.fields.ctaHelperText')}
               />
 
               <Divider />

@@ -1466,8 +1466,15 @@
       "fields": {
         "sectionType": "Abschnittstyp",
         "displayOrder": "Anzeigereihenfolge",
-        "settings": "Einstellungen"
-      }
+        "settings": "Einstellungen",
+        "buttonText": "Schaltflächentext",
+        "ctaRoute": "Call-to-Action-Route",
+        "ctaHelperText": "Optionaler CTA-Link-Pfad"
+      },
+      "localizedContent": "Lokalisierter Inhalt",
+      "sectionConfiguration": "Abschnittskonfiguration",
+      "noActiveLocales": "Keine aktiven Sprachen konfiguriert",
+      "localeExists": "vorhanden"
     },
     "undo": "Rückgängig",
     "redo": "Wiederholen",
@@ -1737,6 +1744,44 @@
       "titleTooLong": "Titel überschreitet die maximale Länge von {{max}} Zeichen",
       "bodyTooLong": "Inhalt überschreitet die maximale Länge von {{max}} Zeichen",
       "readFailed": "Datei konnte nicht gelesen werden"
+    }
+  },
+  "editor": {
+    "placeholder": "Tippe / um Blöcke einzufügen...",
+    "sectionPlaceholder": "Abschnittsinhalt...",
+    "toolbar": {
+      "bold": "Fett (Strg+B)",
+      "italic": "Kursiv (Strg+I)",
+      "underline": "Unterstrichen (Strg+U)",
+      "strikethrough": "Durchgestrichen",
+      "heading1": "Überschrift 1",
+      "heading2": "Überschrift 2",
+      "heading3": "Überschrift 3",
+      "blockquote": "Zitat",
+      "bulletList": "Aufzählung",
+      "orderedList": "Nummerierte Liste",
+      "taskList": "Aufgabenliste",
+      "horizontalRule": "Horizontale Linie",
+      "link": "Link",
+      "image": "Bild",
+      "codeBlock": "Codeblock",
+      "insertTable": "Tabelle einfügen",
+      "undo": "Rückgängig (Strg+Z)",
+      "redo": "Wiederholen (Strg+Y)"
+    },
+    "commands": {
+      "paragraph": "Absatz",
+      "heading1": "Überschrift 1",
+      "heading2": "Überschrift 2",
+      "heading3": "Überschrift 3",
+      "bulletList": "Aufzählung",
+      "orderedList": "Nummerierte Liste",
+      "taskList": "Aufgabenliste",
+      "blockquote": "Zitat",
+      "codeBlock": "Codeblock",
+      "horizontalRule": "Horizontale Linie",
+      "image": "Bild",
+      "table": "Tabelle"
     }
   }
 }

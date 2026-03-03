@@ -1466,8 +1466,15 @@
       "fields": {
         "sectionType": "Sectietype",
         "displayOrder": "Weergavevolgorde",
-        "settings": "Instellingen"
-      }
+        "settings": "Instellingen",
+        "buttonText": "Knoptekst",
+        "ctaRoute": "Call-to-action-route",
+        "ctaHelperText": "Optionele CTA-link"
+      },
+      "localizedContent": "Gelokaliseerde inhoud",
+      "sectionConfiguration": "Sectieconfiguratie",
+      "noActiveLocales": "Geen actieve talen geconfigureerd",
+      "localeExists": "bestaat"
     },
     "undo": "Ongedaan maken",
     "redo": "Opnieuw",
@@ -1737,6 +1744,44 @@
       "titleTooLong": "Titel overschrijdt de maximale lengte van {{max}} tekens",
       "bodyTooLong": "Inhoud overschrijdt de maximale lengte van {{max}} tekens",
       "readFailed": "Kan bestand niet lezen"
+    }
+  },
+  "editor": {
+    "placeholder": "Typ / om blokken in te voegen...",
+    "sectionPlaceholder": "Sectie-inhoud...",
+    "toolbar": {
+      "bold": "Vet (Ctrl+B)",
+      "italic": "Cursief (Ctrl+I)",
+      "underline": "Onderstreept (Ctrl+U)",
+      "strikethrough": "Doorgestreept",
+      "heading1": "Kop 1",
+      "heading2": "Kop 2",
+      "heading3": "Kop 3",
+      "blockquote": "Citaat",
+      "bulletList": "Opsomming",
+      "orderedList": "Genummerde lijst",
+      "taskList": "Takenlijst",
+      "horizontalRule": "Horizontale lijn",
+      "link": "Link",
+      "image": "Afbeelding",
+      "codeBlock": "Codeblok",
+      "insertTable": "Tabel invoegen",
+      "undo": "Ongedaan maken (Ctrl+Z)",
+      "redo": "Opnieuw (Ctrl+Y)"
+    },
+    "commands": {
+      "paragraph": "Paragraaf",
+      "heading1": "Kop 1",
+      "heading2": "Kop 2",
+      "heading3": "Kop 3",
+      "bulletList": "Opsomming",
+      "orderedList": "Genummerde lijst",
+      "taskList": "Takenlijst",
+      "blockquote": "Citaat",
+      "codeBlock": "Codeblok",
+      "horizontalRule": "Horizontale lijn",
+      "image": "Afbeelding",
+      "table": "Tabel"
     }
   }
 }

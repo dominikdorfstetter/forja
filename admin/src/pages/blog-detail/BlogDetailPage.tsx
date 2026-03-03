@@ -427,6 +427,7 @@ export default function BlogDetailPage() {
                   control={control}
                   getValues={getValues}
                   onSnapshot={() => formHistory.snapshot()}
+                  siteId={selectedSiteId}
                 />
               )}
               {activeContentTab === 1 && (

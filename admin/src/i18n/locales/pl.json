@@ -1466,8 +1466,15 @@
       "fields": {
         "sectionType": "Typ sekcji",
         "displayOrder": "Kolejność wyświetlania",
-        "settings": "Ustawienia"
-      }
+        "settings": "Ustawienia",
+        "buttonText": "Tekst przycisku",
+        "ctaRoute": "Ścieżka wezwania do działania",
+        "ctaHelperText": "Opcjonalny link CTA"
+      },
+      "localizedContent": "Zlokalizowana treść",
+      "sectionConfiguration": "Konfiguracja sekcji",
+      "noActiveLocales": "Brak skonfigurowanych aktywnych języków",
+      "localeExists": "istnieje"
     },
     "undo": "Cofnij",
     "redo": "Ponów",
@@ -1737,6 +1744,44 @@
       "titleTooLong": "Tytuł przekracza maksymalną długość {{max}} znaków",
       "bodyTooLong": "Treść przekracza maksymalną długość {{max}} znaków",
       "readFailed": "Nie udało się odczytać pliku"
+    }
+  },
+  "editor": {
+    "placeholder": "Wpisz / aby wstawić bloki...",
+    "sectionPlaceholder": "Treść sekcji...",
+    "toolbar": {
+      "bold": "Pogrubienie (Ctrl+B)",
+      "italic": "Kursywa (Ctrl+I)",
+      "underline": "Podkreślenie (Ctrl+U)",
+      "strikethrough": "Przekreślenie",
+      "heading1": "Nagłówek 1",
+      "heading2": "Nagłówek 2",
+      "heading3": "Nagłówek 3",
+      "blockquote": "Cytat",
+      "bulletList": "Lista punktowana",
+      "orderedList": "Lista numerowana",
+      "taskList": "Lista zadań",
+      "horizontalRule": "Linia pozioma",
+      "link": "Odnośnik",
+      "image": "Obraz",
+      "codeBlock": "Blok kodu",
+      "insertTable": "Wstaw tabelę",
+      "undo": "Cofnij (Ctrl+Z)",
+      "redo": "Ponów (Ctrl+Y)"
+    },
+    "commands": {
+      "paragraph": "Akapit",
+      "heading1": "Nagłówek 1",
+      "heading2": "Nagłówek 2",
+      "heading3": "Nagłówek 3",
+      "bulletList": "Lista punktowana",
+      "orderedList": "Lista numerowana",
+      "taskList": "Lista zadań",
+      "blockquote": "Cytat",
+      "codeBlock": "Blok kodu",
+      "horizontalRule": "Linia pozioma",
+      "image": "Obraz",
+      "table": "Tabela"
     }
   }
 }
