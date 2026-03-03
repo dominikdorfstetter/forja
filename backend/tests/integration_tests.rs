@@ -1173,3 +1173,494 @@ async fn test_site_members_read_key_cannot_add() {
         "Read key should not be able to add site members"
     );
 }
+
+// =========================================================================
+// 16. Page CRUD via HTTP
+// =========================================================================
+
+#[rocket::async_test]
+#[serial]
+async fn test_page_crud_lifecycle() {
+    let ctx = test_context().await;
+    cleanup_test_data(&ctx.pool).await;
+
+    let site_id = create_test_site(&ctx.pool).await;
+    let write_key = create_test_api_key(&ctx.pool, site_id, ApiKeyPermission::Write).await;
+
+    // --- Create page ---
+    let create_body = serde_json::json!({
+        "route": "/about",
+        "slug": "about",
+        "page_type": "Static",
+        "is_in_navigation": true,
+        "status": "Draft",
+        "site_ids": [site_id]
+    });
+
+    let response = ctx
+        .client
+        .post("/api/v1/pages")
+        .header(Header::new("X-API-Key", write_key.clone()))
+        .header(Header::new("Content-Type", "application/json"))
+        .body(create_body.to_string())
+        .dispatch()
+        .await;
+    assert_eq!(
+        response.status(),
+        Status::Created,
+        "create_page should return 201"
+    );
+
+    let page: serde_json::Value = response.into_json().await.expect("valid JSON");
+    let page_id = page["id"].as_str().expect("page id").to_string();
+    assert_eq!(page["route"], "/about");
+    assert_eq!(page["slug"], "about");
+
+    // --- List pages for site ---
+    let response = ctx
+        .client
+        .get(format!("/api/v1/sites/{}/pages", site_id))
+        .header(Header::new("X-API-Key", write_key.clone()))
+        .dispatch()
+        .await;
+    assert_eq!(response.status(), Status::Ok);
+
+    let list: serde_json::Value = response.into_json().await.expect("valid JSON");
+    assert!(
+        list["data"].as_array().expect("data array").len() >= 1,
+        "Page list must contain at least the created page"
+    );
+
+    // --- Get page by ID ---
+    let response = ctx
+        .client
+        .get(format!("/api/v1/pages/{}", page_id))
+        .header(Header::new("X-API-Key", write_key.clone()))
+        .dispatch()
+        .await;
+    assert_eq!(response.status(), Status::Ok);
+
+    let fetched: serde_json::Value = response.into_json().await.expect("valid JSON");
+    assert_eq!(fetched["route"], "/about");
+
+    // --- Update page ---
+    let update_body = serde_json::json!({
+        "route": "/about-us",
+        "is_in_navigation": false
+    });
+
+    let response = ctx
+        .client
+        .put(format!("/api/v1/pages/{}", page_id))
+        .header(Header::new("X-API-Key", write_key.clone()))
+        .header(Header::new("Content-Type", "application/json"))
+        .body(update_body.to_string())
+        .dispatch()
+        .await;
+    assert_eq!(response.status(), Status::Ok);
+
+    let updated: serde_json::Value = response.into_json().await.expect("valid JSON");
+    assert_eq!(updated["route"], "/about-us");
+    assert_eq!(updated["is_in_navigation"], false);
+
+    // --- Delete page ---
+    let response = ctx
+        .client
+        .delete(format!("/api/v1/pages/{}", page_id))
+        .header(Header::new("X-API-Key", write_key.clone()))
+        .dispatch()
+        .await;
+    assert_eq!(response.status(), Status::NoContent);
+}
+
+#[rocket::async_test]
+#[serial]
+async fn test_page_read_key_cannot_create() {
+    let ctx = test_context().await;
+    cleanup_test_data(&ctx.pool).await;
+
+    let site_id = create_test_site(&ctx.pool).await;
+    let read_key = create_test_api_key(&ctx.pool, site_id, ApiKeyPermission::Read).await;
+
+    let create_body = serde_json::json!({
+        "route": "/forbidden",
+        "slug": "forbidden",
+        "status": "Draft",
+        "site_ids": [site_id]
+    });
+
+    let response = ctx
+        .client
+        .post("/api/v1/pages")
+        .header(Header::new("X-API-Key", read_key.clone()))
+        .header(Header::new("Content-Type", "application/json"))
+        .body(create_body.to_string())
+        .dispatch()
+        .await;
+
+    assert_eq!(
+        response.status(),
+        Status::Forbidden,
+        "Read-only key must not be able to create pages"
+    );
+}
+
+#[rocket::async_test]
+#[serial]
+async fn test_page_validation_invalid_route() {
+    let ctx = test_context().await;
+    cleanup_test_data(&ctx.pool).await;
+
+    let site_id = create_test_site(&ctx.pool).await;
+    let write_key = create_test_api_key(&ctx.pool, site_id, ApiKeyPermission::Write).await;
+
+    // Route must start with /
+    let bad_body = serde_json::json!({
+        "route": "no-leading-slash",
+        "slug": "test",
+        "status": "Draft",
+        "site_ids": [site_id]
+    });
+
+    let response = ctx
+        .client
+        .post("/api/v1/pages")
+        .header(Header::new("X-API-Key", write_key.clone()))
+        .header(Header::new("Content-Type", "application/json"))
+        .body(bad_body.to_string())
+        .dispatch()
+        .await;
+
+    let status = response.status().code;
+    assert!(
+        status == 400 || status == 422,
+        "Expected validation error (400/422), got {}",
+        status
+    );
+}
+
+// =========================================================================
+// 17. Taxonomy (tags + categories) CRUD via HTTP
+// =========================================================================
+
+#[rocket::async_test]
+#[serial]
+async fn test_tag_crud_lifecycle() {
+    let ctx = test_context().await;
+    cleanup_test_data(&ctx.pool).await;
+
+    let site_id = create_test_site(&ctx.pool).await;
+    let write_key = create_test_api_key(&ctx.pool, site_id, ApiKeyPermission::Write).await;
+
+    // --- Create tag ---
+    let create_body = serde_json::json!({
+        "slug": "rust-programming",
+        "is_global": false,
+        "site_id": site_id
+    });
+
+    let response = ctx
+        .client
+        .post("/api/v1/tags")
+        .header(Header::new("X-API-Key", write_key.clone()))
+        .header(Header::new("Content-Type", "application/json"))
+        .body(create_body.to_string())
+        .dispatch()
+        .await;
+    assert_eq!(
+        response.status(),
+        Status::Created,
+        "create_tag should return 201"
+    );
+
+    let tag: serde_json::Value = response.into_json().await.expect("valid JSON");
+    let tag_id = tag["id"].as_str().expect("tag id").to_string();
+    assert_eq!(tag["slug"], "rust-programming");
+
+    // --- List tags for site ---
+    let response = ctx
+        .client
+        .get(format!("/api/v1/sites/{}/tags", site_id))
+        .header(Header::new("X-API-Key", write_key.clone()))
+        .dispatch()
+        .await;
+    assert_eq!(response.status(), Status::Ok);
+
+    let list: serde_json::Value = response.into_json().await.expect("valid JSON");
+    assert!(list["data"].as_array().expect("data array").len() >= 1);
+
+    // --- Get tag by ID ---
+    let response = ctx
+        .client
+        .get(format!("/api/v1/tags/{}", tag_id))
+        .header(Header::new("X-API-Key", write_key.clone()))
+        .dispatch()
+        .await;
+    assert_eq!(response.status(), Status::Ok);
+
+    // --- Update tag ---
+    let update_body = serde_json::json!({
+        "slug": "rust-lang"
+    });
+
+    let response = ctx
+        .client
+        .put(format!("/api/v1/tags/{}", tag_id))
+        .header(Header::new("X-API-Key", write_key.clone()))
+        .header(Header::new("Content-Type", "application/json"))
+        .body(update_body.to_string())
+        .dispatch()
+        .await;
+    assert_eq!(response.status(), Status::Ok);
+
+    let updated: serde_json::Value = response.into_json().await.expect("valid JSON");
+    assert_eq!(updated["slug"], "rust-lang");
+
+    // --- Delete tag ---
+    let response = ctx
+        .client
+        .delete(format!("/api/v1/tags/{}", tag_id))
+        .header(Header::new("X-API-Key", write_key.clone()))
+        .dispatch()
+        .await;
+    assert_eq!(response.status(), Status::NoContent);
+}
+
+#[rocket::async_test]
+#[serial]
+async fn test_category_crud_lifecycle() {
+    let ctx = test_context().await;
+    cleanup_test_data(&ctx.pool).await;
+
+    let site_id = create_test_site(&ctx.pool).await;
+    let write_key = create_test_api_key(&ctx.pool, site_id, ApiKeyPermission::Write).await;
+
+    // --- Create category ---
+    let create_body = serde_json::json!({
+        "slug": "technology",
+        "is_global": false,
+        "site_id": site_id
+    });
+
+    let response = ctx
+        .client
+        .post("/api/v1/categories")
+        .header(Header::new("X-API-Key", write_key.clone()))
+        .header(Header::new("Content-Type", "application/json"))
+        .body(create_body.to_string())
+        .dispatch()
+        .await;
+    assert_eq!(
+        response.status(),
+        Status::Created,
+        "create_category should return 201"
+    );
+
+    let category: serde_json::Value = response.into_json().await.expect("valid JSON");
+    let cat_id = category["id"].as_str().expect("category id").to_string();
+    assert_eq!(category["slug"], "technology");
+
+    // --- Create child category ---
+    let child_body = serde_json::json!({
+        "slug": "web-development",
+        "parent_id": cat_id,
+        "is_global": false,
+        "site_id": site_id
+    });
+
+    let response = ctx
+        .client
+        .post("/api/v1/categories")
+        .header(Header::new("X-API-Key", write_key.clone()))
+        .header(Header::new("Content-Type", "application/json"))
+        .body(child_body.to_string())
+        .dispatch()
+        .await;
+    assert_eq!(response.status(), Status::Created);
+
+    // --- List categories for site ---
+    let response = ctx
+        .client
+        .get(format!("/api/v1/sites/{}/categories", site_id))
+        .header(Header::new("X-API-Key", write_key.clone()))
+        .dispatch()
+        .await;
+    assert_eq!(response.status(), Status::Ok);
+
+    let list: serde_json::Value = response.into_json().await.expect("valid JSON");
+    assert_eq!(
+        list["data"].as_array().expect("data array").len(),
+        1,
+        "Should have one root category (child is nested under parent)"
+    );
+
+    // --- Get children of parent ---
+    let response = ctx
+        .client
+        .get(format!("/api/v1/categories/{}/children", cat_id))
+        .header(Header::new("X-API-Key", write_key.clone()))
+        .dispatch()
+        .await;
+    assert_eq!(response.status(), Status::Ok);
+
+    let children: serde_json::Value = response.into_json().await.expect("valid JSON");
+    let children_arr = children.as_array().expect("children array");
+    assert_eq!(children_arr.len(), 1);
+    assert_eq!(children_arr[0]["slug"], "web-development");
+
+    // --- Delete parent (should cascade) ---
+    let response = ctx
+        .client
+        .delete(format!("/api/v1/categories/{}", cat_id))
+        .header(Header::new("X-API-Key", write_key.clone()))
+        .dispatch()
+        .await;
+    assert_eq!(response.status(), Status::NoContent);
+}
+
+// =========================================================================
+// 18. Cross-site access denial
+// =========================================================================
+
+#[rocket::async_test]
+#[serial]
+async fn test_cross_site_access_denied() {
+    let ctx = test_context().await;
+    cleanup_test_data(&ctx.pool).await;
+
+    // Create two sites with separate API keys
+    let site_a = create_test_site(&ctx.pool).await;
+    let site_b = create_test_site(&ctx.pool).await;
+    let key_a = create_test_api_key(&ctx.pool, site_a, ApiKeyPermission::Write).await;
+
+    // Create a blog on site_a
+    let create_body = serde_json::json!({
+        "slug": "site-a-blog",
+        "author": "Author A",
+        "published_date": "2025-01-01",
+        "site_ids": [site_a],
+        "status": "Draft"
+    });
+
+    let response = ctx
+        .client
+        .post("/api/v1/blogs")
+        .header(Header::new("X-API-Key", key_a.clone()))
+        .header(Header::new("Content-Type", "application/json"))
+        .body(create_body.to_string())
+        .dispatch()
+        .await;
+    assert_eq!(response.status(), Status::Created);
+
+    // Site A key should NOT be able to list site B's blogs
+    let response = ctx
+        .client
+        .get(format!("/api/v1/sites/{}/blogs", site_b))
+        .header(Header::new("X-API-Key", key_a.clone()))
+        .dispatch()
+        .await;
+
+    assert_eq!(
+        response.status(),
+        Status::Forbidden,
+        "Site A key must not access Site B resources"
+    );
+}
+
+// =========================================================================
+// 19. API key permission escalation
+// =========================================================================
+
+#[rocket::async_test]
+#[serial]
+async fn test_permission_levels_enforced() {
+    let ctx = test_context().await;
+    cleanup_test_data(&ctx.pool).await;
+
+    let site_id = create_test_site(&ctx.pool).await;
+    let read_key = create_test_api_key(&ctx.pool, site_id, ApiKeyPermission::Read).await;
+    let write_key = create_test_api_key(&ctx.pool, site_id, ApiKeyPermission::Write).await;
+
+    // Read key can list blogs
+    let response = ctx
+        .client
+        .get(format!("/api/v1/sites/{}/blogs", site_id))
+        .header(Header::new("X-API-Key", read_key.clone()))
+        .dispatch()
+        .await;
+    assert_eq!(response.status(), Status::Ok);
+
+    // Read key cannot create blogs
+    let create_body = serde_json::json!({
+        "slug": "read-attempt",
+        "author": "Reader",
+        "published_date": "2025-01-01",
+        "site_ids": [site_id],
+        "status": "Draft"
+    });
+
+    let response = ctx
+        .client
+        .post("/api/v1/blogs")
+        .header(Header::new("X-API-Key", read_key.clone()))
+        .header(Header::new("Content-Type", "application/json"))
+        .body(create_body.to_string())
+        .dispatch()
+        .await;
+    assert_eq!(
+        response.status(),
+        Status::Forbidden,
+        "Read key must not create content"
+    );
+
+    // Write key can list and create blogs
+    let response = ctx
+        .client
+        .get(format!("/api/v1/sites/{}/blogs", site_id))
+        .header(Header::new("X-API-Key", write_key.clone()))
+        .dispatch()
+        .await;
+    assert_eq!(response.status(), Status::Ok);
+
+    let create_body = serde_json::json!({
+        "slug": "write-attempt",
+        "author": "Writer",
+        "published_date": "2025-01-01",
+        "site_ids": [site_id],
+        "status": "Draft"
+    });
+
+    let response = ctx
+        .client
+        .post("/api/v1/blogs")
+        .header(Header::new("X-API-Key", write_key.clone()))
+        .header(Header::new("Content-Type", "application/json"))
+        .body(create_body.to_string())
+        .dispatch()
+        .await;
+    assert_eq!(
+        response.status(),
+        Status::Created,
+        "Write key should be able to create content"
+    );
+
+    // Write key cannot create webhooks (requires Admin)
+    let wh_body = serde_json::json!({
+        "url": "https://hooks.example.com/test",
+        "events": ["blog.created"]
+    });
+
+    let response = ctx
+        .client
+        .post(format!("/api/v1/sites/{}/webhooks", site_id))
+        .header(Header::new("X-API-Key", write_key.clone()))
+        .header(Header::new("Content-Type", "application/json"))
+        .body(wh_body.to_string())
+        .dispatch()
+        .await;
+    assert_eq!(
+        response.status(),
+        Status::Forbidden,
+        "Write key must not be able to manage webhooks"
+    );
+}
