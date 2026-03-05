@@ -157,6 +157,7 @@ export default function TemplateSelectionDialog({
         </Typography>
 
         <TextField
+          autoFocus
           fullWidth
           size="small"
           placeholder={t('templates.searchPlaceholder')}

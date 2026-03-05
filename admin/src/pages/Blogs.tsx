@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
@@ -7,18 +7,13 @@ import {
   Paper,
   Typography,
   Chip,
-  IconButton,
-  Tooltip,
+  TableSortLabel,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ArticleIcon from '@mui/icons-material/Article';
 import DescriptionIcon from '@mui/icons-material/Description';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
 import { format } from 'date-fns';
 import apiService from '@/services/api';
@@ -31,7 +26,9 @@ import EmptyState from '@/components/shared/EmptyState';
 import StatusChip from '@/components/shared/StatusChip';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import BulkActionToolbar from '@/components/shared/BulkActionToolbar';
+import TableFilterBar from '@/components/shared/TableFilterBar';
 import BlogFormDialog from '@/components/blogs/BlogFormDialog';
+import BlogActionsMenu from '@/components/blogs/BlogActionsMenu';
 import TemplateSelectionDialog from '@/components/blogs/TemplateSelectionDialog';
 import MarkdownImportDialog from '@/components/blogs/MarkdownImportDialog';
 import DataTable, { type DataTableColumn } from '@/components/shared/DataTable';
@@ -39,8 +36,11 @@ import { useListPageState } from '@/hooks/useListPageState';
 import { useCrudMutations } from '@/hooks/useCrudMutations';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import { useBulkSelection } from '@/hooks/useBulkSelection';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import type { BlogTemplate } from '@/data/blogTemplates';
 import type { MarkdownParseResult } from '@/utils/markdownImport';
+
+type SortDir = 'asc' | 'desc';
 
 export default function BlogsPage() {
   const { t } = useTranslation();
@@ -51,7 +51,7 @@ export default function BlogsPage() {
   const { showError, showSuccess, enqueueSnackbar } = useErrorSnackbar();
 
   const {
-    page, perPage, formOpen, editing: editingBlog, deleting: deletingBlog,
+    page, setPage, perPage, formOpen, editing: editingBlog, deleting: deletingBlog,
     openCreate, closeForm, openEdit: setEditingBlog, closeEdit,
     openDelete: setDeletingBlog, closeDelete,
     handlePageChange, handleRowsPerPageChange,
@@ -60,11 +60,48 @@ export default function BlogsPage() {
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [sortBy, setSortBy] = useState('published_date');
+  const [sortDir, setSortDir] = useState<SortDir>('desc');
+
+  const debouncedSearch = useDebouncedValue(searchQuery);
+
+  // Reset to page 1 when debounced search changes (not on mount)
+  const prevDebouncedSearch = useRef(debouncedSearch);
+  useEffect(() => {
+    if (prevDebouncedSearch.current !== debouncedSearch) {
+      prevDebouncedSearch.current = debouncedSearch;
+      setPage(1);
+    }
+  }, [debouncedSearch, setPage]);
+
+  const handleStatusFilterChange = useCallback((value: string) => {
+    setStatusFilter(value);
+    setPage(1);
+  }, [setPage]);
+
+  // Command palette action listener
+  useEffect(() => {
+    const handler = (e: Event) => {
+      if ((e as CustomEvent).detail === 'create-blog') openCreate();
+    };
+    window.addEventListener('command-palette:action', handler);
+    return () => window.removeEventListener('command-palette:action', handler);
+  }, [openCreate]);
 
   const { data: blogData, isLoading, error } = useQuery({
-    queryKey: ['blogs', selectedSiteId, page, perPage],
-    queryFn: () => apiService.getBlogs(selectedSiteId, { page, per_page: perPage }),
+    queryKey: ['blogs', selectedSiteId, page, perPage, debouncedSearch, statusFilter, sortBy, sortDir],
+    queryFn: () => apiService.getBlogs(selectedSiteId, {
+      page,
+      per_page: perPage,
+      search: debouncedSearch || undefined,
+      status: statusFilter || undefined,
+      sort_by: sortBy,
+      sort_dir: sortDir,
+    }),
     enabled: !!selectedSiteId,
+    placeholderData: keepPreviousData,
   });
 
   const { data: siteLocales } = useQuery({
@@ -79,10 +116,20 @@ export default function BlogsPage() {
     enabled: !!selectedSiteId,
   });
 
-  const blogs = blogData?.data;
-  const blogIds = blogs?.map((b) => b.id) ?? [];
+  const blogs = blogData?.data ?? [];
+  const blogIds = blogs.map((b) => b.id);
 
   const bulk = useBulkSelection([page, perPage, blogData]);
+
+  const handleSort = useCallback((column: string) => {
+    if (sortBy === column) {
+      setSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortBy(column);
+      setSortDir(column === 'published_date' ? 'desc' : 'asc');
+    }
+    setPage(1);
+  }, [sortBy, setPage]);
 
   const { createMutation, updateMutation, deleteMutation } = useCrudMutations<CreateBlogRequest, UpdateBlogRequest>({
     queryKey: 'blogs',
@@ -225,6 +272,15 @@ export default function BlogsPage() {
   const handleBulkDelete = () => setBulkDeleteOpen(true);
   const confirmBulkDelete = () => bulkMutation.mutate({ ids: [...bulk.selectedIds], action: 'Delete' });
 
+  const statusFilterOptions = [
+    { value: '', label: t('common.filters.all') },
+    { value: 'Draft', label: t('common.status.draft') },
+    { value: 'InReview', label: t('common.status.inReview') },
+    { value: 'Scheduled', label: t('common.status.scheduled') },
+    { value: 'Published', label: t('common.status.published') },
+    { value: 'Archived', label: t('common.status.archived') },
+  ];
+
   const columns: DataTableColumn<BlogListItem>[] = [
     {
       header: (
@@ -243,17 +299,29 @@ export default function BlogsPage() {
       ),
     },
     {
-      header: t('blogs.table.slug'),
+      header: (
+        <TableSortLabel active={sortBy === 'slug'} direction={sortBy === 'slug' ? sortDir : 'asc'} onClick={() => handleSort('slug')}>
+          {t('blogs.table.slug')}
+        </TableSortLabel>
+      ),
       scope: 'col',
       render: (blog) => <Typography variant="body2" fontFamily="monospace">{blog.slug || '\u2014'}</Typography>,
     },
     {
-      header: t('blogs.table.author'),
+      header: (
+        <TableSortLabel active={sortBy === 'author'} direction={sortBy === 'author' ? sortDir : 'asc'} onClick={() => handleSort('author')}>
+          {t('blogs.table.author')}
+        </TableSortLabel>
+      ),
       scope: 'col',
       render: (blog) => blog.author,
     },
     {
-      header: t('blogs.table.status'),
+      header: (
+        <TableSortLabel active={sortBy === 'status'} direction={sortBy === 'status' ? sortDir : 'asc'} onClick={() => handleSort('status')}>
+          {t('blogs.table.status')}
+        </TableSortLabel>
+      ),
       scope: 'col',
       render: (blog) => <StatusChip value={blog.status} />,
     },
@@ -263,7 +331,11 @@ export default function BlogsPage() {
       render: (blog) => blog.is_featured ? <Chip label={t('common.labels.featured')} size="small" color="primary" variant="outlined" /> : null,
     },
     {
-      header: t('blogs.table.published'),
+      header: (
+        <TableSortLabel active={sortBy === 'published_date'} direction={sortBy === 'published_date' ? sortDir : 'desc'} onClick={() => handleSort('published_date')}>
+          {t('blogs.table.published')}
+        </TableSortLabel>
+      ),
       scope: 'col',
       render: (blog) => format(new Date(blog.published_date), 'PP'),
     },
@@ -272,12 +344,18 @@ export default function BlogsPage() {
       scope: 'col',
       align: 'right',
       render: (blog) => (
-        <>
-          <Tooltip title={t('blogs.viewDetail')}><IconButton size="small" aria-label={t('blogs.viewDetail')} onClick={() => navigate(`/blogs/${blog.id}`)}><VisibilityIcon fontSize="small" /></IconButton></Tooltip>
-          {canWrite && <Tooltip title={t('common.actions.clone')}><IconButton size="small" aria-label={t('common.actions.clone')} onClick={() => cloneMutation.mutate(blog.id)} disabled={cloneMutation.isPending}><ContentCopyIcon fontSize="small" /></IconButton></Tooltip>}
-          {canWrite && <Tooltip title={t('common.actions.edit')}><IconButton size="small" aria-label={t('common.actions.edit')} onClick={() => setEditingBlog(blog)}><EditIcon fontSize="small" /></IconButton></Tooltip>}
-          {isAdmin && <Tooltip title={t('common.actions.delete')}><IconButton size="small" aria-label={t('common.actions.delete')} color="error" onClick={() => setDeletingBlog(blog)}><DeleteIcon fontSize="small" /></IconButton></Tooltip>}
-        </>
+        <BlogActionsMenu
+          blog={blog}
+          canWrite={canWrite}
+          isAdmin={isAdmin}
+          onView={(b) => navigate(`/blogs/${b.id}`)}
+          onEdit={(b) => setEditingBlog(b)}
+          onPublish={(b) => updateMutation.mutate({ id: b.id, data: { status: 'Published' } })}
+          onUnpublish={(b) => updateMutation.mutate({ id: b.id, data: { status: 'Draft' } })}
+          onClone={(b) => cloneMutation.mutate(b.id)}
+          onDelete={(b) => setDeletingBlog(b)}
+          cloneDisabled={cloneMutation.isPending}
+        />
       ),
     },
   ];
@@ -301,7 +379,7 @@ export default function BlogsPage() {
         <LoadingState label={t('blogs.loading')} />
       ) : error ? (
         <Alert severity="error">{t('blogs.loadError')}</Alert>
-      ) : !blogs || blogs.length === 0 ? (
+      ) : blogs.length === 0 && !searchQuery && !statusFilter ? (
         <EmptyState icon={<ArticleIcon sx={{ fontSize: 64 }} />} title={t('blogs.empty.title')} description={t('blogs.empty.description')} action={{ label: t('blogs.createButton'), onClick: openCreate }} />
       ) : (
         <>
@@ -316,6 +394,20 @@ export default function BlogsPage() {
             loading={bulkMutation.isPending}
           />
           <Paper>
+            <TableFilterBar
+              searchValue={searchQuery}
+              onSearchChange={setSearchQuery}
+              searchPlaceholder={t('blogs.searchPlaceholder')}
+              filters={[
+                {
+                  key: 'status',
+                  label: t('common.filters.status'),
+                  options: statusFilterOptions,
+                  value: statusFilter,
+                  onChange: handleStatusFilterChange,
+                },
+              ]}
+            />
             <DataTable<BlogListItem>
               data={blogs}
               columns={columns}

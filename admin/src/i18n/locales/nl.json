@@ -22,7 +22,8 @@
       "deleting": "Verwijderen...",
       "clone": "Klonen",
       "upload": "Uploaden",
-      "preview": "Voorbeeld"
+      "preview": "Voorbeeld",
+      "viewDetails": "Details bekijken"
     },
     "status": {
       "active": "Actief",
@@ -234,7 +235,8 @@
       "title": "Blog verwijderen",
       "message": "Blog \"{{slug}}\" verwijderen? Dit kan niet ongedaan worden gemaakt."
     },
-    "moreActions": "Meer"
+    "moreActions": "Meer",
+    "searchPlaceholder": "Zoek op ID, slug of auteur..."
   },
   "blogDetail": {
     "title": "Blogdetails",
@@ -362,9 +364,37 @@
       "deleted": "Pagina verwijderd",
       "cloned": "Pagina succesvol gekloond"
     },
+    "searchPlaceholder": "Zoek op ID, route of slug...",
     "deleteDialog": {
       "title": "Pagina verwijderen",
       "message": "Pagina \"{{route}}\" verwijderen? Dit kan niet ongedaan worden gemaakt."
+    },
+    "wizard": {
+      "steps": {
+        "pageType": "Paginatype",
+        "identity": "Identiteit",
+        "options": "Opties"
+      },
+      "next": "Volgende",
+      "back": "Terug",
+      "createPage": "Pagina aanmaken",
+      "creating": "Aanmaken...",
+      "types": {
+        "static": "Statisch",
+        "staticDesc": "Standaard inhoudspagina",
+        "landing": "Landing",
+        "landingDesc": "Marketingpagina met hero-secties",
+        "contact": "Contact",
+        "contactDesc": "Contactformulier en informatie",
+        "blogIndex": "Blog-index",
+        "blogIndexDesc": "Overzichtspagina van blogberichten",
+        "custom": "Aangepast",
+        "customDesc": "Volledig aangepaste pagina-indeling"
+      },
+      "routeHint": "URL-pad van de pagina (bijv. /over-ons)",
+      "slugHint": "URL-vriendelijke identifier, automatisch gegenereerd uit de route",
+      "site": "Site",
+      "inNavigation": "Tonen in navigatie"
     }
   },
   "pageDetail": {
@@ -1146,8 +1176,22 @@
     "preferences": {
       "title": "Voorkeuren",
       "language": {
+        "title": "Taal",
         "label": "Beheerderstaal",
         "description": "Kies de weergavetaal voor de beheerinterface"
+      },
+      "theme": {
+        "title": "Thema",
+        "label": "Kleurthema",
+        "description": "Kies een kleurthema voor de beheerinterface"
+      },
+      "autosave": {
+        "title": "Automatisch opslaan",
+        "enableLabel": "Automatisch opslaan inschakelen",
+        "enableDescription": "Wijzigingen in editors automatisch opslaan na een korte vertraging",
+        "debounceLabel": "Opslagvertraging",
+        "debounceDescription": "Wachttijd na de laatste bewerking voordat wordt opgeslagen (1–60)",
+        "seconds": "seconden"
       }
     }
   },
@@ -1162,6 +1206,10 @@
       "multilingualDesc": "Ingebouwde lokalisatie met ondersteuning voor elke taal en RTL-tekstrichting.",
       "apiFirst": "API-First",
       "apiFirstDesc": "Headless architectuur met volledige REST-API. Lever content aan elk frontend."
+    },
+    "preferences": {
+      "title": "Uw voorkeuren",
+      "description": "Stel uw voorkeurstaal en thema in voordat u begint."
     },
     "createSite": "Maak uw eerste site",
     "stepPrefix": "Stap 1 van 1"
@@ -1479,7 +1527,6 @@
     "section": {
       "title": "Sectie bewerken",
       "fields": {
-        "sectionType": "Sectietype",
         "displayOrder": "Weergavevolgorde",
         "settings": "Instellingen",
         "buttonText": "Knoptekst",
@@ -1609,6 +1656,7 @@
     "placeholder": "Zoek opdrachten...",
     "noResults": "Geen resultaten gevonden",
     "categories": {
+      "context": "Snelle acties",
       "navigation": "Navigatie",
       "actions": "Acties",
       "blogs": "Blogs",
@@ -1616,8 +1664,30 @@
       "sites": "Sites"
     },
     "actions": {
-      "toggleTheme": "Thema wisselen",
       "logout": "Uitloggen"
+    },
+    "contextActions": {
+      "createBlog": "Nieuw blog aanmaken",
+      "createPage": "Nieuwe pagina aanmaken",
+      "uploadMedia": "Media uploaden",
+      "createTemplate": "Sjabloon aanmaken",
+      "createTag": "Tag aanmaken",
+      "createCategory": "Categorie aanmaken",
+      "addNavItem": "Navigatie-item toevoegen",
+      "addSocialLink": "Social link toevoegen",
+      "createWebhook": "Webhook aanmaken",
+      "createRedirect": "Doorverwijzing aanmaken",
+      "addMember": "Lid toevoegen",
+      "addCvEntry": "CV-item toevoegen",
+      "addSkill": "Vaardigheid toevoegen",
+      "createSite": "Site aanmaken",
+      "backToSites": "Terug naar sitelijst",
+      "addLanguage": "Taal toevoegen",
+      "addLegalDoc": "Juridisch document toevoegen",
+      "backToLegal": "Terug naar juridische documenten",
+      "createApiKey": "API-sleutel aanmaken",
+      "backToBlogs": "Terug naar bloglijst",
+      "backToPages": "Terug naar paginalijst"
     },
     "hint": "⌘K"
   },

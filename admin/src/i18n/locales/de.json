@@ -22,7 +22,8 @@
       "deleting": "Wird gelöscht...",
       "clone": "Klonen",
       "upload": "Hochladen",
-      "preview": "Vorschau"
+      "preview": "Vorschau",
+      "viewDetails": "Details ansehen"
     },
     "status": {
       "active": "Aktiv",
@@ -234,7 +235,8 @@
       "title": "Blog löschen",
       "message": "Blog \"{{slug}}\" löschen? Dies kann nicht rückgängig gemacht werden."
     },
-    "moreActions": "Mehr"
+    "moreActions": "Mehr",
+    "searchPlaceholder": "Nach ID, Slug oder Autor suchen..."
   },
   "blogDetail": {
     "title": "Blog-Details",
@@ -362,9 +364,37 @@
       "deleted": "Seite gelöscht",
       "cloned": "Seite erfolgreich geklont"
     },
+    "searchPlaceholder": "Nach ID, Route oder Slug suchen...",
     "deleteDialog": {
       "title": "Seite löschen",
       "message": "Seite \"{{route}}\" löschen? Dies kann nicht rückgängig gemacht werden."
+    },
+    "wizard": {
+      "steps": {
+        "pageType": "Seitentyp",
+        "identity": "Identität",
+        "options": "Optionen"
+      },
+      "next": "Weiter",
+      "back": "Zurück",
+      "createPage": "Seite erstellen",
+      "creating": "Erstelle...",
+      "types": {
+        "static": "Statisch",
+        "staticDesc": "Standard-Inhaltsseite",
+        "landing": "Landing",
+        "landingDesc": "Marketingseite mit Hero-Bereichen",
+        "contact": "Kontakt",
+        "contactDesc": "Kontaktformular und Informationen",
+        "blogIndex": "Blog-Index",
+        "blogIndexDesc": "Blog-Beitragsübersicht",
+        "custom": "Benutzerdefiniert",
+        "customDesc": "Vollständig benutzerdefiniertes Seitenlayout"
+      },
+      "routeHint": "URL-Pfad der Seite (z.B. /ueber-uns)",
+      "slugHint": "URL-freundlicher Bezeichner, automatisch aus der Route generiert",
+      "site": "Website",
+      "inNavigation": "In Navigation anzeigen"
     }
   },
   "pageDetail": {
@@ -1146,8 +1176,22 @@
     "preferences": {
       "title": "Präferenzen",
       "language": {
+        "title": "Sprache",
         "label": "Admin-Sprache",
         "description": "Wählen Sie die Anzeigesprache für die Admin-Oberfläche"
+      },
+      "theme": {
+        "title": "Design",
+        "label": "Farbschema",
+        "description": "Wählen Sie ein Farbschema für die Admin-Oberfläche"
+      },
+      "autosave": {
+        "title": "Automatisches Speichern",
+        "enableLabel": "Automatisches Speichern aktivieren",
+        "enableDescription": "Änderungen in Editoren nach kurzer Verzögerung automatisch speichern",
+        "debounceLabel": "Speicherverzögerung",
+        "debounceDescription": "Wartezeit nach der letzten Bearbeitung vor dem Speichern (1–60)",
+        "seconds": "Sekunden"
       }
     }
   },
@@ -1162,6 +1206,10 @@
       "multilingualDesc": "Integrierte Lokalisierung mit Unterstützung für jede Sprache und RTL-Textrichtung.",
       "apiFirst": "API-First",
       "apiFirstDesc": "Headless-Architektur mit vollständiger REST-API. Liefern Sie Inhalte an jedes Frontend."
+    },
+    "preferences": {
+      "title": "Ihre Einstellungen",
+      "description": "Legen Sie Ihre bevorzugte Sprache und Ihr Design fest, bevor Sie beginnen."
     },
     "createSite": "Erste Website erstellen",
     "stepPrefix": "Schritt 1 von 1"
@@ -1479,7 +1527,6 @@
     "section": {
       "title": "Abschnitt bearbeiten",
       "fields": {
-        "sectionType": "Abschnittstyp",
         "displayOrder": "Anzeigereihenfolge",
         "settings": "Einstellungen",
         "buttonText": "Schaltflächentext",
@@ -1609,6 +1656,7 @@
     "placeholder": "Befehle suchen...",
     "noResults": "Keine Ergebnisse gefunden",
     "categories": {
+      "context": "Schnellaktionen",
       "navigation": "Navigation",
       "actions": "Aktionen",
       "blogs": "Blogs",
@@ -1616,8 +1664,30 @@
       "sites": "Websites"
     },
     "actions": {
-      "toggleTheme": "Theme wechseln",
       "logout": "Abmelden"
+    },
+    "contextActions": {
+      "createBlog": "Neuen Blog erstellen",
+      "createPage": "Neue Seite erstellen",
+      "uploadMedia": "Medien hochladen",
+      "createTemplate": "Vorlage erstellen",
+      "createTag": "Tag erstellen",
+      "createCategory": "Kategorie erstellen",
+      "addNavItem": "Navigationselement hinzufügen",
+      "addSocialLink": "Social-Link hinzufügen",
+      "createWebhook": "Webhook erstellen",
+      "createRedirect": "Weiterleitung erstellen",
+      "addMember": "Mitglied hinzufügen",
+      "addCvEntry": "CV-Eintrag hinzufügen",
+      "addSkill": "Fähigkeit hinzufügen",
+      "createSite": "Website erstellen",
+      "backToSites": "Zurück zur Website-Liste",
+      "addLanguage": "Sprache hinzufügen",
+      "addLegalDoc": "Rechtsdokument hinzufügen",
+      "backToLegal": "Zurück zu Rechtsdokumenten",
+      "createApiKey": "API-Schlüssel erstellen",
+      "backToBlogs": "Zurück zur Blog-Liste",
+      "backToPages": "Zurück zur Seitenliste"
     },
     "hint": "⌘K"
   },

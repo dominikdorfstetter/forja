@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, Paper, Chip, Divider, IconButton, Tooltip, Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
@@ -26,6 +27,15 @@ export default function LocalesPage() {
     formOpen, editing, deleting,
     openCreate, closeForm, openEdit, closeEdit, openDelete, closeDelete,
   } = useListPageState<Locale>();
+
+  // Command palette action listener
+  useEffect(() => {
+    const handler = (e: Event) => {
+      if ((e as CustomEvent).detail === 'add-language') openCreate();
+    };
+    window.addEventListener('command-palette:action', handler);
+    return () => window.removeEventListener('command-palette:action', handler);
+  }, [openCreate]);
 
   const { data: locales, isLoading } = useQuery({
     queryKey: ['locales', 'all'],

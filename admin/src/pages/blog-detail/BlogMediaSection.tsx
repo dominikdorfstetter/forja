@@ -13,6 +13,7 @@ import { Controller, type Control, type UseFormWatch, type UseFormSetValue } fro
 import { useTranslation } from 'react-i18next';
 import type { BlogContentFormData } from './blogDetailSchema';
 import MediaPickerDialog from '@/components/media/MediaPickerDialog';
+import { useMediaUrl } from '@/hooks/useMediaUrl';
 
 interface BlogMediaSectionProps {
   control: Control<BlogContentFormData>;
@@ -111,6 +112,8 @@ function ImageFieldControl({
   onClear: () => void;
   t: (key: string) => string;
 }) {
+  const imageUrl = useMediaUrl(value);
+
   if (!value) {
     return (
       <Card
@@ -138,16 +141,18 @@ function ImageFieldControl({
   return (
     <Box>
       <Card variant="outlined" sx={{ mb: 1 }}>
-        <CardMedia
-          component="img"
-          height={100}
-          image={`/api/media/${value}/file`}
-          alt=""
-          sx={{ objectFit: 'cover' }}
-          onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-            e.currentTarget.style.display = 'none';
-          }}
-        />
+        {imageUrl && (
+          <CardMedia
+            component="img"
+            height={100}
+            image={imageUrl}
+            alt=""
+            sx={{ objectFit: 'cover' }}
+            onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+              e.currentTarget.style.display = 'none';
+            }}
+          />
+        )}
       </Card>
       <Typography variant="caption" fontFamily="monospace" display="block" sx={{ mb: 0.5 }}>
         {value}

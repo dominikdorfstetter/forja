@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Box, Grid, Alert } from '@mui/material';
@@ -28,6 +28,15 @@ export default function SitesPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [editingSite, setEditingSite] = useState<Site | null>(null);
   const [deletingSite, setDeletingSite] = useState<Site | null>(null);
+
+  // Command palette action listener
+  useEffect(() => {
+    const handler = (e: Event) => {
+      if ((e as CustomEvent).detail === 'create-site') setFormOpen(true);
+    };
+    window.addEventListener('command-palette:action', handler);
+    return () => window.removeEventListener('command-palette:action', handler);
+  }, []);
 
   const { data: sites, isLoading, error } = useQuery({
     queryKey: ['sites'],

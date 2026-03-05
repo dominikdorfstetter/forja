@@ -9,8 +9,8 @@ use validator::Validate;
 use crate::dto::bulk::{BulkAction, BulkContentRequest, BulkContentResponse};
 use crate::dto::page::{
     CreatePageRequest, CreatePageSectionRequest, PageListItem, PageResponse, PageSectionResponse,
-    PaginatedPages, SectionLocalizationResponse, UpdatePageRequest, UpdatePageSectionRequest,
-    UpsertSectionLocalizationRequest,
+    PaginatedPages, ReorderPageSectionsRequest, SectionLocalizationResponse, UpdatePageRequest,
+    UpdatePageSectionRequest, UpsertSectionLocalizationRequest,
 };
 use crate::dto::review::{ReviewActionRequest, ReviewActionResponse};
 use crate::errors::{ApiError, ProblemDetails};
@@ -33,11 +33,16 @@ use crate::AppState;
 #[utoipa::path(
     tag = "Pages",
     operation_id = "list_pages",
-    description = "List all pages for a site (paginated)",
+    description = "List all pages for a site (paginated, with optional search/filter/sort)",
     params(
         ("site_id" = Uuid, Path, description = "Site UUID"),
         ("page" = Option<i64>, Query, description = "Page number (default 1)"),
-        ("per_page" = Option<i64>, Query, description = "Items per page (default 10, max 100)")
+        ("per_page" = Option<i64>, Query, description = "Items per page (default 10, max 100)"),
+        ("search" = Option<String>, Query, description = "Search by ID, route, or slug (ILIKE)"),
+        ("status" = Option<String>, Query, description = "Filter by status"),
+        ("page_type" = Option<String>, Query, description = "Filter by page type"),
+        ("sort_by" = Option<String>, Query, description = "Sort column: route, slug, page_type, status, created_at"),
+        ("sort_dir" = Option<String>, Query, description = "Sort direction: asc or desc")
     ),
     responses(
         (status = 200, description = "Paginated page list", body = PaginatedPages),
@@ -46,12 +51,17 @@ use crate::AppState;
     ),
     security(("api_key" = []))
 )]
-#[get("/sites/<site_id>/pages?<page>&<per_page>")]
+#[get("/sites/<site_id>/pages?<page>&<per_page>&<search>&<status>&<page_type>&<sort_by>&<sort_dir>")]
 pub async fn list_pages(
     state: &State<AppState>,
     site_id: Uuid,
     page: Option<i64>,
     per_page: Option<i64>,
+    search: Option<String>,
+    status: Option<String>,
+    page_type: Option<String>,
+    sort_by: Option<String>,
+    sort_dir: Option<String>,
     auth: ReadKey,
 ) -> Result<Json<PaginatedPages>, ApiError> {
     auth.0
@@ -60,8 +70,24 @@ pub async fn list_pages(
     let params = PaginationParams::new(page, per_page);
     let (limit, offset) = params.limit_offset();
 
-    let pages = Page::find_all_for_site(&state.db, site_id, limit, offset).await?;
-    let total = Page::count_for_site(&state.db, site_id).await?;
+    let has_filters = search.is_some() || status.is_some() || page_type.is_some() || sort_by.is_some() || sort_dir.is_some();
+
+    let (pages, total) = if has_filters {
+        let pages = Page::find_all_for_site_filtered(
+            &state.db, site_id, limit, offset,
+            search.as_deref(), status.as_deref(), page_type.as_deref(),
+            sort_by.as_deref(), sort_dir.as_deref(),
+        ).await?;
+        let total = Page::count_for_site_filtered(
+            &state.db, site_id,
+            search.as_deref(), status.as_deref(), page_type.as_deref(),
+        ).await?;
+        (pages, total)
+    } else {
+        let pages = Page::find_all_for_site(&state.db, site_id, limit, offset).await?;
+        let total = Page::count_for_site(&state.db, site_id).await?;
+        (pages, total)
+    };
 
     let items: Vec<PageListItem> = pages.into_iter().map(PageListItem::from).collect();
     let paginated = params.paginate(items, total);
@@ -549,6 +575,50 @@ pub async fn delete_page_section(
     Ok(Status::NoContent)
 }
 
+/// Batch-reorder page sections
+#[utoipa::path(
+    tag = "Pages",
+    operation_id = "reorder_page_sections",
+    description = "Batch-reorder page sections for a page",
+    params(("page_id" = Uuid, Path, description = "Page UUID")),
+    request_body(content = ReorderPageSectionsRequest, description = "New ordering"),
+    responses(
+        (status = 204, description = "Page sections reordered"),
+        (status = 400, description = "Validation error", body = ProblemDetails),
+        (status = 401, description = "Unauthorized", body = ProblemDetails),
+        (status = 403, description = "Forbidden", body = ProblemDetails),
+        (status = 404, description = "Section not found", body = ProblemDetails)
+    ),
+    security(("api_key" = []))
+)]
+#[post("/pages/<page_id>/sections/reorder", rank = 3, data = "<body>")]
+pub async fn reorder_page_sections(
+    state: &State<AppState>,
+    page_id: Uuid,
+    body: Json<ReorderPageSectionsRequest>,
+    auth: ReadKey,
+) -> Result<Status, ApiError> {
+    let page = Page::find_by_id(&state.db, page_id).await?;
+    let site_ids = Content::find_site_ids(&state.db, page.content_id).await?;
+    for site_id in &site_ids {
+        auth.0
+            .authorize_site_action(&state.db, *site_id, &SiteRole::Author)
+            .await?;
+    }
+
+    let req = body.into_inner();
+    req.validate()
+        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+
+    let items: Vec<(Uuid, i16)> = req
+        .items
+        .into_iter()
+        .map(|i| (i.id, i.display_order))
+        .collect();
+    PageSection::reorder_for_page(&state.db, page_id, items).await?;
+    Ok(Status::NoContent)
+}
+
 /// Get localizations for a section
 #[utoipa::path(
     tag = "Pages",
@@ -834,6 +904,7 @@ pub fn routes() -> Vec<Route> {
         create_page_section,
         update_page_section,
         delete_page_section,
+        reorder_page_sections,
         get_section_localizations,
         get_page_section_localizations,
         upsert_section_localization,
@@ -849,6 +920,6 @@ mod tests {
     #[test]
     fn test_routes_count() {
         let routes = routes();
-        assert_eq!(routes.len(), 17, "Should have 17 page routes");
+        assert_eq!(routes.len(), 18, "Should have 18 page routes");
     }
 }

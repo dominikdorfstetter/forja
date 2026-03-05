@@ -61,6 +61,15 @@ export default function SocialLinksPage() {
   const [orderedLinks, setOrderedLinks] = useState<SocialLink[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
 
+  // Command palette action listener
+  useEffect(() => {
+    const handler = (e: Event) => {
+      if ((e as CustomEvent).detail === 'add-social-link') openCreate();
+    };
+    window.addEventListener('command-palette:action', handler);
+    return () => window.removeEventListener('command-palette:action', handler);
+  }, [openCreate]);
+
   const { data: links, isLoading, error } = useQuery({
     queryKey: ['social-links', selectedSiteId],
     queryFn: () => apiService.getSocialLinks(selectedSiteId),

@@ -7,11 +7,15 @@ use rocket::http::Status;
 use rocket::serde::json::Json;
 use rocket::Route;
 
+use validator::Validate;
+
 use crate::dto::audit::{AuditLogResponse, ChangeHistoryResponse};
 use crate::dto::auth::{
     AuthInfoResponse, ExportApiKeyRecord, ProfileResponse, UserDataExportResponse,
 };
 use crate::dto::site_membership::{MembershipSummary, MembershipWithSite};
+use crate::dto::user_preferences::{UpdateUserPreferencesRequest, UserPreferencesResponse};
+use crate::models::user_preferences::UserPreferences;
 use crate::guards::auth_guard::{AuthSource, AuthenticatedKey};
 use crate::models::audit::{AuditLog, ChangeHistory};
 use crate::models::site_membership::SiteMembership;
@@ -293,6 +297,77 @@ pub async fn export_user_data(
     }))
 }
 
+/// Get the current user's preferences.
+///
+/// Returns effective preferences (defaults merged with stored values).
+/// Only available for Clerk-authenticated users.
+#[utoipa::path(
+    tag = "Auth",
+    operation_id = "get_preferences",
+    description = "Return the effective preferences for the authenticated user",
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 200, description = "User preferences", body = UserPreferencesResponse),
+        (status = 400, description = "Only available for Clerk-authenticated users"),
+        (status = 401, description = "Missing or invalid credentials")
+    )
+)]
+#[get("/auth/preferences")]
+pub async fn get_preferences(
+    auth: AuthenticatedKey,
+    state: &rocket::State<AppState>,
+) -> Result<Json<UserPreferencesResponse>, crate::errors::ApiError> {
+    let clerk_user_id = match &auth.auth_source {
+        AuthSource::ClerkJwt { clerk_user_id } => clerk_user_id,
+        AuthSource::ApiKey => {
+            return Err(crate::errors::ApiError::BadRequest(
+                "Preferences are only available for Clerk-authenticated users".to_string(),
+            ));
+        }
+    };
+
+    let effective = UserPreferences::get_effective(&state.db, clerk_user_id).await?;
+    Ok(Json(UserPreferencesResponse::from_json(&effective)))
+}
+
+/// Update the current user's preferences.
+///
+/// Partially updates preferences — only provided fields are changed.
+/// Only available for Clerk-authenticated users.
+#[utoipa::path(
+    tag = "Auth",
+    operation_id = "update_preferences",
+    description = "Update the authenticated user's preferences (partial update)",
+    security(("bearer_auth" = [])),
+    request_body = UpdateUserPreferencesRequest,
+    responses(
+        (status = 200, description = "Updated preferences", body = UserPreferencesResponse),
+        (status = 400, description = "Validation error or not a Clerk user"),
+        (status = 401, description = "Missing or invalid credentials")
+    )
+)]
+#[put("/auth/preferences", data = "<body>")]
+pub async fn update_preferences(
+    auth: AuthenticatedKey,
+    state: &rocket::State<AppState>,
+    body: Json<UpdateUserPreferencesRequest>,
+) -> Result<Json<UserPreferencesResponse>, crate::errors::ApiError> {
+    let clerk_user_id = match &auth.auth_source {
+        AuthSource::ClerkJwt { clerk_user_id } => clerk_user_id,
+        AuthSource::ApiKey => {
+            return Err(crate::errors::ApiError::BadRequest(
+                "Preferences are only available for Clerk-authenticated users".to_string(),
+            ));
+        }
+    };
+
+    body.validate()?;
+
+    let partial = body.into_inner().to_json();
+    let effective = UserPreferences::upsert(&state.db, clerk_user_id, partial).await?;
+    Ok(Json(UserPreferencesResponse::from_json(&effective)))
+}
+
 /// Delete the authenticated user's account.
 ///
 /// For Clerk users: blocks if user is sole owner of any site. Deletes memberships,
@@ -355,6 +430,9 @@ pub async fn delete_account(
         .execute(&state.db)
         .await?;
 
+    // Delete user preferences
+    UserPreferences::delete(&state.db, &clerk_user_id).await?;
+
     // Clean up associated CMS data: nullify user references
     let user_uuid = auth.id;
 
@@ -383,7 +461,7 @@ pub async fn delete_account(
 
 /// Collect auth routes
 pub fn routes() -> Vec<Route> {
-    routes![get_me, get_profile, export_user_data, delete_account]
+    routes![get_me, get_profile, get_preferences, update_preferences, export_user_data, delete_account]
 }
 
 #[cfg(test)]

@@ -54,8 +54,12 @@ import { SUPPORTED_LANGUAGES } from '@/i18n';
 import GavelIcon from '@mui/icons-material/Gavel';
 import KeyIcon from '@mui/icons-material/Key';
 import type { UpdateSiteSettingsRequest, PreviewTemplate } from '@/types/api';
+import PaletteIcon from '@mui/icons-material/Palette';
+import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
 import { useAuth } from '@/store/AuthContext';
+import { useUserPreferences } from '@/store/UserPreferencesContext';
+import { useThemeMode } from '@/theme/ThemeContext';
 import LegalPage from '@/pages/Legal';
 import ApiKeysPage from '@/pages/ApiKeys';
 
@@ -650,23 +654,26 @@ function SystemInfoTab() {
 // ─── Preferences Tab ────────────────────────────────────────────────
 
 function PreferencesTab() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  const { preferences, updatePreferences } = useUserPreferences();
+  const { themeId, options: themeOptions } = useThemeMode();
 
   return (
     <Grid container spacing={3}>
+      {/* Language */}
       <Grid size={{ xs: 12, md: 6 }}>
         <Paper sx={{ p: 3 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
             <LanguageIcon color="primary" fontSize="small" />
-            <Typography variant="h6" component="h2">{t('settings.preferences.title')}</Typography>
+            <Typography variant="h6" component="h2">{t('settings.preferences.language.title')}</Typography>
           </Box>
           <Divider sx={{ mb: 2.5 }} />
 
           <TextField
             select
             label={t('settings.preferences.language.label')}
-            value={i18n.language}
-            onChange={(e) => i18n.changeLanguage(e.target.value)}
+            value={preferences.language}
+            onChange={(e) => updatePreferences({ language: e.target.value })}
             fullWidth
             size="small"
             helperText={t('settings.preferences.language.description')}
@@ -679,17 +686,158 @@ function PreferencesTab() {
           </TextField>
         </Paper>
       </Grid>
+
+      {/* Theme */}
+      <Grid size={{ xs: 12, md: 6 }}>
+        <Paper sx={{ p: 3 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+            <PaletteIcon color="primary" fontSize="small" />
+            <Typography variant="h6" component="h2">{t('settings.preferences.theme.title')}</Typography>
+          </Box>
+          <Divider sx={{ mb: 2.5 }} />
+
+          <TextField
+            select
+            label={t('settings.preferences.theme.label')}
+            value={themeId}
+            onChange={(e) => updatePreferences({ theme_id: e.target.value })}
+            fullWidth
+            size="small"
+            helperText={t('settings.preferences.theme.description')}
+          >
+            {themeOptions.map((opt) => (
+              <MenuItem key={opt.id} value={opt.id}>
+                {opt.label} {opt.mode !== 'system' ? `(${opt.mode})` : ''}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Paper>
+      </Grid>
+
+      {/* Autosave */}
+      <Grid size={12}>
+        <Paper sx={{ p: 3 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+            <SaveAltIcon color="primary" fontSize="small" />
+            <Typography variant="h6" component="h2">{t('settings.preferences.autosave.title')}</Typography>
+          </Box>
+          <Divider sx={{ mb: 2.5 }} />
+
+          <Grid container spacing={2.5}>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Stack direction="row" alignItems="center" justifyContent="space-between">
+                <Box>
+                  <Typography variant="body1">{t('settings.preferences.autosave.enableLabel')}</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {t('settings.preferences.autosave.enableDescription')}
+                  </Typography>
+                </Box>
+                <Switch
+                  checked={preferences.autosave_enabled}
+                  onChange={(e) => updatePreferences({ autosave_enabled: e.target.checked })}
+                />
+              </Stack>
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                type="number"
+                label={t('settings.preferences.autosave.debounceLabel')}
+                helperText={t('settings.preferences.autosave.debounceDescription')}
+                size="small"
+                fullWidth
+                disabled={!preferences.autosave_enabled}
+                defaultValue={preferences.autosave_debounce_seconds}
+                key={preferences.autosave_debounce_seconds}
+                slotProps={{
+                  input: {
+                    endAdornment: <InputAdornment position="end">{t('settings.preferences.autosave.seconds')}</InputAdornment>,
+                  },
+                  htmlInput: { min: 1, max: 60 },
+                }}
+                onBlur={(e) => {
+                  const val = parseInt(e.target.value, 10);
+                  if (!isNaN(val) && val >= 1 && val <= 60 && val !== preferences.autosave_debounce_seconds) {
+                    updatePreferences({ autosave_debounce_seconds: val });
+                  }
+                }}
+              />
+            </Grid>
+          </Grid>
+        </Paper>
+      </Grid>
     </Grid>
   );
 }
 
 // ─── Main Page ──────────────────────────────────────────────────────
 
+interface TabDef {
+  key: string;
+  icon: React.ReactElement;
+  label: string;
+  content: React.ReactNode;
+}
+
 export default function SettingsPage() {
   const { t } = useTranslation();
-  const { isAdmin } = useAuth();
+  const { isAdmin, isMaster } = useAuth();
   const { selectedSiteId } = useSiteContext();
   const [tabIndex, setTabIndex] = useState(0);
+
+  // Build tabs dynamically based on permissions
+  const tabs: TabDef[] = [];
+
+  // 1. Preferences — always visible (all users)
+  tabs.push({
+    key: 'preferences',
+    icon: <LanguageIcon />,
+    label: t('settings.tabs.preferences'),
+    content: <PreferencesTab />,
+  });
+
+  // 2. Site Settings — admin + site selected
+  if (isAdmin && selectedSiteId) {
+    tabs.push({
+      key: 'siteSettings',
+      icon: <TuneIcon />,
+      label: t('settings.tabs.siteSettings'),
+      content: <SiteSettingsTab />,
+    });
+  }
+
+  // 3. System Info — master only
+  if (isMaster) {
+    tabs.push({
+      key: 'systemInfo',
+      icon: <StorageIcon />,
+      label: t('settings.tabs.systemInfo'),
+      content: <SystemInfoTab />,
+    });
+  }
+
+  // 4. Legal — admin + site selected
+  if (isAdmin && selectedSiteId) {
+    tabs.push({
+      key: 'legal',
+      icon: <GavelIcon />,
+      label: t('settings.tabs.legal'),
+      content: <LegalPage embedded />,
+    });
+  }
+
+  // 5. API Keys — admin only
+  if (isAdmin) {
+    tabs.push({
+      key: 'apiKeys',
+      icon: <KeyIcon />,
+      label: t('settings.tabs.apiKeys'),
+      content: <ApiKeysPage embedded />,
+    });
+  }
+
+  // Clamp tabIndex if tab list shrinks (e.g. site deselected)
+  const safeTabIndex = Math.min(tabIndex, tabs.length - 1);
 
   return (
     <Box>
@@ -697,25 +845,19 @@ export default function SettingsPage() {
 
       <Paper sx={{ mb: 3 }}>
         <Tabs
-          value={tabIndex}
+          value={safeTabIndex}
           onChange={(_, v) => setTabIndex(v)}
           variant="scrollable"
           scrollButtons="auto"
           aria-label="Settings sections"
         >
-          <Tab icon={<TuneIcon />} iconPosition="start" label={t('settings.tabs.siteSettings')} />
-          <Tab icon={<StorageIcon />} iconPosition="start" label={t('settings.tabs.systemInfo')} />
-          <Tab icon={<LanguageIcon />} iconPosition="start" label={t('settings.tabs.preferences')} />
-          {selectedSiteId && <Tab icon={<GavelIcon />} iconPosition="start" label={t('settings.tabs.legal')} />}
-          {isAdmin && <Tab icon={<KeyIcon />} iconPosition="start" label={t('settings.tabs.apiKeys')} />}
+          {tabs.map((tab) => (
+            <Tab key={tab.key} icon={tab.icon} iconPosition="start" label={tab.label} />
+          ))}
         </Tabs>
       </Paper>
 
-      {tabIndex === 0 && <SiteSettingsTab />}
-      {tabIndex === 1 && <SystemInfoTab />}
-      {tabIndex === 2 && <PreferencesTab />}
-      {tabIndex === 3 && selectedSiteId && <LegalPage embedded />}
-      {tabIndex === (selectedSiteId ? 4 : 3) && isAdmin && <ApiKeysPage embedded />}
+      {tabs[safeTabIndex]?.content}
     </Box>
   );
 }

@@ -110,6 +110,15 @@ export default function MediaPage() {
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
 
+  // Command palette action listener
+  useEffect(() => {
+    const handler = (e: Event) => {
+      if ((e as CustomEvent).detail === 'upload-media') setUploadOpen(true);
+    };
+    window.addEventListener('command-palette:action', handler);
+    return () => window.removeEventListener('command-palette:action', handler);
+  }, []);
+
   // Search & filter state
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');

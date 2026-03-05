@@ -22,7 +22,8 @@
       "deleting": "Deleting...",
       "clone": "Clone",
       "upload": "Upload",
-      "preview": "Preview"
+      "preview": "Preview",
+      "viewDetails": "View details"
     },
     "status": {
       "active": "Active",
@@ -234,7 +235,8 @@
       "title": "Delete Blog",
       "message": "Delete blog \"{{slug}}\"? This cannot be undone."
     },
-    "moreActions": "More"
+    "moreActions": "More",
+    "searchPlaceholder": "Search by ID, slug, or author..."
   },
   "blogDetail": {
     "title": "Blog Detail",
@@ -362,9 +364,37 @@
       "deleted": "Page deleted",
       "cloned": "Page cloned successfully"
     },
+    "searchPlaceholder": "Search by ID, route, or slug...",
     "deleteDialog": {
       "title": "Delete Page",
       "message": "Delete page \"{{route}}\"? This cannot be undone."
+    },
+    "wizard": {
+      "steps": {
+        "pageType": "Page Type",
+        "identity": "Identity",
+        "options": "Options"
+      },
+      "next": "Next",
+      "back": "Back",
+      "createPage": "Create Page",
+      "creating": "Creating...",
+      "types": {
+        "static": "Static",
+        "staticDesc": "Standard content page",
+        "landing": "Landing",
+        "landingDesc": "Marketing page with hero sections",
+        "contact": "Contact",
+        "contactDesc": "Contact form and information",
+        "blogIndex": "Blog Index",
+        "blogIndexDesc": "Blog post listing page",
+        "custom": "Custom",
+        "customDesc": "Fully custom page layout"
+      },
+      "routeHint": "Page URL path (e.g. /about)",
+      "slugHint": "URL-friendly identifier, auto-generated from route",
+      "site": "Site",
+      "inNavigation": "Show in navigation"
     }
   },
   "pageDetail": {
@@ -391,11 +421,13 @@
       "added": "Section added",
       "loadingSections": "Loading sections...",
       "deleteTitle": "Delete Section",
-      "deleteMessage": "Delete this {{type}} section? This cannot be undone."
+      "deleteMessage": "Delete this {{type}} section? This cannot be undone.",
+      "untitled": "Untitled"
     },
     "table": {
       "type": "Type",
       "order": "Order",
+      "content": "Content",
       "localizations": "Localizations",
       "coverImage": "Cover Image",
       "ctaRoute": "CTA Route",
@@ -1146,8 +1178,22 @@
     "preferences": {
       "title": "Preferences",
       "language": {
+        "title": "Language",
         "label": "Admin Language",
         "description": "Choose the display language for the admin interface"
+      },
+      "theme": {
+        "title": "Theme",
+        "label": "Color Theme",
+        "description": "Choose a color theme for the admin interface"
+      },
+      "autosave": {
+        "title": "Autosave",
+        "enableLabel": "Enable Autosave",
+        "enableDescription": "Automatically save changes in editors after a short delay",
+        "debounceLabel": "Autosave Delay",
+        "debounceDescription": "How long to wait after your last edit before saving (1–60)",
+        "seconds": "seconds"
       }
     }
   },
@@ -1162,6 +1208,10 @@
       "multilingualDesc": "Built-in localization with support for any language and RTL text direction.",
       "apiFirst": "API-First",
       "apiFirstDesc": "Headless architecture with a full REST API. Deliver content to any frontend."
+    },
+    "preferences": {
+      "title": "Your Preferences",
+      "description": "Set your preferred language and theme before getting started."
     },
     "createSite": "Create Your First Site",
     "stepPrefix": "Step 1 of 1"
@@ -1479,7 +1529,6 @@
     "section": {
       "title": "Edit Section",
       "fields": {
-        "sectionType": "Section Type",
         "displayOrder": "Display Order",
         "settings": "Settings",
         "buttonText": "Button Text",
@@ -1489,7 +1538,8 @@
       "localizedContent": "Localized Content",
       "sectionConfiguration": "Section Configuration",
       "noActiveLocales": "No active locales configured",
-      "localeExists": "exists"
+      "localeExists": "exists",
+      "sectionSaved": "Section saved"
     },
     "undo": "Undo",
     "redo": "Redo",
@@ -1609,6 +1659,7 @@
     "placeholder": "Search commands...",
     "noResults": "No results found",
     "categories": {
+      "context": "Quick Actions",
       "navigation": "Navigation",
       "actions": "Actions",
       "blogs": "Blogs",
@@ -1616,8 +1667,30 @@
       "sites": "Sites"
     },
     "actions": {
-      "toggleTheme": "Toggle theme",
       "logout": "Log out"
+    },
+    "contextActions": {
+      "createBlog": "Create new blog",
+      "createPage": "Create new page",
+      "uploadMedia": "Upload media",
+      "createTemplate": "Create template",
+      "createTag": "Create tag",
+      "createCategory": "Create category",
+      "addNavItem": "Add navigation item",
+      "addSocialLink": "Add social link",
+      "createWebhook": "Create webhook",
+      "createRedirect": "Create redirect",
+      "addMember": "Add member",
+      "addCvEntry": "Add CV entry",
+      "addSkill": "Add skill",
+      "createSite": "Create site",
+      "backToSites": "Back to site list",
+      "addLanguage": "Add language",
+      "addLegalDoc": "Add legal document",
+      "backToLegal": "Back to legal documents",
+      "createApiKey": "Create API key",
+      "backToBlogs": "Back to blog list",
+      "backToPages": "Back to page list"
     },
     "hint": "⌘K"
   },

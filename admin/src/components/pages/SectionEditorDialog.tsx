@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import {
   Box,
   Button,
@@ -6,6 +6,7 @@ import {
   CardMedia,
   Chip,
   Dialog,
+  DialogActions,
   DialogContent,
   DialogTitle,
   Divider,
@@ -34,6 +35,9 @@ import SectionSettingsForm from './SectionSettingsForm';
 import MediaPickerDialog from '@/components/media/MediaPickerDialog';
 import { useTranslation } from 'react-i18next';
 import { useSiteContext } from '@/store/SiteContext';
+import { useMediaUrl } from '@/hooks/useMediaUrl';
+import { useAutosave } from '@/hooks/useAutosave';
+import { useUserPreferences } from '@/store/UserPreferencesContext';
 
 interface SectionEditorDialogProps {
   open: boolean;
@@ -41,11 +45,18 @@ interface SectionEditorDialogProps {
   onClose: () => void;
 }
 
+interface LocaleFormData {
+  title: string;
+  text: string;
+  buttonText: string;
+}
+
 export default function SectionEditorDialog({ open, section, onClose }: SectionEditorDialogProps) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const { showError, showSuccess } = useErrorSnackbar();
+  const { showError } = useErrorSnackbar();
   const { selectedSiteId } = useSiteContext();
+  const { preferences: userPrefs } = useUserPreferences();
 
   // Locale tab state
   const [activeTab, setActiveTab] = useState(0);
@@ -55,12 +66,17 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
   const [text, setText] = useState('');
   const [buttonText, setButtonText] = useState('');
 
+  // Track dirty locales: map of locale_id -> form data
+  const dirtyLocalesRef = useRef<Map<string, LocaleFormData>>(new Map());
+  const [dirtyVersion, setDirtyVersion] = useState(0);
+
   // Section metadata form state
-  const [displayOrder, setDisplayOrder] = useState(0);
   const [coverImageId, setCoverImageId] = useState('');
   const [ctaRoute, setCtaRoute] = useState('');
   const [settings, setSettings] = useState<Record<string, unknown>>({});
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [formVersion, setFormVersion] = useState(0);
+  const coverImageUrl = useMediaUrl(coverImageId || undefined);
 
   // Queries
   const { data: siteLocalesRaw } = useQuery({
@@ -75,9 +91,12 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
     enabled: !!section,
   });
 
-  const activeLocales = (siteLocalesRaw || [])
-    .filter((sl) => sl.is_active)
-    .map((sl) => ({ id: sl.locale_id, code: sl.code, name: sl.name, native_name: sl.native_name, direction: sl.direction, is_active: sl.is_active, created_at: sl.created_at }));
+  const activeLocales = useMemo(
+    () => (siteLocalesRaw || [])
+      .filter((sl) => sl.is_active)
+      .map((sl) => ({ id: sl.locale_id, code: sl.code, name: sl.name, native_name: sl.native_name, direction: sl.direction, is_active: sl.is_active, created_at: sl.created_at })),
+    [siteLocalesRaw],
+  );
   const currentLocale = activeLocales[activeTab];
 
   // Populate localization form when switching tabs or data loads
@@ -87,40 +106,69 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
     setButtonText(loc?.button_text || '');
   };
 
+  // Mark a locale as dirty and bump version to trigger tab re-render
+  const markLocaleDirty = useCallback((localeId: string, data: LocaleFormData) => {
+    dirtyLocalesRef.current.set(localeId, data);
+    setDirtyVersion((v) => v + 1);
+  }, []);
+
+  // Save current locale form data to dirty map before switching tabs
+  const stashCurrentLocale = useCallback(() => {
+    if (currentLocale) {
+      markLocaleDirty(currentLocale.id, { title, text, buttonText });
+    }
+  }, [currentLocale, title, text, buttonText, markLocaleDirty]);
+
   const handleTabChange = (_: unknown, newValue: number) => {
+    stashCurrentLocale();
     setActiveTab(newValue);
     const locale = activeLocales[newValue];
-    const loc = localizations?.find((l) => locale && l.locale_id === locale.id);
-    populateLocForm(loc);
+    // Check dirty map first, then fall back to API data
+    const dirty = locale ? dirtyLocalesRef.current.get(locale.id) : undefined;
+    if (dirty) {
+      setTitle(dirty.title);
+      setText(dirty.text);
+      setButtonText(dirty.buttonText);
+    } else {
+      const loc = localizations?.find((l) => locale && l.locale_id === locale.id);
+      populateLocForm(loc);
+    }
   };
 
   // Initialize section metadata when dialog opens or section changes
   useEffect(() => {
     if (open && section) {
-      setDisplayOrder(section.display_order);
       setCoverImageId(section.cover_image_id || '');
       setCtaRoute(section.call_to_action_route || '');
       setSettings(section.settings ? { ...section.settings } : {});
       setActiveTab(0);
+      dirtyLocalesRef.current.clear();
+      setDirtyVersion(0);
     }
   }, [open, section]);
 
   // Initialize localization form when data loads
-  useMemo(() => {
+  useEffect(() => {
     if (localizations && currentLocale) {
-      const loc = localizations.find((l) => l.locale_id === currentLocale.id);
-      populateLocForm(loc);
+      const dirty = dirtyLocalesRef.current.get(currentLocale.id);
+      if (dirty) {
+        setTitle(dirty.title);
+        setText(dirty.text);
+        setButtonText(dirty.buttonText);
+      } else {
+        const loc = localizations.find((l) => l.locale_id === currentLocale.id);
+        populateLocForm(loc);
+      }
     }
   }, [localizations, currentLocale]);
 
-  // Mutations
+  // Mutations — don't invalidate section-localizations on save; form state is
+  // the source of truth while the dialog is open.  Invalidate on close instead.
   const upsertLocMutation = useMutation({
     mutationFn: (data: UpsertSectionLocalizationRequest) =>
       apiService.upsertSectionLocalization(section!.id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['section-localizations', section?.id] });
       queryClient.invalidateQueries({ queryKey: ['page-section-localizations'] });
-      showSuccess('Localization saved');
     },
     onError: (error) => showError(error),
   });
@@ -130,40 +178,91 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
       apiService.updatePageSection(section!.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['page-sections', section?.page_id] });
-      showSuccess('Section settings saved');
     },
     onError: (error) => showError(error),
   });
 
-  const handleSaveLocalization = () => {
-    if (!currentLocale) return;
-    upsertLocMutation.mutate({
-      locale_id: currentLocale.id,
-      title: title || undefined,
-      text: text || undefined,
-      button_text: buttonText || undefined,
-    });
-  };
+  // Save all dirty locales + current locale + section config
+  const handleSave = useCallback(async () => {
+    // Stash current locale data first
+    stashCurrentLocale();
 
-  const handleSaveSection = () => {
-    updateSectionMutation.mutate({
-      display_order: displayOrder,
+    // Save all dirty locales
+    const dirtyEntries = Array.from(dirtyLocalesRef.current.entries());
+    for (const [localeId, data] of dirtyEntries) {
+      await upsertLocMutation.mutateAsync({
+        locale_id: localeId,
+        title: data.title || undefined,
+        text: data.text || undefined,
+        button_text: data.buttonText || undefined,
+      });
+    }
+
+    // Also save current locale if not already in dirty map
+    if (currentLocale && !dirtyLocalesRef.current.has(currentLocale.id)) {
+      await upsertLocMutation.mutateAsync({
+        locale_id: currentLocale.id,
+        title: title || undefined,
+        text: text || undefined,
+        button_text: buttonText || undefined,
+      });
+    }
+
+    // Save section config
+    await updateSectionMutation.mutateAsync({
       cover_image_id: coverImageId || undefined,
       call_to_action_route: ctaRoute || undefined,
       settings: Object.keys(settings).length > 0 ? settings : undefined,
     });
-  };
+
+    dirtyLocalesRef.current.clear();
+    setDirtyVersion((v) => v + 1);
+  }, [stashCurrentLocale, currentLocale, title, text, buttonText,
+      coverImageId, ctaRoute, settings, upsertLocMutation, updateSectionMutation]);
+
+  // Track current locale form data in dirty map (ref-only, no state bump to avoid
+  // infinite re-render — the active tab's dot is visible because parent re-renders
+  // from title/text/buttonText state, and stashCurrentLocale bumps version on tab switch)
+  useEffect(() => {
+    if (currentLocale && open) {
+      dirtyLocalesRef.current.set(currentLocale.id, { title, text, buttonText });
+      setFormVersion((v) => v + 1);
+    }
+  }, [title, text, buttonText, currentLocale, open]);
+
+  // Autosave — uses same hook as blog/page detail editors (3s debounce, retries)
+  const isDirty = dirtyLocalesRef.current.size > 0;
+  const { status: autosaveStatus, flush } = useAutosave({
+    isDirty,
+    onSave: handleSave,
+    enabled: open && !!section && userPrefs.autosave_enabled,
+    debounceMs: userPrefs.autosave_debounce_seconds * 1000,
+    formVersion,
+    onError: (err) => showError(err),
+  });
+
+  const isSaving = autosaveStatus === 'saving';
+
+  // Invalidate section-localizations when the dialog closes so next open gets fresh data
+  const handleClose = useCallback(async () => {
+    // Flush any pending autosave before closing
+    await flush();
+    if (section) {
+      queryClient.invalidateQueries({ queryKey: ['section-localizations', section.id] });
+    }
+    onClose();
+  }, [flush, section, queryClient, onClose]);
 
   if (!section) return null;
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
+    <Dialog open={open} onClose={handleClose} maxWidth="lg" fullWidth>
       <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           {t('forms.section.title')}
           <Chip label={section.section_type} size="small" color="primary" variant="outlined" />
         </Box>
-        <IconButton onClick={onClose} size="small" aria-label={t('common.actions.close')}>
+        <IconButton onClick={handleClose} size="small" aria-label={t('common.actions.close')}>
           <CloseIcon />
         </IconButton>
       </DialogTitle>
@@ -186,6 +285,8 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
                 >
                   {activeLocales.map((locale) => {
                     const hasLoc = localizations?.some((l) => l.locale_id === locale.id);
+                    // dirtyVersion is read to trigger re-render when dirty state changes
+                    const isDirty = dirtyVersion >= 0 && dirtyLocalesRef.current.has(locale.id);
                     return (
                       <Tab
                         key={locale.id}
@@ -199,6 +300,16 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
                                 color="success"
                                 variant="outlined"
                                 sx={{ height: 20, fontSize: '0.65rem' }}
+                              />
+                            )}
+                            {isDirty && (
+                              <Box
+                                sx={{
+                                  width: 8,
+                                  height: 8,
+                                  borderRadius: '50%',
+                                  bgcolor: 'warning.main',
+                                }}
                               />
                             )}
                           </Box>
@@ -228,20 +339,10 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
                   <TextField
                     label={t('forms.section.fields.buttonText')}
                     fullWidth
-
                     size="small"
                     value={buttonText}
                     onChange={(e) => setButtonText(e.target.value)}
                   />
-
-                  <Button
-                    variant="contained"
-                    startIcon={<SaveIcon />}
-                    onClick={handleSaveLocalization}
-                    disabled={upsertLocMutation.isPending || !currentLocale}
-                  >
-                    {upsertLocMutation.isPending ? t('common.actions.saving') : `${t('common.actions.save')} ${currentLocale?.code.toUpperCase() || ''}`}
-                  </Button>
                 </Stack>
               </>
             ) : (
@@ -256,20 +357,6 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
             </Typography>
 
             <Stack spacing={2}>
-              <Box>
-                <Typography variant="caption" color="text.secondary">{t('forms.section.fields.sectionType')}</Typography>
-                <Box><Chip label={section.section_type} size="small" variant="outlined" /></Box>
-              </Box>
-
-              <TextField
-                label={t('forms.section.fields.displayOrder')}
-                type="number"
-                fullWidth
-                size="small"
-                value={displayOrder}
-                onChange={(e) => setDisplayOrder(Number(e.target.value))}
-              />
-
               <Box>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                   {t('pageDetail.sections.coverImage')}
@@ -297,16 +384,18 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
                 ) : (
                   <Box>
                     <Card variant="outlined" sx={{ mb: 1 }}>
-                      <CardMedia
-                        component="img"
-                        height={100}
-                        image={`/api/media/${coverImageId}/file`}
-                        alt=""
-                        sx={{ objectFit: 'cover' }}
-                        onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
+                      {coverImageUrl && (
+                        <CardMedia
+                          component="img"
+                          height={100}
+                          image={coverImageUrl}
+                          alt=""
+                          sx={{ objectFit: 'cover' }}
+                          onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                      )}
                     </Card>
                     <Typography variant="caption" fontFamily="monospace" display="block" sx={{ mb: 0.5 }}>
                       {coverImageId}
@@ -339,19 +428,35 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
                 settings={settings}
                 onChange={setSettings}
               />
-
-              <Button
-                variant="contained"
-                startIcon={<SaveIcon />}
-                onClick={handleSaveSection}
-                disabled={updateSectionMutation.isPending}
-              >
-                {updateSectionMutation.isPending ? t('common.actions.saving') : t('common.actions.save')}
-              </Button>
             </Stack>
           </Grid>
         </Grid>
       </DialogContent>
+
+      <DialogActions sx={{ px: 3, py: 2 }}>
+        <Button onClick={handleClose} disabled={isSaving}>
+          {t('common.actions.close')}
+        </Button>
+        <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+          {autosaveStatus === 'saving' && (
+            <Chip label={t('blogDetail.toolbar.saving')} size="small" color="info" variant="outlined" />
+          )}
+          {autosaveStatus === 'saved' && (
+            <Chip label={t('blogDetail.toolbar.saved')} size="small" color="success" variant="outlined" />
+          )}
+          {autosaveStatus === 'error' && (
+            <Chip label={t('blogDetail.toolbar.saveFailed')} size="small" color="error" variant="outlined" />
+          )}
+        </Box>
+        <Button
+          variant="contained"
+          startIcon={<SaveIcon />}
+          onClick={handleSave}
+          disabled={isSaving}
+        >
+          {isSaving ? t('common.actions.saving') : t('common.actions.save')}
+        </Button>
+      </DialogActions>
 
       <MediaPickerDialog
         open={pickerOpen}

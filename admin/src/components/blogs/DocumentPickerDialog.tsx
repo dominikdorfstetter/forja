@@ -134,6 +134,7 @@ export default function DocumentPickerDialog({
       <DialogTitle>{t('blogDetail.documents.attach')}</DialogTitle>
       <DialogContent>
         <TextField
+          autoFocus
           placeholder={t('common.actions.search')}
           size="small"
           fullWidth

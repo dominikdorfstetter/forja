@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Box, Alert, Button, IconButton, Tooltip } from '@mui/material';
@@ -32,6 +33,15 @@ export default function LegalPage({ embedded }: { embedded?: boolean }) {
     openCreate, closeForm, openEdit, closeEdit, openDelete, closeDelete,
     handlePageChange, handleRowsPerPageChange,
   } = useListPageState<LegalDocumentResponse>();
+
+  // Command palette action listener
+  useEffect(() => {
+    const handler = (e: Event) => {
+      if ((e as CustomEvent).detail === 'add-legal-doc') openCreate();
+    };
+    window.addEventListener('command-palette:action', handler);
+    return () => window.removeEventListener('command-palette:action', handler);
+  }, [openCreate]);
 
   const { data: documentsData, isLoading, error } = useQuery({
     queryKey: ['legal', selectedSiteId, page, perPage],

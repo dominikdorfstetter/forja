@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/store/AuthContext';
 import { useSiteContext } from '@/store/SiteContext';
-import { useThemeMode } from '@/theme';
 import apiService from '@/services/api';
 import type { BlogListItem, PageListItem } from '@/types/api';
 import type { ReactNode } from 'react';
@@ -13,7 +12,7 @@ export interface Command {
   id: string;
   label: string;
   icon?: ReactNode;
-  category: 'navigation' | 'action' | 'blog' | 'page' | 'site';
+  category: 'context' | 'navigation' | 'action' | 'blog' | 'page' | 'site';
   action: () => void;
 }
 
@@ -28,14 +27,40 @@ interface UseCommandPaletteReturn {
   execute: (command: Command) => void;
 }
 
+// Route → related nav command IDs for relevance scoring
+const ROUTE_RELEVANCE: Record<string, string[]> = {
+  '/dashboard': ['nav:blogs', 'nav:pages', 'nav:media', 'nav:my-drafts'],
+  '/my-drafts': ['nav:blogs', 'nav:pages', 'nav:dashboard'],
+  '/blogs': ['nav:pages', 'nav:media', 'nav:taxonomy', 'nav:content-templates'],
+  '/pages': ['nav:blogs', 'nav:media', 'nav:taxonomy', 'nav:navigation'],
+  '/content-templates': ['nav:blogs', 'nav:pages'],
+  '/media': ['nav:blogs', 'nav:pages'],
+  '/cv': ['nav:dashboard', 'nav:blogs'],
+  '/navigation': ['nav:pages', 'nav:dashboard'],
+  '/taxonomy': ['nav:blogs', 'nav:pages'],
+  '/social-links': ['nav:navigation', 'nav:settings'],
+  '/redirects': ['nav:pages', 'nav:navigation'],
+  '/webhooks': ['nav:settings', 'nav:api-keys'],
+  '/activity': ['nav:dashboard', 'nav:settings'],
+  '/members': ['nav:settings', 'nav:activity'],
+  '/settings': ['nav:dashboard', 'nav:members'],
+  '/sites': ['nav:settings', 'nav:dashboard'],
+  '/locales': ['nav:settings', 'nav:sites'],
+  '/legal': ['nav:settings', 'nav:sites'],
+  '/api-keys': ['nav:webhooks', 'nav:settings'],
+};
+
+const TOP_N = 5;
+
 export function useCommandPalette(
   navCommands: Command[],
+  contextCommands: Command[],
+  currentPath: string,
 ): UseCommandPaletteReturn {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { logout } = useAuth();
   const { selectedSiteId } = useSiteContext();
-  const { themeId, setThemeId, options: themeOptions } = useThemeMode();
 
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -74,16 +99,6 @@ export function useCommandPalette(
   const actionCommands = useMemo<Command[]>(() => {
     const cmds: Command[] = [];
 
-    // Theme toggle - cycle to next option
-    const currentIdx = themeOptions.findIndex((o) => o.id === themeId);
-    const nextTheme = themeOptions[(currentIdx + 1) % themeOptions.length];
-    cmds.push({
-      id: 'action:toggle-theme',
-      label: t('commandPalette.actions.toggleTheme'),
-      category: 'action',
-      action: () => setThemeId(nextTheme.id),
-    });
-
     cmds.push({
       id: 'action:logout',
       label: t('commandPalette.actions.logout'),
@@ -92,7 +107,7 @@ export function useCommandPalette(
     });
 
     return cmds;
-  }, [t, themeId, themeOptions, setThemeId, logout, navigate]);
+  }, [t, logout, navigate]);
 
   // Entity search queries
   const shouldSearch = open && debouncedQuery.length >= 2 && !!selectedSiteId;
@@ -150,13 +165,34 @@ export function useCommandPalette(
     return cmds;
   }, [debouncedQuery, blogsData, pagesData, navigate]);
 
+  // Resolve parent route for detail pages (e.g. /blogs/123 → /blogs)
+  const parentRoute = useMemo(() => {
+    const segments = currentPath.split('/').filter(Boolean);
+    return segments.length > 0 ? `/${segments[0]}` : currentPath;
+  }, [currentPath]);
+
   // Merge and filter
   const commands = useMemo(() => {
-    const all = [...navCommands, ...actionCommands, ...entityCommands];
-    if (!query) return all.filter((c) => c.category === 'navigation' || c.category === 'action');
+    const all = [...contextCommands, ...navCommands, ...actionCommands, ...entityCommands];
+
+    if (!query) {
+      // Score-based top-N selection
+      const relevantIds = ROUTE_RELEVANCE[parentRoute] ?? [];
+      const scored = all
+        .filter((c) => c.category === 'context' || c.category === 'navigation' || c.category === 'action')
+        .map((c) => {
+          let score = 1;
+          if (c.category === 'context') score = 3;
+          else if (relevantIds.includes(c.id)) score = 2;
+          return { cmd: c, score };
+        })
+        .sort((a, b) => b.score - a.score);
+      return scored.slice(0, TOP_N).map((s) => s.cmd);
+    }
+
     const lowerQ = query.toLowerCase();
     return all.filter((c) => c.label.toLowerCase().includes(lowerQ));
-  }, [navCommands, actionCommands, entityCommands, query]);
+  }, [contextCommands, navCommands, actionCommands, entityCommands, query, parentRoute]);
 
   // Keep selection in bounds
   useEffect(() => {

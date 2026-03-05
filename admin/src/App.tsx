@@ -45,6 +45,7 @@ import Layout from '@/components/Layout';
 import RequireAuth from '@/components/auth/RequireAuth';
 import { SiteProvider } from '@/store/SiteContext';
 import { AuthProvider } from '@/store/AuthContext';
+import { UserPreferencesProvider } from '@/store/UserPreferencesContext';
 import { NavigationGuardProvider } from '@/store/NavigationGuardContext';
 import ErrorBoundary from '@/components/shared/ErrorBoundary';
 import BlogDetailPage from '@/pages/BlogDetail';
@@ -103,6 +104,7 @@ function App() {
         <QueryClientProvider client={queryClient}>
           <BrowserRouter basename="/dashboard">
             <AuthProvider>
+            <UserPreferencesProvider>
             <SiteProvider>
             <NavigationGuardProvider>
               <Routes>
@@ -160,6 +162,7 @@ function App() {
               </Routes>
             </NavigationGuardProvider>
             </SiteProvider>
+            </UserPreferencesProvider>
             </AuthProvider>
           </BrowserRouter>
           

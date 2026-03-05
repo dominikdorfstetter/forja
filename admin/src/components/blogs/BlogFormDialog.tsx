@@ -93,7 +93,7 @@ export default function BlogFormDialog({ open, blog, onSubmit, onClose, loading 
         <DialogTitle id="blog-form-title">{blog ? t('forms.blog.editTitle') : t('forms.blog.createTitle')}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
-            <TextField label={t('forms.blog.fields.slug')} fullWidth required {...register('slug')} onBlur={snapshot} error={!!errors.slug} helperText={errors.slug?.message} />
+            <TextField autoFocus label={t('forms.blog.fields.slug')} fullWidth required {...register('slug')} onBlur={snapshot} error={!!errors.slug} helperText={errors.slug?.message} />
             <TextField label={t('forms.blog.fields.author')} fullWidth required {...register('author')} onBlur={snapshot} error={!!errors.author} helperText={errors.author?.message} />
             <TextField label={t('forms.blog.fields.publishedDate')} type="date" fullWidth required InputLabelProps={{ shrink: true }} {...register('published_date')} onBlur={snapshot} error={!!errors.published_date} helperText={errors.published_date?.message} />
             <Controller name="status" control={control} render={({ field }) => (

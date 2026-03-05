@@ -87,6 +87,14 @@ vi.mock('@/services/api', () => {
     createMediaFolder: vi.fn(),
     updateMediaFolder: vi.fn(),
     deleteMediaFolder: vi.fn(),
+    getMediaById: vi.fn(),
+    // Section methods
+    getSectionLocalizations: vi.fn(),
+    upsertSectionLocalization: vi.fn(),
+    updatePageSection: vi.fn(),
+    // User Preferences
+    getUserPreferences: vi.fn(),
+    updateUserPreferences: vi.fn(),
     // Locale & template methods
     getSiteLocales: vi.fn(),
     getContentTemplates: vi.fn(),

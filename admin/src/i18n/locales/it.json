@@ -22,7 +22,8 @@
       "deleting": "Eliminazione...",
       "clone": "Clona",
       "upload": "Carica",
-      "preview": "Anteprima"
+      "preview": "Anteprima",
+      "viewDetails": "Vedi dettagli"
     },
     "status": {
       "active": "Attivo",
@@ -234,7 +235,8 @@
       "title": "Elimina blog",
       "message": "Eliminare il blog \"{{slug}}\"? Questa azione non può essere annullata."
     },
-    "moreActions": "Altro"
+    "moreActions": "Altro",
+    "searchPlaceholder": "Cerca per ID, slug o autore..."
   },
   "blogDetail": {
     "title": "Dettaglio blog",
@@ -362,9 +364,37 @@
       "deleted": "Pagina eliminata",
       "cloned": "Pagina clonata con successo"
     },
+    "searchPlaceholder": "Cerca per ID, percorso o slug...",
     "deleteDialog": {
       "title": "Elimina pagina",
       "message": "Eliminare la pagina \"{{route}}\"? Questa azione non può essere annullata."
+    },
+    "wizard": {
+      "steps": {
+        "pageType": "Tipo di pagina",
+        "identity": "Identità",
+        "options": "Opzioni"
+      },
+      "next": "Avanti",
+      "back": "Indietro",
+      "createPage": "Crea pagina",
+      "creating": "Creazione...",
+      "types": {
+        "static": "Statica",
+        "staticDesc": "Pagina di contenuto standard",
+        "landing": "Landing",
+        "landingDesc": "Pagina marketing con sezioni hero",
+        "contact": "Contatto",
+        "contactDesc": "Modulo di contatto e informazioni",
+        "blogIndex": "Indice blog",
+        "blogIndexDesc": "Pagina elenco articoli del blog",
+        "custom": "Personalizzata",
+        "customDesc": "Layout di pagina completamente personalizzato"
+      },
+      "routeHint": "Percorso URL della pagina (es. /chi-siamo)",
+      "slugHint": "Identificatore URL, generato automaticamente dalla route",
+      "site": "Sito",
+      "inNavigation": "Mostra nella navigazione"
     }
   },
   "pageDetail": {
@@ -1146,8 +1176,22 @@
     "preferences": {
       "title": "Preferenze",
       "language": {
+        "title": "Lingua",
         "label": "Lingua dell'amministrazione",
         "description": "Scegli la lingua di visualizzazione per l'interfaccia di amministrazione"
+      },
+      "theme": {
+        "title": "Tema",
+        "label": "Tema colori",
+        "description": "Scegli un tema colori per l'interfaccia di amministrazione"
+      },
+      "autosave": {
+        "title": "Salvataggio automatico",
+        "enableLabel": "Attiva salvataggio automatico",
+        "enableDescription": "Salva automaticamente le modifiche negli editor dopo un breve ritardo",
+        "debounceLabel": "Ritardo di salvataggio",
+        "debounceDescription": "Tempo di attesa dopo l'ultima modifica prima di salvare (1–60)",
+        "seconds": "secondi"
       }
     }
   },
@@ -1162,6 +1206,10 @@
       "multilingualDesc": "Localizzazione integrata con supporto per qualsiasi lingua e direzione del testo RTL.",
       "apiFirst": "API-First",
       "apiFirstDesc": "Architettura headless con API REST completa. Distribuisci contenuti a qualsiasi frontend."
+    },
+    "preferences": {
+      "title": "Le tue preferenze",
+      "description": "Imposta la lingua e il tema preferiti prima di iniziare."
     },
     "createSite": "Crea il tuo primo sito",
     "stepPrefix": "Passaggio 1 di 1"
@@ -1479,7 +1527,6 @@
     "section": {
       "title": "Modifica sezione",
       "fields": {
-        "sectionType": "Tipo di sezione",
         "displayOrder": "Ordine di visualizzazione",
         "settings": "Impostazioni",
         "buttonText": "Testo del pulsante",
@@ -1609,6 +1656,7 @@
     "placeholder": "Cerca comandi...",
     "noResults": "Nessun risultato trovato",
     "categories": {
+      "context": "Azioni rapide",
       "navigation": "Navigazione",
       "actions": "Azioni",
       "blogs": "Blog",
@@ -1616,8 +1664,30 @@
       "sites": "Siti"
     },
     "actions": {
-      "toggleTheme": "Cambia tema",
       "logout": "Esci"
+    },
+    "contextActions": {
+      "createBlog": "Crea nuovo blog",
+      "createPage": "Crea nuova pagina",
+      "uploadMedia": "Carica media",
+      "createTemplate": "Crea modello",
+      "createTag": "Crea tag",
+      "createCategory": "Crea categoria",
+      "addNavItem": "Aggiungi elemento di navigazione",
+      "addSocialLink": "Aggiungi link social",
+      "createWebhook": "Crea webhook",
+      "createRedirect": "Crea reindirizzamento",
+      "addMember": "Aggiungi membro",
+      "addCvEntry": "Aggiungi voce CV",
+      "addSkill": "Aggiungi competenza",
+      "createSite": "Crea sito",
+      "backToSites": "Torna alla lista siti",
+      "addLanguage": "Aggiungi lingua",
+      "addLegalDoc": "Aggiungi documento legale",
+      "backToLegal": "Torna ai documenti legali",
+      "createApiKey": "Crea chiave API",
+      "backToBlogs": "Torna alla lista blog",
+      "backToPages": "Torna alla lista pagine"
     },
     "hint": "⌘K"
   },

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, Paper, Chip, IconButton, Tooltip } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
@@ -36,6 +36,15 @@ export default function WebhooksPage() {
 
   const [deliveryWebhookId, setDeliveryWebhookId] = useState<string | null>(null);
   const [testingWebhookId, setTestingWebhookId] = useState<string | null>(null);
+
+  // Command palette action listener
+  useEffect(() => {
+    const handler = (e: Event) => {
+      if ((e as CustomEvent).detail === 'create-webhook') openCreate();
+    };
+    window.addEventListener('command-palette:action', handler);
+    return () => window.removeEventListener('command-palette:action', handler);
+  }, [openCreate]);
 
   const { data, isLoading } = useQuery({
     queryKey: ['webhooks', selectedSiteId, page, perPage],

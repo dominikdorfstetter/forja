@@ -9,7 +9,6 @@ import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ListItem from '@mui/material/ListItem';
@@ -42,8 +41,6 @@ import { useTranslation } from 'react-i18next';
 import { useSiteContext } from '@/store/SiteContext';
 import { useAuth } from '@/store/AuthContext';
 import { useNavigationGuardContext } from '@/store/NavigationGuardContext';
-import ThemeSwitcher from '@/components/ThemeSwitcher';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { CommandPalette } from '@/components/command-palette';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import ErrorBoundary from '@/components/shared/ErrorBoundary';
@@ -113,8 +110,12 @@ const Drawer = styled(MuiDrawer, {
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'flex-end',
+  justifyContent: 'center',
   padding: theme.spacing(0, 1),
+  ...theme.mixins.toolbar,
+}));
+
+const AppBarSpacer = styled('div')(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
@@ -162,7 +163,7 @@ export default function Layout() {
         ...(isAdmin ? [{ text: t('layout.sidebar.webhooks'), icon: <WebhookIcon />, path: '/webhooks' }] : []),
         ...(isAdmin ? [{ text: t('layout.sidebar.activity'), icon: <HistoryIcon />, path: '/activity' }] : []),
         ...(canManageMembers || isAdmin ? [{ text: t('layout.sidebar.members'), icon: <PeopleIcon />, path: '/members' }] : []),
-        ...(isAdmin ? [{ text: t('layout.sidebar.settings'), icon: <SettingsIcon />, path: '/settings' }] : []),
+        { text: t('layout.sidebar.settings'), icon: <SettingsIcon />, path: '/settings' },
       ],
     },
   ];
@@ -198,19 +199,6 @@ export default function Layout() {
       </Box>
       <AppBar position="fixed" open={open} elevation={0} sx={{ borderBottom: '1px solid', borderColor: 'divider' }}>
         <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label={t('layout.toolbar.toggleDrawer')}
-            onClick={() => setOpen(!open)}
-            edge="start"
-            sx={{ mr: 2 }}
-          >
-            {open ? (theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />) : <MenuIcon />}
-          </IconButton>
-          <Typography variant="h6" noWrap component="div" fontWeight={600}>
-            {t('common.appName')}
-          </Typography>
-
           <Tooltip title={authSiteId ? t('common.lockedByScope') : ''} arrow>
             <TextField
               select
@@ -252,13 +240,14 @@ export default function Layout() {
             </TextField>
           </Tooltip>
 
+          <Box sx={{ flexGrow: 1 }} />
+
           <Tooltip title={t('commandPalette.hint')}>
             <IconButton
               color="inherit"
               onClick={() => {
                 window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }));
               }}
-              sx={{ ml: 1 }}
             >
               <SearchIcon />
               <Chip
@@ -278,10 +267,8 @@ export default function Layout() {
           <Box sx={{ flexGrow: 1 }} />
 
           <NotificationBell />
-          <LanguageSwitcher />
-          <ThemeSwitcher />
 
-          <Box sx={{ flexGrow: 0 }}>
+          <Box sx={{ flexGrow: 0, ml: 1.5 }}>
             <Tooltip title={t('layout.toolbar.account')}>
               <IconButton onClick={(e) => setAnchorElUser(e.currentTarget)} sx={{ p: 0 }}>
                 <Avatar alt={userFullName || 'User'} src={userImageUrl || undefined} sx={{ width: 32, height: 32 }} />
@@ -327,7 +314,39 @@ export default function Layout() {
       </AppBar>
 
       <Drawer variant="permanent" open={open} PaperProps={{ component: 'nav' as const, 'aria-label': 'Main navigation' }}>
-        <DrawerHeader />
+        <DrawerHeader sx={{ justifyContent: open ? 'space-between' : 'center', px: open ? 2 : 0 }}>
+          {open ? (
+            <>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Typography variant="h6" component="span" sx={{ fontSize: '1.3rem' }}>
+                  🔨
+                </Typography>
+                <Typography variant="h6" component="div" fontWeight={700} noWrap>
+                  {t('common.appName')}
+                </Typography>
+              </Box>
+              <IconButton
+                aria-label={t('layout.toolbar.toggleDrawer')}
+                onClick={() => setOpen(false)}
+                size="small"
+              >
+                {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+              </IconButton>
+            </>
+          ) : (
+            <Tooltip title={t('common.appName')} placement="right" arrow>
+              <IconButton
+                aria-label={t('layout.toolbar.toggleDrawer')}
+                onClick={() => setOpen(true)}
+                sx={{ borderRadius: 1, px: 1 }}
+              >
+                <Typography component="span" sx={{ fontSize: '1.3rem', lineHeight: 1 }}>
+                  🔨
+                </Typography>
+              </IconButton>
+            </Tooltip>
+          )}
+        </DrawerHeader>
         <Divider />
         {menuSections.map((section, idx) => (
           <List
@@ -468,7 +487,7 @@ export default function Layout() {
           }),
         }}
       >
-        <DrawerHeader />
+        <AppBarSpacer />
         <ErrorBoundary key={location.pathname}>
           <Fade in key={location.pathname} timeout={300}>
             <Box>

@@ -64,11 +64,15 @@ impl<'r> Responder<'r, 'static> for RssResponse {
 #[utoipa::path(
     tag = "Blogs",
     operation_id = "list_blogs",
-    description = "List all blogs for a site (paginated)",
+    description = "List all blogs for a site (paginated, with optional search/filter/sort)",
     params(
         ("site_id" = Uuid, Path, description = "Site UUID"),
         ("page" = Option<i64>, Query, description = "Page number (default 1)"),
-        ("per_page" = Option<i64>, Query, description = "Items per page (default 10, max 100)")
+        ("per_page" = Option<i64>, Query, description = "Items per page (default 10, max 100)"),
+        ("search" = Option<String>, Query, description = "Search by ID, slug, or author (ILIKE)"),
+        ("status" = Option<String>, Query, description = "Filter by status"),
+        ("sort_by" = Option<String>, Query, description = "Sort column: slug, author, published_date, status, created_at"),
+        ("sort_dir" = Option<String>, Query, description = "Sort direction: asc or desc")
     ),
     responses(
         (status = 200, description = "Paginated blog list", body = PaginatedBlogs),
@@ -77,12 +81,16 @@ impl<'r> Responder<'r, 'static> for RssResponse {
     ),
     security(("api_key" = []))
 )]
-#[get("/sites/<site_id>/blogs?<page>&<per_page>")]
+#[get("/sites/<site_id>/blogs?<page>&<per_page>&<search>&<status>&<sort_by>&<sort_dir>")]
 pub async fn list_blogs(
     state: &State<AppState>,
     site_id: Uuid,
     page: Option<i64>,
     per_page: Option<i64>,
+    search: Option<String>,
+    status: Option<String>,
+    sort_by: Option<String>,
+    sort_dir: Option<String>,
     auth: ReadKey,
 ) -> Result<Json<PaginatedBlogs>, ApiError> {
     auth.0
@@ -91,8 +99,24 @@ pub async fn list_blogs(
     let params = PaginationParams::new(page, per_page);
     let (limit, offset) = params.limit_offset();
 
-    let blogs = Blog::find_all_for_site(&state.db, site_id, limit, offset).await?;
-    let total = Blog::count_for_site(&state.db, site_id).await?;
+    let has_filters = search.is_some() || status.is_some() || sort_by.is_some() || sort_dir.is_some();
+
+    let (blogs, total) = if has_filters {
+        let blogs = Blog::find_all_for_site_filtered(
+            &state.db, site_id, limit, offset,
+            search.as_deref(), status.as_deref(),
+            sort_by.as_deref(), sort_dir.as_deref(),
+        ).await?;
+        let total = Blog::count_for_site_filtered(
+            &state.db, site_id,
+            search.as_deref(), status.as_deref(),
+        ).await?;
+        (blogs, total)
+    } else {
+        let blogs = Blog::find_all_for_site(&state.db, site_id, limit, offset).await?;
+        let total = Blog::count_for_site(&state.db, site_id).await?;
+        (blogs, total)
+    };
 
     let items: Vec<BlogListItem> = blogs.into_iter().map(BlogListItem::from).collect();
     let paginated = params.paginate(items, total);

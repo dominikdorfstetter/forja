@@ -77,6 +77,7 @@ export default function MediaPickerDialog({
       <DialogTitle>{t('media.picker.title')}</DialogTitle>
       <DialogContent>
         <TextField
+          autoFocus
           placeholder={t('media.picker.search')}
           size="small"
           fullWidth

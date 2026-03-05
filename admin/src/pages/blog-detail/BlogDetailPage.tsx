@@ -36,6 +36,7 @@ import ReviewCommentDialog from '@/components/shared/ReviewCommentDialog';
 import { useFormHistory } from '@/hooks/useFormHistory';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { useAutosave } from '@/hooks/useAutosave';
+import { useUserPreferences } from '@/store/UserPreferencesContext';
 import { usePreviewUrl } from '@/hooks/usePreviewUrl';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
@@ -83,6 +84,7 @@ export default function BlogDetailPage() {
   const queryClient = useQueryClient();
   const { showError, showSuccess } = useErrorSnackbar();
   const { canWrite } = useAuth();
+  const { preferences: userPrefs } = useUserPreferences();
   const { selectedSiteId } = useSiteContext();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -254,7 +256,8 @@ export default function BlogDetailPage() {
   const { status: autosaveStatus, flush } = useAutosave({
     isDirty,
     onSave: handleSave,
-    enabled: canWrite,
+    enabled: canWrite && userPrefs.autosave_enabled,
+    debounceMs: userPrefs.autosave_debounce_seconds * 1000,
     formVersion,
     onError: (err) => showError(err),
   });

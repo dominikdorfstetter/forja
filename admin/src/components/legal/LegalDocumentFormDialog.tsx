@@ -72,7 +72,7 @@ export default function LegalDocumentFormDialog({ open, siteId: _siteId, documen
         <DialogTitle id="legal-form-title">{document ? t('forms.legal.editTitle') : t('forms.legal.createTitle')}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
-            <TextField label={t('forms.legal.fields.cookieName')} fullWidth required {...register('cookie_name')} error={!!errors.cookie_name} helperText={errors.cookie_name?.message} />
+            <TextField autoFocus label={t('forms.legal.fields.cookieName')} fullWidth required {...register('cookie_name')} error={!!errors.cookie_name} helperText={errors.cookie_name?.message} />
             <Controller name="document_type" control={control} render={({ field }) => (
               <TextField select label={t('forms.legal.fields.documentType')} fullWidth {...field}>
                 <MenuItem value="CookieConsent">Cookie Consent</MenuItem>

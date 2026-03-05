@@ -51,6 +51,8 @@ use utoipa::{Modify, OpenApi};
         // Auth
         crate::handlers::auth::get_me,
         crate::handlers::auth::get_profile,
+        crate::handlers::auth::get_preferences,
+        crate::handlers::auth::update_preferences,
         crate::handlers::auth::export_user_data,
         crate::handlers::auth::delete_account,
         // Sites
@@ -97,6 +99,7 @@ use utoipa::{Modify, OpenApi};
         crate::handlers::page::get_page_section_localizations,
         crate::handlers::page::upsert_section_localization,
         crate::handlers::page::delete_section_localization,
+        crate::handlers::page::reorder_page_sections,
         crate::handlers::page::clone_page,
         crate::handlers::page::review_page,
         crate::handlers::page::bulk_pages,
@@ -259,6 +262,9 @@ use utoipa::{Modify, OpenApi};
         crate::dto::auth::ProfileResponse,
         crate::dto::auth::ExportApiKeyRecord,
         crate::dto::auth::UserDataExportResponse,
+        // User Preferences DTOs
+        crate::dto::user_preferences::UserPreferencesResponse,
+        crate::dto::user_preferences::UpdateUserPreferencesRequest,
         // Error types
         crate::errors::ProblemDetails,
         crate::errors::FieldError,
@@ -327,6 +333,7 @@ use utoipa::{Modify, OpenApi};
         crate::dto::page::PageSectionResponse,
         crate::dto::page::SectionLocalizationResponse,
         crate::dto::page::UpsertSectionLocalizationRequest,
+        crate::dto::page::ReorderPageSectionsRequest,
         // CV DTOs
         crate::dto::cv::CreateSkillRequest,
         crate::dto::cv::UpdateSkillRequest,

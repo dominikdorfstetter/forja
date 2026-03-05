@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Table,
@@ -50,6 +50,15 @@ export default function MembersPage() {
   const [addClerkUserId, setAddClerkUserId] = useState('');
   const [removingMember, setRemovingMember] = useState<SiteMembership | null>(null);
   const [transferTarget, setTransferTarget] = useState<SiteMembership | null>(null);
+
+  // Command palette action listener
+  useEffect(() => {
+    const handler = (e: Event) => {
+      if ((e as CustomEvent).detail === 'add-member') setAddOpen(true);
+    };
+    window.addEventListener('command-palette:action', handler);
+    return () => window.removeEventListener('command-palette:action', handler);
+  }, []);
 
   // Clerk users for the add member dialog
   const [clerkSearch, setClerkSearch] = useState('');
@@ -237,6 +246,7 @@ export default function MembersPage() {
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField
+              autoFocus
               label={t('members.addDialog.searchPlaceholder')}
               value={clerkSearch}
               onChange={(e) => setClerkSearch(e.target.value)}

@@ -128,46 +128,58 @@ describe('PagesPage', () => {
     });
   });
 
-  it('shows view, edit, and delete action buttons per row', async () => {
+  it('shows 3-dot action menu buttons per row', async () => {
     vi.mocked(apiService.getPages).mockResolvedValue(mockPaginatedPages);
     renderWithProviders(<PagesPage />);
     await waitFor(() => {
       expect(screen.getByText('/about')).toBeInTheDocument();
     });
-    const viewButtons = screen.getAllByRole('button').filter(
-      (b) => b.querySelector('[data-testid="VisibilityIcon"]'),
+    const menuButtons = screen.getAllByRole('button').filter(
+      (b) => b.querySelector('[data-testid="MoreVertIcon"]'),
     );
-    expect(viewButtons.length).toBeGreaterThanOrEqual(2);
-
-    const editButtons = screen.getAllByRole('button').filter(
-      (b) => b.querySelector('[data-testid="EditIcon"]'),
-    );
-    expect(editButtons.length).toBeGreaterThanOrEqual(2);
-
-    const deleteButtons = screen.getAllByRole('button').filter(
-      (b) => b.querySelector('[data-testid="DeleteIcon"]'),
-    );
-    expect(deleteButtons.length).toBeGreaterThanOrEqual(2);
+    expect(menuButtons.length).toBeGreaterThanOrEqual(2);
   });
 
-  it('opens delete confirm dialog on delete icon click', async () => {
+  it('opens action menu and shows edit, delete options', async () => {
     vi.mocked(apiService.getPages).mockResolvedValue(mockPaginatedPages);
     renderWithProviders(<PagesPage />);
     await waitFor(() => {
       expect(screen.getByText('/about')).toBeInTheDocument();
     });
     const user = userEvent.setup();
-    const deleteButtons = screen.getAllByRole('button').filter(
-      (b) => b.querySelector('[data-testid="DeleteIcon"]'),
+    const menuButtons = screen.getAllByRole('button').filter(
+      (b) => b.querySelector('[data-testid="MoreVertIcon"]'),
     );
-    expect(deleteButtons.length).toBeGreaterThan(0);
-    await user.click(deleteButtons[0]);
+    await user.click(menuButtons[0]);
+    const menu = await screen.findByRole('menu');
+    const menuItems = menu.querySelectorAll('[role="menuitem"]');
+    const menuTexts = Array.from(menuItems).map((item) => item.textContent);
+    expect(menuTexts).toContain('View details');
+    expect(menuTexts).toContain('Delete');
+  });
+
+  it('opens delete confirm dialog via action menu', async () => {
+    vi.mocked(apiService.getPages).mockResolvedValue(mockPaginatedPages);
+    renderWithProviders(<PagesPage />);
+    await waitFor(() => {
+      expect(screen.getByText('/about')).toBeInTheDocument();
+    });
+    const user = userEvent.setup();
+    const menuButtons = screen.getAllByRole('button').filter(
+      (b) => b.querySelector('[data-testid="MoreVertIcon"]'),
+    );
+    await user.click(menuButtons[0]);
+    const menu = await screen.findByRole('menu');
+    const deleteItem = Array.from(menu.querySelectorAll('[role="menuitem"]')).find(
+      (item) => item.textContent === 'Delete',
+    )!;
+    await user.click(deleteItem);
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
   });
 
-  it('hides edit and delete buttons when canWrite=false and isAdmin=false', async () => {
+  it('hides edit and delete in action menu when canWrite=false and isAdmin=false', async () => {
     mockAuth.canWrite = false;
     mockAuth.isAdmin = false;
     vi.mocked(apiService.getPages).mockResolvedValue(mockPaginatedPages);
@@ -175,23 +187,26 @@ describe('PagesPage', () => {
     await waitFor(() => {
       expect(screen.getByText('/about')).toBeInTheDocument();
     });
-    const editButtons = screen.getAllByRole('button').filter(
-      (b) => b.querySelector('[data-testid="EditIcon"]'),
+    const user = userEvent.setup();
+    const menuButtons = screen.getAllByRole('button').filter(
+      (b) => b.querySelector('[data-testid="MoreVertIcon"]'),
     );
-    expect(editButtons).toHaveLength(0);
-    const deleteButtons = screen.getAllByRole('button').filter(
-      (b) => b.querySelector('[data-testid="DeleteIcon"]'),
-    );
-    expect(deleteButtons).toHaveLength(0);
+    await user.click(menuButtons[0]);
+    await waitFor(() => {
+      expect(screen.getByRole('menu')).toBeInTheDocument();
+    });
+    expect(screen.getByText('View details')).toBeInTheDocument();
+    expect(screen.queryByText('Delete')).not.toBeInTheDocument();
   });
 
   it('displays page type chips correctly', async () => {
     vi.mocked(apiService.getPages).mockResolvedValue(mockPaginatedPages);
     renderWithProviders(<PagesPage />);
     await waitFor(() => {
-      expect(screen.getByText('Static')).toBeInTheDocument();
+      // Use getAllByText since "Static" and "Contact" also appear in the type filter dropdown
+      expect(screen.getAllByText('Static').length).toBeGreaterThanOrEqual(1);
     });
-    expect(screen.getByText('Contact')).toBeInTheDocument();
+    expect(screen.getAllByText('Contact').length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows error alert when API fails', async () => {

@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import apiService from '@/services/api';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
-import type { UpdatePageRequest, ContentStatus, ReviewActionRequest } from '@/types/api';
+import type { UpdatePageRequest, ContentStatus, ReviewActionRequest, ReorderItem } from '@/types/api';
 import { useAuth } from '@/store/AuthContext';
 import { useSiteContext } from '@/store/SiteContext';
 import { useEditorialWorkflow } from '@/hooks/useEditorialWorkflow';
@@ -15,6 +15,7 @@ import ReviewCommentDialog from '@/components/shared/ReviewCommentDialog';
 import { useFormHistory } from '@/hooks/useFormHistory';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { useAutosave } from '@/hooks/useAutosave';
+import { useUserPreferences } from '@/store/UserPreferencesContext';
 import { usePreviewUrl } from '@/hooks/usePreviewUrl';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
@@ -56,6 +57,7 @@ export default function PageDetailPage() {
   const queryClient = useQueryClient();
   const { showError, showSuccess } = useErrorSnackbar();
   const { canWrite, isAdmin } = useAuth();
+  const { preferences: userPrefs } = useUserPreferences();
   const { selectedSiteId } = useSiteContext();
 
   const [activeTab, setActiveTab] = useState(0);
@@ -162,6 +164,14 @@ export default function PageDetailPage() {
     onError: (err) => showError(err),
   });
 
+  const reorderSectionsMutation = useMutation({
+    mutationFn: (items: ReorderItem[]) => apiService.reorderPageSections(id!, items),
+    onError: (err) => {
+      showError(err);
+      queryClient.invalidateQueries({ queryKey: ['page-sections', id] });
+    },
+  });
+
   // Unified save
   const handleSave = useCallback(async () => {
     if (!page) return;
@@ -200,7 +210,8 @@ export default function PageDetailPage() {
   const { status: autosaveStatus, flush } = useAutosave({
     isDirty,
     onSave: handleSave,
-    enabled: canWrite,
+    enabled: canWrite && userPrefs.autosave_enabled,
+    debounceMs: userPrefs.autosave_debounce_seconds * 1000,
     formVersion,
     onError: (err) => showError(err),
   });
@@ -334,6 +345,7 @@ export default function PageDetailPage() {
               isAdmin={isAdmin}
               onCreateSection={(data) => createSectionMutation.mutate(data)}
               onDeleteSection={(sectionId) => deleteSectionMutation.mutate(sectionId)}
+              onReorderSections={(items) => reorderSectionsMutation.mutate(items)}
               onSectionEditorClose={() => {
                 queryClient.invalidateQueries({ queryKey: ['page-section-localizations', id] });
                 queryClient.invalidateQueries({ queryKey: ['page-sections', id] });

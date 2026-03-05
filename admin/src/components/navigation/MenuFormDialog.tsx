@@ -82,6 +82,7 @@ export default function MenuFormDialog({ open, menu, onSubmitCreate, onSubmitUpd
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField
+              autoFocus
               label={t('navigation.menus.fields.slug', 'Slug')}
               fullWidth
               required

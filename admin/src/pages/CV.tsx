@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
@@ -70,6 +70,17 @@ export default function CVPage() {
     openDelete: setDeletingSkill, closeDelete: closeSkillDelete,
     handlePageChange: handleSkillPageChange, handleRowsPerPageChange: handleSkillRowsPerPageChange,
   } = useListPageState<SkillResponse>();
+
+  // Command palette action listener
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail === 'add-cv-entry') openEntryCreate();
+      else if (detail === 'add-skill') openSkillCreate();
+    };
+    window.addEventListener('command-palette:action', handler);
+    return () => window.removeEventListener('command-palette:action', handler);
+  }, [openEntryCreate, openSkillCreate]);
 
   // Queries
   const { data: entriesData, isLoading: entriesLoading, error: entriesError } = useQuery({

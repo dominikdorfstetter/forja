@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
@@ -65,6 +65,15 @@ export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
   const [revokingKey, setRevokingKey] = useState<ApiKeyListItem | null>(null);
   const [deletingKey, setDeletingKey] = useState<ApiKeyListItem | null>(null);
   const [usageKey, setUsageKey] = useState<ApiKeyListItem | null>(null);
+
+  // Command palette action listener
+  useEffect(() => {
+    const handler = (e: Event) => {
+      if ((e as CustomEvent).detail === 'create-api-key') setCreateOpen(true);
+    };
+    window.addEventListener('command-palette:action', handler);
+    return () => window.removeEventListener('command-palette:action', handler);
+  }, []);
 
   const { data: sites } = useQuery({
     queryKey: ['sites'],
