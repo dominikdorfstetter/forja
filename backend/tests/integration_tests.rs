@@ -1664,3 +1664,120 @@ async fn test_permission_levels_enforced() {
         "Write key must not be able to manage webhooks"
     );
 }
+
+// =========================================================================
+// 20. Media site authorization
+// =========================================================================
+
+#[rocket::async_test]
+#[serial]
+async fn test_media_update_cross_site_denied() {
+    let ctx = test_context().await;
+    cleanup_test_data(&ctx.pool).await;
+
+    let site_a = create_test_site(&ctx.pool).await;
+    let site_b = create_test_site(&ctx.pool).await;
+    let key_a = create_test_api_key(&ctx.pool, site_a, ApiKeyPermission::Write).await;
+    let key_b = create_test_api_key(&ctx.pool, site_b, ApiKeyPermission::Write).await;
+
+    // Create media on site A
+    let create_body = serde_json::json!({
+        "filename": "test.jpg",
+        "original_filename": "test.jpg",
+        "mime_type": "image/jpeg",
+        "file_size": 1024,
+        "storage_path": "/uploads/test.jpg",
+        "public_url": "https://cdn.example.com/test.jpg",
+        "is_global": false,
+        "site_ids": [site_a]
+    });
+
+    let response = ctx
+        .client
+        .post("/api/v1/media")
+        .header(Header::new("X-API-Key", key_a.clone()))
+        .header(Header::new("Content-Type", "application/json"))
+        .body(create_body.to_string())
+        .dispatch()
+        .await;
+    assert_eq!(
+        response.status(),
+        Status::Created,
+        "Site A key must create media"
+    );
+
+    let media: serde_json::Value = response.into_json().await.expect("valid JSON");
+    let media_id = media["id"].as_str().expect("media id");
+
+    // Site B key must not be able to update site A's media
+    let update_body = serde_json::json!({ "alt_text": "hacked" });
+    let response = ctx
+        .client
+        .put(format!("/api/v1/media/{}", media_id))
+        .header(Header::new("X-API-Key", key_b.clone()))
+        .header(Header::new("Content-Type", "application/json"))
+        .body(update_body.to_string())
+        .dispatch()
+        .await;
+
+    assert_eq!(
+        response.status(),
+        Status::Forbidden,
+        "Site B key must not update site A media"
+    );
+}
+
+#[rocket::async_test]
+#[serial]
+async fn test_media_delete_cross_site_denied() {
+    let ctx = test_context().await;
+    cleanup_test_data(&ctx.pool).await;
+
+    let site_a = create_test_site(&ctx.pool).await;
+    let site_b = create_test_site(&ctx.pool).await;
+    let key_a = create_test_api_key(&ctx.pool, site_a, ApiKeyPermission::Write).await;
+    let key_b = create_test_api_key(&ctx.pool, site_b, ApiKeyPermission::Write).await;
+
+    // Create media on site A
+    let create_body = serde_json::json!({
+        "filename": "delete-test.jpg",
+        "original_filename": "delete-test.jpg",
+        "mime_type": "image/jpeg",
+        "file_size": 2048,
+        "storage_path": "/uploads/delete-test.jpg",
+        "public_url": "https://cdn.example.com/delete-test.jpg",
+        "is_global": false,
+        "site_ids": [site_a]
+    });
+
+    let response = ctx
+        .client
+        .post("/api/v1/media")
+        .header(Header::new("X-API-Key", key_a.clone()))
+        .header(Header::new("Content-Type", "application/json"))
+        .body(create_body.to_string())
+        .dispatch()
+        .await;
+    assert_eq!(
+        response.status(),
+        Status::Created,
+        "Site A key must create media"
+    );
+
+    let media: serde_json::Value = response.into_json().await.expect("valid JSON");
+    let media_id = media["id"].as_str().expect("media id");
+
+    // Site B key must not be able to delete site A's media
+    let response = ctx
+        .client
+        .delete(format!("/api/v1/media/{}", media_id))
+        .header(Header::new("X-API-Key", key_b.clone()))
+        .dispatch()
+        .await;
+
+    assert_eq!(
+        response.status(),
+        Status::Forbidden,
+        "Site B key must not delete site A media"
+    );
+}

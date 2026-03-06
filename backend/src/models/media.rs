@@ -492,6 +492,16 @@ impl MediaFile {
 
         Ok(())
     }
+
+    /// Find all site IDs associated with a media file via the media_sites join table
+    pub async fn find_site_ids(pool: &PgPool, media_file_id: Uuid) -> Result<Vec<Uuid>, ApiError> {
+        let rows: Vec<(Uuid,)> =
+            sqlx::query_as("SELECT site_id FROM media_sites WHERE media_file_id = $1")
+                .bind(media_file_id)
+                .fetch_all(pool)
+                .await?;
+        Ok(rows.into_iter().map(|(id,)| id).collect())
+    }
 }
 
 impl MediaVariant {
@@ -547,6 +557,22 @@ impl MediaVariant {
 }
 
 impl MediaMetadata {
+    /// Find metadata by ID
+    pub async fn find_by_id(pool: &PgPool, id: Uuid) -> Result<Self, ApiError> {
+        sqlx::query_as::<_, Self>(
+            r#"
+            SELECT id, media_file_id, locale_id, alt_text, caption, title,
+                   created_at, updated_at
+            FROM media_metadata
+            WHERE id = $1
+            "#,
+        )
+        .bind(id)
+        .fetch_optional(pool)
+        .await?
+        .ok_or_else(|| ApiError::NotFound(format!("Media metadata with ID {} not found", id)))
+    }
+
     /// Find metadata for a media file and locale
     pub async fn find_for_media_locale(
         pool: &PgPool,
