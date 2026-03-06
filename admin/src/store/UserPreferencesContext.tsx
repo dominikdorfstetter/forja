@@ -7,12 +7,14 @@ import apiService from '@/services/api';
 import type { UserPreferencesResponse, UpdateUserPreferencesRequest } from '@/types/api';
 import type { ThemeId } from '@/theme/createAppTheme';
 
-const DEFAULT_PREFERENCES: UserPreferencesResponse = {
-  autosave_enabled: true,
-  autosave_debounce_seconds: 3,
-  language: localStorage.getItem('admin-language') || 'en',
-  theme_id: localStorage.getItem('theme-preference') || 'system',
-};
+function getDefaultPreferences(): UserPreferencesResponse {
+  return {
+    autosave_enabled: true,
+    autosave_debounce_seconds: 3,
+    language: localStorage.getItem('admin-language') || 'en',
+    theme_id: localStorage.getItem('theme-preference') || 'system',
+  };
+}
 
 interface UserPreferencesContextValue {
   preferences: UserPreferencesResponse;
@@ -99,7 +101,7 @@ export function UserPreferencesProvider({ children }: { children: ReactNode }) {
   );
 
   const value: UserPreferencesContextValue = {
-    preferences: data ?? DEFAULT_PREFERENCES,
+    preferences: data ?? getDefaultPreferences(),
     isLoading,
     updatePreferences,
     isUpdating: mutation.isPending,

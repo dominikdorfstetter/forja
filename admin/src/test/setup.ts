@@ -105,6 +105,18 @@ vi.mock('@/services/api', () => {
 // Mock window.scrollTo
 window.scrollTo = vi.fn() as unknown as typeof window.scrollTo;
 
+// Mock localStorage (jsdom may not fully initialise it in all environments)
+const localStorageMock = (() => {
+  const store: Record<string, string> = {};
+  return {
+    getItem: (key: string) => store[key] ?? null,
+    setItem: (key: string, value: string) => { store[key] = value; },
+    removeItem: (key: string) => { delete store[key]; },
+    clear: () => { Object.keys(store).forEach((k) => delete store[k]); },
+  };
+})();
+Object.defineProperty(window, 'localStorage', { value: localStorageMock, writable: true });
+
 // Mock IntersectionObserver
 class MockIntersectionObserver {
   observe = vi.fn();
