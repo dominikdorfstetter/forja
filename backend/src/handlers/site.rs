@@ -7,8 +7,8 @@ use uuid::Uuid;
 use validator::Validate;
 
 use crate::dto::site::{
-    should_show_team_workflow_prompt, CreateSiteRequest, SiteContextFeatures, SiteContextResponse,
-    SiteContextSuggestions, SiteResponse, UpdateSiteRequest,
+    should_show_team_workflow_prompt, CreateSiteRequest, SiteContextFeatures, SiteContextModules,
+    SiteContextResponse, SiteContextSuggestions, SiteResponse, UpdateSiteRequest,
 };
 use crate::errors::{ApiError, ProblemDetails};
 use crate::guards::auth_guard::{AuthSource, AuthenticatedKey, ReadKey};
@@ -17,7 +17,10 @@ use crate::models::locale::Locale;
 use crate::models::site::Site;
 use crate::models::site_locale::SiteLocale;
 use crate::models::site_membership::{SiteMembership, SiteRole};
-use crate::models::site_settings::SiteSetting;
+use crate::models::site_settings::{
+    SiteSetting, KEY_MODULE_BLOG_ENABLED, KEY_MODULE_CV_ENABLED, KEY_MODULE_DOCUMENTS_ENABLED,
+    KEY_MODULE_LEGAL_ENABLED, KEY_MODULE_PAGES_ENABLED,
+};
 use crate::services::audit_service;
 use crate::AppState;
 
@@ -368,6 +371,27 @@ pub async fn get_site_context(
         .and_then(|v| v.as_bool())
         .unwrap_or(false);
 
+    let module_blog = settings
+        .get(KEY_MODULE_BLOG_ENABLED)
+        .and_then(|v| v.as_bool())
+        .unwrap_or(true);
+    let module_pages = settings
+        .get(KEY_MODULE_PAGES_ENABLED)
+        .and_then(|v| v.as_bool())
+        .unwrap_or(true);
+    let module_cv = settings
+        .get(KEY_MODULE_CV_ENABLED)
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false);
+    let module_legal = settings
+        .get(KEY_MODULE_LEGAL_ENABLED)
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false);
+    let module_documents = settings
+        .get(KEY_MODULE_DOCUMENTS_ENABLED)
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false);
+
     Ok(Json(SiteContextResponse {
         member_count,
         current_user_role,
@@ -383,6 +407,13 @@ pub async fn get_site_context(
                 editorial_workflow,
                 prompt_dismissed,
             ),
+        },
+        modules: SiteContextModules {
+            blog: module_blog,
+            pages: module_pages,
+            cv: module_cv,
+            legal: module_legal,
+            documents: module_documents,
         },
     }))
 }
