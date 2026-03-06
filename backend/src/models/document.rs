@@ -414,6 +414,24 @@ pub struct DocumentLocalization {
 }
 
 impl DocumentLocalization {
+    pub async fn find_by_id(pool: &PgPool, id: Uuid) -> Result<Self, ApiError> {
+        let loc = sqlx::query_as::<_, Self>(
+            r#"
+            SELECT id, document_id, locale_id, name, description, created_at, updated_at
+            FROM document_localizations
+            WHERE id = $1
+            "#,
+        )
+        .bind(id)
+        .fetch_optional(pool)
+        .await?
+        .ok_or_else(|| {
+            ApiError::NotFound(format!("Document localization with ID {} not found", id))
+        })?;
+
+        Ok(loc)
+    }
+
     pub async fn find_all_for_document(
         pool: &PgPool,
         document_id: Uuid,
