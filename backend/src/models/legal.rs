@@ -10,6 +10,7 @@ use crate::dto::legal::{
     UpdateLegalDocumentRequest, UpdateLegalGroupRequest, UpdateLegalItemRequest,
 };
 use crate::errors::ApiError;
+use crate::models::content::Content;
 use crate::services::content_service::ContentService;
 
 /// Legal document type enum matching PostgreSQL
@@ -146,6 +147,18 @@ impl LegalDocument {
         .ok_or_else(|| ApiError::NotFound(format!("Legal document with ID {} not found", id)))?;
 
         Ok(document)
+    }
+
+    /// Resolve the site_id for a legal document via content → content_sites
+    pub async fn resolve_site_id(pool: &PgPool, id: Uuid) -> Result<Uuid, ApiError> {
+        let doc = Self::find_by_id(pool, id).await?;
+        let content_id = doc
+            .content_id
+            .ok_or_else(|| ApiError::BadRequest("Legal document has no content_id".to_string()))?;
+        let site_ids = Content::find_site_ids(pool, content_id).await?;
+        site_ids.into_iter().next().ok_or_else(|| {
+            ApiError::BadRequest("Legal document is not associated with any site".to_string())
+        })
     }
 
     /// Find legal document by type for a site
