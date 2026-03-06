@@ -84,7 +84,7 @@ export default function CategoryFormDialog({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth aria-labelledby="category-form-title">
+    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth aria-labelledby="category-form-title" data-testid="category-form.dialog">
       <form onSubmit={handleSubmit(onFormSubmit)}>
         <DialogTitle id="category-form-title">{category ? t('forms.category.editTitle') : t('forms.category.createTitle')}</DialogTitle>
         <DialogContent>
@@ -126,11 +126,12 @@ export default function CategoryFormDialog({
           </>)} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose}>{t('common.actions.cancel')}</Button>
+          <Button onClick={onClose} data-testid="category-form.btn.cancel">{t('common.actions.cancel')}</Button>
           <Button
             type="submit"
             variant="contained"
             disabled={loading || !isValid}
+            data-testid="category-form.btn.submit"
           >
             {loading ? t('common.actions.saving') : category ? t('common.actions.save') : t('common.actions.create')}
           </Button>

@@ -144,7 +144,7 @@ export default function ContentTemplateFormDialog({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth aria-labelledby="content-template-form-title">
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth aria-labelledby="content-template-form-title" data-testid="content-template-form.dialog">
       <form onSubmit={handleSubmit(onFormSubmit)}>
         <DialogTitle id="content-template-form-title">
           {template ? t('forms.contentTemplate.editTitle') : t('forms.contentTemplate.createTitle')}
@@ -278,11 +278,12 @@ export default function ContentTemplateFormDialog({
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose}>{t('common.actions.cancel')}</Button>
+          <Button onClick={onClose} data-testid="content-template-form.btn.cancel">{t('common.actions.cancel')}</Button>
           <Button
             type="submit"
             variant="contained"
             disabled={loading || !isValid}
+            data-testid="content-template-form.btn.submit"
           >
             {loading ? t('common.actions.saving') : template ? t('common.actions.save') : t('common.actions.create')}
           </Button>

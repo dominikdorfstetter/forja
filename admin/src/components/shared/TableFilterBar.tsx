@@ -21,6 +21,7 @@ interface TableFilterBarProps {
   onSearchChange: (value: string) => void;
   searchPlaceholder?: string;
   filters?: FilterConfig[];
+  testIdPrefix?: string;
 }
 
 export default function TableFilterBar({
@@ -28,6 +29,7 @@ export default function TableFilterBar({
   onSearchChange,
   searchPlaceholder,
   filters,
+  testIdPrefix,
 }: TableFilterBarProps) {
   const { t } = useTranslation();
 
@@ -40,6 +42,9 @@ export default function TableFilterBar({
           placeholder={searchPlaceholder ?? t('common.actions.search')}
           value={searchValue}
           onChange={(e) => onSearchChange(e.target.value)}
+          inputProps={{
+            'aria-label': searchPlaceholder ?? t('common.actions.search'),
+          }}
           slotProps={{
             input: {
               startAdornment: (
@@ -49,7 +54,12 @@ export default function TableFilterBar({
               ),
               endAdornment: searchValue ? (
                 <InputAdornment position="end">
-                  <IconButton size="small" onClick={() => onSearchChange('')} aria-label={t('common.actions.clear')}>
+                  <IconButton
+                    size="small"
+                    onClick={() => onSearchChange('')}
+                    aria-label={t('common.actions.clear')}
+                    {...(testIdPrefix ? { 'data-testid': `${testIdPrefix}.search.clear` } : {})}
+                  >
                     <ClearIcon fontSize="small" />
                   </IconButton>
                 </InputAdornment>
@@ -57,6 +67,7 @@ export default function TableFilterBar({
             },
           }}
           sx={{ minWidth: 280, flex: 1, maxWidth: 400 }}
+          {...(testIdPrefix ? { 'data-testid': `${testIdPrefix}.search.input` } : {})}
         />
         <Stack direction="row" spacing={1.5} alignItems="center" sx={{ ml: 'auto' }}>
           {filters?.map((filter) => (

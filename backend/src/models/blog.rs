@@ -220,6 +220,97 @@ impl Blog {
         Ok(blogs)
     }
 
+    /// Find similar blogs based on taxonomy overlap and author
+    pub async fn find_similar(
+        pool: &PgPool,
+        blog_id: Uuid,
+        site_id: Uuid,
+        limit: i64,
+    ) -> Result<Vec<BlogWithContent>, ApiError> {
+        let blogs = sqlx::query_as::<_, BlogWithContent>(
+            r#"
+            WITH source AS (
+                SELECT b.id, b.content_id, b.author
+                FROM blogs b
+                INNER JOIN contents c ON b.content_id = c.id
+                WHERE b.id = $1 AND c.is_deleted = FALSE
+            ),
+            source_tags AS (
+                SELECT ct.tag_id
+                FROM content_tags ct
+                INNER JOIN source s ON ct.content_id = s.content_id
+            ),
+            source_categories AS (
+                SELECT cc.category_id, cc.is_primary
+                FROM content_categories cc
+                INNER JOIN source s ON cc.content_id = s.content_id
+            ),
+            candidates AS (
+                SELECT
+                    b.id, b.content_id, b.author, b.published_date,
+                    b.reading_time_minutes, b.cover_image_id, b.header_image_id,
+                    b.is_featured, b.allow_comments,
+                    c.slug, c.status, c.published_at, c.publish_start, c.publish_end,
+                    b.created_at, b.updated_at
+                FROM blogs b
+                INNER JOIN contents c ON b.content_id = c.id
+                INNER JOIN content_sites cs ON c.id = cs.content_id
+                WHERE cs.site_id = $2
+                  AND b.id != $1
+                  AND c.is_deleted = FALSE
+                  AND c.status IN ('published', 'scheduled')
+                  AND (c.publish_start IS NULL OR c.publish_start <= NOW())
+                  AND (c.publish_end IS NULL OR c.publish_end > NOW())
+            ),
+            scores AS (
+                SELECT
+                    cand.*,
+                    COALESCE((
+                        SELECT COUNT(*) * 3
+                        FROM content_tags ct
+                        INNER JOIN source_tags st ON ct.tag_id = st.tag_id
+                        WHERE ct.content_id = cand.content_id
+                    ), 0)
+                    + COALESCE((
+                        SELECT COUNT(*) * 2
+                        FROM content_categories cc
+                        INNER JOIN source_categories sc ON cc.category_id = sc.category_id
+                        WHERE cc.content_id = cand.content_id
+                    ), 0)
+                    + COALESCE((
+                        SELECT 3
+                        FROM content_categories cc
+                        INNER JOIN source_categories sc ON cc.category_id = sc.category_id
+                            AND sc.is_primary = TRUE
+                        WHERE cc.content_id = cand.content_id
+                          AND cc.is_primary = TRUE
+                        LIMIT 1
+                    ), 0)
+                    + CASE WHEN cand.author = (SELECT author FROM source) THEN 1 ELSE 0 END
+                    AS similarity_score
+                FROM candidates cand
+            )
+            SELECT
+                id, content_id, author, published_date,
+                reading_time_minutes, cover_image_id, header_image_id,
+                is_featured, allow_comments,
+                slug, status, published_at, publish_start, publish_end,
+                created_at, updated_at
+            FROM scores
+            WHERE similarity_score > 0
+            ORDER BY similarity_score DESC, published_date DESC
+            LIMIT $3
+            "#,
+        )
+        .bind(blog_id)
+        .bind(site_id)
+        .bind(limit)
+        .fetch_all(pool)
+        .await?;
+
+        Ok(blogs)
+    }
+
     /// Count blogs for a site
     pub async fn count_for_site(pool: &PgPool, site_id: Uuid) -> Result<i64, ApiError> {
         let row: (i64,) = sqlx::query_as(
@@ -248,11 +339,18 @@ impl Blog {
         status: Option<&str>,
         sort_by: Option<&str>,
         sort_dir: Option<&str>,
+        exclude_status: Option<&str>,
     ) -> Result<Vec<BlogWithContent>, ApiError> {
         // Normalize status to DB enum value early so we can reject invalid values
         let db_status = match status {
             Some(s) => Some(normalize_content_status(s).ok_or_else(|| {
                 ApiError::BadRequest(format!("Invalid status filter: {}", s))
+            })?),
+            None => None,
+        };
+        let db_exclude_status = match exclude_status {
+            Some(s) => Some(normalize_content_status(s).ok_or_else(|| {
+                ApiError::BadRequest(format!("Invalid exclude_status filter: {}", s))
             })?),
             None => None,
         };
@@ -271,6 +369,10 @@ impl Blog {
         }
         if db_status.is_some() {
             where_clauses.push(format!("c.status::text = ${bind_idx}"));
+            bind_idx += 1;
+        }
+        if db_exclude_status.is_some() {
+            where_clauses.push(format!("c.status::text != ${bind_idx}"));
             bind_idx += 1;
         }
         let _ = bind_idx;
@@ -318,6 +420,9 @@ impl Blog {
         if let Some(st) = db_status {
             query = query.bind(st);
         }
+        if let Some(es) = db_exclude_status {
+            query = query.bind(es);
+        }
 
         let blogs = query.fetch_all(pool).await?;
         Ok(blogs)
@@ -329,10 +434,17 @@ impl Blog {
         site_id: Uuid,
         search: Option<&str>,
         status: Option<&str>,
+        exclude_status: Option<&str>,
     ) -> Result<i64, ApiError> {
         let db_status = match status {
             Some(s) => Some(normalize_content_status(s).ok_or_else(|| {
                 ApiError::BadRequest(format!("Invalid status filter: {}", s))
+            })?),
+            None => None,
+        };
+        let db_exclude_status = match exclude_status {
+            Some(s) => Some(normalize_content_status(s).ok_or_else(|| {
+                ApiError::BadRequest(format!("Invalid exclude_status filter: {}", s))
             })?),
             None => None,
         };
@@ -351,6 +463,10 @@ impl Blog {
         }
         if db_status.is_some() {
             where_clauses.push(format!("c.status::text = ${bind_idx}"));
+            bind_idx += 1;
+        }
+        if db_exclude_status.is_some() {
+            where_clauses.push(format!("c.status::text != ${bind_idx}"));
             bind_idx += 1;
         }
         let _ = bind_idx;
@@ -373,6 +489,9 @@ impl Blog {
         }
         if let Some(st) = db_status {
             query = query.bind(st);
+        }
+        if let Some(es) = db_exclude_status {
+            query = query.bind(es);
         }
 
         let row = query.fetch_one(pool).await?;

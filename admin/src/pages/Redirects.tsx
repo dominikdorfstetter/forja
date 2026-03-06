@@ -85,7 +85,7 @@ export default function RedirectsPage() {
   ];
 
   return (
-    <Box>
+    <Box data-testid="redirects.page">
       <PageHeader
         title={t('redirects.title')}
         subtitle={t('redirects.subtitle')}
@@ -117,7 +117,7 @@ export default function RedirectsPage() {
 
       <RedirectFormDialog open={formOpen} onSubmitCreate={(data) => createMutation.mutate(data)} onClose={closeForm} loading={createMutation.isPending} />
       <RedirectFormDialog open={!!editing} redirect={editing} onSubmitUpdate={(data) => editing && updateMutation.mutate({ id: editing.id, data })} onClose={closeEdit} loading={updateMutation.isPending} />
-      <ConfirmDialog open={!!deleting} title={t('redirects.deleteDialog.title')} message={t('redirects.deleteDialog.message', { source: deleting?.source_path })} confirmLabel={t('common.actions.delete')} onConfirm={() => deleting && deleteMutation.mutate(deleting.id)} onCancel={closeDelete} loading={deleteMutation.isPending} />
+      <ConfirmDialog open={!!deleting} title={t('redirects.deleteDialog.title')} message={t('redirects.deleteDialog.message', { source: deleting?.source_path })} confirmLabel={t('common.actions.delete')} onConfirm={() => deleting && deleteMutation.mutate(deleting.id)} onCancel={closeDelete} loading={deleteMutation.isPending} confirmationText={t('common.actions.delete')} />
     </Box>
   );
 }

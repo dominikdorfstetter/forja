@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, type ReactNode } from 'react';
+import { useCallback, useId, useMemo, useRef, type ReactNode } from 'react';
 import { useNavigate, useLocation } from 'react-router';
 import {
   Dialog,
@@ -45,7 +45,7 @@ const NAV_ICON_MAP: Record<string, ReactNode> = {
   '/my-drafts': <EditNoteIcon fontSize="small" />,
   '/blogs': <ArticleIcon fontSize="small" />,
   '/pages': <DescriptionIcon fontSize="small" />,
-  '/content-templates': <ViewQuiltIcon fontSize="small" />,
+  '/blogs/templates': <ViewQuiltIcon fontSize="small" />,
   '/media': <PermMediaIcon fontSize="small" />,
   '/cv': <WorkIcon fontSize="small" />,
   '/navigation': <MenuBookIcon fontSize="small" />,
@@ -90,7 +90,7 @@ export default function CommandPalette() {
     { id: 'nav:my-drafts', label: t('layout.sidebar.myDrafts'), icon: NAV_ICON_MAP['/my-drafts'], category: 'navigation', action: () => navigate('/my-drafts') },
     { id: 'nav:blogs', label: t('layout.sidebar.blogs'), icon: NAV_ICON_MAP['/blogs'], category: 'navigation', action: () => navigate('/blogs') },
     { id: 'nav:pages', label: t('layout.sidebar.pages'), icon: NAV_ICON_MAP['/pages'], category: 'navigation', action: () => navigate('/pages') },
-    { id: 'nav:content-templates', label: t('layout.sidebar.contentTemplates'), icon: NAV_ICON_MAP['/content-templates'], category: 'navigation', action: () => navigate('/content-templates') },
+    ...(isAdmin ? [{ id: 'nav:content-templates', label: t('layout.sidebar.contentTemplates'), icon: NAV_ICON_MAP['/blogs/templates'], category: 'navigation' as const, action: () => navigate('/blogs/templates') }] : []),
     { id: 'nav:media', label: t('layout.sidebar.assets'), icon: NAV_ICON_MAP['/media'], category: 'navigation', action: () => navigate('/media') },
     { id: 'nav:cv', label: t('layout.sidebar.cv'), icon: NAV_ICON_MAP['/cv'], category: 'navigation', action: () => navigate('/cv') },
     { id: 'nav:navigation', label: t('layout.sidebar.navigation'), icon: NAV_ICON_MAP['/navigation'], category: 'navigation', action: () => navigate('/navigation') },
@@ -129,7 +129,7 @@ export default function CommandPalette() {
       cmds.push({ id: 'ctx:upload-media', label: t('commandPalette.contextActions.uploadMedia'), icon: <UploadIcon fontSize="small" />, category: 'context', action: () => dispatchAction('upload-media') });
     }
 
-    if (path === '/content-templates') {
+    if (path === '/blogs/templates') {
       cmds.push({ id: 'ctx:create-template', label: t('commandPalette.contextActions.createTemplate'), icon: <AddIcon fontSize="small" />, category: 'context', action: () => dispatchAction('create-template') });
     }
 
@@ -239,9 +239,23 @@ export default function CommandPalette() {
   };
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const uniqueId = useId();
 
-  // Build flat index for keyboard navigation
-  let flatIndex = 0;
+  // Pre-compute flat index mapping so we don't mutate during render
+  const flatIndexMap = useMemo(() => {
+    const map = new Map<string, number>();
+    let idx = 0;
+    for (const cat of CATEGORY_ORDER) {
+      const group = grouped.get(cat);
+      if (!group || group.length === 0) continue;
+      for (const cmd of group) {
+        map.set(cmd.id, idx++);
+      }
+    }
+    return map;
+  }, [grouped]);
+
+  const hasResults = commands.length > 0;
 
   return (
     <Dialog
@@ -251,6 +265,8 @@ export default function CommandPalette() {
       fullWidth
       disableAutoFocus
       disableRestoreFocus
+      aria-label={t('commandPalette.title')}
+      data-testid="command-palette"
       TransitionProps={{
         onEntered: () => inputRef.current?.focus(),
       }}
@@ -265,6 +281,14 @@ export default function CommandPalette() {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onKeyDown={handleKeyDown}
+        data-testid="command-palette.input"
+        inputProps={{
+          'aria-label': t('commandPalette.searchLabel'),
+          role: 'combobox',
+          'aria-expanded': hasResults,
+          'aria-controls': hasResults ? 'command-palette-listbox' : undefined,
+          'aria-activedescendant': commands[selectedIndex] ? `command-palette-option-${commands[selectedIndex].id}` : undefined,
+        }}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -281,20 +305,36 @@ export default function CommandPalette() {
         }}
       />
 
-      {commands.length === 0 ? (
+      {/* Live region for screen reader result count announcements */}
+      <Box
+        aria-live="polite"
+        aria-atomic="true"
+        sx={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }}
+      >
+        {query
+          ? t('commandPalette.resultCount', { count: commands.length })
+          : ''
+        }
+      </Box>
+
+      {!hasResults ? (
         <Box sx={{ p: 3, textAlign: 'center' }}>
           <Typography variant="body2" color="text.secondary">
             {t('commandPalette.noResults')}
           </Typography>
         </Box>
       ) : (
-        <List sx={{ overflow: 'auto', py: 0 }}>
+        <List sx={{ overflow: 'auto', py: 0 }} role="listbox" id="command-palette-listbox">
           {CATEGORY_ORDER.map((cat) => {
             const group = grouped.get(cat);
             if (!group || group.length === 0) return null;
+            const groupLabelId = `${uniqueId}-group-${cat}`;
             return (
-              <Box key={cat}>
+              <li key={cat} role="group" aria-labelledby={groupLabelId}>
                 <ListSubheader
+                  id={groupLabelId}
+                  component="div"
+                  role="presentation"
                   sx={{
                     lineHeight: '32px',
                     fontSize: '0.7rem',
@@ -305,27 +345,35 @@ export default function CommandPalette() {
                 >
                   {categoryLabel(cat)}
                 </ListSubheader>
-                {group.map((cmd) => {
-                  const idx = flatIndex++;
-                  return (
-                    <ListItem key={cmd.id} disablePadding>
-                      <ListItemButton
-                        tabIndex={-1}
-                        selected={idx === selectedIndex}
-                        onClick={() => execute(cmd)}
-                        onMouseEnter={() => setSelectedIndex(idx)}
-                        sx={{ py: 0.75 }}
+                <List disablePadding role="presentation">
+                  {group.map((cmd) => {
+                    const idx = flatIndexMap.get(cmd.id) ?? 0;
+                    return (
+                      <ListItem
+                        key={cmd.id}
+                        disablePadding
+                        role="option"
+                        id={`command-palette-option-${cmd.id}`}
+                        aria-selected={idx === selectedIndex}
                       >
-                        {cmd.icon && <ListItemIcon sx={{ minWidth: 36 }}>{cmd.icon}</ListItemIcon>}
-                        <ListItemText
-                          primary={cmd.label}
-                          primaryTypographyProps={{ fontSize: '0.875rem' }}
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  );
-                })}
-              </Box>
+                        <ListItemButton
+                          tabIndex={-1}
+                          selected={idx === selectedIndex}
+                          onClick={() => execute(cmd)}
+                          onMouseEnter={() => setSelectedIndex(idx)}
+                          sx={{ py: 0.75 }}
+                        >
+                          {cmd.icon && <ListItemIcon sx={{ minWidth: 36 }}>{cmd.icon}</ListItemIcon>}
+                          <ListItemText
+                            primary={cmd.label}
+                            primaryTypographyProps={{ fontSize: '0.875rem' }}
+                          />
+                        </ListItemButton>
+                      </ListItem>
+                    );
+                  })}
+                </List>
+              </li>
             );
           })}
         </List>

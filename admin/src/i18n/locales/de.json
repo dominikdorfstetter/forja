@@ -23,7 +23,9 @@
       "clone": "Klonen",
       "upload": "Hochladen",
       "preview": "Vorschau",
-      "viewDetails": "Details ansehen"
+      "viewDetails": "Details ansehen",
+      "clickToCopy": "Klicken zum Kopieren",
+      "copied": "Kopiert!"
     },
     "status": {
       "active": "Aktiv",
@@ -54,6 +56,9 @@
     "confirm": {
       "cannotBeUndone": "Dies kann nicht rückgängig gemacht werden.",
       "areYouSure": "Sind Sie sicher?"
+    },
+    "confirmDialog": {
+      "typeToConfirm": "Geben Sie \"{{word}}\" ein, um zu bestätigen"
     },
     "filters": {
       "all": "Alle",
@@ -188,7 +193,23 @@
       "admin": "Admin",
       "write": "Schreiben",
       "readOnly": "Nur lesen"
-    }
+    },
+    "contentOverview": "Inhaltsübersicht",
+    "chart": {
+      "noContent": "Noch keine Inhalte. Erstellen Sie Ihren ersten Blogbeitrag oder eine Seite."
+    },
+    "attention": {
+      "awaitingReview": "Auf Ihre Prüfung wartend",
+      "draftsToFinish": "Entwürfe fertigstellen",
+      "recentlyPublished": "Kürzlich veröffentlicht",
+      "noItemsReview": "Keine Elemente zur Prüfung ausstehend.",
+      "noItemsDrafts": "Alle Inhalte sind veröffentlicht oder in Prüfung.",
+      "noItemsPublished": "Noch keine veröffentlichten Inhalte.",
+      "viewAll": "Alle anzeigen"
+    },
+    "recentActivity": "Letzte Aktivitäten",
+    "recentActivityEmpty": "Noch keine Aktivitäten.",
+    "updatedAgo": "Aktualisiert vor {{time}}"
   },
   "myDrafts": {
     "title": "Meine Entwürfe",
@@ -235,8 +256,50 @@
       "title": "Blog löschen",
       "message": "Blog \"{{slug}}\" löschen? Dies kann nicht rückgängig gemacht werden."
     },
+    "publishDialog": {
+      "title": "Blog veröffentlichen?",
+      "message": "\"{{slug}}\" wird öffentlich sichtbar gemacht."
+    },
+    "unpublishDialog": {
+      "title": "Blog zurückziehen?",
+      "message": "\"{{slug}}\" wird aus der öffentlichen Ansicht entfernt und auf Entwurf zurückgesetzt."
+    },
+    "archiveDialog": {
+      "title": "Blog archivieren?",
+      "message": "Dies archiviert \"{{slug}}\" und verschiebt ihn in die Archivansicht."
+    },
+    "restoreDialog": {
+      "title": "Blog wiederherstellen?",
+      "message": "Dies stellt \"{{slug}}\" als Entwurf wieder her."
+    },
+    "tabs": {
+      "active": "Aktiv",
+      "archived": "Archiviert"
+    },
     "moreActions": "Mehr",
-    "searchPlaceholder": "Nach ID, Slug oder Autor suchen..."
+    "searchPlaceholder": "Nach ID, Slug oder Autor suchen...",
+    "wizard": {
+      "title": "Blog erstellen",
+      "steps": {
+        "method": "Methode",
+        "details": "Details"
+      },
+      "methods": {
+        "scratch": "Von Grund auf",
+        "scratchDesc": "Mit einem leeren Blogbeitrag beginnen",
+        "template": "Aus Vorlage",
+        "templateDesc": "Eine vorgefertigte Inhaltsvorlage verwenden",
+        "import": "Markdown importieren",
+        "importDesc": "Inhalt aus einer .md-Datei importieren"
+      },
+      "fields": {
+        "slug": "Slug",
+        "slugHint": "URL-freundlicher Bezeichner (z.B. mein-erster-beitrag)",
+        "author": "Autor"
+      },
+      "creating": "Wird erstellt...",
+      "create": "Blog erstellen"
+    }
   },
   "blogDetail": {
     "title": "Blog-Details",
@@ -289,7 +352,13 @@
       "readingTime": "Lesezeit",
       "manualOverride": "Manuelle Eingabe",
       "autoCalculated": "Automatisch aus Inhalt berechnet",
-      "resetAuto": "Auf automatische Berechnung zurücksetzen"
+      "resetAuto": "Auf automatische Berechnung zurücksetzen",
+      "info": "Metadaten",
+      "blogId": "Blog-ID",
+      "contentId": "Inhalts-ID",
+      "publishedAt": "Veröffentlicht am",
+      "createdAt": "Erstellt",
+      "updatedAt": "Zuletzt aktualisiert"
     },
     "images": {
       "title": "Bilder",
@@ -368,6 +437,26 @@
     "deleteDialog": {
       "title": "Seite löschen",
       "message": "Seite \"{{route}}\" löschen? Dies kann nicht rückgängig gemacht werden."
+    },
+    "publishDialog": {
+      "title": "Seite veröffentlichen?",
+      "message": "\"{{route}}\" wird öffentlich sichtbar gemacht."
+    },
+    "unpublishDialog": {
+      "title": "Seite zurückziehen?",
+      "message": "\"{{route}}\" wird aus der öffentlichen Ansicht entfernt und auf Entwurf zurückgesetzt."
+    },
+    "archiveDialog": {
+      "title": "Seite archivieren?",
+      "message": "Dies archiviert \"{{route}}\" und verschiebt sie in die Archivansicht."
+    },
+    "restoreDialog": {
+      "title": "Seite wiederherstellen?",
+      "message": "Dies stellt \"{{route}}\" als Entwurf wieder her."
+    },
+    "tabs": {
+      "active": "Aktiv",
+      "archived": "Archiviert"
     },
     "wizard": {
       "steps": {
@@ -512,6 +601,10 @@
       "title": "Medium löschen",
       "message": "\"{{filename}}\" löschen? Dies kann nicht rückgängig gemacht werden."
     },
+    "deleteFolderDialog": {
+      "title": "Ordner löschen?",
+      "message": "Dieser Ordner wird endgültig gelöscht und seine Dateien werden in die Stammebene verschoben."
+    },
     "upload": {
       "dragDrop": "Dateien hier ablegen oder klicken zum Durchsuchen",
       "uploading": "Wird hochgeladen...",
@@ -550,6 +643,10 @@
     "deleteDialog": {
       "title": "Dokument löschen",
       "message": "Dokument \"{{title}}\" löschen? Dies kann nicht rückgängig gemacht werden."
+    },
+    "deleteFolderDialog": {
+      "title": "Ordner löschen?",
+      "message": "Dieser Ordner wird endgültig gelöscht und seine Dokumente werden in die Stammebene verschoben."
     }
   },
   "navigation": {
@@ -861,7 +958,8 @@
     },
     "revokeDialog": {
       "title": "API Key widerrufen",
-      "message": "Möchten Sie \"{{name}}\" wirklich widerrufen? Dies ist dauerhaft und kann nicht rückgängig gemacht werden."
+      "message": "Möchten Sie \"{{name}}\" wirklich widerrufen? Dies ist dauerhaft und kann nicht rückgängig gemacht werden.",
+      "confirmWord": "Widerrufen"
     },
     "deleteDialog": {
       "title": "API Key löschen",
@@ -1689,7 +1787,10 @@
       "backToBlogs": "Zurück zur Blog-Liste",
       "backToPages": "Zurück zur Seitenliste"
     },
-    "hint": "⌘K"
+    "open": "Befehlspalette öffnen",
+    "searchLabel": "Befehle suchen",
+    "title": "Befehlspalette",
+    "resultCount": "{{count}} Ergebnisse verfügbar"
   },
   "languages": {
     "en": "English",
@@ -1710,7 +1811,23 @@
     "submittedForReview": "Inhalt zur Überprüfung eingereicht",
     "approved": "Inhalt genehmigt",
     "changesRequested": "Änderungen angefordert",
-    "cannotPublish": "Der redaktionelle Workflow ist aktiviert. Reichen Sie Inhalte zur Überprüfung ein, um sie zu veröffentlichen."
+    "cannotPublish": "Der redaktionelle Workflow ist aktiviert. Reichen Sie Inhalte zur Überprüfung ein, um sie zu veröffentlichen.",
+    "publish": "Veröffentlichen",
+    "unpublish": "Zurückziehen",
+    "archive": "Archivieren",
+    "restore": "Wiederherstellen",
+    "restoreAsDraft": "Als Entwurf wiederherstellen"
+  },
+  "approveDialog": {
+    "title": "Inhalt genehmigen",
+    "message": "Wählen Sie, wie dieser Inhalt veröffentlicht werden soll.",
+    "publishNow": "Jetzt veröffentlichen",
+    "schedule": "Planen",
+    "selectDate": "Veröffentlichungsdatum wählen"
+  },
+  "restoreDialog": {
+    "restore": "Wiederherstellen",
+    "restoreAsDraft": "Als Entwurf wiederherstellen"
   },
   "notifications": {
     "title": "Benachrichtigungen",
@@ -1740,11 +1857,29 @@
     "selectedCount": "{{count}} ausgewählt",
     "publish": "Veröffentlichen",
     "unpublish": "Zurückziehen",
+    "archive": "Archivieren",
+    "restore": "Wiederherstellen",
     "delete": "Löschen",
     "clearSelection": "Auswahl aufheben",
     "deleteDialog": {
       "title": "Ausgewählte Elemente löschen",
       "message": "{{count}} ausgewählte Elemente löschen? Dies kann nicht rückgängig gemacht werden."
+    },
+    "publishDialog": {
+      "title": "Ausgewählte Elemente veröffentlichen?",
+      "message": "{{count}} Element(e) werden veröffentlicht und öffentlich sichtbar gemacht."
+    },
+    "unpublishDialog": {
+      "title": "Ausgewählte Elemente zurückziehen?",
+      "message": "{{count}} Element(e) werden zurückgezogen und auf Entwurf zurückgesetzt."
+    },
+    "archiveDialog": {
+      "title": "Ausgewählte Elemente archivieren?",
+      "message": "Dies archiviert {{count}} Element(e) und verschiebt sie in die Archivansicht."
+    },
+    "restoreDialog": {
+      "title": "Ausgewählte Elemente wiederherstellen?",
+      "message": "Dies stellt {{count}} Element(e) als Entwurf wieder her."
     },
     "messages": {
       "success": "{{count}} Elemente erfolgreich aktualisiert",
@@ -1752,8 +1887,8 @@
     }
   },
   "contentTemplates": {
-    "title": "Inhaltsvorlagen",
-    "subtitle": "Wiederverwendbare Inhaltsvorlagen verwalten",
+    "title": "Blog-Vorlagen",
+    "subtitle": "Wiederverwendbare Vorlagen für Blogbeiträge verwalten",
     "addTemplate": "Vorlage hinzufügen",
     "table": {
       "name": "Name",
@@ -1777,6 +1912,22 @@
     "deleteDialog": {
       "title": "Vorlage löschen",
       "message": "Vorlage \"{{name}}\" löschen? Dies kann nicht rückgängig gemacht werden."
+    },
+    "wizard": {
+      "title": "Vorlage erstellen",
+      "steps": {
+        "method": "Methode",
+        "details": "Details"
+      },
+      "methods": {
+        "scratch": "Von Grund auf",
+        "scratchDesc": "Mit einer leeren Vorlage beginnen",
+        "template": "Von Vorlage",
+        "templateDesc": "Eine integrierte Vorlage als Ausgangspunkt verwenden",
+        "import": "Markdown importieren",
+        "importDesc": "Inhalt aus einer .md-Datei importieren"
+      },
+      "slugPrefixHint": "URL-Präfix für Blogs, die mit dieser Vorlage erstellt werden"
     }
   },
   "templates": {

@@ -260,7 +260,7 @@ export default function DocumentFormDialog({
   );
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="document-form-title">
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="document-form-title" data-testid="document-form.dialog">
       <form onSubmit={handleSubmit(onFormSubmit)}>
         <DialogTitle id="document-form-title">
           {isEditing ? t('forms.document.editTitle') : t('forms.document.createTitle')}
@@ -452,10 +452,10 @@ export default function DocumentFormDialog({
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose} disabled={loading}>
+          <Button onClick={onClose} disabled={loading} data-testid="document-form.btn.cancel">
             {t('common.actions.cancel')}
           </Button>
-          <Button type="submit" variant="contained" disabled={loading || !isValid}>
+          <Button type="submit" variant="contained" disabled={loading || !isValid} data-testid="document-form.btn.submit">
             {loading ? t('common.actions.saving') : isEditing ? t('common.actions.save') : t('common.actions.create')}
           </Button>
         </DialogActions>

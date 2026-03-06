@@ -23,7 +23,9 @@
       "clone": "Clonar",
       "upload": "Enviar",
       "preview": "Pré-visualização",
-      "viewDetails": "Ver detalhes"
+      "viewDetails": "Ver detalhes",
+      "clickToCopy": "Clique para copiar",
+      "copied": "Copiado!"
     },
     "status": {
       "active": "Ativo",
@@ -54,6 +56,9 @@
     "confirm": {
       "cannotBeUndone": "Esta ação não pode ser revertida.",
       "areYouSure": "Tem a certeza?"
+    },
+    "confirmDialog": {
+      "typeToConfirm": "Digite \"{{word}}\" para confirmar"
     },
     "filters": {
       "all": "Todos",
@@ -188,7 +193,23 @@
       "admin": "Admin",
       "write": "Escrita",
       "readOnly": "Apenas leitura"
-    }
+    },
+    "contentOverview": "Visão geral do conteúdo",
+    "chart": {
+      "noContent": "Ainda sem conteúdo. Crie o seu primeiro artigo de blogue ou página."
+    },
+    "attention": {
+      "awaitingReview": "A aguardar a sua revisão",
+      "draftsToFinish": "Rascunhos por terminar",
+      "recentlyPublished": "Publicados recentemente",
+      "noItemsReview": "Nenhum item a aguardar revisão.",
+      "noItemsDrafts": "Todo o conteúdo está publicado ou em revisão.",
+      "noItemsPublished": "Ainda sem conteúdo publicado.",
+      "viewAll": "Ver todos"
+    },
+    "recentActivity": "Atividade recente",
+    "recentActivityEmpty": "Ainda sem atividade recente.",
+    "updatedAgo": "Atualizado há {{time}}"
   },
   "myDrafts": {
     "title": "Meus rascunhos",
@@ -235,8 +256,50 @@
       "title": "Eliminar Blogue",
       "message": "Eliminar o blogue \"{{slug}}\"? Esta ação não pode ser revertida."
     },
+    "publishDialog": {
+      "title": "Publicar blog?",
+      "message": "\"{{slug}}\" ficará visível publicamente."
+    },
+    "unpublishDialog": {
+      "title": "Despublicar blog?",
+      "message": "\"{{slug}}\" será removido da visualização pública e voltará a rascunho."
+    },
+    "archiveDialog": {
+      "title": "Arquivar blog?",
+      "message": "Isso arquivará \"{{slug}}\" e o moverá para a visualização de arquivo."
+    },
+    "restoreDialog": {
+      "title": "Restaurar blog?",
+      "message": "Isso restaurará \"{{slug}}\" para o status de rascunho."
+    },
+    "tabs": {
+      "active": "Ativos",
+      "archived": "Arquivados"
+    },
     "moreActions": "Mais",
-    "searchPlaceholder": "Pesquisar por ID, slug ou autor..."
+    "searchPlaceholder": "Pesquisar por ID, slug ou autor...",
+    "wizard": {
+      "title": "Criar Blog",
+      "steps": {
+        "method": "Método",
+        "details": "Detalhes"
+      },
+      "methods": {
+        "scratch": "Do zero",
+        "scratchDesc": "Começar com uma postagem em branco",
+        "template": "A partir de modelo",
+        "templateDesc": "Usar um modelo de conteúdo pré-definido",
+        "import": "Importar Markdown",
+        "importDesc": "Importar conteúdo de um arquivo .md"
+      },
+      "fields": {
+        "slug": "Slug",
+        "slugHint": "Identificador amigável para URL (ex. meu-primeiro-post)",
+        "author": "Autor"
+      },
+      "creating": "Criando...",
+      "create": "Criar Blog"
+    }
   },
   "blogDetail": {
     "title": "Detalhes do Blogue",
@@ -289,7 +352,13 @@
       "readingTime": "Tempo de leitura",
       "manualOverride": "Substituição manual",
       "autoCalculated": "Calculado automaticamente a partir do conteúdo",
-      "resetAuto": "Redefinir para cálculo automático"
+      "resetAuto": "Redefinir para cálculo automático",
+      "info": "Metadados",
+      "blogId": "ID do blog",
+      "contentId": "ID do conteúdo",
+      "publishedAt": "Publicado em",
+      "createdAt": "Criado",
+      "updatedAt": "Última atualização"
     },
     "images": {
       "title": "Imagens",
@@ -368,6 +437,26 @@
     "deleteDialog": {
       "title": "Eliminar Página",
       "message": "Eliminar a página \"{{route}}\"? Esta ação não pode ser revertida."
+    },
+    "publishDialog": {
+      "title": "Publicar página?",
+      "message": "\"{{route}}\" ficará visível publicamente."
+    },
+    "unpublishDialog": {
+      "title": "Despublicar página?",
+      "message": "\"{{route}}\" será removida da visualização pública e voltará a rascunho."
+    },
+    "archiveDialog": {
+      "title": "Arquivar página?",
+      "message": "Isso arquivará \"{{route}}\" e a moverá para a visualização de arquivo."
+    },
+    "restoreDialog": {
+      "title": "Restaurar página?",
+      "message": "Isso restaurará \"{{route}}\" para o status de rascunho."
+    },
+    "tabs": {
+      "active": "Ativas",
+      "archived": "Arquivadas"
     },
     "wizard": {
       "steps": {
@@ -512,6 +601,10 @@
       "title": "Eliminar Média",
       "message": "Eliminar \"{{filename}}\"? Esta ação não pode ser revertida."
     },
+    "deleteFolderDialog": {
+      "title": "Excluir pasta?",
+      "message": "Esta pasta será excluída permanentemente e seus arquivos serão movidos para o nível raiz."
+    },
     "upload": {
       "dragDrop": "Arraste e solte arquivos aqui, ou clique para procurar",
       "uploading": "Enviando...",
@@ -550,6 +643,10 @@
     "deleteDialog": {
       "title": "Eliminar Documento",
       "message": "Eliminar o documento \"{{title}}\"? Esta ação não pode ser revertida."
+    },
+    "deleteFolderDialog": {
+      "title": "Excluir pasta?",
+      "message": "Esta pasta será excluída permanentemente e seus documentos serão movidos para o nível raiz."
     }
   },
   "navigation": {
@@ -861,7 +958,8 @@
     },
     "revokeDialog": {
       "title": "Revogar Chave API",
-      "message": "Tem a certeza que pretende revogar \"{{name}}\"? Esta ação é permanente e não pode ser revertida."
+      "message": "Tem a certeza que pretende revogar \"{{name}}\"? Esta ação é permanente e não pode ser revertida.",
+      "confirmWord": "Revogar"
     },
     "deleteDialog": {
       "title": "Eliminar Chave API",
@@ -1689,7 +1787,10 @@
       "backToBlogs": "Voltar à lista de blogs",
       "backToPages": "Voltar à lista de páginas"
     },
-    "hint": "⌘K"
+    "open": "Abrir paleta de comandos",
+    "searchLabel": "Pesquisar comandos",
+    "title": "Paleta de comandos",
+    "resultCount": "{{count}} resultados disponíveis"
   },
   "languages": {
     "en": "English",
@@ -1710,7 +1811,23 @@
     "submittedForReview": "Conteúdo enviado para revisão",
     "approved": "Conteúdo aprovado",
     "changesRequested": "Alterações solicitadas",
-    "cannotPublish": "O fluxo editorial está ativado. Envie o conteúdo para revisão para publicá-lo."
+    "cannotPublish": "O fluxo editorial está ativado. Envie o conteúdo para revisão para publicá-lo.",
+    "publish": "Publicar",
+    "unpublish": "Despublicar",
+    "archive": "Arquivar",
+    "restore": "Restaurar",
+    "restoreAsDraft": "Restaurar como rascunho"
+  },
+  "approveDialog": {
+    "title": "Aprovar conteúdo",
+    "message": "Escolha como publicar este conteúdo.",
+    "publishNow": "Publicar agora",
+    "schedule": "Agendar",
+    "selectDate": "Selecionar data de publicação"
+  },
+  "restoreDialog": {
+    "restore": "Restaurar",
+    "restoreAsDraft": "Restaurar como rascunho"
   },
   "notifications": {
     "title": "Notificações",
@@ -1740,11 +1857,29 @@
     "selectedCount": "{{count}} selecionados",
     "publish": "Publicar",
     "unpublish": "Despublicar",
+    "archive": "Arquivar",
+    "restore": "Restaurar",
     "delete": "Excluir",
     "clearSelection": "Limpar seleção",
     "deleteDialog": {
       "title": "Excluir itens selecionados",
       "message": "Excluir {{count}} itens selecionados? Esta ação não pode ser desfeita."
+    },
+    "publishDialog": {
+      "title": "Publicar itens selecionados?",
+      "message": "{{count}} item(ns) serão publicados e ficarão visíveis publicamente."
+    },
+    "unpublishDialog": {
+      "title": "Despublicar itens selecionados?",
+      "message": "{{count}} item(ns) serão despublicados e voltarão a rascunho."
+    },
+    "archiveDialog": {
+      "title": "Arquivar itens selecionados?",
+      "message": "Isso arquivará {{count}} item(ns) e os moverá para a visualização de arquivo."
+    },
+    "restoreDialog": {
+      "title": "Restaurar itens selecionados?",
+      "message": "Isso restaurará {{count}} item(ns) para o status de rascunho."
     },
     "messages": {
       "success": "{{count}} itens atualizados com sucesso",
@@ -1752,8 +1887,8 @@
     }
   },
   "contentTemplates": {
-    "title": "Modelos de conteúdo",
-    "subtitle": "Gerir modelos de conteúdo reutilizáveis",
+    "title": "Modelos de blog",
+    "subtitle": "Gerir modelos reutilizáveis para publicações de blog",
     "addTemplate": "Adicionar modelo",
     "table": {
       "name": "Nome",
@@ -1777,6 +1912,22 @@
     "deleteDialog": {
       "title": "Eliminar modelo",
       "message": "Eliminar o modelo \"{{name}}\"? Esta ação não pode ser desfeita."
+    },
+    "wizard": {
+      "title": "Criar modelo",
+      "steps": {
+        "method": "Método",
+        "details": "Detalhes"
+      },
+      "methods": {
+        "scratch": "Do zero",
+        "scratchDesc": "Começar com um modelo em branco",
+        "template": "De modelo",
+        "templateDesc": "Usar um modelo integrado como ponto de partida",
+        "import": "Importar Markdown",
+        "importDesc": "Importar conteúdo de um ficheiro .md"
+      },
+      "slugPrefixHint": "Prefixo de URL para blogs criados a partir deste modelo"
     }
   },
   "templates": {

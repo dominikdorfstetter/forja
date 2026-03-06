@@ -66,7 +66,7 @@ export default function SocialLinkFormDialog({ open, siteId, link, onSubmit, onC
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="social-link-form-title">
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="social-link-form-title" data-testid="social-link-form.dialog">
       <form onSubmit={handleSubmit(onFormSubmit)}>
         <DialogTitle id="social-link-form-title">{link ? t('forms.socialLink.editTitle') : t('forms.socialLink.createTitle')}</DialogTitle>
         <DialogContent>
@@ -79,8 +79,8 @@ export default function SocialLinkFormDialog({ open, siteId, link, onSubmit, onC
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose} disabled={loading}>{t('common.actions.cancel')}</Button>
-          <Button type="submit" variant="contained" disabled={loading || !isValid}>
+          <Button onClick={onClose} disabled={loading} data-testid="social-link-form.btn.cancel">{t('common.actions.cancel')}</Button>
+          <Button type="submit" variant="contained" disabled={loading || !isValid} data-testid="social-link-form.btn.submit">
             {loading ? t('common.actions.saving') : (link ? t('common.actions.save') : t('common.actions.create'))}
           </Button>
         </DialogActions>

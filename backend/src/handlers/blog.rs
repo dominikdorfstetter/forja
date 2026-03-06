@@ -43,6 +43,8 @@ use crate::AppState;
 
 const DEFAULT_FEATURED_LIMIT: i64 = 5;
 const MAX_FEATURED_LIMIT: i64 = 20;
+const DEFAULT_SIMILAR_LIMIT: i64 = 3;
+const MAX_SIMILAR_LIMIT: i64 = 10;
 const RSS_MAX_ITEMS: i64 = 50;
 const RSS_BODY_TRUNCATE_LEN: usize = 500;
 
@@ -72,7 +74,8 @@ impl<'r> Responder<'r, 'static> for RssResponse {
         ("search" = Option<String>, Query, description = "Search by ID, slug, or author (ILIKE)"),
         ("status" = Option<String>, Query, description = "Filter by status"),
         ("sort_by" = Option<String>, Query, description = "Sort column: slug, author, published_date, status, created_at"),
-        ("sort_dir" = Option<String>, Query, description = "Sort direction: asc or desc")
+        ("sort_dir" = Option<String>, Query, description = "Sort direction: asc or desc"),
+        ("exclude_status" = Option<String>, Query, description = "Exclude items with this status (e.g. Archived)")
     ),
     responses(
         (status = 200, description = "Paginated blog list", body = PaginatedBlogs),
@@ -81,7 +84,7 @@ impl<'r> Responder<'r, 'static> for RssResponse {
     ),
     security(("api_key" = []))
 )]
-#[get("/sites/<site_id>/blogs?<page>&<per_page>&<search>&<status>&<sort_by>&<sort_dir>")]
+#[get("/sites/<site_id>/blogs?<page>&<per_page>&<search>&<status>&<sort_by>&<sort_dir>&<exclude_status>")]
 pub async fn list_blogs(
     state: &State<AppState>,
     site_id: Uuid,
@@ -91,6 +94,7 @@ pub async fn list_blogs(
     status: Option<String>,
     sort_by: Option<String>,
     sort_dir: Option<String>,
+    exclude_status: Option<String>,
     auth: ReadKey,
 ) -> Result<Json<PaginatedBlogs>, ApiError> {
     auth.0
@@ -99,17 +103,19 @@ pub async fn list_blogs(
     let params = PaginationParams::new(page, per_page);
     let (limit, offset) = params.limit_offset();
 
-    let has_filters = search.is_some() || status.is_some() || sort_by.is_some() || sort_dir.is_some();
+    let has_filters = search.is_some() || status.is_some() || sort_by.is_some() || sort_dir.is_some() || exclude_status.is_some();
 
     let (blogs, total) = if has_filters {
         let blogs = Blog::find_all_for_site_filtered(
             &state.db, site_id, limit, offset,
             search.as_deref(), status.as_deref(),
             sort_by.as_deref(), sort_dir.as_deref(),
+            exclude_status.as_deref(),
         ).await?;
         let total = Blog::count_for_site_filtered(
             &state.db, site_id,
             search.as_deref(), status.as_deref(),
+            exclude_status.as_deref(),
         ).await?;
         (blogs, total)
     } else {
@@ -239,6 +245,46 @@ pub async fn list_featured_blogs(
         .unwrap_or(DEFAULT_FEATURED_LIMIT)
         .min(MAX_FEATURED_LIMIT);
     let blogs = Blog::find_featured_for_site(&state.db, site_id, limit).await?;
+    let items: Vec<BlogListItem> = blogs.into_iter().map(BlogListItem::from).collect();
+    Ok(Json(items))
+}
+
+/// List similar blogs for a given blog post
+#[utoipa::path(
+    tag = "Blogs",
+    operation_id = "list_similar_blogs",
+    description = "Get similar blogs ranked by taxonomy overlap (shared tags, categories) and author",
+    params(
+        ("site_id" = Uuid, Path, description = "Site UUID"),
+        ("id" = Uuid, Path, description = "Source blog UUID"),
+        ("limit" = Option<i64>, Query, description = "Max results (default 3, max 10)")
+    ),
+    responses(
+        (status = 200, description = "Similar blogs", body = Vec<BlogListItem>),
+        (status = 401, description = "Unauthorized", body = ProblemDetails),
+        (status = 403, description = "Forbidden", body = ProblemDetails),
+        (status = 404, description = "Source blog not found", body = ProblemDetails)
+    ),
+    security(("api_key" = []))
+)]
+#[get("/sites/<site_id>/blogs/<id>/similar?<limit>")]
+pub async fn list_similar_blogs(
+    state: &State<AppState>,
+    site_id: Uuid,
+    id: Uuid,
+    limit: Option<i64>,
+    auth: ReadKey,
+) -> Result<Json<Vec<BlogListItem>>, ApiError> {
+    auth.0
+        .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)
+        .await?;
+    // Verify source blog exists
+    Blog::find_by_id(&state.db, id).await?;
+    let limit = limit
+        .unwrap_or(DEFAULT_SIMILAR_LIMIT)
+        .max(1)
+        .min(MAX_SIMILAR_LIMIT);
+    let blogs = Blog::find_similar(&state.db, id, site_id, limit).await?;
     let items: Vec<BlogListItem> = blogs.into_iter().map(BlogListItem::from).collect();
     Ok(Json(items))
 }
@@ -1040,6 +1086,7 @@ pub fn routes() -> Vec<Route> {
         list_published_blogs,
         list_published_blogs_by_category,
         list_featured_blogs,
+        list_similar_blogs,
         get_blog,
         get_blog_by_slug,
         create_blog,
@@ -1064,6 +1111,6 @@ mod tests {
     #[test]
     fn test_routes_count() {
         let routes = routes();
-        assert_eq!(routes.len(), 18, "Should have 18 blog routes");
+        assert_eq!(routes.len(), 19, "Should have 19 blog routes");
     }
 }

@@ -137,7 +137,7 @@ export default function ForjaEditor({
   };
 
   return (
-    <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
+    <Paper variant="outlined" sx={{ overflow: 'hidden' }} data-testid="forja-editor">
       <EditorToolbar editor={editor} />
       <Box
         sx={{

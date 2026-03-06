@@ -140,6 +140,7 @@ function DocumentsPage({ embedded = false, ref }: { embedded?: boolean; ref?: Re
   const [formOpen, setFormOpen] = useState(false);
   const [editingDocument, setEditingDocument] = useState<DocumentResponse | null>(null);
   const [deletingDocument, setDeletingDocument] = useState<DocumentListItem | null>(null);
+  const [deletingFolderId, setDeletingFolderId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeId, setActiveId] = useState<string | null>(null);
 
@@ -459,7 +460,7 @@ function DocumentsPage({ embedded = false, ref }: { embedded?: boolean; ref?: Re
     createDocumentMutation.isPending || updateDocumentMutation.isPending;
 
   return (
-    <Box>
+    <Box data-testid="documents.page">
       {!embedded && (
         <PageHeader
           title={t('documents.title')}
@@ -513,7 +514,7 @@ function DocumentsPage({ embedded = false, ref }: { embedded?: boolean; ref?: Re
                 onSelectFolder={(id) => { setSelectedFolderId(id); setPage(1); }}
                 onCreateFolder={(name, parentId) => createFolderMutation.mutate({ name, parentId })}
                 onRenameFolder={(id, name) => renameFolderMutation.mutate({ id, name })}
-                onDeleteFolder={(id) => deleteFolderMutation.mutate(id)}
+                onDeleteFolder={(id) => setDeletingFolderId(id)}
                 canWrite={canWrite}
                 droppable={canWrite}
               />
@@ -754,6 +755,16 @@ function DocumentsPage({ embedded = false, ref }: { embedded?: boolean; ref?: Re
         onConfirm={() => deletingDocument && deleteDocumentMutation.mutate(deletingDocument.id)}
         onCancel={() => setDeletingDocument(null)}
         loading={deleteDocumentMutation.isPending}
+        confirmationText={t('common.actions.delete')}
+      />
+      <ConfirmDialog
+        open={!!deletingFolderId}
+        title={t('documents.deleteFolderDialog.title')}
+        message={t('documents.deleteFolderDialog.message')}
+        confirmLabel={t('common.actions.delete')}
+        onConfirm={() => { if (deletingFolderId) { deleteFolderMutation.mutate(deletingFolderId); setDeletingFolderId(null); } }}
+        onCancel={() => setDeletingFolderId(null)}
+        confirmationText={t('common.actions.delete')}
       />
     </Box>
   );

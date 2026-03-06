@@ -67,7 +67,7 @@ export default function LegalDocumentFormDialog({ open, siteId: _siteId, documen
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="legal-form-title">
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="legal-form-title" data-testid="legal-document-form.dialog">
       <form onSubmit={handleSubmit(onFormSubmit)}>
         <DialogTitle id="legal-form-title">{document ? t('forms.legal.editTitle') : t('forms.legal.createTitle')}</DialogTitle>
         <DialogContent>
@@ -103,8 +103,8 @@ export default function LegalDocumentFormDialog({ open, siteId: _siteId, documen
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose} disabled={loading}>{t('common.actions.cancel')}</Button>
-          <Button type="submit" variant="contained" disabled={loading || !isValid}>{loading ? t('common.actions.saving') : (document ? t('common.actions.save') : t('common.actions.create'))}</Button>
+          <Button onClick={onClose} disabled={loading} data-testid="legal-document-form.btn.cancel">{t('common.actions.cancel')}</Button>
+          <Button type="submit" variant="contained" disabled={loading || !isValid} data-testid="legal-document-form.btn.submit">{loading ? t('common.actions.saving') : (document ? t('common.actions.save') : t('common.actions.create'))}</Button>
         </DialogActions>
       </form>
     </Dialog>

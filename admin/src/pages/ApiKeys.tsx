@@ -145,7 +145,7 @@ export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
   if (error) return <Alert severity="error">{t('apiKeys.loadError')}</Alert>;
 
   return (
-    <Box>
+    <Box data-testid="api-keys.page">
       {!embedded && (
         <PageHeader
           title={t('apiKeys.title')}
@@ -291,6 +291,7 @@ export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
         onConfirm={() => revokingKey && revokeMutation.mutate(revokingKey.id)}
         onCancel={() => setRevokingKey(null)}
         loading={revokeMutation.isPending}
+        confirmationText={t('apiKeys.revokeDialog.confirmWord')}
       />
 
       <ConfirmDialog
@@ -301,6 +302,7 @@ export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
         onConfirm={() => deletingKey && deleteMutation.mutate(deletingKey.id)}
         onCancel={() => setDeletingKey(null)}
         loading={deleteMutation.isPending}
+        confirmationText={t('common.actions.delete')}
       />
 
       <ApiKeyUsageDialog

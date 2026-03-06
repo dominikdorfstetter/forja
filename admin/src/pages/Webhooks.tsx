@@ -115,7 +115,7 @@ export default function WebhooksPage() {
   ];
 
   return (
-    <Box>
+    <Box data-testid="webhooks.page">
       <PageHeader
         title={t('webhooks.title')}
         subtitle={t('webhooks.subtitle')}
@@ -147,7 +147,7 @@ export default function WebhooksPage() {
 
       <WebhookFormDialog open={formOpen} onSubmitCreate={(data) => createMutation.mutate(data)} onClose={closeForm} loading={createMutation.isPending} />
       <WebhookFormDialog open={!!editing} webhook={editing} onSubmitUpdate={(data) => editing && updateMutation.mutate({ id: editing.id, data })} onClose={closeEdit} loading={updateMutation.isPending} />
-      <ConfirmDialog open={!!deleting} title={t('webhooks.deleteDialog.title')} message={t('webhooks.deleteDialog.message', { url: deleting?.url })} confirmLabel={t('common.actions.delete')} onConfirm={() => deleting && deleteMutation.mutate(deleting.id)} onCancel={closeDelete} loading={deleteMutation.isPending} />
+      <ConfirmDialog open={!!deleting} title={t('webhooks.deleteDialog.title')} message={t('webhooks.deleteDialog.message', { url: deleting?.url })} confirmLabel={t('common.actions.delete')} onConfirm={() => deleting && deleteMutation.mutate(deleting.id)} onCancel={closeDelete} loading={deleteMutation.isPending} confirmationText={t('common.actions.delete')} />
       <WebhookDeliveryLog open={!!deliveryWebhookId} webhookId={deliveryWebhookId} onClose={() => setDeliveryWebhookId(null)} />
     </Box>
   );

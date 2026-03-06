@@ -30,7 +30,6 @@ import LanguageIcon from '@mui/icons-material/Language';
 import SettingsIcon from '@mui/icons-material/Settings';
 import WebhookIcon from '@mui/icons-material/Webhook';
 import AltRouteIcon from '@mui/icons-material/AltRoute';
-import ViewQuiltIcon from '@mui/icons-material/ViewQuilt';
 import IntegrationInstructionsIcon from '@mui/icons-material/IntegrationInstructions';
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -44,6 +43,10 @@ import { useNavigationGuardContext } from '@/store/NavigationGuardContext';
 import { CommandPalette } from '@/components/command-palette';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import ErrorBoundary from '@/components/shared/ErrorBoundary';
+
+const isMac = typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+const modifierKey = isMac ? '⌘' : 'Ctrl+';
+const shortcutLabel = `${modifierKey}K`;
 
 const drawerWidth = 240;
 const collapsedWidth = 64;
@@ -143,7 +146,6 @@ export default function Layout() {
       items: [
         { text: t('layout.sidebar.blogs'), icon: <ArticleIcon />, path: '/blogs' },
         { text: t('layout.sidebar.pages'), icon: <DescriptionIcon />, path: '/pages' },
-        { text: t('layout.sidebar.contentTemplates'), icon: <ViewQuiltIcon />, path: '/content-templates' },
         { text: t('layout.sidebar.assets'), icon: <PermMediaIcon />, path: '/media' },
         { text: t('layout.sidebar.cv'), icon: <WorkIcon />, path: '/cv' },
       ],
@@ -206,6 +208,8 @@ export default function Layout() {
               value={selectedSiteId}
               onChange={(e) => setSelectedSiteId(e.target.value)}
               disabled={!!authSiteId}
+              data-testid="layout.btn.site-selector"
+              inputProps={{ 'aria-label': t('layout.toolbar.siteSelector') }}
               sx={{
                 mx: 3,
                 minWidth: 180,
@@ -242,16 +246,18 @@ export default function Layout() {
 
           <Box sx={{ flexGrow: 1 }} />
 
-          <Tooltip title={t('commandPalette.hint')}>
+          <Tooltip title={shortcutLabel}>
             <IconButton
               color="inherit"
+              aria-label={t('commandPalette.open')}
+              data-testid="layout.btn.search"
               onClick={() => {
-                window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }));
+                window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: isMac, ctrlKey: !isMac }));
               }}
             >
               <SearchIcon />
               <Chip
-                label="⌘K"
+                label={shortcutLabel}
                 size="small"
                 sx={{
                   ml: 0.5,
@@ -270,7 +276,13 @@ export default function Layout() {
 
           <Box sx={{ flexGrow: 0, ml: 1.5 }}>
             <Tooltip title={t('layout.toolbar.account')}>
-              <IconButton onClick={(e) => setAnchorElUser(e.currentTarget)} sx={{ p: 0 }}>
+              <IconButton
+                onClick={(e) => setAnchorElUser(e.currentTarget)}
+                aria-haspopup="true"
+                aria-expanded={Boolean(anchorElUser)}
+                data-testid="layout.btn.user-menu"
+                sx={{ p: 0 }}
+              >
                 <Avatar alt={userFullName || 'User'} src={userImageUrl || undefined} sx={{ width: 32, height: 32 }} />
               </IconButton>
             </Tooltip>
@@ -318,15 +330,19 @@ export default function Layout() {
           {open ? (
             <>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography variant="h6" component="span" sx={{ fontSize: '1.3rem' }}>
-                  🔨
-                </Typography>
+                <Box
+                  component="img"
+                  src={`${import.meta.env.BASE_URL}icons/forja-icon.svg`}
+                  alt=""
+                  sx={{ width: 28, height: 28 }}
+                />
                 <Typography variant="h6" component="div" fontWeight={700} noWrap>
                   {t('common.appName')}
                 </Typography>
               </Box>
               <IconButton
                 aria-label={t('layout.toolbar.toggleDrawer')}
+                data-testid="layout.btn.toggle-sidebar"
                 onClick={() => setOpen(false)}
                 size="small"
               >
@@ -337,12 +353,16 @@ export default function Layout() {
             <Tooltip title={t('common.appName')} placement="right" arrow>
               <IconButton
                 aria-label={t('layout.toolbar.toggleDrawer')}
+                data-testid="layout.btn.toggle-sidebar"
                 onClick={() => setOpen(true)}
                 sx={{ borderRadius: 1, px: 1 }}
               >
-                <Typography component="span" sx={{ fontSize: '1.3rem', lineHeight: 1 }}>
-                  🔨
-                </Typography>
+                <Box
+                  component="img"
+                  src={`${import.meta.env.BASE_URL}icons/forja-icon.svg`}
+                  alt=""
+                  sx={{ width: 28, height: 28 }}
+                />
               </IconButton>
             </Tooltip>
           )}
@@ -382,6 +402,7 @@ export default function Layout() {
                     <ListItemButton
                       selected={isActive}
                       aria-current={isActive ? 'page' : undefined}
+                      data-testid={`layout.nav.${item.path.replace(/^\//, '')}`}
                       onClick={() => guardedNavigate(item.path)}
                       sx={{
                         minHeight: 44,
@@ -434,6 +455,7 @@ export default function Layout() {
             <Tooltip title={open ? '' : t('layout.sidebar.logout')} placement="right" arrow>
               <ListItemButton
                 onClick={handleLogout}
+                data-testid="layout.btn.logout"
                 sx={{
                   minHeight: 44,
                   px: 2.5,

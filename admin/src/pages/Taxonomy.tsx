@@ -203,7 +203,7 @@ export default function TaxonomyPage() {
   ];
 
   return (
-    <Box>
+    <Box data-testid="taxonomy.page">
       <PageHeader title={t('taxonomy.title')} subtitle={t('taxonomy.subtitle')} />
 
       {!selectedSiteId ? (
@@ -326,6 +326,7 @@ export default function TaxonomyPage() {
         onConfirm={() => deletingTag && deleteTagMutation.mutate(deletingTag.id)}
         onCancel={closeTagDelete}
         loading={deleteTagMutation.isPending}
+        confirmationText={t('common.actions.delete')}
       />
 
       {/* Category Dialogs */}
@@ -352,6 +353,7 @@ export default function TaxonomyPage() {
         onConfirm={() => deletingCat && deleteCatMutation.mutate(deletingCat.id)}
         onCancel={closeCatDelete}
         loading={deleteCatMutation.isPending}
+        confirmationText={t('common.actions.delete')}
       />
     </Box>
   );

@@ -73,8 +73,8 @@ export default function MediaPickerDialog({
   const effectiveSelected = selected ?? (currentValue || null);
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-      <DialogTitle>{t('media.picker.title')}</DialogTitle>
+    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth aria-labelledby="media-picker-dialog-title" data-testid="media-picker.dialog">
+      <DialogTitle id="media-picker-dialog-title">{t('media.picker.title')}</DialogTitle>
       <DialogContent>
         <TextField
           autoFocus
@@ -166,11 +166,12 @@ export default function MediaPickerDialog({
           </Button>
         )}
         <Box sx={{ flex: 1 }} />
-        <Button onClick={handleClose}>{t('common.actions.cancel')}</Button>
+        <Button onClick={handleClose} data-testid="media-picker.btn.cancel">{t('common.actions.cancel')}</Button>
         <Button
           variant="contained"
           onClick={handleSelect}
           disabled={!effectiveSelected}
+          data-testid="media-picker.btn.submit"
         >
           {t('media.picker.select')}
         </Button>

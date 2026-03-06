@@ -27,6 +27,7 @@ import SiteFormDialog from '@/components/sites/SiteFormDialog';
 import SiteLocalesManager from '@/components/sites/SiteLocalesManager';
 import EntityHistoryPanel from '@/components/shared/EntityHistoryPanel';
 import InlineEditField from '@/components/shared/InlineEditField';
+import CopyableId from '@/components/shared/CopyableId';
 
 export default function SiteDetailPage() {
   const { t } = useTranslation();
@@ -75,7 +76,7 @@ export default function SiteDetailPage() {
   if (error || !site) return <Alert severity="error">{t('siteDetail.loadFailed')}</Alert>;
 
   return (
-    <Box>
+    <Box data-testid="site-detail.page">
       <PageHeader
         title={site.name}
         subtitle={site.slug}
@@ -158,9 +159,9 @@ export default function SiteDetailPage() {
             <Divider sx={{ mb: 2 }} />
 
             <Typography variant="caption" color="text.secondary">{t('siteDetail.fields.id')}</Typography>
-            <Typography variant="body2" fontFamily="monospace" sx={{ mb: 1, wordBreak: 'break-all' }}>
-              {site.id}
-            </Typography>
+            <Box sx={{ mb: 1 }}>
+              <CopyableId value={site.id} />
+            </Box>
 
             <Typography variant="caption" color="text.secondary">{t('siteDetail.fields.status')}</Typography>
             <Box sx={{ mb: 1 }}>
@@ -229,6 +230,7 @@ export default function SiteDetailPage() {
         onConfirm={() => deleteMutation.mutate()}
         onCancel={() => setDeleteOpen(false)}
         loading={deleteMutation.isPending}
+        confirmationText={t('common.actions.delete')}
       />
     </Box>
   );

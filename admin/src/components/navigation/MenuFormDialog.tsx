@@ -74,7 +74,7 @@ export default function MenuFormDialog({ open, menu, onSubmitCreate, onSubmitUpd
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="menu-form-title">
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="menu-form-title" data-testid="menu-form.dialog">
       <form onSubmit={handleSubmit(onFormSubmit)}>
         <DialogTitle id="menu-form-title">
           {menu ? t('navigation.menus.editTitle', 'Edit Menu') : t('navigation.menus.createTitle', 'Create Menu')}
@@ -116,8 +116,8 @@ export default function MenuFormDialog({ open, menu, onSubmitCreate, onSubmitUpd
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose} disabled={loading}>{t('common.actions.cancel')}</Button>
-          <Button type="submit" variant="contained" disabled={loading || !isValid}>
+          <Button onClick={onClose} disabled={loading} data-testid="menu-form.btn.cancel">{t('common.actions.cancel')}</Button>
+          <Button type="submit" variant="contained" disabled={loading || !isValid} data-testid="menu-form.btn.submit">
             {loading ? t('common.actions.saving') : (menu ? t('common.actions.save') : t('common.actions.create'))}
           </Button>
         </DialogActions>

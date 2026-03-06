@@ -88,7 +88,7 @@ export default function SkillFormDialog({ open, skill, onSubmit, onClose, loadin
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="skill-form-title">
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="skill-form-title" data-testid="skill-form.dialog">
       <form onSubmit={handleSubmit(onFormSubmit)}>
         <DialogTitle id="skill-form-title">{skill ? t('forms.skill.editTitle') : t('forms.skill.createTitle')}</DialogTitle>
         <DialogContent>
@@ -116,8 +116,8 @@ export default function SkillFormDialog({ open, skill, onSubmit, onClose, loadin
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose} disabled={loading}>{t('common.actions.cancel')}</Button>
-          <Button type="submit" variant="contained" disabled={loading || !isValid}>{loading ? t('common.actions.saving') : (skill ? t('common.actions.save') : t('common.actions.create'))}</Button>
+          <Button onClick={onClose} disabled={loading} data-testid="skill-form.btn.cancel">{t('common.actions.cancel')}</Button>
+          <Button type="submit" variant="contained" disabled={loading || !isValid} data-testid="skill-form.btn.submit">{loading ? t('common.actions.saving') : (skill ? t('common.actions.save') : t('common.actions.create'))}</Button>
         </DialogActions>
       </form>
     </Dialog>

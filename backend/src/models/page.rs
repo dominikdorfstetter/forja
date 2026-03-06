@@ -225,6 +225,7 @@ impl Page {
         page_type: Option<&str>,
         sort_by: Option<&str>,
         sort_dir: Option<&str>,
+        exclude_status: Option<&str>,
     ) -> Result<Vec<PageWithContent>, ApiError> {
         // Normalize enum values to DB representation early
         let db_status = match status {
@@ -236,6 +237,12 @@ impl Page {
         let db_page_type = match page_type {
             Some(pt) => Some(normalize_page_type(pt).ok_or_else(|| {
                 ApiError::BadRequest(format!("Invalid page_type filter: {}", pt))
+            })?),
+            None => None,
+        };
+        let db_exclude_status = match exclude_status {
+            Some(s) => Some(normalize_content_status(s).ok_or_else(|| {
+                ApiError::BadRequest(format!("Invalid exclude_status filter: {}", s))
             })?),
             None => None,
         };
@@ -258,6 +265,10 @@ impl Page {
         }
         if db_page_type.is_some() {
             where_clauses.push(format!("p.page_type::text = ${bind_idx}"));
+            bind_idx += 1;
+        }
+        if db_exclude_status.is_some() {
+            where_clauses.push(format!("c.status::text != ${bind_idx}"));
             bind_idx += 1;
         }
         let _ = bind_idx;
@@ -308,6 +319,9 @@ impl Page {
         if let Some(pt) = db_page_type {
             query = query.bind(pt);
         }
+        if let Some(es) = db_exclude_status {
+            query = query.bind(es);
+        }
 
         let pages = query.fetch_all(pool).await?;
         Ok(pages)
@@ -320,6 +334,7 @@ impl Page {
         search: Option<&str>,
         status: Option<&str>,
         page_type: Option<&str>,
+        exclude_status: Option<&str>,
     ) -> Result<i64, ApiError> {
         let db_status = match status {
             Some(s) => Some(normalize_content_status(s).ok_or_else(|| {
@@ -330,6 +345,12 @@ impl Page {
         let db_page_type = match page_type {
             Some(pt) => Some(normalize_page_type(pt).ok_or_else(|| {
                 ApiError::BadRequest(format!("Invalid page_type filter: {}", pt))
+            })?),
+            None => None,
+        };
+        let db_exclude_status = match exclude_status {
+            Some(s) => Some(normalize_content_status(s).ok_or_else(|| {
+                ApiError::BadRequest(format!("Invalid exclude_status filter: {}", s))
             })?),
             None => None,
         };
@@ -352,6 +373,10 @@ impl Page {
         }
         if db_page_type.is_some() {
             where_clauses.push(format!("p.page_type::text = ${bind_idx}"));
+            bind_idx += 1;
+        }
+        if db_exclude_status.is_some() {
+            where_clauses.push(format!("c.status::text != ${bind_idx}"));
             bind_idx += 1;
         }
         let _ = bind_idx;
@@ -377,6 +402,9 @@ impl Page {
         }
         if let Some(pt) = db_page_type {
             query = query.bind(pt);
+        }
+        if let Some(es) = db_exclude_status {
+            query = query.bind(es);
         }
 
         let row = query.fetch_one(pool).await?;

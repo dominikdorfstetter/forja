@@ -106,6 +106,7 @@ export default function MediaPage() {
   const [perPage, setPerPage] = useState(25);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [deletingFile, setDeletingFile] = useState<MediaListItem | null>(null);
+  const [deletingFolderId, setDeletingFolderId] = useState<string | null>(null);
   const [detailFile, setDetailFile] = useState<MediaListItem | null>(null);
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -250,7 +251,7 @@ export default function MediaPage() {
     : undefined;
 
   return (
-    <Box>
+    <Box data-testid="media.page">
       <PageHeader
         title={t('layout.sidebar.assets')}
         subtitle={assetsTab === 0 ? t('media.subtitle') : t('documents.subtitle')}
@@ -300,7 +301,7 @@ export default function MediaPage() {
                 onSelectFolder={(id) => { setSelectedFolderId(id); setPage(1); }}
                 onCreateFolder={(name) => createFolderMutation.mutate(name)}
                 onRenameFolder={(id, name) => renameFolderMutation.mutate({ id, name })}
-                onDeleteFolder={(id) => deleteFolderMutation.mutate(id)}
+                onDeleteFolder={(id) => setDeletingFolderId(id)}
                 canWrite={canWrite}
                 droppable={canWrite}
               />
@@ -501,7 +502,8 @@ export default function MediaPage() {
         loading={uploadMutation.isPending}
       />
       <MediaDetailDialog open={!!detailFile} media={detailFile} folders={folders} onClose={() => setDetailFile(null)} />
-      <ConfirmDialog open={!!deletingFile} title={t('media.deleteDialog.title')} message={t('media.deleteDialog.message', { filename: deletingFile?.original_filename })} confirmLabel={t('common.actions.delete')} onConfirm={() => deletingFile && deleteMutation.mutate(deletingFile.id)} onCancel={() => setDeletingFile(null)} loading={deleteMutation.isPending} />
+      <ConfirmDialog open={!!deletingFile} title={t('media.deleteDialog.title')} message={t('media.deleteDialog.message', { filename: deletingFile?.original_filename })} confirmLabel={t('common.actions.delete')} onConfirm={() => deletingFile && deleteMutation.mutate(deletingFile.id)} onCancel={() => setDeletingFile(null)} loading={deleteMutation.isPending} confirmationText={t('common.actions.delete')} />
+      <ConfirmDialog open={!!deletingFolderId} title={t('media.deleteFolderDialog.title')} message={t('media.deleteFolderDialog.message')} confirmLabel={t('common.actions.delete')} onConfirm={() => { if (deletingFolderId) { deleteFolderMutation.mutate(deletingFolderId); setDeletingFolderId(null); } }} onCancel={() => setDeletingFolderId(null)} confirmationText={t('common.actions.delete')} />
       </>)}
     </Box>
   );

@@ -42,7 +42,8 @@ use crate::AppState;
         ("status" = Option<String>, Query, description = "Filter by status"),
         ("page_type" = Option<String>, Query, description = "Filter by page type"),
         ("sort_by" = Option<String>, Query, description = "Sort column: route, slug, page_type, status, created_at"),
-        ("sort_dir" = Option<String>, Query, description = "Sort direction: asc or desc")
+        ("sort_dir" = Option<String>, Query, description = "Sort direction: asc or desc"),
+        ("exclude_status" = Option<String>, Query, description = "Exclude items with this status (e.g. Archived)")
     ),
     responses(
         (status = 200, description = "Paginated page list", body = PaginatedPages),
@@ -51,7 +52,7 @@ use crate::AppState;
     ),
     security(("api_key" = []))
 )]
-#[get("/sites/<site_id>/pages?<page>&<per_page>&<search>&<status>&<page_type>&<sort_by>&<sort_dir>")]
+#[get("/sites/<site_id>/pages?<page>&<per_page>&<search>&<status>&<page_type>&<sort_by>&<sort_dir>&<exclude_status>")]
 pub async fn list_pages(
     state: &State<AppState>,
     site_id: Uuid,
@@ -62,6 +63,7 @@ pub async fn list_pages(
     page_type: Option<String>,
     sort_by: Option<String>,
     sort_dir: Option<String>,
+    exclude_status: Option<String>,
     auth: ReadKey,
 ) -> Result<Json<PaginatedPages>, ApiError> {
     auth.0
@@ -70,17 +72,19 @@ pub async fn list_pages(
     let params = PaginationParams::new(page, per_page);
     let (limit, offset) = params.limit_offset();
 
-    let has_filters = search.is_some() || status.is_some() || page_type.is_some() || sort_by.is_some() || sort_dir.is_some();
+    let has_filters = search.is_some() || status.is_some() || page_type.is_some() || sort_by.is_some() || sort_dir.is_some() || exclude_status.is_some();
 
     let (pages, total) = if has_filters {
         let pages = Page::find_all_for_site_filtered(
             &state.db, site_id, limit, offset,
             search.as_deref(), status.as_deref(), page_type.as_deref(),
             sort_by.as_deref(), sort_dir.as_deref(),
+            exclude_status.as_deref(),
         ).await?;
         let total = Page::count_for_site_filtered(
             &state.db, site_id,
             search.as_deref(), status.as_deref(), page_type.as_deref(),
+            exclude_status.as_deref(),
         ).await?;
         (pages, total)
     } else {

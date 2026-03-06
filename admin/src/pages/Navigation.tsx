@@ -338,7 +338,7 @@ export default function NavigationPage() {
   const isLoading = menusLoading || itemsLoading;
 
   return (
-    <Box>
+    <Box data-testid="navigation.page">
       <PageHeader
         title={t('navigation.title')}
         subtitle={t('navigation.subtitle')}
@@ -527,6 +527,7 @@ export default function NavigationPage() {
         onConfirm={() => deletingItem && deleteItemMutation.mutate(deletingItem.id)}
         onCancel={() => setDeletingItem(null)}
         loading={deleteItemMutation.isPending}
+        confirmationText={t('common.actions.delete')}
       />
 
       {/* Delete menu confirm */}
@@ -538,6 +539,7 @@ export default function NavigationPage() {
         onConfirm={() => deletingMenu && deleteMenuMutation.mutate(deletingMenu.id)}
         onCancel={() => setDeletingMenu(null)}
         loading={deleteMenuMutation.isPending}
+        confirmationText={t('common.actions.delete')}
       />
     </Box>
   );

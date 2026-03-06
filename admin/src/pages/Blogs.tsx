@@ -8,16 +8,19 @@ import {
   Typography,
   Chip,
   TableSortLabel,
+  Tabs,
+  Tab,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import ViewQuiltIcon from '@mui/icons-material/ViewQuilt';
 import ArticleIcon from '@mui/icons-material/Article';
-import DescriptionIcon from '@mui/icons-material/Description';
-import UploadFileIcon from '@mui/icons-material/UploadFile';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import ArchiveIcon from '@mui/icons-material/Archive';
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
 import { format } from 'date-fns';
 import apiService from '@/services/api';
-import type { BlogListItem, ContentTemplate, CreateBlogRequest, UpdateBlogRequest, BulkContentRequest } from '@/types/api';
+import type { BlogListItem, UpdateBlogRequest, BulkContentRequest } from '@/types/api';
 import { useSiteContext } from '@/store/SiteContext';
 import { useAuth } from '@/store/AuthContext';
 import PageHeader from '@/components/shared/PageHeader';
@@ -25,20 +28,17 @@ import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
 import StatusChip from '@/components/shared/StatusChip';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
+import RestoreDialog from '@/components/shared/RestoreDialog';
 import BulkActionToolbar from '@/components/shared/BulkActionToolbar';
 import TableFilterBar from '@/components/shared/TableFilterBar';
-import BlogFormDialog from '@/components/blogs/BlogFormDialog';
 import BlogActionsMenu from '@/components/blogs/BlogActionsMenu';
-import TemplateSelectionDialog from '@/components/blogs/TemplateSelectionDialog';
-import MarkdownImportDialog from '@/components/blogs/MarkdownImportDialog';
+import CreateBlogWizard from '@/components/blogs/CreateBlogWizard';
 import DataTable, { type DataTableColumn } from '@/components/shared/DataTable';
 import { useListPageState } from '@/hooks/useListPageState';
 import { useCrudMutations } from '@/hooks/useCrudMutations';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import { useBulkSelection } from '@/hooks/useBulkSelection';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
-import type { BlogTemplate } from '@/data/blogTemplates';
-import type { MarkdownParseResult } from '@/utils/markdownImport';
 
 type SortDir = 'asc' | 'desc';
 
@@ -47,19 +47,26 @@ export default function BlogsPage() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { selectedSiteId } = useSiteContext();
-  const { canWrite, isAdmin, userFullName } = useAuth();
+  const { canWrite, isAdmin } = useAuth();
   const { showError, showSuccess, enqueueSnackbar } = useErrorSnackbar();
 
   const {
-    page, setPage, perPage, formOpen, editing: editingBlog, deleting: deletingBlog,
-    openCreate, closeForm, openEdit: setEditingBlog, closeEdit,
+    page, setPage, perPage, formOpen, deleting: deletingBlog,
+    openCreate, closeForm,
     openDelete: setDeletingBlog, closeDelete,
     handlePageChange, handleRowsPerPageChange,
   } = useListPageState<BlogListItem>();
 
+  const [viewTab, setViewTab] = useState<'active' | 'archived'>('active');
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
-  const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
-  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [publishingBlog, setPublishingBlog] = useState<BlogListItem | null>(null);
+  const [unpublishingBlog, setUnpublishingBlog] = useState<BlogListItem | null>(null);
+  const [archivingBlog, setArchivingBlog] = useState<BlogListItem | null>(null);
+  const [restoringBlog, setRestoringBlog] = useState<BlogListItem | null>(null);
+  const [bulkPublishOpen, setBulkPublishOpen] = useState(false);
+  const [bulkUnpublishOpen, setBulkUnpublishOpen] = useState(false);
+  const [bulkArchiveOpen, setBulkArchiveOpen] = useState(false);
+  const [bulkRestoreOpen, setBulkRestoreOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [sortBy, setSortBy] = useState('published_date');
@@ -81,6 +88,15 @@ export default function BlogsPage() {
     setPage(1);
   }, [setPage]);
 
+  const handleTabChange = useCallback((_: React.SyntheticEvent, newValue: 'active' | 'archived') => {
+    setViewTab(newValue);
+    setPage(1);
+    setStatusFilter('');
+    setSearchQuery('');
+    bulk.clear();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setPage]);
+
   // Command palette action listener
   useEffect(() => {
     const handler = (e: Event) => {
@@ -90,15 +106,18 @@ export default function BlogsPage() {
     return () => window.removeEventListener('command-palette:action', handler);
   }, [openCreate]);
 
+  const isArchived = viewTab === 'archived';
+
   const { data: blogData, isLoading, error } = useQuery({
-    queryKey: ['blogs', selectedSiteId, page, perPage, debouncedSearch, statusFilter, sortBy, sortDir],
+    queryKey: ['blogs', selectedSiteId, page, perPage, debouncedSearch, statusFilter, sortBy, sortDir, viewTab],
     queryFn: () => apiService.getBlogs(selectedSiteId, {
       page,
       per_page: perPage,
       search: debouncedSearch || undefined,
-      status: statusFilter || undefined,
+      status: isArchived ? 'Archived' : (statusFilter || undefined),
       sort_by: sortBy,
       sort_dir: sortDir,
+      exclude_status: isArchived ? undefined : 'Archived',
     }),
     enabled: !!selectedSiteId,
     placeholderData: keepPreviousData,
@@ -131,115 +150,17 @@ export default function BlogsPage() {
     setPage(1);
   }, [sortBy, setPage]);
 
-  const { createMutation, updateMutation, deleteMutation } = useCrudMutations<CreateBlogRequest, UpdateBlogRequest>({
+  const { updateMutation, deleteMutation } = useCrudMutations<never, UpdateBlogRequest>({
     queryKey: 'blogs',
-    create: {
-      mutationFn: (data) => apiService.createBlog(data),
-      successMessage: t('blogs.messages.created'),
-      onSuccess: (blog) => { closeForm(); navigate(`/blogs/${blog.id}`); },
-    },
     update: {
       mutationFn: ({ id, data }) => apiService.updateBlog(id, data),
       successMessage: t('blogs.messages.updated'),
-      onSuccess: () => { closeEdit(); },
     },
     delete: {
       mutationFn: (id) => apiService.deleteBlog(id),
       successMessage: t('blogs.messages.deleted'),
       onSuccess: () => { closeDelete(); },
     },
-  });
-
-  const templateCreateMutation = useMutation({
-    mutationFn: async ({ template, source }: { template: BlogTemplate | ContentTemplate; source: 'builtin' | 'custom' }) => {
-      let slug: string;
-      let is_featured: boolean;
-      let allow_comments: boolean;
-      let content: { title: string; subtitle: string; excerpt: string; body: string; meta_title: string; meta_description: string };
-
-      if (source === 'builtin') {
-        const bt = template as BlogTemplate;
-        slug = `${bt.defaults.slug}-${Date.now()}`;
-        is_featured = bt.defaults.is_featured;
-        allow_comments = bt.defaults.allow_comments;
-        content = bt.content;
-      } else {
-        const ct = template as ContentTemplate;
-        slug = `${ct.slug_prefix}-${Date.now()}`;
-        is_featured = ct.is_featured;
-        allow_comments = ct.allow_comments;
-        content = {
-          title: ct.title,
-          subtitle: ct.subtitle,
-          excerpt: ct.excerpt,
-          body: ct.body,
-          meta_title: ct.meta_title,
-          meta_description: ct.meta_description,
-        };
-      }
-
-      const blog = await apiService.createBlog({
-        slug,
-        author: userFullName || 'Author',
-        published_date: new Date().toISOString().split('T')[0],
-        is_featured,
-        allow_comments,
-        status: 'Draft',
-        site_ids: [selectedSiteId],
-      });
-      const defaultLocale = siteLocales?.find((l) => l.is_default);
-      if (defaultLocale) {
-        await apiService.createBlogLocalization(blog.id, {
-          locale_id: defaultLocale.locale_id,
-          title: content.title,
-          subtitle: content.subtitle,
-          excerpt: content.excerpt,
-          body: content.body,
-          meta_title: content.meta_title,
-          meta_description: content.meta_description,
-        });
-      }
-      return blog;
-    },
-    onSuccess: (blog) => {
-      queryClient.invalidateQueries({ queryKey: ['blogs'] });
-      setTemplateDialogOpen(false);
-      showSuccess(t('blogs.messages.created'));
-      navigate(`/blogs/${blog.id}`);
-    },
-    onError: showError,
-  });
-
-  const importCreateMutation = useMutation({
-    mutationFn: async (parsed: MarkdownParseResult) => {
-      const blog = await apiService.createBlog({
-        slug: parsed.slug,
-        author: userFullName || 'Author',
-        published_date: new Date().toISOString().split('T')[0],
-        is_featured: false,
-        allow_comments: true,
-        status: 'Draft',
-        site_ids: [selectedSiteId],
-      });
-      const defaultLocale = siteLocales?.find((l) => l.is_default);
-      if (defaultLocale) {
-        await apiService.createBlogLocalization(blog.id, {
-          locale_id: defaultLocale.locale_id,
-          title: parsed.title,
-          excerpt: parsed.excerpt,
-          body: parsed.body,
-          meta_title: parsed.meta_title,
-        });
-      }
-      return blog;
-    },
-    onSuccess: (blog) => {
-      queryClient.invalidateQueries({ queryKey: ['blogs'] });
-      setImportDialogOpen(false);
-      showSuccess(t('blogs.messages.created'));
-      navigate(`/blogs/${blog.id}`);
-    },
-    onError: showError,
   });
 
   const cloneMutation = useMutation({
@@ -258,6 +179,10 @@ export default function BlogsPage() {
       queryClient.invalidateQueries({ queryKey: ['blogs'] });
       bulk.clear();
       setBulkDeleteOpen(false);
+      setBulkPublishOpen(false);
+      setBulkUnpublishOpen(false);
+      setBulkArchiveOpen(false);
+      setBulkRestoreOpen(false);
       if (resp.failed === 0) {
         enqueueSnackbar(t('bulk.messages.success', { count: resp.succeeded }), { variant: 'success' });
       } else {
@@ -267,8 +192,14 @@ export default function BlogsPage() {
     onError: showError,
   });
 
-  const handleBulkPublish = () => bulkMutation.mutate({ ids: [...bulk.selectedIds], action: 'UpdateStatus', status: 'Published' });
-  const handleBulkUnpublish = () => bulkMutation.mutate({ ids: [...bulk.selectedIds], action: 'UpdateStatus', status: 'Draft' });
+  const handleBulkPublish = () => setBulkPublishOpen(true);
+  const handleBulkUnpublish = () => setBulkUnpublishOpen(true);
+  const handleBulkArchive = () => setBulkArchiveOpen(true);
+  const handleBulkRestore = () => setBulkRestoreOpen(true);
+  const confirmBulkPublish = () => bulkMutation.mutate({ ids: [...bulk.selectedIds], action: 'UpdateStatus', status: 'Published' });
+  const confirmBulkUnpublish = () => bulkMutation.mutate({ ids: [...bulk.selectedIds], action: 'UpdateStatus', status: 'Draft' });
+  const confirmBulkArchive = () => bulkMutation.mutate({ ids: [...bulk.selectedIds], action: 'UpdateStatus', status: 'Archived' });
+  const confirmBulkRestore = () => bulkMutation.mutate({ ids: [...bulk.selectedIds], action: 'UpdateStatus', status: 'Draft' });
   const handleBulkDelete = () => setBulkDeleteOpen(true);
   const confirmBulkDelete = () => bulkMutation.mutate({ ids: [...bulk.selectedIds], action: 'Delete' });
 
@@ -278,7 +209,6 @@ export default function BlogsPage() {
     { value: 'InReview', label: t('common.status.inReview') },
     { value: 'Scheduled', label: t('common.status.scheduled') },
     { value: 'Published', label: t('common.status.published') },
-    { value: 'Archived', label: t('common.status.archived') },
   ];
 
   const columns: DataTableColumn<BlogListItem>[] = [
@@ -288,6 +218,7 @@ export default function BlogsPage() {
           indeterminate={bulk.count > 0 && !bulk.allSelected(blogIds)}
           checked={bulk.allSelected(blogIds)}
           onChange={() => bulk.selectAll(blogIds)}
+          aria-label={t('blogs.table.selectAll')}
         />
       ),
       padding: 'checkbox',
@@ -295,6 +226,7 @@ export default function BlogsPage() {
         <Checkbox
           checked={bulk.isSelected(blog.id)}
           onChange={() => bulk.toggle(blog.id)}
+          aria-label={t('blogs.table.selectRow', { slug: blog.slug })}
         />
       ),
     },
@@ -349,11 +281,12 @@ export default function BlogsPage() {
           canWrite={canWrite}
           isAdmin={isAdmin}
           onView={(b) => navigate(`/blogs/${b.id}`)}
-          onEdit={(b) => setEditingBlog(b)}
-          onPublish={(b) => updateMutation.mutate({ id: b.id, data: { status: 'Published' } })}
-          onUnpublish={(b) => updateMutation.mutate({ id: b.id, data: { status: 'Draft' } })}
+          onPublish={(b) => setPublishingBlog(b)}
+          onUnpublish={(b) => setUnpublishingBlog(b)}
           onClone={(b) => cloneMutation.mutate(b.id)}
           onDelete={(b) => setDeletingBlog(b)}
+          onArchive={(b) => setArchivingBlog(b)}
+          onRestore={(b) => setRestoringBlog(b)}
           cloneDisabled={cloneMutation.isPending}
         />
       ),
@@ -361,16 +294,12 @@ export default function BlogsPage() {
   ];
 
   return (
-    <Box>
+    <Box data-testid="blogs.page">
       <PageHeader
         title={t('blogs.title')}
         subtitle={t('blogs.subtitle')}
         action={selectedSiteId ? { label: t('blogs.createButton'), icon: <AddIcon />, onClick: openCreate, hidden: !canWrite } : undefined}
-        secondaryActions={selectedSiteId ? [
-          { label: t('templates.fromTemplate'), icon: <DescriptionIcon />, onClick: () => setTemplateDialogOpen(true), hidden: !canWrite },
-          { label: t('markdownImport.importButton'), icon: <UploadFileIcon />, onClick: () => setImportDialogOpen(true), hidden: !canWrite },
-        ] : undefined}
-        secondaryActionsLabel={t('blogs.moreActions')}
+        secondaryAction={selectedSiteId ? { label: t('templates.manageTemplates'), icon: <ViewQuiltIcon />, onClick: () => navigate('/blogs/templates'), hidden: !isAdmin } : undefined}
       />
 
       {!selectedSiteId ? (
@@ -379,14 +308,20 @@ export default function BlogsPage() {
         <LoadingState label={t('blogs.loading')} />
       ) : error ? (
         <Alert severity="error">{t('blogs.loadError')}</Alert>
-      ) : blogs.length === 0 && !searchQuery && !statusFilter ? (
+      ) : blogs.length === 0 && !searchQuery && !statusFilter && !isArchived ? (
         <EmptyState icon={<ArticleIcon sx={{ fontSize: 64 }} />} title={t('blogs.empty.title')} description={t('blogs.empty.description')} action={{ label: t('blogs.createButton'), onClick: openCreate }} />
       ) : (
         <>
+          <Tabs value={viewTab} onChange={handleTabChange} sx={{ mb: 2 }}>
+            <Tab icon={<CheckCircleOutlineIcon fontSize="small" />} iconPosition="start" label={t('blogs.tabs.active')} value="active" />
+            <Tab icon={<ArchiveIcon fontSize="small" />} iconPosition="start" label={t('blogs.tabs.archived')} value="archived" />
+          </Tabs>
           <BulkActionToolbar
             selectedCount={bulk.count}
-            onPublish={handleBulkPublish}
-            onUnpublish={handleBulkUnpublish}
+            onPublish={isArchived ? undefined : handleBulkPublish}
+            onUnpublish={isArchived ? undefined : handleBulkUnpublish}
+            onArchive={isArchived ? undefined : handleBulkArchive}
+            onRestore={isArchived ? handleBulkRestore : undefined}
             onDelete={handleBulkDelete}
             onClear={bulk.clear}
             canWrite={canWrite}
@@ -398,7 +333,7 @@ export default function BlogsPage() {
               searchValue={searchQuery}
               onSearchChange={setSearchQuery}
               searchPlaceholder={t('blogs.searchPlaceholder')}
-              filters={[
+              filters={isArchived ? [] : [
                 {
                   key: 'status',
                   label: t('common.filters.status'),
@@ -424,12 +359,17 @@ export default function BlogsPage() {
         </>
       )}
 
-      <BlogFormDialog open={formOpen} onSubmit={(data) => createMutation.mutate(data)} onClose={closeForm} loading={createMutation.isPending} />
-      <BlogFormDialog open={!!editingBlog} blog={editingBlog} onSubmit={(data) => editingBlog && updateMutation.mutate({ id: editingBlog.id, data })} onClose={closeEdit} loading={updateMutation.isPending} />
-      <ConfirmDialog open={!!deletingBlog} title={t('blogs.deleteDialog.title')} message={t('blogs.deleteDialog.message', { slug: deletingBlog?.slug })} confirmLabel={t('common.actions.delete')} onConfirm={() => deletingBlog && deleteMutation.mutate(deletingBlog.id)} onCancel={closeDelete} loading={deleteMutation.isPending} />
-      <ConfirmDialog open={bulkDeleteOpen} title={t('bulk.deleteDialog.title')} message={t('bulk.deleteDialog.message', { count: bulk.count })} confirmLabel={t('common.actions.delete')} onConfirm={confirmBulkDelete} onCancel={() => setBulkDeleteOpen(false)} loading={bulkMutation.isPending} />
-      <TemplateSelectionDialog open={templateDialogOpen} onSelect={(template, source) => templateCreateMutation.mutate({ template, source })} onClose={() => setTemplateDialogOpen(false)} loading={templateCreateMutation.isPending} siteTemplates={siteTemplatesData?.data} siteTemplatesLoading={siteTemplatesLoading} />
-      <MarkdownImportDialog open={importDialogOpen} onImport={(parsed) => importCreateMutation.mutate(parsed)} onClose={() => setImportDialogOpen(false)} loading={importCreateMutation.isPending} />
+      <CreateBlogWizard open={formOpen} onClose={closeForm} onCreated={(id) => navigate(`/blogs/${id}`)} siteLocales={siteLocales} siteTemplates={siteTemplatesData?.data} siteTemplatesLoading={siteTemplatesLoading} />
+      <ConfirmDialog open={!!deletingBlog} title={t('blogs.deleteDialog.title')} message={t('blogs.deleteDialog.message', { slug: deletingBlog?.slug })} confirmLabel={t('common.actions.delete')} onConfirm={() => deletingBlog && deleteMutation.mutate(deletingBlog.id)} onCancel={closeDelete} loading={deleteMutation.isPending} confirmationText={t('common.actions.delete')} />
+      <ConfirmDialog open={bulkDeleteOpen} title={t('bulk.deleteDialog.title')} message={t('bulk.deleteDialog.message', { count: bulk.count })} confirmLabel={t('common.actions.delete')} onConfirm={confirmBulkDelete} onCancel={() => setBulkDeleteOpen(false)} loading={bulkMutation.isPending} confirmationText={t('common.actions.delete')} />
+      <ConfirmDialog open={!!publishingBlog} title={t('blogs.publishDialog.title')} message={t('blogs.publishDialog.message', { slug: publishingBlog?.slug })} confirmLabel={t('bulk.publish')} confirmColor="primary" onConfirm={() => { if (publishingBlog) { updateMutation.mutate({ id: publishingBlog.id, data: { status: 'Published' } }); setPublishingBlog(null); } }} onCancel={() => setPublishingBlog(null)} />
+      <ConfirmDialog open={!!unpublishingBlog} title={t('blogs.unpublishDialog.title')} message={t('blogs.unpublishDialog.message', { slug: unpublishingBlog?.slug })} confirmLabel={t('bulk.unpublish')} confirmColor="warning" onConfirm={() => { if (unpublishingBlog) { updateMutation.mutate({ id: unpublishingBlog.id, data: { status: 'Draft' } }); setUnpublishingBlog(null); } }} onCancel={() => setUnpublishingBlog(null)} />
+      <ConfirmDialog open={!!archivingBlog} title={t('blogs.archiveDialog.title')} message={t('blogs.archiveDialog.message', { slug: archivingBlog?.slug })} confirmLabel={t('bulk.archive')} confirmColor="warning" onConfirm={() => { if (archivingBlog) { updateMutation.mutate({ id: archivingBlog.id, data: { status: 'Archived' } }); setArchivingBlog(null); } }} onCancel={() => setArchivingBlog(null)} />
+      <RestoreDialog open={!!restoringBlog} title={t('blogs.restoreDialog.title')} message={t('blogs.restoreDialog.message', { slug: restoringBlog?.slug })} onRestore={() => { if (restoringBlog) { updateMutation.mutate({ id: restoringBlog.id, data: { status: 'Published' } }); setRestoringBlog(null); } }} onRestoreAsDraft={() => { if (restoringBlog) { updateMutation.mutate({ id: restoringBlog.id, data: { status: 'Draft' } }); setRestoringBlog(null); } }} onCancel={() => setRestoringBlog(null)} />
+      <ConfirmDialog open={bulkPublishOpen} title={t('bulk.publishDialog.title')} message={t('bulk.publishDialog.message', { count: bulk.count })} confirmLabel={t('bulk.publish')} confirmColor="primary" onConfirm={confirmBulkPublish} onCancel={() => setBulkPublishOpen(false)} loading={bulkMutation.isPending} />
+      <ConfirmDialog open={bulkUnpublishOpen} title={t('bulk.unpublishDialog.title')} message={t('bulk.unpublishDialog.message', { count: bulk.count })} confirmLabel={t('bulk.unpublish')} confirmColor="warning" onConfirm={confirmBulkUnpublish} onCancel={() => setBulkUnpublishOpen(false)} loading={bulkMutation.isPending} />
+      <ConfirmDialog open={bulkArchiveOpen} title={t('bulk.archiveDialog.title')} message={t('bulk.archiveDialog.message', { count: bulk.count })} confirmLabel={t('bulk.archive')} confirmColor="warning" onConfirm={confirmBulkArchive} onCancel={() => setBulkArchiveOpen(false)} loading={bulkMutation.isPending} />
+      <ConfirmDialog open={bulkRestoreOpen} title={t('bulk.restoreDialog.title')} message={t('bulk.restoreDialog.message', { count: bulk.count })} confirmLabel={t('bulk.restore')} confirmColor="primary" onConfirm={confirmBulkRestore} onCancel={() => setBulkRestoreOpen(false)} loading={bulkMutation.isPending} />
     </Box>
   );
 }

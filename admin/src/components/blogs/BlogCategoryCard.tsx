@@ -153,8 +153,8 @@ export default function BlogCategoryCard({ contentId, categories }: BlogCategory
       </Card>
 
       {/* Create category dialog */}
-      <Dialog open={createOpen} onClose={() => setCreateOpen(false)} maxWidth="xs" fullWidth>
-        <DialogTitle>{t('forms.category.createTitle')}</DialogTitle>
+      <Dialog open={createOpen} onClose={() => setCreateOpen(false)} maxWidth="xs" fullWidth aria-labelledby="blog-category-create-dialog-title" data-testid="blog-category-create.dialog">
+        <DialogTitle id="blog-category-create-dialog-title">{t('forms.category.createTitle')}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField
@@ -171,11 +171,12 @@ export default function BlogCategoryCard({ contentId, categories }: BlogCategory
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setCreateOpen(false)}>{t('common.actions.cancel')}</Button>
+          <Button onClick={() => setCreateOpen(false)} data-testid="blog-category-create.btn.cancel">{t('common.actions.cancel')}</Button>
           <Button
             variant="contained"
             onClick={handleCreateAndAssign}
             disabled={!newSlug.trim() || createMutation.isPending}
+            data-testid="blog-category-create.btn.submit"
           >
             {createMutation.isPending ? t('common.actions.saving') : t('common.actions.create')}
           </Button>

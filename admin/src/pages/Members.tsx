@@ -120,7 +120,7 @@ export default function MembersPage() {
 
   if (!selectedSiteId) {
     return (
-      <Box>
+      <Box data-testid="members.page">
         <PageHeader title={t('members.title')} subtitle={t('members.subtitle')} />
         <EmptyState title={t('members.empty.noSite')} />
       </Box>
@@ -153,7 +153,7 @@ export default function MembersPage() {
   });
 
   return (
-    <Box>
+    <Box data-testid="members.page">
       <PageHeader
         title={t('members.title')}
         subtitle={t('members.subtitle')}
@@ -241,8 +241,8 @@ export default function MembersPage() {
       )}
 
       {/* Add Member Dialog */}
-      <Dialog open={addOpen} onClose={() => setAddOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{t('members.addDialog.title')}</DialogTitle>
+      <Dialog open={addOpen} onClose={() => setAddOpen(false)} maxWidth="sm" fullWidth aria-labelledby="add-member-dialog-title">
+        <DialogTitle id="add-member-dialog-title">{t('members.addDialog.title')}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField
@@ -318,6 +318,7 @@ export default function MembersPage() {
         confirmLabel={t('common.actions.delete')}
         onConfirm={() => removingMember && removeMemberMutation.mutate(removingMember.id)}
         onCancel={() => setRemovingMember(null)}
+        confirmationText={t('common.actions.delete')}
       />
 
       {/* Transfer Ownership Confirmation */}

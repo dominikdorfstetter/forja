@@ -90,7 +90,7 @@ export default function LegalPage({ embedded }: { embedded?: boolean }) {
   ];
 
   return (
-    <Box>
+    <Box data-testid="legal.page">
       {!embedded && (
         <PageHeader
           title={t('legal.title')}
@@ -129,7 +129,7 @@ export default function LegalPage({ embedded }: { embedded?: boolean }) {
 
       <LegalDocumentFormDialog open={formOpen} siteId={selectedSiteId} onSubmit={(data) => createMutation.mutate(data)} onClose={closeForm} loading={createMutation.isPending} />
       <LegalDocumentFormDialog open={!!editing} siteId={selectedSiteId} document={editing} onSubmit={(data) => editing && updateMutation.mutate({ id: editing.id, data })} onClose={closeEdit} loading={updateMutation.isPending} />
-      <ConfirmDialog open={!!deleting} title={t('legal.deleteDialog.title')} message={t('legal.deleteDialog.message', { cookieName: deleting?.cookie_name })} confirmLabel={t('common.actions.delete')} onConfirm={() => deleting && deleteMutation.mutate(deleting.id)} onCancel={closeDelete} loading={deleteMutation.isPending} />
+      <ConfirmDialog open={!!deleting} title={t('legal.deleteDialog.title')} message={t('legal.deleteDialog.message', { cookieName: deleting?.cookie_name })} confirmLabel={t('common.actions.delete')} onConfirm={() => deleting && deleteMutation.mutate(deleting.id)} onCancel={closeDelete} loading={deleteMutation.isPending} confirmationText={t('common.actions.delete')} />
     </Box>
   );
 }

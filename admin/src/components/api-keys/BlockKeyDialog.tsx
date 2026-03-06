@@ -45,7 +45,7 @@ export default function BlockKeyDialog({ open, keyName: _keyName, onConfirm, onC
   };
 
   return (
-    <Dialog open={open} onClose={onCancel} maxWidth="xs" fullWidth aria-labelledby="block-key-title">
+    <Dialog open={open} onClose={onCancel} maxWidth="xs" fullWidth aria-labelledby="block-key-title" data-testid="block-key.dialog">
       <form onSubmit={handleSubmit(onFormSubmit)}>
         <DialogTitle id="block-key-title">{t('apiKeys.blockDialog.title')}</DialogTitle>
         <DialogContent>
@@ -64,12 +64,13 @@ export default function BlockKeyDialog({ open, keyName: _keyName, onConfirm, onC
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={onCancel} disabled={loading}>{t('common.actions.cancel')}</Button>
+          <Button onClick={onCancel} disabled={loading} data-testid="block-key.btn.cancel">{t('common.actions.cancel')}</Button>
           <Button
             type="submit"
             color="warning"
             variant="contained"
             disabled={loading || !isValid}
+            data-testid="block-key.btn.submit"
           >
             {loading ? t('common.actions.loading') : t('apiKeys.actionsMenu.block')}
           </Button>

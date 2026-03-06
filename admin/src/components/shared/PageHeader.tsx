@@ -32,7 +32,7 @@ export default function PageHeader({ title, subtitle, breadcrumbs, action, secon
   const visibleSecondaryActions = secondaryActions?.filter((a) => !a.hidden);
 
   return (
-    <Box sx={{ mb: 3 }}>
+    <Box sx={{ mb: 3 }} data-testid="page-header">
       {breadcrumbs && breadcrumbs.length > 0 && (
         <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} sx={{ mb: 1 }}>
           {breadcrumbs.map((crumb, idx) =>
@@ -57,7 +57,7 @@ export default function PageHeader({ title, subtitle, breadcrumbs, action, secon
       )}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <Box>
-          <Typography variant="h4" component="h1" fontWeight="bold">{title}</Typography>
+          <Typography variant="h4" component="h1" fontWeight="bold" data-testid="page-header.title">{title}</Typography>
           {subtitle && (
             <Typography variant="subtitle1" color="text.secondary" sx={{ mt: 0.5 }}>
               {subtitle}
@@ -71,6 +71,8 @@ export default function PageHeader({ title, subtitle, breadcrumbs, action, secon
                 variant="outlined"
                 endIcon={<ArrowDropDownIcon />}
                 onClick={(e) => setAnchorEl(e.currentTarget)}
+                aria-haspopup="menu"
+                aria-expanded={Boolean(anchorEl)}
               >
                 {secondaryActionsLabel || 'More'}
               </Button>
@@ -94,12 +96,12 @@ export default function PageHeader({ title, subtitle, breadcrumbs, action, secon
               </Menu>
             </>
           ) : secondaryAction && !secondaryAction.hidden ? (
-            <Button variant="outlined" startIcon={secondaryAction.icon} onClick={secondaryAction.onClick}>
+            <Button variant="outlined" startIcon={secondaryAction.icon} onClick={secondaryAction.onClick} data-testid="page-header.btn.secondary">
               {secondaryAction.label}
             </Button>
           ) : null}
           {action && !action.hidden && (
-            <Button variant="contained" startIcon={action.icon} onClick={action.onClick}>
+            <Button variant="contained" startIcon={action.icon} onClick={action.onClick} data-testid="page-header.btn.primary">
               {action.label}
             </Button>
           )}

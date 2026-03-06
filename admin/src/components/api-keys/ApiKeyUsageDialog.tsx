@@ -36,7 +36,7 @@ export default function ApiKeyUsageDialog({ open, keyId, keyName, onClose }: Api
   });
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth aria-labelledby="api-key-usage-title">
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth aria-labelledby="api-key-usage-title" data-testid="api-key-usage.dialog">
       <DialogTitle id="api-key-usage-title">{t('apiKeys.usageDialog.title')}: {keyName}</DialogTitle>
       <DialogContent>
         {isLoading ? (
@@ -88,7 +88,7 @@ export default function ApiKeyUsageDialog({ open, keyId, keyName, onClose }: Api
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>{t('common.actions.close')}</Button>
+        <Button onClick={onClose} data-testid="api-key-usage.btn.close">{t('common.actions.close')}</Button>
       </DialogActions>
     </Dialog>
   );

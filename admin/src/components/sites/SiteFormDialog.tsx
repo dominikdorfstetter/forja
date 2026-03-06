@@ -138,7 +138,7 @@ export default function SiteFormDialog({ open, site, onSubmit, onClose, loading 
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="site-form-title">
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="site-form-title" data-testid="site-form.dialog">
       <form onSubmit={handleSubmit(onFormSubmit)}>
         <DialogTitle id="site-form-title">{site ? t('forms.site.editTitle') : t('forms.site.createTitle')}</DialogTitle>
         <DialogContent>
@@ -260,8 +260,8 @@ export default function SiteFormDialog({ open, site, onSubmit, onClose, loading 
             </span>
           </Tooltip>
           <Box sx={{ flex: 1 }} />
-          <Button onClick={onClose} disabled={loading}>{t('common.actions.cancel')}</Button>
-          <Button type="submit" variant="contained" disabled={loading || !isValid}>
+          <Button onClick={onClose} disabled={loading} data-testid="site-form.btn.cancel">{t('common.actions.cancel')}</Button>
+          <Button type="submit" variant="contained" disabled={loading || !isValid} data-testid="site-form.btn.submit">
             {loading ? t('common.actions.saving') : (site ? t('common.actions.save') : t('common.actions.create'))}
           </Button>
         </DialogActions>

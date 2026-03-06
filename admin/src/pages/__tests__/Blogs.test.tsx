@@ -150,7 +150,7 @@ describe('BlogsPage', () => {
     expect(menuButtons.length).toBeGreaterThanOrEqual(2);
   });
 
-  it('opens action menu and shows edit, delete options', async () => {
+  it('opens action menu and shows view details, delete options', async () => {
     vi.mocked(apiService.getBlogs).mockResolvedValue(mockPaginatedBlogs);
     renderWithProviders(<BlogsPage />);
     await waitFor(() => {
@@ -161,12 +161,12 @@ describe('BlogsPage', () => {
       (b) => b.querySelector('[data-testid="MoreVertIcon"]'),
     );
     await user.click(menuButtons[0]);
-    // Menu should open with View details, Edit, Clone, Delete options
+    // Menu should open with View details, Clone, Delete options (no Edit)
     const menu = await screen.findByRole('menu');
     const menuItems = menu.querySelectorAll('[role="menuitem"]');
     const menuTexts = Array.from(menuItems).map((item) => item.textContent);
     expect(menuTexts).toContain('View details');
-    expect(menuTexts).toContain('Edit');
+    expect(menuTexts).not.toContain('Edit');
     expect(menuTexts).toContain('Delete');
   });
 
@@ -192,7 +192,7 @@ describe('BlogsPage', () => {
     });
   });
 
-  it('hides edit and delete in action menu when canWrite=false and isAdmin=false', async () => {
+  it('hides clone and delete in action menu when canWrite=false and isAdmin=false', async () => {
     mockAuth.canWrite = false;
     mockAuth.isAdmin = false;
     vi.mocked(apiService.getBlogs).mockResolvedValue(mockPaginatedBlogs);
@@ -210,8 +210,8 @@ describe('BlogsPage', () => {
     });
     // View details should still be visible
     expect(screen.getByText('View details')).toBeInTheDocument();
-    // Edit, Clone, Delete should not be visible
-    expect(screen.queryByText('Edit')).not.toBeInTheDocument();
+    // Clone, Delete should not be visible
+    expect(screen.queryByText('Clone')).not.toBeInTheDocument();
     expect(screen.queryByText('Delete')).not.toBeInTheDocument();
   });
 

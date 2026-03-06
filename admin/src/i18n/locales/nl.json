@@ -23,7 +23,9 @@
       "clone": "Klonen",
       "upload": "Uploaden",
       "preview": "Voorbeeld",
-      "viewDetails": "Details bekijken"
+      "viewDetails": "Details bekijken",
+      "clickToCopy": "Klik om te kopiëren",
+      "copied": "Gekopieerd!"
     },
     "status": {
       "active": "Actief",
@@ -54,6 +56,9 @@
     "confirm": {
       "cannotBeUndone": "Dit kan niet ongedaan worden gemaakt.",
       "areYouSure": "Weet u het zeker?"
+    },
+    "confirmDialog": {
+      "typeToConfirm": "Typ \"{{word}}\" om te bevestigen"
     },
     "filters": {
       "all": "Alle",
@@ -188,7 +193,23 @@
       "admin": "Admin",
       "write": "Schrijven",
       "readOnly": "Alleen-lezen"
-    }
+    },
+    "contentOverview": "Inhoudsoverzicht",
+    "chart": {
+      "noContent": "Nog geen inhoud. Maak uw eerste blogbericht of pagina aan."
+    },
+    "attention": {
+      "awaitingReview": "Wacht op uw beoordeling",
+      "draftsToFinish": "Concepten om af te ronden",
+      "recentlyPublished": "Recent gepubliceerd",
+      "noItemsReview": "Geen items wachten op beoordeling.",
+      "noItemsDrafts": "Alle inhoud is gepubliceerd of in beoordeling.",
+      "noItemsPublished": "Nog geen gepubliceerde inhoud.",
+      "viewAll": "Alles bekijken"
+    },
+    "recentActivity": "Recente activiteit",
+    "recentActivityEmpty": "Nog geen recente activiteit.",
+    "updatedAgo": "{{time}} geleden bijgewerkt"
   },
   "myDrafts": {
     "title": "Mijn concepten",
@@ -235,8 +256,50 @@
       "title": "Blog verwijderen",
       "message": "Blog \"{{slug}}\" verwijderen? Dit kan niet ongedaan worden gemaakt."
     },
+    "publishDialog": {
+      "title": "Blog publiceren?",
+      "message": "\"{{slug}}\" wordt publiek zichtbaar."
+    },
+    "unpublishDialog": {
+      "title": "Blog depubliceren?",
+      "message": "\"{{slug}}\" wordt verwijderd uit de publieke weergave en teruggezet naar concept."
+    },
+    "archiveDialog": {
+      "title": "Blog archiveren?",
+      "message": "Dit archiveert \"{{slug}}\" en verplaatst het naar de archiefweergave."
+    },
+    "restoreDialog": {
+      "title": "Blog herstellen?",
+      "message": "Dit herstelt \"{{slug}}\" naar conceptstatus."
+    },
+    "tabs": {
+      "active": "Actief",
+      "archived": "Gearchiveerd"
+    },
     "moreActions": "Meer",
-    "searchPlaceholder": "Zoek op ID, slug of auteur..."
+    "searchPlaceholder": "Zoek op ID, slug of auteur...",
+    "wizard": {
+      "title": "Blog aanmaken",
+      "steps": {
+        "method": "Methode",
+        "details": "Details"
+      },
+      "methods": {
+        "scratch": "Vanaf nul",
+        "scratchDesc": "Begin met een leeg blogbericht",
+        "template": "Vanuit sjabloon",
+        "templateDesc": "Gebruik een kant-en-klare inhoudssjabloon",
+        "import": "Markdown importeren",
+        "importDesc": "Importeer inhoud uit een .md-bestand"
+      },
+      "fields": {
+        "slug": "Slug",
+        "slugHint": "URL-vriendelijke identificatie (bijv. mijn-eerste-bericht)",
+        "author": "Auteur"
+      },
+      "creating": "Aanmaken...",
+      "create": "Blog aanmaken"
+    }
   },
   "blogDetail": {
     "title": "Blogdetails",
@@ -289,7 +352,13 @@
       "readingTime": "Leestijd",
       "manualOverride": "Handmatige overschrijving",
       "autoCalculated": "Automatisch berekend op basis van inhoud",
-      "resetAuto": "Terugzetten naar automatische berekening"
+      "resetAuto": "Terugzetten naar automatische berekening",
+      "info": "Metadata",
+      "blogId": "Blog-ID",
+      "contentId": "Inhoud-ID",
+      "publishedAt": "Gepubliceerd op",
+      "createdAt": "Aangemaakt",
+      "updatedAt": "Laatst bijgewerkt"
     },
     "images": {
       "title": "Afbeeldingen",
@@ -368,6 +437,26 @@
     "deleteDialog": {
       "title": "Pagina verwijderen",
       "message": "Pagina \"{{route}}\" verwijderen? Dit kan niet ongedaan worden gemaakt."
+    },
+    "publishDialog": {
+      "title": "Pagina publiceren?",
+      "message": "\"{{route}}\" wordt publiek zichtbaar."
+    },
+    "unpublishDialog": {
+      "title": "Pagina depubliceren?",
+      "message": "\"{{route}}\" wordt verwijderd uit de publieke weergave en teruggezet naar concept."
+    },
+    "archiveDialog": {
+      "title": "Pagina archiveren?",
+      "message": "Dit archiveert \"{{route}}\" en verplaatst het naar de archiefweergave."
+    },
+    "restoreDialog": {
+      "title": "Pagina herstellen?",
+      "message": "Dit herstelt \"{{route}}\" naar conceptstatus."
+    },
+    "tabs": {
+      "active": "Actief",
+      "archived": "Gearchiveerd"
     },
     "wizard": {
       "steps": {
@@ -512,6 +601,10 @@
       "title": "Media verwijderen",
       "message": "\"{{filename}}\" verwijderen? Dit kan niet ongedaan worden gemaakt."
     },
+    "deleteFolderDialog": {
+      "title": "Map verwijderen?",
+      "message": "Deze map wordt permanent verwijderd en de bestanden worden naar het hoofdniveau verplaatst."
+    },
     "upload": {
       "dragDrop": "Sleep bestanden hierheen, of klik om te bladeren",
       "uploading": "Uploaden...",
@@ -550,6 +643,10 @@
     "deleteDialog": {
       "title": "Document verwijderen",
       "message": "Document \"{{title}}\" verwijderen? Dit kan niet ongedaan worden gemaakt."
+    },
+    "deleteFolderDialog": {
+      "title": "Map verwijderen?",
+      "message": "Deze map wordt permanent verwijderd en de documenten worden naar het hoofdniveau verplaatst."
     }
   },
   "navigation": {
@@ -861,7 +958,8 @@
     },
     "revokeDialog": {
       "title": "API-sleutel intrekken",
-      "message": "Weet u zeker dat u \"{{name}}\" wilt intrekken? Dit is permanent en kan niet ongedaan worden gemaakt."
+      "message": "Weet u zeker dat u \"{{name}}\" wilt intrekken? Dit is permanent en kan niet ongedaan worden gemaakt.",
+      "confirmWord": "Intrekken"
     },
     "deleteDialog": {
       "title": "API-sleutel verwijderen",
@@ -1689,7 +1787,10 @@
       "backToBlogs": "Terug naar bloglijst",
       "backToPages": "Terug naar paginalijst"
     },
-    "hint": "⌘K"
+    "open": "Opdrachtenpalet openen",
+    "searchLabel": "Opdrachten zoeken",
+    "title": "Opdrachtenpalet",
+    "resultCount": "{{count}} resultaten beschikbaar"
   },
   "languages": {
     "en": "English",
@@ -1710,7 +1811,23 @@
     "submittedForReview": "Inhoud ter beoordeling ingediend",
     "approved": "Inhoud goedgekeurd",
     "changesRequested": "Wijzigingen aangevraagd",
-    "cannotPublish": "De redactionele workflow is ingeschakeld. Dien inhoud ter beoordeling in om te publiceren."
+    "cannotPublish": "De redactionele workflow is ingeschakeld. Dien inhoud ter beoordeling in om te publiceren.",
+    "publish": "Publiceren",
+    "unpublish": "Depubliceren",
+    "archive": "Archiveren",
+    "restore": "Herstellen",
+    "restoreAsDraft": "Herstellen als concept"
+  },
+  "approveDialog": {
+    "title": "Inhoud goedkeuren",
+    "message": "Kies hoe u deze inhoud wilt publiceren.",
+    "publishNow": "Nu publiceren",
+    "schedule": "Plannen",
+    "selectDate": "Publicatiedatum selecteren"
+  },
+  "restoreDialog": {
+    "restore": "Herstellen",
+    "restoreAsDraft": "Herstellen als concept"
   },
   "notifications": {
     "title": "Meldingen",
@@ -1740,11 +1857,29 @@
     "selectedCount": "{{count}} geselecteerd",
     "publish": "Publiceren",
     "unpublish": "Depubliceren",
+    "archive": "Archiveren",
+    "restore": "Herstellen",
     "delete": "Verwijderen",
     "clearSelection": "Selectie wissen",
     "deleteDialog": {
       "title": "Geselecteerde items verwijderen",
       "message": "{{count}} geselecteerde items verwijderen? Dit kan niet ongedaan worden gemaakt."
+    },
+    "publishDialog": {
+      "title": "Geselecteerde items publiceren?",
+      "message": "{{count}} item(s) worden gepubliceerd en publiek zichtbaar gemaakt."
+    },
+    "unpublishDialog": {
+      "title": "Geselecteerde items depubliceren?",
+      "message": "{{count}} item(s) worden gedepubliceerd en teruggezet naar concept."
+    },
+    "archiveDialog": {
+      "title": "Geselecteerde items archiveren?",
+      "message": "Dit archiveert {{count}} item(s) en verplaatst ze naar de archiefweergave."
+    },
+    "restoreDialog": {
+      "title": "Geselecteerde items herstellen?",
+      "message": "Dit herstelt {{count}} item(s) naar conceptstatus."
     },
     "messages": {
       "success": "{{count}} items succesvol bijgewerkt",
@@ -1752,8 +1887,8 @@
     }
   },
   "contentTemplates": {
-    "title": "Inhoudssjablonen",
-    "subtitle": "Beheer herbruikbare inhoudssjablonen",
+    "title": "Blogsjablonen",
+    "subtitle": "Beheer herbruikbare sjablonen voor blogberichten",
     "addTemplate": "Sjabloon toevoegen",
     "table": {
       "name": "Naam",
@@ -1777,6 +1912,22 @@
     "deleteDialog": {
       "title": "Sjabloon verwijderen",
       "message": "Sjabloon \"{{name}}\" verwijderen? Dit kan niet ongedaan worden gemaakt."
+    },
+    "wizard": {
+      "title": "Sjabloon aanmaken",
+      "steps": {
+        "method": "Methode",
+        "details": "Details"
+      },
+      "methods": {
+        "scratch": "Vanaf nul",
+        "scratchDesc": "Begin met een leeg sjabloon",
+        "template": "Van sjabloon",
+        "templateDesc": "Gebruik een ingebouwd sjabloon als uitgangspunt",
+        "import": "Markdown importeren",
+        "importDesc": "Importeer inhoud uit een .md-bestand"
+      },
+      "slugPrefixHint": "URL-voorvoegsel voor blogs gemaakt met dit sjabloon"
     }
   },
   "templates": {

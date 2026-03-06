@@ -9,6 +9,28 @@ use crate::models::content::ContentStatus;
 
 pub struct ContentService;
 
+/// Check whether a content status transition is structurally valid.
+/// This is independent of roles or workflow settings — it enforces
+/// the immutable state machine (e.g. Draft cannot jump to Archived).
+pub fn is_valid_status_transition(from: &ContentStatus, to: &ContentStatus) -> bool {
+    matches!(
+        (from, to),
+        (ContentStatus::Draft, ContentStatus::InReview)
+            | (ContentStatus::Draft, ContentStatus::Published)
+            | (ContentStatus::Draft, ContentStatus::Scheduled)
+            | (ContentStatus::InReview, ContentStatus::Draft)
+            | (ContentStatus::InReview, ContentStatus::Published)
+            | (ContentStatus::InReview, ContentStatus::Scheduled)
+            | (ContentStatus::Published, ContentStatus::Draft)
+            | (ContentStatus::Published, ContentStatus::Archived)
+            | (ContentStatus::Scheduled, ContentStatus::Draft)
+            | (ContentStatus::Scheduled, ContentStatus::Published)
+            | (ContentStatus::Scheduled, ContentStatus::Archived)
+            | (ContentStatus::Archived, ContentStatus::Published)
+            | (ContentStatus::Archived, ContentStatus::Draft)
+    )
+}
+
 impl ContentService {
     /// Create a new content record with site associations.
     /// Uses a transaction so the caller can wrap this with their own entity insert.
@@ -105,6 +127,7 @@ impl ContentService {
     /// Update an existing content record (slug, status, scheduling).
     /// Auto-sets published_at when status becomes Published.
     /// Auto-sets status to Scheduled when publish_start is in the future.
+    /// Validates status transitions against the content state machine.
     pub async fn update_content(
         pool: &PgPool,
         content_id: Uuid,
@@ -119,6 +142,23 @@ impl ContentService {
                 return Err(ApiError::BadRequest(
                     "publish_end must be after publish_start".to_string(),
                 ));
+            }
+        }
+
+        // Validate status transition against the state machine
+        if let Some(requested) = status {
+            let current: ContentStatus = sqlx::query_scalar(
+                "SELECT status FROM contents WHERE id = $1 AND is_deleted = FALSE",
+            )
+            .bind(content_id)
+            .fetch_one(pool)
+            .await?;
+
+            if &current != requested && !is_valid_status_transition(&current, requested) {
+                return Err(ApiError::BadRequest(format!(
+                    "Invalid status transition from {:?} to {:?}",
+                    current, requested
+                )));
             }
         }
 
@@ -297,5 +337,58 @@ impl ContentService {
         }
 
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn valid_transitions_accepted() {
+        let valid = vec![
+            (ContentStatus::Draft, ContentStatus::InReview),
+            (ContentStatus::Draft, ContentStatus::Published),
+            (ContentStatus::Draft, ContentStatus::Scheduled),
+            (ContentStatus::InReview, ContentStatus::Draft),
+            (ContentStatus::InReview, ContentStatus::Published),
+            (ContentStatus::InReview, ContentStatus::Scheduled),
+            (ContentStatus::Published, ContentStatus::Draft),
+            (ContentStatus::Published, ContentStatus::Archived),
+            (ContentStatus::Scheduled, ContentStatus::Draft),
+            (ContentStatus::Scheduled, ContentStatus::Published),
+            (ContentStatus::Scheduled, ContentStatus::Archived),
+            (ContentStatus::Archived, ContentStatus::Published),
+            (ContentStatus::Archived, ContentStatus::Draft),
+        ];
+        for (from, to) in valid {
+            assert!(
+                is_valid_status_transition(&from, &to),
+                "{:?} -> {:?} should be valid",
+                from,
+                to
+            );
+        }
+    }
+
+    #[test]
+    fn blocked_transitions_rejected() {
+        let blocked = vec![
+            (ContentStatus::Draft, ContentStatus::Archived),
+            (ContentStatus::InReview, ContentStatus::Archived),
+            (ContentStatus::Archived, ContentStatus::InReview),
+            (ContentStatus::Archived, ContentStatus::Scheduled),
+            (ContentStatus::Published, ContentStatus::InReview),
+            (ContentStatus::Published, ContentStatus::Scheduled),
+            (ContentStatus::Scheduled, ContentStatus::InReview),
+        ];
+        for (from, to) in blocked {
+            assert!(
+                !is_valid_status_transition(&from, &to),
+                "{:?} -> {:?} should be blocked",
+                from,
+                to
+            );
+        }
     }
 }

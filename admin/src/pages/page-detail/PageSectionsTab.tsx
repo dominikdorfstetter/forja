@@ -367,6 +367,7 @@ export default function PageSectionsTab({
         }}
         onCancel={() => setDeletingSection(null)}
         loading={deleteLoading}
+        confirmationText={t('common.actions.delete')}
       />
     </Box>
   );

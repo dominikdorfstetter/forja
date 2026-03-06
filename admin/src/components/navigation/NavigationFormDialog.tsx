@@ -165,7 +165,7 @@ export default function NavigationFormDialog({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="navigation-form-title">
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="navigation-form-title" data-testid="navigation-form.dialog">
       <form onSubmit={handleSubmit(onFormSubmit)}>
         <DialogTitle id="navigation-form-title">{item ? t('forms.navigation.editTitle') : t('forms.navigation.createTitle')}</DialogTitle>
         <DialogContent>
@@ -237,8 +237,8 @@ export default function NavigationFormDialog({
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose} disabled={loading}>{t('common.actions.cancel')}</Button>
-          <Button type="submit" variant="contained" disabled={loading || !isValid}>
+          <Button onClick={onClose} disabled={loading} data-testid="navigation-form.btn.cancel">{t('common.actions.cancel')}</Button>
+          <Button type="submit" variant="contained" disabled={loading || !isValid} data-testid="navigation-form.btn.submit">
             {loading ? t('common.actions.saving') : (item ? t('common.actions.save') : t('common.actions.create'))}
           </Button>
         </DialogActions>

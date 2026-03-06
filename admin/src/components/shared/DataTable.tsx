@@ -14,6 +14,7 @@ export interface DataTableColumn<T> {
   render: (item: T) => ReactNode;
   align?: 'left' | 'center' | 'right';
   padding?: 'checkbox' | 'none' | 'normal';
+  /** @deprecated scope="col" is now applied automatically to all header cells */
   scope?: string;
 }
 
@@ -35,6 +36,8 @@ export interface DataTableProps<T> {
   isRowSelected?: (item: T) => boolean;
   size?: 'small' | 'medium';
   rowsPerPageOptions?: number[];
+  caption?: string;
+  testIdPrefix?: string;
 }
 
 export default function DataTable<T>({
@@ -49,11 +52,18 @@ export default function DataTable<T>({
   isRowSelected,
   size = 'small',
   rowsPerPageOptions = [10, 25, 50],
+  caption,
+  testIdPrefix,
 }: DataTableProps<T>) {
   return (
     <>
-      <TableContainer>
+      <TableContainer {...(testIdPrefix ? { 'data-testid': `${testIdPrefix}.table` } : {})}>
         <Table size={size}>
+          {caption && (
+            <caption style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0,0,0,0)' }}>
+              {caption}
+            </caption>
+          )}
           <TableHead>
             <TableRow>
               {columns.map((col, i) => (
@@ -61,7 +71,7 @@ export default function DataTable<T>({
                   key={i}
                   align={col.align}
                   padding={col.padding}
-                  scope={col.scope as never}
+                  scope="col"
                 >
                   {col.header}
                 </TableCell>
@@ -90,6 +100,7 @@ export default function DataTable<T>({
           rowsPerPage={rowsPerPage ?? meta.page_size}
           onRowsPerPageChange={onRowsPerPageChange}
           rowsPerPageOptions={rowsPerPageOptions}
+          {...(testIdPrefix ? { 'data-testid': `${testIdPrefix}.table.pagination` } : {})}
         />
       )}
     </>

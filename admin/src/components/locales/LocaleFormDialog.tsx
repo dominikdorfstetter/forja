@@ -98,7 +98,7 @@ export default function LocaleFormDialog({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth aria-labelledby="locale-form-title">
+    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth aria-labelledby="locale-form-title" data-testid="locale-form.dialog">
       <form onSubmit={handleSubmit(onFormSubmit)}>
         <DialogTitle id="locale-form-title">
           {locale ? t('forms.locale.editTitle') : t('forms.locale.createTitle')}
@@ -161,8 +161,8 @@ export default function LocaleFormDialog({
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose}>{t('common.actions.cancel')}</Button>
-          <Button type="submit" variant="contained" disabled={loading || !isValid}>
+          <Button onClick={onClose} data-testid="locale-form.btn.cancel">{t('common.actions.cancel')}</Button>
+          <Button type="submit" variant="contained" disabled={loading || !isValid} data-testid="locale-form.btn.submit">
             {loading
               ? t('common.actions.saving')
               : locale

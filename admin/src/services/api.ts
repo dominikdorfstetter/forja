@@ -338,6 +338,7 @@ export class ApiService {
     status?: string;
     sort_by?: string;
     sort_dir?: string;
+    exclude_status?: string;
   }): Promise<Paginated<BlogListItem>> {
     return apiRequest<Paginated<BlogListItem>>('GET', `/sites/${siteId}/blogs`, undefined, { params });
   }
@@ -524,6 +525,11 @@ export class ApiService {
     return apiRequest<BlogResponse>('POST', `/blogs/${id}/clone`);
   }
 
+  async getSimilarBlogs(siteId: string, blogId: string, limit?: number): Promise<BlogListItem[]> {
+    const params = limit !== undefined ? `?limit=${limit}` : '';
+    return apiRequest<BlogListItem[]>('GET', `/sites/${siteId}/blogs/${blogId}/similar${params}`);
+  }
+
   // Media (mutations)
   async uploadMedia(data: UploadMediaRequest): Promise<MediaListItem> {
     return apiRequest<MediaListItem>('POST', '/media', data);
@@ -566,6 +572,7 @@ export class ApiService {
     page_type?: string;
     sort_by?: string;
     sort_dir?: string;
+    exclude_status?: string;
   }): Promise<Paginated<PageListItem>> {
     return apiRequest<Paginated<PageListItem>>('GET', `/sites/${siteId}/pages`, undefined, { params });
   }
@@ -959,7 +966,7 @@ export class ApiService {
   }
 
   async createContentTemplate(siteId: string, data: CreateContentTemplateRequest): Promise<ContentTemplate> {
-    return apiRequest<ContentTemplate>('POST', `/sites/${siteId}/content-templates`, data);
+    return apiRequest<ContentTemplate>('POST', `/sites/${siteId}/content-templates`, { ...data, site_id: siteId });
   }
 
   async updateContentTemplate(id: string, data: UpdateContentTemplateRequest): Promise<ContentTemplate> {

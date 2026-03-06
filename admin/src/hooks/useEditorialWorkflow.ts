@@ -5,8 +5,6 @@ import { useAuth } from '@/store/AuthContext';
 import { useSiteContext } from '@/store/SiteContext';
 import type { ContentStatus, SiteRole } from '@/types/api';
 
-const ALL_STATUSES: ContentStatus[] = ['Draft', 'InReview', 'Scheduled', 'Published', 'Archived'];
-
 const ROLE_RANK: Record<SiteRole, number> = {
   owner: 60,
   admin: 50,
@@ -21,8 +19,20 @@ function isAtLeast(role: SiteRole | null, min: SiteRole): boolean {
   return ROLE_RANK[role] >= ROLE_RANK[min];
 }
 
-export function useEditorialWorkflow(currentStatus: ContentStatus) {
-  const { currentSiteRole } = useAuth();
+export interface WorkflowActions {
+  workflowEnabled: boolean;
+  canSubmitForReview: boolean;
+  canApprove: boolean;
+  canRequestChanges: boolean;
+  canPublish: boolean;
+  canUnpublish: boolean;
+  canArchive: boolean;
+  canRestore: boolean;
+  canSchedule: boolean;
+}
+
+export function useEditorialWorkflow(currentStatus: ContentStatus): WorkflowActions {
+  const { currentSiteRole, canWrite } = useAuth();
   const { selectedSiteId } = useSiteContext();
 
   const { data: settings } = useQuery({
@@ -35,61 +45,70 @@ export function useEditorialWorkflow(currentStatus: ContentStatus) {
   const workflowEnabled = settings?.editorial_workflow_enabled ?? false;
 
   return useMemo(() => {
-    // Workflow disabled: no restrictions
+    const base: WorkflowActions = {
+      workflowEnabled,
+      canSubmitForReview: false,
+      canApprove: false,
+      canRequestChanges: false,
+      canPublish: false,
+      canUnpublish: false,
+      canArchive: false,
+      canRestore: false,
+      canSchedule: false,
+    };
+
+    if (!canWrite) return base;
+
+    // ── Workflow DISABLED: all actions based on current status ──
     if (!workflowEnabled) {
       return {
-        workflowEnabled: false,
-        allowedStatuses: ALL_STATUSES,
-        canSubmitForReview: false,
-        canApprove: false,
-        canRequestChanges: false,
+        ...base,
+        canPublish: currentStatus === 'Draft' || currentStatus === 'Scheduled',
+        canUnpublish: currentStatus === 'Published' || currentStatus === 'Scheduled',
+        canArchive: currentStatus === 'Published' || currentStatus === 'Scheduled',
+        canRestore: currentStatus === 'Archived',
+        canSchedule: currentStatus === 'Draft',
       };
     }
 
-    // Editors/Admins/Owners bypass
+    // ── Workflow ENABLED ──
+
+    // Editor+ bypass: all actions based on current status + workflow actions
     if (isAtLeast(currentSiteRole, 'editor')) {
       return {
+        ...base,
         workflowEnabled: true,
-        allowedStatuses: ALL_STATUSES,
         canSubmitForReview: currentStatus === 'Draft',
         canApprove: currentStatus === 'InReview',
         canRequestChanges: currentStatus === 'InReview',
+        canPublish: currentStatus === 'Draft' || currentStatus === 'Scheduled',
+        canUnpublish: currentStatus === 'Published' || currentStatus === 'Scheduled',
+        canArchive: currentStatus === 'Published' || currentStatus === 'Scheduled',
+        canRestore: currentStatus === 'Archived',
+        canSchedule: currentStatus === 'Draft',
       };
     }
 
-    // Author rules
+    // Author: can only submit for review from Draft
     if (isAtLeast(currentSiteRole, 'author')) {
-      const allowedStatuses: ContentStatus[] = ['Draft', 'InReview'];
       return {
+        ...base,
         workflowEnabled: true,
-        allowedStatuses,
         canSubmitForReview: currentStatus === 'Draft',
-        canApprove: false,
-        canRequestChanges: false,
       };
     }
 
-    // Reviewer rules
+    // Reviewer: can approve or request changes on InReview content
     if (isAtLeast(currentSiteRole, 'reviewer')) {
-      const allowedStatuses: ContentStatus[] = currentStatus === 'InReview'
-        ? ['Draft', 'Published', 'Scheduled']
-        : [currentStatus];
       return {
+        ...base,
         workflowEnabled: true,
-        allowedStatuses,
-        canSubmitForReview: false,
         canApprove: currentStatus === 'InReview',
         canRequestChanges: currentStatus === 'InReview',
       };
     }
 
     // Viewer / no role
-    return {
-      workflowEnabled: true,
-      allowedStatuses: [currentStatus] as ContentStatus[],
-      canSubmitForReview: false,
-      canApprove: false,
-      canRequestChanges: false,
-    };
-  }, [workflowEnabled, currentSiteRole, currentStatus]);
+    return base;
+  }, [workflowEnabled, currentSiteRole, currentStatus, canWrite]);
 }

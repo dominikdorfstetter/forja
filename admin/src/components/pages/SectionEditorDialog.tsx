@@ -256,8 +256,8 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
   if (!section) return null;
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="lg" fullWidth>
-      <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <Dialog open={open} onClose={handleClose} maxWidth="lg" fullWidth aria-labelledby="section-editor-dialog-title" data-testid="section-editor.dialog">
+      <DialogTitle id="section-editor-dialog-title" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           {t('forms.section.title')}
           <Chip label={section.section_type} size="small" color="primary" variant="outlined" />
@@ -434,7 +434,7 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
       </DialogContent>
 
       <DialogActions sx={{ px: 3, py: 2 }}>
-        <Button onClick={handleClose} disabled={isSaving}>
+        <Button onClick={handleClose} disabled={isSaving} data-testid="section-editor.btn.close">
           {t('common.actions.close')}
         </Button>
         <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
@@ -453,6 +453,7 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
           startIcon={<SaveIcon />}
           onClick={handleSave}
           disabled={isSaving}
+          data-testid="section-editor.btn.submit"
         >
           {isSaving ? t('common.actions.saving') : t('common.actions.save')}
         </Button>

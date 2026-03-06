@@ -119,7 +119,7 @@ export default function CreatePageWizard({ open, onSubmit, onClose, loading }: C
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="create-page-wizard-title">
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="create-page-wizard-title" data-testid="create-page-wizard">
       <form onSubmit={handleSubmit(onFormSubmit)}>
         <DialogTitle id="create-page-wizard-title">{t('forms.page.createTitle')}</DialogTitle>
         <DialogContent>
@@ -245,12 +245,12 @@ export default function CreatePageWizard({ open, onSubmit, onClose, loading }: C
           <Button type="button" onClick={onClose} disabled={loading}>{t('common.actions.cancel')}</Button>
           <Box sx={{ flex: 1 }} />
           {activeStep > 0 && (
-            <Button type="button" onClick={handleBack} disabled={loading}>{t('pages.wizard.back')}</Button>
+            <Button type="button" onClick={handleBack} disabled={loading} data-testid="create-page-wizard.btn.back">{t('pages.wizard.back')}</Button>
           )}
           {activeStep < 2 ? (
-            <Button type="button" variant="contained" onClick={handleNext}>{t('pages.wizard.next')}</Button>
+            <Button type="button" variant="contained" onClick={handleNext} data-testid="create-page-wizard.btn.next">{t('pages.wizard.next')}</Button>
           ) : (
-            <Button type="submit" variant="contained" disabled={loading}>
+            <Button type="submit" variant="contained" disabled={loading} data-testid="create-page-wizard.btn.create">
               {loading ? t('pages.wizard.creating') : t('pages.wizard.createPage')}
             </Button>
           )}

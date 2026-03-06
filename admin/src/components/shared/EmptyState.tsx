@@ -14,7 +14,7 @@ interface EmptyStateProps {
 
 export default function EmptyState({ icon, title, description, action }: EmptyStateProps) {
   return (
-    <Box role="status" sx={{ textAlign: 'center', py: 8 }}>
+    <Box role="status" aria-live="polite" data-testid="empty-state" sx={{ textAlign: 'center', py: 8 }}>
       <Box sx={{ color: 'text.disabled', mb: 2 }}>
         {icon || <InboxIcon sx={{ fontSize: 64 }} />}
       </Box>

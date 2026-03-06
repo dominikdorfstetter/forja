@@ -84,7 +84,7 @@ export default function LocalesPage() {
   ];
 
   return (
-    <Box>
+    <Box data-testid="locales.page">
       <PageHeader title={t('locales.title')} subtitle={t('locales.subtitle')} />
 
       <Paper sx={{ p: 3 }}>
@@ -118,7 +118,7 @@ export default function LocalesPage() {
 
       <LocaleFormDialog open={formOpen} onSubmitCreate={(data) => createMutation.mutate(data)} onClose={closeForm} loading={createMutation.isPending} />
       <LocaleFormDialog open={!!editing} locale={editing} onSubmitUpdate={(data) => editing && updateMutation.mutate({ id: editing.id, data })} onClose={closeEdit} loading={updateMutation.isPending} />
-      <ConfirmDialog open={!!deleting} title={t('locales.deleteDialog.title')} message={t('locales.deleteDialog.message', { code: deleting?.code })} confirmLabel={t('common.actions.delete')} onConfirm={() => deleting && deleteMutation.mutate(deleting.id)} onCancel={closeDelete} loading={deleteMutation.isPending} />
+      <ConfirmDialog open={!!deleting} title={t('locales.deleteDialog.title')} message={t('locales.deleteDialog.message', { code: deleting?.code })} confirmLabel={t('common.actions.delete')} onConfirm={() => deleting && deleteMutation.mutate(deleting.id)} onCancel={closeDelete} loading={deleteMutation.isPending} confirmationText={t('common.actions.delete')} />
     </Box>
   );
 }

@@ -4,6 +4,8 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import PublishIcon from '@mui/icons-material/Publish';
 import UnpublishedIcon from '@mui/icons-material/Unpublished';
+import ArchiveIcon from '@mui/icons-material/Archive';
+import UnarchiveIcon from '@mui/icons-material/Unarchive';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useTranslation } from 'react-i18next';
@@ -18,6 +20,8 @@ interface PageActionsMenuProps {
   onPublish: (page: PageListItem) => void;
   onUnpublish: (page: PageListItem) => void;
   onDelete: (page: PageListItem) => void;
+  onArchive?: (page: PageListItem) => void;
+  onRestore?: (page: PageListItem) => void;
   cloneDisabled?: boolean;
 }
 
@@ -30,6 +34,8 @@ export default function PageActionsMenu({
   onPublish,
   onUnpublish,
   onDelete,
+  onArchive,
+  onRestore,
   cloneDisabled,
 }: PageActionsMenuProps) {
   const { t } = useTranslation();
@@ -37,12 +43,14 @@ export default function PageActionsMenu({
 
   const handleClose = () => setAnchorEl(null);
 
-  const canPublishPage = canWrite && page.status !== 'Published';
-  const canUnpublishPage = canWrite && page.status === 'Published';
+  const canPublishPage = canWrite && (page.status === 'Draft' || page.status === 'Scheduled');
+  const canUnpublishPage = canWrite && (page.status === 'Published' || page.status === 'Scheduled');
+  const canArchivePage = canWrite && (page.status === 'Published' || page.status === 'Scheduled') && onArchive;
+  const canRestorePage = canWrite && page.status === 'Archived' && onRestore;
 
   return (
     <>
-      <IconButton size="small" aria-label={t('common.table.actions')} onClick={(e) => setAnchorEl(e.currentTarget)}>
+      <IconButton size="small" aria-label={t('common.table.actions')} aria-haspopup="menu" aria-expanded={!!anchorEl} data-testid="page-actions.btn.menu" onClick={(e) => setAnchorEl(e.currentTarget)}>
         <MoreVertIcon />
       </IconButton>
       <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={handleClose}>
@@ -69,6 +77,20 @@ export default function PageActionsMenu({
           <MenuItem onClick={() => { handleClose(); onClone(page); }} disabled={cloneDisabled}>
             <ListItemIcon><ContentCopyIcon fontSize="small" /></ListItemIcon>
             <ListItemText>{t('common.actions.clone')}</ListItemText>
+          </MenuItem>
+        )}
+
+        {canArchivePage && (
+          <MenuItem onClick={() => { handleClose(); onArchive(page); }}>
+            <ListItemIcon><ArchiveIcon fontSize="small" color="warning" /></ListItemIcon>
+            <ListItemText>{t('bulk.archive')}</ListItemText>
+          </MenuItem>
+        )}
+
+        {canRestorePage && (
+          <MenuItem onClick={() => { handleClose(); onRestore(page); }}>
+            <ListItemIcon><UnarchiveIcon fontSize="small" /></ListItemIcon>
+            <ListItemText>{t('bulk.restore')}</ListItemText>
           </MenuItem>
         )}
 

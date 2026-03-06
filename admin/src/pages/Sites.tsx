@@ -80,7 +80,7 @@ export default function SitesPage() {
   if (error) return <Alert severity="error">{t('sites.loadError')}</Alert>;
 
   return (
-    <Box>
+    <Box data-testid="sites.page">
       <PageHeader
         title={t('sites.title')}
         subtitle={t('sites.subtitle')}
@@ -132,6 +132,7 @@ export default function SitesPage() {
         onConfirm={() => deletingSite && deleteMutation.mutate(deletingSite.id)}
         onCancel={() => setDeletingSite(null)}
         loading={deleteMutation.isPending}
+        confirmationText={t('common.actions.delete')}
       />
     </Box>
   );
