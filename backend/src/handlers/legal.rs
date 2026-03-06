@@ -15,6 +15,7 @@ use crate::dto::legal::{
 };
 use crate::errors::{ApiError, ProblemDetails};
 use crate::guards::auth_guard::ReadKey;
+use crate::guards::module_guard::{LegalModule, ModuleGuard};
 use crate::models::audit::AuditAction;
 use crate::models::legal::{
     LegalDocType, LegalDocument, LegalDocumentLocalization, LegalGroup, LegalItem,
@@ -48,6 +49,7 @@ pub async fn list_legal_documents(
     page: Option<i64>,
     per_page: Option<i64>,
     auth: ReadKey,
+    _module: ModuleGuard<LegalModule>,
 ) -> Result<Json<PaginatedLegalDocuments>, ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)
@@ -105,6 +107,7 @@ pub async fn get_cookie_consent(
     state: &State<AppState>,
     site_id: Uuid,
     auth: ReadKey,
+    _module: ModuleGuard<LegalModule>,
 ) -> Result<Json<LegalDocumentWithGroups>, ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)
@@ -204,6 +207,7 @@ pub async fn create_legal_document(
     site_id: Uuid,
     body: Json<CreateLegalDocumentRequest>,
     auth: ReadKey,
+    _module: ModuleGuard<LegalModule>,
 ) -> Result<(Status, Json<LegalDocumentResponse>), ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Author)
@@ -256,6 +260,7 @@ pub async fn update_legal_document(
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Author)
         .await?;
+    ModuleGuard::<LegalModule>::check(&state.db, site_id).await?;
     let req = body.into_inner();
     req.validate()
         .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
@@ -298,6 +303,7 @@ pub async fn delete_legal_document(
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Editor)
         .await?;
+    ModuleGuard::<LegalModule>::check(&state.db, site_id).await?;
     LegalDocument::soft_delete(&state.db, id).await?;
     audit_service::log_action(
         &state.db,
@@ -338,6 +344,7 @@ pub async fn create_legal_group(
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Author)
         .await?;
+    ModuleGuard::<LegalModule>::check(&state.db, site_id).await?;
     let req = body.into_inner();
     req.validate()
         .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
@@ -383,6 +390,7 @@ pub async fn update_legal_group(
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Author)
         .await?;
+    ModuleGuard::<LegalModule>::check(&state.db, site_id).await?;
     let req = body.into_inner();
     req.validate()
         .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
@@ -426,6 +434,7 @@ pub async fn delete_legal_group(
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Editor)
         .await?;
+    ModuleGuard::<LegalModule>::check(&state.db, site_id).await?;
     LegalGroup::delete(&state.db, id).await?;
     audit_service::log_action(
         &state.db,
@@ -467,6 +476,7 @@ pub async fn create_legal_item(
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Author)
         .await?;
+    ModuleGuard::<LegalModule>::check(&state.db, site_id).await?;
     let req = body.into_inner();
     req.validate()
         .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
@@ -513,6 +523,7 @@ pub async fn update_legal_item(
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Author)
         .await?;
+    ModuleGuard::<LegalModule>::check(&state.db, site_id).await?;
     let req = body.into_inner();
     req.validate()
         .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
@@ -557,6 +568,7 @@ pub async fn delete_legal_item(
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Editor)
         .await?;
+    ModuleGuard::<LegalModule>::check(&state.db, site_id).await?;
     LegalItem::delete(&state.db, id).await?;
     audit_service::log_action(
         &state.db,
@@ -595,6 +607,7 @@ pub async fn get_legal_document_by_slug(
     site_id: Uuid,
     slug: &str,
     auth: ReadKey,
+    _module: ModuleGuard<LegalModule>,
 ) -> Result<Json<LegalDocumentDetailResponse>, ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)

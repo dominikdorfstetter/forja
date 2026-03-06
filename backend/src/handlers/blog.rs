@@ -24,6 +24,7 @@ use crate::dto::review::{ReviewActionRequest, ReviewActionResponse};
 use crate::dto::taxonomy::CategoryResponse;
 use crate::errors::{ApiError, ProblemDetails};
 use crate::guards::auth_guard::ReadKey;
+use crate::guards::module_guard::{BlogModule, ModuleGuard};
 use crate::models::audit::AuditAction;
 use crate::models::blog::Blog;
 use crate::models::content::{Content, ContentLocalization, ContentStatus};
@@ -97,6 +98,7 @@ pub async fn list_blogs(
     sort_dir: Option<String>,
     exclude_status: Option<String>,
     auth: ReadKey,
+    _module: ModuleGuard<BlogModule>,
 ) -> Result<Json<PaginatedBlogs>, ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)
@@ -168,6 +170,7 @@ pub async fn list_published_blogs(
     page: Option<i64>,
     per_page: Option<i64>,
     auth: ReadKey,
+    _module: ModuleGuard<BlogModule>,
 ) -> Result<Json<PaginatedBlogs>, ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)
@@ -210,6 +213,7 @@ pub async fn list_published_blogs_by_category(
     page: Option<i64>,
     per_page: Option<i64>,
     auth: ReadKey,
+    _module: ModuleGuard<BlogModule>,
 ) -> Result<Json<PaginatedBlogs>, ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)
@@ -251,6 +255,7 @@ pub async fn list_featured_blogs(
     site_id: Uuid,
     limit: Option<i64>,
     auth: ReadKey,
+    _module: ModuleGuard<BlogModule>,
 ) -> Result<Json<Vec<BlogListItem>>, ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)
@@ -288,6 +293,7 @@ pub async fn list_similar_blogs(
     id: Uuid,
     limit: Option<i64>,
     auth: ReadKey,
+    _module: ModuleGuard<BlogModule>,
 ) -> Result<Json<Vec<BlogListItem>>, ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)
@@ -328,6 +334,9 @@ pub async fn get_blog(
             .authorize_site_action(&state.db, *site_id, &SiteRole::Viewer)
             .await?;
     }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<BlogModule>::check(&state.db, site_id).await?;
+    }
     Ok(Json(BlogResponse::from(blog)))
 }
 
@@ -354,6 +363,7 @@ pub async fn get_blog_by_slug(
     site_id: Uuid,
     slug: &str,
     auth: ReadKey,
+    _module: ModuleGuard<BlogModule>,
 ) -> Result<Json<BlogResponse>, ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)
@@ -390,6 +400,9 @@ pub async fn create_blog(
         auth.0
             .authorize_site_action(&state.db, *site_id, &SiteRole::Author)
             .await?;
+    }
+    if let Some(&site_id) = req.site_ids.first() {
+        ModuleGuard::<BlogModule>::check(&state.db, site_id).await?;
     }
 
     // Validate initial status against editorial workflow rules
@@ -464,6 +477,9 @@ pub async fn update_blog(
         auth.0
             .authorize_site_action(&state.db, *site_id, &SiteRole::Author)
             .await?;
+    }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<BlogModule>::check(&state.db, site_id).await?;
     }
     let old = serde_json::to_value(&existing).ok();
 
@@ -557,6 +573,9 @@ pub async fn delete_blog(
             .authorize_site_action(&state.db, *site_id, &SiteRole::Editor)
             .await?;
     }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<BlogModule>::check(&state.db, site_id).await?;
+    }
 
     Blog::soft_delete(&state.db, id).await?;
     let site_id = site_ids.into_iter().next();
@@ -609,6 +628,9 @@ pub async fn clone_blog(
             .authorize_site_action(&state.db, *site_id, &SiteRole::Author)
             .await?;
     }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<BlogModule>::check(&state.db, site_id).await?;
+    }
 
     let blog = Blog::clone_blog(&state.db, id, site_ids.clone()).await?;
     let site_id = site_ids.into_iter().next();
@@ -660,6 +682,9 @@ pub async fn get_blog_detail(
         auth.0
             .authorize_site_action(&state.db, *site_id, &SiteRole::Viewer)
             .await?;
+    }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<BlogModule>::check(&state.db, site_id).await?;
     }
     let localizations =
         ContentLocalization::find_all_for_content(&state.db, blog.content_id).await?;
@@ -714,6 +739,9 @@ pub async fn get_blog_localizations(
             .authorize_site_action(&state.db, *site_id, &SiteRole::Viewer)
             .await?;
     }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<BlogModule>::check(&state.db, site_id).await?;
+    }
     let localizations =
         ContentLocalization::find_all_for_content(&state.db, blog.content_id).await?;
     let responses: Vec<LocalizationResponse> = localizations
@@ -755,6 +783,9 @@ pub async fn create_blog_localization(
         auth.0
             .authorize_site_action(&state.db, *site_id, &SiteRole::Author)
             .await?;
+    }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<BlogModule>::check(&state.db, site_id).await?;
     }
 
     // Check for duplicate locale
@@ -814,6 +845,9 @@ pub async fn update_blog_localization(
             .authorize_site_action(&state.db, *site_id, &SiteRole::Author)
             .await?;
     }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<BlogModule>::check(&state.db, site_id).await?;
+    }
 
     let req = body.into_inner();
     req.validate()
@@ -862,6 +896,9 @@ pub async fn delete_blog_localization(
             .authorize_site_action(&state.db, *site_id, &SiteRole::Editor)
             .await?;
     }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<BlogModule>::check(&state.db, site_id).await?;
+    }
 
     ContentLocalization::delete(&state.db, loc_id).await?;
     Ok(Status::NoContent)
@@ -896,6 +933,9 @@ pub async fn review_blog(
         auth.0
             .authorize_site_action(&state.db, *site_id, &SiteRole::Reviewer)
             .await?;
+    }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<BlogModule>::check(&state.db, site_id).await?;
     }
 
     let slug = blog.slug.clone().unwrap_or_else(|| id.to_string());
@@ -942,6 +982,7 @@ pub async fn rss_feed(
     state: &State<AppState>,
     site_id: Uuid,
     auth: ReadKey,
+    _module: ModuleGuard<BlogModule>,
 ) -> Result<RssResponse, ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)
@@ -1049,6 +1090,7 @@ pub async fn bulk_blogs(
     site_id: Uuid,
     body: Json<BulkContentRequest>,
     auth: ReadKey,
+    _module: ModuleGuard<BlogModule>,
 ) -> Result<Json<BulkContentResponse>, ApiError> {
     let req = body.into_inner();
     req.validate()
