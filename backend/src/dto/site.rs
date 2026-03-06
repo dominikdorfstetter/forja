@@ -150,6 +150,54 @@ impl From<Site> for SiteResponse {
     }
 }
 
+/// Feature flags for the site context
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, utoipa::ToSchema)]
+#[schema(description = "Feature flags derived from site settings")]
+pub struct SiteContextFeatures {
+    #[schema(example = false)]
+    pub editorial_workflow: bool,
+    #[schema(example = true)]
+    pub scheduling: bool,
+    #[schema(example = true)]
+    pub versioning: bool,
+    #[schema(example = false)]
+    pub analytics: bool,
+}
+
+/// Contextual suggestions for the UI
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, utoipa::ToSchema)]
+#[schema(description = "UI suggestions based on site state")]
+pub struct SiteContextSuggestions {
+    #[schema(example = false)]
+    pub show_team_workflow_prompt: bool,
+}
+
+/// Site context response for progressive disclosure
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, utoipa::ToSchema)]
+#[schema(description = "Site context for adaptive UI — drives progressive disclosure")]
+pub struct SiteContextResponse {
+    #[schema(example = 1)]
+    pub member_count: i64,
+    #[schema(example = "owner")]
+    pub current_user_role: String,
+    pub features: SiteContextFeatures,
+    pub suggestions: SiteContextSuggestions,
+}
+
+/// Compute whether the team workflow prompt should be shown.
+///
+/// Returns true when:
+/// - The site has 2+ members (team setup)
+/// - Editorial workflow is not yet enabled
+/// - The user hasn't dismissed the prompt
+pub fn should_show_team_workflow_prompt(
+    member_count: i64,
+    editorial_workflow: bool,
+    prompt_dismissed: bool,
+) -> bool {
+    member_count >= 2 && !editorial_workflow && !prompt_dismissed
+}
+
 /// Import the validation module to use the slug validation function
 use crate::utils::validation::{validate_json_depth, validate_slug, validate_timezone};
 
@@ -418,6 +466,55 @@ mod tests {
             is_active: None,
         };
         assert!(request.validate().is_err());
+    }
+
+    #[test]
+    fn test_should_show_team_workflow_prompt_solo_user() {
+        // Solo user — never show prompt
+        assert!(!should_show_team_workflow_prompt(1, false, false));
+    }
+
+    #[test]
+    fn test_should_show_team_workflow_prompt_team_without_workflow() {
+        // Team (2+) without editorial workflow and not dismissed — show prompt
+        assert!(should_show_team_workflow_prompt(2, false, false));
+        assert!(should_show_team_workflow_prompt(5, false, false));
+    }
+
+    #[test]
+    fn test_should_show_team_workflow_prompt_already_enabled() {
+        // Team with editorial workflow already enabled — don't show
+        assert!(!should_show_team_workflow_prompt(3, true, false));
+    }
+
+    #[test]
+    fn test_should_show_team_workflow_prompt_dismissed() {
+        // Team without workflow but prompt dismissed — don't show
+        assert!(!should_show_team_workflow_prompt(2, false, true));
+    }
+
+    #[test]
+    fn test_site_context_response_serialization() {
+        let response = SiteContextResponse {
+            member_count: 1,
+            current_user_role: "owner".to_string(),
+            features: SiteContextFeatures {
+                editorial_workflow: false,
+                scheduling: true,
+                versioning: true,
+                analytics: false,
+            },
+            suggestions: SiteContextSuggestions {
+                show_team_workflow_prompt: false,
+            },
+        };
+
+        let json = serde_json::to_string(&response).unwrap();
+        assert!(json.contains("\"member_count\":1"));
+        assert!(json.contains("\"current_user_role\":\"owner\""));
+        assert!(json.contains("\"editorial_workflow\":false"));
+        assert!(json.contains("\"scheduling\":true"));
+        assert!(json.contains("\"show_team_workflow_prompt\":false"));
     }
 
     #[test]

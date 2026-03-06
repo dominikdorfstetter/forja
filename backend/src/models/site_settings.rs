@@ -17,6 +17,9 @@ pub const KEY_CONTACT_EMAIL: &str = "contact_email";
 pub const KEY_POSTS_PER_PAGE: &str = "posts_per_page";
 pub const KEY_EDITORIAL_WORKFLOW_ENABLED: &str = "editorial_workflow_enabled";
 pub const KEY_PREVIEW_TEMPLATES: &str = "preview_templates";
+pub const KEY_SCHEDULING_ENABLED: &str = "scheduling_enabled";
+pub const KEY_VERSIONING_ENABLED: &str = "versioning_enabled";
+pub const KEY_TEAM_FEATURES_PROMPT_DISMISSED: &str = "team_features_prompt_dismissed";
 
 /// Returns the known defaults as a HashMap.
 pub fn defaults() -> HashMap<String, serde_json::Value> {
@@ -38,6 +41,12 @@ pub fn defaults() -> HashMap<String, serde_json::Value> {
         serde_json::json!(false),
     );
     m.insert(KEY_PREVIEW_TEMPLATES.into(), serde_json::json!([]));
+    m.insert(KEY_SCHEDULING_ENABLED.into(), serde_json::json!(true));
+    m.insert(KEY_VERSIONING_ENABLED.into(), serde_json::json!(true));
+    m.insert(
+        KEY_TEAM_FEATURES_PROMPT_DISMISSED.into(),
+        serde_json::json!(false),
+    );
     m
 }
 
@@ -147,7 +156,7 @@ mod tests {
     #[test]
     fn test_defaults_contains_all_keys() {
         let d = defaults();
-        assert_eq!(d.len(), 8);
+        assert_eq!(d.len(), 11);
         assert!(d.contains_key(KEY_MAX_DOCUMENT_FILE_SIZE));
         assert!(d.contains_key(KEY_MAX_MEDIA_FILE_SIZE));
         assert!(d.contains_key(KEY_ANALYTICS_ENABLED));
@@ -156,6 +165,9 @@ mod tests {
         assert!(d.contains_key(KEY_POSTS_PER_PAGE));
         assert!(d.contains_key(KEY_EDITORIAL_WORKFLOW_ENABLED));
         assert!(d.contains_key(KEY_PREVIEW_TEMPLATES));
+        assert!(d.contains_key(KEY_SCHEDULING_ENABLED));
+        assert!(d.contains_key(KEY_VERSIONING_ENABLED));
+        assert!(d.contains_key(KEY_TEAM_FEATURES_PROMPT_DISMISSED));
     }
 
     #[test]
@@ -169,6 +181,12 @@ mod tests {
         assert_eq!(d[KEY_POSTS_PER_PAGE], serde_json::json!(10));
         assert_eq!(d[KEY_EDITORIAL_WORKFLOW_ENABLED], serde_json::json!(false));
         assert_eq!(d[KEY_PREVIEW_TEMPLATES], serde_json::json!([]));
+        assert_eq!(d[KEY_SCHEDULING_ENABLED], serde_json::json!(true));
+        assert_eq!(d[KEY_VERSIONING_ENABLED], serde_json::json!(true));
+        assert_eq!(
+            d[KEY_TEAM_FEATURES_PROMPT_DISMISSED],
+            serde_json::json!(false)
+        );
     }
 
     #[test]
