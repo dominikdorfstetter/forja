@@ -21,6 +21,13 @@ pub const KEY_SCHEDULING_ENABLED: &str = "scheduling_enabled";
 pub const KEY_VERSIONING_ENABLED: &str = "versioning_enabled";
 pub const KEY_TEAM_FEATURES_PROMPT_DISMISSED: &str = "team_features_prompt_dismissed";
 
+// Module enable/disable keys
+pub const KEY_MODULE_BLOG_ENABLED: &str = "module_blog_enabled";
+pub const KEY_MODULE_PAGES_ENABLED: &str = "module_pages_enabled";
+pub const KEY_MODULE_CV_ENABLED: &str = "module_cv_enabled";
+pub const KEY_MODULE_LEGAL_ENABLED: &str = "module_legal_enabled";
+pub const KEY_MODULE_DOCUMENTS_ENABLED: &str = "module_documents_enabled";
+
 /// Returns the known defaults as a HashMap.
 pub fn defaults() -> HashMap<String, serde_json::Value> {
     let mut m = HashMap::new();
@@ -45,6 +52,14 @@ pub fn defaults() -> HashMap<String, serde_json::Value> {
     m.insert(KEY_VERSIONING_ENABLED.into(), serde_json::json!(true));
     m.insert(
         KEY_TEAM_FEATURES_PROMPT_DISMISSED.into(),
+        serde_json::json!(false),
+    );
+    m.insert(KEY_MODULE_BLOG_ENABLED.into(), serde_json::json!(true));
+    m.insert(KEY_MODULE_PAGES_ENABLED.into(), serde_json::json!(true));
+    m.insert(KEY_MODULE_CV_ENABLED.into(), serde_json::json!(false));
+    m.insert(KEY_MODULE_LEGAL_ENABLED.into(), serde_json::json!(false));
+    m.insert(
+        KEY_MODULE_DOCUMENTS_ENABLED.into(),
         serde_json::json!(false),
     );
     m
@@ -156,7 +171,7 @@ mod tests {
     #[test]
     fn test_defaults_contains_all_keys() {
         let d = defaults();
-        assert_eq!(d.len(), 11);
+        assert_eq!(d.len(), 16);
         assert!(d.contains_key(KEY_MAX_DOCUMENT_FILE_SIZE));
         assert!(d.contains_key(KEY_MAX_MEDIA_FILE_SIZE));
         assert!(d.contains_key(KEY_ANALYTICS_ENABLED));
@@ -168,6 +183,11 @@ mod tests {
         assert!(d.contains_key(KEY_SCHEDULING_ENABLED));
         assert!(d.contains_key(KEY_VERSIONING_ENABLED));
         assert!(d.contains_key(KEY_TEAM_FEATURES_PROMPT_DISMISSED));
+        assert!(d.contains_key(KEY_MODULE_BLOG_ENABLED));
+        assert!(d.contains_key(KEY_MODULE_PAGES_ENABLED));
+        assert!(d.contains_key(KEY_MODULE_CV_ENABLED));
+        assert!(d.contains_key(KEY_MODULE_LEGAL_ENABLED));
+        assert!(d.contains_key(KEY_MODULE_DOCUMENTS_ENABLED));
     }
 
     #[test]
@@ -187,6 +207,11 @@ mod tests {
             d[KEY_TEAM_FEATURES_PROMPT_DISMISSED],
             serde_json::json!(false)
         );
+        assert_eq!(d[KEY_MODULE_BLOG_ENABLED], serde_json::json!(true));
+        assert_eq!(d[KEY_MODULE_PAGES_ENABLED], serde_json::json!(true));
+        assert_eq!(d[KEY_MODULE_CV_ENABLED], serde_json::json!(false));
+        assert_eq!(d[KEY_MODULE_LEGAL_ENABLED], serde_json::json!(false));
+        assert_eq!(d[KEY_MODULE_DOCUMENTS_ENABLED], serde_json::json!(false));
     }
 
     #[test]
