@@ -1,0 +1,59 @@
+# Forja — Fly.io deployment configuration
+#
+# Setup:
+#   fly apps create forja
+#   fly postgres create --name forja-db
+#   fly postgres attach forja-db
+#   fly redis create --name forja-redis
+#
+# Deploy:
+#   fly deploy
+#
+# See deploy/fly/README.md for the full guide.
+
+app = "forja"
+primary_region = "fra"
+
+[build]
+  dockerfile = "../../Dockerfile"
+
+[env]
+  APP__ENVIRONMENT = "production"
+  APP__HOST = "0.0.0.0"
+  APP__PORT = "8000"
+  ROCKET_ADDRESS = "0.0.0.0"
+  ROCKET_PORT = "8000"
+  ROCKET_LOG_LEVEL = "normal"
+  STORAGE_PROVIDER = "local"
+  STORAGE_LOCAL_UPLOAD_DIR = "/data/uploads"
+  STORAGE_LOCAL_BASE_URL = "/uploads"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [http_service.concurrency]
+    type = "requests"
+    hard_limit = 250
+    soft_limit = 200
+
+[[vm]]
+  memory = "1gb"
+  cpu_kind = "shared"
+  cpus = 1
+
+[mounts]
+  source = "forja_uploads"
+  destination = "/data/uploads"
+
+[checks]
+  [checks.health]
+    type = "http"
+    port = 8000
+    path = "/health"
+    interval = "15s"
+    timeout = "5s"
+    grace_period = "30s"

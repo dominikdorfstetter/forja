@@ -6,6 +6,20 @@ sidebar_position: 1
 
 Forja ships with a multi-stage Dockerfile that builds both the React admin dashboard and the Rust backend into a single, minimal production image.
 
+## Quick Start
+
+The fastest way to run Forja in production:
+
+```bash
+# 1. Generate a .env with secure random secrets
+./scripts/forja-init.sh
+
+# 2. Start everything
+docker compose -f docker-compose.prod.yml up -d
+```
+
+This starts PostgreSQL, Redis, and Forja with health checks, persistent volumes, and auto-configured database extensions. No source code checkout required beyond the compose file and init script.
+
 ## Docker Hub
 
 Pre-built images are published to [Docker Hub](https://hub.docker.com/r/dominikdorfstetter/forja) on every push to `main`. Multi-platform images are available for `linux/amd64` and `linux/arm64`.
@@ -58,73 +72,40 @@ These settings prevent out-of-memory errors on machines with limited RAM (e.g., 
 
 ## Running with Docker Compose
 
-For production deployments, create a `docker-compose.yaml` that includes the application, PostgreSQL, and Redis:
+### Production Compose (recommended)
 
-```yaml
-services:
-  app:
-    image: dominikdorfstetter/forja
-    ports:
-      - "8000:8000"
-    environment:
-      DATABASE_URL: postgres://forja:changeme@postgres:5432/forja
-      REDIS_URL: redis://redis:6379
-      APP__ENVIRONMENT: production
-      APP__HOST: 0.0.0.0
-      APP__PORT: "8000"
-      ROCKET_ADDRESS: 0.0.0.0
-      ROCKET_PORT: "8000"
-      ROCKET_LOG_LEVEL: normal
-      APP__CORS_ORIGINS: "https://yourdomain.com"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    restart: unless-stopped
-
-  postgres:
-    image: postgres:16
-    environment:
-      POSTGRES_USER: forja
-      POSTGRES_PASSWORD: changeme
-      POSTGRES_DB: forja
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-      - ./backend/scripts/init-extensions.sql:/docker-entrypoint-initdb.d/init-extensions.sql:ro
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U forja -d forja"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  redis:
-    image: redis:7
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-volumes:
-  pgdata:
-```
-
-Start the stack:
+The repository includes `docker-compose.prod.yml`, a standalone compose file that uses the pre-built Docker Hub image. It does not require the source code -- just the compose file and a `.env`:
 
 ```bash
+# Generate .env with secure random secrets
+./scripts/forja-init.sh
+
+# Start all services
+docker compose -f docker-compose.prod.yml up -d
+```
+
+The production compose auto-constructs `DATABASE_URL` from the PostgreSQL credentials in your `.env`, so you only need to set `POSTGRES_PASSWORD` once.
+
+### Source Build Compose
+
+If you prefer to build from source, the default `docker-compose.yml` builds the image locally:
+
+```bash
+# Set POSTGRES_PASSWORD in .env or export it
 docker compose up -d
 ```
 
 ### Database Extensions
 
-The `init-extensions.sql` script (mounted into the Postgres container) automatically creates the required PostgreSQL extensions on first run:
+The required PostgreSQL extensions are created automatically on first container start:
 
 - `uuid-ossp` -- UUID generation
 - `citext` -- case-insensitive text type
 - `pg_trgm` -- trigram matching for search
 
-If you are using a managed PostgreSQL service that does not run Docker entrypoint scripts, you must create these extensions manually. See the [Railway guide](./railway) for an example.
+The production compose embeds the extension SQL inline using Docker Compose `configs`. The source build compose mounts `backend/scripts/init-extensions.sql` instead.
+
+If you are using a managed PostgreSQL service, you must create these extensions manually. See the [Railway guide](./railway) for an example.
 
 ## Production Environment Variables
 
@@ -202,3 +183,56 @@ docker compose up -d
 ```
 
 Migrations are applied automatically on startup, so schema changes are handled without manual intervention.
+
+## Backup and Restore
+
+### Database Backup
+
+Create a PostgreSQL dump while the stack is running:
+
+```bash
+docker compose -f docker-compose.prod.yml exec postgres \
+  pg_dump -U forja -d forja --format=custom -f /tmp/forja.dump
+
+docker compose -f docker-compose.prod.yml cp postgres:/tmp/forja.dump ./forja-backup.dump
+```
+
+### Database Restore
+
+Restore from a backup file:
+
+```bash
+docker compose -f docker-compose.prod.yml cp ./forja-backup.dump postgres:/tmp/forja.dump
+
+docker compose -f docker-compose.prod.yml exec postgres \
+  pg_restore -U forja -d forja --clean --if-exists /tmp/forja.dump
+```
+
+### Upload Files Backup
+
+The `uploads` volume stores media files. Back it up with:
+
+```bash
+docker run --rm \
+  -v forja_uploads:/data \
+  -v "$(pwd)":/backup \
+  alpine tar czf /backup/forja-uploads.tar.gz -C /data .
+```
+
+Restore:
+
+```bash
+docker run --rm \
+  -v forja_uploads:/data \
+  -v "$(pwd)":/backup \
+  alpine sh -c "cd /data && tar xzf /backup/forja-uploads.tar.gz"
+```
+
+### Automated Backups
+
+For scheduled backups, add a cron job on the host:
+
+```bash
+# Daily database backup at 2:00 AM, keep last 7 days
+0 2 * * * cd /path/to/forja && docker compose -f docker-compose.prod.yml exec -T postgres pg_dump -U forja -d forja --format=custom > backups/forja-$(date +\%Y\%m\%d).dump && find backups/ -name "forja-*.dump" -mtime +7 -delete
+```
