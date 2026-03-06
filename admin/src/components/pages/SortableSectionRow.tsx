@@ -63,10 +63,16 @@ export default function SortableSectionRow({
           </IconButton>
         </TableCell>
       )}
-      <TableCell>
+      <TableCell
+        onClick={() => onEdit(section)}
+        sx={{ cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
+      >
         <Chip label={section.section_type} size="small" variant="outlined" color="primary" />
       </TableCell>
-      <TableCell>
+      <TableCell
+        onClick={() => onEdit(section)}
+        sx={{ cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
+      >
         <Box>
           <Typography variant="body2" fontWeight={500} noWrap sx={{ maxWidth: 300 }}>
             {primaryTitle || <Typography component="span" variant="body2" color="text.secondary">—</Typography>}
@@ -78,7 +84,10 @@ export default function SortableSectionRow({
           )}
         </Box>
       </TableCell>
-      <TableCell>
+      <TableCell
+        onClick={() => onEdit(section)}
+        sx={{ cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
+      >
         {localeChips.length > 0 ? (
           <Stack direction="row" spacing={0.5} flexWrap="wrap">
             {localeChips.map((code) => (
