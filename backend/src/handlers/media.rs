@@ -158,10 +158,12 @@ pub async fn create_media(
         }
     }
 
+    let first_site_id = req.site_ids.first().copied();
     let media = MediaFile::create(&state.db, req).await?;
+    let site_id = first_site_id;
     audit_service::log_action(
         &state.db,
-        None,
+        site_id,
         Some(auth.0.id),
         AuditAction::Create,
         "media",
@@ -356,6 +358,7 @@ pub async fn upload_media(
     };
 
     // 12. Insert into database
+    let first_site_id = site_ids[0];
     let media = MediaFile::create_from_upload(
         &state.db,
         &sanitized_filename,
@@ -385,7 +388,7 @@ pub async fn upload_media(
     // 14. Audit log
     audit_service::log_action(
         &state.db,
-        None,
+        Some(first_site_id),
         Some(auth.0.id),
         AuditAction::Create,
         "media",
@@ -488,6 +491,12 @@ pub async fn update_media(
     auth: ReadKey,
 ) -> Result<Json<MediaListItem>, ApiError> {
     let existing = MediaFile::find_by_id(&state.db, id).await?;
+    let site_ids = MediaFile::find_site_ids(&state.db, id).await?;
+    for site_id in &site_ids {
+        auth.0
+            .authorize_site_action(&state.db, *site_id, &SiteRole::Author)
+            .await?;
+    }
     let old = serde_json::to_value(&existing).ok();
 
     let req = body.into_inner();
@@ -495,9 +504,10 @@ pub async fn update_media(
         .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
 
     let media = MediaFile::update(&state.db, id, req).await?;
+    let site_id = site_ids.into_iter().next();
     audit_service::log_action(
         &state.db,
-        None,
+        site_id,
         Some(auth.0.id),
         AuditAction::Update,
         "media",
@@ -506,7 +516,8 @@ pub async fn update_media(
     )
     .await;
     if let (Some(old), Ok(new)) = (old, serde_json::to_value(&media)) {
-        audit_service::log_changes(&state.db, None, "media", id, Some(auth.0.id), &old, &new).await;
+        audit_service::log_changes(&state.db, site_id, "media", id, Some(auth.0.id), &old, &new)
+            .await;
     }
     Ok(Json(MediaListItem::from(media)))
 }
@@ -533,6 +544,12 @@ pub async fn delete_media(
 ) -> Result<Status, ApiError> {
     // Fetch media and variants before soft-deleting
     let media = MediaFile::find_by_id(&state.db, id).await?;
+    let site_ids = MediaFile::find_site_ids(&state.db, id).await?;
+    for site_id in &site_ids {
+        auth.0
+            .authorize_site_action(&state.db, *site_id, &SiteRole::Editor)
+            .await?;
+    }
     let variants = MediaVariant::find_for_media(&state.db, id).await?;
 
     // Delete variant files from storage
@@ -549,9 +566,10 @@ pub async fn delete_media(
 
     // Soft-delete the DB record
     MediaFile::soft_delete(&state.db, id).await?;
+    let site_id = site_ids.into_iter().next();
     audit_service::log_action(
         &state.db,
-        None,
+        site_id,
         Some(auth.0.id),
         AuditAction::Delete,
         "media",
@@ -613,13 +631,19 @@ pub async fn create_media_metadata(
     state: &State<AppState>,
     id: Uuid,
     body: Json<AddMediaMetadataRequest>,
-    _auth: ReadKey,
+    auth: ReadKey,
 ) -> Result<(Status, Json<MediaMetadataResponse>), ApiError> {
     let req = body.into_inner();
     req.validate()
         .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
 
     MediaFile::find_by_id(&state.db, id).await?;
+    let site_ids = MediaFile::find_site_ids(&state.db, id).await?;
+    for site_id in &site_ids {
+        auth.0
+            .authorize_site_action(&state.db, *site_id, &SiteRole::Author)
+            .await?;
+    }
     let metadata = MediaMetadata::create(&state.db, id, req).await?;
     Ok((Status::Created, Json(MediaMetadataResponse::from(metadata))))
 }
@@ -643,12 +667,19 @@ pub async fn update_media_metadata(
     state: &State<AppState>,
     metadata_id: Uuid,
     body: Json<UpdateMediaMetadataRequest>,
-    _auth: ReadKey,
+    auth: ReadKey,
 ) -> Result<Json<MediaMetadataResponse>, ApiError> {
     let req = body.into_inner();
     req.validate()
         .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
 
+    let existing = MediaMetadata::find_by_id(&state.db, metadata_id).await?;
+    let site_ids = MediaFile::find_site_ids(&state.db, existing.media_file_id).await?;
+    for site_id in &site_ids {
+        auth.0
+            .authorize_site_action(&state.db, *site_id, &SiteRole::Author)
+            .await?;
+    }
     let metadata = MediaMetadata::update(&state.db, metadata_id, req).await?;
     Ok(Json(MediaMetadataResponse::from(metadata)))
 }
@@ -670,8 +701,15 @@ pub async fn update_media_metadata(
 pub async fn delete_media_metadata(
     state: &State<AppState>,
     metadata_id: Uuid,
-    _auth: ReadKey,
+    auth: ReadKey,
 ) -> Result<Status, ApiError> {
+    let existing = MediaMetadata::find_by_id(&state.db, metadata_id).await?;
+    let site_ids = MediaFile::find_site_ids(&state.db, existing.media_file_id).await?;
+    for site_id in &site_ids {
+        auth.0
+            .authorize_site_action(&state.db, *site_id, &SiteRole::Author)
+            .await?;
+    }
     MediaMetadata::delete(&state.db, metadata_id).await?;
     Ok(Status::NoContent)
 }
