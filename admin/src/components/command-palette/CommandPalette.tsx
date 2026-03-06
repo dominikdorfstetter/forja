@@ -29,6 +29,7 @@ import HistoryIcon from '@mui/icons-material/History';
 import PeopleIcon from '@mui/icons-material/People';
 import SettingsIcon from '@mui/icons-material/Settings';
 import EditNoteIcon from '@mui/icons-material/EditNote';
+import BoltIcon from '@mui/icons-material/Bolt';
 import ViewQuiltIcon from '@mui/icons-material/ViewQuilt';
 import AltRouteIcon from '@mui/icons-material/AltRoute';
 import WebhookIcon from '@mui/icons-material/Webhook';
@@ -82,7 +83,7 @@ export default function CommandPalette() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAdmin, canManageMembers } = useAuth();
+  const { isAdmin, canWrite, canManageMembers } = useAuth();
 
   // Build nav commands from static routes (mirrors sidebar + account menu)
   const navCommands: Command[] = [
@@ -111,6 +112,11 @@ export default function CommandPalette() {
   const contextCommands = useMemo<Command[]>(() => {
     const path = location.pathname;
     const cmds: Command[] = [];
+
+    // Global quick post — available from any page
+    if (canWrite) {
+      cmds.push({ id: 'ctx:quick-post', label: t('quickPost.title'), icon: <BoltIcon fontSize="small" />, category: 'context', action: () => dispatchAction('quick-post') });
+    }
 
     // Content list pages
     if (path === '/blogs') {
@@ -192,7 +198,7 @@ export default function CommandPalette() {
     }
 
     return cmds;
-  }, [location.pathname, t, navigate]);
+  }, [location.pathname, t, navigate, canWrite]);
 
   const {
     open,

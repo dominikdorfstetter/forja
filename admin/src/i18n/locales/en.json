@@ -2043,5 +2043,16 @@
       "image": "Image",
       "table": "Table"
     }
+  },
+  "quickPost": {
+    "title": "Quick Post",
+    "titlePlaceholder": "Post title...",
+    "bodyPlaceholder": "Start writing...",
+    "publish": "Publish",
+    "publishNow": "Publish now",
+    "saveAsDraft": "Save as draft",
+    "moreOptions": "More options",
+    "success": "Blog post created",
+    "dashboardButton": "Quick Post"
   }
 }

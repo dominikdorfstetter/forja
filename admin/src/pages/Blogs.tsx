@@ -12,6 +12,7 @@ import {
   Tab,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import BoltIcon from '@mui/icons-material/Bolt';
 import ViewQuiltIcon from '@mui/icons-material/ViewQuilt';
 import ArticleIcon from '@mui/icons-material/Article';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -33,6 +34,7 @@ import BulkActionToolbar from '@/components/shared/BulkActionToolbar';
 import TableFilterBar from '@/components/shared/TableFilterBar';
 import BlogActionsMenu from '@/components/blogs/BlogActionsMenu';
 import CreateBlogWizard from '@/components/blogs/CreateBlogWizard';
+import QuickPostDialog from '@/components/blogs/QuickPostDialog';
 import DataTable, { type DataTableColumn } from '@/components/shared/DataTable';
 import { useListPageState } from '@/hooks/useListPageState';
 import { useCrudMutations } from '@/hooks/useCrudMutations';
@@ -57,6 +59,7 @@ export default function BlogsPage() {
     handlePageChange, handleRowsPerPageChange,
   } = useListPageState<BlogListItem>();
 
+  const [quickPostOpen, setQuickPostOpen] = useState(false);
   const [viewTab, setViewTab] = useState<'active' | 'archived'>('active');
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [publishingBlog, setPublishingBlog] = useState<BlogListItem | null>(null);
@@ -100,7 +103,9 @@ export default function BlogsPage() {
   // Command palette action listener
   useEffect(() => {
     const handler = (e: Event) => {
-      if ((e as CustomEvent).detail === 'create-blog') openCreate();
+      const detail = (e as CustomEvent).detail;
+      if (detail === 'create-blog') openCreate();
+      if (detail === 'quick-post') setQuickPostOpen(true);
     };
     window.addEventListener('command-palette:action', handler);
     return () => window.removeEventListener('command-palette:action', handler);
@@ -299,7 +304,10 @@ export default function BlogsPage() {
         title={t('blogs.title')}
         subtitle={t('blogs.subtitle')}
         action={selectedSiteId ? { label: t('blogs.createButton'), icon: <AddIcon />, onClick: openCreate, hidden: !canWrite } : undefined}
-        secondaryAction={selectedSiteId ? { label: t('templates.manageTemplates'), icon: <ViewQuiltIcon />, onClick: () => navigate('/blogs/templates'), hidden: !isAdmin } : undefined}
+        secondaryActions={selectedSiteId ? [
+          { label: t('quickPost.title'), icon: <BoltIcon />, onClick: () => setQuickPostOpen(true), hidden: !canWrite },
+          { label: t('templates.manageTemplates'), icon: <ViewQuiltIcon />, onClick: () => navigate('/blogs/templates'), hidden: !isAdmin },
+        ] : undefined}
       />
 
       {!selectedSiteId ? (
@@ -359,6 +367,7 @@ export default function BlogsPage() {
         </>
       )}
 
+      <QuickPostDialog open={quickPostOpen} onClose={() => setQuickPostOpen(false)} />
       <CreateBlogWizard open={formOpen} onClose={closeForm} onCreated={(id) => navigate(`/blogs/${id}`)} siteLocales={siteLocales} siteTemplates={siteTemplatesData?.data} siteTemplatesLoading={siteTemplatesLoading} />
       <ConfirmDialog open={!!deletingBlog} title={t('blogs.deleteDialog.title')} message={t('blogs.deleteDialog.message', { slug: deletingBlog?.slug })} confirmLabel={t('common.actions.delete')} onConfirm={() => deletingBlog && deleteMutation.mutate(deletingBlog.id)} onCancel={closeDelete} loading={deleteMutation.isPending} confirmationText={t('common.actions.delete')} />
       <ConfirmDialog open={bulkDeleteOpen} title={t('bulk.deleteDialog.title')} message={t('bulk.deleteDialog.message', { count: bulk.count })} confirmLabel={t('common.actions.delete')} onConfirm={confirmBulkDelete} onCancel={() => setBulkDeleteOpen(false)} loading={bulkMutation.isPending} confirmationText={t('common.actions.delete')} />
