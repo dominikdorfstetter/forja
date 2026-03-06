@@ -57,6 +57,7 @@ import MediaDetailDialog from '@/components/media/MediaDetailDialog';
 import FolderTree from '@/components/shared/FolderTree';
 import DraggableMediaCard from '@/components/media/DraggableMediaCard';
 import DocumentsPage, { type DocumentsPageHandle } from '@/pages/Documents';
+import { useSiteContextData } from '@/hooks/useSiteContextData';
 
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -99,6 +100,7 @@ export default function MediaPage() {
   const { showError, showSuccess } = useErrorSnackbar();
   const { selectedSiteId } = useSiteContext();
   const { canWrite, isAdmin } = useAuth();
+  const { modules } = useSiteContextData();
 
   const documentsRef = useRef<DocumentsPageHandle>(null);
   const [assetsTab, setAssetsTab] = useState(0);
@@ -258,12 +260,14 @@ export default function MediaPage() {
         action={headerAction}
       />
 
-      <Tabs value={assetsTab} onChange={(_, v) => setAssetsTab(v)} sx={{ mb: 3 }}>
-        <Tab icon={<PermMediaIcon />} iconPosition="start" label={t('layout.sidebar.media')} />
-        <Tab icon={<ArticleIcon />} iconPosition="start" label={t('layout.sidebar.documents')} />
-      </Tabs>
+      {modules.documents && (
+        <Tabs value={assetsTab} onChange={(_, v) => setAssetsTab(v)} sx={{ mb: 3 }}>
+          <Tab icon={<PermMediaIcon />} iconPosition="start" label={t('layout.sidebar.media')} />
+          <Tab icon={<ArticleIcon />} iconPosition="start" label={t('layout.sidebar.documents')} />
+        </Tabs>
+      )}
 
-      {assetsTab === 1 && <DocumentsPage ref={documentsRef} embedded />}
+      {modules.documents && assetsTab === 1 && <DocumentsPage ref={documentsRef} embedded />}
 
       {assetsTab === 0 && (<>
 
