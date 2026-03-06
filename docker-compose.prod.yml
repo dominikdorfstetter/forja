@@ -1,0 +1,80 @@
+# Forja — One-command production deployment
+#
+# Quick start:
+#   1. Run: ./scripts/forja-init.sh
+#   2. Run: docker compose -f docker-compose.prod.yml up -d
+#
+# Or manually create a .env file and set POSTGRES_PASSWORD, then run step 2.
+# See docs/docs/deployment/docker.md for the full guide.
+
+services:
+  app:
+    image: dominikdorfstetter/forja:latest
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    environment:
+      - DATABASE_URL=postgres://${POSTGRES_USER:-forja}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-forja}
+      - REDIS_URL=redis://redis:6379
+      - APP__ENVIRONMENT=production
+      - APP__HOST=0.0.0.0
+      - APP__PORT=8000
+      - ROCKET_ADDRESS=0.0.0.0
+      - ROCKET_PORT=8000
+      - ROCKET_LOG_LEVEL=normal
+      - CLERK_SECRET_KEY=${CLERK_SECRET_KEY:-}
+      - CLERK_PUBLISHABLE_KEY=${CLERK_PUBLISHABLE_KEY:-}
+      - SYSTEM_ADMIN_CLERK_IDS=${SYSTEM_ADMIN_CLERK_IDS:-}
+      - STORAGE_PROVIDER=${STORAGE_PROVIDER:-local}
+      - STORAGE_LOCAL_UPLOAD_DIR=/data/uploads
+      - STORAGE_LOCAL_BASE_URL=/uploads
+      - APP__CORS_ORIGINS=${APP__CORS_ORIGINS:-*}
+    volumes:
+      - uploads:/data/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-forja}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env or run scripts/forja-init.sh}
+      POSTGRES_DB: ${POSTGRES_DB:-forja}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    configs:
+      - source: pg_extensions
+        target: /docker-entrypoint-initdb.d/init-extensions.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-forja}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7
+    volumes:
+      - redisdata:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+configs:
+  pg_extensions:
+    content: |
+      CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+      CREATE EXTENSION IF NOT EXISTS "citext";
+      CREATE EXTENSION IF NOT EXISTS "pg_trgm";
+
+volumes:
+  pgdata:
+  redisdata:
+  uploads:
