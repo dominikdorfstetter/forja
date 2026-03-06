@@ -278,6 +278,34 @@ export interface UpdateSiteRequest {
   is_active?: boolean;
 }
 
+// Site Context (progressive disclosure)
+export interface SiteContextFeatures {
+  editorial_workflow: boolean;
+  scheduling: boolean;
+  versioning: boolean;
+  analytics: boolean;
+}
+
+export interface SiteContextModules {
+  blog: boolean;
+  pages: boolean;
+  cv: boolean;
+  legal: boolean;
+  documents: boolean;
+}
+
+export interface SiteContextSuggestions {
+  show_team_workflow_prompt: boolean;
+}
+
+export interface SiteContextResponse {
+  member_count: number;
+  current_user_role: string;
+  features: SiteContextFeatures;
+  suggestions: SiteContextSuggestions;
+  modules: SiteContextModules;
+}
+
 // API Key
 export interface ApiKeyListItem {
   id: string;

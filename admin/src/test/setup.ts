@@ -130,6 +130,7 @@ vi.mock('@/services/api', () => {
     getClerkUsers: vi.fn(),
     // Site methods
     createSite: vi.fn(),
+    getSiteContext: vi.fn(),
     // API key methods
     getApiKeys: vi.fn(),
   };
