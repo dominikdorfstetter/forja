@@ -215,6 +215,16 @@ impl Tag {
 
         Ok(())
     }
+
+    /// Find the site IDs associated with a tag (via tag_sites junction table)
+    pub async fn find_site_ids(pool: &PgPool, tag_id: Uuid) -> Result<Vec<Uuid>, ApiError> {
+        let rows: Vec<(Uuid,)> = sqlx::query_as("SELECT site_id FROM tag_sites WHERE tag_id = $1")
+            .bind(tag_id)
+            .fetch_all(pool)
+            .await?;
+
+        Ok(rows.into_iter().map(|(id,)| id).collect())
+    }
 }
 
 impl Category {
@@ -470,6 +480,16 @@ impl Category {
         .await?;
 
         Ok(rows)
+    }
+
+    /// Find the site IDs associated with a category (via category_sites junction table)
+    pub async fn find_site_ids(pool: &PgPool, category_id: Uuid) -> Result<Vec<Uuid>, ApiError> {
+        let rows: Vec<(Uuid,)> =
+            sqlx::query_as("SELECT site_id FROM category_sites WHERE category_id = $1")
+                .bind(category_id)
+                .fetch_all(pool)
+                .await?;
+        Ok(rows.into_iter().map(|(id,)| id).collect())
     }
 }
 

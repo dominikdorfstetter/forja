@@ -14,6 +14,7 @@ use crate::dto::taxonomy::{
 use crate::errors::{ApiError, ProblemDetails};
 use crate::guards::auth_guard::ReadKey;
 use crate::models::audit::AuditAction;
+use crate::models::content::Content;
 use crate::models::site_membership::SiteRole;
 use crate::models::taxonomy::{Category, Tag};
 use crate::services::audit_service;
@@ -307,10 +308,11 @@ pub async fn update_tag(
     req.validate()
         .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
 
+    let site_id = Tag::find_site_ids(&state.db, id).await?.into_iter().next();
     let tag = Tag::update(&state.db, id, &req).await?;
     audit_service::log_action(
         &state.db,
-        None,
+        site_id,
         Some(auth.0.id),
         AuditAction::Update,
         "tag",
@@ -341,10 +343,11 @@ pub async fn delete_tag(
     id: Uuid,
     auth: ReadKey,
 ) -> Result<Status, ApiError> {
+    let site_id = Tag::find_site_ids(&state.db, id).await?.into_iter().next();
     Tag::soft_delete(&state.db, id).await?;
     audit_service::log_action(
         &state.db,
-        None,
+        site_id,
         Some(auth.0.id),
         AuditAction::Delete,
         "tag",
@@ -426,10 +429,14 @@ pub async fn update_category(
     req.validate()
         .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
 
+    let site_id = Category::find_site_ids(&state.db, id)
+        .await?
+        .into_iter()
+        .next();
     let category = Category::update(&state.db, id, &req).await?;
     audit_service::log_action(
         &state.db,
-        None,
+        site_id,
         Some(auth.0.id),
         AuditAction::Update,
         "category",
@@ -460,10 +467,14 @@ pub async fn delete_category(
     id: Uuid,
     auth: ReadKey,
 ) -> Result<Status, ApiError> {
+    let site_id = Category::find_site_ids(&state.db, id)
+        .await?
+        .into_iter()
+        .next();
     Category::soft_delete(&state.db, id).await?;
     audit_service::log_action(
         &state.db,
-        None,
+        site_id,
         Some(auth.0.id),
         AuditAction::Delete,
         "category",
@@ -494,11 +505,17 @@ pub async fn assign_category_to_content(
     state: &State<AppState>,
     content_id: Uuid,
     body: Json<AssignCategoryRequest>,
-    _auth: ReadKey,
+    auth: ReadKey,
 ) -> Result<Status, ApiError> {
     let req = body.into_inner();
     req.validate()
         .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+    let site_ids = Content::find_site_ids(&state.db, content_id).await?;
+    for site_id in &site_ids {
+        auth.0
+            .authorize_site_action(&state.db, *site_id, &SiteRole::Author)
+            .await?;
+    }
     Category::assign_to_content(&state.db, content_id, req.category_id, req.is_primary).await?;
     Ok(Status::NoContent)
 }
@@ -525,8 +542,14 @@ pub async fn remove_category_from_content(
     state: &State<AppState>,
     content_id: Uuid,
     category_id: Uuid,
-    _auth: ReadKey,
+    auth: ReadKey,
 ) -> Result<Status, ApiError> {
+    let site_ids = Content::find_site_ids(&state.db, content_id).await?;
+    for site_id in &site_ids {
+        auth.0
+            .authorize_site_action(&state.db, *site_id, &SiteRole::Editor)
+            .await?;
+    }
     Category::remove_from_content(&state.db, content_id, category_id).await?;
     Ok(Status::NoContent)
 }
