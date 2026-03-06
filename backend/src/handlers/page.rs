@@ -52,6 +52,7 @@ use crate::AppState;
     ),
     security(("api_key" = []))
 )]
+#[allow(clippy::too_many_arguments)]
 #[get("/sites/<site_id>/pages?<page>&<per_page>&<search>&<status>&<page_type>&<sort_by>&<sort_dir>&<exclude_status>")]
 pub async fn list_pages(
     state: &State<AppState>,
@@ -72,20 +73,36 @@ pub async fn list_pages(
     let params = PaginationParams::new(page, per_page);
     let (limit, offset) = params.limit_offset();
 
-    let has_filters = search.is_some() || status.is_some() || page_type.is_some() || sort_by.is_some() || sort_dir.is_some() || exclude_status.is_some();
+    let has_filters = search.is_some()
+        || status.is_some()
+        || page_type.is_some()
+        || sort_by.is_some()
+        || sort_dir.is_some()
+        || exclude_status.is_some();
 
     let (pages, total) = if has_filters {
         let pages = Page::find_all_for_site_filtered(
-            &state.db, site_id, limit, offset,
-            search.as_deref(), status.as_deref(), page_type.as_deref(),
-            sort_by.as_deref(), sort_dir.as_deref(),
+            &state.db,
+            site_id,
+            limit,
+            offset,
+            search.as_deref(),
+            status.as_deref(),
+            page_type.as_deref(),
+            sort_by.as_deref(),
+            sort_dir.as_deref(),
             exclude_status.as_deref(),
-        ).await?;
+        )
+        .await?;
         let total = Page::count_for_site_filtered(
-            &state.db, site_id,
-            search.as_deref(), status.as_deref(), page_type.as_deref(),
+            &state.db,
+            site_id,
+            search.as_deref(),
+            status.as_deref(),
+            page_type.as_deref(),
             exclude_status.as_deref(),
-        ).await?;
+        )
+        .await?;
         (pages, total)
     } else {
         let pages = Page::find_all_for_site(&state.db, site_id, limit, offset).await?;

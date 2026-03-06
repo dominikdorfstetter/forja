@@ -27,6 +27,7 @@ yarn-error.log*
 
 # claude
 .claude/
+WORKING_WITH_CLAUDE.md
 
 # astro
 **/.astro/

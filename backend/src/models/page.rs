@@ -215,6 +215,7 @@ impl Page {
     }
 
     /// Find all pages for a site with optional search, filter, and sort
+    #[allow(clippy::too_many_arguments)]
     pub async fn find_all_for_site_filtered(
         pool: &PgPool,
         site_id: Uuid,
@@ -229,9 +230,10 @@ impl Page {
     ) -> Result<Vec<PageWithContent>, ApiError> {
         // Normalize enum values to DB representation early
         let db_status = match status {
-            Some(s) => Some(normalize_content_status(s).ok_or_else(|| {
-                ApiError::BadRequest(format!("Invalid status filter: {}", s))
-            })?),
+            Some(s) => Some(
+                normalize_content_status(s)
+                    .ok_or_else(|| ApiError::BadRequest(format!("Invalid status filter: {}", s)))?,
+            ),
             None => None,
         };
         let db_page_type = match page_type {
@@ -337,9 +339,10 @@ impl Page {
         exclude_status: Option<&str>,
     ) -> Result<i64, ApiError> {
         let db_status = match status {
-            Some(s) => Some(normalize_content_status(s).ok_or_else(|| {
-                ApiError::BadRequest(format!("Invalid status filter: {}", s))
-            })?),
+            Some(s) => Some(
+                normalize_content_status(s)
+                    .ok_or_else(|| ApiError::BadRequest(format!("Invalid status filter: {}", s)))?,
+            ),
             None => None,
         };
         let db_page_type = match page_type {

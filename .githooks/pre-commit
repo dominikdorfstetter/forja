@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Pre-commit hook: auto-format Rust code with cargo fmt
+# Only runs when .rs files are staged — pure frontend commits are unaffected.
+
+set -e
+
+ROOT="$(git rev-parse --show-toplevel)"
+
+if git diff --cached --name-only | grep -q '\.rs$'; then
+  echo "Running cargo fmt..."
+  (cd "$ROOT/backend" && cargo fmt)
+
+  # Re-stage any tracked Rust files that fmt modified
+  git diff --name-only | grep '\.rs$' | while read -r file; do
+    git add "$ROOT/$file"
+  done
+
+  echo "Running cargo clippy..."
+  (cd "$ROOT/backend" && cargo clippy -- -D warnings)
+fi

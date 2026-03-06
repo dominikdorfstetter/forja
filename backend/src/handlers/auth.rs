@@ -15,10 +15,10 @@ use crate::dto::auth::{
 };
 use crate::dto::site_membership::{MembershipSummary, MembershipWithSite};
 use crate::dto::user_preferences::{UpdateUserPreferencesRequest, UserPreferencesResponse};
-use crate::models::user_preferences::UserPreferences;
 use crate::guards::auth_guard::{AuthSource, AuthenticatedKey};
 use crate::models::audit::{AuditLog, ChangeHistory};
 use crate::models::site_membership::SiteMembership;
+use crate::models::user_preferences::UserPreferences;
 use crate::AppState;
 
 /// Fetch membership summaries for a Clerk user
@@ -461,7 +461,14 @@ pub async fn delete_account(
 
 /// Collect auth routes
 pub fn routes() -> Vec<Route> {
-    routes![get_me, get_profile, get_preferences, update_preferences, export_user_data, delete_account]
+    routes![
+        get_me,
+        get_profile,
+        get_preferences,
+        update_preferences,
+        export_user_data,
+        delete_account
+    ]
 }
 
 #[cfg(test)]

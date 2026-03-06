@@ -92,7 +92,7 @@ describe('SectionEditorDialog autosave status', () => {
   it('shows "Saving..." chip when autosave status is saving', async () => {
     mockStatus = 'saving';
 
-    const { container } = renderWithProviders(
+    renderWithProviders(
       <SectionEditorDialog open section={mockSection} onClose={vi.fn()} />,
     );
 

@@ -131,7 +131,10 @@ mod tests {
         }
 
         assert_eq!(defaults[KEY_AUTOSAVE_ENABLED], serde_json::json!(false));
-        assert_eq!(defaults[KEY_AUTOSAVE_DEBOUNCE_SECONDS], serde_json::json!(10));
+        assert_eq!(
+            defaults[KEY_AUTOSAVE_DEBOUNCE_SECONDS],
+            serde_json::json!(10)
+        );
     }
 
     #[test]
@@ -149,6 +152,9 @@ mod tests {
 
         // autosave_enabled should still be the default
         assert_eq!(defaults[KEY_AUTOSAVE_ENABLED], serde_json::json!(true));
-        assert_eq!(defaults[KEY_AUTOSAVE_DEBOUNCE_SECONDS], serde_json::json!(15));
+        assert_eq!(
+            defaults[KEY_AUTOSAVE_DEBOUNCE_SECONDS],
+            serde_json::json!(15)
+        );
     }
 }

@@ -330,6 +330,7 @@ impl Blog {
     }
 
     /// Find all blogs for a site with optional search, filter, and sort
+    #[allow(clippy::too_many_arguments)]
     pub async fn find_all_for_site_filtered(
         pool: &PgPool,
         site_id: Uuid,
@@ -343,9 +344,10 @@ impl Blog {
     ) -> Result<Vec<BlogWithContent>, ApiError> {
         // Normalize status to DB enum value early so we can reject invalid values
         let db_status = match status {
-            Some(s) => Some(normalize_content_status(s).ok_or_else(|| {
-                ApiError::BadRequest(format!("Invalid status filter: {}", s))
-            })?),
+            Some(s) => Some(
+                normalize_content_status(s)
+                    .ok_or_else(|| ApiError::BadRequest(format!("Invalid status filter: {}", s)))?,
+            ),
             None => None,
         };
         let db_exclude_status = match exclude_status {
@@ -437,9 +439,10 @@ impl Blog {
         exclude_status: Option<&str>,
     ) -> Result<i64, ApiError> {
         let db_status = match status {
-            Some(s) => Some(normalize_content_status(s).ok_or_else(|| {
-                ApiError::BadRequest(format!("Invalid status filter: {}", s))
-            })?),
+            Some(s) => Some(
+                normalize_content_status(s)
+                    .ok_or_else(|| ApiError::BadRequest(format!("Invalid status filter: {}", s)))?,
+            ),
             None => None,
         };
         let db_exclude_status = match exclude_status {
