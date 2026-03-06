@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Pre-commit hook: auto-format Rust code with cargo fmt
-# Only runs when .rs files are staged — pure frontend commits are unaffected.
+# Pre-commit hook: lint and test checks scoped to what's staged.
+# Rust checks only run when .rs files are staged.
+# Frontend checks only run when admin/ files are staged.
 
 set -e
 
@@ -17,4 +18,12 @@ if git diff --cached --name-only | grep -q '\.rs$'; then
 
   echo "Running cargo clippy..."
   (cd "$ROOT/backend" && cargo clippy -- -D warnings)
+fi
+
+if git diff --cached --name-only | grep -q '^admin/'; then
+  echo "Running npm lint..."
+  (cd "$ROOT/admin" && npm run lint)
+
+  echo "Running npm test..."
+  (cd "$ROOT/admin" && npm test)
 fi
