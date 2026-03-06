@@ -98,6 +98,40 @@ vi.mock('@/services/api', () => {
     // Locale & template methods
     getSiteLocales: vi.fn(),
     getContentTemplates: vi.fn(),
+    // Redirect methods
+    getRedirects: vi.fn(),
+    createRedirect: vi.fn(),
+    updateRedirect: vi.fn(),
+    deleteRedirect: vi.fn(),
+    // Social link methods
+    getSocialLinks: vi.fn(),
+    createSocialLink: vi.fn(),
+    updateSocialLink: vi.fn(),
+    deleteSocialLink: vi.fn(),
+    reorderSocialLinks: vi.fn(),
+    // Navigation methods
+    getNavigationMenus: vi.fn(),
+    createNavigationMenu: vi.fn(),
+    updateNavigationMenu: vi.fn(),
+    deleteNavigationMenu: vi.fn(),
+    getMenuItems: vi.fn(),
+    createMenuItem: vi.fn(),
+    createNavigationItem: vi.fn(),
+    updateNavigationItem: vi.fn(),
+    deleteNavigationItem: vi.fn(),
+    reorderMenuItems: vi.fn(),
+    reorderNavigationItems: vi.fn(),
+    // Member methods
+    getSiteMembers: vi.fn(),
+    addSiteMember: vi.fn(),
+    updateMemberRole: vi.fn(),
+    removeSiteMember: vi.fn(),
+    transferOwnership: vi.fn(),
+    getClerkUsers: vi.fn(),
+    // Site methods
+    createSite: vi.fn(),
+    // API key methods
+    getApiKeys: vi.fn(),
   };
   return { default: apiService, ApiService: vi.fn(() => apiService) };
 });
