@@ -62,6 +62,7 @@ use utoipa::{Modify, OpenApi};
         crate::handlers::site::create_site,
         crate::handlers::site::update_site,
         crate::handlers::site::delete_site,
+        crate::handlers::site::get_site_context,
         // Site Settings
         crate::handlers::site_settings::get_site_settings,
         crate::handlers::site_settings::update_site_settings,
@@ -305,6 +306,9 @@ use utoipa::{Modify, OpenApi};
         crate::dto::site::CreateSiteRequest,
         crate::dto::site::UpdateSiteRequest,
         crate::dto::site::SiteResponse,
+        crate::dto::site::SiteContextResponse,
+        crate::dto::site::SiteContextFeatures,
+        crate::dto::site::SiteContextSuggestions,
         // Site Settings DTOs
         crate::dto::site_settings::SiteSettingsResponse,
         crate::dto::site_settings::UpdateSiteSettingsRequest,

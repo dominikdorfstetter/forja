@@ -6,7 +6,10 @@ use rocket::{Route, State};
 use uuid::Uuid;
 use validator::Validate;
 
-use crate::dto::site::{CreateSiteRequest, SiteResponse, UpdateSiteRequest};
+use crate::dto::site::{
+    should_show_team_workflow_prompt, CreateSiteRequest, SiteContextFeatures, SiteContextResponse,
+    SiteContextSuggestions, SiteResponse, UpdateSiteRequest,
+};
 use crate::errors::{ApiError, ProblemDetails};
 use crate::guards::auth_guard::{AuthSource, AuthenticatedKey, ReadKey};
 use crate::models::audit::AuditAction;
@@ -14,6 +17,7 @@ use crate::models::locale::Locale;
 use crate::models::site::Site;
 use crate::models::site_locale::SiteLocale;
 use crate::models::site_membership::{SiteMembership, SiteRole};
+use crate::models::site_settings::SiteSetting;
 use crate::services::audit_service;
 use crate::AppState;
 
@@ -308,11 +312,87 @@ pub async fn delete_site(
     Ok(Status::NoContent)
 }
 
+/// Get site context for progressive disclosure
+#[utoipa::path(
+    tag = "Sites",
+    operation_id = "get_site_context",
+    description = "Returns site context for adaptive UI — member count, current user role, feature flags, and suggestions",
+    params(("site_id" = Uuid, Path, description = "Site UUID")),
+    responses(
+        (status = 200, description = "Site context", body = SiteContextResponse),
+        (status = 401, description = "Unauthorized", body = ProblemDetails),
+        (status = 403, description = "Forbidden", body = ProblemDetails),
+        (status = 404, description = "Site not found", body = ProblemDetails)
+    ),
+    security(("api_key" = []), ("bearer_auth" = []))
+)]
+#[get("/sites/<site_id>/context")]
+pub async fn get_site_context(
+    state: &State<AppState>,
+    site_id: Uuid,
+    auth: ReadKey,
+) -> Result<Json<SiteContextResponse>, ApiError> {
+    auth.0
+        .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)
+        .await?;
+
+    let member_count = SiteMembership::count_for_site(&state.db, site_id).await?;
+
+    let role = auth
+        .0
+        .effective_site_role(&state.db, site_id)
+        .await?
+        .unwrap_or(SiteRole::Viewer);
+    let current_user_role = format!("{:?}", role).to_lowercase();
+
+    let settings = SiteSetting::get_effective_settings(&state.db, site_id).await?;
+
+    let editorial_workflow = settings
+        .get("editorial_workflow_enabled")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false);
+    let scheduling = settings
+        .get("scheduling_enabled")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(true);
+    let versioning = settings
+        .get("versioning_enabled")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(true);
+    let analytics = settings
+        .get("analytics_enabled")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false);
+    let prompt_dismissed = settings
+        .get("team_features_prompt_dismissed")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false);
+
+    Ok(Json(SiteContextResponse {
+        member_count,
+        current_user_role,
+        features: SiteContextFeatures {
+            editorial_workflow,
+            scheduling,
+            versioning,
+            analytics,
+        },
+        suggestions: SiteContextSuggestions {
+            show_team_workflow_prompt: should_show_team_workflow_prompt(
+                member_count,
+                editorial_workflow,
+                prompt_dismissed,
+            ),
+        },
+    }))
+}
+
 /// Collect site routes
 pub fn routes() -> Vec<Route> {
     routes![
         list_sites,
         get_site_by_slug, // More specific routes first
+        get_site_context,
         get_site,
         create_site,
         update_site,
@@ -327,6 +407,6 @@ mod tests {
     #[test]
     fn test_routes_count() {
         let routes = routes();
-        assert_eq!(routes.len(), 6, "Should have 6 site routes");
+        assert_eq!(routes.len(), 7, "Should have 7 site routes");
     }
 }
