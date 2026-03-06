@@ -1197,6 +1197,11 @@ export interface SiteSettingsResponse {
   posts_per_page: number;
   editorial_workflow_enabled: boolean;
   preview_templates: PreviewTemplate[];
+  module_blog_enabled: boolean;
+  module_pages_enabled: boolean;
+  module_cv_enabled: boolean;
+  module_legal_enabled: boolean;
+  module_documents_enabled: boolean;
 }
 
 export interface UpdateSiteSettingsRequest {
@@ -1208,6 +1213,11 @@ export interface UpdateSiteSettingsRequest {
   posts_per_page?: number;
   editorial_workflow_enabled?: boolean;
   preview_templates?: PreviewTemplate[];
+  module_blog_enabled?: boolean;
+  module_pages_enabled?: boolean;
+  module_cv_enabled?: boolean;
+  module_legal_enabled?: boolean;
+  module_documents_enabled?: boolean;
 }
 
 // User Preferences

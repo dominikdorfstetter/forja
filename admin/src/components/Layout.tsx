@@ -43,6 +43,7 @@ import { useNavigationGuardContext } from '@/store/NavigationGuardContext';
 import { CommandPalette } from '@/components/command-palette';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import ErrorBoundary from '@/components/shared/ErrorBoundary';
+import { useSiteContextData } from '@/hooks/useSiteContextData';
 
 const isMac = typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 const modifierKey = isMac ? '⌘' : 'Ctrl+';
@@ -132,6 +133,7 @@ export default function Layout() {
   const { selectedSiteId, setSelectedSiteId, sites } = useSiteContext();
   const { isAdmin, canManageMembers, siteId: authSiteId, logout, userFullName, userImageUrl } = useAuth();
   const { guardedNavigate } = useNavigationGuardContext();
+  const { modules } = useSiteContextData();
 
   // Sidebar: site-workspace items only
   const allMenuSections = [
@@ -144,10 +146,10 @@ export default function Layout() {
     {
       label: t('layout.sidebar.content'),
       items: [
-        { text: t('layout.sidebar.blogs'), icon: <ArticleIcon />, path: '/blogs' },
-        { text: t('layout.sidebar.pages'), icon: <DescriptionIcon />, path: '/pages' },
+        ...(modules.blog ? [{ text: t('layout.sidebar.blogs'), icon: <ArticleIcon />, path: '/blogs' }] : []),
+        ...(modules.pages ? [{ text: t('layout.sidebar.pages'), icon: <DescriptionIcon />, path: '/pages' }] : []),
         { text: t('layout.sidebar.assets'), icon: <PermMediaIcon />, path: '/media' },
-        { text: t('layout.sidebar.cv'), icon: <WorkIcon />, path: '/cv' },
+        ...(modules.cv ? [{ text: t('layout.sidebar.cv'), icon: <WorkIcon />, path: '/cv' }] : []),
       ],
     },
     {

@@ -9,13 +9,13 @@ import apiService from '@/services/api';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import type { Site, CreateSiteRequest } from '@/types/api';
 import { useAuth } from '@/store/AuthContext';
-import { useSiteContext } from '@/store/SiteContext';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import SiteCard from '@/components/sites/SiteCard';
 import SiteFormDialog from '@/components/sites/SiteFormDialog';
+import SiteCreationWizard from '@/components/sites/SiteCreationWizard';
 
 export default function SitesPage() {
   const { t } = useTranslation();
@@ -23,16 +23,15 @@ export default function SitesPage() {
   const queryClient = useQueryClient();
   const { showError, showSuccess } = useErrorSnackbar();
 
-  const { isAdmin, refreshAuth } = useAuth();
-  const { setSelectedSiteId } = useSiteContext();
-  const [formOpen, setFormOpen] = useState(false);
+  const { isAdmin } = useAuth();
+  const [wizardOpen, setWizardOpen] = useState(false);
   const [editingSite, setEditingSite] = useState<Site | null>(null);
   const [deletingSite, setDeletingSite] = useState<Site | null>(null);
 
   // Command palette action listener
   useEffect(() => {
     const handler = (e: Event) => {
-      if ((e as CustomEvent).detail === 'create-site') setFormOpen(true);
+      if ((e as CustomEvent).detail === 'create-site') setWizardOpen(true);
     };
     window.addEventListener('command-palette:action', handler);
     return () => window.removeEventListener('command-palette:action', handler);
@@ -41,19 +40,6 @@ export default function SitesPage() {
   const { data: sites, isLoading, error } = useQuery({
     queryKey: ['sites'],
     queryFn: () => apiService.getSites(),
-  });
-
-  const createMutation = useMutation({
-    mutationFn: (data: CreateSiteRequest) => apiService.createSite(data),
-    onSuccess: async (newSite) => {
-      // Refresh auth to pick up the new owner membership
-      await refreshAuth();
-      queryClient.invalidateQueries({ queryKey: ['sites'] });
-      setSelectedSiteId(newSite.id);
-      setFormOpen(false);
-      showSuccess(t('sites.messages.created'));
-    },
-    onError: (error) => { showError(error); },
   });
 
   const updateMutation = useMutation({
@@ -84,7 +70,7 @@ export default function SitesPage() {
       <PageHeader
         title={t('sites.title')}
         subtitle={t('sites.subtitle')}
-        action={{ label: t('sites.createButton'), icon: <AddIcon />, onClick: () => setFormOpen(true) }}
+        action={{ label: t('sites.createButton'), icon: <AddIcon />, onClick: () => setWizardOpen(true) }}
       />
 
       {sites && sites.length > 0 ? (
@@ -105,15 +91,13 @@ export default function SitesPage() {
           icon={<WebIcon sx={{ fontSize: 64 }} />}
           title={t('sites.empty.title')}
           description={t('sites.empty.description')}
-          action={{ label: t('sites.createButton'), onClick: () => setFormOpen(true) }}
+          action={{ label: t('sites.createButton'), onClick: () => setWizardOpen(true) }}
         />
       )}
 
-      <SiteFormDialog
-        open={formOpen}
-        onSubmit={(data) => createMutation.mutate(data)}
-        onClose={() => setFormOpen(false)}
-        loading={createMutation.isPending}
+      <SiteCreationWizard
+        open={wizardOpen}
+        onClose={() => setWizardOpen(false)}
       />
 
       <SiteFormDialog

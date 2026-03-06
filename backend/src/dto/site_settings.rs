@@ -6,7 +6,9 @@ use validator::Validate;
 
 use crate::models::site_settings::{
     KEY_ANALYTICS_ENABLED, KEY_CONTACT_EMAIL, KEY_EDITORIAL_WORKFLOW_ENABLED, KEY_MAINTENANCE_MODE,
-    KEY_MAX_DOCUMENT_FILE_SIZE, KEY_MAX_MEDIA_FILE_SIZE, KEY_POSTS_PER_PAGE, KEY_PREVIEW_TEMPLATES,
+    KEY_MAX_DOCUMENT_FILE_SIZE, KEY_MAX_MEDIA_FILE_SIZE, KEY_MODULE_BLOG_ENABLED,
+    KEY_MODULE_CV_ENABLED, KEY_MODULE_DOCUMENTS_ENABLED, KEY_MODULE_LEGAL_ENABLED,
+    KEY_MODULE_PAGES_ENABLED, KEY_POSTS_PER_PAGE, KEY_PREVIEW_TEMPLATES,
 };
 use crate::utils::validation::validate_email;
 
@@ -38,6 +40,17 @@ pub struct SiteSettingsResponse {
     #[schema(example = false)]
     pub editorial_workflow_enabled: bool,
     pub preview_templates: Vec<PreviewTemplate>,
+    // Module flags
+    #[schema(example = true)]
+    pub module_blog_enabled: bool,
+    #[schema(example = true)]
+    pub module_pages_enabled: bool,
+    #[schema(example = false)]
+    pub module_cv_enabled: bool,
+    #[schema(example = false)]
+    pub module_legal_enabled: bool,
+    #[schema(example = false)]
+    pub module_documents_enabled: bool,
 }
 
 impl SiteSettingsResponse {
@@ -77,6 +90,26 @@ impl SiteSettingsResponse {
                 .get(KEY_PREVIEW_TEMPLATES)
                 .and_then(|v| serde_json::from_value::<Vec<PreviewTemplate>>(v.clone()).ok())
                 .unwrap_or_default(),
+            module_blog_enabled: map
+                .get(KEY_MODULE_BLOG_ENABLED)
+                .and_then(|v| v.as_bool())
+                .unwrap_or(true),
+            module_pages_enabled: map
+                .get(KEY_MODULE_PAGES_ENABLED)
+                .and_then(|v| v.as_bool())
+                .unwrap_or(true),
+            module_cv_enabled: map
+                .get(KEY_MODULE_CV_ENABLED)
+                .and_then(|v| v.as_bool())
+                .unwrap_or(false),
+            module_legal_enabled: map
+                .get(KEY_MODULE_LEGAL_ENABLED)
+                .and_then(|v| v.as_bool())
+                .unwrap_or(false),
+            module_documents_enabled: map
+                .get(KEY_MODULE_DOCUMENTS_ENABLED)
+                .and_then(|v| v.as_bool())
+                .unwrap_or(false),
         }
     }
 }
@@ -114,6 +147,13 @@ pub struct UpdateSiteSettingsRequest {
     pub editorial_workflow_enabled: Option<bool>,
 
     pub preview_templates: Option<Vec<PreviewTemplate>>,
+
+    // Module flags
+    pub module_blog_enabled: Option<bool>,
+    pub module_pages_enabled: Option<bool>,
+    pub module_cv_enabled: Option<bool>,
+    pub module_legal_enabled: Option<bool>,
+    pub module_documents_enabled: Option<bool>,
 }
 
 impl UpdateSiteSettingsRequest {
@@ -145,6 +185,21 @@ impl UpdateSiteSettingsRequest {
         if let Some(ref v) = self.preview_templates {
             out.push((KEY_PREVIEW_TEMPLATES, serde_json::json!(v), false));
         }
+        if let Some(v) = self.module_blog_enabled {
+            out.push((KEY_MODULE_BLOG_ENABLED, serde_json::json!(v), false));
+        }
+        if let Some(v) = self.module_pages_enabled {
+            out.push((KEY_MODULE_PAGES_ENABLED, serde_json::json!(v), false));
+        }
+        if let Some(v) = self.module_cv_enabled {
+            out.push((KEY_MODULE_CV_ENABLED, serde_json::json!(v), false));
+        }
+        if let Some(v) = self.module_legal_enabled {
+            out.push((KEY_MODULE_LEGAL_ENABLED, serde_json::json!(v), false));
+        }
+        if let Some(v) = self.module_documents_enabled {
+            out.push((KEY_MODULE_DOCUMENTS_ENABLED, serde_json::json!(v), false));
+        }
 
         out
     }
@@ -167,6 +222,11 @@ mod tests {
         assert_eq!(resp.posts_per_page, 10);
         assert!(!resp.editorial_workflow_enabled);
         assert!(resp.preview_templates.is_empty());
+        assert!(resp.module_blog_enabled);
+        assert!(resp.module_pages_enabled);
+        assert!(!resp.module_cv_enabled);
+        assert!(!resp.module_legal_enabled);
+        assert!(!resp.module_documents_enabled);
     }
 
     #[test]
@@ -193,6 +253,11 @@ mod tests {
             posts_per_page: Some(20),
             editorial_workflow_enabled: None,
             preview_templates: None,
+            module_blog_enabled: Some(true),
+            module_pages_enabled: None,
+            module_cv_enabled: None,
+            module_legal_enabled: None,
+            module_documents_enabled: None,
         };
         assert!(req.validate().is_ok());
     }
@@ -208,6 +273,11 @@ mod tests {
             posts_per_page: None,
             editorial_workflow_enabled: None,
             preview_templates: None,
+            module_blog_enabled: None,
+            module_pages_enabled: None,
+            module_cv_enabled: None,
+            module_legal_enabled: None,
+            module_documents_enabled: None,
         };
         assert!(req.validate().is_err());
     }
@@ -223,6 +293,11 @@ mod tests {
             posts_per_page: None,
             editorial_workflow_enabled: None,
             preview_templates: None,
+            module_blog_enabled: None,
+            module_pages_enabled: None,
+            module_cv_enabled: None,
+            module_legal_enabled: None,
+            module_documents_enabled: None,
         };
         assert!(req.validate().is_err());
     }
@@ -238,6 +313,11 @@ mod tests {
             posts_per_page: None,
             editorial_workflow_enabled: None,
             preview_templates: None,
+            module_blog_enabled: None,
+            module_pages_enabled: None,
+            module_cv_enabled: None,
+            module_legal_enabled: None,
+            module_documents_enabled: None,
         };
         assert!(req.validate().is_err());
     }
@@ -253,6 +333,11 @@ mod tests {
             posts_per_page: Some(0),
             editorial_workflow_enabled: None,
             preview_templates: None,
+            module_blog_enabled: None,
+            module_pages_enabled: None,
+            module_cv_enabled: None,
+            module_legal_enabled: None,
+            module_documents_enabled: None,
         };
         assert!(req.validate().is_err());
     }
@@ -268,6 +353,11 @@ mod tests {
             posts_per_page: Some(101),
             editorial_workflow_enabled: None,
             preview_templates: None,
+            module_blog_enabled: None,
+            module_pages_enabled: None,
+            module_cv_enabled: None,
+            module_legal_enabled: None,
+            module_documents_enabled: None,
         };
         assert!(req.validate().is_err());
     }
@@ -283,6 +373,11 @@ mod tests {
             posts_per_page: None,
             editorial_workflow_enabled: None,
             preview_templates: None,
+            module_blog_enabled: None,
+            module_pages_enabled: None,
+            module_cv_enabled: None,
+            module_legal_enabled: None,
+            module_documents_enabled: None,
         };
         assert!(req.validate().is_ok());
     }
@@ -298,6 +393,11 @@ mod tests {
             posts_per_page: None,
             editorial_workflow_enabled: None,
             preview_templates: None,
+            module_blog_enabled: None,
+            module_pages_enabled: None,
+            module_cv_enabled: None,
+            module_legal_enabled: None,
+            module_documents_enabled: None,
         };
         assert!(req.validate().is_err());
     }
@@ -313,6 +413,11 @@ mod tests {
             posts_per_page: None,
             editorial_workflow_enabled: None,
             preview_templates: None,
+            module_blog_enabled: None,
+            module_pages_enabled: None,
+            module_cv_enabled: None,
+            module_legal_enabled: None,
+            module_documents_enabled: None,
         };
         assert!(req.validate().is_ok());
     }
@@ -329,6 +434,11 @@ mod tests {
             posts_per_page: None,
             editorial_workflow_enabled: None,
             preview_templates: None,
+            module_blog_enabled: None,
+            module_pages_enabled: None,
+            module_cv_enabled: None,
+            module_legal_enabled: None,
+            module_documents_enabled: None,
         };
         assert!(req.validate().is_ok());
     }
@@ -344,12 +454,18 @@ mod tests {
             posts_per_page: Some(20),
             editorial_workflow_enabled: None,
             preview_templates: None,
+            module_blog_enabled: Some(true),
+            module_pages_enabled: None,
+            module_cv_enabled: None,
+            module_legal_enabled: None,
+            module_documents_enabled: None,
         };
         let vec = req.to_settings_vec();
-        assert_eq!(vec.len(), 3);
+        assert_eq!(vec.len(), 4);
         assert_eq!(vec[0].0, "max_document_file_size");
         assert_eq!(vec[1].0, "analytics_enabled");
         assert_eq!(vec[2].0, "posts_per_page");
+        assert_eq!(vec[3].0, "module_blog_enabled");
     }
 
     #[test]
@@ -363,6 +479,11 @@ mod tests {
             posts_per_page: 10,
             editorial_workflow_enabled: false,
             preview_templates: vec![],
+            module_blog_enabled: true,
+            module_pages_enabled: true,
+            module_cv_enabled: false,
+            module_legal_enabled: false,
+            module_documents_enabled: false,
         };
         let json = serde_json::to_string(&resp).unwrap();
         assert!(json.contains("\"max_document_file_size\":10485760"));
