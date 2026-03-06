@@ -6,6 +6,35 @@ sidebar_position: 100
 
 This page tracks the release history of Forja. For the most up-to-date changelog, see the [CHANGELOG.md](https://github.com/dominikdorfstetter/forja/blob/main/CHANGELOG.md) file in the repository.
 
+## v1.1.0
+
+### Backend
+
+- **Similar blogs endpoint** -- new `GET /sites/{site_id}/blogs/{id}/similar?limit` endpoint that returns related posts ranked by taxonomy overlap (shared tags, categories, primary category match, and same author).
+- **Similar pages** -- `find_similar_pages()` model method for page similarity scoring.
+- **Unique slug generation** -- `ContentService::generate_unique_slug()` for creating conflict-free slugs when cloning content.
+
+### Admin Dashboard
+
+- **Blog creation wizard** -- replaced the single-dialog blog form with a step-by-step wizard (slug, metadata, settings).
+- **Content template wizard** -- new guided wizard for creating content templates.
+- **Dashboard widgets** -- attention panel (items needing review), content status chart, and recent activity feed on the home page.
+- **Editorial workflow improvements** -- approve and restore actions, review comment dialog enhancements.
+- **Command palette enhancements** -- additional quick actions in Cmd+K.
+- **New shared components** -- ApproveDialog, CopyableId, PageTypeChip, RestoreDialog.
+- **PWA support** -- web app manifest and app icons for installable dashboard experience.
+- **Extended i18n** -- new translation keys across all 8 supported locales (de, en, es, fr, it, nl, pl, pt).
+
+### Astro Blog Template
+
+- **Dark mode** -- system preference detection, manual toggle in the nav bar, and localStorage persistence. All colors adapt via CSS custom properties.
+- **Similar blogs section** -- "Continue Reading" section on blog detail pages showing up to 3 related posts from the similarity API.
+- **Footer redesign** -- 3-column layout with brand, navigation links, and social icons.
+- **UI refinements** -- sticky nav with backdrop blur, card hover animations, responsive excerpt clamping, improved typography and spacing.
+- **Category archive pages** -- blog listing filtered by category slug at `/blog/category/{slug}`.
+
+---
+
 ## v1.0.0 -- Initial Release
 
 The first public release of Forja, a complete multi-site CMS built with Rust and React.

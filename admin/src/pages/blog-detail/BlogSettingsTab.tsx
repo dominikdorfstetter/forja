@@ -1,5 +1,6 @@
 import {
   Box,
+  Divider,
   FormControlLabel,
   Grid,
   IconButton,
@@ -12,6 +13,8 @@ import {
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import { Controller, type Control, type UseFormWatch, type UseFormSetValue } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns';
+import CopyableId from '@/components/shared/CopyableId';
 import type { BlogContentFormData } from './blogDetailSchema';
 import { calculateReadingTime } from './blogDetailSchema';
 
@@ -20,6 +23,11 @@ interface BlogSettingsTabProps {
   watch: UseFormWatch<BlogContentFormData>;
   setValue: UseFormSetValue<BlogContentFormData>;
   onSnapshot: () => void;
+  blogId: string;
+  contentId: string;
+  publishedAt?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export default function BlogSettingsTab({
@@ -27,6 +35,11 @@ export default function BlogSettingsTab({
   watch,
   setValue,
   onSnapshot,
+  blogId,
+  contentId,
+  publishedAt,
+  createdAt,
+  updatedAt,
 }: BlogSettingsTabProps) {
   const { t } = useTranslation();
   const body = watch('body');
@@ -144,6 +157,35 @@ export default function BlogSettingsTab({
           )}
         />
       </Box>
+
+      <Divider sx={{ my: 3 }} />
+      <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+        {t('blogDetail.metadata.info')}
+      </Typography>
+      <Grid container spacing={1}>
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <Typography variant="caption" color="text.secondary">{t('blogDetail.metadata.blogId')}</Typography>
+          <CopyableId value={blogId} />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <Typography variant="caption" color="text.secondary">{t('blogDetail.metadata.contentId')}</Typography>
+          <CopyableId value={contentId} />
+        </Grid>
+        {publishedAt && (
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Typography variant="caption" color="text.secondary">{t('blogDetail.metadata.publishedAt')}</Typography>
+            <Typography variant="body2">{format(new Date(publishedAt), 'PPpp')}</Typography>
+          </Grid>
+        )}
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <Typography variant="caption" color="text.secondary">{t('blogDetail.metadata.createdAt')}</Typography>
+          <Typography variant="body2">{format(new Date(createdAt), 'PPpp')}</Typography>
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <Typography variant="caption" color="text.secondary">{t('blogDetail.metadata.updatedAt')}</Typography>
+          <Typography variant="body2">{format(new Date(updatedAt), 'PPpp')}</Typography>
+        </Grid>
+      </Grid>
     </Box>
   );
 }

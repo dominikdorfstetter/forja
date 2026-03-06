@@ -101,7 +101,12 @@ export default function NotificationBell() {
   return (
     <>
       <Tooltip title={t('notifications.bell')}>
-        <IconButton color="inherit" onClick={(e) => setAnchorEl(e.currentTarget)}>
+        <IconButton
+          color="inherit"
+          onClick={(e) => setAnchorEl(e.currentTarget)}
+          aria-label={unreadCount > 0 ? t('notifications.bellWithCount', { count: unreadCount }) : t('notifications.bell')}
+          data-testid="notifications.btn.bell"
+        >
           <Badge badgeContent={unreadCount} color="error" max={99}>
             <NotificationsIcon />
           </Badge>
@@ -113,7 +118,8 @@ export default function NotificationBell() {
         onClose={() => setAnchorEl(null)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-        slotProps={{ paper: { sx: { width: 380, maxHeight: 480 } } }}
+        slotProps={{ paper: { sx: { width: 380, maxHeight: 480 }, role: 'dialog', 'aria-label': t('notifications.title') } }}
+        data-testid="notifications.popover"
       >
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 2, py: 1.5 }}>
           <Typography variant="subtitle1" fontWeight={600}>{t('notifications.title')}</Typography>
@@ -122,6 +128,7 @@ export default function NotificationBell() {
               size="small"
               onClick={() => markAllReadMutation.mutate()}
               disabled={markAllReadMutation.isPending}
+              data-testid="notifications.btn.mark-all-read"
             >
               {t('notifications.markAllRead')}
             </Button>
@@ -184,6 +191,7 @@ export default function NotificationBell() {
               setAnchorEl(null);
               navigate('/notifications');
             }}
+            data-testid="notifications.btn.view-all"
           >
             {t('notifications.viewAll')}
           </Button>

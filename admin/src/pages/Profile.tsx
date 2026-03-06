@@ -86,7 +86,7 @@ export default function ProfilePage() {
   const isClerkUser = profile?.auth_method === 'clerk_jwt';
 
   return (
-    <Box>
+    <Box data-testid="profile.page">
       <PageHeader
         title={t('profile.title')}
         subtitle={t('profile.subtitle')}
@@ -255,6 +255,7 @@ export default function ProfilePage() {
         onConfirm={() => deleteMutation.mutate()}
         onCancel={() => setDeleteOpen(false)}
         loading={deleteMutation.isPending}
+        confirmationText={t('common.actions.delete')}
       />
     </Box>
   );

@@ -70,7 +70,7 @@ export default function InlineEditField({
 
   if (editing) {
     return (
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }} data-testid="inline-edit">
         <TextField
           inputRef={inputRef}
           size="small"
@@ -80,6 +80,7 @@ export default function InlineEditField({
           onKeyDown={handleKeyDown}
           disabled={saving}
           sx={{ flex: 1, '& input': { fontFamily } }}
+          data-testid="inline-edit.input"
         />
         {saving && <CircularProgress size={18} />}
       </Box>
@@ -96,6 +97,7 @@ export default function InlineEditField({
         '&:hover .edit-icon': disabled ? {} : { opacity: 1 },
       }}
       onClick={disabled ? undefined : () => setEditing(true)}
+      data-testid="inline-edit"
     >
       <Typography variant={variant} sx={{ fontFamily }}>
         {value || '—'}
@@ -104,8 +106,9 @@ export default function InlineEditField({
         <IconButton
           size="small"
           className="edit-icon"
-          sx={{ opacity: 0, transition: 'opacity 0.2s' }}
+          sx={{ opacity: 0, transition: 'opacity 0.2s', '&:focus-visible': { opacity: 1 }, minWidth: 44, minHeight: 44 }}
           aria-label={t('inlineEdit.clickToEdit')}
+          data-testid="inline-edit.btn.edit"
         >
           <EditIcon sx={{ fontSize: 14 }} />
         </IconButton>

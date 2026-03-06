@@ -148,6 +148,7 @@ export function createAppTheme(flavor: Flavor, locale?: ThemeOptions): Theme {
         styleOverrides: {
           root: {
             backgroundImage: 'none',
+            borderRadius: 0,
           },
         },
       },
@@ -156,6 +157,7 @@ export function createAppTheme(flavor: Flavor, locale?: ThemeOptions): Theme {
           paper: {
             backgroundColor: p.mantle,
             backgroundImage: 'none',
+            borderRadius: 0,
           },
         },
       },

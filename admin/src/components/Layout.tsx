@@ -9,7 +9,6 @@ import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ListItem from '@mui/material/ListItem';
@@ -31,7 +30,6 @@ import LanguageIcon from '@mui/icons-material/Language';
 import SettingsIcon from '@mui/icons-material/Settings';
 import WebhookIcon from '@mui/icons-material/Webhook';
 import AltRouteIcon from '@mui/icons-material/AltRoute';
-import ViewQuiltIcon from '@mui/icons-material/ViewQuilt';
 import IntegrationInstructionsIcon from '@mui/icons-material/IntegrationInstructions';
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -42,11 +40,13 @@ import { useTranslation } from 'react-i18next';
 import { useSiteContext } from '@/store/SiteContext';
 import { useAuth } from '@/store/AuthContext';
 import { useNavigationGuardContext } from '@/store/NavigationGuardContext';
-import ThemeSwitcher from '@/components/ThemeSwitcher';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { CommandPalette } from '@/components/command-palette';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import ErrorBoundary from '@/components/shared/ErrorBoundary';
+
+const isMac = typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+const modifierKey = isMac ? '⌘' : 'Ctrl+';
+const shortcutLabel = `${modifierKey}K`;
 
 const drawerWidth = 240;
 const collapsedWidth = 64;
@@ -113,8 +113,12 @@ const Drawer = styled(MuiDrawer, {
 const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'flex-end',
+  justifyContent: 'center',
   padding: theme.spacing(0, 1),
+  ...theme.mixins.toolbar,
+}));
+
+const AppBarSpacer = styled('div')(({ theme }) => ({
   ...theme.mixins.toolbar,
 }));
 
@@ -142,7 +146,6 @@ export default function Layout() {
       items: [
         { text: t('layout.sidebar.blogs'), icon: <ArticleIcon />, path: '/blogs' },
         { text: t('layout.sidebar.pages'), icon: <DescriptionIcon />, path: '/pages' },
-        { text: t('layout.sidebar.contentTemplates'), icon: <ViewQuiltIcon />, path: '/content-templates' },
         { text: t('layout.sidebar.assets'), icon: <PermMediaIcon />, path: '/media' },
         { text: t('layout.sidebar.cv'), icon: <WorkIcon />, path: '/cv' },
       ],
@@ -162,7 +165,7 @@ export default function Layout() {
         ...(isAdmin ? [{ text: t('layout.sidebar.webhooks'), icon: <WebhookIcon />, path: '/webhooks' }] : []),
         ...(isAdmin ? [{ text: t('layout.sidebar.activity'), icon: <HistoryIcon />, path: '/activity' }] : []),
         ...(canManageMembers || isAdmin ? [{ text: t('layout.sidebar.members'), icon: <PeopleIcon />, path: '/members' }] : []),
-        ...(isAdmin ? [{ text: t('layout.sidebar.settings'), icon: <SettingsIcon />, path: '/settings' }] : []),
+        { text: t('layout.sidebar.settings'), icon: <SettingsIcon />, path: '/settings' },
       ],
     },
   ];
@@ -198,19 +201,6 @@ export default function Layout() {
       </Box>
       <AppBar position="fixed" open={open} elevation={0} sx={{ borderBottom: '1px solid', borderColor: 'divider' }}>
         <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label={t('layout.toolbar.toggleDrawer')}
-            onClick={() => setOpen(!open)}
-            edge="start"
-            sx={{ mr: 2 }}
-          >
-            {open ? (theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />) : <MenuIcon />}
-          </IconButton>
-          <Typography variant="h6" noWrap component="div" fontWeight={600}>
-            {t('common.appName')}
-          </Typography>
-
           <Tooltip title={authSiteId ? t('common.lockedByScope') : ''} arrow>
             <TextField
               select
@@ -218,6 +208,8 @@ export default function Layout() {
               value={selectedSiteId}
               onChange={(e) => setSelectedSiteId(e.target.value)}
               disabled={!!authSiteId}
+              data-testid="layout.btn.site-selector"
+              inputProps={{ 'aria-label': t('layout.toolbar.siteSelector') }}
               sx={{
                 mx: 3,
                 minWidth: 180,
@@ -252,17 +244,20 @@ export default function Layout() {
             </TextField>
           </Tooltip>
 
-          <Tooltip title={t('commandPalette.hint')}>
+          <Box sx={{ flexGrow: 1 }} />
+
+          <Tooltip title={shortcutLabel}>
             <IconButton
               color="inherit"
+              aria-label={t('commandPalette.open')}
+              data-testid="layout.btn.search"
               onClick={() => {
-                window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }));
+                window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: isMac, ctrlKey: !isMac }));
               }}
-              sx={{ ml: 1 }}
             >
               <SearchIcon />
               <Chip
-                label="⌘K"
+                label={shortcutLabel}
                 size="small"
                 sx={{
                   ml: 0.5,
@@ -278,12 +273,16 @@ export default function Layout() {
           <Box sx={{ flexGrow: 1 }} />
 
           <NotificationBell />
-          <LanguageSwitcher />
-          <ThemeSwitcher />
 
-          <Box sx={{ flexGrow: 0 }}>
+          <Box sx={{ flexGrow: 0, ml: 1.5 }}>
             <Tooltip title={t('layout.toolbar.account')}>
-              <IconButton onClick={(e) => setAnchorElUser(e.currentTarget)} sx={{ p: 0 }}>
+              <IconButton
+                onClick={(e) => setAnchorElUser(e.currentTarget)}
+                aria-haspopup="true"
+                aria-expanded={Boolean(anchorElUser)}
+                data-testid="layout.btn.user-menu"
+                sx={{ p: 0 }}
+              >
                 <Avatar alt={userFullName || 'User'} src={userImageUrl || undefined} sx={{ width: 32, height: 32 }} />
               </IconButton>
             </Tooltip>
@@ -327,7 +326,47 @@ export default function Layout() {
       </AppBar>
 
       <Drawer variant="permanent" open={open} PaperProps={{ component: 'nav' as const, 'aria-label': 'Main navigation' }}>
-        <DrawerHeader />
+        <DrawerHeader sx={{ justifyContent: open ? 'space-between' : 'center', px: open ? 2 : 0 }}>
+          {open ? (
+            <>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box
+                  component="img"
+                  src={`${import.meta.env.BASE_URL}icons/forja-icon.svg`}
+                  alt=""
+                  sx={{ width: 28, height: 28 }}
+                />
+                <Typography variant="h6" component="div" fontWeight={700} noWrap>
+                  {t('common.appName')}
+                </Typography>
+              </Box>
+              <IconButton
+                aria-label={t('layout.toolbar.toggleDrawer')}
+                data-testid="layout.btn.toggle-sidebar"
+                onClick={() => setOpen(false)}
+                size="small"
+              >
+                {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+              </IconButton>
+            </>
+          ) : (
+            <Tooltip title={t('common.appName')} placement="right" arrow>
+              <IconButton
+                aria-label={t('layout.toolbar.toggleDrawer')}
+                data-testid="layout.btn.toggle-sidebar"
+                onClick={() => setOpen(true)}
+                sx={{ borderRadius: 1, px: 1 }}
+              >
+                <Box
+                  component="img"
+                  src={`${import.meta.env.BASE_URL}icons/forja-icon.svg`}
+                  alt=""
+                  sx={{ width: 28, height: 28 }}
+                />
+              </IconButton>
+            </Tooltip>
+          )}
+        </DrawerHeader>
         <Divider />
         {menuSections.map((section, idx) => (
           <List
@@ -363,6 +402,7 @@ export default function Layout() {
                     <ListItemButton
                       selected={isActive}
                       aria-current={isActive ? 'page' : undefined}
+                      data-testid={`layout.nav.${item.path.replace(/^\//, '')}`}
                       onClick={() => guardedNavigate(item.path)}
                       sx={{
                         minHeight: 44,
@@ -415,6 +455,7 @@ export default function Layout() {
             <Tooltip title={open ? '' : t('layout.sidebar.logout')} placement="right" arrow>
               <ListItemButton
                 onClick={handleLogout}
+                data-testid="layout.btn.logout"
                 sx={{
                   minHeight: 44,
                   px: 2.5,
@@ -468,7 +509,7 @@ export default function Layout() {
           }),
         }}
       >
-        <DrawerHeader />
+        <AppBarSpacer />
         <ErrorBoundary key={location.pathname}>
           <Fade in key={location.pathname} timeout={300}>
             <Box>

@@ -1182,6 +1182,21 @@ export interface UpdateSiteSettingsRequest {
   preview_templates?: PreviewTemplate[];
 }
 
+// User Preferences
+export interface UserPreferencesResponse {
+  autosave_enabled: boolean;
+  autosave_debounce_seconds: number;
+  language: string;
+  theme_id: string;
+}
+
+export interface UpdateUserPreferencesRequest {
+  autosave_enabled?: boolean;
+  autosave_debounce_seconds?: number;
+  language?: string;
+  theme_id?: string;
+}
+
 // Clerk User Management
 export interface ClerkUser {
   id: string;

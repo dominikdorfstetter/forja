@@ -13,6 +13,7 @@ Blog posts are the primary content type in Forja. They support localization, cat
 | GET | `/sites/{site_id}/blogs?page&per_page` | Read | List all blogs (paginated) |
 | GET | `/sites/{site_id}/blogs/published?page&per_page` | Read | List published blogs |
 | GET | `/sites/{site_id}/blogs/featured?limit` | Read | List featured blogs |
+| GET | `/sites/{site_id}/blogs/{id}/similar?limit` | Read | List similar blogs by taxonomy overlap |
 | GET | `/sites/{site_id}/blogs/by-slug/{slug}` | Read | Get blog by slug |
 | GET | `/blogs/{id}` | Read | Get blog by ID |
 | GET | `/blogs/{id}/detail` | Read | Get blog with localizations, categories, and documents |
@@ -62,6 +63,23 @@ curl -X POST \
 ```
 
 **Response** `201 Created`
+
+## Similar Blogs
+
+Returns blogs similar to the given blog post, ranked by taxonomy overlap. Scoring: shared tags (+3 each), shared categories (+2 each), primary category match (+3 bonus), same author (+1). Only published blogs with a score > 0 are returned. If nothing is similar, the response is an empty array.
+
+```bash
+curl -H "X-API-Key: oy_live_abc123..." \
+  "https://your-domain.com/api/v1/sites/{site_id}/blogs/{id}/similar?limit=3"
+```
+
+**Query Parameters**
+
+| Parameter | Default | Max | Description |
+|-----------|---------|-----|-------------|
+| `limit` | 3 | 10 | Number of similar blogs to return |
+
+**Response** `200 OK` -- Array of `BlogListItem` objects sorted by relevance score (descending), then by `published_date` (most recent first).
 
 ## Editorial Workflow
 

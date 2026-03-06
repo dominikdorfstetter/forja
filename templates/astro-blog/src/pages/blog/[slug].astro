@@ -2,8 +2,9 @@
 import Base from "../../layouts/Base.astro";
 import SeoHead from "../../components/SeoHead.astro";
 import ResponsiveImage from "../../components/ResponsiveImage.astro";
-import { fetchBlogBySlug, fetchMedia, fetchSite, getSiteUrl } from "../../lib/api";
-import type { MediaResponse } from "../../lib/api";
+import BlogCard from "../../components/BlogCard.astro";
+import { fetchBlogBySlug, fetchBlogDetails, fetchMedia, fetchMediaBatch, fetchSimilarBlogs, fetchSite, getSiteUrl } from "../../lib/api";
+import type { BlogDetailResponse, MediaResponse } from "../../lib/api";
 import { renderMarkdown } from "../../lib/markdown";
 import { buildSeoMeta } from "../../lib/seo";
 
@@ -41,6 +42,25 @@ const date = new Date(blog.published_date).toLocaleDateString("en-US", {
   month: "long",
   day: "numeric",
 });
+
+// Fetch similar blogs
+let similarBlogs: BlogDetailResponse[] = [];
+try {
+  const similarItems = await fetchSimilarBlogs(blog.id, 3);
+  if (similarItems.length > 0) {
+    similarBlogs = await fetchBlogDetails(similarItems.map((b) => b.id));
+  }
+} catch (e) {
+  console.warn("[CMS] Failed to fetch similar blogs:", e instanceof Error ? e.message : e);
+}
+
+// Batch-fetch cover images for similar blogs
+const similarCoverIds = similarBlogs
+  .map((b) => b.cover_image_id)
+  .filter((id): id is string => !!id);
+const similarMediaMap = similarCoverIds.length > 0
+  ? await fetchMediaBatch(similarCoverIds).catch(() => new Map())
+  : new Map();
 
 const site = await fetchSite().catch(() => null);
 const siteName = site?.name ?? "My Site";
@@ -96,4 +116,18 @@ Astro.response.headers.set("Cache-Control", "public, max-age=300, s-maxage=900")
 
     <div class="blog-detail__body" set:html={body} />
   </article>
+
+  {similarBlogs.length > 0 && (
+    <section class="similar-blogs">
+      <h2 class="similar-blogs__title">Continue Reading</h2>
+      <div class="similar-blogs__grid">
+        {similarBlogs.map((sb) => (
+          <BlogCard
+            blog={sb}
+            coverMedia={sb.cover_image_id ? similarMediaMap.get(sb.cover_image_id) ?? null : null}
+          />
+        ))}
+      </div>
+    </section>
+  )}
 </Base>

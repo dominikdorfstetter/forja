@@ -87,6 +87,14 @@ vi.mock('@/services/api', () => {
     createMediaFolder: vi.fn(),
     updateMediaFolder: vi.fn(),
     deleteMediaFolder: vi.fn(),
+    getMediaById: vi.fn(),
+    // Section methods
+    getSectionLocalizations: vi.fn(),
+    upsertSectionLocalization: vi.fn(),
+    updatePageSection: vi.fn(),
+    // User Preferences
+    getUserPreferences: vi.fn(),
+    updateUserPreferences: vi.fn(),
     // Locale & template methods
     getSiteLocales: vi.fn(),
     getContentTemplates: vi.fn(),
@@ -97,6 +105,18 @@ vi.mock('@/services/api', () => {
 // Mock window.scrollTo
 window.scrollTo = vi.fn() as unknown as typeof window.scrollTo;
 
+// Mock localStorage (jsdom may not fully initialise it in all environments)
+const localStorageMock = (() => {
+  const store: Record<string, string> = {};
+  return {
+    getItem: (key: string) => store[key] ?? null,
+    setItem: (key: string, value: string) => { store[key] = value; },
+    removeItem: (key: string) => { delete store[key]; },
+    clear: () => { Object.keys(store).forEach((k) => delete store[k]); },
+  };
+})();
+Object.defineProperty(window, 'localStorage', { value: localStorageMock, writable: true });
+
 // Mock IntersectionObserver
 class MockIntersectionObserver {
   observe = vi.fn();
@@ -106,4 +126,15 @@ class MockIntersectionObserver {
 Object.defineProperty(window, 'IntersectionObserver', {
   writable: true,
   value: MockIntersectionObserver,
+});
+
+// Mock ResizeObserver (needed by recharts)
+class MockResizeObserver {
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+}
+Object.defineProperty(window, 'ResizeObserver', {
+  writable: true,
+  value: MockResizeObserver,
 });

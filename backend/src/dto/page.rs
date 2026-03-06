@@ -339,6 +339,14 @@ pub struct UpsertSectionLocalizationRequest {
     pub button_text: Option<String>,
 }
 
+/// Request to batch-reorder page sections
+#[derive(Debug, Clone, Deserialize, Validate, utoipa::ToSchema)]
+#[schema(description = "Batch reorder page sections")]
+pub struct ReorderPageSectionsRequest {
+    #[validate(nested)]
+    pub items: Vec<crate::dto::social::ReorderItem>,
+}
+
 /// Paginated page list
 pub type PaginatedPages = Paginated<PageListItem>;
 

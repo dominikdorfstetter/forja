@@ -89,7 +89,7 @@ export default function WebhookFormDialog({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="webhook-form-title">
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="webhook-form-title" data-testid="webhook-form.dialog">
       <form onSubmit={handleSubmit(onFormSubmit)}>
         <DialogTitle id="webhook-form-title">
           {webhook ? t('forms.webhook.editTitle') : t('forms.webhook.createTitle')}
@@ -146,11 +146,12 @@ export default function WebhookFormDialog({
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose}>{t('common.actions.cancel')}</Button>
+          <Button onClick={onClose} data-testid="webhook-form.btn.cancel">{t('common.actions.cancel')}</Button>
           <Button
             type="submit"
             variant="contained"
             disabled={loading || !isValid}
+            data-testid="webhook-form.btn.submit"
           >
             {loading ? t('common.actions.saving') : webhook ? t('common.actions.save') : t('common.actions.create')}
           </Button>

@@ -119,7 +119,7 @@ export default function CreateApiKeyDialog({ open, sites, maxPermission = 'Admin
   // Phase 2: show the created key
   if (createdKey) {
     return (
-      <Dialog open={open} maxWidth="sm" fullWidth aria-labelledby="create-api-key-title">
+      <Dialog open={open} maxWidth="sm" fullWidth aria-labelledby="create-api-key-title" data-testid="create-api-key.dialog">
         <DialogTitle id="create-api-key-title">{t('apiKeys.createDialog.created.title')}</DialogTitle>
         <DialogContent>
           <Alert severity="warning" sx={{ mb: 2 }}>
@@ -146,7 +146,7 @@ export default function CreateApiKeyDialog({ open, sites, maxPermission = 'Admin
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCopy} variant="outlined">{t('apiKeys.createDialog.created.title')}</Button>
-          <Button onClick={handleClose} variant="contained">{t('common.actions.close')}</Button>
+          <Button onClick={handleClose} variant="contained" data-testid="create-api-key.btn.close">{t('common.actions.close')}</Button>
         </DialogActions>
       </Dialog>
     );
@@ -154,7 +154,7 @@ export default function CreateApiKeyDialog({ open, sites, maxPermission = 'Admin
 
   // Phase 1: creation form
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth aria-labelledby="create-api-key-title">
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth aria-labelledby="create-api-key-title" data-testid="create-api-key.dialog">
       <form onSubmit={handleSubmit(onFormSubmit)}>
         <DialogTitle id="create-api-key-title">{t('apiKeys.createDialog.title')}</DialogTitle>
         <DialogContent>
@@ -254,8 +254,8 @@ export default function CreateApiKeyDialog({ open, sites, maxPermission = 'Admin
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} disabled={submitting}>{t('common.actions.cancel')}</Button>
-          <Button type="submit" variant="contained" disabled={submitting || !isValid}>
+          <Button onClick={handleClose} disabled={submitting} data-testid="create-api-key.btn.cancel">{t('common.actions.cancel')}</Button>
+          <Button type="submit" variant="contained" disabled={submitting || !isValid} data-testid="create-api-key.btn.submit">
             {submitting ? t('common.actions.saving') : t('common.actions.create')}
           </Button>
         </DialogActions>

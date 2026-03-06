@@ -45,6 +45,7 @@ import Layout from '@/components/Layout';
 import RequireAuth from '@/components/auth/RequireAuth';
 import { SiteProvider } from '@/store/SiteContext';
 import { AuthProvider } from '@/store/AuthContext';
+import { UserPreferencesProvider } from '@/store/UserPreferencesContext';
 import { NavigationGuardProvider } from '@/store/NavigationGuardContext';
 import ErrorBoundary from '@/components/shared/ErrorBoundary';
 import BlogDetailPage from '@/pages/BlogDetail';
@@ -71,7 +72,7 @@ function App() {
   return (
     <ErrorBoundary
       fallback={(error) => (
-        <Box sx={{ textAlign: 'center', mt: 12, px: 2 }}>
+        <Box role="alert" data-testid="app.error.boundary" sx={{ textAlign: 'center', mt: 12, px: 2 }}>
           <Typography variant="h5" gutterBottom>Something went wrong</Typography>
           <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
             An unexpected error occurred.
@@ -81,7 +82,7 @@ function App() {
               {error.message}
             </Typography>
           )}
-          <Button variant="contained" onClick={() => window.location.reload()}>
+          <Button data-testid="app.btn.reload" variant="contained" onClick={() => window.location.reload()}>
             Reload page
           </Button>
         </Box>
@@ -103,6 +104,7 @@ function App() {
         <QueryClientProvider client={queryClient}>
           <BrowserRouter basename="/dashboard">
             <AuthProvider>
+            <UserPreferencesProvider>
             <SiteProvider>
             <NavigationGuardProvider>
               <Routes>
@@ -132,6 +134,7 @@ function App() {
                   <Route path="sites" element={<SitesPage />} />
                   <Route path="sites/:id" element={<SiteDetailPage />} />
                   <Route path="blogs" element={<BlogsPage />} />
+                  <Route path="blogs/templates" element={<ContentTemplatesPage />} />
                   <Route path="blogs/:id" element={<BlogDetailPage />} />
                   <Route path="pages" element={<PagesPage />} />
                   <Route path="pages/:id" element={<PageDetailPage />} />
@@ -149,7 +152,6 @@ function App() {
                   <Route path="api-keys" element={<ApiKeysPage />} />
                   <Route path="taxonomy" element={<TaxonomyPage />} />
                   <Route path="webhooks" element={<WebhooksPage />} />
-                  <Route path="content-templates" element={<ContentTemplatesPage />} />
                   <Route path="redirects" element={<RedirectsPage />} />
                   <Route path="locales" element={<LocalesPage />} />
                   <Route path="profile" element={<ProfilePage />} />
@@ -160,6 +162,7 @@ function App() {
               </Routes>
             </NavigationGuardProvider>
             </SiteProvider>
+            </UserPreferencesProvider>
             </AuthProvider>
           </BrowserRouter>
           

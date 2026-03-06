@@ -5,7 +5,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTranslation } from 'react-i18next';
 import { enUS, deDE, frFR, esES, itIT, ptPT, nlNL, plPL } from '@mui/material/locale';
-import { type Flavor } from './palettes';
+import { type Flavor, palettes } from './palettes';
 import { type ThemeId, type ThemeOption, THEME_OPTIONS, createAppTheme } from './createAppTheme';
 
 const MUI_LOCALES: Record<string, ThemeOptions> = {
@@ -70,6 +70,13 @@ export function ThemeModeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     document.documentElement.style.colorScheme = theme.palette.mode;
   }, [theme.palette.mode]);
+
+  useEffect(() => {
+    const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+    if (meta) {
+      meta.content = palettes[resolvedFlavor].mantle;
+    }
+  }, [resolvedFlavor]);
 
   const value = useMemo<ThemeModeContextValue>(
     () => ({ themeId, setThemeId, resolvedFlavor, options: THEME_OPTIONS }),

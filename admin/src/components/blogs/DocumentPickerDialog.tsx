@@ -130,10 +130,11 @@ export default function DocumentPickerDialog({
   const isLoading = isListLoading || isDetailsLoading;
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-      <DialogTitle>{t('blogDetail.documents.attach')}</DialogTitle>
+    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth aria-labelledby="document-picker-dialog-title" data-testid="document-picker.dialog">
+      <DialogTitle id="document-picker-dialog-title">{t('blogDetail.documents.attach')}</DialogTitle>
       <DialogContent>
         <TextField
+          autoFocus
           placeholder={t('common.actions.search')}
           size="small"
           fullWidth
@@ -256,11 +257,12 @@ export default function DocumentPickerDialog({
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose}>{t('common.actions.cancel')}</Button>
+        <Button onClick={handleClose} data-testid="document-picker.btn.cancel">{t('common.actions.cancel')}</Button>
         <Button
           variant="contained"
           onClick={handleAttach}
           disabled={selected.size === 0}
+          data-testid="document-picker.btn.submit"
         >
           {t('blogDetail.documents.attach')} ({selected.size})
         </Button>

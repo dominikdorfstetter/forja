@@ -96,7 +96,7 @@ export default function CvEntryFormDialog({ open, entry, onSubmit, onClose, load
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="cv-entry-form-title">
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="cv-entry-form-title" data-testid="cv-entry-form.dialog">
       <form onSubmit={handleSubmit(onFormSubmit)}>
         <DialogTitle id="cv-entry-form-title">{entry ? t('forms.cvEntry.editTitle') : t('forms.cvEntry.createTitle')}</DialogTitle>
         <DialogContent>
@@ -138,8 +138,8 @@ export default function CvEntryFormDialog({ open, entry, onSubmit, onClose, load
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose} disabled={loading}>{t('common.actions.cancel')}</Button>
-          <Button type="submit" variant="contained" disabled={loading || !isValid}>{loading ? t('common.actions.saving') : (entry ? t('common.actions.save') : t('common.actions.create'))}</Button>
+          <Button onClick={onClose} disabled={loading} data-testid="cv-entry-form.btn.cancel">{t('common.actions.cancel')}</Button>
+          <Button type="submit" variant="contained" disabled={loading || !isValid} data-testid="cv-entry-form.btn.submit">{loading ? t('common.actions.saving') : (entry ? t('common.actions.save') : t('common.actions.create'))}</Button>
         </DialogActions>
       </form>
     </Dialog>

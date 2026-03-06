@@ -12,6 +12,7 @@ import { Controller, type Control, type UseFormWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import type { PageResponse } from '@/types/api';
+import CopyableId from '@/components/shared/CopyableId';
 import type { PageDetailFormData } from './pageDetailSchema';
 
 interface PageInfoTabProps {
@@ -164,15 +165,11 @@ export default function PageInfoTab({ control, watch, page, onSnapshot }: PageIn
       <Grid container spacing={1}>
         <Grid size={{ xs: 12, sm: 6 }}>
           <Typography variant="caption" color="text.secondary">{t('pageDetail.fields.id')}</Typography>
-          <Typography variant="body2" fontFamily="monospace" sx={{ wordBreak: 'break-all' }}>
-            {page.id}
-          </Typography>
+          <CopyableId value={page.id} />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
           <Typography variant="caption" color="text.secondary">{t('pageDetail.contentId')}</Typography>
-          <Typography variant="body2" fontFamily="monospace" sx={{ wordBreak: 'break-all' }}>
-            {page.content_id}
-          </Typography>
+          <CopyableId value={page.content_id} />
         </Grid>
         {page.published_at && (
           <Grid size={{ xs: 12, sm: 6 }}>

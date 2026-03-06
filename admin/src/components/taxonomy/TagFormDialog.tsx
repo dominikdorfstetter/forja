@@ -73,7 +73,7 @@ export default function TagFormDialog({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth aria-labelledby="tag-form-title">
+    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth aria-labelledby="tag-form-title" data-testid="tag-form.dialog">
       <form onSubmit={handleSubmit(onFormSubmit)}>
         <DialogTitle id="tag-form-title">{tag ? t('forms.tag.editTitle') : t('forms.tag.createTitle')}</DialogTitle>
         <DialogContent>
@@ -96,11 +96,12 @@ export default function TagFormDialog({
           </>)} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose}>{t('common.actions.cancel')}</Button>
+          <Button onClick={onClose} data-testid="tag-form.btn.cancel">{t('common.actions.cancel')}</Button>
           <Button
             type="submit"
             variant="contained"
             disabled={loading || !isValid}
+            data-testid="tag-form.btn.submit"
           >
             {loading ? t('common.actions.saving') : tag ? t('common.actions.save') : t('common.actions.create')}
           </Button>

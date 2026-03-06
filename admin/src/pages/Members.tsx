@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Table,
@@ -50,6 +50,15 @@ export default function MembersPage() {
   const [addClerkUserId, setAddClerkUserId] = useState('');
   const [removingMember, setRemovingMember] = useState<SiteMembership | null>(null);
   const [transferTarget, setTransferTarget] = useState<SiteMembership | null>(null);
+
+  // Command palette action listener
+  useEffect(() => {
+    const handler = (e: Event) => {
+      if ((e as CustomEvent).detail === 'add-member') setAddOpen(true);
+    };
+    window.addEventListener('command-palette:action', handler);
+    return () => window.removeEventListener('command-palette:action', handler);
+  }, []);
 
   // Clerk users for the add member dialog
   const [clerkSearch, setClerkSearch] = useState('');
@@ -111,7 +120,7 @@ export default function MembersPage() {
 
   if (!selectedSiteId) {
     return (
-      <Box>
+      <Box data-testid="members.page">
         <PageHeader title={t('members.title')} subtitle={t('members.subtitle')} />
         <EmptyState title={t('members.empty.noSite')} />
       </Box>
@@ -144,7 +153,7 @@ export default function MembersPage() {
   });
 
   return (
-    <Box>
+    <Box data-testid="members.page">
       <PageHeader
         title={t('members.title')}
         subtitle={t('members.subtitle')}
@@ -232,11 +241,12 @@ export default function MembersPage() {
       )}
 
       {/* Add Member Dialog */}
-      <Dialog open={addOpen} onClose={() => setAddOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{t('members.addDialog.title')}</DialogTitle>
+      <Dialog open={addOpen} onClose={() => setAddOpen(false)} maxWidth="sm" fullWidth aria-labelledby="add-member-dialog-title">
+        <DialogTitle id="add-member-dialog-title">{t('members.addDialog.title')}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField
+              autoFocus
               label={t('members.addDialog.searchPlaceholder')}
               value={clerkSearch}
               onChange={(e) => setClerkSearch(e.target.value)}
@@ -308,6 +318,7 @@ export default function MembersPage() {
         confirmLabel={t('common.actions.delete')}
         onConfirm={() => removingMember && removeMemberMutation.mutate(removingMember.id)}
         onCancel={() => setRemovingMember(null)}
+        confirmationText={t('common.actions.delete')}
       />
 
       {/* Transfer Ownership Confirmation */}

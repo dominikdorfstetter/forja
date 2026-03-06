@@ -125,6 +125,8 @@ import type {
   UpdateContentTemplateRequest,
   BulkContentRequest,
   BulkContentResponse,
+  UserPreferencesResponse,
+  UpdateUserPreferencesRequest,
 } from '@/types/api';
 
 const API_BASE_URL = '/api/v1';
@@ -221,6 +223,15 @@ export class ApiService {
 
   async deleteAccount(): Promise<void> {
     return apiRequest<void>('DELETE', '/auth/account');
+  }
+
+  // User Preferences
+  async getUserPreferences(): Promise<UserPreferencesResponse> {
+    return apiRequest<UserPreferencesResponse>('GET', '/auth/preferences');
+  }
+
+  async updateUserPreferences(data: UpdateUserPreferencesRequest): Promise<UserPreferencesResponse> {
+    return apiRequest<UserPreferencesResponse>('PUT', '/auth/preferences', data);
   }
 
   // Health (mounted at root, not under /api/v1)
@@ -323,6 +334,11 @@ export class ApiService {
   async getBlogs(siteId: string, params?: {
     page?: number;
     per_page?: number;
+    search?: string;
+    status?: string;
+    sort_by?: string;
+    sort_dir?: string;
+    exclude_status?: string;
   }): Promise<Paginated<BlogListItem>> {
     return apiRequest<Paginated<BlogListItem>>('GET', `/sites/${siteId}/blogs`, undefined, { params });
   }
@@ -336,6 +352,10 @@ export class ApiService {
     folder_id?: string;
   }): Promise<Paginated<MediaListItem>> {
     return apiRequest<Paginated<MediaListItem>>('GET', `/sites/${siteId}/media`, undefined, { params });
+  }
+
+  async getMediaById(id: string): Promise<MediaResponse> {
+    return apiRequest<MediaResponse>('GET', `/media/${id}`);
   }
 
   // Blog Localizations
@@ -505,6 +525,11 @@ export class ApiService {
     return apiRequest<BlogResponse>('POST', `/blogs/${id}/clone`);
   }
 
+  async getSimilarBlogs(siteId: string, blogId: string, limit?: number): Promise<BlogListItem[]> {
+    const params = limit !== undefined ? `?limit=${limit}` : '';
+    return apiRequest<BlogListItem[]>('GET', `/sites/${siteId}/blogs/${blogId}/similar${params}`);
+  }
+
   // Media (mutations)
   async uploadMedia(data: UploadMediaRequest): Promise<MediaListItem> {
     return apiRequest<MediaListItem>('POST', '/media', data);
@@ -539,7 +564,16 @@ export class ApiService {
   }
 
   // Pages
-  async getPages(siteId: string, params?: { page?: number; per_page?: number }): Promise<Paginated<PageListItem>> {
+  async getPages(siteId: string, params?: {
+    page?: number;
+    per_page?: number;
+    search?: string;
+    status?: string;
+    page_type?: string;
+    sort_by?: string;
+    sort_dir?: string;
+    exclude_status?: string;
+  }): Promise<Paginated<PageListItem>> {
     return apiRequest<Paginated<PageListItem>>('GET', `/sites/${siteId}/pages`, undefined, { params });
   }
 
@@ -577,6 +611,10 @@ export class ApiService {
 
   async deletePageSection(id: string): Promise<void> {
     return apiRequest<void>('DELETE', `/pages/sections/${id}`);
+  }
+
+  async reorderPageSections(pageId: string, items: ReorderItem[]): Promise<void> {
+    return apiRequest<void>('POST', `/pages/${pageId}/sections/reorder`, { items });
   }
 
   // Section Localizations
@@ -928,7 +966,7 @@ export class ApiService {
   }
 
   async createContentTemplate(siteId: string, data: CreateContentTemplateRequest): Promise<ContentTemplate> {
-    return apiRequest<ContentTemplate>('POST', `/sites/${siteId}/content-templates`, data);
+    return apiRequest<ContentTemplate>('POST', `/sites/${siteId}/content-templates`, { ...data, site_id: siteId });
   }
 
   async updateContentTemplate(id: string, data: UpdateContentTemplateRequest): Promise<ContentTemplate> {

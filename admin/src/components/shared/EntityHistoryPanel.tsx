@@ -303,8 +303,8 @@ export default function EntityHistoryPanel({ entityType, entityId }: EntityHisto
       )}
 
       {/* Revert Confirmation Dialog */}
-      <Dialog open={!!revertGroup} onClose={() => setRevertGroup(null)} maxWidth="sm" fullWidth>
-        <DialogTitle>{t('entityHistory.revertConfirmTitle')}</DialogTitle>
+      <Dialog open={!!revertGroup} onClose={() => setRevertGroup(null)} maxWidth="sm" fullWidth aria-labelledby="entity-history-revert-dialog-title" data-testid="entity-history-revert.dialog">
+        <DialogTitle id="entity-history-revert-dialog-title">{t('entityHistory.revertConfirmTitle')}</DialogTitle>
         <DialogContent>
           <Alert severity="warning" sx={{ mb: 2 }}>
             {t('entityHistory.revertConfirmMessage')}
@@ -324,7 +324,7 @@ export default function EntityHistoryPanel({ entityType, entityId }: EntityHisto
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setRevertGroup(null)} disabled={revertMutation.isPending}>
+          <Button onClick={() => setRevertGroup(null)} disabled={revertMutation.isPending} data-testid="entity-history-revert.btn.cancel">
             {t('common.actions.cancel')}
           </Button>
           <Button
@@ -333,6 +333,7 @@ export default function EntityHistoryPanel({ entityType, entityId }: EntityHisto
             color="warning"
             disabled={revertMutation.isPending}
             startIcon={revertMutation.isPending ? <CircularProgress size={16} /> : <RestoreIcon />}
+            data-testid="entity-history-revert.btn.submit"
           >
             {t('entityHistory.revert')}
           </Button>

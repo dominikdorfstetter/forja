@@ -20,24 +20,43 @@ function href(item: NavigationTree): string {
   if (item.page_slug) return `/${item.page_slug}`;
   return "#";
 }
+
+const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer">
-  {items.length > 0 && (
-    <ul class="site-footer__links">
-      {items.map((item) => (
-        <li>
-          <a
-            href={href(item)}
-            target={item.open_in_new_tab ? "_blank" : undefined}
-            rel={item.open_in_new_tab ? "noopener noreferrer" : undefined}
-          >
-            {item.title ?? "Untitled"}
-          </a>
-        </li>
-      ))}
-    </ul>
-  )}
-  <SocialLinks />
-  <p>&copy; {new Date().getFullYear()} {siteName}. All rights reserved.</p>
+  <div class="site-footer__inner">
+    <div class="site-footer__brand">
+      <a href="/" class="site-footer__logo">{siteName}</a>
+      <p class="site-footer__tagline">Built with Forja</p>
+    </div>
+
+    {items.length > 0 && (
+      <nav class="site-footer__nav" aria-label="Footer navigation">
+        <p class="site-footer__nav-heading">Links</p>
+        <ul class="site-footer__links">
+          {items.map((item) => (
+            <li>
+              <a
+                href={href(item)}
+                target={item.open_in_new_tab ? "_blank" : undefined}
+                rel={item.open_in_new_tab ? "noopener noreferrer" : undefined}
+              >
+                {item.title ?? "Untitled"}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    )}
+
+    <div class="site-footer__social">
+      <p class="site-footer__nav-heading">Connect</p>
+      <SocialLinks />
+    </div>
+  </div>
+
+  <div class="site-footer__bottom">
+    <p>&copy; {year} {siteName}. All rights reserved.</p>
+  </div>
 </footer>

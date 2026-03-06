@@ -22,7 +22,11 @@
       "deleting": "Deleting...",
       "clone": "Clone",
       "upload": "Upload",
-      "preview": "Preview"
+      "preview": "Preview",
+      "viewDetails": "View details",
+      "clickToCopy": "Click to copy",
+      "copied": "Copied!",
+      "copyLabel": "Copy {{value}} to clipboard"
     },
     "status": {
       "active": "Active",
@@ -53,6 +57,9 @@
     "confirm": {
       "cannotBeUndone": "This cannot be undone.",
       "areYouSure": "Are you sure?"
+    },
+    "confirmDialog": {
+      "typeToConfirm": "Type \"{{word}}\" to confirm"
     },
     "filters": {
       "all": "All",
@@ -130,7 +137,8 @@
       "account": "Account",
       "profile": "Profile",
       "theme": "Theme",
-      "language": "Language"
+      "language": "Language",
+      "siteSelector": "Select site"
     },
     "accountMenu": {
       "system": "System",
@@ -187,7 +195,23 @@
       "admin": "Admin",
       "write": "Write",
       "readOnly": "Read-only"
-    }
+    },
+    "contentOverview": "Content Overview",
+    "chart": {
+      "noContent": "No content yet. Create your first blog post or page."
+    },
+    "attention": {
+      "awaitingReview": "Awaiting Your Review",
+      "draftsToFinish": "Drafts to Finish",
+      "recentlyPublished": "Recently Published",
+      "noItemsReview": "No items awaiting review.",
+      "noItemsDrafts": "All content is published or in review.",
+      "noItemsPublished": "No published content yet.",
+      "viewAll": "View all"
+    },
+    "recentActivity": "Recent Activity",
+    "recentActivityEmpty": "No recent activity yet.",
+    "updatedAgo": "Updated {{time}} ago"
   },
   "myDrafts": {
     "title": "My Drafts",
@@ -214,7 +238,10 @@
       "status": "Status",
       "featured": "Featured",
       "published": "Published",
-      "actions": "Actions"
+      "actions": "Actions",
+      "selectAll": "Select all blogs",
+      "selectRow": "Select blog {{slug}}",
+      "caption": "Blog posts list"
     },
     "viewDetail": "View Detail",
     "empty": {
@@ -234,7 +261,50 @@
       "title": "Delete Blog",
       "message": "Delete blog \"{{slug}}\"? This cannot be undone."
     },
-    "moreActions": "More"
+    "publishDialog": {
+      "title": "Publish blog?",
+      "message": "This will make \"{{slug}}\" publicly visible."
+    },
+    "unpublishDialog": {
+      "title": "Unpublish blog?",
+      "message": "This will remove \"{{slug}}\" from public view and set it back to draft."
+    },
+    "archiveDialog": {
+      "title": "Archive blog?",
+      "message": "This will archive \"{{slug}}\" and move it to the archive view."
+    },
+    "restoreDialog": {
+      "title": "Restore blog?",
+      "message": "This will restore \"{{slug}}\" to draft status."
+    },
+    "tabs": {
+      "active": "Active",
+      "archived": "Archived"
+    },
+    "moreActions": "More",
+    "searchPlaceholder": "Search by ID, slug, or author...",
+    "wizard": {
+      "title": "Create Blog",
+      "steps": {
+        "method": "Method",
+        "details": "Details"
+      },
+      "methods": {
+        "scratch": "From Scratch",
+        "scratchDesc": "Start with a blank blog post",
+        "template": "From Template",
+        "templateDesc": "Use a pre-built content template",
+        "import": "Import Markdown",
+        "importDesc": "Import content from a .md file"
+      },
+      "fields": {
+        "slug": "Slug",
+        "slugHint": "URL-friendly identifier (e.g. my-first-post)",
+        "author": "Author"
+      },
+      "creating": "Creating...",
+      "create": "Create Blog"
+    }
   },
   "blogDetail": {
     "title": "Blog Detail",
@@ -287,7 +357,13 @@
       "readingTime": "Reading Time",
       "manualOverride": "Manual override",
       "autoCalculated": "Auto-calculated from content",
-      "resetAuto": "Reset to auto-calculated"
+      "resetAuto": "Reset to auto-calculated",
+      "info": "Metadata",
+      "blogId": "Blog ID",
+      "contentId": "Content ID",
+      "publishedAt": "Published at",
+      "createdAt": "Created",
+      "updatedAt": "Last updated"
     },
     "images": {
       "title": "Images",
@@ -346,7 +422,10 @@
       "status": "Status",
       "inNav": "In Nav",
       "created": "Created",
-      "actions": "Actions"
+      "actions": "Actions",
+      "selectAll": "Select all pages",
+      "selectRow": "Select page {{route}}",
+      "caption": "Pages list"
     },
     "viewDetails": "View Details",
     "empty": {
@@ -362,9 +441,57 @@
       "deleted": "Page deleted",
       "cloned": "Page cloned successfully"
     },
+    "searchPlaceholder": "Search by ID, route, or slug...",
     "deleteDialog": {
       "title": "Delete Page",
       "message": "Delete page \"{{route}}\"? This cannot be undone."
+    },
+    "publishDialog": {
+      "title": "Publish page?",
+      "message": "This will make \"{{route}}\" publicly visible."
+    },
+    "unpublishDialog": {
+      "title": "Unpublish page?",
+      "message": "This will remove \"{{route}}\" from public view and set it back to draft."
+    },
+    "archiveDialog": {
+      "title": "Archive page?",
+      "message": "This will archive \"{{route}}\" and move it to the archive view."
+    },
+    "restoreDialog": {
+      "title": "Restore page?",
+      "message": "This will restore \"{{route}}\" to draft status."
+    },
+    "tabs": {
+      "active": "Active",
+      "archived": "Archived"
+    },
+    "wizard": {
+      "steps": {
+        "pageType": "Page Type",
+        "identity": "Identity",
+        "options": "Options"
+      },
+      "next": "Next",
+      "back": "Back",
+      "createPage": "Create Page",
+      "creating": "Creating...",
+      "types": {
+        "static": "Static",
+        "staticDesc": "Standard content page",
+        "landing": "Landing",
+        "landingDesc": "Marketing page with hero sections",
+        "contact": "Contact",
+        "contactDesc": "Contact form and information",
+        "blogIndex": "Blog Index",
+        "blogIndexDesc": "Blog post listing page",
+        "custom": "Custom",
+        "customDesc": "Fully custom page layout"
+      },
+      "routeHint": "Page URL path (e.g. /about)",
+      "slugHint": "URL-friendly identifier, auto-generated from route",
+      "site": "Site",
+      "inNavigation": "Show in navigation"
     }
   },
   "pageDetail": {
@@ -391,11 +518,13 @@
       "added": "Section added",
       "loadingSections": "Loading sections...",
       "deleteTitle": "Delete Section",
-      "deleteMessage": "Delete this {{type}} section? This cannot be undone."
+      "deleteMessage": "Delete this {{type}} section? This cannot be undone.",
+      "untitled": "Untitled"
     },
     "table": {
       "type": "Type",
       "order": "Order",
+      "content": "Content",
       "localizations": "Localizations",
       "coverImage": "Cover Image",
       "ctaRoute": "CTA Route",
@@ -482,6 +611,10 @@
       "title": "Delete Media",
       "message": "Delete \"{{filename}}\"? This cannot be undone."
     },
+    "deleteFolderDialog": {
+      "title": "Delete folder?",
+      "message": "This will permanently delete this folder and move its files to the root level."
+    },
     "upload": {
       "dragDrop": "Drag and drop files here, or click to browse",
       "uploading": "Uploading...",
@@ -520,6 +653,10 @@
     "deleteDialog": {
       "title": "Delete Document",
       "message": "Delete document \"{{title}}\"? This cannot be undone."
+    },
+    "deleteFolderDialog": {
+      "title": "Delete folder?",
+      "message": "This will permanently delete this folder and move its documents to the root level."
     }
   },
   "navigation": {
@@ -831,7 +968,8 @@
     },
     "revokeDialog": {
       "title": "Revoke API Key",
-      "message": "Are you sure you want to revoke \"{{name}}\"? This is permanent and cannot be undone."
+      "message": "Are you sure you want to revoke \"{{name}}\"? This is permanent and cannot be undone.",
+      "confirmWord": "Revoke"
     },
     "deleteDialog": {
       "title": "Delete API Key",
@@ -1146,8 +1284,22 @@
     "preferences": {
       "title": "Preferences",
       "language": {
+        "title": "Language",
         "label": "Admin Language",
         "description": "Choose the display language for the admin interface"
+      },
+      "theme": {
+        "title": "Theme",
+        "label": "Color Theme",
+        "description": "Choose a color theme for the admin interface"
+      },
+      "autosave": {
+        "title": "Autosave",
+        "enableLabel": "Enable Autosave",
+        "enableDescription": "Automatically save changes in editors after a short delay",
+        "debounceLabel": "Autosave Delay",
+        "debounceDescription": "How long to wait after your last edit before saving (1–60)",
+        "seconds": "seconds"
       }
     }
   },
@@ -1162,6 +1314,10 @@
       "multilingualDesc": "Built-in localization with support for any language and RTL text direction.",
       "apiFirst": "API-First",
       "apiFirstDesc": "Headless architecture with a full REST API. Deliver content to any frontend."
+    },
+    "preferences": {
+      "title": "Your Preferences",
+      "description": "Set your preferred language and theme before getting started."
     },
     "createSite": "Create Your First Site",
     "stepPrefix": "Step 1 of 1"
@@ -1479,7 +1635,6 @@
     "section": {
       "title": "Edit Section",
       "fields": {
-        "sectionType": "Section Type",
         "displayOrder": "Display Order",
         "settings": "Settings",
         "buttonText": "Button Text",
@@ -1489,7 +1644,8 @@
       "localizedContent": "Localized Content",
       "sectionConfiguration": "Section Configuration",
       "noActiveLocales": "No active locales configured",
-      "localeExists": "exists"
+      "localeExists": "exists",
+      "sectionSaved": "Section saved"
     },
     "undo": "Undo",
     "redo": "Redo",
@@ -1509,7 +1665,8 @@
     },
     "confirmDialog": {
       "defaultTitle": "Confirm",
-      "defaultCancel": "Cancel"
+      "defaultCancel": "Cancel",
+      "confirmationInput": "Confirmation text"
     },
     "loadingState": {
       "defaultLabel": "Loading..."
@@ -1523,7 +1680,9 @@
       "rename": "Rename",
       "delete": "Delete",
       "createFolder": "Create folder",
-      "folderName": "Folder name"
+      "folderName": "Folder name",
+      "collapse": "Collapse {{name}}",
+      "expand": "Expand {{name}}"
     },
     "pageHeader": {},
     "statusChip": {},
@@ -1609,6 +1768,7 @@
     "placeholder": "Search commands...",
     "noResults": "No results found",
     "categories": {
+      "context": "Quick Actions",
       "navigation": "Navigation",
       "actions": "Actions",
       "blogs": "Blogs",
@@ -1616,10 +1776,35 @@
       "sites": "Sites"
     },
     "actions": {
-      "toggleTheme": "Toggle theme",
       "logout": "Log out"
     },
-    "hint": "⌘K"
+    "contextActions": {
+      "createBlog": "Create new blog",
+      "createPage": "Create new page",
+      "uploadMedia": "Upload media",
+      "createTemplate": "Create template",
+      "createTag": "Create tag",
+      "createCategory": "Create category",
+      "addNavItem": "Add navigation item",
+      "addSocialLink": "Add social link",
+      "createWebhook": "Create webhook",
+      "createRedirect": "Create redirect",
+      "addMember": "Add member",
+      "addCvEntry": "Add CV entry",
+      "addSkill": "Add skill",
+      "createSite": "Create site",
+      "backToSites": "Back to site list",
+      "addLanguage": "Add language",
+      "addLegalDoc": "Add legal document",
+      "backToLegal": "Back to legal documents",
+      "createApiKey": "Create API key",
+      "backToBlogs": "Back to blog list",
+      "backToPages": "Back to page list"
+    },
+    "open": "Open command palette",
+    "searchLabel": "Search commands",
+    "title": "Command palette",
+    "resultCount": "{{count}} results available"
   },
   "languages": {
     "en": "English",
@@ -1640,11 +1825,29 @@
     "submittedForReview": "Content submitted for review",
     "approved": "Content approved",
     "changesRequested": "Changes requested",
-    "cannotPublish": "Editorial workflow is enabled. Submit content for review to publish."
+    "cannotPublish": "Editorial workflow is enabled. Submit content for review to publish.",
+    "publish": "Publish",
+    "unpublish": "Unpublish",
+    "archive": "Archive",
+    "restore": "Restore",
+    "restoreAsDraft": "Restore as Draft"
+  },
+  "approveDialog": {
+    "title": "Approve content",
+    "message": "Choose how to publish this content.",
+    "publishNow": "Publish Now",
+    "schedule": "Schedule",
+    "selectDate": "Select publish date"
+  },
+  "restoreDialog": {
+    "restore": "Restore",
+    "restoreAsDraft": "Restore as Draft"
   },
   "notifications": {
     "title": "Notifications",
     "bell": "Notifications",
+    "bellWithCount": "Notifications, {{count}} unread",
+    "unread": "Unread",
     "empty": "No notifications yet",
     "markAllRead": "Mark all read",
     "viewAll": "View all",
@@ -1667,14 +1870,33 @@
     }
   },
   "bulk": {
+    "toolbar": "Bulk actions toolbar",
     "selectedCount": "{{count}} selected",
     "publish": "Publish",
     "unpublish": "Unpublish",
+    "archive": "Archive",
+    "restore": "Restore",
     "delete": "Delete",
     "clearSelection": "Clear selection",
     "deleteDialog": {
       "title": "Delete Selected Items",
       "message": "Delete {{count}} selected items? This cannot be undone."
+    },
+    "publishDialog": {
+      "title": "Publish selected items?",
+      "message": "This will publish {{count}} item(s) and make them publicly visible."
+    },
+    "unpublishDialog": {
+      "title": "Unpublish selected items?",
+      "message": "This will unpublish {{count}} item(s) and set them back to draft."
+    },
+    "archiveDialog": {
+      "title": "Archive selected items?",
+      "message": "This will archive {{count}} item(s) and move them to the archive view."
+    },
+    "restoreDialog": {
+      "title": "Restore selected items?",
+      "message": "This will restore {{count}} item(s) to draft status."
     },
     "messages": {
       "success": "{{count}} items updated successfully",
@@ -1682,8 +1904,8 @@
     }
   },
   "contentTemplates": {
-    "title": "Content Templates",
-    "subtitle": "Manage reusable content templates for your sites",
+    "title": "Blog Templates",
+    "subtitle": "Manage reusable templates for blog posts",
     "addTemplate": "Add Template",
     "table": {
       "name": "Name",
@@ -1707,6 +1929,22 @@
     "deleteDialog": {
       "title": "Delete Template",
       "message": "Delete template \"{{name}}\"? This cannot be undone."
+    },
+    "wizard": {
+      "title": "Create Template",
+      "steps": {
+        "method": "Method",
+        "details": "Details"
+      },
+      "methods": {
+        "scratch": "From Scratch",
+        "scratchDesc": "Start with a blank template",
+        "template": "From Built-in",
+        "templateDesc": "Use a built-in template as a starting point",
+        "import": "Import Markdown",
+        "importDesc": "Import content from a .md file"
+      },
+      "slugPrefixHint": "URL prefix for blogs created from this template"
     }
   },
   "templates": {
@@ -1765,6 +2003,13 @@
     "placeholder": "Type / to insert blocks...",
     "sectionPlaceholder": "Section content...",
     "toolbar": {
+      "label": "Text formatting",
+      "linkDialog": {
+        "title": "Insert link",
+        "urlLabel": "URL",
+        "insert": "Insert",
+        "remove": "Remove link"
+      },
       "bold": "Bold (Ctrl+B)",
       "italic": "Italic (Ctrl+I)",
       "underline": "Underline (Ctrl+U)",

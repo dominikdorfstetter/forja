@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { ClerkProvider } from '@clerk/clerk-react';
-import './i18n';
+import i18n from './i18n';
 import App from './App';
 
 interface AppConfig {
@@ -10,6 +10,12 @@ interface AppConfig {
 }
 
 async function bootstrap() {
+  // Sync document lang with i18n language
+  document.documentElement.lang = i18n.language || 'en';
+  i18n.on('languageChanged', (lng) => {
+    document.documentElement.lang = lng;
+  });
+
   const root = ReactDOM.createRoot(document.getElementById('root')!);
 
   try {
@@ -33,7 +39,10 @@ async function bootstrap() {
   } catch (err) {
     console.error('Failed to load application config:', err);
     root.render(
-      <div style={{
+      <div
+        role="alert"
+        data-testid="app.error.config"
+        style={{
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
         display: 'flex',
         alignItems: 'center',

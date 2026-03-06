@@ -25,6 +25,9 @@ interface BlogEditorSidebarProps {
   canWrite: boolean;
   siteId: string;
   contentId: string;
+  publishedAt?: string;
+  createdAt: string;
+  updatedAt: string;
   categories: Category[];
   documents: BlogDocumentResponse[];
 }
@@ -41,6 +44,9 @@ export default function BlogEditorSidebar({
   canWrite,
   siteId,
   contentId,
+  publishedAt,
+  createdAt,
+  updatedAt,
   categories,
   documents,
 }: BlogEditorSidebarProps) {
@@ -98,6 +104,11 @@ export default function BlogEditorSidebar({
             watch={watch}
             setValue={setValue}
             onSnapshot={onSnapshot}
+            blogId={blogId}
+            contentId={contentId}
+            publishedAt={publishedAt}
+            createdAt={createdAt}
+            updatedAt={updatedAt}
           />
         )}
         {activeTab === 2 && (

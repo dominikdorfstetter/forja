@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Box, Alert, Button, IconButton, Tooltip } from '@mui/material';
@@ -32,6 +33,15 @@ export default function LegalPage({ embedded }: { embedded?: boolean }) {
     openCreate, closeForm, openEdit, closeEdit, openDelete, closeDelete,
     handlePageChange, handleRowsPerPageChange,
   } = useListPageState<LegalDocumentResponse>();
+
+  // Command palette action listener
+  useEffect(() => {
+    const handler = (e: Event) => {
+      if ((e as CustomEvent).detail === 'add-legal-doc') openCreate();
+    };
+    window.addEventListener('command-palette:action', handler);
+    return () => window.removeEventListener('command-palette:action', handler);
+  }, [openCreate]);
 
   const { data: documentsData, isLoading, error } = useQuery({
     queryKey: ['legal', selectedSiteId, page, perPage],
@@ -80,7 +90,7 @@ export default function LegalPage({ embedded }: { embedded?: boolean }) {
   ];
 
   return (
-    <Box>
+    <Box data-testid="legal.page">
       {!embedded && (
         <PageHeader
           title={t('legal.title')}
@@ -119,7 +129,7 @@ export default function LegalPage({ embedded }: { embedded?: boolean }) {
 
       <LegalDocumentFormDialog open={formOpen} siteId={selectedSiteId} onSubmit={(data) => createMutation.mutate(data)} onClose={closeForm} loading={createMutation.isPending} />
       <LegalDocumentFormDialog open={!!editing} siteId={selectedSiteId} document={editing} onSubmit={(data) => editing && updateMutation.mutate({ id: editing.id, data })} onClose={closeEdit} loading={updateMutation.isPending} />
-      <ConfirmDialog open={!!deleting} title={t('legal.deleteDialog.title')} message={t('legal.deleteDialog.message', { cookieName: deleting?.cookie_name })} confirmLabel={t('common.actions.delete')} onConfirm={() => deleting && deleteMutation.mutate(deleting.id)} onCancel={closeDelete} loading={deleteMutation.isPending} />
+      <ConfirmDialog open={!!deleting} title={t('legal.deleteDialog.title')} message={t('legal.deleteDialog.message', { cookieName: deleting?.cookie_name })} confirmLabel={t('common.actions.delete')} onConfirm={() => deleting && deleteMutation.mutate(deleting.id)} onCancel={closeDelete} loading={deleteMutation.isPending} confirmationText={t('common.actions.delete')} />
     </Box>
   );
 }

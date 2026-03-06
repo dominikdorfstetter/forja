@@ -149,14 +149,15 @@ export default function TemplateSelectionDialog({
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-      <DialogTitle>{t('templates.dialogTitle')}</DialogTitle>
+    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth aria-labelledby="template-selection-title" data-testid="template-selection-dialog">
+      <DialogTitle id="template-selection-title">{t('templates.dialogTitle')}</DialogTitle>
       <DialogContent>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
           {t('templates.dialogSubtitle')}
         </Typography>
 
         <TextField
+          autoFocus
           fullWidth
           size="small"
           placeholder={t('templates.searchPlaceholder')}
@@ -322,7 +323,7 @@ export default function TemplateSelectionDialog({
             <Button
               size="small"
               startIcon={<SettingsIcon />}
-              onClick={() => { handleClose(); navigate('/content-templates'); }}
+              onClick={() => { handleClose(); navigate('/blogs/templates'); }}
             >
               {t('templates.manageTemplates')}
             </Button>

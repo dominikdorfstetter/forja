@@ -137,49 +137,62 @@ describe('BlogsPage', () => {
     });
   });
 
-  it('shows view, edit, and delete action buttons per row', async () => {
+  it('shows 3-dot action menu buttons per row', async () => {
     vi.mocked(apiService.getBlogs).mockResolvedValue(mockPaginatedBlogs);
     renderWithProviders(<BlogsPage />);
     await waitFor(() => {
       expect(screen.getByText('hello-world')).toBeInTheDocument();
     });
-    // View buttons (VisibilityIcon)
-    const viewButtons = screen.getAllByRole('button').filter(
-      (b) => b.querySelector('[data-testid="VisibilityIcon"]'),
+    // Each row should have a MoreVertIcon (3-dot menu) button
+    const menuButtons = screen.getAllByRole('button').filter(
+      (b) => b.querySelector('[data-testid="MoreVertIcon"]'),
     );
-    expect(viewButtons.length).toBeGreaterThanOrEqual(2);
-
-    // Edit buttons (EditIcon)
-    const editButtons = screen.getAllByRole('button').filter(
-      (b) => b.querySelector('[data-testid="EditIcon"]'),
-    );
-    expect(editButtons.length).toBeGreaterThanOrEqual(2);
-
-    // Delete buttons (DeleteIcon)
-    const deleteButtons = screen.getAllByRole('button').filter(
-      (b) => b.querySelector('[data-testid="DeleteIcon"]'),
-    );
-    expect(deleteButtons.length).toBeGreaterThanOrEqual(2);
+    expect(menuButtons.length).toBeGreaterThanOrEqual(2);
   });
 
-  it('opens delete confirm dialog on delete icon click', async () => {
+  it('opens action menu and shows view details, delete options', async () => {
     vi.mocked(apiService.getBlogs).mockResolvedValue(mockPaginatedBlogs);
     renderWithProviders(<BlogsPage />);
     await waitFor(() => {
       expect(screen.getByText('hello-world')).toBeInTheDocument();
     });
     const user = userEvent.setup();
-    const deleteButtons = screen.getAllByRole('button').filter(
-      (b) => b.querySelector('[data-testid="DeleteIcon"]'),
+    const menuButtons = screen.getAllByRole('button').filter(
+      (b) => b.querySelector('[data-testid="MoreVertIcon"]'),
     );
-    expect(deleteButtons.length).toBeGreaterThan(0);
-    await user.click(deleteButtons[0]);
+    await user.click(menuButtons[0]);
+    // Menu should open with View details, Clone, Delete options (no Edit)
+    const menu = await screen.findByRole('menu');
+    const menuItems = menu.querySelectorAll('[role="menuitem"]');
+    const menuTexts = Array.from(menuItems).map((item) => item.textContent);
+    expect(menuTexts).toContain('View details');
+    expect(menuTexts).not.toContain('Edit');
+    expect(menuTexts).toContain('Delete');
+  });
+
+  it('opens delete confirm dialog via action menu', async () => {
+    vi.mocked(apiService.getBlogs).mockResolvedValue(mockPaginatedBlogs);
+    renderWithProviders(<BlogsPage />);
+    await waitFor(() => {
+      expect(screen.getByText('hello-world')).toBeInTheDocument();
+    });
+    const user = userEvent.setup();
+    const menuButtons = screen.getAllByRole('button').filter(
+      (b) => b.querySelector('[data-testid="MoreVertIcon"]'),
+    );
+    await user.click(menuButtons[0]);
+    const menu = await screen.findByRole('menu');
+    // Click Delete in the menu (find within menu to avoid BulkActionToolbar's Delete)
+    const deleteItem = Array.from(menu.querySelectorAll('[role="menuitem"]')).find(
+      (item) => item.textContent === 'Delete',
+    )!;
+    await user.click(deleteItem);
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
   });
 
-  it('hides edit and delete buttons when canWrite=false and isAdmin=false', async () => {
+  it('hides clone and delete in action menu when canWrite=false and isAdmin=false', async () => {
     mockAuth.canWrite = false;
     mockAuth.isAdmin = false;
     vi.mocked(apiService.getBlogs).mockResolvedValue(mockPaginatedBlogs);
@@ -187,19 +200,22 @@ describe('BlogsPage', () => {
     await waitFor(() => {
       expect(screen.getByText('hello-world')).toBeInTheDocument();
     });
-    // Edit buttons should not exist
-    const editButtons = screen.getAllByRole('button').filter(
-      (b) => b.querySelector('[data-testid="EditIcon"]'),
+    const user = userEvent.setup();
+    const menuButtons = screen.getAllByRole('button').filter(
+      (b) => b.querySelector('[data-testid="MoreVertIcon"]'),
     );
-    expect(editButtons).toHaveLength(0);
-    // Delete buttons should not exist
-    const deleteButtons = screen.getAllByRole('button').filter(
-      (b) => b.querySelector('[data-testid="DeleteIcon"]'),
-    );
-    expect(deleteButtons).toHaveLength(0);
+    await user.click(menuButtons[0]);
+    await waitFor(() => {
+      expect(screen.getByRole('menu')).toBeInTheDocument();
+    });
+    // View details should still be visible
+    expect(screen.getByText('View details')).toBeInTheDocument();
+    // Clone, Delete should not be visible
+    expect(screen.queryByText('Clone')).not.toBeInTheDocument();
+    expect(screen.queryByText('Delete')).not.toBeInTheDocument();
   });
 
-  it('calls cloneBlog on clone button click', async () => {
+  it('calls cloneBlog via action menu', async () => {
     vi.mocked(apiService.getBlogs).mockResolvedValue(mockPaginatedBlogs);
     vi.mocked(apiService.cloneBlog).mockResolvedValue({
       id: 'blog-3',
@@ -218,12 +234,15 @@ describe('BlogsPage', () => {
       expect(screen.getByText('hello-world')).toBeInTheDocument();
     });
     const user = userEvent.setup();
-    // Clone buttons (ContentCopyIcon)
-    const cloneButtons = screen.getAllByRole('button').filter(
-      (b) => b.querySelector('[data-testid="ContentCopyIcon"]'),
+    const menuButtons = screen.getAllByRole('button').filter(
+      (b) => b.querySelector('[data-testid="MoreVertIcon"]'),
     );
-    expect(cloneButtons.length).toBeGreaterThan(0);
-    await user.click(cloneButtons[0]);
+    await user.click(menuButtons[0]);
+    await waitFor(() => {
+      expect(screen.getByRole('menu')).toBeInTheDocument();
+    });
+    const cloneItem = screen.getByText('Clone').closest('[role="menuitem"]')!;
+    await user.click(cloneItem);
     expect(apiService.cloneBlog).toHaveBeenCalledWith('blog-1');
   });
 

@@ -22,7 +22,10 @@
       "deleting": "Usuwanie...",
       "clone": "Klonuj",
       "upload": "Prześlij",
-      "preview": "Podgląd"
+      "preview": "Podgląd",
+      "viewDetails": "Zobacz szczegóły",
+      "clickToCopy": "Kliknij, aby skopiować",
+      "copied": "Skopiowano!"
     },
     "status": {
       "active": "Aktywny",
@@ -53,6 +56,9 @@
     "confirm": {
       "cannotBeUndone": "Tej operacji nie można cofnąć.",
       "areYouSure": "Czy na pewno?"
+    },
+    "confirmDialog": {
+      "typeToConfirm": "Wpisz \"{{word}}\", aby potwierdzić"
     },
     "filters": {
       "all": "Wszystko",
@@ -187,7 +193,23 @@
       "admin": "Admin",
       "write": "Zapis",
       "readOnly": "Tylko do odczytu"
-    }
+    },
+    "contentOverview": "Przegląd treści",
+    "chart": {
+      "noContent": "Brak treści. Utwórz swój pierwszy wpis na blogu lub stronę."
+    },
+    "attention": {
+      "awaitingReview": "Oczekujące na recenzję",
+      "draftsToFinish": "Szkice do ukończenia",
+      "recentlyPublished": "Ostatnio opublikowane",
+      "noItemsReview": "Brak elementów oczekujących na recenzję.",
+      "noItemsDrafts": "Cała treść jest opublikowana lub w recenzji.",
+      "noItemsPublished": "Brak opublikowanej treści.",
+      "viewAll": "Zobacz wszystkie"
+    },
+    "recentActivity": "Ostatnia aktywność",
+    "recentActivityEmpty": "Brak ostatniej aktywności.",
+    "updatedAgo": "Zaktualizowano {{time}} temu"
   },
   "myDrafts": {
     "title": "Moje szkice",
@@ -234,7 +256,50 @@
       "title": "Usuń wpis",
       "message": "Usunąć wpis \"{{slug}}\"? Tej operacji nie można cofnąć."
     },
-    "moreActions": "Więcej"
+    "publishDialog": {
+      "title": "Opublikować blog?",
+      "message": "\"{{slug}}\" będzie publicznie widoczny."
+    },
+    "unpublishDialog": {
+      "title": "Cofnąć publikację bloga?",
+      "message": "\"{{slug}}\" zostanie usunięty z widoku publicznego i przywrócony do wersji roboczej."
+    },
+    "archiveDialog": {
+      "title": "Zarchiwizować blog?",
+      "message": "To zarchiwizuje \"{{slug}}\" i przeniesie go do widoku archiwum."
+    },
+    "restoreDialog": {
+      "title": "Przywrócić blog?",
+      "message": "To przywróci \"{{slug}}\" do statusu szkicu."
+    },
+    "tabs": {
+      "active": "Aktywne",
+      "archived": "Zarchiwizowane"
+    },
+    "moreActions": "Więcej",
+    "searchPlaceholder": "Szukaj po ID, slug lub autorze...",
+    "wizard": {
+      "title": "Utwórz blog",
+      "steps": {
+        "method": "Metoda",
+        "details": "Szczegóły"
+      },
+      "methods": {
+        "scratch": "Od zera",
+        "scratchDesc": "Zacznij od pustego wpisu na blogu",
+        "template": "Z szablonu",
+        "templateDesc": "Użyj gotowego szablonu treści",
+        "import": "Importuj Markdown",
+        "importDesc": "Importuj treść z pliku .md"
+      },
+      "fields": {
+        "slug": "Slug",
+        "slugHint": "Identyfikator przyjazny dla URL (np. moj-pierwszy-wpis)",
+        "author": "Autor"
+      },
+      "creating": "Tworzenie...",
+      "create": "Utwórz blog"
+    }
   },
   "blogDetail": {
     "title": "Szczegóły wpisu",
@@ -287,7 +352,13 @@
       "readingTime": "Czas czytania",
       "manualOverride": "Ręczne nadpisanie",
       "autoCalculated": "Obliczono automatycznie z treści",
-      "resetAuto": "Przywróć automatyczne obliczanie"
+      "resetAuto": "Przywróć automatyczne obliczanie",
+      "info": "Metadane",
+      "blogId": "ID bloga",
+      "contentId": "ID treści",
+      "publishedAt": "Opublikowano",
+      "createdAt": "Utworzono",
+      "updatedAt": "Ostatnia aktualizacja"
     },
     "images": {
       "title": "Obrazy",
@@ -362,9 +433,57 @@
       "deleted": "Strona usunięta",
       "cloned": "Strona sklonowana pomyślnie"
     },
+    "searchPlaceholder": "Szukaj po ID, trasie lub slug...",
     "deleteDialog": {
       "title": "Usuń stronę",
       "message": "Usunąć stronę \"{{route}}\"? Tej operacji nie można cofnąć."
+    },
+    "publishDialog": {
+      "title": "Opublikować stronę?",
+      "message": "\"{{route}}\" będzie publicznie widoczna."
+    },
+    "unpublishDialog": {
+      "title": "Cofnąć publikację strony?",
+      "message": "\"{{route}}\" zostanie usunięta z widoku publicznego i przywrócona do wersji roboczej."
+    },
+    "archiveDialog": {
+      "title": "Zarchiwizować stronę?",
+      "message": "To zarchiwizuje \"{{route}}\" i przeniesie ją do widoku archiwum."
+    },
+    "restoreDialog": {
+      "title": "Przywrócić stronę?",
+      "message": "To przywróci \"{{route}}\" do statusu szkicu."
+    },
+    "tabs": {
+      "active": "Aktywne",
+      "archived": "Zarchiwizowane"
+    },
+    "wizard": {
+      "steps": {
+        "pageType": "Typ strony",
+        "identity": "Tożsamość",
+        "options": "Opcje"
+      },
+      "next": "Dalej",
+      "back": "Wstecz",
+      "createPage": "Utwórz stronę",
+      "creating": "Tworzenie...",
+      "types": {
+        "static": "Statyczna",
+        "staticDesc": "Standardowa strona z treścią",
+        "landing": "Landing",
+        "landingDesc": "Strona marketingowa z sekcjami hero",
+        "contact": "Kontakt",
+        "contactDesc": "Formularz kontaktowy i informacje",
+        "blogIndex": "Indeks bloga",
+        "blogIndexDesc": "Strona z listą wpisów na blogu",
+        "custom": "Niestandardowa",
+        "customDesc": "Całkowicie niestandardowy układ strony"
+      },
+      "routeHint": "Ścieżka URL strony (np. /o-nas)",
+      "slugHint": "Identyfikator przyjazny dla URL, generowany automatycznie z trasy",
+      "site": "Strona",
+      "inNavigation": "Pokaż w nawigacji"
     }
   },
   "pageDetail": {
@@ -482,6 +601,10 @@
       "title": "Usuń plik multimedialny",
       "message": "Usunąć \"{{filename}}\"? Tej operacji nie można cofnąć."
     },
+    "deleteFolderDialog": {
+      "title": "Usunąć folder?",
+      "message": "Ten folder zostanie trwale usunięty, a jego pliki zostaną przeniesione do poziomu głównego."
+    },
     "upload": {
       "dragDrop": "Przeciągnij i upuść pliki tutaj lub kliknij, aby przeglądać",
       "uploading": "Przesyłanie...",
@@ -520,6 +643,10 @@
     "deleteDialog": {
       "title": "Usuń dokument",
       "message": "Usunąć dokument \"{{title}}\"? Tej operacji nie można cofnąć."
+    },
+    "deleteFolderDialog": {
+      "title": "Usunąć folder?",
+      "message": "Ten folder zostanie trwale usunięty, a jego dokumenty zostaną przeniesione do poziomu głównego."
     }
   },
   "navigation": {
@@ -831,7 +958,8 @@
     },
     "revokeDialog": {
       "title": "Unieważnij klucz API",
-      "message": "Czy na pewno chcesz unieważnić \"{{name}}\"? Ta operacja jest trwała i nie można jej cofnąć."
+      "message": "Czy na pewno chcesz unieważnić \"{{name}}\"? Ta operacja jest trwała i nie można jej cofnąć.",
+      "confirmWord": "Odwołaj"
     },
     "deleteDialog": {
       "title": "Usuń klucz API",
@@ -1146,8 +1274,22 @@
     "preferences": {
       "title": "Preferencje",
       "language": {
+        "title": "Język",
         "label": "Język panelu administracyjnego",
         "description": "Wybierz język wyświetlania interfejsu administracyjnego"
+      },
+      "theme": {
+        "title": "Motyw",
+        "label": "Motyw kolorystyczny",
+        "description": "Wybierz motyw kolorystyczny dla interfejsu administracyjnego"
+      },
+      "autosave": {
+        "title": "Automatyczny zapis",
+        "enableLabel": "Włącz automatyczny zapis",
+        "enableDescription": "Automatycznie zapisuj zmiany w edytorach po krótkim opóźnieniu",
+        "debounceLabel": "Opóźnienie zapisu",
+        "debounceDescription": "Czas oczekiwania po ostatniej edycji przed zapisaniem (1–60)",
+        "seconds": "sekund"
       }
     }
   },
@@ -1162,6 +1304,10 @@
       "multilingualDesc": "Wbudowana lokalizacja ze wsparciem dla dowolnego języka i kierunku tekstu RTL.",
       "apiFirst": "API-First",
       "apiFirstDesc": "Architektura headless z pełnym REST API. Dostarczaj treści do dowolnego frontendu."
+    },
+    "preferences": {
+      "title": "Twoje preferencje",
+      "description": "Ustaw preferowany język i motyw przed rozpoczęciem."
     },
     "createSite": "Utwórz swoją pierwszą stronę",
     "stepPrefix": "Krok 1 z 1"
@@ -1479,7 +1625,6 @@
     "section": {
       "title": "Edytuj sekcję",
       "fields": {
-        "sectionType": "Typ sekcji",
         "displayOrder": "Kolejność wyświetlania",
         "settings": "Ustawienia",
         "buttonText": "Tekst przycisku",
@@ -1609,6 +1754,7 @@
     "placeholder": "Szukaj poleceń...",
     "noResults": "Brak wyników",
     "categories": {
+      "context": "Szybkie akcje",
       "navigation": "Nawigacja",
       "actions": "Akcje",
       "blogs": "Blogi",
@@ -1616,10 +1762,35 @@
       "sites": "Witryny"
     },
     "actions": {
-      "toggleTheme": "Zmień motyw",
       "logout": "Wyloguj się"
     },
-    "hint": "⌘K"
+    "contextActions": {
+      "createBlog": "Utwórz nowy blog",
+      "createPage": "Utwórz nową stronę",
+      "uploadMedia": "Prześlij plik",
+      "createTemplate": "Utwórz szablon",
+      "createTag": "Utwórz tag",
+      "createCategory": "Utwórz kategorię",
+      "addNavItem": "Dodaj element nawigacji",
+      "addSocialLink": "Dodaj link społecznościowy",
+      "createWebhook": "Utwórz webhook",
+      "createRedirect": "Utwórz przekierowanie",
+      "addMember": "Dodaj członka",
+      "addCvEntry": "Dodaj wpis CV",
+      "addSkill": "Dodaj umiejętność",
+      "createSite": "Utwórz witrynę",
+      "backToSites": "Wróć do listy witryn",
+      "addLanguage": "Dodaj język",
+      "addLegalDoc": "Dodaj dokument prawny",
+      "backToLegal": "Wróć do dokumentów prawnych",
+      "createApiKey": "Utwórz klucz API",
+      "backToBlogs": "Wróć do listy blogów",
+      "backToPages": "Wróć do listy stron"
+    },
+    "open": "Otwórz paletę poleceń",
+    "searchLabel": "Szukaj poleceń",
+    "title": "Paleta poleceń",
+    "resultCount": "{{count}} wyników dostępnych"
   },
   "languages": {
     "en": "English",
@@ -1640,7 +1811,23 @@
     "submittedForReview": "Treść przesłana do przeglądu",
     "approved": "Treść zatwierdzona",
     "changesRequested": "Zmiany żądane",
-    "cannotPublish": "Obieg redakcyjny jest włączony. Prześlij treść do przeglądu, aby ją opublikować."
+    "cannotPublish": "Obieg redakcyjny jest włączony. Prześlij treść do przeglądu, aby ją opublikować.",
+    "publish": "Opublikuj",
+    "unpublish": "Cofnij publikację",
+    "archive": "Archiwizuj",
+    "restore": "Przywróć",
+    "restoreAsDraft": "Przywróć jako szkic"
+  },
+  "approveDialog": {
+    "title": "Zatwierdź treść",
+    "message": "Wybierz sposób publikacji tej treści.",
+    "publishNow": "Opublikuj teraz",
+    "schedule": "Zaplanuj",
+    "selectDate": "Wybierz datę publikacji"
+  },
+  "restoreDialog": {
+    "restore": "Przywróć",
+    "restoreAsDraft": "Przywróć jako szkic"
   },
   "notifications": {
     "title": "Powiadomienia",
@@ -1670,11 +1857,29 @@
     "selectedCount": "{{count}} zaznaczonych",
     "publish": "Opublikuj",
     "unpublish": "Cofnij publikację",
+    "archive": "Archiwizuj",
+    "restore": "Przywróć",
     "delete": "Usuń",
     "clearSelection": "Wyczyść zaznaczenie",
     "deleteDialog": {
       "title": "Usuń zaznaczone elementy",
       "message": "Usunąć {{count}} zaznaczonych elementów? Tej operacji nie można cofnąć."
+    },
+    "publishDialog": {
+      "title": "Opublikować wybrane elementy?",
+      "message": "{{count}} element(ów) zostanie opublikowanych i publicznie widocznych."
+    },
+    "unpublishDialog": {
+      "title": "Cofnąć publikację wybranych elementów?",
+      "message": "{{count}} element(ów) zostanie cofniętych z publikacji i przywróconych do wersji roboczej."
+    },
+    "archiveDialog": {
+      "title": "Zarchiwizować wybrane elementy?",
+      "message": "To zarchiwizuje {{count}} element(ów) i przeniesie je do widoku archiwum."
+    },
+    "restoreDialog": {
+      "title": "Przywrócić wybrane elementy?",
+      "message": "To przywróci {{count}} element(ów) do statusu szkicu."
     },
     "messages": {
       "success": "{{count}} elementów zaktualizowano pomyślnie",
@@ -1682,8 +1887,8 @@
     }
   },
   "contentTemplates": {
-    "title": "Szablony treści",
-    "subtitle": "Zarządzaj szablonami treści wielokrotnego użytku",
+    "title": "Szablony blogów",
+    "subtitle": "Zarządzaj szablonami wielokrotnego użytku dla wpisów na blogu",
     "addTemplate": "Dodaj szablon",
     "table": {
       "name": "Nazwa",
@@ -1707,6 +1912,22 @@
     "deleteDialog": {
       "title": "Usuń szablon",
       "message": "Usunąć szablon \"{{name}}\"? Tej operacji nie można cofnąć."
+    },
+    "wizard": {
+      "title": "Utwórz szablon",
+      "steps": {
+        "method": "Metoda",
+        "details": "Szczegóły"
+      },
+      "methods": {
+        "scratch": "Od zera",
+        "scratchDesc": "Zacznij od pustego szablonu",
+        "template": "Z szablonu",
+        "templateDesc": "Użyj wbudowanego szablonu jako punktu wyjścia",
+        "import": "Importuj Markdown",
+        "importDesc": "Importuj treść z pliku .md"
+      },
+      "slugPrefixHint": "Prefiks URL dla blogów tworzonych z tego szablonu"
     }
   },
   "templates": {

@@ -7,14 +7,18 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import apiService from '@/services/api';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
-import type { UpdatePageRequest, ContentStatus, ReviewActionRequest } from '@/types/api';
+import type { UpdatePageRequest, ContentStatus, ReviewActionRequest, ReorderItem } from '@/types/api';
 import { useAuth } from '@/store/AuthContext';
 import { useSiteContext } from '@/store/SiteContext';
 import { useEditorialWorkflow } from '@/hooks/useEditorialWorkflow';
 import ReviewCommentDialog from '@/components/shared/ReviewCommentDialog';
+import ApproveDialog from '@/components/shared/ApproveDialog';
+import ConfirmDialog from '@/components/shared/ConfirmDialog';
+import RestoreDialog from '@/components/shared/RestoreDialog';
 import { useFormHistory } from '@/hooks/useFormHistory';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { useAutosave } from '@/hooks/useAutosave';
+import { useUserPreferences } from '@/store/UserPreferencesContext';
 import { usePreviewUrl } from '@/hooks/usePreviewUrl';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
@@ -56,11 +60,15 @@ export default function PageDetailPage() {
   const queryClient = useQueryClient();
   const { showError, showSuccess } = useErrorSnackbar();
   const { canWrite, isAdmin } = useAuth();
+  const { preferences: userPrefs } = useUserPreferences();
   const { selectedSiteId } = useSiteContext();
 
   const [activeTab, setActiveTab] = useState(0);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+  const [approveDialogOpen, setApproveDialogOpen] = useState(false);
+  const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
+  const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
   const [formVersion, setFormVersion] = useState(0);
 
   const { templates: previewTemplates, openPreview } = usePreviewUrl();
@@ -162,6 +170,14 @@ export default function PageDetailPage() {
     onError: (err) => showError(err),
   });
 
+  const reorderSectionsMutation = useMutation({
+    mutationFn: (items: ReorderItem[]) => apiService.reorderPageSections(id!, items),
+    onError: (err) => {
+      showError(err);
+      queryClient.invalidateQueries({ queryKey: ['page-sections', id] });
+    },
+  });
+
   // Unified save
   const handleSave = useCallback(async () => {
     if (!page) return;
@@ -200,7 +216,8 @@ export default function PageDetailPage() {
   const { status: autosaveStatus, flush } = useAutosave({
     isDirty,
     onSave: handleSave,
-    enabled: canWrite,
+    enabled: canWrite && userPrefs.autosave_enabled,
+    debounceMs: userPrefs.autosave_debounce_seconds * 1000,
     formVersion,
     onError: (err) => showError(err),
   });
@@ -246,7 +263,18 @@ export default function PageDetailPage() {
     flush();
   };
 
-  const handleApprove = () => {
+  const handleApproveClick = () => {
+    setApproveDialogOpen(true);
+  };
+
+  const handleApprovePublishNow = () => {
+    setApproveDialogOpen(false);
+    reviewPageMutation.mutate({ action: 'approve' });
+  };
+
+  const handleApproveSchedule = (date: string) => {
+    setApproveDialogOpen(false);
+    setValue('publish_start', date, { shouldDirty: true });
     reviewPageMutation.mutate({ action: 'approve' });
   };
 
@@ -257,6 +285,45 @@ export default function PageDetailPage() {
   const handleReviewCommentSubmit = (comment?: string) => {
     setReviewDialogOpen(false);
     reviewPageMutation.mutate({ action: 'request_changes', comment });
+  };
+
+  // State machine action handlers
+  const handlePublish = () => {
+    setValue('status', 'Published' as PageDetailFormData['status'], { shouldDirty: true });
+    flush();
+  };
+
+  const handleUnpublish = () => {
+    setValue('status', 'Draft' as PageDetailFormData['status'], { shouldDirty: true });
+    setValue('publish_start', null, { shouldDirty: true });
+    setValue('publish_end', null, { shouldDirty: true });
+    flush();
+  };
+
+  const handleArchiveClick = () => {
+    setArchiveDialogOpen(true);
+  };
+
+  const handleArchiveConfirm = () => {
+    setArchiveDialogOpen(false);
+    setValue('status', 'Archived' as PageDetailFormData['status'], { shouldDirty: true });
+    flush();
+  };
+
+  const handleRestoreClick = () => {
+    setRestoreDialogOpen(true);
+  };
+
+  const handleRestore = () => {
+    setRestoreDialogOpen(false);
+    setValue('status', 'Published' as PageDetailFormData['status'], { shouldDirty: true });
+    flush();
+  };
+
+  const handleRestoreAsDraft = () => {
+    setRestoreDialogOpen(false);
+    setValue('status', 'Draft' as PageDetailFormData['status'], { shouldDirty: true });
+    flush();
   };
 
   if (isLoading) return <LoadingState label={t('pageDetail.loading')} />;
@@ -292,13 +359,21 @@ export default function PageDetailPage() {
         onToggleHistory={() => setHistoryOpen((o) => !o)}
         isSaving={isSaving}
         canWrite={canWrite}
-        allowedStatuses={workflow.allowedStatuses}
         canSubmitForReview={workflow.canSubmitForReview}
         canApprove={workflow.canApprove}
         canRequestChanges={workflow.canRequestChanges}
+        canPublish={workflow.canPublish}
+        canUnpublish={workflow.canUnpublish}
+        canArchive={workflow.canArchive}
+        canRestore={workflow.canRestore}
+        canSchedule={workflow.canSchedule}
         onSubmitForReview={handleSubmitForReview}
-        onApprove={handleApprove}
+        onApprove={handleApproveClick}
         onRequestChanges={handleRequestChanges}
+        onPublish={handlePublish}
+        onUnpublish={handleUnpublish}
+        onArchive={handleArchiveClick}
+        onRestore={handleRestoreClick}
         previewTemplates={previewTemplates}
         onPreview={(url) => openPreview(page.route, url)}
       />
@@ -334,6 +409,7 @@ export default function PageDetailPage() {
               isAdmin={isAdmin}
               onCreateSection={(data) => createSectionMutation.mutate(data)}
               onDeleteSection={(sectionId) => deleteSectionMutation.mutate(sectionId)}
+              onReorderSections={(items) => reorderSectionsMutation.mutate(items)}
               onSectionEditorClose={() => {
                 queryClient.invalidateQueries({ queryKey: ['page-section-localizations', id] });
                 queryClient.invalidateQueries({ queryKey: ['page-sections', id] });
@@ -358,6 +434,35 @@ export default function PageDetailPage() {
         onClose={() => setReviewDialogOpen(false)}
         onSubmit={handleReviewCommentSubmit}
         loading={reviewPageMutation.isPending}
+      />
+
+      <ApproveDialog
+        open={approveDialogOpen}
+        onPublishNow={handleApprovePublishNow}
+        onSchedule={handleApproveSchedule}
+        onCancel={() => setApproveDialogOpen(false)}
+        loading={reviewPageMutation.isPending}
+      />
+
+      <ConfirmDialog
+        open={archiveDialogOpen}
+        title={t('pages.archiveDialog.title')}
+        message={t('pages.archiveDialog.message', { route: page.route })}
+        confirmLabel={t('workflow.archive')}
+        confirmColor="warning"
+        onConfirm={handleArchiveConfirm}
+        onCancel={() => setArchiveDialogOpen(false)}
+        loading={isSaving}
+      />
+
+      <RestoreDialog
+        open={restoreDialogOpen}
+        title={t('pages.restoreDialog.title')}
+        message={t('pages.restoreDialog.message', { route: page.route })}
+        onRestore={handleRestore}
+        onRestoreAsDraft={handleRestoreAsDraft}
+        onCancel={() => setRestoreDialogOpen(false)}
+        loading={isSaving}
       />
     </Box>
   );

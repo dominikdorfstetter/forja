@@ -31,4 +31,5 @@ pub mod site_membership;
 pub mod site_settings;
 pub mod social;
 pub mod taxonomy;
+pub mod user_preferences;
 pub mod webhook;

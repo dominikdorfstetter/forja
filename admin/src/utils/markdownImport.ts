@@ -1,3 +1,7 @@
+import { slugify } from './slugify';
+
+export { slugify, MAX_SLUG_LENGTH } from './slugify';
+
 export interface MarkdownParseResult {
   title: string;
   body: string;
@@ -10,7 +14,6 @@ const MAX_TITLE_LENGTH = 500;
 const MAX_BODY_LENGTH = 200_000;
 const MAX_EXCERPT_LENGTH = 200;
 const MAX_META_TITLE_LENGTH = 200;
-const MAX_SLUG_LENGTH = 80;
 
 /**
  * Validates a File object before reading its content.
@@ -25,21 +28,6 @@ export function validateMarkdownFile(file: File): string | null {
     return 'markdownImport.errors.emptyFile';
   }
   return null;
-}
-
-/**
- * Converts text to a URL-friendly slug.
- */
-export function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '') // strip diacritics
-    .replace(/[^\w\s-]/g, '')        // strip non-word chars
-    .replace(/[\s_]+/g, '-')         // spaces/underscores → hyphens
-    .replace(/-+/g, '-')             // collapse consecutive hyphens
-    .replace(/^-|-$/g, '')           // trim leading/trailing hyphens
-    .slice(0, MAX_SLUG_LENGTH);
 }
 
 /**

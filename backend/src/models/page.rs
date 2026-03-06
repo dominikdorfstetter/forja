@@ -90,6 +90,30 @@ pub struct PageSection {
     pub updated_at: DateTime<Utc>,
 }
 
+/// Map API/serde status name (PascalCase) to PostgreSQL enum text value.
+fn normalize_content_status(api_value: &str) -> Option<&'static str> {
+    match api_value {
+        "Draft" => Some("draft"),
+        "InReview" => Some("in_review"),
+        "Scheduled" => Some("scheduled"),
+        "Published" => Some("published"),
+        "Archived" => Some("archived"),
+        _ => None,
+    }
+}
+
+/// Map API/serde page type name (PascalCase) to PostgreSQL enum text value.
+fn normalize_page_type(api_value: &str) -> Option<&'static str> {
+    match api_value {
+        "Static" => Some("static"),
+        "Landing" => Some("landing"),
+        "Contact" => Some("contact"),
+        "BlogIndex" => Some("blog_index"),
+        "Custom" => Some("custom"),
+        _ => None,
+    }
+}
+
 impl Page {
     /// Find all pages for a site
     pub async fn find_all_for_site(
@@ -187,6 +211,206 @@ impl Page {
         .fetch_one(pool)
         .await?;
 
+        Ok(row.0)
+    }
+
+    /// Find all pages for a site with optional search, filter, and sort
+    #[allow(clippy::too_many_arguments)]
+    pub async fn find_all_for_site_filtered(
+        pool: &PgPool,
+        site_id: Uuid,
+        limit: i64,
+        offset: i64,
+        search: Option<&str>,
+        status: Option<&str>,
+        page_type: Option<&str>,
+        sort_by: Option<&str>,
+        sort_dir: Option<&str>,
+        exclude_status: Option<&str>,
+    ) -> Result<Vec<PageWithContent>, ApiError> {
+        // Normalize enum values to DB representation early
+        let db_status = match status {
+            Some(s) => Some(
+                normalize_content_status(s)
+                    .ok_or_else(|| ApiError::BadRequest(format!("Invalid status filter: {}", s)))?,
+            ),
+            None => None,
+        };
+        let db_page_type = match page_type {
+            Some(pt) => Some(normalize_page_type(pt).ok_or_else(|| {
+                ApiError::BadRequest(format!("Invalid page_type filter: {}", pt))
+            })?),
+            None => None,
+        };
+        let db_exclude_status = match exclude_status {
+            Some(s) => Some(normalize_content_status(s).ok_or_else(|| {
+                ApiError::BadRequest(format!("Invalid exclude_status filter: {}", s))
+            })?),
+            None => None,
+        };
+
+        let mut where_clauses = vec![
+            "cs.site_id = $1".to_string(),
+            "c.is_deleted = FALSE".to_string(),
+        ];
+        let mut bind_idx = 4u32; // $1=site_id, $2=limit, $3=offset
+
+        if search.is_some() {
+            where_clauses.push(format!(
+                "(p.id::text ILIKE '%' || ${bind_idx} || '%' OR p.route ILIKE '%' || ${bind_idx} || '%' OR c.slug ILIKE '%' || ${bind_idx} || '%')"
+            ));
+            bind_idx += 1;
+        }
+        if db_status.is_some() {
+            where_clauses.push(format!("c.status::text = ${bind_idx}"));
+            bind_idx += 1;
+        }
+        if db_page_type.is_some() {
+            where_clauses.push(format!("p.page_type::text = ${bind_idx}"));
+            bind_idx += 1;
+        }
+        if db_exclude_status.is_some() {
+            where_clauses.push(format!("c.status::text != ${bind_idx}"));
+            bind_idx += 1;
+        }
+        let _ = bind_idx;
+
+        let order_col = match sort_by.unwrap_or("route") {
+            "route" => "p.route",
+            "slug" => "c.slug",
+            "page_type" => "p.page_type",
+            "status" => "c.status",
+            "created_at" => "p.created_at",
+            _ => "p.route",
+        };
+        let order_dir = match sort_dir.unwrap_or("asc") {
+            "desc" | "DESC" => "DESC",
+            _ => "ASC",
+        };
+
+        let sql = format!(
+            r#"
+            SELECT
+                p.id, p.content_id, p.route, p.page_type,
+                p.template, p.is_in_navigation, p.navigation_order, p.parent_page_id,
+                c.slug, c.status, c.published_at, c.publish_start, c.publish_end,
+                p.created_at, p.updated_at
+            FROM pages p
+            INNER JOIN contents c ON p.content_id = c.id
+            INNER JOIN content_sites cs ON c.id = cs.content_id
+            WHERE {}
+            ORDER BY {} {}
+            LIMIT $2 OFFSET $3
+            "#,
+            where_clauses.join(" AND "),
+            order_col,
+            order_dir,
+        );
+
+        let mut query = sqlx::query_as::<_, PageWithContent>(&sql)
+            .bind(site_id)
+            .bind(limit)
+            .bind(offset);
+
+        if let Some(s) = search {
+            query = query.bind(s);
+        }
+        if let Some(st) = db_status {
+            query = query.bind(st);
+        }
+        if let Some(pt) = db_page_type {
+            query = query.bind(pt);
+        }
+        if let Some(es) = db_exclude_status {
+            query = query.bind(es);
+        }
+
+        let pages = query.fetch_all(pool).await?;
+        Ok(pages)
+    }
+
+    /// Count pages for a site with optional search and filter
+    pub async fn count_for_site_filtered(
+        pool: &PgPool,
+        site_id: Uuid,
+        search: Option<&str>,
+        status: Option<&str>,
+        page_type: Option<&str>,
+        exclude_status: Option<&str>,
+    ) -> Result<i64, ApiError> {
+        let db_status = match status {
+            Some(s) => Some(
+                normalize_content_status(s)
+                    .ok_or_else(|| ApiError::BadRequest(format!("Invalid status filter: {}", s)))?,
+            ),
+            None => None,
+        };
+        let db_page_type = match page_type {
+            Some(pt) => Some(normalize_page_type(pt).ok_or_else(|| {
+                ApiError::BadRequest(format!("Invalid page_type filter: {}", pt))
+            })?),
+            None => None,
+        };
+        let db_exclude_status = match exclude_status {
+            Some(s) => Some(normalize_content_status(s).ok_or_else(|| {
+                ApiError::BadRequest(format!("Invalid exclude_status filter: {}", s))
+            })?),
+            None => None,
+        };
+
+        let mut where_clauses = vec![
+            "cs.site_id = $1".to_string(),
+            "c.is_deleted = FALSE".to_string(),
+        ];
+        let mut bind_idx = 2u32; // $1=site_id
+
+        if search.is_some() {
+            where_clauses.push(format!(
+                "(p.id::text ILIKE '%' || ${bind_idx} || '%' OR p.route ILIKE '%' || ${bind_idx} || '%' OR c.slug ILIKE '%' || ${bind_idx} || '%')"
+            ));
+            bind_idx += 1;
+        }
+        if db_status.is_some() {
+            where_clauses.push(format!("c.status::text = ${bind_idx}"));
+            bind_idx += 1;
+        }
+        if db_page_type.is_some() {
+            where_clauses.push(format!("p.page_type::text = ${bind_idx}"));
+            bind_idx += 1;
+        }
+        if db_exclude_status.is_some() {
+            where_clauses.push(format!("c.status::text != ${bind_idx}"));
+            bind_idx += 1;
+        }
+        let _ = bind_idx;
+
+        let sql = format!(
+            r#"
+            SELECT COUNT(*)
+            FROM pages p
+            INNER JOIN contents c ON p.content_id = c.id
+            INNER JOIN content_sites cs ON c.id = cs.content_id
+            WHERE {}
+            "#,
+            where_clauses.join(" AND "),
+        );
+
+        let mut query = sqlx::query_as::<_, (i64,)>(&sql).bind(site_id);
+
+        if let Some(s) = search {
+            query = query.bind(s);
+        }
+        if let Some(st) = db_status {
+            query = query.bind(st);
+        }
+        if let Some(pt) = db_page_type {
+            query = query.bind(pt);
+        }
+        if let Some(es) = db_exclude_status {
+            query = query.bind(es);
+        }
+
+        let row = query.fetch_one(pool).await?;
         Ok(row.0)
     }
 
@@ -507,6 +731,36 @@ impl PageSection {
         .ok_or_else(|| ApiError::NotFound(format!("Page section with ID {} not found", id)))?;
 
         Ok(section)
+    }
+
+    /// Batch-reorder page sections for a page within a single transaction
+    pub async fn reorder_for_page(
+        pool: &PgPool,
+        page_id: Uuid,
+        items: Vec<(Uuid, i16)>,
+    ) -> Result<(), ApiError> {
+        let mut tx = pool.begin().await?;
+
+        for (id, display_order) in &items {
+            let result = sqlx::query(
+                "UPDATE page_sections SET display_order = $1, updated_at = NOW() WHERE id = $2 AND page_id = $3",
+            )
+            .bind(display_order)
+            .bind(id)
+            .bind(page_id)
+            .execute(&mut *tx)
+            .await?;
+
+            if result.rows_affected() == 0 {
+                return Err(ApiError::NotFound(format!(
+                    "Page section with ID {} not found for page {}",
+                    id, page_id
+                )));
+            }
+        }
+
+        tx.commit().await?;
+        Ok(())
     }
 
     /// Delete a page section (hard delete)

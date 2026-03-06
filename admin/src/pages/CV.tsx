@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
@@ -70,6 +70,17 @@ export default function CVPage() {
     openDelete: setDeletingSkill, closeDelete: closeSkillDelete,
     handlePageChange: handleSkillPageChange, handleRowsPerPageChange: handleSkillRowsPerPageChange,
   } = useListPageState<SkillResponse>();
+
+  // Command palette action listener
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail === 'add-cv-entry') openEntryCreate();
+      else if (detail === 'add-skill') openSkillCreate();
+    };
+    window.addEventListener('command-palette:action', handler);
+    return () => window.removeEventListener('command-palette:action', handler);
+  }, [openEntryCreate, openSkillCreate]);
 
   // Queries
   const { data: entriesData, isLoading: entriesLoading, error: entriesError } = useQuery({
@@ -226,7 +237,7 @@ export default function CVPage() {
   ];
 
   return (
-    <Box>
+    <Box data-testid="cv.page">
       <PageHeader
         title={t('cv.title')}
         subtitle={t('cv.subtitle')}
@@ -238,8 +249,8 @@ export default function CVPage() {
       ) : (
         <>
           <Tabs value={tabIndex} onChange={(_, v) => setTabIndex(v)} sx={{ mb: 3 }}>
-            <Tab label={t('cv.tabs.entries')} />
-            <Tab label={t('cv.tabs.skills')} />
+            <Tab icon={<WorkIcon fontSize="small" />} iconPosition="start" label={t('cv.tabs.entries')} />
+            <Tab icon={<SchoolIcon fontSize="small" />} iconPosition="start" label={t('cv.tabs.skills')} />
           </Tabs>
 
           {/* Entries Tab */}
@@ -306,12 +317,12 @@ export default function CVPage() {
       {/* Entry Dialogs */}
       <CvEntryFormDialog open={entryFormOpen} onSubmit={(data) => createEntryMutation.mutate(data)} onClose={closeEntryForm} loading={createEntryMutation.isPending} />
       <CvEntryFormDialog open={!!editingEntry} entry={editingEntry} onSubmit={(data) => editingEntry && updateEntryMutation.mutate({ id: editingEntry.id, data })} onClose={closeEntryEdit} loading={updateEntryMutation.isPending} />
-      <ConfirmDialog open={!!deletingEntry} title={t('cv.entries.deleteDialog.title')} message={t('cv.entries.deleteDialog.message', { company: deletingEntry?.company })} confirmLabel={t('common.actions.delete')} onConfirm={() => deletingEntry && deleteEntryMutation.mutate(deletingEntry.id)} onCancel={closeEntryDelete} loading={deleteEntryMutation.isPending} />
+      <ConfirmDialog open={!!deletingEntry} title={t('cv.entries.deleteDialog.title')} message={t('cv.entries.deleteDialog.message', { company: deletingEntry?.company })} confirmLabel={t('common.actions.delete')} onConfirm={() => deletingEntry && deleteEntryMutation.mutate(deletingEntry.id)} onCancel={closeEntryDelete} loading={deleteEntryMutation.isPending} confirmationText={t('common.actions.delete')} />
 
       {/* Skill Dialogs */}
       <SkillFormDialog open={skillFormOpen} onSubmit={(data) => createSkillMutation.mutate(data)} onClose={closeSkillForm} loading={createSkillMutation.isPending} />
       <SkillFormDialog open={!!editingSkill} skill={editingSkill} onSubmit={(data) => editingSkill && updateSkillMutation.mutate({ id: editingSkill.id, data })} onClose={closeSkillEdit} loading={updateSkillMutation.isPending} />
-      <ConfirmDialog open={!!deletingSkill} title={t('cv.skills.deleteDialog.title')} message={t('cv.skills.deleteDialog.message', { name: deletingSkill?.name })} confirmLabel={t('common.actions.delete')} onConfirm={() => deletingSkill && deleteSkillMutation.mutate(deletingSkill.id)} onCancel={closeSkillDelete} loading={deleteSkillMutation.isPending} />
+      <ConfirmDialog open={!!deletingSkill} title={t('cv.skills.deleteDialog.title')} message={t('cv.skills.deleteDialog.message', { name: deletingSkill?.name })} confirmLabel={t('common.actions.delete')} onConfirm={() => deletingSkill && deleteSkillMutation.mutate(deletingSkill.id)} onCancel={closeSkillDelete} loading={deleteSkillMutation.isPending} confirmationText={t('common.actions.delete')} />
     </Box>
   );
 }

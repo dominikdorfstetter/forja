@@ -89,7 +89,7 @@ export default function RedirectFormDialog({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="redirect-form-title">
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="redirect-form-title" data-testid="redirect-form.dialog">
       <form onSubmit={handleSubmit(onFormSubmit)}>
         <DialogTitle id="redirect-form-title">
           {redirect ? t('forms.redirect.editTitle') : t('forms.redirect.createTitle')}
@@ -151,11 +151,12 @@ export default function RedirectFormDialog({
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose}>{t('common.actions.cancel')}</Button>
+          <Button onClick={onClose} data-testid="redirect-form.btn.cancel">{t('common.actions.cancel')}</Button>
           <Button
             type="submit"
             variant="contained"
             disabled={loading || !isValid}
+            data-testid="redirect-form.btn.submit"
           >
             {loading ? t('common.actions.saving') : redirect ? t('common.actions.save') : t('common.actions.create')}
           </Button>

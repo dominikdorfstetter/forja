@@ -33,9 +33,13 @@ import { useAuth } from '@/store/AuthContext';
 import { useSiteContext } from '@/store/SiteContext';
 import { useEditorialWorkflow } from '@/hooks/useEditorialWorkflow';
 import ReviewCommentDialog from '@/components/shared/ReviewCommentDialog';
+import ApproveDialog from '@/components/shared/ApproveDialog';
+import ConfirmDialog from '@/components/shared/ConfirmDialog';
+import RestoreDialog from '@/components/shared/RestoreDialog';
 import { useFormHistory } from '@/hooks/useFormHistory';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { useAutosave } from '@/hooks/useAutosave';
+import { useUserPreferences } from '@/store/UserPreferencesContext';
 import { usePreviewUrl } from '@/hooks/usePreviewUrl';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
@@ -83,6 +87,7 @@ export default function BlogDetailPage() {
   const queryClient = useQueryClient();
   const { showError, showSuccess } = useErrorSnackbar();
   const { canWrite } = useAuth();
+  const { preferences: userPrefs } = useUserPreferences();
   const { selectedSiteId } = useSiteContext();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -90,6 +95,9 @@ export default function BlogDetailPage() {
   const [activeLocaleTab, setActiveLocaleTab] = useState(0);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+  const [approveDialogOpen, setApproveDialogOpen] = useState(false);
+  const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
+  const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
   const [formVersion, setFormVersion] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [sidebarTab, setSidebarTab] = useState(0);
@@ -254,7 +262,8 @@ export default function BlogDetailPage() {
   const { status: autosaveStatus, flush } = useAutosave({
     isDirty,
     onSave: handleSave,
-    enabled: canWrite,
+    enabled: canWrite && userPrefs.autosave_enabled,
+    debounceMs: userPrefs.autosave_debounce_seconds * 1000,
     formVersion,
     onError: (err) => showError(err),
   });
@@ -335,7 +344,18 @@ export default function BlogDetailPage() {
     flush();
   };
 
-  const handleApprove = () => {
+  const handleApproveClick = () => {
+    setApproveDialogOpen(true);
+  };
+
+  const handleApprovePublishNow = () => {
+    setApproveDialogOpen(false);
+    reviewBlogMutation.mutate({ action: 'approve' });
+  };
+
+  const handleApproveSchedule = (date: string) => {
+    setApproveDialogOpen(false);
+    setValue('publish_start', date, { shouldDirty: true });
     reviewBlogMutation.mutate({ action: 'approve' });
   };
 
@@ -346,6 +366,45 @@ export default function BlogDetailPage() {
   const handleReviewCommentSubmit = (comment?: string) => {
     setReviewDialogOpen(false);
     reviewBlogMutation.mutate({ action: 'request_changes', comment });
+  };
+
+  // State machine action handlers
+  const handlePublish = () => {
+    setValue('status', 'Published' as BlogContentFormData['status'], { shouldDirty: true });
+    flush();
+  };
+
+  const handleUnpublish = () => {
+    setValue('status', 'Draft' as BlogContentFormData['status'], { shouldDirty: true });
+    setValue('publish_start', null, { shouldDirty: true });
+    setValue('publish_end', null, { shouldDirty: true });
+    flush();
+  };
+
+  const handleArchiveClick = () => {
+    setArchiveDialogOpen(true);
+  };
+
+  const handleArchiveConfirm = () => {
+    setArchiveDialogOpen(false);
+    setValue('status', 'Archived' as BlogContentFormData['status'], { shouldDirty: true });
+    flush();
+  };
+
+  const handleRestoreClick = () => {
+    setRestoreDialogOpen(true);
+  };
+
+  const handleRestore = () => {
+    setRestoreDialogOpen(false);
+    setValue('status', 'Published' as BlogContentFormData['status'], { shouldDirty: true });
+    flush();
+  };
+
+  const handleRestoreAsDraft = () => {
+    setRestoreDialogOpen(false);
+    setValue('status', 'Draft' as BlogContentFormData['status'], { shouldDirty: true });
+    flush();
   };
 
   if (isLoading) return <LoadingState label={t('blogDetail.loading')} />;
@@ -369,6 +428,9 @@ export default function BlogDetailPage() {
       canWrite={canWrite}
       siteId={selectedSiteId}
       contentId={blogDetail.content_id}
+      publishedAt={blogDetail.published_at}
+      createdAt={blogDetail.created_at}
+      updatedAt={blogDetail.updated_at}
       categories={blogDetail.categories || []}
       documents={blogDetail.documents || []}
     />
@@ -397,13 +459,21 @@ export default function BlogDetailPage() {
         onToggleHistory={() => setHistoryOpen((o) => !o)}
         isSaving={isSaving}
         canWrite={canWrite}
-        allowedStatuses={workflow.allowedStatuses}
         canSubmitForReview={workflow.canSubmitForReview}
         canApprove={workflow.canApprove}
         canRequestChanges={workflow.canRequestChanges}
+        canPublish={workflow.canPublish}
+        canUnpublish={workflow.canUnpublish}
+        canArchive={workflow.canArchive}
+        canRestore={workflow.canRestore}
+        canSchedule={workflow.canSchedule}
         onSubmitForReview={handleSubmitForReview}
-        onApprove={handleApprove}
+        onApprove={handleApproveClick}
         onRequestChanges={handleRequestChanges}
+        onPublish={handlePublish}
+        onUnpublish={handleUnpublish}
+        onArchive={handleArchiveClick}
+        onRestore={handleRestoreClick}
         previewTemplates={previewTemplates}
         onPreview={(url) => openPreview('/blog/' + (blogDetail.slug || ''), url)}
         sidebarOpen={sidebarOpen}
@@ -572,6 +642,35 @@ export default function BlogDetailPage() {
         onClose={() => setReviewDialogOpen(false)}
         onSubmit={handleReviewCommentSubmit}
         loading={reviewBlogMutation.isPending}
+      />
+
+      <ApproveDialog
+        open={approveDialogOpen}
+        onPublishNow={handleApprovePublishNow}
+        onSchedule={handleApproveSchedule}
+        onCancel={() => setApproveDialogOpen(false)}
+        loading={reviewBlogMutation.isPending}
+      />
+
+      <ConfirmDialog
+        open={archiveDialogOpen}
+        title={t('blogs.archiveDialog.title')}
+        message={t('blogs.archiveDialog.message', { slug: blogDetail.slug })}
+        confirmLabel={t('workflow.archive')}
+        confirmColor="warning"
+        onConfirm={handleArchiveConfirm}
+        onCancel={() => setArchiveDialogOpen(false)}
+        loading={isSaving}
+      />
+
+      <RestoreDialog
+        open={restoreDialogOpen}
+        title={t('blogs.restoreDialog.title')}
+        message={t('blogs.restoreDialog.message', { slug: blogDetail.slug })}
+        onRestore={handleRestore}
+        onRestoreAsDraft={handleRestoreAsDraft}
+        onCancel={() => setRestoreDialogOpen(false)}
+        loading={isSaving}
       />
     </Box>
   );

@@ -7,7 +7,7 @@ const version = process.env.FORJA_VERSION || 'dev';
 const config: Config = {
   title: 'Forja',
   tagline: 'Forge your content — a multi-site CMS built with Rust and React',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/logo.svg',
 
   url: 'https://dominikdorfstetter.github.io',
   baseUrl: '/forja/',

@@ -122,8 +122,8 @@ export default function MarkdownImportDialog({ open, onImport, onClose, loading 
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle>{t('markdownImport.dialogTitle')}</DialogTitle>
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth aria-labelledby="markdown-import-title" data-testid="markdown-import-dialog">
+      <DialogTitle id="markdown-import-title">{t('markdownImport.dialogTitle')}</DialogTitle>
       <DialogContent>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
           {t('markdownImport.dialogSubtitle')}

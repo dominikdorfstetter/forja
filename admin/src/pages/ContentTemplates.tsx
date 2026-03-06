@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, Paper, Chip, IconButton, Tooltip, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
@@ -18,6 +19,7 @@ import EmptyState from '@/components/shared/EmptyState';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import DataTable, { type DataTableColumn } from '@/components/shared/DataTable';
 import ContentTemplateFormDialog from '@/components/content-templates/ContentTemplateFormDialog';
+import CreateTemplateWizard from '@/components/content-templates/CreateTemplateWizard';
 
 export default function ContentTemplatesPage() {
   const { t } = useTranslation();
@@ -29,6 +31,15 @@ export default function ContentTemplatesPage() {
     openCreate, closeForm, openEdit, closeEdit, openDelete, closeDelete,
     handlePageChange, handleRowsPerPageChange,
   } = useListPageState<ContentTemplate>();
+
+  // Command palette action listener
+  useEffect(() => {
+    const handler = (e: Event) => {
+      if ((e as CustomEvent).detail === 'create-template') openCreate();
+    };
+    window.addEventListener('command-palette:action', handler);
+    return () => window.removeEventListener('command-palette:action', handler);
+  }, [openCreate]);
 
   const { data, isLoading } = useQuery({
     queryKey: ['content-templates', selectedSiteId, page, perPage],
@@ -77,10 +88,14 @@ export default function ContentTemplatesPage() {
   ];
 
   return (
-    <Box>
+    <Box data-testid="content-templates.page">
       <PageHeader
         title={t('contentTemplates.title')}
         subtitle={t('contentTemplates.subtitle')}
+        breadcrumbs={[
+          { label: t('blogs.title'), path: '/blogs' },
+          { label: t('contentTemplates.title') },
+        ]}
         action={selectedSiteId ? { label: t('contentTemplates.addTemplate'), icon: <AddIcon />, onClick: openCreate, hidden: !canWrite } : undefined}
       />
 
@@ -107,9 +122,9 @@ export default function ContentTemplatesPage() {
         </Paper>
       )}
 
-      <ContentTemplateFormDialog open={formOpen} onSubmitCreate={(data) => createMutation.mutate(data)} onClose={closeForm} loading={createMutation.isPending} />
+      <CreateTemplateWizard open={formOpen} onClose={closeForm} onSubmit={(data) => createMutation.mutate(data)} loading={createMutation.isPending} />
       <ContentTemplateFormDialog open={!!editing} template={editing} onSubmitUpdate={(data) => editing && updateMutation.mutate({ id: editing.id, data })} onClose={closeEdit} loading={updateMutation.isPending} />
-      <ConfirmDialog open={!!deleting} title={t('contentTemplates.deleteDialog.title')} message={t('contentTemplates.deleteDialog.message', { name: deleting?.name })} confirmLabel={t('common.actions.delete')} onConfirm={() => deleting && deleteMutation.mutate(deleting.id)} onCancel={closeDelete} loading={deleteMutation.isPending} />
+      <ConfirmDialog open={!!deleting} title={t('contentTemplates.deleteDialog.title')} message={t('contentTemplates.deleteDialog.message', { name: deleting?.name })} confirmLabel={t('common.actions.delete')} onConfirm={() => deleting && deleteMutation.mutate(deleting.id)} onCancel={closeDelete} loading={deleteMutation.isPending} confirmationText={t('common.actions.delete')} />
     </Box>
   );
 }

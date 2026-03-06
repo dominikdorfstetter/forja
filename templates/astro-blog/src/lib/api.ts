@@ -154,6 +154,10 @@ export async function fetchFeaturedBlogs(limit = 3): Promise<BlogListItem[]> {
   return api(`/sites/${SITE_ID}/blogs/featured?limit=${limit}`);
 }
 
+export async function fetchSimilarBlogs(blogId: string, limit = 3): Promise<BlogListItem[]> {
+  return api(`/sites/${SITE_ID}/blogs/${blogId}/similar?limit=${limit}`);
+}
+
 export async function fetchBlogBySlug(slug: string): Promise<BlogDetailResponse> {
   const brief = await api<{
     id: string;

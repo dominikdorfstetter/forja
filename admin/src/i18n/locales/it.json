@@ -22,7 +22,10 @@
       "deleting": "Eliminazione...",
       "clone": "Clona",
       "upload": "Carica",
-      "preview": "Anteprima"
+      "preview": "Anteprima",
+      "viewDetails": "Vedi dettagli",
+      "clickToCopy": "Clicca per copiare",
+      "copied": "Copiato!"
     },
     "status": {
       "active": "Attivo",
@@ -53,6 +56,9 @@
     "confirm": {
       "cannotBeUndone": "Questa azione non può essere annullata.",
       "areYouSure": "Sei sicuro?"
+    },
+    "confirmDialog": {
+      "typeToConfirm": "Digita \"{{word}}\" per confermare"
     },
     "filters": {
       "all": "Tutti",
@@ -187,7 +193,23 @@
       "admin": "Admin",
       "write": "Scrittura",
       "readOnly": "Sola lettura"
-    }
+    },
+    "contentOverview": "Panoramica dei contenuti",
+    "chart": {
+      "noContent": "Nessun contenuto ancora. Crea il tuo primo articolo del blog o una pagina."
+    },
+    "attention": {
+      "awaitingReview": "In attesa della tua revisione",
+      "draftsToFinish": "Bozze da completare",
+      "recentlyPublished": "Pubblicati di recente",
+      "noItemsReview": "Nessun elemento in attesa di revisione.",
+      "noItemsDrafts": "Tutti i contenuti sono pubblicati o in revisione.",
+      "noItemsPublished": "Nessun contenuto pubblicato ancora.",
+      "viewAll": "Vedi tutti"
+    },
+    "recentActivity": "Attività recente",
+    "recentActivityEmpty": "Nessuna attività recente.",
+    "updatedAgo": "Aggiornato {{time}} fa"
   },
   "myDrafts": {
     "title": "Le mie bozze",
@@ -234,7 +256,50 @@
       "title": "Elimina blog",
       "message": "Eliminare il blog \"{{slug}}\"? Questa azione non può essere annullata."
     },
-    "moreActions": "Altro"
+    "publishDialog": {
+      "title": "Pubblicare il blog?",
+      "message": "\"{{slug}}\" sarà visibile pubblicamente."
+    },
+    "unpublishDialog": {
+      "title": "Annullare la pubblicazione del blog?",
+      "message": "\"{{slug}}\" verrà rimosso dalla vista pubblica e riportato a bozza."
+    },
+    "archiveDialog": {
+      "title": "Archiviare il blog?",
+      "message": "Questo archivierà \"{{slug}}\" e lo sposterà nella vista archivio."
+    },
+    "restoreDialog": {
+      "title": "Ripristinare il blog?",
+      "message": "Questo ripristinerà \"{{slug}}\" allo stato di bozza."
+    },
+    "tabs": {
+      "active": "Attivi",
+      "archived": "Archiviati"
+    },
+    "moreActions": "Altro",
+    "searchPlaceholder": "Cerca per ID, slug o autore...",
+    "wizard": {
+      "title": "Crea Blog",
+      "steps": {
+        "method": "Metodo",
+        "details": "Dettagli"
+      },
+      "methods": {
+        "scratch": "Da zero",
+        "scratchDesc": "Inizia con un articolo vuoto",
+        "template": "Da modello",
+        "templateDesc": "Usa un modello di contenuto predefinito",
+        "import": "Importa Markdown",
+        "importDesc": "Importa contenuto da un file .md"
+      },
+      "fields": {
+        "slug": "Slug",
+        "slugHint": "Identificatore compatibile con URL (es. il-mio-primo-post)",
+        "author": "Autore"
+      },
+      "creating": "Creazione...",
+      "create": "Crea Blog"
+    }
   },
   "blogDetail": {
     "title": "Dettaglio blog",
@@ -287,7 +352,13 @@
       "readingTime": "Tempo di lettura",
       "manualOverride": "Sovrascrittura manuale",
       "autoCalculated": "Calcolato automaticamente dal contenuto",
-      "resetAuto": "Ripristina al calcolo automatico"
+      "resetAuto": "Ripristina al calcolo automatico",
+      "info": "Metadati",
+      "blogId": "ID blog",
+      "contentId": "ID contenuto",
+      "publishedAt": "Pubblicato il",
+      "createdAt": "Creato",
+      "updatedAt": "Ultimo aggiornamento"
     },
     "images": {
       "title": "Immagini",
@@ -362,9 +433,57 @@
       "deleted": "Pagina eliminata",
       "cloned": "Pagina clonata con successo"
     },
+    "searchPlaceholder": "Cerca per ID, percorso o slug...",
     "deleteDialog": {
       "title": "Elimina pagina",
       "message": "Eliminare la pagina \"{{route}}\"? Questa azione non può essere annullata."
+    },
+    "publishDialog": {
+      "title": "Pubblicare la pagina?",
+      "message": "\"{{route}}\" sarà visibile pubblicamente."
+    },
+    "unpublishDialog": {
+      "title": "Annullare la pubblicazione della pagina?",
+      "message": "\"{{route}}\" verrà rimossa dalla vista pubblica e riportata a bozza."
+    },
+    "archiveDialog": {
+      "title": "Archiviare la pagina?",
+      "message": "Questo archivierà \"{{route}}\" e la sposterà nella vista archivio."
+    },
+    "restoreDialog": {
+      "title": "Ripristinare la pagina?",
+      "message": "Questo ripristinerà \"{{route}}\" allo stato di bozza."
+    },
+    "tabs": {
+      "active": "Attive",
+      "archived": "Archiviate"
+    },
+    "wizard": {
+      "steps": {
+        "pageType": "Tipo di pagina",
+        "identity": "Identità",
+        "options": "Opzioni"
+      },
+      "next": "Avanti",
+      "back": "Indietro",
+      "createPage": "Crea pagina",
+      "creating": "Creazione...",
+      "types": {
+        "static": "Statica",
+        "staticDesc": "Pagina di contenuto standard",
+        "landing": "Landing",
+        "landingDesc": "Pagina marketing con sezioni hero",
+        "contact": "Contatto",
+        "contactDesc": "Modulo di contatto e informazioni",
+        "blogIndex": "Indice blog",
+        "blogIndexDesc": "Pagina elenco articoli del blog",
+        "custom": "Personalizzata",
+        "customDesc": "Layout di pagina completamente personalizzato"
+      },
+      "routeHint": "Percorso URL della pagina (es. /chi-siamo)",
+      "slugHint": "Identificatore URL, generato automaticamente dalla route",
+      "site": "Sito",
+      "inNavigation": "Mostra nella navigazione"
     }
   },
   "pageDetail": {
@@ -482,6 +601,10 @@
       "title": "Elimina media",
       "message": "Eliminare \"{{filename}}\"? Questa azione non può essere annullata."
     },
+    "deleteFolderDialog": {
+      "title": "Eliminare la cartella?",
+      "message": "Questa cartella verrà eliminata definitivamente e i suoi file verranno spostati al livello principale."
+    },
     "upload": {
       "dragDrop": "Trascina i file qui, o clicca per sfogliare",
       "uploading": "Caricamento in corso...",
@@ -520,6 +643,10 @@
     "deleteDialog": {
       "title": "Elimina documento",
       "message": "Eliminare il documento \"{{title}}\"? Questa azione non può essere annullata."
+    },
+    "deleteFolderDialog": {
+      "title": "Eliminare la cartella?",
+      "message": "Questa cartella verrà eliminata definitivamente e i suoi documenti verranno spostati al livello principale."
     }
   },
   "navigation": {
@@ -831,7 +958,8 @@
     },
     "revokeDialog": {
       "title": "Revoca API Key",
-      "message": "Sei sicuro di voler revocare \"{{name}}\"? Questa azione è permanente e non può essere annullata."
+      "message": "Sei sicuro di voler revocare \"{{name}}\"? Questa azione è permanente e non può essere annullata.",
+      "confirmWord": "Revocare"
     },
     "deleteDialog": {
       "title": "Elimina API Key",
@@ -1146,8 +1274,22 @@
     "preferences": {
       "title": "Preferenze",
       "language": {
+        "title": "Lingua",
         "label": "Lingua dell'amministrazione",
         "description": "Scegli la lingua di visualizzazione per l'interfaccia di amministrazione"
+      },
+      "theme": {
+        "title": "Tema",
+        "label": "Tema colori",
+        "description": "Scegli un tema colori per l'interfaccia di amministrazione"
+      },
+      "autosave": {
+        "title": "Salvataggio automatico",
+        "enableLabel": "Attiva salvataggio automatico",
+        "enableDescription": "Salva automaticamente le modifiche negli editor dopo un breve ritardo",
+        "debounceLabel": "Ritardo di salvataggio",
+        "debounceDescription": "Tempo di attesa dopo l'ultima modifica prima di salvare (1–60)",
+        "seconds": "secondi"
       }
     }
   },
@@ -1162,6 +1304,10 @@
       "multilingualDesc": "Localizzazione integrata con supporto per qualsiasi lingua e direzione del testo RTL.",
       "apiFirst": "API-First",
       "apiFirstDesc": "Architettura headless con API REST completa. Distribuisci contenuti a qualsiasi frontend."
+    },
+    "preferences": {
+      "title": "Le tue preferenze",
+      "description": "Imposta la lingua e il tema preferiti prima di iniziare."
     },
     "createSite": "Crea il tuo primo sito",
     "stepPrefix": "Passaggio 1 di 1"
@@ -1479,7 +1625,6 @@
     "section": {
       "title": "Modifica sezione",
       "fields": {
-        "sectionType": "Tipo di sezione",
         "displayOrder": "Ordine di visualizzazione",
         "settings": "Impostazioni",
         "buttonText": "Testo del pulsante",
@@ -1609,6 +1754,7 @@
     "placeholder": "Cerca comandi...",
     "noResults": "Nessun risultato trovato",
     "categories": {
+      "context": "Azioni rapide",
       "navigation": "Navigazione",
       "actions": "Azioni",
       "blogs": "Blog",
@@ -1616,10 +1762,35 @@
       "sites": "Siti"
     },
     "actions": {
-      "toggleTheme": "Cambia tema",
       "logout": "Esci"
     },
-    "hint": "⌘K"
+    "contextActions": {
+      "createBlog": "Crea nuovo blog",
+      "createPage": "Crea nuova pagina",
+      "uploadMedia": "Carica media",
+      "createTemplate": "Crea modello",
+      "createTag": "Crea tag",
+      "createCategory": "Crea categoria",
+      "addNavItem": "Aggiungi elemento di navigazione",
+      "addSocialLink": "Aggiungi link social",
+      "createWebhook": "Crea webhook",
+      "createRedirect": "Crea reindirizzamento",
+      "addMember": "Aggiungi membro",
+      "addCvEntry": "Aggiungi voce CV",
+      "addSkill": "Aggiungi competenza",
+      "createSite": "Crea sito",
+      "backToSites": "Torna alla lista siti",
+      "addLanguage": "Aggiungi lingua",
+      "addLegalDoc": "Aggiungi documento legale",
+      "backToLegal": "Torna ai documenti legali",
+      "createApiKey": "Crea chiave API",
+      "backToBlogs": "Torna alla lista blog",
+      "backToPages": "Torna alla lista pagine"
+    },
+    "open": "Apri tavolozza comandi",
+    "searchLabel": "Cerca comandi",
+    "title": "Tavolozza comandi",
+    "resultCount": "{{count}} risultati disponibili"
   },
   "languages": {
     "en": "English",
@@ -1640,7 +1811,23 @@
     "submittedForReview": "Contenuto inviato per revisione",
     "approved": "Contenuto approvato",
     "changesRequested": "Modifiche richieste",
-    "cannotPublish": "Il flusso editoriale è attivato. Invia il contenuto per la revisione per pubblicarlo."
+    "cannotPublish": "Il flusso editoriale è attivato. Invia il contenuto per la revisione per pubblicarlo.",
+    "publish": "Pubblica",
+    "unpublish": "Annulla pubblicazione",
+    "archive": "Archivia",
+    "restore": "Ripristina",
+    "restoreAsDraft": "Ripristina come bozza"
+  },
+  "approveDialog": {
+    "title": "Approva contenuto",
+    "message": "Scegli come pubblicare questo contenuto.",
+    "publishNow": "Pubblica ora",
+    "schedule": "Pianifica",
+    "selectDate": "Seleziona data di pubblicazione"
+  },
+  "restoreDialog": {
+    "restore": "Ripristina",
+    "restoreAsDraft": "Ripristina come bozza"
   },
   "notifications": {
     "title": "Notifiche",
@@ -1670,11 +1857,29 @@
     "selectedCount": "{{count}} selezionati",
     "publish": "Pubblica",
     "unpublish": "Annulla pubblicazione",
+    "archive": "Archivia",
+    "restore": "Ripristina",
     "delete": "Elimina",
     "clearSelection": "Cancella selezione",
     "deleteDialog": {
       "title": "Elimina elementi selezionati",
       "message": "Eliminare {{count}} elementi selezionati? Questa azione non può essere annullata."
+    },
+    "publishDialog": {
+      "title": "Pubblicare gli elementi selezionati?",
+      "message": "{{count}} elemento/i verranno pubblicati e resi visibili pubblicamente."
+    },
+    "unpublishDialog": {
+      "title": "Annullare la pubblicazione degli elementi selezionati?",
+      "message": "{{count}} elemento/i verranno rimossi dalla vista pubblica e riportati a bozza."
+    },
+    "archiveDialog": {
+      "title": "Archiviare gli elementi selezionati?",
+      "message": "Questo archivierà {{count}} elemento/i e li sposterà nella vista archivio."
+    },
+    "restoreDialog": {
+      "title": "Ripristinare gli elementi selezionati?",
+      "message": "Questo ripristinerà {{count}} elemento/i allo stato di bozza."
     },
     "messages": {
       "success": "{{count}} elementi aggiornati con successo",
@@ -1682,8 +1887,8 @@
     }
   },
   "contentTemplates": {
-    "title": "Modelli di contenuto",
-    "subtitle": "Gestisci modelli di contenuto riutilizzabili",
+    "title": "Modelli di blog",
+    "subtitle": "Gestisci modelli riutilizzabili per gli articoli del blog",
     "addTemplate": "Aggiungi modello",
     "table": {
       "name": "Nome",
@@ -1707,6 +1912,22 @@
     "deleteDialog": {
       "title": "Elimina modello",
       "message": "Eliminare il modello \"{{name}}\"? Questa azione non può essere annullata."
+    },
+    "wizard": {
+      "title": "Crea modello",
+      "steps": {
+        "method": "Metodo",
+        "details": "Dettagli"
+      },
+      "methods": {
+        "scratch": "Da zero",
+        "scratchDesc": "Inizia con un modello vuoto",
+        "template": "Da modello",
+        "templateDesc": "Usa un modello integrato come punto di partenza",
+        "import": "Importa Markdown",
+        "importDesc": "Importa contenuto da un file .md"
+      },
+      "slugPrefixHint": "Prefisso URL per i blog creati da questo modello"
     }
   },
   "templates": {

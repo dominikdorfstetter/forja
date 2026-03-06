@@ -53,6 +53,7 @@ import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import LegalDocumentFormDialog from '@/components/legal/LegalDocumentFormDialog';
+import CopyableId from '@/components/shared/CopyableId';
 
 // --- Group form dialog (inline) ---
 
@@ -98,9 +99,9 @@ function GroupFormDialog({ open, group, onSubmit, onClose, loading }: GroupFormD
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="group-form-dialog-title">
       <form onSubmit={handleSubmit(onFormSubmit)}>
-        <DialogTitle>{group ? t('legalDetail.dialog.editGroup') : t('legalDetail.dialog.addGroup')}</DialogTitle>
+        <DialogTitle id="group-form-dialog-title">{group ? t('legalDetail.dialog.editGroup') : t('legalDetail.dialog.addGroup')}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField label={t('legalDetail.dialog.cookieName')} fullWidth {...register('cookie_name', { required: t('legalDetail.dialog.cookieNameRequired') })} error={!!errors.cookie_name} helperText={errors.cookie_name?.message} />
@@ -163,9 +164,9 @@ function ItemFormDialog({ open, item, onSubmit, onClose, loading }: ItemFormDial
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="item-form-dialog-title">
       <form onSubmit={handleSubmit(onFormSubmit)}>
-        <DialogTitle>{item ? t('legalDetail.dialog.editItem') : t('legalDetail.dialog.addItem')}</DialogTitle>
+        <DialogTitle id="item-form-dialog-title">{item ? t('legalDetail.dialog.editItem') : t('legalDetail.dialog.addItem')}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField label={t('legalDetail.dialog.cookieName')} fullWidth {...register('cookie_name', { required: t('legalDetail.dialog.cookieNameRequired') })} error={!!errors.cookie_name} helperText={errors.cookie_name?.message} />
@@ -262,7 +263,7 @@ function GroupItemsSection({ groupId }: GroupItemsSectionProps) {
 
       <ItemFormDialog open={itemFormOpen} onSubmit={(data) => createItemMutation.mutate(data)} onClose={() => setItemFormOpen(false)} loading={createItemMutation.isPending} />
       <ItemFormDialog open={!!editingItem} item={editingItem} onSubmit={(data) => editingItem && updateItemMutation.mutate({ id: editingItem.id, data })} onClose={() => setEditingItem(null)} loading={updateItemMutation.isPending} />
-      <ConfirmDialog open={!!deletingItem} title={t('legalDetail.items.deleteItem')} message={t('legalDetail.items.deleteMessage', { name: deletingItem?.cookie_name })} confirmLabel={t('common.actions.delete')} onConfirm={() => deletingItem && deleteItemMutation.mutate(deletingItem.id)} onCancel={() => setDeletingItem(null)} loading={deleteItemMutation.isPending} />
+      <ConfirmDialog open={!!deletingItem} title={t('legalDetail.items.deleteItem')} message={t('legalDetail.items.deleteMessage', { name: deletingItem?.cookie_name })} confirmLabel={t('common.actions.delete')} onConfirm={() => deletingItem && deleteItemMutation.mutate(deletingItem.id)} onCancel={() => setDeletingItem(null)} loading={deleteItemMutation.isPending} confirmationText={t('common.actions.delete')} />
     </Box>
   );
 }
@@ -357,7 +358,7 @@ export default function LegalDocumentDetailPage() {
   });
 
   return (
-    <Box>
+    <Box data-testid="legal-detail.page">
       <PageHeader
         title={document?.cookie_name || t('legalDetail.title')}
         subtitle={document?.document_type || t('common.actions.loading')}
@@ -381,7 +382,7 @@ export default function LegalDocumentDetailPage() {
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="caption" color="text.secondary">{t('legalDetail.documentId')}</Typography>
-            <Typography variant="body2" fontFamily="monospace" sx={{ wordBreak: 'break-all' }}>{id}</Typography>
+            <CopyableId value={id!} />
           </Grid>
         </Grid>
       </Paper>
@@ -439,7 +440,7 @@ export default function LegalDocumentDetailPage() {
       {/* Group form dialogs */}
       <GroupFormDialog open={groupFormOpen} onSubmit={(data) => createGroupMutation.mutate(data)} onClose={() => setGroupFormOpen(false)} loading={createGroupMutation.isPending} />
       <GroupFormDialog open={!!editingGroup} group={editingGroup} onSubmit={(data) => editingGroup && updateGroupMutation.mutate({ groupId: editingGroup.id, data })} onClose={() => setEditingGroup(null)} loading={updateGroupMutation.isPending} />
-      <ConfirmDialog open={!!deletingGroup} title={t('legalDetail.groups.deleteGroup')} message={t('legalDetail.groups.deleteMessage', { name: deletingGroup?.cookie_name })} confirmLabel={t('common.actions.delete')} onConfirm={() => deletingGroup && deleteGroupMutation.mutate(deletingGroup.id)} onCancel={() => setDeletingGroup(null)} loading={deleteGroupMutation.isPending} />
+      <ConfirmDialog open={!!deletingGroup} title={t('legalDetail.groups.deleteGroup')} message={t('legalDetail.groups.deleteMessage', { name: deletingGroup?.cookie_name })} confirmLabel={t('common.actions.delete')} onConfirm={() => deletingGroup && deleteGroupMutation.mutate(deletingGroup.id)} onCancel={() => setDeletingGroup(null)} loading={deleteGroupMutation.isPending} confirmationText={t('common.actions.delete')} />
     </Box>
   );
 }

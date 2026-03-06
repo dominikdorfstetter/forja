@@ -1,0 +1,16 @@
+{
+  "name": "Forja Admin Dashboard",
+  "short_name": "Forja",
+  "description": "Content management dashboard for Forja CMS",
+  "start_url": "/dashboard/",
+  "scope": "/dashboard/",
+  "display": "standalone",
+  "background_color": "#eff1f5",
+  "theme_color": "#1e66f5",
+  "icons": [
+    { "src": "/dashboard/icons/forja-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/dashboard/icons/forja-icon-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" },
+    { "src": "/dashboard/icons/forja-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/dashboard/icons/forja-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

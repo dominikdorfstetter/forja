@@ -38,8 +38,8 @@ export default function ReviewCommentDialog({
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle>{title}</DialogTitle>
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth aria-labelledby="review-comment-dialog-title" data-testid="review-comment.dialog">
+      <DialogTitle id="review-comment-dialog-title">{title}</DialogTitle>
       <DialogContent>
         <TextField
           autoFocus
@@ -55,10 +55,10 @@ export default function ReviewCommentDialog({
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleClose} disabled={loading}>
+        <Button onClick={handleClose} disabled={loading} data-testid="review-comment.btn.cancel">
           {t('common.actions.cancel')}
         </Button>
-        <Button onClick={handleSubmit} variant="contained" disabled={loading}>
+        <Button onClick={handleSubmit} variant="contained" disabled={loading} data-testid="review-comment.btn.submit">
           {loading ? t('common.actions.saving') : t('common.actions.submit')}
         </Button>
       </DialogActions>

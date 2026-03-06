@@ -20,6 +20,7 @@ import ImagePickerExtension from './ImagePickerExtension';
 import EditorToolbar from './EditorToolbar';
 import { SlashCommands } from './SlashCommandMenu';
 import MediaPickerDialog from '@/components/media/MediaPickerDialog';
+import apiService from '@/services/api';
 
 const lowlight = createLowlight(common);
 
@@ -121,15 +122,22 @@ export default function ForjaEditor({
     };
   }, []);
 
-  const handleMediaSelect = (mediaId: string | null) => {
+  const handleMediaSelect = async (mediaId: string | null) => {
     if (mediaId && editor) {
-      editor.chain().focus().setImage({ src: `/api/media/${mediaId}/file` }).run();
+      try {
+        const media = await apiService.getMediaById(mediaId);
+        if (media.public_url) {
+          editor.chain().focus().setImage({ src: media.public_url }).run();
+        }
+      } catch {
+        // Fall back silently — image won't be inserted
+      }
     }
     setMediaPickerOpen(false);
   };
 
   return (
-    <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
+    <Paper variant="outlined" sx={{ overflow: 'hidden' }} data-testid="forja-editor">
       <EditorToolbar editor={editor} />
       <Box
         sx={{

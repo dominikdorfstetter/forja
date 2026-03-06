@@ -155,8 +155,8 @@ export default function MediaDetailDialog({ open, media, folders, onClose }: Med
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>{t('forms.mediaDetail.title')}</DialogTitle>
+    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth aria-labelledby="media-detail-dialog-title" data-testid="media-detail.dialog">
+      <DialogTitle id="media-detail-dialog-title">{t('forms.mediaDetail.title')}</DialogTitle>
       <DialogContent>
         <Box sx={{ display: 'flex', gap: 3, mt: 1 }}>
           {/* Preview */}
@@ -257,7 +257,7 @@ export default function MediaDetailDialog({ open, media, folders, onClose }: Med
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>{t('common.actions.close')}</Button>
+        <Button onClick={onClose} data-testid="media-detail.btn.close">{t('common.actions.close')}</Button>
       </DialogActions>
     </Dialog>
   );

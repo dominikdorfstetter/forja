@@ -9,7 +9,7 @@ export default function LoadingState({ label }: LoadingStateProps) {
   const { t } = useTranslation();
   const displayLabel = label ?? t('shared.loadingState.defaultLabel');
   return (
-    <Box role="status" aria-live="polite" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 8 }}>
+    <Box role="status" aria-live="polite" data-testid="loading-state" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 8 }}>
       <CircularProgress sx={{ mb: 2 }} />
       {displayLabel && <Typography color="text.secondary">{displayLabel}</Typography>}
     </Box>

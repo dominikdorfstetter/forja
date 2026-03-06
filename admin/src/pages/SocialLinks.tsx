@@ -61,6 +61,15 @@ export default function SocialLinksPage() {
   const [orderedLinks, setOrderedLinks] = useState<SocialLink[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
 
+  // Command palette action listener
+  useEffect(() => {
+    const handler = (e: Event) => {
+      if ((e as CustomEvent).detail === 'add-social-link') openCreate();
+    };
+    window.addEventListener('command-palette:action', handler);
+    return () => window.removeEventListener('command-palette:action', handler);
+  }, [openCreate]);
+
   const { data: links, isLoading, error } = useQuery({
     queryKey: ['social-links', selectedSiteId],
     queryFn: () => apiService.getSocialLinks(selectedSiteId),
@@ -129,7 +138,7 @@ export default function SocialLinksPage() {
   const activeLink = activeId ? orderedLinks.find((l) => l.id === activeId) : null;
 
   return (
-    <Box>
+    <Box data-testid="social-links.page">
       <PageHeader
         title={t('socialLinks.title')}
         subtitle={t('socialLinks.subtitle')}
@@ -179,7 +188,7 @@ export default function SocialLinksPage() {
 
       <SocialLinkFormDialog open={formOpen} siteId={selectedSiteId} onSubmit={(data) => createMutation.mutate(data)} onClose={closeForm} loading={createMutation.isPending} />
       <SocialLinkFormDialog open={!!editing} siteId={selectedSiteId} link={editing} onSubmit={(data) => editing && updateMutation.mutate({ id: editing.id, data })} onClose={closeEdit} loading={updateMutation.isPending} />
-      <ConfirmDialog open={!!deleting} title={t('socialLinks.deleteDialog.title')} message={t('socialLinks.deleteDialog.message', { title: deleting?.title })} confirmLabel={t('common.actions.delete')} onConfirm={() => deleting && deleteMutation.mutate(deleting.id)} onCancel={closeDelete} loading={deleteMutation.isPending} />
+      <ConfirmDialog open={!!deleting} title={t('socialLinks.deleteDialog.title')} message={t('socialLinks.deleteDialog.message', { title: deleting?.title })} confirmLabel={t('common.actions.delete')} onConfirm={() => deleting && deleteMutation.mutate(deleting.id)} onCancel={closeDelete} loading={deleteMutation.isPending} confirmationText={t('common.actions.delete')} />
     </Box>
   );
 }

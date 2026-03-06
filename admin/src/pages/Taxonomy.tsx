@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Alert,
@@ -67,6 +67,17 @@ export default function TaxonomyPage() {
     openDelete: setDeletingCat, closeDelete: closeCatDelete,
     handlePageChange: handleCatPageChange, handleRowsPerPageChange: handleCatRowsPerPageChange,
   } = useListPageState<Category>();
+
+  // Command palette action listener
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail === 'create-tag') openTagCreate();
+      else if (detail === 'create-category') openCatCreate();
+    };
+    window.addEventListener('command-palette:action', handler);
+    return () => window.removeEventListener('command-palette:action', handler);
+  }, [openTagCreate, openCatCreate]);
 
   const { data: tagsData, isLoading: tagsLoading } = useQuery({
     queryKey: ['tags', selectedSiteId, tagPage, tagPerPage],
@@ -192,7 +203,7 @@ export default function TaxonomyPage() {
   ];
 
   return (
-    <Box>
+    <Box data-testid="taxonomy.page">
       <PageHeader title={t('taxonomy.title')} subtitle={t('taxonomy.subtitle')} />
 
       {!selectedSiteId ? (
@@ -315,6 +326,7 @@ export default function TaxonomyPage() {
         onConfirm={() => deletingTag && deleteTagMutation.mutate(deletingTag.id)}
         onCancel={closeTagDelete}
         loading={deleteTagMutation.isPending}
+        confirmationText={t('common.actions.delete')}
       />
 
       {/* Category Dialogs */}
@@ -341,6 +353,7 @@ export default function TaxonomyPage() {
         onConfirm={() => deletingCat && deleteCatMutation.mutate(deletingCat.id)}
         onCancel={closeCatDelete}
         loading={deleteCatMutation.isPending}
+        confirmationText={t('common.actions.delete')}
       />
     </Box>
   );

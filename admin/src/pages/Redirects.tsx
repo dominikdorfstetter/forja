@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, Paper, Chip, IconButton, Tooltip } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
@@ -27,6 +28,15 @@ export default function RedirectsPage() {
     openCreate, closeForm, openEdit, closeEdit, openDelete, closeDelete,
     handlePageChange, handleRowsPerPageChange,
   } = useListPageState<Redirect>();
+
+  // Command palette action listener
+  useEffect(() => {
+    const handler = (e: Event) => {
+      if ((e as CustomEvent).detail === 'create-redirect') openCreate();
+    };
+    window.addEventListener('command-palette:action', handler);
+    return () => window.removeEventListener('command-palette:action', handler);
+  }, [openCreate]);
 
   const { data, isLoading } = useQuery({
     queryKey: ['redirects', selectedSiteId, page, perPage],
@@ -75,7 +85,7 @@ export default function RedirectsPage() {
   ];
 
   return (
-    <Box>
+    <Box data-testid="redirects.page">
       <PageHeader
         title={t('redirects.title')}
         subtitle={t('redirects.subtitle')}
@@ -107,7 +117,7 @@ export default function RedirectsPage() {
 
       <RedirectFormDialog open={formOpen} onSubmitCreate={(data) => createMutation.mutate(data)} onClose={closeForm} loading={createMutation.isPending} />
       <RedirectFormDialog open={!!editing} redirect={editing} onSubmitUpdate={(data) => editing && updateMutation.mutate({ id: editing.id, data })} onClose={closeEdit} loading={updateMutation.isPending} />
-      <ConfirmDialog open={!!deleting} title={t('redirects.deleteDialog.title')} message={t('redirects.deleteDialog.message', { source: deleting?.source_path })} confirmLabel={t('common.actions.delete')} onConfirm={() => deleting && deleteMutation.mutate(deleting.id)} onCancel={closeDelete} loading={deleteMutation.isPending} />
+      <ConfirmDialog open={!!deleting} title={t('redirects.deleteDialog.title')} message={t('redirects.deleteDialog.message', { source: deleting?.source_path })} confirmLabel={t('common.actions.delete')} onConfirm={() => deleting && deleteMutation.mutate(deleting.id)} onCancel={closeDelete} loading={deleteMutation.isPending} confirmationText={t('common.actions.delete')} />
     </Box>
   );
 }

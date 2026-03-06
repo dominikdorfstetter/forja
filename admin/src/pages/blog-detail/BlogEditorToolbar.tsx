@@ -3,12 +3,10 @@ import {
   Box,
   Button,
   Chip,
-  FormControl,
   IconButton,
   Menu,
   MenuItem,
   Popover,
-  Select,
   Stack,
   Tooltip,
   Typography,
@@ -22,16 +20,19 @@ import ScheduleIcon from '@mui/icons-material/CalendarMonth';
 import ClearIcon from '@mui/icons-material/Clear';
 import SendIcon from '@mui/icons-material/Send';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import PublishIcon from '@mui/icons-material/Publish';
+import UnpublishedIcon from '@mui/icons-material/Unpublished';
+import ArchiveIcon from '@mui/icons-material/Archive';
+import UnarchiveIcon from '@mui/icons-material/Unarchive';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { Controller, type Control, type UseFormWatch, type UseFormSetValue } from 'react-hook-form';
+import { type Control, type UseFormWatch, type UseFormSetValue } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import type { AutosaveStatus } from '@/hooks/useAutosave';
-import type { ContentStatus, PreviewTemplate } from '@/types/api';
+import type { PreviewTemplate } from '@/types/api';
+import StatusChip from '@/components/shared/StatusChip';
 import type { BlogContentFormData } from './blogDetailSchema';
-
-const ALL_STATUS_OPTIONS: ContentStatus[] = ['Draft', 'InReview', 'Scheduled', 'Published', 'Archived'];
 
 interface BlogEditorToolbarProps {
   control: Control<BlogContentFormData>;
@@ -46,14 +47,22 @@ interface BlogEditorToolbarProps {
   onToggleHistory: () => void;
   isSaving: boolean;
   canWrite: boolean;
-  // Workflow props
-  allowedStatuses?: ContentStatus[];
+  // Workflow action props
   canSubmitForReview?: boolean;
   canApprove?: boolean;
   canRequestChanges?: boolean;
+  canPublish?: boolean;
+  canUnpublish?: boolean;
+  canArchive?: boolean;
+  canRestore?: boolean;
+  canSchedule?: boolean;
   onSubmitForReview?: () => void;
   onApprove?: () => void;
   onRequestChanges?: () => void;
+  onPublish?: () => void;
+  onUnpublish?: () => void;
+  onArchive?: () => void;
+  onRestore?: () => void;
   previewTemplates?: PreviewTemplate[];
   onPreview?: (templateUrl: string) => void;
   sidebarOpen?: boolean;
@@ -61,7 +70,6 @@ interface BlogEditorToolbarProps {
 }
 
 export default function BlogEditorToolbar({
-  control,
   watch,
   setValue,
   canUndo,
@@ -73,13 +81,21 @@ export default function BlogEditorToolbar({
   onToggleHistory,
   isSaving,
   canWrite,
-  allowedStatuses,
   canSubmitForReview,
   canApprove,
   canRequestChanges,
+  canPublish,
+  canUnpublish,
+  canArchive,
+  canRestore,
+  canSchedule,
   onSubmitForReview,
   onApprove,
   onRequestChanges,
+  onPublish,
+  onUnpublish,
+  onArchive,
+  onRestore,
   previewTemplates,
   onPreview,
   sidebarOpen,
@@ -93,8 +109,6 @@ export default function BlogEditorToolbar({
   const publishEnd = watch('publish_end');
   const currentStatus = watch('status');
 
-  const statusOptions = allowedStatuses ?? ALL_STATUS_OPTIONS;
-
   const handleClearSchedule = () => {
     setValue('publish_start', null, { shouldDirty: true });
     setValue('publish_end', null, { shouldDirty: true });
@@ -104,7 +118,7 @@ export default function BlogEditorToolbar({
     setScheduleAnchor(null);
   };
 
-  const statusChip = () => {
+  const autosaveChip = () => {
     switch (autosaveStatus) {
       case 'saving':
         return <Chip label={t('blogDetail.toolbar.saving')} size="small" color="info" variant="outlined" />;
@@ -134,84 +148,8 @@ export default function BlogEditorToolbar({
         mb: 2,
       }}
     >
-      <Controller
-        name="status"
-        control={control}
-        render={({ field }) => (
-          <FormControl size="small" sx={{ minWidth: 130 }}>
-            <Select
-              {...field}
-              size="small"
-              disabled={!canWrite}
-              onChange={(e) => {
-                const newStatus = e.target.value;
-                field.onChange(newStatus);
-                // Clear scheduling dates when manually setting non-Scheduled status
-                if (newStatus !== 'Scheduled' && publishStart) {
-                  setValue('publish_start', null, { shouldDirty: true });
-                  setValue('publish_end', null, { shouldDirty: true });
-                }
-              }}
-            >
-              {statusOptions.map((s) => (
-                <MenuItem key={s} value={s}>
-                  {s}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        )}
-      />
-
-      {/* Workflow action buttons */}
-      {canSubmitForReview && currentStatus === 'Draft' && onSubmitForReview && (
-        <Button
-          size="small"
-          variant="outlined"
-          color="info"
-          startIcon={<SendIcon />}
-          onClick={onSubmitForReview}
-          disabled={isSaving}
-        >
-          {t('workflow.submitForReview')}
-        </Button>
-      )}
-      {canApprove && currentStatus === 'InReview' && onApprove && (
-        <Button
-          size="small"
-          variant="outlined"
-          color="success"
-          startIcon={<CheckCircleIcon />}
-          onClick={onApprove}
-          disabled={isSaving}
-        >
-          {t('workflow.approve')}
-        </Button>
-      )}
-      {canRequestChanges && currentStatus === 'InReview' && onRequestChanges && (
-        <Button
-          size="small"
-          variant="outlined"
-          color="warning"
-          startIcon={<UndoIcon />}
-          onClick={onRequestChanges}
-          disabled={isSaving}
-        >
-          {t('workflow.requestChanges')}
-        </Button>
-      )}
-
-      <Tooltip title={t('scheduling.publishAt')}>
-        <IconButton
-          size="small"
-          onClick={(e) => setScheduleAnchor(e.currentTarget)}
-          disabled={!canWrite}
-          color={publishStart ? 'primary' : 'default'}
-        >
-          <ScheduleIcon fontSize="small" />
-        </IconButton>
-      </Tooltip>
-
+      {/* Group 1: Identity & Status */}
+      <StatusChip value={currentStatus} />
       {publishStart && (
         <Chip
           label={t('scheduling.scheduledFor', { date: format(new Date(publishStart), 'PPp') })}
@@ -230,6 +168,171 @@ export default function BlogEditorToolbar({
         />
       )}
 
+      <Box sx={{ borderLeft: 1, borderColor: 'divider', height: 24, mx: 0.5 }} />
+
+      {/* Group 2: Edit Tools */}
+      <Tooltip title={`${t('forms.undo')} (Ctrl+Z)`}>
+        <span>
+          <IconButton size="small" onClick={onUndo} disabled={!canUndo}>
+            <UndoIcon fontSize="small" />
+          </IconButton>
+        </span>
+      </Tooltip>
+      <Tooltip title={`${t('forms.redo')} (Ctrl+Shift+Z)`}>
+        <span>
+          <IconButton size="small" onClick={onRedo} disabled={!canRedo}>
+            <RedoIcon fontSize="small" />
+          </IconButton>
+        </span>
+      </Tooltip>
+      <Box sx={{ mx: 0.5 }}>{autosaveChip()}</Box>
+
+      <Box sx={{ flex: 1 }} />
+
+      {/* Group 3: Utility Icons */}
+      {canSchedule && (
+        <Tooltip title={t('scheduling.publishAt')}>
+          <IconButton
+            size="small"
+            onClick={(e) => setScheduleAnchor(e.currentTarget)}
+            disabled={!canWrite}
+            color={publishStart ? 'primary' : 'default'}
+          >
+            <ScheduleIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      )}
+
+      {previewTemplates && previewTemplates.length > 0 && onPreview && (
+        <Tooltip title={t('common.actions.preview')}>
+          <IconButton
+            size="small"
+            onClick={(e) =>
+              previewTemplates.length === 1
+                ? onPreview(previewTemplates[0].url)
+                : setPreviewAnchor(e.currentTarget)
+            }
+          >
+            <VisibilityIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      )}
+
+      {onToggleSidebar && (
+        <Tooltip title={t('blogDetail.sidebar.toggle')}>
+          <IconButton
+            size="small"
+            onClick={onToggleSidebar}
+            color={sidebarOpen ? 'primary' : 'default'}
+          >
+            <ViewSidebarIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      )}
+
+      <Tooltip title={t('entityHistory.title')}>
+        <IconButton size="small" onClick={onToggleHistory}>
+          <HistoryIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
+
+      <Box sx={{ borderLeft: 1, borderColor: 'divider', height: 24, mx: 0.5 }} />
+
+      {/* Group 4: Workflow Actions (secondary → primary → save) */}
+      {canRequestChanges && currentStatus === 'InReview' && onRequestChanges && (
+        <Button
+          size="small"
+          variant="outlined"
+          color="warning"
+          startIcon={<UndoIcon />}
+          onClick={onRequestChanges}
+          disabled={isSaving}
+        >
+          {t('workflow.requestChanges')}
+        </Button>
+      )}
+      {canUnpublish && onUnpublish && (
+        <Button
+          size="small"
+          variant="outlined"
+          startIcon={<UnpublishedIcon />}
+          onClick={onUnpublish}
+          disabled={isSaving}
+        >
+          {t('workflow.unpublish')}
+        </Button>
+      )}
+      {canArchive && onArchive && (
+        <Button
+          size="small"
+          variant="outlined"
+          color="warning"
+          startIcon={<ArchiveIcon />}
+          onClick={onArchive}
+          disabled={isSaving}
+        >
+          {t('workflow.archive')}
+        </Button>
+      )}
+      {canRestore && onRestore && (
+        <Button
+          size="small"
+          variant="outlined"
+          startIcon={<UnarchiveIcon />}
+          onClick={onRestore}
+          disabled={isSaving}
+        >
+          {t('workflow.restore')}
+        </Button>
+      )}
+      {canSubmitForReview && currentStatus === 'Draft' && onSubmitForReview && (
+        <Button
+          size="small"
+          variant="contained"
+          color="info"
+          startIcon={<SendIcon />}
+          onClick={onSubmitForReview}
+          disabled={isSaving}
+        >
+          {t('workflow.submitForReview')}
+        </Button>
+      )}
+      {canApprove && currentStatus === 'InReview' && onApprove && (
+        <Button
+          size="small"
+          variant="contained"
+          color="success"
+          startIcon={<CheckCircleIcon />}
+          onClick={onApprove}
+          disabled={isSaving}
+        >
+          {t('workflow.approve')}
+        </Button>
+      )}
+      {canPublish && onPublish && (
+        <Button
+          size="small"
+          variant="contained"
+          color="success"
+          startIcon={<PublishIcon />}
+          onClick={onPublish}
+          disabled={isSaving}
+        >
+          {t('workflow.publish')}
+        </Button>
+      )}
+
+      <Button
+        variant="contained"
+        size="small"
+        startIcon={<SaveIcon />}
+        onClick={onSave}
+        disabled={isSaving || !canWrite}
+      >
+        {isSaving ? t('common.actions.saving') : t('common.actions.save')}
+      </Button>
+
+      {/* Schedule Popover */}
       <Popover
         open={Boolean(scheduleAnchor)}
         anchorEl={scheduleAnchor}
@@ -244,7 +347,6 @@ export default function BlogEditorToolbar({
             onChange={(date) => {
               const iso = date ? date.toISOString() : null;
               setValue('publish_start', iso, { shouldDirty: true });
-              // Auto-set status to Scheduled if date is in the future
               if (date && date > new Date()) {
                 setValue('status', 'Scheduled', { shouldDirty: true });
               }
@@ -271,91 +373,24 @@ export default function BlogEditorToolbar({
         </Stack>
       </Popover>
 
-      <Box sx={{ borderLeft: 1, borderColor: 'divider', height: 24, mx: 0.5 }} />
-
-      <Tooltip title={`${t('forms.undo')} (Ctrl+Z)`}>
-        <span>
-          <IconButton size="small" onClick={onUndo} disabled={!canUndo}>
-            <UndoIcon fontSize="small" />
-          </IconButton>
-        </span>
-      </Tooltip>
-      <Tooltip title={`${t('forms.redo')} (Ctrl+Shift+Z)`}>
-        <span>
-          <IconButton size="small" onClick={onRedo} disabled={!canRedo}>
-            <RedoIcon fontSize="small" />
-          </IconButton>
-        </span>
-      </Tooltip>
-
-      <Box sx={{ mx: 1 }}>{statusChip()}</Box>
-
-      <Box sx={{ flex: 1 }} />
-
-      {previewTemplates && previewTemplates.length > 0 && onPreview && (
-        <>
-          {previewTemplates.length === 1 ? (
-            <Tooltip title={t('common.actions.preview')}>
-              <IconButton size="small" onClick={() => onPreview(previewTemplates[0].url)}>
-                <VisibilityIcon fontSize="small" />
-              </IconButton>
-            </Tooltip>
-          ) : (
-            <>
-              <Tooltip title={t('common.actions.preview')}>
-                <IconButton size="small" onClick={(e) => setPreviewAnchor(e.currentTarget)}>
-                  <VisibilityIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-              <Menu
-                anchorEl={previewAnchor}
-                open={Boolean(previewAnchor)}
-                onClose={() => setPreviewAnchor(null)}
-              >
-                {previewTemplates.map((pt) => (
-                  <MenuItem
-                    key={pt.url}
-                    onClick={() => {
-                      onPreview(pt.url);
-                      setPreviewAnchor(null);
-                    }}
-                  >
-                    {pt.name}
-                  </MenuItem>
-                ))}
-              </Menu>
-            </>
-          )}
-        </>
-      )}
-
-      {onToggleSidebar && (
-        <Tooltip title={t('blogDetail.sidebar.toggle')}>
-          <IconButton
-            size="small"
-            onClick={onToggleSidebar}
-            color={sidebarOpen ? 'primary' : 'default'}
-          >
-            <ViewSidebarIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-      )}
-
-      <Tooltip title={t('entityHistory.title')}>
-        <IconButton size="small" onClick={onToggleHistory}>
-          <HistoryIcon fontSize="small" />
-        </IconButton>
-      </Tooltip>
-
-      <Button
-        variant="contained"
-        size="small"
-        startIcon={<SaveIcon />}
-        onClick={onSave}
-        disabled={isSaving || !canWrite}
+      {/* Preview Menu */}
+      <Menu
+        anchorEl={previewAnchor}
+        open={Boolean(previewAnchor)}
+        onClose={() => setPreviewAnchor(null)}
       >
-        {isSaving ? t('common.actions.saving') : t('common.actions.save')}
-      </Button>
+        {previewTemplates?.map((pt) => (
+          <MenuItem
+            key={pt.url}
+            onClick={() => {
+              onPreview?.(pt.url);
+              setPreviewAnchor(null);
+            }}
+          >
+            {pt.name}
+          </MenuItem>
+        ))}
+      </Menu>
     </Box>
   );
 }

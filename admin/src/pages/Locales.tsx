@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, Paper, Chip, Divider, IconButton, Tooltip, Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
@@ -26,6 +27,15 @@ export default function LocalesPage() {
     formOpen, editing, deleting,
     openCreate, closeForm, openEdit, closeEdit, openDelete, closeDelete,
   } = useListPageState<Locale>();
+
+  // Command palette action listener
+  useEffect(() => {
+    const handler = (e: Event) => {
+      if ((e as CustomEvent).detail === 'add-language') openCreate();
+    };
+    window.addEventListener('command-palette:action', handler);
+    return () => window.removeEventListener('command-palette:action', handler);
+  }, [openCreate]);
 
   const { data: locales, isLoading } = useQuery({
     queryKey: ['locales', 'all'],
@@ -74,7 +84,7 @@ export default function LocalesPage() {
   ];
 
   return (
-    <Box>
+    <Box data-testid="locales.page">
       <PageHeader title={t('locales.title')} subtitle={t('locales.subtitle')} />
 
       <Paper sx={{ p: 3 }}>
@@ -108,7 +118,7 @@ export default function LocalesPage() {
 
       <LocaleFormDialog open={formOpen} onSubmitCreate={(data) => createMutation.mutate(data)} onClose={closeForm} loading={createMutation.isPending} />
       <LocaleFormDialog open={!!editing} locale={editing} onSubmitUpdate={(data) => editing && updateMutation.mutate({ id: editing.id, data })} onClose={closeEdit} loading={updateMutation.isPending} />
-      <ConfirmDialog open={!!deleting} title={t('locales.deleteDialog.title')} message={t('locales.deleteDialog.message', { code: deleting?.code })} confirmLabel={t('common.actions.delete')} onConfirm={() => deleting && deleteMutation.mutate(deleting.id)} onCancel={closeDelete} loading={deleteMutation.isPending} />
+      <ConfirmDialog open={!!deleting} title={t('locales.deleteDialog.title')} message={t('locales.deleteDialog.message', { code: deleting?.code })} confirmLabel={t('common.actions.delete')} onConfirm={() => deleting && deleteMutation.mutate(deleting.id)} onCancel={closeDelete} loading={deleteMutation.isPending} confirmationText={t('common.actions.delete')} />
     </Box>
   );
 }

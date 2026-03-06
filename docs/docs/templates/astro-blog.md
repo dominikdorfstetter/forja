@@ -11,7 +11,7 @@ A server-rendered blog and portfolio site powered by [Astro 5](https://astro.bui
 - **Framework**: Astro 5 with SSR (`output: 'server'`)
 - **Adapter**: `@astrojs/node` (standalone mode)
 - **Markdown**: `marked` (GFM + line breaks)
-- **Styling**: Minimal CSS with custom properties
+- **Styling**: Minimal CSS with custom properties and dark mode
 
 ## Quick Start
 
@@ -53,7 +53,8 @@ npm run dev
 |-------|-------------|
 | `/` | Home page with hero section and featured posts |
 | `/blog/` | Paginated blog listing |
-| `/blog/{slug}` | Full blog post with markdown rendering |
+| `/blog/{slug}` | Full blog post with markdown rendering and similar posts |
+| `/blog/category/{slug}` | Blog posts filtered by category |
 | `/cv` | Work/education timeline and skills |
 | `/legal/{slug}` | Legal documents (imprint, privacy policy, etc.) |
 | `/rss.xml` | RSS 2.0 feed (proxied from the backend) |
@@ -67,12 +68,19 @@ templates/astro-blog/
 ├── src/
 │   ├── lib/
 │   │   ├── api.ts           # API client and TypeScript types
-│   │   └── markdown.ts      # Markdown-to-HTML helper (marked)
+│   │   ├── markdown.ts      # Markdown-to-HTML helper (marked)
+│   │   ├── media-helpers.ts # Responsive image srcset builder
+│   │   └── seo.ts           # SEO meta tag and JSON-LD builder
 │   ├── layouts/
 │   │   └── Base.astro       # HTML shell with navigation and footer
 │   ├── components/
-│   │   ├── Nav.astro        # Navigation bar
-│   │   ├── Footer.astro     # Site footer
+│   │   ├── BlogCard.astro   # Blog post card (grid/listing)
+│   │   ├── Nav.astro        # Navigation bar with theme toggle
+│   │   ├── Footer.astro     # 3-column site footer
+│   │   ├── Pagination.astro # Page navigation
+│   │   ├── ResponsiveImage.astro # AVIF/WebP responsive images
+│   │   ├── SeoHead.astro    # OpenGraph and JSON-LD metadata
+│   │   ├── SocialLinks.astro # Social media icon links
 │   │   └── PageSection.astro # Generic page section renderer
 │   ├── pages/
 │   │   ├── index.astro      # Home page
@@ -113,23 +121,43 @@ async function fetchApi<T>(path: string): Promise<T> {
 
 ## Customization
 
+### Dark Mode
+
+The template includes built-in dark mode support:
+
+- **System preference detection** -- automatically respects `prefers-color-scheme: dark`
+- **Manual toggle** -- moon/sun button in the navigation bar
+- **Persistence** -- user choice saved to `localStorage` and applied on page load without flash
+- **CSS custom properties** -- all colors are defined in `:root` and overridden under `[data-theme="dark"]`
+
+### Similar Blogs ("Continue Reading")
+
+Blog detail pages automatically show a "Continue Reading" section with up to 3 related posts. Related posts are ranked by the backend's similarity scoring based on shared tags, categories, and author. If no similar posts exist, the section is hidden.
+
 ### Styling
 
-Edit CSS custom properties in `src/styles/global.css` to change colors, fonts, and spacing:
+Edit CSS custom properties in `src/styles/global.css` to change colors, fonts, and spacing. Light and dark mode each have their own set of values:
 
 ```css
 :root {
   --color-primary: #2563eb;
-  --color-text: #1e293b;
+  --color-text: #1a1a2e;
   --color-bg: #ffffff;
-  --font-body: 'Inter', system-ui, sans-serif;
-  --max-width: 800px;
+  --color-surface: #f6f7f9;
+  --max-width: 1100px;
+}
+
+[data-theme="dark"] {
+  --color-primary: #60a5fa;
+  --color-text: #e4e4e7;
+  --color-bg: #111118;
+  --color-surface: #1a1a24;
 }
 ```
 
 ### Layout
 
-The `Base.astro` layout provides the HTML shell, navigation, and footer. Modify this file to change the overall page structure.
+The `Base.astro` layout provides the HTML shell, navigation, and footer. It includes the dark mode initialization script and theme toggle wiring. Modify this file to change the overall page structure.
 
 ### Components
 

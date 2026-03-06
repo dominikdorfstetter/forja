@@ -65,6 +65,7 @@ export default defineConfig({
           ],
           'vendor-markdown': ['react-markdown', 'rehype-raw', 'remark-gfm'],
           'vendor-dnd': ['@dnd-kit/core', '@dnd-kit/sortable', '@dnd-kit/utilities'],
+          'vendor-charts': ['recharts'],
           'vendor-i18n': ['i18next', 'react-i18next', 'i18next-browser-languagedetector'],
         },
       },

@@ -208,6 +208,8 @@ export default function FolderTree({
         selected={isSelected}
         onClick={() => onSelectFolder(folder.id)}
         sx={{ pl: 2 + depth * 2, pr: 1 }}
+        role="treeitem"
+        aria-expanded={isExpanded}
       >
         {hasChildren ? (
           <IconButton
@@ -217,7 +219,7 @@ export default function FolderTree({
               toggleExpand(folder.id);
             }}
             sx={{ mr: 0.5 }}
-            aria-label={isExpanded ? 'Collapse' : 'Expand'}
+            aria-label={isExpanded ? t('shared.folderTree.collapse', { name: folder.name }) : t('shared.folderTree.expand', { name: folder.name })}
           >
             {isExpanded ? <ExpandLess fontSize="small" /> : <ExpandMore fontSize="small" />}
           </IconButton>
@@ -239,7 +241,7 @@ export default function FolderTree({
           }
         />
         {canWrite && (
-          <Box sx={{ display: 'flex', opacity: 0, '.MuiListItemButton-root:hover &': { opacity: 1 }, transition: 'opacity 0.15s' }}>
+          <Box sx={{ display: 'flex', opacity: 0, '.MuiListItemButton-root:hover &': { opacity: 1 }, '&:focus-within': { opacity: 1 }, transition: 'opacity 0.15s' }}>
             <Tooltip title={t('shared.folderTree.newFolder')}>
               <IconButton
                 size="small"
@@ -330,8 +332,8 @@ export default function FolderTree({
   );
 
   return (
-    <Box sx={{ width: '100%' }}>
-      <List component="nav" dense disablePadding>
+    <Box sx={{ width: '100%' }} data-testid="folder-tree">
+      <List component="nav" dense disablePadding role="tree">
         {/* Root "All Items" entry — drop here removes folder assignment */}
         {droppable ? (
           <DroppableFolderEntry id="folder-__root__" folderId={null} enabled>
@@ -357,6 +359,7 @@ export default function FolderTree({
             onClick={() => startCreate()}
             fullWidth
             sx={{ justifyContent: 'flex-start', textTransform: 'none' }}
+            data-testid="folder-tree.btn.new-folder"
           >
             {t('shared.folderTree.newFolder')}
           </Button>

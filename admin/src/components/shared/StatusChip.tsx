@@ -45,6 +45,7 @@ export default function StatusChip({ value, size = 'small' }: StatusChipProps) {
       size={size}
       color={statusColors[value] || 'default'}
       variant="outlined"
+      data-testid="status-chip"
     />
   );
 }
