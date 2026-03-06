@@ -18,6 +18,8 @@ use crate::dto::document::{
 use crate::errors::{ApiError, ProblemDetails};
 use crate::guards::auth_guard::ReadKey;
 use crate::models::audit::AuditAction;
+use crate::models::blog::Blog;
+use crate::models::content::Content;
 use crate::models::document::{BlogDocument, Document, DocumentFolder, DocumentLocalization};
 use crate::models::site_membership::SiteRole;
 use crate::services::{audit_service, webhook_service};
@@ -545,13 +547,30 @@ pub async fn update_document_localization(
     state: &State<AppState>,
     loc_id: Uuid,
     body: Json<UpdateDocumentLocalizationRequest>,
-    _auth: ReadKey,
+    auth: ReadKey,
 ) -> Result<Json<DocumentLocalizationResponse>, ApiError> {
     let req = body.into_inner();
     req.validate()
         .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
 
+    // Resolve site via parent document
+    let existing = DocumentLocalization::find_by_id(&state.db, loc_id).await?;
+    let doc = Document::find_by_id(&state.db, existing.document_id).await?;
+    auth.0
+        .authorize_site_action(&state.db, doc.site_id, &SiteRole::Author)
+        .await?;
+
     let loc = DocumentLocalization::update(&state.db, loc_id, req).await?;
+    audit_service::log_action(
+        &state.db,
+        Some(doc.site_id),
+        Some(auth.0.id),
+        AuditAction::Update,
+        "document_localization",
+        loc_id,
+        None,
+    )
+    .await;
     Ok(Json(DocumentLocalizationResponse::from(loc)))
 }
 
@@ -572,9 +591,26 @@ pub async fn update_document_localization(
 pub async fn delete_document_localization(
     state: &State<AppState>,
     loc_id: Uuid,
-    _auth: ReadKey,
+    auth: ReadKey,
 ) -> Result<Status, ApiError> {
+    // Resolve site via parent document
+    let existing = DocumentLocalization::find_by_id(&state.db, loc_id).await?;
+    let doc = Document::find_by_id(&state.db, existing.document_id).await?;
+    auth.0
+        .authorize_site_action(&state.db, doc.site_id, &SiteRole::Editor)
+        .await?;
+
     DocumentLocalization::delete(&state.db, loc_id).await?;
+    audit_service::log_action(
+        &state.db,
+        Some(doc.site_id),
+        Some(auth.0.id),
+        AuditAction::Delete,
+        "document_localization",
+        loc_id,
+        None,
+    )
+    .await;
     Ok(Status::NoContent)
 }
 
@@ -629,13 +665,35 @@ pub async fn assign_blog_document(
     state: &State<AppState>,
     blog_id: Uuid,
     body: Json<AssignBlogDocumentRequest>,
-    _auth: ReadKey,
+    auth: ReadKey,
 ) -> Result<(Status, Json<BlogDocumentResponse>), ApiError> {
     let req = body.into_inner();
     req.validate()
         .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
 
+    // Resolve site via blog → content → site
+    let blog = Blog::find_by_id(&state.db, blog_id).await?;
+    let site_ids = Content::find_site_ids(&state.db, blog.content_id).await?;
+    for site_id in &site_ids {
+        auth.0
+            .authorize_site_action(&state.db, *site_id, &SiteRole::Author)
+            .await?;
+    }
+
     let bd = BlogDocument::assign(&state.db, blog_id, req.document_id, req.display_order).await?;
+
+    if let Some(site_id) = site_ids.first() {
+        audit_service::log_action(
+            &state.db,
+            Some(*site_id),
+            Some(auth.0.id),
+            AuditAction::Create,
+            "blog_document",
+            bd.id,
+            None,
+        )
+        .await;
+    }
 
     // Fetch full details for response
     let doc = Document::find_by_id(&state.db, req.document_id).await?;
@@ -682,9 +740,32 @@ pub async fn unassign_blog_document(
     state: &State<AppState>,
     blog_id: Uuid,
     doc_id: Uuid,
-    _auth: ReadKey,
+    auth: ReadKey,
 ) -> Result<Status, ApiError> {
+    // Resolve site via blog → content → site
+    let blog = Blog::find_by_id(&state.db, blog_id).await?;
+    let site_ids = Content::find_site_ids(&state.db, blog.content_id).await?;
+    for site_id in &site_ids {
+        auth.0
+            .authorize_site_action(&state.db, *site_id, &SiteRole::Editor)
+            .await?;
+    }
+
     BlogDocument::unassign(&state.db, blog_id, doc_id).await?;
+
+    if let Some(site_id) = site_ids.first() {
+        audit_service::log_action(
+            &state.db,
+            Some(*site_id),
+            Some(auth.0.id),
+            AuditAction::Delete,
+            "blog_document",
+            doc_id,
+            None,
+        )
+        .await;
+    }
+
     Ok(Status::NoContent)
 }
 
