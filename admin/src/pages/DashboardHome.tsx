@@ -22,6 +22,7 @@ import ArticleIcon from '@mui/icons-material/Article';
 import ImageIcon from '@mui/icons-material/Image';
 import KeyIcon from '@mui/icons-material/Key';
 import DescriptionIcon from '@mui/icons-material/Description';
+import BoltIcon from '@mui/icons-material/Bolt';
 import DnsIcon from '@mui/icons-material/Dns';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
@@ -40,6 +41,7 @@ import SiteFormDialog from '@/components/sites/SiteFormDialog';
 import ContentStatusChart from '@/components/dashboard/ContentStatusChart';
 import AttentionPanel from '@/components/dashboard/AttentionPanel';
 import RecentActivityPanel from '@/components/dashboard/RecentActivityPanel';
+import QuickPostDialog from '@/components/blogs/QuickPostDialog';
 import type { CreateSiteRequest, ContentStatus } from '@/types/api';
 
 
@@ -152,6 +154,7 @@ export default function DashboardHome() {
   const { setSelectedSiteId } = useSiteContext();
 
   const [siteFormOpen, setSiteFormOpen] = useState(false);
+  const [quickPostOpen, setQuickPostOpen] = useState(false);
 
   const hasSite = !!selectedSiteId;
   const hasNoSites = !sitesLoading2 && (!sites || sites.length === 0);
@@ -187,6 +190,15 @@ export default function DashboardHome() {
               ? currentSiteRole.charAt(0).toUpperCase() + currentSiteRole.slice(1)
               : permission;
   const meta = effectivePermission ? PERMISSION_META[effectivePermission] : null;
+
+  // Command palette listener for quick-post
+  useEffect(() => {
+    const handler = (e: Event) => {
+      if ((e as CustomEvent).detail === 'quick-post') setQuickPostOpen(true);
+    };
+    window.addEventListener('command-palette:action', handler);
+    return () => window.removeEventListener('command-palette:action', handler);
+  }, []);
 
   // ---------- Setup checklist ----------
 
@@ -240,11 +252,23 @@ export default function DashboardHome() {
         )}
       </Stack>
 
-      <Typography variant="subtitle1" color="text.secondary" sx={{ mb: 3 }}>
-        {selectedSite
-          ? t('dashboard.managing', { name: selectedSite.name })
-          : t('dashboard.selectSitePrompt')}
-      </Typography>
+      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+        <Typography variant="subtitle1" color="text.secondary">
+          {selectedSite
+            ? t('dashboard.managing', { name: selectedSite.name })
+            : t('dashboard.selectSitePrompt')}
+        </Typography>
+        {hasSite && canWrite && (
+          <Button
+            variant="contained"
+            startIcon={<BoltIcon />}
+            onClick={() => setQuickPostOpen(true)}
+            size="small"
+          >
+            {t('quickPost.dashboardButton')}
+          </Button>
+        )}
+      </Stack>
 
       {/* Setup checklist */}
       {showChecklist && (
@@ -497,6 +521,8 @@ export default function DashboardHome() {
           </Stack>
         </Grid>
       </Grid>
+
+      <QuickPostDialog open={quickPostOpen} onClose={() => setQuickPostOpen(false)} />
     </Box>
   );
 }
