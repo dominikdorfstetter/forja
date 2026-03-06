@@ -1,5 +1,18 @@
 # Changelog
 
+## v1.0.4
+
+### Admin Dashboard
+
+- **Tiptap block editor**: Replaced the Markdown editor (`@uiw/react-md-editor`) with a full block editor built on Tiptap. Supports headings, bold, italic, underline, code blocks with syntax highlighting, tables, task lists, links, and images via the media picker. Storage format remains Markdown via `tiptap-markdown`. (#52)
+- **Collapsible right sidebar in blog editor**: Replaced accordion panels with a collapsible right-hand sidebar for blog metadata (status, dates, author, cover image, SEO). Sidebar can be toggled open/closed and persists across sessions. (#53)
+- **Lint and test fixes**: Fixed `react/display-name` ESLint error in `useMediaUrl` test; deferred `localStorage` reads in `UserPreferencesContext` to render time to fix jsdom test environment failures; added `localStorage` mock to global test setup.
+
+### Developer Tooling
+
+- **Pre-commit hook**: Added `.githooks/pre-commit` that automatically runs `cargo fmt`, `cargo clippy -- -D warnings`, `npm run lint`, and `npm test` on staged files. Rust checks only run when `.rs` files are staged; frontend checks only run when `admin/` files are staged. (#61)
+- **CI fixes**: Applied `cargo fmt` across 8 backend files; suppressed `clippy::too_many_arguments` on Rocket filter handlers and SQL model methods; replaced `.max(1).min(N)` with `.clamp(1, N)` in `list_similar_blogs`. (#61)
+
 ## v1.0.3
 
 ### Astro Blog Template
