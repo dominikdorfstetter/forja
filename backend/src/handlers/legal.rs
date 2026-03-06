@@ -252,6 +252,10 @@ pub async fn update_legal_document(
     body: Json<UpdateLegalDocumentRequest>,
     auth: ReadKey,
 ) -> Result<Json<LegalDocumentResponse>, ApiError> {
+    let site_id = LegalDocument::resolve_site_id(&state.db, id).await?;
+    auth.0
+        .authorize_site_action(&state.db, site_id, &SiteRole::Author)
+        .await?;
     let req = body.into_inner();
     req.validate()
         .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
@@ -259,7 +263,7 @@ pub async fn update_legal_document(
     let document = LegalDocument::update(&state.db, id, req).await?;
     audit_service::log_action(
         &state.db,
-        None,
+        Some(site_id),
         Some(auth.0.id),
         AuditAction::Update,
         "legal_document",
@@ -290,10 +294,14 @@ pub async fn delete_legal_document(
     id: Uuid,
     auth: ReadKey,
 ) -> Result<Status, ApiError> {
+    let site_id = LegalDocument::resolve_site_id(&state.db, id).await?;
+    auth.0
+        .authorize_site_action(&state.db, site_id, &SiteRole::Editor)
+        .await?;
     LegalDocument::soft_delete(&state.db, id).await?;
     audit_service::log_action(
         &state.db,
-        None,
+        Some(site_id),
         Some(auth.0.id),
         AuditAction::Delete,
         "legal_document",
@@ -324,13 +332,27 @@ pub async fn create_legal_group(
     state: &State<AppState>,
     doc_id: Uuid,
     body: Json<CreateLegalGroupRequest>,
-    _auth: ReadKey,
+    auth: ReadKey,
 ) -> Result<(Status, Json<LegalGroupResponse>), ApiError> {
+    let site_id = LegalDocument::resolve_site_id(&state.db, doc_id).await?;
+    auth.0
+        .authorize_site_action(&state.db, site_id, &SiteRole::Author)
+        .await?;
     let req = body.into_inner();
     req.validate()
         .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
 
     let group = LegalGroup::create(&state.db, doc_id, req).await?;
+    audit_service::log_action(
+        &state.db,
+        Some(site_id),
+        Some(auth.0.id),
+        AuditAction::Create,
+        "legal_group",
+        group.id,
+        None,
+    )
+    .await;
     Ok((Status::Created, Json(LegalGroupResponse::from(group))))
 }
 
@@ -354,14 +376,29 @@ pub async fn update_legal_group(
     state: &State<AppState>,
     id: Uuid,
     body: Json<UpdateLegalGroupRequest>,
-    _auth: ReadKey,
+    auth: ReadKey,
 ) -> Result<Json<LegalGroupResponse>, ApiError> {
+    let group = LegalGroup::find_by_id(&state.db, id).await?;
+    let site_id = LegalDocument::resolve_site_id(&state.db, group.legal_document_id).await?;
+    auth.0
+        .authorize_site_action(&state.db, site_id, &SiteRole::Author)
+        .await?;
     let req = body.into_inner();
     req.validate()
         .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
 
-    let group = LegalGroup::update(&state.db, id, req).await?;
-    Ok(Json(LegalGroupResponse::from(group)))
+    let updated = LegalGroup::update(&state.db, id, req).await?;
+    audit_service::log_action(
+        &state.db,
+        Some(site_id),
+        Some(auth.0.id),
+        AuditAction::Update,
+        "legal_group",
+        id,
+        None,
+    )
+    .await;
+    Ok(Json(LegalGroupResponse::from(updated)))
 }
 
 /// Delete a legal group
@@ -382,9 +419,24 @@ pub async fn update_legal_group(
 pub async fn delete_legal_group(
     state: &State<AppState>,
     id: Uuid,
-    _auth: ReadKey,
+    auth: ReadKey,
 ) -> Result<Status, ApiError> {
+    let group = LegalGroup::find_by_id(&state.db, id).await?;
+    let site_id = LegalDocument::resolve_site_id(&state.db, group.legal_document_id).await?;
+    auth.0
+        .authorize_site_action(&state.db, site_id, &SiteRole::Editor)
+        .await?;
     LegalGroup::delete(&state.db, id).await?;
+    audit_service::log_action(
+        &state.db,
+        Some(site_id),
+        Some(auth.0.id),
+        AuditAction::Delete,
+        "legal_group",
+        id,
+        None,
+    )
+    .await;
     Ok(Status::NoContent)
 }
 
@@ -408,13 +460,28 @@ pub async fn create_legal_item(
     state: &State<AppState>,
     group_id: Uuid,
     body: Json<CreateLegalItemRequest>,
-    _auth: ReadKey,
+    auth: ReadKey,
 ) -> Result<(Status, Json<LegalItemResponse>), ApiError> {
+    let group = LegalGroup::find_by_id(&state.db, group_id).await?;
+    let site_id = LegalDocument::resolve_site_id(&state.db, group.legal_document_id).await?;
+    auth.0
+        .authorize_site_action(&state.db, site_id, &SiteRole::Author)
+        .await?;
     let req = body.into_inner();
     req.validate()
         .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
 
     let item = LegalItem::create(&state.db, group_id, req).await?;
+    audit_service::log_action(
+        &state.db,
+        Some(site_id),
+        Some(auth.0.id),
+        AuditAction::Create,
+        "legal_item",
+        item.id,
+        None,
+    )
+    .await;
     Ok((Status::Created, Json(LegalItemResponse::from(item))))
 }
 
@@ -438,14 +505,30 @@ pub async fn update_legal_item(
     state: &State<AppState>,
     id: Uuid,
     body: Json<UpdateLegalItemRequest>,
-    _auth: ReadKey,
+    auth: ReadKey,
 ) -> Result<Json<LegalItemResponse>, ApiError> {
+    let item = LegalItem::find_by_id(&state.db, id).await?;
+    let group = LegalGroup::find_by_id(&state.db, item.legal_group_id).await?;
+    let site_id = LegalDocument::resolve_site_id(&state.db, group.legal_document_id).await?;
+    auth.0
+        .authorize_site_action(&state.db, site_id, &SiteRole::Author)
+        .await?;
     let req = body.into_inner();
     req.validate()
         .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
 
-    let item = LegalItem::update(&state.db, id, req).await?;
-    Ok(Json(LegalItemResponse::from(item)))
+    let updated = LegalItem::update(&state.db, id, req).await?;
+    audit_service::log_action(
+        &state.db,
+        Some(site_id),
+        Some(auth.0.id),
+        AuditAction::Update,
+        "legal_item",
+        id,
+        None,
+    )
+    .await;
+    Ok(Json(LegalItemResponse::from(updated)))
 }
 
 /// Delete a legal item
@@ -466,9 +549,25 @@ pub async fn update_legal_item(
 pub async fn delete_legal_item(
     state: &State<AppState>,
     id: Uuid,
-    _auth: ReadKey,
+    auth: ReadKey,
 ) -> Result<Status, ApiError> {
+    let item = LegalItem::find_by_id(&state.db, id).await?;
+    let group = LegalGroup::find_by_id(&state.db, item.legal_group_id).await?;
+    let site_id = LegalDocument::resolve_site_id(&state.db, group.legal_document_id).await?;
+    auth.0
+        .authorize_site_action(&state.db, site_id, &SiteRole::Editor)
+        .await?;
     LegalItem::delete(&state.db, id).await?;
+    audit_service::log_action(
+        &state.db,
+        Some(site_id),
+        Some(auth.0.id),
+        AuditAction::Delete,
+        "legal_item",
+        id,
+        None,
+    )
+    .await;
     Ok(Status::NoContent)
 }
 
