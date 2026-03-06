@@ -309,6 +309,7 @@ use utoipa::{Modify, OpenApi};
         crate::dto::site::SiteContextResponse,
         crate::dto::site::SiteContextFeatures,
         crate::dto::site::SiteContextSuggestions,
+        crate::dto::site::SiteContextModules,
         // Site Settings DTOs
         crate::dto::site_settings::SiteSettingsResponse,
         crate::dto::site_settings::UpdateSiteSettingsRequest,
