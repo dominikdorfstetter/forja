@@ -58,6 +58,7 @@ import PaletteIcon from '@mui/icons-material/Palette';
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import { useUnsavedChanges } from '@/hooks/useUnsavedChanges';
 import { useAuth } from '@/store/AuthContext';
+import { useSiteContextData } from '@/hooks/useSiteContextData';
 import { useUserPreferences } from '@/store/UserPreferencesContext';
 import { useThemeMode } from '@/theme/ThemeContext';
 import LegalPage from '@/pages/Legal';
@@ -919,6 +920,7 @@ export default function SettingsPage() {
   const { t } = useTranslation();
   const { isAdmin, isMaster } = useAuth();
   const { selectedSiteId } = useSiteContext();
+  const { modules } = useSiteContextData();
   const [tabIndex, setTabIndex] = useState(0);
 
   // Build tabs dynamically based on permissions
@@ -962,8 +964,8 @@ export default function SettingsPage() {
     });
   }
 
-  // 4. Legal — admin + site selected
-  if (isAdmin && selectedSiteId) {
+  // 5. Legal — admin + site selected + module enabled
+  if (isAdmin && selectedSiteId && modules.legal) {
     tabs.push({
       key: 'legal',
       icon: <GavelIcon />,
