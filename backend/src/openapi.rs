@@ -42,7 +42,8 @@ use utoipa::{Modify, OpenApi};
         (name = "Webhooks", description = "Webhook subscription management"),
         (name = "Redirects", description = "URL redirect management"),
         (name = "Content Templates", description = "Content template management"),
-        (name = "API Keys", description = "API key management (requires master key)")
+        (name = "API Keys", description = "API key management (requires master key)"),
+        (name = "AI", description = "AI content assist")
     ),
     paths(
         // System
@@ -255,6 +256,12 @@ use utoipa::{Modify, OpenApi};
         crate::handlers::content_template::create_content_template,
         crate::handlers::content_template::update_content_template,
         crate::handlers::content_template::delete_content_template,
+        // AI
+        crate::handlers::ai::get_ai_config,
+        crate::handlers::ai::upsert_ai_config,
+        crate::handlers::ai::delete_ai_config,
+        crate::handlers::ai::test_ai_connection,
+        crate::handlers::ai::generate_ai_content,
         // Config
         crate::handlers::config::get_config,
     ),
@@ -302,6 +309,13 @@ use utoipa::{Modify, OpenApi};
         crate::models::environment::EnvironmentType,
         crate::models::locale::TextDirection,
         crate::models::audit::AuditAction,
+        // AI DTOs
+        crate::dto::ai::AiAction,
+        crate::dto::ai::AiGenerateRequest,
+        crate::dto::ai::AiGenerateResponse,
+        crate::dto::ai::CreateAiConfigRequest,
+        crate::dto::ai::AiConfigResponse,
+        crate::dto::ai::AiTestResponse,
         // Site DTOs
         crate::dto::site::CreateSiteRequest,
         crate::dto::site::UpdateSiteRequest,

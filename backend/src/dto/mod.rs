@@ -2,6 +2,7 @@
 //!
 //! This module contains request/response DTOs for the API.
 
+pub mod ai;
 pub mod api_key;
 pub mod audit;
 pub mod auth;

@@ -2,6 +2,7 @@
 //!
 //! This module contains service layer implementations.
 
+pub mod ai_service;
 pub mod audit_service;
 pub mod bulk_content_service;
 pub mod clerk_service;
