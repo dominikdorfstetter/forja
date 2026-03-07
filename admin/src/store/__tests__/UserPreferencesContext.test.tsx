@@ -2,6 +2,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
+
+// Undo the global mock so we can test the real implementation
+vi.unmock('@/store/UserPreferencesContext');
+
 import { UserPreferencesProvider, useUserPreferences } from '../UserPreferencesContext';
 import apiService from '@/services/api';
 
@@ -74,6 +78,7 @@ describe('UserPreferencesContext', () => {
       autosave_debounce_seconds: 10,
       language: 'de',
       theme_id: 'mocha',
+      page_size: 50,
     });
 
     const { result } = renderHook(() => useUserPreferences(), { wrapper: createWrapper() });
@@ -87,6 +92,7 @@ describe('UserPreferencesContext', () => {
       autosave_debounce_seconds: 10,
       language: 'de',
       theme_id: 'mocha',
+      page_size: 50,
     });
   });
 
@@ -96,12 +102,14 @@ describe('UserPreferencesContext', () => {
       autosave_debounce_seconds: 3,
       language: 'en',
       theme_id: 'system',
+      page_size: 25,
     });
     mockedApi.updateUserPreferences.mockResolvedValue({
       autosave_enabled: false,
       autosave_debounce_seconds: 3,
       language: 'en',
       theme_id: 'system',
+      page_size: 25,
     });
 
     const { result } = renderHook(() => useUserPreferences(), { wrapper: createWrapper() });
@@ -121,12 +129,14 @@ describe('UserPreferencesContext', () => {
       autosave_debounce_seconds: 3,
       language: 'en',
       theme_id: 'system',
+      page_size: 25,
     });
     mockedApi.updateUserPreferences.mockResolvedValue({
       autosave_enabled: true,
       autosave_debounce_seconds: 3,
       language: 'de',
       theme_id: 'system',
+      page_size: 25,
     });
 
     const { result } = renderHook(() => useUserPreferences(), { wrapper: createWrapper() });
@@ -146,12 +156,14 @@ describe('UserPreferencesContext', () => {
       autosave_debounce_seconds: 3,
       language: 'en',
       theme_id: 'system',
+      page_size: 25,
     });
     mockedApi.updateUserPreferences.mockResolvedValue({
       autosave_enabled: true,
       autosave_debounce_seconds: 3,
       language: 'en',
       theme_id: 'mocha',
+      page_size: 25,
     });
 
     const { result } = renderHook(() => useUserPreferences(), { wrapper: createWrapper() });

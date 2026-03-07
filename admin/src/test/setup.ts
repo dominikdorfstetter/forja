@@ -24,6 +24,22 @@ vi.mock('@clerk/clerk-react', () => ({
   ClerkProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
+// Mock UserPreferencesContext (used by useListPageState and many page components)
+vi.mock('@/store/UserPreferencesContext', () => ({
+  useUserPreferences: () => ({
+    preferences: {
+      autosave_enabled: true,
+      autosave_debounce_seconds: 3,
+      language: 'en',
+      theme_id: 'system',
+      page_size: 25,
+    },
+    isLoading: false,
+    updatePreferences: vi.fn(),
+    isUpdating: false,
+  }),
+}));
+
 // Mock window.matchMedia (needed by MUI)
 Object.defineProperty(window, 'matchMedia', {
   writable: true,

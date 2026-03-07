@@ -1219,8 +1219,7 @@
     },
     "general": {
       "title": "Ogólne",
-      "contactEmail": "Email kontaktowy",
-      "postsPerPage": "Wpisów na stronę"
+      "contactEmail": "Email kontaktowy"
     },
     "featureToggles": {
       "title": "Przełączniki funkcji",

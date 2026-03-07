@@ -13,6 +13,7 @@ import {
   IconButton,
   Tooltip,
   Alert,
+  Collapse,
   Divider,
   Stack,
   TextField,
@@ -32,10 +33,12 @@ import SaveIcon from '@mui/icons-material/Save';
 import TuneIcon from '@mui/icons-material/Tune';
 import StorageIcon from '@mui/icons-material/Storage';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LanguageIcon from '@mui/icons-material/Language';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import TableChartIcon from '@mui/icons-material/TableChart';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -76,7 +79,6 @@ const settingsSchema = z.object({
   analytics_enabled: z.boolean(),
   maintenance_mode: z.boolean(),
   contact_email: z.string().max(500).optional().or(z.literal('')),
-  posts_per_page: z.number().int().min(1, 'Min 1').max(100, 'Max 100'),
   editorial_workflow_enabled: z.boolean(),
 });
 
@@ -94,6 +96,7 @@ function SiteSettingsTab() {
 
   const [previewTemplates, setPreviewTemplates] = useState<PreviewTemplate[]>([]);
   const [previewTemplatesDirty, setPreviewTemplatesDirty] = useState(false);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
 
   const { data: settings, isLoading } = useQuery({
     queryKey: ['site-settings', selectedSiteId],
@@ -109,7 +112,6 @@ function SiteSettingsTab() {
       analytics_enabled: false,
       maintenance_mode: false,
       contact_email: '',
-      posts_per_page: 10,
       editorial_workflow_enabled: false,
     },
   });
@@ -124,7 +126,6 @@ function SiteSettingsTab() {
         analytics_enabled: settings.analytics_enabled,
         maintenance_mode: settings.maintenance_mode,
         contact_email: settings.contact_email,
-        posts_per_page: settings.posts_per_page,
         editorial_workflow_enabled: settings.editorial_workflow_enabled,
       });
       setPreviewTemplates(settings.preview_templates ?? []);
@@ -151,7 +152,6 @@ function SiteSettingsTab() {
       analytics_enabled: values.analytics_enabled,
       maintenance_mode: values.maintenance_mode,
       contact_email: values.contact_email || '',
-      posts_per_page: values.posts_per_page,
       editorial_workflow_enabled: values.editorial_workflow_enabled,
       preview_templates: previewTemplates.filter(pt => pt.name.trim() && pt.url.trim()),
     });
@@ -188,245 +188,250 @@ function SiteSettingsTab() {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={3}>
-        {/* Upload Limits */}
-        <Grid size={{ xs: 12, md: 6 }}>
-          <Paper sx={{ p: 3, height: '100%' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-              <CloudUploadIcon color="primary" fontSize="small" />
-              <Typography variant="h6" component="h2">{t('settings.uploadLimits.title')}</Typography>
-            </Box>
-            <Divider sx={{ mb: 2.5 }} />
-
-            <Stack spacing={2.5}>
-              <Controller
-                name="max_document_file_size_mb"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                    label={t('settings.uploadLimits.maxDocumentSize')}
-                    type="number"
-                    fullWidth
-                    size="small"
-                    InputProps={{
-                      endAdornment: <InputAdornment position="end">MB</InputAdornment>,
-                    }}
-                    inputProps={{ min: 1, max: 100 }}
-                    helperText={errors.max_document_file_size_mb?.message || '1 \u2013 100 MB'}
-                    error={!!errors.max_document_file_size_mb}
-                  />
-                )}
-              />
-
-              <Controller
-                name="max_media_file_size_mb"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                    label={t('settings.uploadLimits.maxMediaSize')}
-                    type="number"
-                    fullWidth
-                    size="small"
-                    InputProps={{
-                      endAdornment: <InputAdornment position="end">MB</InputAdornment>,
-                    }}
-                    inputProps={{ min: 1, max: 500 }}
-                    helperText={errors.max_media_file_size_mb?.message || '1 \u2013 500 MB'}
-                    error={!!errors.max_media_file_size_mb}
-                  />
-                )}
-              />
-            </Stack>
-          </Paper>
-        </Grid>
-
-        {/* General Settings */}
-        <Grid size={{ xs: 12, md: 6 }}>
-          <Paper sx={{ p: 3, height: '100%' }}>
+        {/* General Settings — always visible (Level 1) */}
+        <Grid size={12}>
+          <Paper sx={{ p: 3 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
               <SettingsIcon color="primary" fontSize="small" />
               <Typography variant="h6" component="h2">{t('settings.general.title')}</Typography>
             </Box>
             <Divider sx={{ mb: 2.5 }} />
 
-            <Stack spacing={2.5}>
-              <Controller
-                name="contact_email"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label={t('settings.general.contactEmail')}
-                    type="email"
-                    fullWidth
-                    size="small"
-                    helperText={errors.contact_email?.message}
-                    error={!!errors.contact_email}
-                  />
-                )}
-              />
-
-              <Controller
-                name="posts_per_page"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                    label={t('settings.general.postsPerPage')}
-                    type="number"
-                    fullWidth
-                    size="small"
-                    inputProps={{ min: 1, max: 100 }}
-                    helperText={errors.posts_per_page?.message || '1 \u2013 100'}
-                    error={!!errors.posts_per_page}
-                  />
-                )}
-              />
-            </Stack>
+            <Controller
+              name="contact_email"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label={t('settings.general.contactEmail')}
+                  type="email"
+                  fullWidth
+                  size="small"
+                  helperText={errors.contact_email?.message}
+                  error={!!errors.contact_email}
+                />
+              )}
+            />
           </Paper>
         </Grid>
 
-        {/* Toggles */}
+        {/* Advanced Settings — collapsible (Level 2) */}
         <Grid size={12}>
           <Paper sx={{ p: 3 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+            <Box
+              sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer' }}
+              onClick={() => setAdvancedOpen((prev) => !prev)}
+              role="button"
+              aria-expanded={advancedOpen}
+              data-testid="settings.advanced.toggle"
+            >
               <TuneIcon color="primary" fontSize="small" />
-              <Typography variant="h6" component="h2">{t('settings.featureToggles.title')}</Typography>
-            </Box>
-            <Divider sx={{ mb: 2 }} />
-
-            <Grid container spacing={2}>
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <Controller
-                  name="analytics_enabled"
-                  control={control}
-                  render={({ field }) => (
-                    <Paper variant="outlined" sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Box>
-                        <Typography variant="body1" fontWeight={500}>{t('settings.featureToggles.analytics')}</Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {t('settings.featureToggles.analyticsDescription')}
-                        </Typography>
-                      </Box>
-                      <Switch checked={field.value} onChange={field.onChange} />
-                    </Paper>
-                  )}
-                />
-              </Grid>
-
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <Controller
-                  name="maintenance_mode"
-                  control={control}
-                  render={({ field }) => (
-                    <Paper
-                      variant="outlined"
-                      sx={{
-                        p: 2,
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        borderColor: field.value ? 'warning.main' : undefined,
-                      }}
-                    >
-                      <Box>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Typography variant="body1" fontWeight={500}>{t('settings.featureToggles.maintenanceMode')}</Typography>
-                          {field.value && <Chip label={t('common.status.active')} color="warning" size="small" />}
-                        </Box>
-                        <Typography variant="caption" color="text.secondary">
-                          {t('settings.featureToggles.maintenanceModeDescription')}
-                        </Typography>
-                      </Box>
-                      <Switch checked={field.value} onChange={field.onChange} color="warning" />
-                    </Paper>
-                  )}
-                />
-              </Grid>
-
-              <Grid size={{ xs: 12, sm: 6 }}>
-                <Controller
-                  name="editorial_workflow_enabled"
-                  control={control}
-                  render={({ field }) => (
-                    <Paper variant="outlined" sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Box>
-                        <Typography variant="body1" fontWeight={500}>{t('settings.featureToggles.editorialWorkflow')}</Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {t('settings.featureToggles.editorialWorkflowDescription')}
-                        </Typography>
-                      </Box>
-                      <Switch checked={field.value} onChange={field.onChange} />
-                    </Paper>
-                  )}
-                />
-              </Grid>
-            </Grid>
-          </Paper>
-        </Grid>
-
-        {/* Preview Templates */}
-        <Grid size={12}>
-          <Paper sx={{ p: 3 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-              <VisibilityIcon color="primary" fontSize="small" />
-              <Typography variant="h6" component="h2">{t('settings.preview.title')}</Typography>
+              <Typography variant="h6" component="h2" sx={{ flexGrow: 1 }}>
+                {t('settings.advanced.title')}
+              </Typography>
+              <ExpandMoreIcon
+                sx={{
+                  transform: advancedOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.2s',
+                }}
+              />
             </Box>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-              {t('settings.preview.description')}
+              {t('settings.advanced.description')}
             </Typography>
-            <Divider sx={{ mb: 2 }} />
 
-            <Stack spacing={1.5}>
-              {previewTemplates.map((pt, index) => (
-                <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <TextField
-                    value={pt.name}
-                    onChange={(e) => handleTemplateChange(index, 'name', e.target.value)}
-                    label={t('settings.preview.name')}
-                    size="small"
-                    sx={{ flex: 1 }}
-                  />
-                  <TextField
-                    value={pt.url}
-                    onChange={(e) => handleTemplateChange(index, 'url', e.target.value)}
-                    label={t('settings.preview.url')}
-                    size="small"
-                    placeholder="http://localhost:4321"
-                    sx={{ flex: 2 }}
-                  />
-                  <Tooltip title={t('settings.preview.openPreview')}>
-                    <span>
-                      <IconButton
+            <Collapse in={advancedOpen}>
+              <Divider sx={{ my: 2 }} />
+
+              <Grid container spacing={3}>
+                {/* Upload Limits */}
+                <Grid size={12}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                    <CloudUploadIcon color="action" fontSize="small" />
+                    <Typography variant="subtitle1" fontWeight={600}>{t('settings.uploadLimits.title')}</Typography>
+                  </Box>
+                  <Grid container spacing={2}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <Controller
+                        name="max_document_file_size_mb"
+                        control={control}
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            onChange={(e) => field.onChange(Number(e.target.value))}
+                            label={t('settings.uploadLimits.maxDocumentSize')}
+                            type="number"
+                            fullWidth
+                            size="small"
+                            InputProps={{
+                              endAdornment: <InputAdornment position="end">MB</InputAdornment>,
+                            }}
+                            inputProps={{ min: 1, max: 100 }}
+                            helperText={errors.max_document_file_size_mb?.message || '1 \u2013 100 MB'}
+                            error={!!errors.max_document_file_size_mb}
+                          />
+                        )}
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <Controller
+                        name="max_media_file_size_mb"
+                        control={control}
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            onChange={(e) => field.onChange(Number(e.target.value))}
+                            label={t('settings.uploadLimits.maxMediaSize')}
+                            type="number"
+                            fullWidth
+                            size="small"
+                            InputProps={{
+                              endAdornment: <InputAdornment position="end">MB</InputAdornment>,
+                            }}
+                            inputProps={{ min: 1, max: 500 }}
+                            helperText={errors.max_media_file_size_mb?.message || '1 \u2013 500 MB'}
+                            error={!!errors.max_media_file_size_mb}
+                          />
+                        )}
+                      />
+                    </Grid>
+                  </Grid>
+                </Grid>
+
+                {/* Feature Toggles */}
+                <Grid size={12}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                    <TuneIcon color="action" fontSize="small" />
+                    <Typography variant="subtitle1" fontWeight={600}>{t('settings.featureToggles.title')}</Typography>
+                  </Box>
+                  <Grid container spacing={2}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <Controller
+                        name="analytics_enabled"
+                        control={control}
+                        render={({ field }) => (
+                          <Paper variant="outlined" sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <Box>
+                              <Typography variant="body1" fontWeight={500}>{t('settings.featureToggles.analytics')}</Typography>
+                              <Typography variant="caption" color="text.secondary">
+                                {t('settings.featureToggles.analyticsDescription')}
+                              </Typography>
+                            </Box>
+                            <Switch checked={field.value} onChange={field.onChange} />
+                          </Paper>
+                        )}
+                      />
+                    </Grid>
+
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <Controller
+                        name="maintenance_mode"
+                        control={control}
+                        render={({ field }) => (
+                          <Paper
+                            variant="outlined"
+                            sx={{
+                              p: 2,
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              borderColor: field.value ? 'warning.main' : undefined,
+                            }}
+                          >
+                            <Box>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Typography variant="body1" fontWeight={500}>{t('settings.featureToggles.maintenanceMode')}</Typography>
+                                {field.value && <Chip label={t('common.status.active')} color="warning" size="small" />}
+                              </Box>
+                              <Typography variant="caption" color="text.secondary">
+                                {t('settings.featureToggles.maintenanceModeDescription')}
+                              </Typography>
+                            </Box>
+                            <Switch checked={field.value} onChange={field.onChange} color="warning" />
+                          </Paper>
+                        )}
+                      />
+                    </Grid>
+
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <Controller
+                        name="editorial_workflow_enabled"
+                        control={control}
+                        render={({ field }) => (
+                          <Paper variant="outlined" sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <Box>
+                              <Typography variant="body1" fontWeight={500}>{t('settings.featureToggles.editorialWorkflow')}</Typography>
+                              <Typography variant="caption" color="text.secondary">
+                                {t('settings.featureToggles.editorialWorkflowDescription')}
+                              </Typography>
+                            </Box>
+                            <Switch checked={field.value} onChange={field.onChange} />
+                          </Paper>
+                        )}
+                      />
+                    </Grid>
+                  </Grid>
+                </Grid>
+
+                {/* Preview Templates */}
+                <Grid size={12}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                    <VisibilityIcon color="action" fontSize="small" />
+                    <Typography variant="subtitle1" fontWeight={600}>{t('settings.preview.title')}</Typography>
+                  </Box>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                    {t('settings.preview.description')}
+                  </Typography>
+
+                  <Stack spacing={1.5}>
+                    {previewTemplates.map((pt, index) => (
+                      <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <TextField
+                          value={pt.name}
+                          onChange={(e) => handleTemplateChange(index, 'name', e.target.value)}
+                          label={t('settings.preview.name')}
+                          size="small"
+                          sx={{ flex: 1 }}
+                        />
+                        <TextField
+                          value={pt.url}
+                          onChange={(e) => handleTemplateChange(index, 'url', e.target.value)}
+                          label={t('settings.preview.url')}
+                          size="small"
+                          placeholder="http://localhost:4321"
+                          sx={{ flex: 2 }}
+                        />
+                        <Tooltip title={t('settings.preview.openPreview')}>
+                          <span>
+                            <IconButton
+                              size="small"
+                              disabled={!pt.url.trim()}
+                              onClick={() => window.open(pt.url, '_blank')}
+                            >
+                              <OpenInNewIcon fontSize="small" />
+                            </IconButton>
+                          </span>
+                        </Tooltip>
+                        <Tooltip title={t('common.actions.delete')}>
+                          <IconButton size="small" color="error" onClick={() => handleRemoveTemplate(index)}>
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    ))}
+                    <Box>
+                      <Button
                         size="small"
-                        disabled={!pt.url.trim()}
-                        onClick={() => window.open(pt.url, '_blank')}
+                        startIcon={<AddIcon />}
+                        onClick={handleAddTemplate}
                       >
-                        <OpenInNewIcon fontSize="small" />
-                      </IconButton>
-                    </span>
-                  </Tooltip>
-                  <Tooltip title={t('common.actions.delete')}>
-                    <IconButton size="small" color="error" onClick={() => handleRemoveTemplate(index)}>
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
-                </Box>
-              ))}
-              <Box>
-                <Button
-                  size="small"
-                  startIcon={<AddIcon />}
-                  onClick={handleAddTemplate}
-                >
-                  {t('settings.preview.add')}
-                </Button>
-              </Box>
-            </Stack>
+                        {t('settings.preview.add')}
+                      </Button>
+                    </Box>
+                  </Stack>
+                </Grid>
+              </Grid>
+            </Collapse>
           </Paper>
         </Grid>
 
@@ -852,55 +857,81 @@ function PreferencesTab() {
       </Grid>
 
       {/* Autosave */}
-      <Grid size={12}>
-        <Paper sx={{ p: 3 }}>
+      <Grid size={{ xs: 12, md: 6 }}>
+        <Paper sx={{ p: 3, height: '100%' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
             <SaveAltIcon color="primary" fontSize="small" />
             <Typography variant="h6" component="h2">{t('settings.preferences.autosave.title')}</Typography>
           </Box>
           <Divider sx={{ mb: 2.5 }} />
 
-          <Grid container spacing={2.5}>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <Stack direction="row" alignItems="center" justifyContent="space-between">
-                <Box>
-                  <Typography variant="body1">{t('settings.preferences.autosave.enableLabel')}</Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {t('settings.preferences.autosave.enableDescription')}
-                  </Typography>
-                </Box>
-                <Switch
-                  checked={preferences.autosave_enabled}
-                  onChange={(e) => updatePreferences({ autosave_enabled: e.target.checked })}
-                />
-              </Stack>
-            </Grid>
-
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField
-                type="number"
-                label={t('settings.preferences.autosave.debounceLabel')}
-                helperText={t('settings.preferences.autosave.debounceDescription')}
-                size="small"
-                fullWidth
-                disabled={!preferences.autosave_enabled}
-                defaultValue={preferences.autosave_debounce_seconds}
-                key={preferences.autosave_debounce_seconds}
-                slotProps={{
-                  input: {
-                    endAdornment: <InputAdornment position="end">{t('settings.preferences.autosave.seconds')}</InputAdornment>,
-                  },
-                  htmlInput: { min: 1, max: 60 },
-                }}
-                onBlur={(e) => {
-                  const val = parseInt(e.target.value, 10);
-                  if (!isNaN(val) && val >= 1 && val <= 60 && val !== preferences.autosave_debounce_seconds) {
-                    updatePreferences({ autosave_debounce_seconds: val });
-                  }
-                }}
+          <Stack spacing={2.5}>
+            <Stack direction="row" alignItems="center" justifyContent="space-between">
+              <Box>
+                <Typography variant="body1">{t('settings.preferences.autosave.enableLabel')}</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {t('settings.preferences.autosave.enableDescription')}
+                </Typography>
+              </Box>
+              <Switch
+                checked={preferences.autosave_enabled}
+                onChange={(e) => updatePreferences({ autosave_enabled: e.target.checked })}
               />
-            </Grid>
-          </Grid>
+            </Stack>
+
+            <TextField
+              type="number"
+              label={t('settings.preferences.autosave.debounceLabel')}
+              helperText={t('settings.preferences.autosave.debounceDescription')}
+              size="small"
+              fullWidth
+              disabled={!preferences.autosave_enabled}
+              defaultValue={preferences.autosave_debounce_seconds}
+              key={preferences.autosave_debounce_seconds}
+              slotProps={{
+                input: {
+                  endAdornment: <InputAdornment position="end">{t('settings.preferences.autosave.seconds')}</InputAdornment>,
+                },
+                htmlInput: { min: 1, max: 60 },
+              }}
+              onBlur={(e) => {
+                const val = parseInt(e.target.value, 10);
+                if (!isNaN(val) && val >= 1 && val <= 60 && val !== preferences.autosave_debounce_seconds) {
+                  updatePreferences({ autosave_debounce_seconds: val });
+                }
+              }}
+            />
+          </Stack>
+        </Paper>
+      </Grid>
+
+      {/* Table Display */}
+      <Grid size={{ xs: 12, md: 6 }}>
+        <Paper sx={{ p: 3, height: '100%' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+            <TableChartIcon color="primary" fontSize="small" />
+            <Typography variant="h6" component="h2">{t('settings.preferences.tableDisplay.title')}</Typography>
+          </Box>
+          <Divider sx={{ mb: 2.5 }} />
+
+          <TextField
+            select
+            label={t('settings.preferences.tableDisplay.pageSizeLabel')}
+            helperText={t('settings.preferences.tableDisplay.pageSizeDescription')}
+            size="small"
+            fullWidth
+            value={preferences.page_size}
+            onChange={(e) => {
+              const val = Number(e.target.value);
+              if (val !== preferences.page_size) {
+                updatePreferences({ page_size: val });
+              }
+            }}
+          >
+            {[10, 25, 50, 100].map((size) => (
+              <MenuItem key={size} value={size}>{size}</MenuItem>
+            ))}
+          </TextField>
         </Paper>
       </Grid>
     </Grid>

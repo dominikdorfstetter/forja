@@ -8,7 +8,7 @@ use crate::models::site_settings::{
     KEY_ANALYTICS_ENABLED, KEY_CONTACT_EMAIL, KEY_EDITORIAL_WORKFLOW_ENABLED, KEY_MAINTENANCE_MODE,
     KEY_MAX_DOCUMENT_FILE_SIZE, KEY_MAX_MEDIA_FILE_SIZE, KEY_MODULE_BLOG_ENABLED,
     KEY_MODULE_CV_ENABLED, KEY_MODULE_DOCUMENTS_ENABLED, KEY_MODULE_LEGAL_ENABLED,
-    KEY_MODULE_PAGES_ENABLED, KEY_POSTS_PER_PAGE, KEY_PREVIEW_TEMPLATES,
+    KEY_MODULE_PAGES_ENABLED, KEY_PREVIEW_TEMPLATES,
 };
 use crate::utils::validation::validate_email;
 
@@ -35,8 +35,6 @@ pub struct SiteSettingsResponse {
     pub maintenance_mode: bool,
     #[schema(example = "")]
     pub contact_email: String,
-    #[schema(example = 10)]
-    pub posts_per_page: i64,
     #[schema(example = false)]
     pub editorial_workflow_enabled: bool,
     pub preview_templates: Vec<PreviewTemplate>,
@@ -78,10 +76,6 @@ impl SiteSettingsResponse {
                 .and_then(|v| v.as_str())
                 .unwrap_or("")
                 .to_string(),
-            posts_per_page: map
-                .get(KEY_POSTS_PER_PAGE)
-                .and_then(|v| v.as_i64())
-                .unwrap_or(10),
             editorial_workflow_enabled: map
                 .get(KEY_EDITORIAL_WORKFLOW_ENABLED)
                 .and_then(|v| v.as_bool())
@@ -139,10 +133,6 @@ pub struct UpdateSiteSettingsRequest {
     #[schema(example = "admin@example.com")]
     pub contact_email: Option<String>,
 
-    #[validate(range(min = 1, max = 100))]
-    #[schema(example = 10)]
-    pub posts_per_page: Option<i64>,
-
     #[schema(example = false)]
     pub editorial_workflow_enabled: Option<bool>,
 
@@ -175,9 +165,6 @@ impl UpdateSiteSettingsRequest {
         }
         if let Some(ref v) = self.contact_email {
             out.push((KEY_CONTACT_EMAIL, serde_json::json!(v), false));
-        }
-        if let Some(v) = self.posts_per_page {
-            out.push((KEY_POSTS_PER_PAGE, serde_json::json!(v), false));
         }
         if let Some(v) = self.editorial_workflow_enabled {
             out.push((KEY_EDITORIAL_WORKFLOW_ENABLED, serde_json::json!(v), false));
@@ -219,7 +206,6 @@ mod tests {
         assert!(!resp.analytics_enabled);
         assert!(!resp.maintenance_mode);
         assert_eq!(resp.contact_email, "");
-        assert_eq!(resp.posts_per_page, 10);
         assert!(!resp.editorial_workflow_enabled);
         assert!(resp.preview_templates.is_empty());
         assert!(resp.module_blog_enabled);
@@ -232,13 +218,11 @@ mod tests {
     #[test]
     fn test_from_map_overrides() {
         let mut map = crate::models::site_settings::defaults();
-        map.insert("posts_per_page".into(), serde_json::json!(25));
         map.insert(
             "contact_email".into(),
             serde_json::json!("test@example.com"),
         );
         let resp = SiteSettingsResponse::from_map(&map);
-        assert_eq!(resp.posts_per_page, 25);
         assert_eq!(resp.contact_email, "test@example.com");
     }
 
@@ -250,7 +234,6 @@ mod tests {
             analytics_enabled: Some(true),
             maintenance_mode: None,
             contact_email: Some("a@b.com".into()),
-            posts_per_page: Some(20),
             editorial_workflow_enabled: None,
             preview_templates: None,
             module_blog_enabled: Some(true),
@@ -270,7 +253,7 @@ mod tests {
             analytics_enabled: None,
             maintenance_mode: None,
             contact_email: None,
-            posts_per_page: None,
+
             editorial_workflow_enabled: None,
             preview_templates: None,
             module_blog_enabled: None,
@@ -290,7 +273,7 @@ mod tests {
             analytics_enabled: None,
             maintenance_mode: None,
             contact_email: None,
-            posts_per_page: None,
+
             editorial_workflow_enabled: None,
             preview_templates: None,
             module_blog_enabled: None,
@@ -310,47 +293,7 @@ mod tests {
             analytics_enabled: None,
             maintenance_mode: None,
             contact_email: None,
-            posts_per_page: None,
-            editorial_workflow_enabled: None,
-            preview_templates: None,
-            module_blog_enabled: None,
-            module_pages_enabled: None,
-            module_cv_enabled: None,
-            module_legal_enabled: None,
-            module_documents_enabled: None,
-        };
-        assert!(req.validate().is_err());
-    }
 
-    #[test]
-    fn test_update_request_posts_per_page_zero() {
-        let req = UpdateSiteSettingsRequest {
-            max_document_file_size: None,
-            max_media_file_size: None,
-            analytics_enabled: None,
-            maintenance_mode: None,
-            contact_email: None,
-            posts_per_page: Some(0),
-            editorial_workflow_enabled: None,
-            preview_templates: None,
-            module_blog_enabled: None,
-            module_pages_enabled: None,
-            module_cv_enabled: None,
-            module_legal_enabled: None,
-            module_documents_enabled: None,
-        };
-        assert!(req.validate().is_err());
-    }
-
-    #[test]
-    fn test_update_request_posts_per_page_too_high() {
-        let req = UpdateSiteSettingsRequest {
-            max_document_file_size: None,
-            max_media_file_size: None,
-            analytics_enabled: None,
-            maintenance_mode: None,
-            contact_email: None,
-            posts_per_page: Some(101),
             editorial_workflow_enabled: None,
             preview_templates: None,
             module_blog_enabled: None,
@@ -370,7 +313,7 @@ mod tests {
             analytics_enabled: None,
             maintenance_mode: None,
             contact_email: None,
-            posts_per_page: None,
+
             editorial_workflow_enabled: None,
             preview_templates: None,
             module_blog_enabled: None,
@@ -390,7 +333,7 @@ mod tests {
             analytics_enabled: None,
             maintenance_mode: None,
             contact_email: Some("not-an-email".into()),
-            posts_per_page: None,
+
             editorial_workflow_enabled: None,
             preview_templates: None,
             module_blog_enabled: None,
@@ -410,7 +353,7 @@ mod tests {
             analytics_enabled: None,
             maintenance_mode: None,
             contact_email: Some("admin@example.com".into()),
-            posts_per_page: None,
+
             editorial_workflow_enabled: None,
             preview_templates: None,
             module_blog_enabled: None,
@@ -431,7 +374,7 @@ mod tests {
             analytics_enabled: None,
             maintenance_mode: None,
             contact_email: Some("".into()),
-            posts_per_page: None,
+
             editorial_workflow_enabled: None,
             preview_templates: None,
             module_blog_enabled: None,
@@ -451,7 +394,6 @@ mod tests {
             analytics_enabled: Some(true),
             maintenance_mode: None,
             contact_email: None,
-            posts_per_page: Some(20),
             editorial_workflow_enabled: None,
             preview_templates: None,
             module_blog_enabled: Some(true),
@@ -461,11 +403,10 @@ mod tests {
             module_documents_enabled: None,
         };
         let vec = req.to_settings_vec();
-        assert_eq!(vec.len(), 4);
+        assert_eq!(vec.len(), 3);
         assert_eq!(vec[0].0, "max_document_file_size");
         assert_eq!(vec[1].0, "analytics_enabled");
-        assert_eq!(vec[2].0, "posts_per_page");
-        assert_eq!(vec[3].0, "module_blog_enabled");
+        assert_eq!(vec[2].0, "module_blog_enabled");
     }
 
     #[test]
@@ -476,7 +417,6 @@ mod tests {
             analytics_enabled: false,
             maintenance_mode: false,
             contact_email: "".to_string(),
-            posts_per_page: 10,
             editorial_workflow_enabled: false,
             preview_templates: vec![],
             module_blog_enabled: true,
@@ -487,6 +427,5 @@ mod tests {
         };
         let json = serde_json::to_string(&resp).unwrap();
         assert!(json.contains("\"max_document_file_size\":10485760"));
-        assert!(json.contains("\"posts_per_page\":10"));
     }
 }

@@ -11,6 +11,7 @@ pub const KEY_AUTOSAVE_ENABLED: &str = "autosave_enabled";
 pub const KEY_AUTOSAVE_DEBOUNCE_SECONDS: &str = "autosave_debounce_seconds";
 pub const KEY_LANGUAGE: &str = "language";
 pub const KEY_THEME_ID: &str = "theme_id";
+pub const KEY_PAGE_SIZE: &str = "page_size";
 
 /// Returns the default preferences as a JSON object.
 pub fn default_preferences() -> serde_json::Value {
@@ -18,7 +19,8 @@ pub fn default_preferences() -> serde_json::Value {
         KEY_AUTOSAVE_ENABLED: true,
         KEY_AUTOSAVE_DEBOUNCE_SECONDS: 3,
         KEY_LANGUAGE: "en",
-        KEY_THEME_ID: "system"
+        KEY_THEME_ID: "system",
+        KEY_PAGE_SIZE: 25
     })
 }
 
@@ -100,11 +102,12 @@ mod tests {
     fn test_default_preferences_keys() {
         let d = default_preferences();
         let obj = d.as_object().unwrap();
-        assert_eq!(obj.len(), 4);
+        assert_eq!(obj.len(), 5);
         assert!(obj.contains_key(KEY_AUTOSAVE_ENABLED));
         assert!(obj.contains_key(KEY_AUTOSAVE_DEBOUNCE_SECONDS));
         assert!(obj.contains_key(KEY_LANGUAGE));
         assert!(obj.contains_key(KEY_THEME_ID));
+        assert!(obj.contains_key(KEY_PAGE_SIZE));
     }
 
     #[test]
@@ -114,6 +117,7 @@ mod tests {
         assert_eq!(d[KEY_AUTOSAVE_DEBOUNCE_SECONDS], serde_json::json!(3));
         assert_eq!(d[KEY_LANGUAGE], serde_json::json!("en"));
         assert_eq!(d[KEY_THEME_ID], serde_json::json!("system"));
+        assert_eq!(d[KEY_PAGE_SIZE], serde_json::json!(25));
     }
 
     #[test]

@@ -17,7 +17,7 @@ vi.mock('@/hooks/useAutosave', () => ({
 
 vi.mock('@/store/UserPreferencesContext', () => ({
   useUserPreferences: () => ({
-    preferences: { autosave_enabled: true, autosave_debounce_seconds: 3, language: 'en', theme_id: 'system' },
+    preferences: { autosave_enabled: true, autosave_debounce_seconds: 3, language: 'en', theme_id: 'system', page_size: 25 },
     isLoading: false,
     updatePreferences: vi.fn(),
     isUpdating: false,

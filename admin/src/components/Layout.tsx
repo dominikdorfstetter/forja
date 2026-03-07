@@ -25,6 +25,8 @@ import MenuBookIcon from '@mui/icons-material/MenuBook';
 import ShareIcon from '@mui/icons-material/Share';
 import HistoryIcon from '@mui/icons-material/History';
 import PeopleIcon from '@mui/icons-material/People';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import RateReviewIcon from '@mui/icons-material/RateReview';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import LanguageIcon from '@mui/icons-material/Language';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -133,7 +135,9 @@ export default function Layout() {
   const { selectedSiteId, setSelectedSiteId, sites } = useSiteContext();
   const { isAdmin, canManageMembers, siteId: authSiteId, logout, userFullName, userImageUrl } = useAuth();
   const { guardedNavigate } = useNavigationGuardContext();
-  const { modules } = useSiteContextData();
+  const { modules, context } = useSiteContextData();
+  const isSolo = context.member_count <= 1;
+  const isTeamWithWorkflow = !isSolo && context.features.editorial_workflow;
 
   // Sidebar: site-workspace items only
   const allMenuSections = [
@@ -166,7 +170,12 @@ export default function Layout() {
         { text: t('layout.sidebar.redirects'), icon: <AltRouteIcon />, path: '/redirects' },
         ...(isAdmin ? [{ text: t('layout.sidebar.webhooks'), icon: <WebhookIcon />, path: '/webhooks' }] : []),
         ...(isAdmin ? [{ text: t('layout.sidebar.activity'), icon: <HistoryIcon />, path: '/activity' }] : []),
-        ...(canManageMembers || isAdmin ? [{ text: t('layout.sidebar.members'), icon: <PeopleIcon />, path: '/members' }] : []),
+        ...(isSolo && (canManageMembers || isAdmin)
+          ? [{ text: t('layout.sidebar.invite'), icon: <PersonAddIcon />, path: '/members' }]
+          : (canManageMembers || isAdmin)
+            ? [{ text: t('layout.sidebar.members'), icon: <PeopleIcon />, path: '/members' }]
+            : []),
+        ...(isTeamWithWorkflow ? [{ text: t('layout.sidebar.reviews'), icon: <RateReviewIcon />, path: '/my-drafts' }] : []),
         { text: t('layout.sidebar.settings'), icon: <SettingsIcon />, path: '/settings' },
       ],
     },

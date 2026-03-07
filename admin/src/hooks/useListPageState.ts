@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { useUserPreferences } from '@/store/UserPreferencesContext';
 
 interface UseListPageStateOptions {
   initialPage?: number;
@@ -6,8 +7,9 @@ interface UseListPageStateOptions {
 }
 
 export function useListPageState<T>(options?: UseListPageStateOptions) {
+  const { preferences } = useUserPreferences();
   const [page, setPage] = useState(options?.initialPage ?? 1);
-  const [perPage, setPerPage] = useState(options?.initialPerPage ?? 25);
+  const [perPage, setPerPage] = useState(options?.initialPerPage ?? preferences.page_size);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<T | null>(null);
   const [deleting, setDeleting] = useState<T | null>(null);

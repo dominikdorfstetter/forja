@@ -1,15 +1,40 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useListPageState } from '../useListPageState';
 
+let mockPageSize = 25;
+
+vi.mock('@/store/UserPreferencesContext', () => ({
+  useUserPreferences: () => ({
+    preferences: {
+      autosave_enabled: true,
+      autosave_debounce_seconds: 3,
+      language: 'en',
+      theme_id: 'system',
+      page_size: mockPageSize,
+    },
+    isLoading: false,
+    updatePreferences: vi.fn(),
+    isUpdating: false,
+  }),
+}));
+
 describe('useListPageState', () => {
-  it('starts with default page=1 and perPage=25', () => {
+  it('starts with default page=1 and perPage from user preferences', () => {
+    mockPageSize = 25;
     const { result } = renderHook(() => useListPageState());
     expect(result.current.page).toBe(1);
     expect(result.current.perPage).toBe(25);
   });
 
-  it('respects custom initial values', () => {
+  it('uses user preference page_size as default', () => {
+    mockPageSize = 50;
+    const { result } = renderHook(() => useListPageState());
+    expect(result.current.perPage).toBe(50);
+  });
+
+  it('respects custom initial values over user preference', () => {
+    mockPageSize = 25;
     const { result } = renderHook(() =>
       useListPageState({ initialPage: 3, initialPerPage: 50 }),
     );
@@ -18,6 +43,7 @@ describe('useListPageState', () => {
   });
 
   it('handlePageChange converts 0-based MUI index to 1-based page', () => {
+    mockPageSize = 25;
     const { result } = renderHook(() => useListPageState());
 
     act(() => result.current.handlePageChange(null, 2));
@@ -25,6 +51,7 @@ describe('useListPageState', () => {
   });
 
   it('handleRowsPerPageChange updates perPage and resets page to 1', () => {
+    mockPageSize = 25;
     const { result } = renderHook(() => useListPageState());
 
     // First move to page 3
@@ -42,6 +69,7 @@ describe('useListPageState', () => {
   });
 
   it('manages form open/close state', () => {
+    mockPageSize = 25;
     const { result } = renderHook(() => useListPageState());
 
     expect(result.current.formOpen).toBe(false);
@@ -52,6 +80,7 @@ describe('useListPageState', () => {
   });
 
   it('manages editing state', () => {
+    mockPageSize = 25;
     const { result } = renderHook(() => useListPageState<{ id: string }>());
 
     expect(result.current.editing).toBeNull();
@@ -63,6 +92,7 @@ describe('useListPageState', () => {
   });
 
   it('manages deleting state', () => {
+    mockPageSize = 25;
     const { result } = renderHook(() => useListPageState<{ id: string }>());
 
     expect(result.current.deleting).toBeNull();

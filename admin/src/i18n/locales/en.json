@@ -122,6 +122,8 @@
       "legal": "Legal",
       "cv": "CV",
       "members": "Members",
+      "invite": "Invite",
+      "reviews": "Reviews",
       "apiKeys": "API Keys",
       "contentTemplates": "Templates",
       "redirects": "Redirects",
@@ -1275,8 +1277,11 @@
     },
     "general": {
       "title": "General",
-      "contactEmail": "Contact Email",
-      "postsPerPage": "Posts Per Page"
+      "contactEmail": "Contact Email"
+    },
+    "advanced": {
+      "title": "Advanced Settings",
+      "description": "Configuration options for power users and team workflows"
     },
     "featureToggles": {
       "title": "Feature Toggles",
@@ -1346,6 +1351,11 @@
         "debounceLabel": "Autosave Delay",
         "debounceDescription": "How long to wait after your last edit before saving (1–60)",
         "seconds": "seconds"
+      },
+      "tableDisplay": {
+        "title": "Table Display",
+        "pageSizeLabel": "Rows Per Page",
+        "pageSizeDescription": "Default number of rows shown in admin tables"
       }
     }
   },
