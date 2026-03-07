@@ -1219,8 +1219,7 @@
     },
     "general": {
       "title": "General",
-      "contactEmail": "Correo electrónico de contacto",
-      "postsPerPage": "Publicaciones por página"
+      "contactEmail": "Correo electrónico de contacto"
     },
     "featureToggles": {
       "title": "Funciones activables",

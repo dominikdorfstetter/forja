@@ -1194,7 +1194,6 @@ export interface SiteSettingsResponse {
   analytics_enabled: boolean;
   maintenance_mode: boolean;
   contact_email: string;
-  posts_per_page: number;
   editorial_workflow_enabled: boolean;
   preview_templates: PreviewTemplate[];
   module_blog_enabled: boolean;
@@ -1210,7 +1209,6 @@ export interface UpdateSiteSettingsRequest {
   analytics_enabled?: boolean;
   maintenance_mode?: boolean;
   contact_email?: string;
-  posts_per_page?: number;
   editorial_workflow_enabled?: boolean;
   preview_templates?: PreviewTemplate[];
   module_blog_enabled?: boolean;
@@ -1226,6 +1224,7 @@ export interface UserPreferencesResponse {
   autosave_debounce_seconds: number;
   language: string;
   theme_id: string;
+  page_size: number;
 }
 
 export interface UpdateUserPreferencesRequest {
@@ -1233,6 +1232,7 @@ export interface UpdateUserPreferencesRequest {
   autosave_debounce_seconds?: number;
   language?: string;
   theme_id?: string;
+  page_size?: number;
 }
 
 // Clerk User Management

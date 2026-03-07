@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use validator::Validate;
 
 use crate::models::user_preferences::{
-    KEY_AUTOSAVE_DEBOUNCE_SECONDS, KEY_AUTOSAVE_ENABLED, KEY_LANGUAGE, KEY_THEME_ID,
+    KEY_AUTOSAVE_DEBOUNCE_SECONDS, KEY_AUTOSAVE_ENABLED, KEY_LANGUAGE, KEY_PAGE_SIZE, KEY_THEME_ID,
 };
 
 /// Response with effective user preferences (defaults merged with stored values)
@@ -19,6 +19,8 @@ pub struct UserPreferencesResponse {
     pub language: String,
     #[schema(example = "system")]
     pub theme_id: String,
+    #[schema(example = 25)]
+    pub page_size: i64,
 }
 
 impl UserPreferencesResponse {
@@ -43,6 +45,10 @@ impl UserPreferencesResponse {
                 .and_then(|v| v.as_str())
                 .unwrap_or("system")
                 .to_string(),
+            page_size: json
+                .get(KEY_PAGE_SIZE)
+                .and_then(|v| v.as_i64())
+                .unwrap_or(25),
         }
     }
 }
@@ -68,6 +74,11 @@ pub struct UpdateUserPreferencesRequest {
     #[validate(length(min = 2, max = 20))]
     #[schema(example = "system")]
     pub theme_id: Option<String>,
+
+    /// Table page size for admin UI (10–100)
+    #[validate(range(min = 10, max = 100))]
+    #[schema(example = 25)]
+    pub page_size: Option<i64>,
 }
 
 impl UpdateUserPreferencesRequest {
@@ -90,6 +101,9 @@ impl UpdateUserPreferencesRequest {
         if let Some(ref v) = self.theme_id {
             map.insert(KEY_THEME_ID.to_string(), serde_json::json!(v));
         }
+        if let Some(v) = self.page_size {
+            map.insert(KEY_PAGE_SIZE.to_string(), serde_json::json!(v));
+        }
 
         serde_json::Value::Object(map)
     }
@@ -108,6 +122,7 @@ mod tests {
         assert_eq!(resp.autosave_debounce_seconds, 3);
         assert_eq!(resp.language, "en");
         assert_eq!(resp.theme_id, "system");
+        assert_eq!(resp.page_size, 25);
     }
 
     #[test]
@@ -116,13 +131,15 @@ mod tests {
             "autosave_enabled": false,
             "autosave_debounce_seconds": 10,
             "language": "de",
-            "theme_id": "mocha"
+            "theme_id": "mocha",
+            "page_size": 50
         });
         let resp = UserPreferencesResponse::from_json(&json);
         assert!(!resp.autosave_enabled);
         assert_eq!(resp.autosave_debounce_seconds, 10);
         assert_eq!(resp.language, "de");
         assert_eq!(resp.theme_id, "mocha");
+        assert_eq!(resp.page_size, 50);
     }
 
     #[test]
@@ -133,6 +150,7 @@ mod tests {
         assert_eq!(resp.autosave_debounce_seconds, 3);
         assert_eq!(resp.language, "en");
         assert_eq!(resp.theme_id, "system");
+        assert_eq!(resp.page_size, 25);
     }
 
     #[test]
@@ -142,6 +160,7 @@ mod tests {
             autosave_debounce_seconds: Some(10),
             language: Some("de".to_string()),
             theme_id: Some("mocha".to_string()),
+            page_size: Some(50),
         };
         assert!(req.validate().is_ok());
     }
@@ -153,6 +172,7 @@ mod tests {
             autosave_debounce_seconds: None,
             language: None,
             theme_id: None,
+            page_size: None,
         };
         assert!(req.validate().is_ok());
     }
@@ -164,6 +184,7 @@ mod tests {
             autosave_debounce_seconds: Some(0),
             language: None,
             theme_id: None,
+            page_size: None,
         };
         assert!(req.validate().is_err());
     }
@@ -175,6 +196,7 @@ mod tests {
             autosave_debounce_seconds: Some(61),
             language: None,
             theme_id: None,
+            page_size: None,
         };
         assert!(req.validate().is_err());
     }
@@ -186,6 +208,7 @@ mod tests {
             autosave_debounce_seconds: Some(1),
             language: None,
             theme_id: None,
+            page_size: None,
         };
         assert!(req.validate().is_ok());
     }
@@ -197,6 +220,7 @@ mod tests {
             autosave_debounce_seconds: Some(60),
             language: None,
             theme_id: None,
+            page_size: None,
         };
         assert!(req.validate().is_ok());
     }
@@ -208,6 +232,7 @@ mod tests {
             autosave_debounce_seconds: None,
             language: Some("x".to_string()),
             theme_id: None,
+            page_size: None,
         };
         assert!(req.validate().is_err());
     }
@@ -219,6 +244,7 @@ mod tests {
             autosave_debounce_seconds: None,
             language: None,
             theme_id: Some("a".repeat(21)),
+            page_size: None,
         };
         assert!(req.validate().is_err());
     }
@@ -230,12 +256,14 @@ mod tests {
             autosave_debounce_seconds: None,
             language: None,
             theme_id: None,
+            page_size: None,
         };
         let json = req.to_json();
         assert_eq!(json["autosave_enabled"], serde_json::json!(false));
         assert!(json.get("autosave_debounce_seconds").is_none());
         assert!(json.get("language").is_none());
         assert!(json.get("theme_id").is_none());
+        assert!(json.get("page_size").is_none());
     }
 
     #[test]
@@ -245,12 +273,14 @@ mod tests {
             autosave_debounce_seconds: Some(15),
             language: Some("fr".to_string()),
             theme_id: Some("latte".to_string()),
+            page_size: Some(50),
         };
         let json = req.to_json();
         assert_eq!(json["autosave_enabled"], serde_json::json!(true));
         assert_eq!(json["autosave_debounce_seconds"], serde_json::json!(15));
         assert_eq!(json["language"], serde_json::json!("fr"));
         assert_eq!(json["theme_id"], serde_json::json!("latte"));
+        assert_eq!(json["page_size"], serde_json::json!(50));
     }
 
     #[test]
@@ -260,6 +290,7 @@ mod tests {
             autosave_debounce_seconds: None,
             language: None,
             theme_id: None,
+            page_size: None,
         };
         let json = req.to_json();
         assert!(json.as_object().unwrap().is_empty());
@@ -272,11 +303,13 @@ mod tests {
             autosave_debounce_seconds: 5,
             language: "en".to_string(),
             theme_id: "system".to_string(),
+            page_size: 25,
         };
         let json = serde_json::to_string(&resp).unwrap();
         assert!(json.contains("\"autosave_enabled\":true"));
         assert!(json.contains("\"autosave_debounce_seconds\":5"));
         assert!(json.contains("\"language\":\"en\""));
         assert!(json.contains("\"theme_id\":\"system\""));
+        assert!(json.contains("\"page_size\":25"));
     }
 }

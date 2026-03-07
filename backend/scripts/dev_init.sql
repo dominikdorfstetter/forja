@@ -323,9 +323,7 @@ BEGIN
         (v_site1, 'contact_email',            '"john@johndoe.dev"'::jsonb, FALSE),
         (v_site1, 'max_document_file_size',   '10485760'::jsonb, FALSE),
         (v_site1, 'max_media_file_size',      '52428800'::jsonb, FALSE),
-        (v_site1, 'posts_per_page',           '10'::jsonb,      FALSE),
         (v_site2, 'analytics_enabled',        'true'::jsonb,    FALSE),
-        (v_site2, 'posts_per_page',           '12'::jsonb,      FALSE),
         (v_site2, 'max_document_file_size',   '10485760'::jsonb, FALSE),
         (v_site2, 'max_media_file_size',      '52428800'::jsonb, FALSE);
 

@@ -1277,8 +1277,7 @@
     },
     "general": {
       "title": "General",
-      "contactEmail": "Contact Email",
-      "postsPerPage": "Posts Per Page"
+      "contactEmail": "Contact Email"
     },
     "advanced": {
       "title": "Advanced Settings",
@@ -1352,6 +1351,11 @@
         "debounceLabel": "Autosave Delay",
         "debounceDescription": "How long to wait after your last edit before saving (1–60)",
         "seconds": "seconds"
+      },
+      "tableDisplay": {
+        "title": "Table Display",
+        "pageSizeLabel": "Rows Per Page",
+        "pageSizeDescription": "Default number of rows shown in admin tables"
       }
     }
   },

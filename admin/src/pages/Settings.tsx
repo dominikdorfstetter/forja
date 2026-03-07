@@ -38,6 +38,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import LanguageIcon from '@mui/icons-material/Language';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import TableChartIcon from '@mui/icons-material/TableChart';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -78,7 +79,6 @@ const settingsSchema = z.object({
   analytics_enabled: z.boolean(),
   maintenance_mode: z.boolean(),
   contact_email: z.string().max(500).optional().or(z.literal('')),
-  posts_per_page: z.number().int().min(1, 'Min 1').max(100, 'Max 100'),
   editorial_workflow_enabled: z.boolean(),
 });
 
@@ -112,7 +112,6 @@ function SiteSettingsTab() {
       analytics_enabled: false,
       maintenance_mode: false,
       contact_email: '',
-      posts_per_page: 10,
       editorial_workflow_enabled: false,
     },
   });
@@ -127,7 +126,6 @@ function SiteSettingsTab() {
         analytics_enabled: settings.analytics_enabled,
         maintenance_mode: settings.maintenance_mode,
         contact_email: settings.contact_email,
-        posts_per_page: settings.posts_per_page,
         editorial_workflow_enabled: settings.editorial_workflow_enabled,
       });
       setPreviewTemplates(settings.preview_templates ?? []);
@@ -154,7 +152,6 @@ function SiteSettingsTab() {
       analytics_enabled: values.analytics_enabled,
       maintenance_mode: values.maintenance_mode,
       contact_email: values.contact_email || '',
-      posts_per_page: values.posts_per_page,
       editorial_workflow_enabled: values.editorial_workflow_enabled,
       preview_templates: previewTemplates.filter(pt => pt.name.trim() && pt.url.trim()),
     });
@@ -200,45 +197,21 @@ function SiteSettingsTab() {
             </Box>
             <Divider sx={{ mb: 2.5 }} />
 
-            <Grid container spacing={2.5}>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <Controller
-                  name="contact_email"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      label={t('settings.general.contactEmail')}
-                      type="email"
-                      fullWidth
-                      size="small"
-                      helperText={errors.contact_email?.message}
-                      error={!!errors.contact_email}
-                    />
-                  )}
+            <Controller
+              name="contact_email"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label={t('settings.general.contactEmail')}
+                  type="email"
+                  fullWidth
+                  size="small"
+                  helperText={errors.contact_email?.message}
+                  error={!!errors.contact_email}
                 />
-              </Grid>
-
-              <Grid size={{ xs: 12, md: 6 }}>
-                <Controller
-                  name="posts_per_page"
-                  control={control}
-                  render={({ field }) => (
-                    <TextField
-                      {...field}
-                      onChange={(e) => field.onChange(Number(e.target.value))}
-                      label={t('settings.general.postsPerPage')}
-                      type="number"
-                      fullWidth
-                      size="small"
-                      inputProps={{ min: 1, max: 100 }}
-                      helperText={errors.posts_per_page?.message || '1 \u2013 100'}
-                      error={!!errors.posts_per_page}
-                    />
-                  )}
-                />
-              </Grid>
-            </Grid>
+              )}
+            />
           </Paper>
         </Grid>
 
@@ -884,55 +857,81 @@ function PreferencesTab() {
       </Grid>
 
       {/* Autosave */}
-      <Grid size={12}>
-        <Paper sx={{ p: 3 }}>
+      <Grid size={{ xs: 12, md: 6 }}>
+        <Paper sx={{ p: 3, height: '100%' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
             <SaveAltIcon color="primary" fontSize="small" />
             <Typography variant="h6" component="h2">{t('settings.preferences.autosave.title')}</Typography>
           </Box>
           <Divider sx={{ mb: 2.5 }} />
 
-          <Grid container spacing={2.5}>
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <Stack direction="row" alignItems="center" justifyContent="space-between">
-                <Box>
-                  <Typography variant="body1">{t('settings.preferences.autosave.enableLabel')}</Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {t('settings.preferences.autosave.enableDescription')}
-                  </Typography>
-                </Box>
-                <Switch
-                  checked={preferences.autosave_enabled}
-                  onChange={(e) => updatePreferences({ autosave_enabled: e.target.checked })}
-                />
-              </Stack>
-            </Grid>
-
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField
-                type="number"
-                label={t('settings.preferences.autosave.debounceLabel')}
-                helperText={t('settings.preferences.autosave.debounceDescription')}
-                size="small"
-                fullWidth
-                disabled={!preferences.autosave_enabled}
-                defaultValue={preferences.autosave_debounce_seconds}
-                key={preferences.autosave_debounce_seconds}
-                slotProps={{
-                  input: {
-                    endAdornment: <InputAdornment position="end">{t('settings.preferences.autosave.seconds')}</InputAdornment>,
-                  },
-                  htmlInput: { min: 1, max: 60 },
-                }}
-                onBlur={(e) => {
-                  const val = parseInt(e.target.value, 10);
-                  if (!isNaN(val) && val >= 1 && val <= 60 && val !== preferences.autosave_debounce_seconds) {
-                    updatePreferences({ autosave_debounce_seconds: val });
-                  }
-                }}
+          <Stack spacing={2.5}>
+            <Stack direction="row" alignItems="center" justifyContent="space-between">
+              <Box>
+                <Typography variant="body1">{t('settings.preferences.autosave.enableLabel')}</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {t('settings.preferences.autosave.enableDescription')}
+                </Typography>
+              </Box>
+              <Switch
+                checked={preferences.autosave_enabled}
+                onChange={(e) => updatePreferences({ autosave_enabled: e.target.checked })}
               />
-            </Grid>
-          </Grid>
+            </Stack>
+
+            <TextField
+              type="number"
+              label={t('settings.preferences.autosave.debounceLabel')}
+              helperText={t('settings.preferences.autosave.debounceDescription')}
+              size="small"
+              fullWidth
+              disabled={!preferences.autosave_enabled}
+              defaultValue={preferences.autosave_debounce_seconds}
+              key={preferences.autosave_debounce_seconds}
+              slotProps={{
+                input: {
+                  endAdornment: <InputAdornment position="end">{t('settings.preferences.autosave.seconds')}</InputAdornment>,
+                },
+                htmlInput: { min: 1, max: 60 },
+              }}
+              onBlur={(e) => {
+                const val = parseInt(e.target.value, 10);
+                if (!isNaN(val) && val >= 1 && val <= 60 && val !== preferences.autosave_debounce_seconds) {
+                  updatePreferences({ autosave_debounce_seconds: val });
+                }
+              }}
+            />
+          </Stack>
+        </Paper>
+      </Grid>
+
+      {/* Table Display */}
+      <Grid size={{ xs: 12, md: 6 }}>
+        <Paper sx={{ p: 3, height: '100%' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+            <TableChartIcon color="primary" fontSize="small" />
+            <Typography variant="h6" component="h2">{t('settings.preferences.tableDisplay.title')}</Typography>
+          </Box>
+          <Divider sx={{ mb: 2.5 }} />
+
+          <TextField
+            select
+            label={t('settings.preferences.tableDisplay.pageSizeLabel')}
+            helperText={t('settings.preferences.tableDisplay.pageSizeDescription')}
+            size="small"
+            fullWidth
+            value={preferences.page_size}
+            onChange={(e) => {
+              const val = Number(e.target.value);
+              if (val !== preferences.page_size) {
+                updatePreferences({ page_size: val });
+              }
+            }}
+          >
+            {[10, 25, 50, 100].map((size) => (
+              <MenuItem key={size} value={size}>{size}</MenuItem>
+            ))}
+          </TextField>
         </Paper>
       </Grid>
     </Grid>

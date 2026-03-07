@@ -14,7 +14,6 @@ pub const KEY_MAX_MEDIA_FILE_SIZE: &str = "max_media_file_size";
 pub const KEY_ANALYTICS_ENABLED: &str = "analytics_enabled";
 pub const KEY_MAINTENANCE_MODE: &str = "maintenance_mode";
 pub const KEY_CONTACT_EMAIL: &str = "contact_email";
-pub const KEY_POSTS_PER_PAGE: &str = "posts_per_page";
 pub const KEY_EDITORIAL_WORKFLOW_ENABLED: &str = "editorial_workflow_enabled";
 pub const KEY_PREVIEW_TEMPLATES: &str = "preview_templates";
 pub const KEY_SCHEDULING_ENABLED: &str = "scheduling_enabled";
@@ -42,7 +41,6 @@ pub fn defaults() -> HashMap<String, serde_json::Value> {
     m.insert(KEY_ANALYTICS_ENABLED.into(), serde_json::json!(false));
     m.insert(KEY_MAINTENANCE_MODE.into(), serde_json::json!(false));
     m.insert(KEY_CONTACT_EMAIL.into(), serde_json::json!(""));
-    m.insert(KEY_POSTS_PER_PAGE.into(), serde_json::json!(10));
     m.insert(
         KEY_EDITORIAL_WORKFLOW_ENABLED.into(),
         serde_json::json!(false),
@@ -171,13 +169,12 @@ mod tests {
     #[test]
     fn test_defaults_contains_all_keys() {
         let d = defaults();
-        assert_eq!(d.len(), 16);
+        assert_eq!(d.len(), 15);
         assert!(d.contains_key(KEY_MAX_DOCUMENT_FILE_SIZE));
         assert!(d.contains_key(KEY_MAX_MEDIA_FILE_SIZE));
         assert!(d.contains_key(KEY_ANALYTICS_ENABLED));
         assert!(d.contains_key(KEY_MAINTENANCE_MODE));
         assert!(d.contains_key(KEY_CONTACT_EMAIL));
-        assert!(d.contains_key(KEY_POSTS_PER_PAGE));
         assert!(d.contains_key(KEY_EDITORIAL_WORKFLOW_ENABLED));
         assert!(d.contains_key(KEY_PREVIEW_TEMPLATES));
         assert!(d.contains_key(KEY_SCHEDULING_ENABLED));
@@ -198,7 +195,6 @@ mod tests {
         assert_eq!(d[KEY_ANALYTICS_ENABLED], serde_json::json!(false));
         assert_eq!(d[KEY_MAINTENANCE_MODE], serde_json::json!(false));
         assert_eq!(d[KEY_CONTACT_EMAIL], serde_json::json!(""));
-        assert_eq!(d[KEY_POSTS_PER_PAGE], serde_json::json!(10));
         assert_eq!(d[KEY_EDITORIAL_WORKFLOW_ENABLED], serde_json::json!(false));
         assert_eq!(d[KEY_PREVIEW_TEMPLATES], serde_json::json!([]));
         assert_eq!(d[KEY_SCHEDULING_ENABLED], serde_json::json!(true));
@@ -219,15 +215,15 @@ mod tests {
         let setting = SiteSetting {
             id: Uuid::new_v4(),
             site_id: Uuid::new_v4(),
-            setting_key: "posts_per_page".to_string(),
-            setting_value: serde_json::json!(20),
+            setting_key: "analytics_enabled".to_string(),
+            setting_value: serde_json::json!(true),
             is_sensitive: false,
             created_at: Utc::now(),
             updated_at: Utc::now(),
         };
 
         let json = serde_json::to_string(&setting).unwrap();
-        assert!(json.contains("\"setting_key\":\"posts_per_page\""));
-        assert!(json.contains("\"setting_value\":20"));
+        assert!(json.contains("\"setting_key\":\"analytics_enabled\""));
+        assert!(json.contains("\"setting_value\":true"));
     }
 }

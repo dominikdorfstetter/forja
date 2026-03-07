@@ -13,6 +13,7 @@ function getDefaultPreferences(): UserPreferencesResponse {
     autosave_debounce_seconds: 3,
     language: localStorage.getItem('admin-language') || 'en',
     theme_id: localStorage.getItem('theme-preference') || 'system',
+    page_size: 25,
   };
 }
 
