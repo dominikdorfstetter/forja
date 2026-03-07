@@ -24,7 +24,11 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
+  IconButton,
+  InputAdornment,
+  Tooltip,
 } from '@mui/material';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Controller, useForm } from 'react-hook-form';
@@ -113,6 +117,7 @@ export default function BlogDetailPage() {
   const [translateDialogOpen, setTranslateDialogOpen] = useState(false);
   const [translateLocale, setTranslateLocale] = useState('');
   const [translationPreview, setTranslationPreview] = useState<Partial<Record<'title' | 'subtitle' | 'excerpt' | 'body' | 'meta_title' | 'meta_description', string>> | null>(null);
+  const [refreshingField, setRefreshingField] = useState<string | null>(null);
 
   const { templates: previewTemplates, openPreview } = usePreviewUrl();
   const { isConfigured: aiConfigured, generate: aiGenerate, isGenerating: aiGenerating } = useAiAssist();
@@ -379,6 +384,23 @@ export default function BlogDetailPage() {
       meta_title: result.meta_title,
       meta_description: result.meta_description,
     });
+  };
+
+  const handleRefreshField = async (fieldName: 'title' | 'subtitle' | 'excerpt' | 'body' | 'meta_title' | 'meta_description') => {
+    const values = getValues();
+    const sourceValue = values[fieldName];
+    if (!sourceValue || !translateLocale) return;
+
+    setRefreshingField(fieldName);
+    try {
+      const result = await aiGenerate('translate', JSON.stringify({ [fieldName]: sourceValue }), translateLocale);
+      const translated = result[fieldName];
+      if (translated) {
+        setTranslationPreview((prev) => prev ? { ...prev, [fieldName]: translated } : prev);
+      }
+    } finally {
+      setRefreshingField(null);
+    }
   };
 
   const handleApplyTranslation = async () => {
@@ -798,67 +820,44 @@ export default function BlogDetailPage() {
 
           {translationPreview && (
             <Stack spacing={2}>
-              {translationPreview.title !== undefined && (
+              {([
+                { key: 'title' as const, label: t('blogDetail.fields.title') },
+                { key: 'subtitle' as const, label: t('blogDetail.fields.subtitle') },
+                { key: 'excerpt' as const, label: t('blogDetail.fields.excerpt'), multiline: true, minRows: 2 },
+                { key: 'body' as const, label: t('blogDetail.fields.body'), multiline: true, minRows: 4, maxRows: 12 },
+                { key: 'meta_title' as const, label: t('blogDetail.fields.metaTitle') },
+                { key: 'meta_description' as const, label: t('blogDetail.fields.metaDescription'), multiline: true, minRows: 2 },
+              ] as const).filter(({ key }) => translationPreview[key] !== undefined).map(({ key, label, ...props }) => (
                 <TextField
-                  label={t('blogDetail.fields.title')}
-                  value={translationPreview.title}
-                  onChange={(e) => setTranslationPreview((prev) => prev ? { ...prev, title: e.target.value } : prev)}
+                  key={key}
+                  label={label}
+                  value={translationPreview[key] ?? ''}
+                  onChange={(e) => setTranslationPreview((prev) => prev ? { ...prev, [key]: e.target.value } : prev)}
                   fullWidth
                   size="small"
+                  disabled={refreshingField === key}
+                  slotProps={{
+                    input: {
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <Tooltip title={t('blogDetail.ai.refreshField')}>
+                            <span>
+                              <IconButton
+                                size="small"
+                                onClick={() => handleRefreshField(key)}
+                                disabled={refreshingField !== null}
+                              >
+                                {refreshingField === key ? <CircularProgress size={16} /> : <RefreshIcon fontSize="small" />}
+                              </IconButton>
+                            </span>
+                          </Tooltip>
+                        </InputAdornment>
+                      ),
+                    },
+                  }}
+                  {...props}
                 />
-              )}
-              {translationPreview.subtitle !== undefined && (
-                <TextField
-                  label={t('blogDetail.fields.subtitle')}
-                  value={translationPreview.subtitle}
-                  onChange={(e) => setTranslationPreview((prev) => prev ? { ...prev, subtitle: e.target.value } : prev)}
-                  fullWidth
-                  size="small"
-                />
-              )}
-              {translationPreview.excerpt !== undefined && (
-                <TextField
-                  label={t('blogDetail.fields.excerpt')}
-                  value={translationPreview.excerpt}
-                  onChange={(e) => setTranslationPreview((prev) => prev ? { ...prev, excerpt: e.target.value } : prev)}
-                  multiline
-                  minRows={2}
-                  fullWidth
-                  size="small"
-                />
-              )}
-              {translationPreview.body !== undefined && (
-                <TextField
-                  label={t('blogDetail.fields.body')}
-                  value={translationPreview.body}
-                  onChange={(e) => setTranslationPreview((prev) => prev ? { ...prev, body: e.target.value } : prev)}
-                  multiline
-                  minRows={4}
-                  maxRows={12}
-                  fullWidth
-                  size="small"
-                />
-              )}
-              {translationPreview.meta_title !== undefined && (
-                <TextField
-                  label={t('blogDetail.fields.metaTitle')}
-                  value={translationPreview.meta_title}
-                  onChange={(e) => setTranslationPreview((prev) => prev ? { ...prev, meta_title: e.target.value } : prev)}
-                  fullWidth
-                  size="small"
-                />
-              )}
-              {translationPreview.meta_description !== undefined && (
-                <TextField
-                  label={t('blogDetail.fields.metaDescription')}
-                  value={translationPreview.meta_description}
-                  onChange={(e) => setTranslationPreview((prev) => prev ? { ...prev, meta_description: e.target.value } : prev)}
-                  multiline
-                  minRows={2}
-                  fullWidth
-                  size="small"
-                />
-              )}
+              ))}
             </Stack>
           )}
         </DialogContent>
