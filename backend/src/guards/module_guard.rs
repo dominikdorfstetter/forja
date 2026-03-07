@@ -59,6 +59,13 @@ impl ModuleMarker for DocumentsModule {
     const DEFAULT_ENABLED: bool = false;
 }
 
+pub struct AiModule;
+impl ModuleMarker for AiModule {
+    const SETTING_KEY: &'static str = "module_ai_enabled";
+    const MODULE_NAME: &'static str = "ai";
+    const DEFAULT_ENABLED: bool = false;
+}
+
 // ── Guard struct ────────────────────────────────────────────────────
 
 /// Request guard that rejects requests when the content module is disabled.
@@ -192,5 +199,9 @@ mod tests {
         assert_eq!(DocumentsModule::SETTING_KEY, "module_documents_enabled");
         assert_eq!(DocumentsModule::MODULE_NAME, "documents");
         assert!(!DocumentsModule::DEFAULT_ENABLED);
+
+        assert_eq!(AiModule::SETTING_KEY, "module_ai_enabled");
+        assert_eq!(AiModule::MODULE_NAME, "ai");
+        assert!(!AiModule::DEFAULT_ENABLED);
     }
 }
