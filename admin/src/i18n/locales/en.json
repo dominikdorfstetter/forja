@@ -902,6 +902,13 @@
       "reviewer": "Reviewer",
       "viewer": "Viewer"
     },
+    "roleDescriptions": {
+      "admin": "Full site management access",
+      "editor": "Can manage all content and authors",
+      "author": "Can write and edit their own content",
+      "reviewer": "Can review content submitted for approval",
+      "viewer": "Can view content (read-only)"
+    },
     "empty": {
       "noSite": "Select a site from the toolbar to manage its members",
       "title": "No team members yet",
@@ -1392,6 +1399,11 @@
       "writeBlog": "Write a blog post",
       "setupNav": "Set up navigation"
     }
+  },
+  "teamWorkflowPrompt": {
+    "message": "Your site now has multiple contributors. Enable editorial review to have content reviewed before publishing.",
+    "enableButton": "Enable in Settings",
+    "dismissButton": "Dismiss"
   },
   "activity": {
     "title": "Activity",

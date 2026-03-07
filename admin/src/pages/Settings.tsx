@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Box,
   Paper,
@@ -48,7 +48,7 @@ import { z } from 'zod';
 import { format } from 'date-fns';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 import apiService from '@/services/api';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
@@ -88,15 +88,16 @@ const BYTES_PER_MB = 1_048_576;
 
 // ─── Site Settings Tab ──────────────────────────────────────────────
 
-function SiteSettingsTab() {
+function SiteSettingsTab({ highlightField }: { highlightField?: string }) {
   const { t } = useTranslation();
   const { selectedSiteId } = useSiteContext();
   const queryClient = useQueryClient();
   const { enqueueSnackbar } = useSnackbar();
+  const workflowRef = useRef<HTMLDivElement>(null);
 
   const [previewTemplates, setPreviewTemplates] = useState<PreviewTemplate[]>([]);
   const [previewTemplatesDirty, setPreviewTemplatesDirty] = useState(false);
-  const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [advancedOpen, setAdvancedOpen] = useState(highlightField === 'editorial_workflow');
 
   const { data: settings, isLoading } = useQuery({
     queryKey: ['site-settings', selectedSiteId],
@@ -132,6 +133,16 @@ function SiteSettingsTab() {
       setPreviewTemplatesDirty(false);
     }
   }, [settings, reset]);
+
+  // Scroll to and highlight the editorial workflow toggle when linked from prompt
+  useEffect(() => {
+    if (highlightField === 'editorial_workflow' && advancedOpen && workflowRef.current) {
+      const timer = setTimeout(() => {
+        workflowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [highlightField, advancedOpen]);
 
   const mutation = useMutation({
     mutationFn: (data: UpdateSiteSettingsRequest) =>
@@ -358,7 +369,21 @@ function SiteSettingsTab() {
                         name="editorial_workflow_enabled"
                         control={control}
                         render={({ field }) => (
-                          <Paper variant="outlined" sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Paper
+                            ref={workflowRef}
+                            variant="outlined"
+                            sx={{
+                              p: 2,
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              ...(highlightField === 'editorial_workflow' && {
+                                borderColor: 'primary.main',
+                                borderWidth: 2,
+                                boxShadow: (theme) => `0 0 0 3px ${theme.palette.primary.main}25`,
+                              }),
+                            }}
+                          >
                             <Box>
                               <Typography variant="body1" fontWeight={500}>{t('settings.featureToggles.editorialWorkflow')}</Typography>
                               <Typography variant="caption" color="text.secondary">
@@ -952,6 +977,8 @@ export default function SettingsPage() {
   const { isAdmin, isMaster } = useAuth();
   const { selectedSiteId } = useSiteContext();
   const { modules } = useSiteContextData();
+  const [searchParams] = useSearchParams();
+  const highlightField = searchParams.get('highlight') ?? undefined;
   const [tabIndex, setTabIndex] = useState(0);
 
   // Build tabs dynamically based on permissions
@@ -971,7 +998,7 @@ export default function SettingsPage() {
       key: 'siteSettings',
       icon: <TuneIcon />,
       label: t('settings.tabs.siteSettings'),
-      content: <SiteSettingsTab />,
+      content: <SiteSettingsTab highlightField={highlightField} />,
     });
   }
 
@@ -1014,6 +1041,14 @@ export default function SettingsPage() {
       content: <ApiKeysPage embedded />,
     });
   }
+
+  // Auto-switch to siteSettings tab when highlight param is set
+  useEffect(() => {
+    if (highlightField) {
+      const idx = tabs.findIndex((t) => t.key === 'siteSettings');
+      if (idx >= 0) setTabIndex(idx);
+    }
+  }, [highlightField]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Clamp tabIndex if tab list shrinks (e.g. site deselected)
   const safeTabIndex = Math.min(tabIndex, tabs.length - 1);

@@ -1211,6 +1211,7 @@ export interface UpdateSiteSettingsRequest {
   contact_email?: string;
   editorial_workflow_enabled?: boolean;
   preview_templates?: PreviewTemplate[];
+  team_features_prompt_dismissed?: boolean;
   module_blog_enabled?: boolean;
   module_pages_enabled?: boolean;
   module_cv_enabled?: boolean;

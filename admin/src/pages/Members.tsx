@@ -11,6 +11,7 @@ import {
   Avatar,
   Chip,
   IconButton,
+  ListItemText,
   MenuItem,
   TextField,
   Dialog,
@@ -262,7 +263,12 @@ export default function MembersPage() {
               fullWidth
             >
               {ROLES.filter((r) => r !== 'owner').map((r) => (
-                <MenuItem key={r} value={r}>{t(`members.roles.${r}`)}</MenuItem>
+                <MenuItem key={r} value={r}>
+                  <ListItemText
+                    primary={t(`members.roles.${r}`)}
+                    secondary={t(`members.roleDescriptions.${r}`)}
+                  />
+                </MenuItem>
               ))}
             </TextField>
             <Paper variant="outlined" sx={{ maxHeight: 240, overflow: 'auto' }}>
