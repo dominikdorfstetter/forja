@@ -39,6 +39,7 @@ import { useCrudMutations } from '@/hooks/useCrudMutations';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import { useBulkSelection } from '@/hooks/useBulkSelection';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { useSiteContextData } from '@/hooks/useSiteContextData';
 
 type SortDir = 'asc' | 'desc';
 
@@ -49,6 +50,8 @@ export default function PagesPage() {
   const { selectedSiteId } = useSiteContext();
   const { canWrite, isAdmin } = useAuth();
   const { showError, enqueueSnackbar } = useErrorSnackbar();
+  const { context } = useSiteContextData();
+  const workflowEnabled = context.features.editorial_workflow;
 
   const {
     page, setPage, perPage, formOpen, deleting: deletingPage,
@@ -209,8 +212,8 @@ export default function PagesPage() {
   const statusFilterOptions = [
     { value: '', label: t('common.filters.all') },
     { value: 'Draft', label: t('common.status.draft') },
-    { value: 'InReview', label: t('common.status.inReview') },
-    { value: 'Scheduled', label: t('common.status.scheduled') },
+    ...(workflowEnabled ? [{ value: 'InReview', label: t('common.status.inReview') }] : []),
+    ...(workflowEnabled ? [{ value: 'Scheduled', label: t('common.status.scheduled') }] : []),
     { value: 'Published', label: t('common.status.published') },
   ];
 

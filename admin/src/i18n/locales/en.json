@@ -122,6 +122,8 @@
       "legal": "Legal",
       "cv": "CV",
       "members": "Members",
+      "invite": "Invite",
+      "reviews": "Reviews",
       "apiKeys": "API Keys",
       "contentTemplates": "Templates",
       "redirects": "Redirects",
@@ -1277,6 +1279,10 @@
       "title": "General",
       "contactEmail": "Contact Email",
       "postsPerPage": "Posts Per Page"
+    },
+    "advanced": {
+      "title": "Advanced Settings",
+      "description": "Configuration options for power users and team workflows"
     },
     "featureToggles": {
       "title": "Feature Toggles",
