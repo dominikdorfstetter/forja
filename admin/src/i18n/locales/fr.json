@@ -405,6 +405,18 @@
       "general": "Général",
       "media": "Médias",
       "relations": "Relations"
+    },
+    "ai": {
+      "generateSeo": "Générer le SEO",
+      "generateExcerpt": "Générer un extrait",
+      "translate": "Traduction IA",
+      "generating": "Génération...",
+      "writeContentFirst": "Rédigez d'abord du contenu",
+      "selectTargetLocale": "Langue cible",
+      "suggestTranslation": "Suggérer une traduction",
+      "applyTranslation": "Appliquer",
+      "refreshField": "Retraduire ce champ",
+      "translationPreview": "Aperçu de la traduction"
     }
   },
   "pages": {
@@ -2017,6 +2029,51 @@
       "horizontalRule": "Ligne horizontale",
       "image": "Image",
       "table": "Tableau"
+    }
+  },
+  "aiSettings": {
+    "title": "Paramètres IA",
+    "advanced": "Paramètres avancés",
+    "fields": {
+      "providerPreset": "Fournisseur",
+      "providerName": "Nom du fournisseur",
+      "providerNameHelp": "Nom d'affichage pour cette configuration",
+      "baseUrl": "URL de base",
+      "baseUrlHelp": "Point d'accès API — rempli automatiquement lors de la sélection d'un fournisseur",
+      "apiKey": "Clé API",
+      "apiKeyHelp": "Clé API de votre fournisseur",
+      "apiKeyOptional": "Optionnel — ce fournisseur ne nécessite pas de clé API",
+      "apiKeyExisting": "Clé actuelle",
+      "model": "Modèle",
+      "modelHelp": "Saisissez un nom de modèle ou cliquez sur Actualiser pour découvrir les modèles disponibles",
+      "temperature": "Température",
+      "maxTokens": "Tokens max.",
+      "systemPromptsHelp": "Laisser vide pour les valeurs par défaut. Les prompts personnalisés remplacent entièrement les valeurs par défaut.",
+      "systemPromptSeo": "Prompt de génération SEO",
+      "systemPromptExcerpt": "Prompt de génération d'extrait",
+      "systemPromptTranslate": "Prompt de traduction",
+      "defaultPromptSeo": "Vous êtes un expert SEO. Générez un méta-titre optimisé SEO (max 60 caractères) et une méta-description (max 160 caractères) à partir du contenu fourni.",
+      "defaultPromptExcerpt": "Vous êtes un éditeur de contenu. Générez un extrait concis de 1-2 phrases résumant les points clés du contenu fourni.",
+      "defaultPromptTranslate": "Vous êtes un traducteur professionnel. Traduisez le contenu suivant dans la langue cible. Maintenez le ton, le style et le formatage markdown d'origine."
+    },
+    "actions": {
+      "save": "Enregistrer",
+      "testConnection": "Tester la connexion",
+      "remove": "Supprimer la configuration",
+      "discoverModels": "Découvrir les modèles disponibles"
+    },
+    "messages": {
+      "saved": "Configuration IA enregistrée",
+      "saveFailed": "Échec de l'enregistrement de la configuration IA",
+      "deleted": "Configuration IA supprimée",
+      "testFailed": "Échec du test de connexion",
+      "modelsFound": "{{count}} modèle(s) trouvé(s)",
+      "noModels": "Aucun modèle trouvé — vérifiez l'URL de base et la clé API",
+      "modelsFailed": "Impossible de découvrir les modèles — vérifiez l'URL de base et la clé API"
+    },
+    "deleteConfirm": {
+      "title": "Supprimer la configuration IA ?",
+      "message": "Cela désactivera les fonctionnalités IA pour ce site. Vous pourrez reconfigurer plus tard."
     }
   }
 }
