@@ -292,6 +292,7 @@ export interface SiteContextModules {
   cv: boolean;
   legal: boolean;
   documents: boolean;
+  ai: boolean;
 }
 
 export interface SiteContextSuggestions {
@@ -1420,4 +1421,50 @@ export interface BulkContentResponse {
   succeeded: number;
   failed: number;
   results: BulkItemResult[];
+}
+
+// AI Content Assist
+export type AiAction = 'seo' | 'excerpt' | 'translate';
+
+export interface AiGenerateRequest {
+  action: AiAction;
+  content: string;
+  target_locale?: string;
+}
+
+export interface AiGenerateResponse {
+  meta_title?: string;
+  meta_description?: string;
+  excerpt?: string;
+  title?: string;
+  subtitle?: string;
+  body?: string;
+}
+
+export interface CreateAiConfigRequest {
+  provider_name: string;
+  base_url: string;
+  api_key: string;
+  model: string;
+  temperature?: number;
+  max_tokens?: number;
+  system_prompts?: Record<string, string>;
+}
+
+export interface AiConfigResponse {
+  id: string;
+  site_id: string;
+  provider_name: string;
+  base_url: string;
+  api_key_masked: string;
+  model: string;
+  temperature: number;
+  max_tokens: number;
+  system_prompts: Record<string, string>;
+  updated_at: string;
+}
+
+export interface AiTestResponse {
+  success: boolean;
+  message: string;
 }

@@ -129,6 +129,7 @@
       "redirects": "Redirects",
       "webhooks": "Webhooks",
       "settings": "Settings",
+      "aiSettings": "AI Settings",
       "sites": "Sites",
       "locales": "Languages",
       "apiDocs": "API Docs",
@@ -328,6 +329,17 @@
       "saving": "Saving...",
       "saved": "All changes saved",
       "saveFailed": "Save failed"
+    },
+    "ai": {
+      "generateSeo": "Generate SEO",
+      "generateExcerpt": "Generate Excerpt",
+      "translate": "AI Translate",
+      "generating": "Generating...",
+      "writeContentFirst": "Write some content first",
+      "selectTargetLocale": "Target Locale",
+      "suggestTranslation": "Suggest Translation",
+      "applyTranslation": "Apply",
+      "translationPreview": "Translation Preview"
     },
     "seo": {
       "serpPreview": "Search Engine Preview",
@@ -1210,7 +1222,9 @@
         "legal": "Legal",
         "legalDesc": "Privacy policy, terms of service, and legal documents",
         "documents": "Documents",
-        "documentsDesc": "Upload and manage downloadable files"
+        "documentsDesc": "Upload and manage downloadable files",
+        "ai": "AI Assist",
+        "aiDesc": "SEO generation, auto-excerpts, and translation suggestions"
       },
       "workflowDescription": "How will you manage content on this site?",
       "workflow": {
@@ -2122,5 +2136,41 @@
     "moreOptions": "More options",
     "success": "Blog post created",
     "dashboardButton": "Quick Post"
+  },
+  "aiSettings": {
+    "title": "AI Settings",
+    "advanced": "Advanced Settings",
+    "fields": {
+      "providerName": "Provider Name",
+      "providerNameHelp": "Display name (e.g. OpenAI, Ollama Local)",
+      "baseUrl": "Base URL",
+      "baseUrlHelp": "OpenAI-compatible API base URL (e.g. https://api.openai.com)",
+      "apiKey": "API Key",
+      "apiKeyHelp": "Your provider's API key",
+      "apiKeyExisting": "Current key",
+      "model": "Model",
+      "modelHelp": "Model identifier (e.g. gpt-4o-mini, llama3)",
+      "temperature": "Temperature",
+      "maxTokens": "Max Tokens",
+      "systemPromptsHelp": "Leave empty to use built-in defaults. Custom prompts fully replace the defaults.",
+      "systemPromptSeo": "SEO Generation Prompt",
+      "systemPromptExcerpt": "Excerpt Generation Prompt",
+      "systemPromptTranslate": "Translation Prompt"
+    },
+    "actions": {
+      "save": "Save",
+      "testConnection": "Test Connection",
+      "remove": "Remove Configuration"
+    },
+    "messages": {
+      "saved": "AI configuration saved",
+      "saveFailed": "Failed to save AI configuration",
+      "deleted": "AI configuration removed",
+      "testFailed": "Connection test failed"
+    },
+    "deleteConfirm": {
+      "title": "Remove AI Configuration?",
+      "message": "This will disable AI features for this site. You can reconfigure later."
+    }
   }
 }

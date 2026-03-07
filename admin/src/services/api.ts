@@ -128,6 +128,11 @@ import type {
   UserPreferencesResponse,
   UpdateUserPreferencesRequest,
   SiteContextResponse,
+  AiConfigResponse,
+  CreateAiConfigRequest,
+  AiTestResponse,
+  AiGenerateRequest,
+  AiGenerateResponse,
 } from '@/types/api';
 
 const API_BASE_URL = '/api/v1';
@@ -1016,6 +1021,27 @@ export class ApiService {
 
   async markAllNotificationsRead(siteId: string): Promise<MarkAllReadResponse> {
     return apiRequest<MarkAllReadResponse>('PUT', `/sites/${siteId}/notifications/read-all`);
+  }
+
+  // AI Content Assist
+  async getAiConfig(siteId: string): Promise<AiConfigResponse> {
+    return apiRequest<AiConfigResponse>('GET', `/sites/${siteId}/ai/config`);
+  }
+
+  async upsertAiConfig(siteId: string, data: CreateAiConfigRequest): Promise<AiConfigResponse> {
+    return apiRequest<AiConfigResponse>('PUT', `/sites/${siteId}/ai/config`, data);
+  }
+
+  async deleteAiConfig(siteId: string): Promise<void> {
+    return apiRequest<void>('DELETE', `/sites/${siteId}/ai/config`);
+  }
+
+  async testAiConnection(siteId: string): Promise<AiTestResponse> {
+    return apiRequest<AiTestResponse>('POST', `/sites/${siteId}/ai/test`);
+  }
+
+  async generateAiContent(siteId: string, data: AiGenerateRequest): Promise<AiGenerateResponse> {
+    return apiRequest<AiGenerateResponse>('POST', `/sites/${siteId}/ai/generate`, data);
   }
 }
 

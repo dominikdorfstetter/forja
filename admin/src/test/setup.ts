@@ -153,6 +153,12 @@ vi.mock('@/services/api', () => {
     getLocales: vi.fn(),
     // API key methods
     getApiKeys: vi.fn(),
+    // AI methods
+    getAiConfig: vi.fn(),
+    upsertAiConfig: vi.fn(),
+    deleteAiConfig: vi.fn(),
+    testAiConnection: vi.fn(),
+    generateAiContent: vi.fn(),
   };
   return { default: apiService, ApiService: vi.fn(() => apiService) };
 });

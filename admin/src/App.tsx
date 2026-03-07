@@ -38,6 +38,7 @@ import ProfilePage from '@/pages/Profile';
 import ClerkUsersPage from '@/pages/ClerkUsers';
 import ActivityLogPage from '@/pages/ActivityLog';
 import NotificationsPage from '@/pages/Notifications';
+import AiSettingsPage from '@/pages/ai-settings/AiSettingsPage';
 import NotFoundPage from '@/pages/NotFound';
 
 // Components
@@ -156,6 +157,7 @@ function App() {
                   <Route path="locales" element={<LocalesPage />} />
                   <Route path="profile" element={<ProfilePage />} />
                   <Route path="settings" element={<SettingsPage />} />
+                  <Route path="ai-settings" element={<AiSettingsPage />} />
                   <Route path="api-docs" element={<ApiDocsPage />} />
                   <Route path="*" element={<NotFoundPage />} />
                 </Route>

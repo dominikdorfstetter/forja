@@ -24,6 +24,7 @@ import PublishIcon from '@mui/icons-material/Publish';
 import UnpublishedIcon from '@mui/icons-material/Unpublished';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import UnarchiveIcon from '@mui/icons-material/Unarchive';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { type Control, type UseFormWatch, type UseFormSetValue } from 'react-hook-form';
@@ -67,6 +68,8 @@ interface BlogEditorToolbarProps {
   onPreview?: (templateUrl: string) => void;
   sidebarOpen?: boolean;
   onToggleSidebar?: () => void;
+  showAiTranslate?: boolean;
+  onAiTranslate?: () => void;
 }
 
 export default function BlogEditorToolbar({
@@ -100,6 +103,8 @@ export default function BlogEditorToolbar({
   onPreview,
   sidebarOpen,
   onToggleSidebar,
+  showAiTranslate,
+  onAiTranslate,
 }: BlogEditorToolbarProps) {
   const { t } = useTranslation();
   const [scheduleAnchor, setScheduleAnchor] = useState<HTMLElement | null>(null);
@@ -214,6 +219,14 @@ export default function BlogEditorToolbar({
             }
           >
             <VisibilityIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      )}
+
+      {showAiTranslate && onAiTranslate && (
+        <Tooltip title={t('blogDetail.ai.translate')}>
+          <IconButton size="small" onClick={onAiTranslate}>
+            <AutoAwesomeIcon fontSize="small" />
           </IconButton>
         </Tooltip>
       )}

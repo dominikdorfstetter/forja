@@ -1,14 +1,21 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useParams } from 'react-router';
 import {
   Alert,
   Box,
+  Button,
   Chip,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Drawer,
   Grid,
   List,
   ListItem,
   ListItemText,
+  MenuItem,
   Paper,
   Tabs,
   Tab,
@@ -53,6 +60,7 @@ import {
 import BlogEditorToolbar from './BlogEditorToolbar';
 import BlogEditorSidebar from './BlogEditorSidebar';
 import HistoryDrawer from '@/components/shared/HistoryDrawer';
+import { useAiAssist } from '@/hooks/useAiAssist';
 
 const SIDEBAR_WIDTH = 380;
 
@@ -101,8 +109,12 @@ export default function BlogDetailPage() {
   const [formVersion, setFormVersion] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [sidebarTab, setSidebarTab] = useState(0);
+  const [translateDialogOpen, setTranslateDialogOpen] = useState(false);
+  const [translateLocale, setTranslateLocale] = useState('');
+  const [translationPreview, setTranslationPreview] = useState('');
 
   const { templates: previewTemplates, openPreview } = usePreviewUrl();
+  const { isConfigured: aiConfigured, generate: aiGenerate, isGenerating: aiGenerating } = useAiAssist();
 
   // Cache for locale form data
   const localeFormCache = useRef<Map<string, BlogContentFormData>>(new Map());
@@ -333,6 +345,32 @@ export default function BlogDetailPage() {
     return () => window.removeEventListener('keydown', handler);
   }, [flush, formHistory]);
 
+  // AI Translate handlers
+  const otherLocales = useMemo(
+    () => activeLocales.filter((l) => currentLocale && l.id !== currentLocale.id),
+    [activeLocales, currentLocale],
+  );
+
+  const handleOpenTranslate = () => {
+    setTranslateLocale(otherLocales[0]?.code ?? '');
+    setTranslationPreview('');
+    setTranslateDialogOpen(true);
+  };
+
+  const handleGenerateTranslation = async () => {
+    const body = getValues('body');
+    if (!body || !translateLocale) return;
+    const result = await aiGenerate('translate', body, translateLocale);
+    if (result.body) setTranslationPreview(result.body);
+  };
+
+  const handleApplyTranslation = () => {
+    if (!translationPreview) return;
+    setValue('body', translationPreview, { shouldDirty: true });
+    setTranslateDialogOpen(false);
+    setTranslationPreview('');
+  };
+
   const isSaving = createLocMutation.isPending || updateLocMutation.isPending || updateBlogMutation.isPending || reviewBlogMutation.isPending;
 
   // Editorial workflow
@@ -478,6 +516,8 @@ export default function BlogDetailPage() {
         onPreview={(url) => openPreview('/blog/' + (blogDetail.slug || ''), url)}
         sidebarOpen={sidebarOpen}
         onToggleSidebar={() => setSidebarOpen((o) => !o)}
+        showAiTranslate={aiConfigured && otherLocales.length > 0}
+        onAiTranslate={handleOpenTranslate}
       />
 
       {/* Locale Tabs */}
@@ -672,6 +712,70 @@ export default function BlogDetailPage() {
         onCancel={() => setRestoreDialogOpen(false)}
         loading={isSaving}
       />
+
+      {/* AI Translate Dialog */}
+      <Dialog
+        open={translateDialogOpen}
+        onClose={() => setTranslateDialogOpen(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>{t('blogDetail.ai.translate')}</DialogTitle>
+        <DialogContent>
+          <TextField
+            select
+            label={t('blogDetail.ai.selectTargetLocale')}
+            value={translateLocale}
+            onChange={(e) => {
+              setTranslateLocale(e.target.value);
+              setTranslationPreview('');
+            }}
+            fullWidth
+            size="small"
+            sx={{ mt: 1, mb: 2 }}
+          >
+            {otherLocales.map((l) => (
+              <MenuItem key={l.id} value={l.code}>
+                {l.name} ({l.code.toUpperCase()})
+              </MenuItem>
+            ))}
+          </TextField>
+
+          <Button
+            variant="outlined"
+            onClick={handleGenerateTranslation}
+            disabled={aiGenerating || !translateLocale || !getValues('body')}
+            startIcon={aiGenerating ? <CircularProgress size={16} /> : undefined}
+            sx={{ mb: 2 }}
+          >
+            {aiGenerating ? t('blogDetail.ai.generating') : t('blogDetail.ai.suggestTranslation')}
+          </Button>
+
+          {translationPreview && (
+            <TextField
+              label={t('blogDetail.ai.translationPreview')}
+              value={translationPreview}
+              onChange={(e) => setTranslationPreview(e.target.value)}
+              multiline
+              minRows={6}
+              maxRows={16}
+              fullWidth
+            />
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setTranslateDialogOpen(false)}>
+            {t('common.actions.cancel')}
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleApplyTranslation}
+            disabled={!translationPreview}
+          >
+            {t('blogDetail.ai.applyTranslation')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
