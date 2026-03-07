@@ -12,6 +12,7 @@ import BlogSettingsTab from './BlogSettingsTab';
 import BlogMediaSection from './BlogMediaSection';
 import BlogCategoryCard from '@/components/blogs/BlogCategoryCard';
 import BlogDocumentCard from '@/components/blogs/BlogDocumentCard';
+import { useSiteContextData } from '@/hooks/useSiteContextData';
 
 interface BlogEditorSidebarProps {
   activeTab: number;
@@ -51,6 +52,7 @@ export default function BlogEditorSidebar({
   documents,
 }: BlogEditorSidebarProps) {
   const { t } = useTranslation();
+  const { modules } = useSiteContextData();
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -126,10 +128,12 @@ export default function BlogEditorSidebar({
               contentId={contentId}
               categories={categories}
             />
-            <BlogDocumentCard
-              blogId={blogId}
-              documents={documents}
-            />
+            {modules.documents && (
+              <BlogDocumentCard
+                blogId={blogId}
+                documents={documents}
+              />
+            )}
           </Box>
         )}
       </Box>

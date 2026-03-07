@@ -278,6 +278,34 @@ export interface UpdateSiteRequest {
   is_active?: boolean;
 }
 
+// Site Context (progressive disclosure)
+export interface SiteContextFeatures {
+  editorial_workflow: boolean;
+  scheduling: boolean;
+  versioning: boolean;
+  analytics: boolean;
+}
+
+export interface SiteContextModules {
+  blog: boolean;
+  pages: boolean;
+  cv: boolean;
+  legal: boolean;
+  documents: boolean;
+}
+
+export interface SiteContextSuggestions {
+  show_team_workflow_prompt: boolean;
+}
+
+export interface SiteContextResponse {
+  member_count: number;
+  current_user_role: string;
+  features: SiteContextFeatures;
+  suggestions: SiteContextSuggestions;
+  modules: SiteContextModules;
+}
+
 // API Key
 export interface ApiKeyListItem {
   id: string;
@@ -1169,6 +1197,11 @@ export interface SiteSettingsResponse {
   posts_per_page: number;
   editorial_workflow_enabled: boolean;
   preview_templates: PreviewTemplate[];
+  module_blog_enabled: boolean;
+  module_pages_enabled: boolean;
+  module_cv_enabled: boolean;
+  module_legal_enabled: boolean;
+  module_documents_enabled: boolean;
 }
 
 export interface UpdateSiteSettingsRequest {
@@ -1180,6 +1213,11 @@ export interface UpdateSiteSettingsRequest {
   posts_per_page?: number;
   editorial_workflow_enabled?: boolean;
   preview_templates?: PreviewTemplate[];
+  module_blog_enabled?: boolean;
+  module_pages_enabled?: boolean;
+  module_cv_enabled?: boolean;
+  module_legal_enabled?: boolean;
+  module_documents_enabled?: boolean;
 }
 
 // User Preferences

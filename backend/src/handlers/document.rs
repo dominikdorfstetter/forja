@@ -17,6 +17,7 @@ use crate::dto::document::{
 };
 use crate::errors::{ApiError, ProblemDetails};
 use crate::guards::auth_guard::ReadKey;
+use crate::guards::module_guard::{DocumentsModule, ModuleGuard};
 use crate::models::audit::AuditAction;
 use crate::models::blog::Blog;
 use crate::models::content::Content;
@@ -69,6 +70,7 @@ pub async fn list_document_folders(
     state: &State<AppState>,
     site_id: Uuid,
     auth: ReadKey,
+    _module: ModuleGuard<DocumentsModule>,
 ) -> Result<Json<Vec<DocumentFolderResponse>>, ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)
@@ -101,6 +103,7 @@ pub async fn create_document_folder(
     site_id: Uuid,
     body: Json<CreateDocumentFolderRequest>,
     auth: ReadKey,
+    _module: ModuleGuard<DocumentsModule>,
 ) -> Result<(Status, Json<DocumentFolderResponse>), ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Author)
@@ -148,6 +151,7 @@ pub async fn update_document_folder(
     auth.0
         .authorize_site_action(&state.db, existing.site_id, &SiteRole::Author)
         .await?;
+    ModuleGuard::<DocumentsModule>::check(&state.db, existing.site_id).await?;
 
     let req = body.into_inner();
     req.validate()
@@ -190,6 +194,7 @@ pub async fn delete_document_folder(
     auth.0
         .authorize_site_action(&state.db, existing.site_id, &SiteRole::Editor)
         .await?;
+    ModuleGuard::<DocumentsModule>::check(&state.db, existing.site_id).await?;
 
     DocumentFolder::delete(&state.db, id).await?;
     audit_service::log_action(
@@ -234,6 +239,7 @@ pub async fn list_documents(
     page: Option<i64>,
     per_page: Option<i64>,
     auth: ReadKey,
+    _module: ModuleGuard<DocumentsModule>,
 ) -> Result<Json<PaginatedDocuments>, ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)
@@ -266,6 +272,7 @@ pub async fn create_document(
     site_id: Uuid,
     body: Json<CreateDocumentRequest>,
     auth: ReadKey,
+    _module: ModuleGuard<DocumentsModule>,
 ) -> Result<(Status, Json<DocumentListItem>), ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Author)
@@ -332,6 +339,7 @@ pub async fn get_document(
     auth.0
         .authorize_site_action(&state.db, doc.site_id, &SiteRole::Viewer)
         .await?;
+    ModuleGuard::<DocumentsModule>::check(&state.db, doc.site_id).await?;
     let locs = DocumentLocalization::find_all_for_document(&state.db, id).await?;
     Ok(Json(DocumentResponse::from_parts(doc, locs)))
 }
@@ -366,6 +374,7 @@ pub async fn update_document(
     auth.0
         .authorize_site_action(&state.db, existing.site_id, &SiteRole::Author)
         .await?;
+    ModuleGuard::<DocumentsModule>::check(&state.db, existing.site_id).await?;
     let old = serde_json::to_value(&existing).ok();
     let max_file_size = Document::get_max_file_size(&state.db, existing.site_id).await?;
     req.validate_source(max_file_size)
@@ -440,6 +449,7 @@ pub async fn delete_document(
     auth.0
         .authorize_site_action(&state.db, existing.site_id, &SiteRole::Editor)
         .await?;
+    ModuleGuard::<DocumentsModule>::check(&state.db, existing.site_id).await?;
 
     Document::delete(&state.db, id).await?;
     audit_service::log_action(
@@ -520,6 +530,7 @@ pub async fn create_document_localization(
     auth.0
         .authorize_site_action(&state.db, doc.site_id, &SiteRole::Author)
         .await?;
+    ModuleGuard::<DocumentsModule>::check(&state.db, doc.site_id).await?;
 
     let loc = DocumentLocalization::create(&state.db, id, req).await?;
     Ok((
@@ -559,6 +570,7 @@ pub async fn update_document_localization(
     auth.0
         .authorize_site_action(&state.db, doc.site_id, &SiteRole::Author)
         .await?;
+    ModuleGuard::<DocumentsModule>::check(&state.db, doc.site_id).await?;
 
     let loc = DocumentLocalization::update(&state.db, loc_id, req).await?;
     audit_service::log_action(
@@ -599,6 +611,7 @@ pub async fn delete_document_localization(
     auth.0
         .authorize_site_action(&state.db, doc.site_id, &SiteRole::Editor)
         .await?;
+    ModuleGuard::<DocumentsModule>::check(&state.db, doc.site_id).await?;
 
     DocumentLocalization::delete(&state.db, loc_id).await?;
     audit_service::log_action(
@@ -679,6 +692,9 @@ pub async fn assign_blog_document(
             .authorize_site_action(&state.db, *site_id, &SiteRole::Author)
             .await?;
     }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<DocumentsModule>::check(&state.db, site_id).await?;
+    }
 
     let bd = BlogDocument::assign(&state.db, blog_id, req.document_id, req.display_order).await?;
 
@@ -749,6 +765,9 @@ pub async fn unassign_blog_document(
         auth.0
             .authorize_site_action(&state.db, *site_id, &SiteRole::Editor)
             .await?;
+    }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<DocumentsModule>::check(&state.db, site_id).await?;
     }
 
     BlogDocument::unassign(&state.db, blog_id, doc_id).await?;

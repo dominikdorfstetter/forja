@@ -127,6 +127,7 @@ import type {
   BulkContentResponse,
   UserPreferencesResponse,
   UpdateUserPreferencesRequest,
+  SiteContextResponse,
 } from '@/types/api';
 
 const API_BASE_URL = '/api/v1';
@@ -259,6 +260,10 @@ export class ApiService {
 
   async deleteSite(id: string): Promise<void> {
     return apiRequest<void>('DELETE', `/sites/${id}`);
+  }
+
+  async getSiteContext(siteId: string): Promise<SiteContextResponse> {
+    return apiRequest<SiteContextResponse>('GET', `/sites/${siteId}/context`);
   }
 
   // API Keys

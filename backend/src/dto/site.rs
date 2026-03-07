@@ -172,6 +172,22 @@ pub struct SiteContextSuggestions {
     pub show_team_workflow_prompt: bool,
 }
 
+/// Module enable/disable flags for the site
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, utoipa::ToSchema)]
+#[schema(description = "Content module flags — which modules are enabled for this site")]
+pub struct SiteContextModules {
+    #[schema(example = true)]
+    pub blog: bool,
+    #[schema(example = true)]
+    pub pages: bool,
+    #[schema(example = false)]
+    pub cv: bool,
+    #[schema(example = false)]
+    pub legal: bool,
+    #[schema(example = false)]
+    pub documents: bool,
+}
+
 /// Site context response for progressive disclosure
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, utoipa::ToSchema)]
 #[schema(description = "Site context for adaptive UI — drives progressive disclosure")]
@@ -182,6 +198,7 @@ pub struct SiteContextResponse {
     pub current_user_role: String,
     pub features: SiteContextFeatures,
     pub suggestions: SiteContextSuggestions,
+    pub modules: SiteContextModules,
 }
 
 /// Compute whether the team workflow prompt should be shown.
@@ -507,6 +524,13 @@ mod tests {
             suggestions: SiteContextSuggestions {
                 show_team_workflow_prompt: false,
             },
+            modules: SiteContextModules {
+                blog: true,
+                pages: true,
+                cv: false,
+                legal: false,
+                documents: false,
+            },
         };
 
         let json = serde_json::to_string(&response).unwrap();
@@ -515,6 +539,8 @@ mod tests {
         assert!(json.contains("\"editorial_workflow\":false"));
         assert!(json.contains("\"scheduling\":true"));
         assert!(json.contains("\"show_team_workflow_prompt\":false"));
+        assert!(json.contains("\"blog\":true"));
+        assert!(json.contains("\"cv\":false"));
     }
 
     #[test]

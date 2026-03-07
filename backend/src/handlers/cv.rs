@@ -12,6 +12,7 @@ use crate::dto::cv::{
 };
 use crate::errors::{ApiError, ProblemDetails};
 use crate::guards::auth_guard::ReadKey;
+use crate::guards::module_guard::{CvModule, ModuleGuard};
 use crate::models::audit::AuditAction;
 use crate::models::cv::{CvEntry, CvEntryType, Skill};
 use crate::models::site_membership::SiteRole;
@@ -43,6 +44,7 @@ pub async fn list_skills(
     page: Option<i64>,
     per_page: Option<i64>,
     auth: ReadKey,
+    _module: ModuleGuard<CvModule>,
 ) -> Result<Json<PaginatedSkills>, ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)
@@ -131,6 +133,10 @@ pub async fn create_skill(
         auth.0
             .authorize_site_action(&state.db, *site_id, &SiteRole::Author)
             .await?;
+    }
+
+    if let Some(&site_id) = req.site_ids.first() {
+        ModuleGuard::<CvModule>::check(&state.db, site_id).await?;
     }
 
     let site_id = req.site_ids.first().copied();
@@ -248,6 +254,7 @@ pub async fn list_cv_entries(
     page: Option<i64>,
     per_page: Option<i64>,
     auth: ReadKey,
+    _module: ModuleGuard<CvModule>,
 ) -> Result<Json<PaginatedCvEntries>, ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)
@@ -322,6 +329,10 @@ pub async fn create_cv_entry(
         auth.0
             .authorize_site_action(&state.db, *site_id, &SiteRole::Author)
             .await?;
+    }
+
+    if let Some(&site_id) = req.site_ids.first() {
+        ModuleGuard::<CvModule>::check(&state.db, site_id).await?;
     }
 
     let site_id = req.site_ids.first().copied();

@@ -15,6 +15,7 @@ use crate::dto::page::{
 use crate::dto::review::{ReviewActionRequest, ReviewActionResponse};
 use crate::errors::{ApiError, ProblemDetails};
 use crate::guards::auth_guard::ReadKey;
+use crate::guards::module_guard::{ModuleGuard, PagesModule};
 use crate::models::audit::AuditAction;
 use crate::models::content::{Content, ContentStatus};
 use crate::models::page::{Page, PageSection, PageSectionLocalization};
@@ -66,6 +67,7 @@ pub async fn list_pages(
     sort_dir: Option<String>,
     exclude_status: Option<String>,
     auth: ReadKey,
+    _module: ModuleGuard<PagesModule>,
 ) -> Result<Json<PaginatedPages>, ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)
@@ -142,6 +144,9 @@ pub async fn get_page(
             .authorize_site_action(&state.db, *site_id, &SiteRole::Viewer)
             .await?;
     }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<PagesModule>::check(&state.db, site_id).await?;
+    }
     Ok(Json(PageResponse::from(page)))
 }
 
@@ -168,6 +173,7 @@ pub async fn get_page_by_route(
     site_id: Uuid,
     route: std::path::PathBuf,
     auth: ReadKey,
+    _module: ModuleGuard<PagesModule>,
 ) -> Result<Json<PageResponse>, ApiError> {
     let route_str = route.to_string_lossy();
     auth.0
@@ -203,6 +209,9 @@ pub async fn get_page_sections(
         auth.0
             .authorize_site_action(&state.db, *site_id, &SiteRole::Viewer)
             .await?;
+    }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<PagesModule>::check(&state.db, site_id).await?;
     }
 
     let sections = PageSection::find_for_page(&state.db, page_id).await?;
@@ -241,6 +250,9 @@ pub async fn create_page(
         auth.0
             .authorize_site_action(&state.db, *site_id, &SiteRole::Author)
             .await?;
+    }
+    if let Some(&site_id) = req.site_ids.first() {
+        ModuleGuard::<PagesModule>::check(&state.db, site_id).await?;
     }
 
     // Validate initial status against editorial workflow rules
@@ -315,6 +327,9 @@ pub async fn update_page(
         auth.0
             .authorize_site_action(&state.db, *site_id, &SiteRole::Author)
             .await?;
+    }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<PagesModule>::check(&state.db, site_id).await?;
     }
     let old = serde_json::to_value(&existing).ok();
 
@@ -408,6 +423,9 @@ pub async fn delete_page(
             .authorize_site_action(&state.db, *site_id, &SiteRole::Editor)
             .await?;
     }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<PagesModule>::check(&state.db, site_id).await?;
+    }
 
     Page::soft_delete(&state.db, id).await?;
     let site_id = site_ids.into_iter().next();
@@ -459,6 +477,9 @@ pub async fn clone_page(
         auth.0
             .authorize_site_action(&state.db, *site_id, &SiteRole::Author)
             .await?;
+    }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<PagesModule>::check(&state.db, site_id).await?;
     }
 
     let page = Page::clone_page(&state.db, id, site_ids.clone()).await?;
@@ -515,6 +536,9 @@ pub async fn create_page_section(
             .authorize_site_action(&state.db, *site_id, &SiteRole::Author)
             .await?;
     }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<PagesModule>::check(&state.db, site_id).await?;
+    }
 
     let req = body.into_inner();
     req.validate()
@@ -554,6 +578,9 @@ pub async fn update_page_section(
             .authorize_site_action(&state.db, *site_id, &SiteRole::Author)
             .await?;
     }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<PagesModule>::check(&state.db, site_id).await?;
+    }
 
     let req = body.into_inner();
     req.validate()
@@ -591,6 +618,9 @@ pub async fn delete_page_section(
             .authorize_site_action(&state.db, *site_id, &SiteRole::Editor)
             .await?;
     }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<PagesModule>::check(&state.db, site_id).await?;
+    }
 
     PageSection::delete(&state.db, id).await?;
     Ok(Status::NoContent)
@@ -625,6 +655,9 @@ pub async fn reorder_page_sections(
         auth.0
             .authorize_site_action(&state.db, *site_id, &SiteRole::Author)
             .await?;
+    }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<PagesModule>::check(&state.db, site_id).await?;
     }
 
     let req = body.into_inner();
@@ -666,6 +699,9 @@ pub async fn get_section_localizations(
             .authorize_site_action(&state.db, *site_id, &SiteRole::Viewer)
             .await?;
     }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<PagesModule>::check(&state.db, site_id).await?;
+    }
 
     let localizations = PageSectionLocalization::find_for_section(&state.db, section_id).await?;
     let responses: Vec<SectionLocalizationResponse> = localizations
@@ -699,6 +735,9 @@ pub async fn get_page_section_localizations(
         auth.0
             .authorize_site_action(&state.db, *site_id, &SiteRole::Viewer)
             .await?;
+    }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<PagesModule>::check(&state.db, site_id).await?;
     }
 
     let localizations = PageSectionLocalization::find_all_for_page(&state.db, page_id).await?;
@@ -738,6 +777,9 @@ pub async fn upsert_section_localization(
         auth.0
             .authorize_site_action(&state.db, *site_id, &SiteRole::Author)
             .await?;
+    }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<PagesModule>::check(&state.db, site_id).await?;
     }
 
     let req = body.into_inner();
@@ -786,6 +828,9 @@ pub async fn delete_section_localization(
             .authorize_site_action(&state.db, *site_id, &SiteRole::Editor)
             .await?;
     }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<PagesModule>::check(&state.db, site_id).await?;
+    }
 
     PageSectionLocalization::delete(&state.db, id).await?;
     Ok(Status::NoContent)
@@ -820,6 +865,9 @@ pub async fn review_page(
         auth.0
             .authorize_site_action(&state.db, *site_id, &SiteRole::Reviewer)
             .await?;
+    }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<PagesModule>::check(&state.db, site_id).await?;
     }
 
     let slug = page.slug.clone().unwrap_or_else(|| page.route.clone());
@@ -868,6 +916,7 @@ pub async fn bulk_pages(
     site_id: Uuid,
     body: Json<BulkContentRequest>,
     auth: ReadKey,
+    _module: ModuleGuard<PagesModule>,
 ) -> Result<Json<BulkContentResponse>, ApiError> {
     let req = body.into_inner();
     req.validate()

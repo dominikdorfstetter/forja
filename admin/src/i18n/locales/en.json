@@ -22,6 +22,7 @@
       "deleting": "Deleting...",
       "clone": "Clone",
       "upload": "Upload",
+      "next": "Next",
       "preview": "Preview",
       "viewDetails": "View details",
       "clickToCopy": "Click to copy",
@@ -1180,6 +1181,36 @@
       "view": "View",
       "edit": "Edit",
       "delete": "Delete"
+    },
+    "wizard": {
+      "title": "Create New Site",
+      "steps": {
+        "basics": "Basics",
+        "modules": "Modules",
+        "workflow": "Workflow",
+        "languages": "Languages"
+      },
+      "modulesDescription": "Choose which content modules to enable. You can change these later in Settings.",
+      "modules": {
+        "blog": "Blog",
+        "blogDesc": "Publish articles, tutorials, and news posts",
+        "pages": "Pages",
+        "pagesDesc": "Create static pages with sections and layouts",
+        "cv": "CV / Resume",
+        "cvDesc": "Manage work experience, education, and skills",
+        "legal": "Legal",
+        "legalDesc": "Privacy policy, terms of service, and legal documents",
+        "documents": "Documents",
+        "documentsDesc": "Upload and manage downloadable files"
+      },
+      "workflowDescription": "How will you manage content on this site?",
+      "workflow": {
+        "solo": "Solo",
+        "soloDesc": "You are the only author. Content goes live when you publish.",
+        "team": "Team",
+        "teamDesc": "Multiple authors collaborate. Enables editorial review workflow."
+      },
+      "languagesDescription": "Select the languages your site will support. You can add more later."
     }
   },
   "siteDetail": {
@@ -1218,7 +1249,22 @@
       "systemInfo": "System Info",
       "preferences": "Preferences",
       "legal": "Legal",
-      "apiKeys": "API Keys"
+      "apiKeys": "API Keys",
+      "modules": "Modules"
+    },
+    "modules": {
+      "title": "Content Modules",
+      "description": "Enable or disable content modules for this site. Disabled modules are hidden from the sidebar and their API endpoints return 403.",
+      "blog": "Blog",
+      "blogDesc": "Publish articles, tutorials, and news posts",
+      "pages": "Pages",
+      "pagesDesc": "Create static pages with sections and layouts",
+      "cv": "CV / Resume",
+      "cvDesc": "Manage work experience, education, and skills",
+      "legal": "Legal",
+      "legalDesc": "Privacy policy, terms of service, and legal documents",
+      "documents": "Documents",
+      "documentsDesc": "Upload and manage downloadable files"
     },
     "selectSiteAlert": "Select a site from the header to manage its settings.",
     "loadingSiteSettings": "Loading site settings...",
