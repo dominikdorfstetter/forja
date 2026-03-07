@@ -488,6 +488,7 @@ const MODULE_DEFS = [
   { key: 'module_cv_enabled' as const, labelKey: 'settings.modules.cv', descKey: 'settings.modules.cvDesc' },
   { key: 'module_legal_enabled' as const, labelKey: 'settings.modules.legal', descKey: 'settings.modules.legalDesc' },
   { key: 'module_documents_enabled' as const, labelKey: 'settings.modules.documents', descKey: 'settings.modules.documentsDesc' },
+  { key: 'module_ai_enabled' as const, labelKey: 'settings.modules.ai', descKey: 'settings.modules.aiDesc' },
 ] as const;
 
 type ModuleKey = typeof MODULE_DEFS[number]['key'];
@@ -510,6 +511,7 @@ function ModulesTab() {
     module_cv_enabled: false,
     module_legal_enabled: false,
     module_documents_enabled: false,
+    module_ai_enabled: false,
   });
   const [dirty, setDirty] = useState(false);
 
@@ -521,6 +523,7 @@ function ModulesTab() {
         module_cv_enabled: settings.module_cv_enabled,
         module_legal_enabled: settings.module_legal_enabled,
         module_documents_enabled: settings.module_documents_enabled,
+        module_ai_enabled: settings.module_ai_enabled,
       });
       setDirty(false);
     }

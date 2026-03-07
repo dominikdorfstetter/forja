@@ -1287,7 +1287,9 @@
       "legal": "Legal",
       "legalDesc": "Privacy policy, terms of service, and legal documents",
       "documents": "Documents",
-      "documentsDesc": "Upload and manage downloadable files"
+      "documentsDesc": "Upload and manage downloadable files",
+      "ai": "AI Assist",
+      "aiDesc": "SEO generation, auto-excerpts, and translation suggestions"
     },
     "selectSiteAlert": "Select a site from the header to manage its settings.",
     "loadingSiteSettings": "Loading site settings...",

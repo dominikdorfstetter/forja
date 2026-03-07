@@ -1202,6 +1202,7 @@ export interface SiteSettingsResponse {
   module_cv_enabled: boolean;
   module_legal_enabled: boolean;
   module_documents_enabled: boolean;
+  module_ai_enabled: boolean;
 }
 
 export interface UpdateSiteSettingsRequest {
@@ -1218,6 +1219,7 @@ export interface UpdateSiteSettingsRequest {
   module_cv_enabled?: boolean;
   module_legal_enabled?: boolean;
   module_documents_enabled?: boolean;
+  module_ai_enabled?: boolean;
 }
 
 // User Preferences
