@@ -636,6 +636,27 @@ pub async fn generate(
     parse_ai_response(&content, &request.action)
 }
 
+/// Build a field-specific translation prompt with constraints.
+fn field_translation_prompt(field_name: &str, locale: &str) -> String {
+    let base = format!("Translate the following text to {locale}.");
+    let constraint = match field_name {
+        "title" => "This is a blog post TITLE. Output ONLY the translated title as plain text. \
+                    No markdown, no headings, no formatting, no quotes. Keep it concise (under 100 characters).",
+        "subtitle" => "This is a blog post SUBTITLE. Output ONLY the translated subtitle as plain text. \
+                      No markdown, no headings, no formatting, no quotes. Keep it concise (under 150 characters).",
+        "excerpt" => "This is a short EXCERPT (summary). Output ONLY the translated excerpt as a single sentence. \
+                     No markdown, no headings, no formatting, no quotes. Maximum 2 sentences.",
+        "body" => "This is the BODY content. Maintain any markdown formatting from the original. \
+                  Output ONLY the translated text.",
+        "meta_title" => "This is an SEO meta title. Output ONLY the translated title as plain text. \
+                        No markdown, no formatting, no quotes. Maximum 60 characters.",
+        "meta_description" => "This is an SEO meta description. Output ONLY the translated description as plain text. \
+                              No markdown, no formatting, no quotes. Maximum 160 characters.",
+        _ => "Output ONLY the translated text, nothing else.",
+    };
+    format!("{base} {constraint}")
+}
+
 /// Translate content field-by-field in parallel.
 /// Each field gets its own simple "translate this text" request,
 /// so the model never has to produce structured output.
@@ -679,16 +700,15 @@ async fn generate_translate_parallel(
         ));
     }
 
-    let system_prompt = format!(
-        "You are a professional translator. Translate the following text to {locale}. \
-         Maintain the original tone, style, and any markdown formatting. \
-         Output ONLY the translated text, nothing else — no labels, no explanations."
-    );
-
-    // Send all translation requests in parallel
+    // Build per-field prompts and send all translation requests in parallel
+    let prompts: Vec<String> = tasks
+        .iter()
+        .map(|(name, _)| field_translation_prompt(name, locale))
+        .collect();
     let futures: Vec<_> = tasks
         .iter()
-        .map(|(_, text)| translate_single_field(config, api_key, provider, &system_prompt, text))
+        .zip(prompts.iter())
+        .map(|((_, text), prompt)| translate_single_field(config, api_key, provider, prompt, text))
         .collect();
 
     let results = futures::future::join_all(futures).await;
