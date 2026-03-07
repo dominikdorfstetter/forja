@@ -97,46 +97,39 @@ struct AnthropicContent {
 
 // ── Default system prompts ───────────────────────────────────────
 
-// JSON-mode prompts (for providers that support response_format: json_object)
+// Content-only prompts (format instructions are appended separately via format_suffix)
 pub const DEFAULT_PROMPT_SEO: &str =
     "You are an SEO expert. Generate an SEO-optimized meta title (max 60 characters) \
-and meta description (max 160 characters) from the provided blog content. \
-Respond with ONLY valid JSON in this exact format: \
-{\"meta_title\": \"...\", \"meta_description\": \"...\"}";
+and meta description (max 160 characters) from the provided blog content.";
 
 pub const DEFAULT_PROMPT_EXCERPT: &str =
     "You are a content editor. Generate a concise 1-2 sentence excerpt that \
-summarizes the key points of the provided blog content. \
-Respond with ONLY valid JSON in this exact format: \
-{\"excerpt\": \"...\"}";
+summarizes the key points of the provided blog content.";
 
 const DEFAULT_PROMPT_TRANSLATE_PREFIX: &str =
     "You are a professional translator. Translate the following content to ";
 const DEFAULT_PROMPT_TRANSLATE_SUFFIX: &str =
-    ". Maintain the original tone, style, and markdown formatting. \
-Respond with ONLY valid JSON in this exact format: \
+    ". Maintain the original tone, style, and markdown formatting.";
+
+// Output format suffixes — appended to ALL prompts (custom or default) based on provider
+const JSON_FORMAT_SEO: &str = "\nRespond with ONLY valid JSON in this exact format: \
+{\"meta_title\": \"...\", \"meta_description\": \"...\"}";
+
+const JSON_FORMAT_EXCERPT: &str = "\nRespond with ONLY valid JSON in this exact format: \
+{\"excerpt\": \"...\"}";
+
+const JSON_FORMAT_TRANSLATE: &str = "\nRespond with ONLY valid JSON in this exact format: \
 {\"title\": \"...\", \"subtitle\": \"...\", \"excerpt\": \"...\", \
 \"body\": \"...\", \"meta_title\": \"...\", \"meta_description\": \"...\"}";
 
-// XML-mode prompts (for local models and Anthropic that don't support response_format)
-const XML_PROMPT_SEO: &str =
-    "You are an SEO expert. Generate an SEO-optimized meta title (max 60 characters) \
-and meta description (max 160 characters) from the provided blog content. \
-Respond using ONLY these XML tags, with no other text:\n\
+const XML_FORMAT_SEO: &str = "\nRespond using ONLY these XML tags, with no other text:\n\
 <meta_title>your meta title here</meta_title>\n\
 <meta_description>your meta description here</meta_description>";
 
-const XML_PROMPT_EXCERPT: &str =
-    "You are a content editor. Generate a concise 1-2 sentence excerpt that \
-summarizes the key points of the provided blog content. \
-Respond using ONLY this XML tag, with no other text:\n\
+const XML_FORMAT_EXCERPT: &str = "\nRespond using ONLY this XML tag, with no other text:\n\
 <excerpt>your excerpt here</excerpt>";
 
-const XML_PROMPT_TRANSLATE_PREFIX: &str =
-    "You are a professional translator. Translate the following content to ";
-const XML_PROMPT_TRANSLATE_SUFFIX: &str =
-    ". Maintain the original tone, style, and markdown formatting. \
-Respond using ONLY these XML tags, with no other text:\n\
+const XML_FORMAT_TRANSLATE: &str = "\nRespond using ONLY these XML tags, with no other text:\n\
 <title>translated title</title>\n\
 <subtitle>translated subtitle</subtitle>\n\
 <excerpt>translated excerpt</excerpt>\n\
@@ -144,32 +137,57 @@ Respond using ONLY these XML tags, with no other text:\n\
 <meta_title>translated meta title</meta_title>\n\
 <meta_description>translated meta description</meta_description>";
 
-fn default_system_prompt(action: &AiAction, target_locale: Option<&str>, use_json: bool) -> String {
+fn default_content_prompt(action: &AiAction, target_locale: Option<&str>) -> String {
+    match action {
+        AiAction::Seo => DEFAULT_PROMPT_SEO.to_string(),
+        AiAction::Excerpt => DEFAULT_PROMPT_EXCERPT.to_string(),
+        AiAction::Translate => {
+            let locale = target_locale.unwrap_or("en");
+            format!("{DEFAULT_PROMPT_TRANSLATE_PREFIX}{locale}{DEFAULT_PROMPT_TRANSLATE_SUFFIX}")
+        }
+    }
+}
+
+/// Returns the output format suffix based on provider type and action.
+/// Always appended to the system prompt (custom or default) so the model
+/// knows how to structure its response.
+fn format_suffix(action: &AiAction, use_json: bool) -> &'static str {
     if use_json {
         match action {
-            AiAction::Seo => DEFAULT_PROMPT_SEO.to_string(),
-            AiAction::Excerpt => DEFAULT_PROMPT_EXCERPT.to_string(),
-            AiAction::Translate => {
-                let locale = target_locale.unwrap_or("en");
-                format!(
-                    "{DEFAULT_PROMPT_TRANSLATE_PREFIX}{locale}{DEFAULT_PROMPT_TRANSLATE_SUFFIX}"
-                )
-            }
+            AiAction::Seo => JSON_FORMAT_SEO,
+            AiAction::Excerpt => JSON_FORMAT_EXCERPT,
+            AiAction::Translate => JSON_FORMAT_TRANSLATE,
         }
     } else {
         match action {
-            AiAction::Seo => XML_PROMPT_SEO.to_string(),
-            AiAction::Excerpt => XML_PROMPT_EXCERPT.to_string(),
-            AiAction::Translate => {
-                let locale = target_locale.unwrap_or("en");
-                format!("{XML_PROMPT_TRANSLATE_PREFIX}{locale}{XML_PROMPT_TRANSLATE_SUFFIX}")
-            }
+            AiAction::Seo => XML_FORMAT_SEO,
+            AiAction::Excerpt => XML_FORMAT_EXCERPT,
+            AiAction::Translate => XML_FORMAT_TRANSLATE,
         }
     }
 }
 
 pub fn default_prompt_translate_for_locale(locale: &str) -> String {
     format!("{DEFAULT_PROMPT_TRANSLATE_PREFIX}{locale}{DEFAULT_PROMPT_TRANSLATE_SUFFIX}")
+}
+
+/// Strip any existing JSON or XML format instructions from a custom prompt.
+/// Users may have saved prompts containing old "Respond with ONLY valid JSON..." text.
+fn strip_format_instructions(prompt: &str) -> &str {
+    // Find the last sentence boundary before any format instruction
+    let markers = [
+        "\nRespond with ONLY",
+        "\nRespond using ONLY",
+        "Respond with ONLY valid JSON",
+        "Respond using ONLY these XML",
+    ];
+    let mut end = prompt.len();
+    for marker in &markers {
+        if let Some(pos) = prompt.find(marker) {
+            end = end.min(pos);
+        }
+    }
+    prompt[..end].trim_end()
 }
 
 // ── Provider-specific calls ──────────────────────────────────────
@@ -566,18 +584,21 @@ pub async fn generate(
         AiAction::Excerpt => "excerpt",
         AiAction::Translate => "translate",
     };
-    let system_prompt = config
+
+    // Build system prompt: content instructions + format suffix
+    // Custom prompts get old format instructions stripped before appending the correct format
+    let content_prompt = config
         .system_prompts
         .get(action_key)
         .and_then(|v| v.as_str())
-        .map(|s| s.to_string())
+        .map(|s| strip_format_instructions(s).to_string())
         .unwrap_or_else(|| {
-            default_system_prompt(
-                &request.action,
-                request.target_locale.as_deref(),
-                use_json_mode,
-            )
+            default_content_prompt(&request.action, request.target_locale.as_deref())
         });
+    let system_prompt = format!(
+        "{content_prompt}{}",
+        format_suffix(&request.action, use_json_mode)
+    );
 
     let raw = match provider {
         Provider::OpenAiCompatible => {
@@ -1144,31 +1165,74 @@ mod tests {
     }
 
     #[test]
-    fn test_default_system_prompt_json_seo() {
-        let prompt = default_system_prompt(&AiAction::Seo, None, true);
+    fn test_content_prompt_seo() {
+        let prompt = default_content_prompt(&AiAction::Seo, None);
         assert!(prompt.contains("meta title"));
-        assert!(prompt.contains("JSON"));
+        assert!(prompt.contains("60 characters"));
     }
 
     #[test]
-    fn test_default_system_prompt_xml_seo() {
-        let prompt = default_system_prompt(&AiAction::Seo, None, false);
-        assert!(prompt.contains("meta_title"));
-        assert!(prompt.contains("<meta_title>"));
+    fn test_format_suffix_json_seo() {
+        let suffix = format_suffix(&AiAction::Seo, true);
+        assert!(suffix.contains("JSON"));
+        assert!(suffix.contains("meta_title"));
     }
 
     #[test]
-    fn test_default_system_prompt_json_translate() {
-        let prompt = default_system_prompt(&AiAction::Translate, Some("de"), true);
-        assert!(prompt.contains("to de"));
-        assert!(prompt.contains("JSON"));
+    fn test_format_suffix_xml_seo() {
+        let suffix = format_suffix(&AiAction::Seo, false);
+        assert!(suffix.contains("<meta_title>"));
+        assert!(suffix.contains("XML"));
     }
 
     #[test]
-    fn test_default_system_prompt_xml_translate() {
-        let prompt = default_system_prompt(&AiAction::Translate, Some("de"), false);
-        assert!(prompt.contains("to de"));
-        assert!(prompt.contains("<title>"));
+    fn test_format_suffix_json_translate() {
+        let suffix = format_suffix(&AiAction::Translate, true);
+        assert!(suffix.contains("JSON"));
+        assert!(suffix.contains("body"));
+    }
+
+    #[test]
+    fn test_format_suffix_xml_translate() {
+        let suffix = format_suffix(&AiAction::Translate, false);
+        assert!(suffix.contains("<title>"));
+        assert!(suffix.contains("<body>"));
+    }
+
+    #[test]
+    fn test_combined_prompt_json() {
+        let content = default_content_prompt(&AiAction::Seo, None);
+        let full = format!("{content}{}", format_suffix(&AiAction::Seo, true));
+        assert!(full.contains("SEO expert"));
+        assert!(full.contains("JSON"));
+    }
+
+    #[test]
+    fn test_combined_prompt_xml() {
+        let content = default_content_prompt(&AiAction::Translate, Some("de"));
+        let full = format!("{content}{}", format_suffix(&AiAction::Translate, false));
+        assert!(full.contains("to de"));
+        assert!(full.contains("<title>"));
+    }
+
+    #[test]
+    fn test_strip_format_instructions_json() {
+        let prompt =
+            "You are an SEO expert.\nRespond with ONLY valid JSON in this exact format: {}";
+        assert_eq!(strip_format_instructions(prompt), "You are an SEO expert.");
+    }
+
+    #[test]
+    fn test_strip_format_instructions_xml() {
+        let prompt =
+            "You are a translator.\nRespond using ONLY these XML tags:\n<title>...</title>";
+        assert_eq!(strip_format_instructions(prompt), "You are a translator.");
+    }
+
+    #[test]
+    fn test_strip_format_instructions_none() {
+        let prompt = "You are a content editor. Generate a summary.";
+        assert_eq!(strip_format_instructions(prompt), prompt);
     }
 
     #[test]
