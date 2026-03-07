@@ -579,10 +579,15 @@ pub async fn generate(
     let use_json_mode =
         provider == Provider::OpenAiCompatible && !is_local_provider(&config.base_url);
 
+    // Translations use parallel field-by-field requests for reliability
+    if request.action == AiAction::Translate {
+        return generate_translate_parallel(&config, &api_key, &provider, request).await;
+    }
+
     let action_key = match &request.action {
         AiAction::Seo => "seo",
         AiAction::Excerpt => "excerpt",
-        AiAction::Translate => "translate",
+        AiAction::Translate => unreachable!(),
     };
 
     // Build system prompt: content instructions + format suffix
@@ -592,9 +597,7 @@ pub async fn generate(
         .get(action_key)
         .and_then(|v| v.as_str())
         .map(|s| strip_format_instructions(s).to_string())
-        .unwrap_or_else(|| {
-            default_content_prompt(&request.action, request.target_locale.as_deref())
-        });
+        .unwrap_or_else(|| default_content_prompt(&request.action, None));
     let system_prompt = format!(
         "{content_prompt}{}",
         format_suffix(&request.action, use_json_mode)
@@ -630,6 +633,143 @@ pub async fn generate(
     // Extract JSON from model output (handles thinking tags, code fences, preamble)
     let content = extract_json(&raw);
     parse_ai_response(&content, &request.action)
+}
+
+/// Translate content field-by-field in parallel.
+/// Each field gets its own simple "translate this text" request,
+/// so the model never has to produce structured output.
+async fn generate_translate_parallel(
+    config: &SiteAiConfig,
+    api_key: &str,
+    provider: &Provider,
+    request: &AiGenerateRequest,
+) -> Result<AiGenerateResponse, ApiError> {
+    let locale = request.target_locale.as_deref().unwrap_or("en");
+
+    // Parse the incoming content as JSON with individual fields
+    let fields: serde_json::Value = serde_json::from_str(&request.content).map_err(|e| {
+        ApiError::BadRequest(format!("Translation request content must be JSON: {e}"))
+    })?;
+
+    let field_names = [
+        "title",
+        "subtitle",
+        "excerpt",
+        "body",
+        "meta_title",
+        "meta_description",
+    ];
+
+    // Collect non-empty fields to translate
+    let tasks: Vec<(&str, String)> = field_names
+        .iter()
+        .filter_map(|&name| {
+            fields
+                .get(name)
+                .and_then(|v| v.as_str())
+                .filter(|s| !s.is_empty())
+                .map(|s| (name, s.to_string()))
+        })
+        .collect();
+
+    if tasks.is_empty() {
+        return Err(ApiError::BadRequest(
+            "No content fields to translate".into(),
+        ));
+    }
+
+    let system_prompt = format!(
+        "You are a professional translator. Translate the following text to {locale}. \
+         Maintain the original tone, style, and any markdown formatting. \
+         Output ONLY the translated text, nothing else — no labels, no explanations."
+    );
+
+    // Send all translation requests in parallel
+    let futures: Vec<_> = tasks
+        .iter()
+        .map(|(_, text)| translate_single_field(config, api_key, provider, &system_prompt, text))
+        .collect();
+
+    let results = futures::future::join_all(futures).await;
+
+    // Assemble results into the response
+    let mut response = AiGenerateResponse {
+        meta_title: None,
+        meta_description: None,
+        excerpt: None,
+        title: None,
+        subtitle: None,
+        body: None,
+    };
+
+    for ((name, _), result) in tasks.iter().zip(results) {
+        let translated = result?;
+        match *name {
+            "title" => response.title = Some(translated),
+            "subtitle" => response.subtitle = Some(translated),
+            "excerpt" => response.excerpt = Some(translated),
+            "body" => response.body = Some(translated),
+            "meta_title" => response.meta_title = Some(translated),
+            "meta_description" => response.meta_description = Some(translated),
+            _ => {}
+        }
+    }
+
+    Ok(response)
+}
+
+/// Translate a single text field. Returns the raw translated text.
+async fn translate_single_field(
+    config: &SiteAiConfig,
+    api_key: &str,
+    provider: &Provider,
+    system_prompt: &str,
+    text: &str,
+) -> Result<String, ApiError> {
+    let raw = match provider {
+        Provider::OpenAiCompatible => {
+            call_openai_compatible(&OpenAiCallParams {
+                base_url: &config.base_url,
+                api_key,
+                model: &config.model,
+                system_prompt,
+                user_content: text,
+                temperature: config.temperature,
+                max_tokens: config.max_tokens,
+                // Never use json_mode for plain text translation
+                use_json_mode: false,
+            })
+            .await?
+        }
+        Provider::Anthropic => {
+            call_anthropic(
+                &config.base_url,
+                api_key,
+                &config.model,
+                system_prompt,
+                text,
+                config.max_tokens,
+            )
+            .await?
+        }
+    };
+
+    // Strip any thinking tags or code fences the model might wrap the translation in
+    let cleaned = extract_json(&raw);
+    // If it looks like JSON (model ignored instructions), try to extract the value
+    if cleaned.starts_with('{') {
+        if let Ok(json) = serde_json::from_str::<serde_json::Value>(&cleaned) {
+            // Return the first string value found
+            if let Some(obj) = json.as_object() {
+                for (_, v) in obj {
+                    if let Some(s) = v.as_str() {
+                        return Ok(s.to_string());
+                    }
+                }
+            }
+        }
+    }
+    Ok(cleaned)
 }
 
 /// Test connection to AI provider.

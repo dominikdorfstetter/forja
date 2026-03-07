@@ -6,7 +6,7 @@ use uuid::Uuid;
 use validator::Validate;
 
 /// AI action types
-#[derive(Debug, Clone, Deserialize, Serialize, ToSchema)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum AiAction {
     Seo,
