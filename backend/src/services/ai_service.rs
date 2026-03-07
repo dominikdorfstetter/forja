@@ -581,6 +581,7 @@ pub async fn generate(
 
     // Translations use parallel field-by-field requests for reliability
     if request.action == AiAction::Translate {
+        tracing::info!("Using parallel field-by-field translation");
         return generate_translate_parallel(&config, &api_key, &provider, request).await;
     }
 
@@ -702,8 +703,14 @@ async fn generate_translate_parallel(
         body: None,
     };
 
-    for ((name, _), result) in tasks.iter().zip(results) {
+    for ((name, original), result) in tasks.iter().zip(results) {
         let translated = result?;
+        tracing::info!(
+            "Translated field '{}': '{}' → '{}'",
+            name,
+            &original[..original.len().min(50)],
+            &translated[..translated.len().min(80)]
+        );
         match *name {
             "title" => response.title = Some(translated),
             "subtitle" => response.subtitle = Some(translated),
