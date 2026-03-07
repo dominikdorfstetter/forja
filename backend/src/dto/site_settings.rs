@@ -8,7 +8,7 @@ use crate::models::site_settings::{
     KEY_ANALYTICS_ENABLED, KEY_CONTACT_EMAIL, KEY_EDITORIAL_WORKFLOW_ENABLED, KEY_MAINTENANCE_MODE,
     KEY_MAX_DOCUMENT_FILE_SIZE, KEY_MAX_MEDIA_FILE_SIZE, KEY_MODULE_BLOG_ENABLED,
     KEY_MODULE_CV_ENABLED, KEY_MODULE_DOCUMENTS_ENABLED, KEY_MODULE_LEGAL_ENABLED,
-    KEY_MODULE_PAGES_ENABLED, KEY_PREVIEW_TEMPLATES,
+    KEY_MODULE_PAGES_ENABLED, KEY_PREVIEW_TEMPLATES, KEY_TEAM_FEATURES_PROMPT_DISMISSED,
 };
 use crate::utils::validation::validate_email;
 
@@ -138,6 +138,10 @@ pub struct UpdateSiteSettingsRequest {
 
     pub preview_templates: Option<Vec<PreviewTemplate>>,
 
+    /// Dismiss the team features prompt banner
+    #[schema(example = false)]
+    pub team_features_prompt_dismissed: Option<bool>,
+
     // Module flags
     pub module_blog_enabled: Option<bool>,
     pub module_pages_enabled: Option<bool>,
@@ -171,6 +175,13 @@ impl UpdateSiteSettingsRequest {
         }
         if let Some(ref v) = self.preview_templates {
             out.push((KEY_PREVIEW_TEMPLATES, serde_json::json!(v), false));
+        }
+        if let Some(v) = self.team_features_prompt_dismissed {
+            out.push((
+                KEY_TEAM_FEATURES_PROMPT_DISMISSED,
+                serde_json::json!(v),
+                false,
+            ));
         }
         if let Some(v) = self.module_blog_enabled {
             out.push((KEY_MODULE_BLOG_ENABLED, serde_json::json!(v), false));
@@ -236,6 +247,7 @@ mod tests {
             contact_email: Some("a@b.com".into()),
             editorial_workflow_enabled: None,
             preview_templates: None,
+            team_features_prompt_dismissed: None,
             module_blog_enabled: Some(true),
             module_pages_enabled: None,
             module_cv_enabled: None,
@@ -256,6 +268,7 @@ mod tests {
 
             editorial_workflow_enabled: None,
             preview_templates: None,
+            team_features_prompt_dismissed: None,
             module_blog_enabled: None,
             module_pages_enabled: None,
             module_cv_enabled: None,
@@ -276,6 +289,7 @@ mod tests {
 
             editorial_workflow_enabled: None,
             preview_templates: None,
+            team_features_prompt_dismissed: None,
             module_blog_enabled: None,
             module_pages_enabled: None,
             module_cv_enabled: None,
@@ -296,6 +310,7 @@ mod tests {
 
             editorial_workflow_enabled: None,
             preview_templates: None,
+            team_features_prompt_dismissed: None,
             module_blog_enabled: None,
             module_pages_enabled: None,
             module_cv_enabled: None,
@@ -316,6 +331,7 @@ mod tests {
 
             editorial_workflow_enabled: None,
             preview_templates: None,
+            team_features_prompt_dismissed: None,
             module_blog_enabled: None,
             module_pages_enabled: None,
             module_cv_enabled: None,
@@ -336,6 +352,7 @@ mod tests {
 
             editorial_workflow_enabled: None,
             preview_templates: None,
+            team_features_prompt_dismissed: None,
             module_blog_enabled: None,
             module_pages_enabled: None,
             module_cv_enabled: None,
@@ -356,6 +373,7 @@ mod tests {
 
             editorial_workflow_enabled: None,
             preview_templates: None,
+            team_features_prompt_dismissed: None,
             module_blog_enabled: None,
             module_pages_enabled: None,
             module_cv_enabled: None,
@@ -377,6 +395,7 @@ mod tests {
 
             editorial_workflow_enabled: None,
             preview_templates: None,
+            team_features_prompt_dismissed: None,
             module_blog_enabled: None,
             module_pages_enabled: None,
             module_cv_enabled: None,
@@ -396,6 +415,7 @@ mod tests {
             contact_email: None,
             editorial_workflow_enabled: None,
             preview_templates: None,
+            team_features_prompt_dismissed: None,
             module_blog_enabled: Some(true),
             module_pages_enabled: None,
             module_cv_enabled: None,

@@ -42,6 +42,7 @@ import ContentStatusChart from '@/components/dashboard/ContentStatusChart';
 import AttentionPanel from '@/components/dashboard/AttentionPanel';
 import RecentActivityPanel from '@/components/dashboard/RecentActivityPanel';
 import QuickPostDialog from '@/components/blogs/QuickPostDialog';
+import TeamWorkflowPrompt from '@/components/TeamWorkflowPrompt';
 import type { CreateSiteRequest, ContentStatus } from '@/types/api';
 
 
@@ -280,6 +281,9 @@ export default function DashboardHome() {
           onDismiss={dismissChecklist}
         />
       )}
+
+      {/* Team workflow prompt */}
+      {hasSite && <TeamWorkflowPrompt />}
 
       {/* Read-only notice */}
       {effectivePermission === 'Read' && (
