@@ -42,8 +42,9 @@ pub struct CreateAiConfigRequest {
     pub provider_name: String,
     #[validate(length(min = 1, max = 500))]
     pub base_url: String,
-    #[validate(length(min = 1, max = 500))]
-    pub api_key: String,
+    /// Optional — local providers like LM Studio or Ollama don't require an API key
+    #[validate(length(max = 500))]
+    pub api_key: Option<String>,
     #[validate(length(min = 1, max = 200))]
     pub model: String,
     pub temperature: Option<f64>,
@@ -71,4 +72,20 @@ pub struct AiConfigResponse {
 pub struct AiTestResponse {
     pub success: bool,
     pub message: String,
+}
+
+/// Request to list available models from a provider
+#[derive(Debug, Deserialize, Validate, ToSchema)]
+pub struct ListModelsRequest {
+    #[validate(length(min = 1, max = 500))]
+    pub base_url: String,
+    pub api_key: Option<String>,
+    #[validate(length(min = 1, max = 100))]
+    pub provider_name: String,
+}
+
+/// Response listing available models
+#[derive(Debug, Serialize, ToSchema)]
+pub struct ListModelsResponse {
+    pub models: Vec<String>,
 }

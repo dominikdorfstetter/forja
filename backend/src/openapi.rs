@@ -262,6 +262,7 @@ use utoipa::{Modify, OpenApi};
         crate::handlers::ai::delete_ai_config,
         crate::handlers::ai::test_ai_connection,
         crate::handlers::ai::generate_ai_content,
+        crate::handlers::ai::list_ai_models,
         // Config
         crate::handlers::config::get_config,
     ),
@@ -316,6 +317,8 @@ use utoipa::{Modify, OpenApi};
         crate::dto::ai::CreateAiConfigRequest,
         crate::dto::ai::AiConfigResponse,
         crate::dto::ai::AiTestResponse,
+        crate::dto::ai::ListModelsRequest,
+        crate::dto::ai::ListModelsResponse,
         // Site DTOs
         crate::dto::site::CreateSiteRequest,
         crate::dto::site::UpdateSiteRequest,

@@ -1446,11 +1446,21 @@ export interface AiGenerateResponse {
 export interface CreateAiConfigRequest {
   provider_name: string;
   base_url: string;
-  api_key: string;
+  api_key?: string;
   model: string;
   temperature?: number;
   max_tokens?: number;
   system_prompts?: Record<string, string>;
+}
+
+export interface ListModelsRequest {
+  base_url: string;
+  api_key?: string;
+  provider_name: string;
+}
+
+export interface ListModelsResponse {
+  models: string[];
 }
 
 export interface AiConfigResponse {

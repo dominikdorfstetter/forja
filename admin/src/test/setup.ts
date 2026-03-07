@@ -159,6 +159,7 @@ vi.mock('@/services/api', () => {
     deleteAiConfig: vi.fn(),
     testAiConnection: vi.fn(),
     generateAiContent: vi.fn(),
+    listAiModels: vi.fn(),
   };
   return { default: apiService, ApiService: vi.fn(() => apiService) };
 });

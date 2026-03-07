@@ -64,8 +64,10 @@ import { useAuth } from '@/store/AuthContext';
 import { useSiteContextData } from '@/hooks/useSiteContextData';
 import { useUserPreferences } from '@/store/UserPreferencesContext';
 import { useThemeMode } from '@/theme/ThemeContext';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import LegalPage from '@/pages/Legal';
 import ApiKeysPage from '@/pages/ApiKeys';
+import AiSettingsPage from '@/pages/ai-settings/AiSettingsPage';
 
 const STATUS_CONFIG = {
   healthy: { icon: <CheckCircleIcon color="success" />, color: 'success' as const, labelKey: 'common.status.healthy' },
@@ -1015,7 +1017,17 @@ export default function SettingsPage() {
     });
   }
 
-  // 4. System Info — master only
+  // 4. AI Settings — admin + site selected + ai module enabled
+  if (isAdmin && selectedSiteId && modules.ai) {
+    tabs.push({
+      key: 'ai',
+      icon: <AutoAwesomeIcon />,
+      label: t('settings.tabs.ai'),
+      content: <AiSettingsPage embedded />,
+    });
+  }
+
+  // 5. System Info — master only
   if (isMaster) {
     tabs.push({
       key: 'systemInfo',

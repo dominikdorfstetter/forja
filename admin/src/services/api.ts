@@ -133,6 +133,8 @@ import type {
   AiTestResponse,
   AiGenerateRequest,
   AiGenerateResponse,
+  ListModelsRequest,
+  ListModelsResponse,
 } from '@/types/api';
 
 const API_BASE_URL = '/api/v1';
@@ -1042,6 +1044,10 @@ export class ApiService {
 
   async generateAiContent(siteId: string, data: AiGenerateRequest): Promise<AiGenerateResponse> {
     return apiRequest<AiGenerateResponse>('POST', `/sites/${siteId}/ai/generate`, data);
+  }
+
+  async listAiModels(siteId: string, data: ListModelsRequest): Promise<ListModelsResponse> {
+    return apiRequest<ListModelsResponse>('POST', `/sites/${siteId}/ai/models`, data);
   }
 }
 

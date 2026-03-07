@@ -1273,7 +1273,8 @@
       "preferences": "Preferences",
       "legal": "Legal",
       "apiKeys": "API Keys",
-      "modules": "Modules"
+      "modules": "Modules",
+      "ai": "AI Assist"
     },
     "modules": {
       "title": "Content Modules",
@@ -2143,32 +2144,41 @@
     "title": "AI Settings",
     "advanced": "Advanced Settings",
     "fields": {
+      "providerPreset": "Provider",
       "providerName": "Provider Name",
-      "providerNameHelp": "Display name (e.g. OpenAI, Ollama Local)",
+      "providerNameHelp": "Display name for this provider configuration",
       "baseUrl": "Base URL",
-      "baseUrlHelp": "OpenAI-compatible API base URL (e.g. https://api.openai.com)",
+      "baseUrlHelp": "API endpoint — auto-filled when selecting a provider",
       "apiKey": "API Key",
       "apiKeyHelp": "Your provider's API key",
+      "apiKeyOptional": "Optional — this provider does not require an API key",
       "apiKeyExisting": "Current key",
       "model": "Model",
-      "modelHelp": "Model identifier (e.g. gpt-4o-mini, llama3)",
+      "modelHelp": "Type a model name or click the refresh button to discover available models",
       "temperature": "Temperature",
       "maxTokens": "Max Tokens",
       "systemPromptsHelp": "Leave empty to use built-in defaults. Custom prompts fully replace the defaults.",
       "systemPromptSeo": "SEO Generation Prompt",
       "systemPromptExcerpt": "Excerpt Generation Prompt",
-      "systemPromptTranslate": "Translation Prompt"
+      "systemPromptTranslate": "Translation Prompt",
+      "defaultPromptSeo": "You are an SEO expert. Generate an SEO-optimized meta title (max 60 characters) and meta description (max 160 characters) from the provided blog content. Respond with ONLY valid JSON: {\"meta_title\": \"...\", \"meta_description\": \"...\"}",
+      "defaultPromptExcerpt": "You are a content editor. Generate a concise 1-2 sentence excerpt that summarizes the key points of the provided blog content. Respond with ONLY valid JSON: {\"excerpt\": \"...\"}",
+      "defaultPromptTranslate": "You are a professional translator. Translate the following content to the target locale. Maintain the original tone, style, and markdown formatting. Respond with ONLY valid JSON: {\"title\": \"...\", \"subtitle\": \"...\", \"excerpt\": \"...\", \"body\": \"...\", \"meta_title\": \"...\", \"meta_description\": \"...\"}"
     },
     "actions": {
       "save": "Save",
       "testConnection": "Test Connection",
-      "remove": "Remove Configuration"
+      "remove": "Remove Configuration",
+      "discoverModels": "Discover available models"
     },
     "messages": {
       "saved": "AI configuration saved",
       "saveFailed": "Failed to save AI configuration",
       "deleted": "AI configuration removed",
-      "testFailed": "Connection test failed"
+      "testFailed": "Connection test failed",
+      "modelsFound": "{{count}} model(s) found",
+      "noModels": "No models found — check the base URL and API key",
+      "modelsFailed": "Failed to discover models — check the base URL and API key"
     },
     "deleteConfirm": {
       "title": "Remove AI Configuration?",

@@ -17,6 +17,7 @@ import {
   ListItemText,
   MenuItem,
   Paper,
+  Stack,
   Tabs,
   Tab,
   TextField,
@@ -111,7 +112,7 @@ export default function BlogDetailPage() {
   const [sidebarTab, setSidebarTab] = useState(0);
   const [translateDialogOpen, setTranslateDialogOpen] = useState(false);
   const [translateLocale, setTranslateLocale] = useState('');
-  const [translationPreview, setTranslationPreview] = useState('');
+  const [translationPreview, setTranslationPreview] = useState<Partial<Record<'title' | 'subtitle' | 'excerpt' | 'body' | 'meta_title' | 'meta_description', string>> | null>(null);
 
   const { templates: previewTemplates, openPreview } = usePreviewUrl();
   const { isConfigured: aiConfigured, generate: aiGenerate, isGenerating: aiGenerating } = useAiAssist();
@@ -353,22 +354,66 @@ export default function BlogDetailPage() {
 
   const handleOpenTranslate = () => {
     setTranslateLocale(otherLocales[0]?.code ?? '');
-    setTranslationPreview('');
+    setTranslationPreview(null);
     setTranslateDialogOpen(true);
   };
 
   const handleGenerateTranslation = async () => {
-    const body = getValues('body');
-    if (!body || !translateLocale) return;
-    const result = await aiGenerate('translate', body, translateLocale);
-    if (result.body) setTranslationPreview(result.body);
+    const values = getValues();
+    if (!values.body || !translateLocale) return;
+    // Send all translatable fields so the AI can translate everything
+    const contentForTranslation = JSON.stringify({
+      title: values.title,
+      subtitle: values.subtitle,
+      excerpt: values.excerpt,
+      body: values.body,
+      meta_title: values.meta_title,
+      meta_description: values.meta_description,
+    });
+    const result = await aiGenerate('translate', contentForTranslation, translateLocale);
+    setTranslationPreview({
+      title: result.title,
+      subtitle: result.subtitle,
+      excerpt: result.excerpt,
+      body: result.body,
+      meta_title: result.meta_title,
+      meta_description: result.meta_description,
+    });
   };
 
-  const handleApplyTranslation = () => {
-    if (!translationPreview) return;
-    setValue('body', translationPreview, { shouldDirty: true });
+  const handleApplyTranslation = async () => {
+    if (!translationPreview || !translateLocale || !currentLocale) return;
+
+    // Find the target locale and its tab index
+    const targetLocale = activeLocales.find((l) => l.code === translateLocale);
+    if (!targetLocale) return;
+    const targetTabIndex = activeLocales.indexOf(targetLocale);
+
+    // Save current (source) locale form data to cache first
+    localeFormCache.current.set(currentLocale.id, getValues());
+    if (isDirty) await flush();
+
+    // Build the target locale's form data: start from existing cache/server data, overlay translations
+    const existingLoc = blogDetail?.localizations?.find((l) => l.locale_id === targetLocale.id);
+    const existingCache = localeFormCache.current.get(targetLocale.id);
+    const base = existingCache ?? buildFormDefaults(blogDetail, existingLoc);
+
+    const merged: BlogContentFormData = {
+      ...base,
+      ...(translationPreview.title && { title: translationPreview.title }),
+      ...(translationPreview.subtitle && { subtitle: translationPreview.subtitle }),
+      ...(translationPreview.excerpt && { excerpt: translationPreview.excerpt }),
+      ...(translationPreview.body && { body: translationPreview.body }),
+      ...(translationPreview.meta_title && { meta_title: translationPreview.meta_title }),
+      ...(translationPreview.meta_description && { meta_description: translationPreview.meta_description }),
+    };
+
+    // Store in cache and switch to the target locale tab
+    localeFormCache.current.set(targetLocale.id, merged);
+    formSyncKey.current = ''; // Force form re-initialization on tab switch
+    setActiveLocaleTab(targetTabIndex);
     setTranslateDialogOpen(false);
-    setTranslationPreview('');
+    setTranslationPreview(null);
   };
 
   const isSaving = createLocMutation.isPending || updateLocMutation.isPending || updateBlogMutation.isPending || reviewBlogMutation.isPending;
@@ -728,7 +773,7 @@ export default function BlogDetailPage() {
             value={translateLocale}
             onChange={(e) => {
               setTranslateLocale(e.target.value);
-              setTranslationPreview('');
+              setTranslationPreview(null);
             }}
             fullWidth
             size="small"
@@ -752,15 +797,69 @@ export default function BlogDetailPage() {
           </Button>
 
           {translationPreview && (
-            <TextField
-              label={t('blogDetail.ai.translationPreview')}
-              value={translationPreview}
-              onChange={(e) => setTranslationPreview(e.target.value)}
-              multiline
-              minRows={6}
-              maxRows={16}
-              fullWidth
-            />
+            <Stack spacing={2}>
+              {translationPreview.title !== undefined && (
+                <TextField
+                  label={t('blogDetail.fields.title')}
+                  value={translationPreview.title}
+                  onChange={(e) => setTranslationPreview((prev) => prev ? { ...prev, title: e.target.value } : prev)}
+                  fullWidth
+                  size="small"
+                />
+              )}
+              {translationPreview.subtitle !== undefined && (
+                <TextField
+                  label={t('blogDetail.fields.subtitle')}
+                  value={translationPreview.subtitle}
+                  onChange={(e) => setTranslationPreview((prev) => prev ? { ...prev, subtitle: e.target.value } : prev)}
+                  fullWidth
+                  size="small"
+                />
+              )}
+              {translationPreview.excerpt !== undefined && (
+                <TextField
+                  label={t('blogDetail.fields.excerpt')}
+                  value={translationPreview.excerpt}
+                  onChange={(e) => setTranslationPreview((prev) => prev ? { ...prev, excerpt: e.target.value } : prev)}
+                  multiline
+                  minRows={2}
+                  fullWidth
+                  size="small"
+                />
+              )}
+              {translationPreview.body !== undefined && (
+                <TextField
+                  label={t('blogDetail.fields.body')}
+                  value={translationPreview.body}
+                  onChange={(e) => setTranslationPreview((prev) => prev ? { ...prev, body: e.target.value } : prev)}
+                  multiline
+                  minRows={4}
+                  maxRows={12}
+                  fullWidth
+                  size="small"
+                />
+              )}
+              {translationPreview.meta_title !== undefined && (
+                <TextField
+                  label={t('blogDetail.fields.metaTitle')}
+                  value={translationPreview.meta_title}
+                  onChange={(e) => setTranslationPreview((prev) => prev ? { ...prev, meta_title: e.target.value } : prev)}
+                  fullWidth
+                  size="small"
+                />
+              )}
+              {translationPreview.meta_description !== undefined && (
+                <TextField
+                  label={t('blogDetail.fields.metaDescription')}
+                  value={translationPreview.meta_description}
+                  onChange={(e) => setTranslationPreview((prev) => prev ? { ...prev, meta_description: e.target.value } : prev)}
+                  multiline
+                  minRows={2}
+                  fullWidth
+                  size="small"
+                />
+              )}
+            </Stack>
           )}
         </DialogContent>
         <DialogActions>

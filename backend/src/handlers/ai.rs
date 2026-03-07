@@ -90,8 +90,9 @@ pub async fn upsert_ai_config(
     req.validate()
         .map_err(|e| ApiError::BadRequest(format!("Validation error: {e}")))?;
 
+    let api_key_plain = req.api_key.as_deref().unwrap_or("");
     let key = encryption::resolve_key(&state.settings.security.ai_encryption_key)?;
-    let (encrypted, nonce) = encryption::encrypt(&req.api_key, &key)?;
+    let (encrypted, nonce) = encryption::encrypt(api_key_plain, &key)?;
 
     let config = SiteAiConfig::upsert(
         &state.db,
@@ -107,7 +108,7 @@ pub async fn upsert_ai_config(
     )
     .await?;
 
-    let api_key_masked = encryption::mask_api_key(&req.api_key);
+    let api_key_masked = encryption::mask_api_key(api_key_plain);
 
     audit_service::log_action(
         &state.db,
@@ -263,12 +264,47 @@ pub async fn generate_ai_content(
     Ok(Json(result))
 }
 
+/// List available models from a provider
+#[utoipa::path(
+    tag = "AI",
+    operation_id = "list_ai_models",
+    description = "List available models from an AI provider (for auto-discovery)",
+    params(("site_id" = Uuid, Path, description = "Site UUID")),
+    request_body = ListModelsRequest,
+    responses(
+        (status = 200, description = "Available models", body = ListModelsResponse),
+        (status = 401, description = "Unauthorized", body = ProblemDetails),
+        (status = 403, description = "Forbidden", body = ProblemDetails),
+    ),
+    security(("bearer_auth" = []), ("api_key" = []))
+)]
+#[post("/sites/<site_id>/ai/models", data = "<req>")]
+pub async fn list_ai_models(
+    state: &State<AppState>,
+    site_id: Uuid,
+    auth: ReadKey,
+    req: Json<ListModelsRequest>,
+) -> Result<Json<ListModelsResponse>, ApiError> {
+    auth.0
+        .authorize_site_action(&state.db, site_id, &SiteRole::Admin)
+        .await?;
+
+    req.validate()
+        .map_err(|e| ApiError::BadRequest(format!("Validation error: {e}")))?;
+
+    let models =
+        ai_service::list_models(&req.base_url, req.api_key.as_deref(), &req.provider_name).await?;
+
+    Ok(Json(ListModelsResponse { models }))
+}
+
 pub fn routes() -> Vec<Route> {
     routes![
         get_ai_config,
         upsert_ai_config,
         delete_ai_config,
         test_ai_connection,
-        generate_ai_content
+        generate_ai_content,
+        list_ai_models
     ]
 }

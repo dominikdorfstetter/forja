@@ -35,7 +35,6 @@ import AltRouteIcon from '@mui/icons-material/AltRoute';
 import IntegrationInstructionsIcon from '@mui/icons-material/IntegrationInstructions';
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import LogoutIcon from '@mui/icons-material/Logout';
-import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import PersonIcon from '@mui/icons-material/Person';
 import { Avatar, Chip, ListSubheader, Menu, MenuItem, TextField, Tooltip, Fade } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
@@ -177,7 +176,6 @@ export default function Layout() {
             ? [{ text: t('layout.sidebar.members'), icon: <PeopleIcon />, path: '/members' }]
             : []),
         ...(isTeamWithWorkflow ? [{ text: t('layout.sidebar.reviews'), icon: <RateReviewIcon />, path: '/my-drafts' }] : []),
-        ...(modules.ai && isAdmin ? [{ text: t('layout.sidebar.aiSettings'), icon: <AutoAwesomeIcon />, path: '/ai-settings' }] : []),
         { text: t('layout.sidebar.settings'), icon: <SettingsIcon />, path: '/settings' },
       ],
     },
