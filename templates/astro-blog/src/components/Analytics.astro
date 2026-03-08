@@ -1,0 +1,33 @@
+---
+/**
+ * Privacy-first analytics integration using @forja/analytics.
+ *
+ * Reads CMS_API_URL, CMS_API_KEY, and CMS_SITE_ID from environment
+ * variables (same as the CMS data fetching) and injects the tracking
+ * snippet into the page. No cookies, no PII, GDPR-compliant.
+ *
+ * Usage: Add <Analytics /> to the <head> slot of your layout.
+ */
+const endpoint = import.meta.env.CMS_API_URL as string;
+const apiKey = import.meta.env.CMS_API_KEY as string;
+const siteId = import.meta.env.CMS_SITE_ID as string;
+const enabled = !!(endpoint && apiKey && siteId);
+---
+
+{enabled && (
+  <meta name="forja:analytics:endpoint" content={endpoint} />
+  <meta name="forja:analytics:api-key" content={apiKey} />
+  <meta name="forja:analytics:site-id" content={siteId} />
+  <script>
+    import { init, trackPageview } from '@forja/analytics';
+
+    const endpoint = document.querySelector('meta[name="forja:analytics:endpoint"]')?.getAttribute('content');
+    const apiKey = document.querySelector('meta[name="forja:analytics:api-key"]')?.getAttribute('content');
+    const siteId = document.querySelector('meta[name="forja:analytics:site-id"]')?.getAttribute('content');
+
+    if (endpoint && apiKey && siteId) {
+      init({ siteId, apiKey, endpoint });
+      trackPageview();
+    }
+  </script>
+)}

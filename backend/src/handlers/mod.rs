@@ -24,6 +24,7 @@ pub mod system;
 pub mod ai;
 
 // Domain handlers
+pub mod analytics;
 pub mod audit;
 pub mod blog;
 pub mod content_template;
@@ -100,6 +101,9 @@ pub fn routes() -> Vec<Route> {
 
     // Audit
     routes.extend(audit::routes());
+
+    // Analytics
+    routes.extend(analytics::routes());
 
     // Clerk user management
     routes.extend(clerk_user::routes());

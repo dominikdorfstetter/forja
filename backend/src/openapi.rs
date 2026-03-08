@@ -43,7 +43,8 @@ use utoipa::{Modify, OpenApi};
         (name = "Redirects", description = "URL redirect management"),
         (name = "Content Templates", description = "Content template management"),
         (name = "API Keys", description = "API key management (requires master key)"),
-        (name = "AI", description = "AI content assist")
+        (name = "AI", description = "AI content assist"),
+        (name = "Analytics", description = "Privacy-first pageview analytics")
     ),
     paths(
         // System
@@ -263,6 +264,10 @@ use utoipa::{Modify, OpenApi};
         crate::handlers::ai::test_ai_connection,
         crate::handlers::ai::generate_ai_content,
         crate::handlers::ai::list_ai_models,
+        // Analytics
+        crate::handlers::analytics::track_pageview,
+        crate::handlers::analytics::get_analytics_report,
+        crate::handlers::analytics::aggregate_analytics,
         // Config
         crate::handlers::config::get_config,
     ),
@@ -319,6 +324,13 @@ use utoipa::{Modify, OpenApi};
         crate::dto::ai::AiTestResponse,
         crate::dto::ai::ListModelsRequest,
         crate::dto::ai::ListModelsResponse,
+        // Analytics DTOs
+        crate::dto::analytics::TrackPageviewRequest,
+        crate::dto::analytics::TrackPageviewResponse,
+        crate::dto::analytics::TopContentItem,
+        crate::dto::analytics::TrendDataPoint,
+        crate::dto::analytics::AnalyticsReportResponse,
+        crate::dto::analytics::AnalyticsMaintenanceResponse,
         // Site DTOs
         crate::dto::site::CreateSiteRequest,
         crate::dto::site::UpdateSiteRequest,

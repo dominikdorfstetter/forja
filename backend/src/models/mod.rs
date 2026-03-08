@@ -3,6 +3,7 @@
 //! This module contains all database models and their associated operations.
 
 pub mod ai_config;
+pub mod analytics;
 pub mod api_key;
 pub mod audit;
 pub mod blog;
