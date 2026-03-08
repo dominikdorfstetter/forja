@@ -189,6 +189,7 @@ vi.mock('@/services/api', () => {
     getApiKeys: vi.fn(),
     // Analytics methods
     getAnalyticsReport: vi.fn(),
+    getAnalyticsPageDetail: vi.fn(),
     aggregateAnalytics: vi.fn(),
     // AI methods
     getAiConfig: vi.fn(),

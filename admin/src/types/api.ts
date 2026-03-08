@@ -1541,160 +1541,29 @@ export interface AnalyticsMaintenanceResponse {
   action: string;
 }
 
-// Help system state
-export interface HelpStateResponse {
-  tour_completed: boolean;
-  hotspots_seen: string[];
-  field_help_seen: string[];
-}
-
-export interface UpdateHelpStateRequest {
-  tour_completed?: boolean;
-  dismiss_hotspot?: string;
-  dismiss_field_help?: string;
-}
-
-// Onboarding Progress
-export interface OnboardingStepResponse {
-  step_key: string;
-  completed_at: string;
-}
-
-export interface OnboardingProgressResponse {
-  completed_steps: OnboardingStepResponse[];
-  total_steps: number;
-  completed_count: number;
-  progress_percent: number;
-}
-
-export interface CompleteStepRequest {
-  step_key: string;
-}
-
-// Seed content
-export interface SeedContentResponse {
-  deleted?: number;
-}
-
-// ── Federation (ActivityPub) ──────────────────────────────────────
-
-export interface FederationActor {
-  id: string;
-  site_id: string;
-  preferred_username: string;
-  display_name: string;
-  summary: string | null;
-  avatar_url: string | null;
-  signature_algorithm: string;
-  created_at: string;
-}
-
-export interface FederationFollower {
-  id: string;
-  actor_uri: string;
-  inbox_uri: string;
-  display_name: string | null;
-  username: string | null;
-  avatar_url: string | null;
-  status: string;
-  followed_at: string;
-}
-
-export interface FederationActivity {
-  id: string;
-  activity_type: string;
-  activity_uri: string;
-  actor_uri: string;
-  object_uri: string | null;
-  object_type: string | null;
-  payload?: Record<string, unknown>;
-  direction: string;
-  status: string;
-  error_message: string | null;
-  created_at: string;
-}
-
-export interface FederationComment {
-  id: string;
-  content_id: string;
-  author_actor_uri: string;
-  author_name: string | null;
-  author_avatar_url: string | null;
-  body_html: string;
-  status: string;
-  created_at: string;
-  moderated_at: string | null;
-}
-
-export interface FederationBlockedInstance {
-  id: string;
+export interface ReferrerItem {
   domain: string;
-  reason: string | null;
-  blocked_at: string;
+  views: number;
 }
 
-export interface FederationBlockedActor {
-  id: string;
-  actor_uri: string;
-  reason: string | null;
-  blocked_at: string;
+export interface AnalyticsPageDetailResponse {
+  path: string;
+  total_views: number;
+  total_unique_visitors: number;
+  trend: TrendDataPoint[];
+  referrers: ReferrerItem[];
 }
 
-export interface FederationNote {
-  id: string;
-  body: string;
-  body_html: string;
-  published_at: string;
-  activity_uri: string | null;
-  status: string;
-  scheduled_at?: string | null;
+export interface AnalyticsReportParams {
+  days?: number;
+  topN?: number;
+  startDate?: string;
+  endDate?: string;
 }
 
-export interface FederationSettings {
-  enabled: boolean;
-  signature_algorithm: string;
-  moderation_mode: string;
-  auto_publish: boolean;
-  actor_uri?: string;
-  webfinger_address?: string;
-  summary?: string;
-  avatar_url?: string;
-}
-
-export interface FederationStats {
-  outbound_activities: number;
-  inbound_activities: number;
-  failed_activities: number;
-  pending_comments: number;
-  follower_count: number;
-  blocked_instances: number;
-  blocked_actors: number;
-}
-
-export interface FederationEngagement {
-  likes: number;
-  boosts: number;
-}
-
-export interface BlocklistImportResult {
-  imported: number;
-  skipped: number;
-}
-
-export interface FederationInstanceHealth {
-  instance_domain: string;
-  total: number;
-  successful: number;
-  failed: number;
-  dead: number;
-  last_attempt: string | null;
-}
-
-export interface FederationFeaturedPost {
-  id: string;
-  content_id: string;
-  position: number;
-  title: string | null;
-  slug: string | null;
-  created_at: string;
+export interface AnalyticsPageDetailParams {
+  path: string;
+  days?: number;
+  startDate?: string;
+  endDate?: string;
 }
