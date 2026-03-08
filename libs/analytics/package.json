@@ -1,0 +1,19 @@
+{
+  "name": "@forja/analytics",
+  "version": "0.1.0",
+  "description": "Privacy-first analytics tracker for Forja CMS. No cookies, no PII.",
+  "main": "dist/forja-analytics.js",
+  "module": "dist/forja-analytics.mjs",
+  "types": "dist/forja-analytics.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --minify",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch"
+  },
+  "keywords": ["analytics", "privacy", "gdpr", "forja", "cms"],
+  "license": "AGPL-3.0-or-later",
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.5.0"
+  }
+}
