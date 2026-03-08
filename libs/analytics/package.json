@@ -1,6 +1,6 @@
 {
   "name": "@forja/analytics",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Privacy-first analytics tracker for Forja CMS. No cookies, no PII.",
   "author": "Dominik Dorfstetter <dominik@dorfstetter.at>",
   "main": "dist/index.js",

@@ -10,7 +10,7 @@ use utoipa::{Modify, OpenApi};
 #[openapi(
     info(
         title = "Forja Multi-Site CMS API",
-        version = "1.0.4",
+        version = "1.0.5",
         description = "A high-performance REST API built with Rust for managing multiple websites with shared content and translations.",
         license(name = "AGPL-3.0-or-later", url = "https://www.gnu.org/licenses/agpl-3.0.html"),
         contact(name = "Forja Team", url = "https://github.com/dominikdorfstetter/forja")

@@ -10,7 +10,7 @@ pub struct HealthResponse {
     #[schema(example = "healthy")]
     pub status: String,
     /// API version from Cargo.toml
-    #[schema(example = "1.0.4")]
+    #[schema(example = "1.0.5")]
     pub version: String,
     /// Individual service health checks
     pub services: Vec<ServiceHealth>,

@@ -1,5 +1,38 @@
 # Changelog
 
+## v1.0.5
+
+### Admin Dashboard
+
+- **Site creation wizard** (#48): Added a 4-step site creation wizard with module selection (blog, pages, CV, legal, documents, AI), workflow mode (solo/team), and language configuration. Replaces the basic site form dialog for first-time setup.
+- **Onboarding survey** (#49): Added a 3-step onboarding survey (user type + content intents) shown on first login. Answers persist on the user profile and pre-configure wizard defaults. Supports skip (defaults to solo + blog). Full i18n across 8 locales.
+- **Adaptive UI** (#73): Dashboard, sidebar, and setup checklist now adapt based on site context — user role, enabled modules, and member count influence what is shown.
+- **Solo-to-team transition prompt** (#74): When a site gains multiple contributors, a contextual banner suggests enabling the editorial review workflow.
+- **Quick Post dialog** (#70): Added a rapid blog publishing dialog accessible from the dashboard and command palette (Cmd+K → "quick-post").
+- **Click-to-edit sections** (#68): Page section summary rows are now clickable to jump directly to editing.
+
+### Backend
+
+- **Site context API** (#71): New `GET /sites/{id}/context` endpoint returns features (workflow, scheduling, versioning, analytics), modules, member count, and suggestions for progressive UI disclosure.
+- **AI content generation** (#92): New AI module with configurable provider/model per site. Supports content generation, summarization, and translation via `POST /sites/{id}/ai/generate`.
+- **Security fixes** (#63–67): Enforced `authorize_site_action` checks on taxonomy, media, document localization, legal, and blog-document mutation handlers. Fixed `audit_service::log` site_id on affected endpoints.
+
+### Analytics (`@forja/analytics`)
+
+- Bumped to 1.0.5 in sync with the main project.
+
+### Documentation
+
+- Documented AI module, analytics, editor architecture, module system, and version sync policy (#101).
+
+### Infrastructure
+
+- **One-command Docker Compose** (#69): Added `docker-compose.yml` for single-command local deployment with PostgreSQL, Redis, backend, and admin dashboard.
+
+### Testing
+
+- Added missing test coverage for hooks and priority admin pages (#66).
+
 ## v1.0.4
 
 ### Admin Dashboard
