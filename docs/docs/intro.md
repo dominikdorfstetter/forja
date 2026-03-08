@@ -7,7 +7,7 @@ slug: /
 
 *Forja (Spanish: forge) — an open-source multi-site CMS where you forge your content. Like a blacksmith shapes raw metal into something useful, Forja lets you shape, manage, and deliver content across multiple sites from a single powerful backend.*
 
-Forja is built with a **Rust backend** (Rocket 0.5), a **React admin dashboard** (Vite + MUI), and pluggable **frontend templates** (Astro, Next.js, etc.). It is designed for developers who want a fast, type-safe CMS they can self-host, extend, and integrate into their own stack.
+Forja is built with a **Rust backend** (Rocket 0.5.1), a **React admin dashboard** (Vite + MUI), and pluggable **frontend templates** (Astro, Next.js, etc.). It is designed for developers who want a fast, type-safe CMS they can self-host, extend, and integrate into their own stack.
 
 ## Why Forja?
 
@@ -33,6 +33,10 @@ Most headless CMS platforms are either too heavy, too opinionated, or too expens
 | **Redirects** | 301/302 URL redirect management per site |
 | **Audit logging** | Track who changed what, and when |
 | **Content scheduling** | Publish and unpublish content on a schedule |
+| **Block editor** | Rich text editing with slash commands, tables, code highlighting, and media picker |
+| **AI Content Assist** | Generate blog drafts, SEO metadata, excerpts, and translations via configurable LLM providers |
+| **Privacy-first analytics** | Pageview tracking without cookies or PII -- GDPR-friendly by design |
+| **Site modules** | Enable only the features you need per site (blog, pages, CV, legal, documents, AI) |
 | **RSS feeds** | Auto-generated RSS 2.0 feeds for blog content |
 | **Notifications** | In-app notification system for admin users |
 | **Templates** | Pluggable frontend templates (ships with an Astro blog template) |
@@ -80,6 +84,8 @@ Most headless CMS platforms are either too heavy, too opinionated, or too expens
 - **[Configuration](./getting-started/configuration)** -- full reference of all environment variables.
 - **[API Reference](./api/overview)** -- explore every endpoint with request/response examples.
 - **[Admin Guide](./admin-guide/overview)** -- learn how to manage content through the dashboard.
+- **[AI Content Assist](./admin-guide/ai-content-assist)** -- set up AI-powered content generation.
+- **[Analytics](./admin-guide/analytics)** -- privacy-first pageview tracking.
 - **[Architecture](./architecture/overview)** -- deep dive into the system design.
 
 ## License

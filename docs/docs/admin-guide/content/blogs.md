@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # Blogs
 
-The blog management section is where you create, edit, and publish blog posts for your site. Forja provides a full-featured blog editor with markdown support, localizations, scheduling, and more.
+The blog management section is where you create, edit, and publish blog posts for your site. Forja provides a full-featured block editor with rich text formatting, localizations, scheduling, and more.
 
 ![Blog management](/img/screenshots/admin-blogs.png)
 
@@ -44,19 +44,67 @@ Select multiple posts using the checkboxes, then use the bulk actions menu:
    - **Title** -- the headline of your post (required).
    - **Slug** -- the URL-friendly identifier. Auto-generated from the title, but editable.
    - **Excerpt** -- a short summary displayed in listings and RSS feeds.
-   - **Content** -- the post body, written in Markdown (see [Markdown Editor](#markdown-editor) below).
+   - **Content** -- the post body, written in the block editor (see [Block Editor](#block-editor) below).
    - **Featured image** -- select an image from the media library or upload a new one.
    - **Tags and categories** -- assign taxonomy terms to organize your content. See [Taxonomy](../taxonomy).
 3. Click **Save as Draft** to save without publishing, or **Publish** to make it live immediately.
 
-## Markdown Editor
+:::tip
+If the AI module is enabled and configured, you can also create posts using **AI Assist** -- describe your idea, review an AI-generated outline, and generate a full draft. See [AI Content Assist](../ai-content-assist) for details.
+:::
 
-The blog editor uses a Markdown editor with the following features:
+## Block Editor
 
-- **Live preview** -- see a rendered preview of your markdown as you type.
-- **Toolbar** -- quick-access buttons for bold, italic, headings, links, images, code blocks, and lists.
-- **Image embedding** -- insert images from the media library directly into your content.
-- **Code syntax highlighting** -- use fenced code blocks with a language identifier (e.g., ` ```javascript `).
+The blog editor uses a Tiptap-based block editor with rich formatting capabilities. Content is stored as Markdown for portability.
+
+### Toolbar
+
+The toolbar provides quick access to formatting options:
+
+- **Text formatting** -- Bold, Italic, Underline, Strikethrough
+- **Headings** -- Heading 1, 2, 3
+- **Block structure** -- Blockquote, Bullet List, Ordered List, Task List, Horizontal Rule
+- **Insert** -- Link, Image (via media picker), Code Block, Table
+- **History** -- Undo / Redo
+
+### Slash Commands
+
+Type `/` anywhere in the editor to open the command palette. Filter by typing after the slash:
+
+| Command | Inserts |
+|---------|---------|
+| `/paragraph` | Plain text block |
+| `/heading1`, `/heading2`, `/heading3` | Heading at the specified level |
+| `/bulletList` | Unordered list |
+| `/orderedList` | Numbered list |
+| `/taskList` | Checklist with toggleable items |
+| `/blockquote` | Quoted text |
+| `/codeBlock` | Syntax-highlighted code block |
+| `/horizontalRule` | Visual divider |
+| `/image` | Image from the media library |
+| `/table` | 3x3 table with header row |
+
+### Supported Block Types
+
+- **Paragraphs and headings** (H1 -- H3)
+- **Lists** -- bullet, ordered, and task lists with nesting
+- **Blockquotes**
+- **Code blocks** -- with syntax highlighting for common languages (via lowlight)
+- **Tables** -- resizable columns and header rows
+- **Images** -- inserted via the media picker dialog (no manual URL entry needed)
+- **Horizontal rules**
+
+### Editor Sidebar
+
+The editor has a collapsible right sidebar with tabs for managing post metadata:
+
+- **General** -- status, author, scheduling, reading time, cover/header images
+- **SEO** -- meta title, meta description, excerpt (with optional [AI generation](../ai-content-assist#seo-metadata-generation))
+- **Relations** -- categories and attached documents
+
+### Storage Format
+
+Content is stored as **Markdown** via the `tiptap-markdown` extension. This means your content remains portable and readable even outside the editor.
 
 ## Editing a Blog Post
 

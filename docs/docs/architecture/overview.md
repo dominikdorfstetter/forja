@@ -58,6 +58,9 @@ Key responsibilities:
 - CRUD operations for all content types (blogs, pages, media, navigation, legal docs, CV entries, etc.)
 - Authentication and authorization (API keys and Clerk JWTs)
 - Media file storage (local filesystem or S3-compatible)
+- AI content generation via configurable LLM providers (OpenAI, Anthropic, Ollama, etc.)
+- Privacy-first analytics with daily rotating visitor hashes and auto-aggregation
+- Site module system for per-site feature gating
 - Rate limiting, audit logging, webhook delivery
 - OpenAPI documentation via utoipa, served at `/api-docs`
 
@@ -66,7 +69,9 @@ Key responsibilities:
 The admin dashboard is a React single-page application built with Vite. It is served by the backend at `/dashboard` and communicates with the API on the same origin. Authentication is handled through Clerk.
 
 Key responsibilities:
-- Site management and content editing
+- Site management and content editing via a rich Tiptap block editor
+- AI Content Assist integration (blog drafts, SEO, translations)
+- Analytics dashboard widget with privacy-first pageview data
 - Media library with folder organization
 - User and API key management
 - Navigation menu builder
