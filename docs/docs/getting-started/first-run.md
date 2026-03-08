@@ -176,4 +176,7 @@ cd admin && rm -rf node_modules && npm install
 
 ## Next Steps
 
-Head to [Configuration](./configuration) for a complete reference of all environment variables, or jump to the [Admin Guide](../admin-guide/overview) to start managing content.
+- **[Configuration](./configuration)** -- full reference of all environment variables.
+- **[Admin Guide](../admin-guide/overview)** -- start managing content through the dashboard.
+- **[Site Modules](../admin-guide/site-modules)** -- learn how to enable or disable features per site.
+- **[AI Content Assist](../admin-guide/ai-content-assist)** -- set up AI-powered content generation.
