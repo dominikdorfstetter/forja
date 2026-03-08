@@ -72,12 +72,28 @@ const MODULE_DEFS = [
   { key: 'ai' as const, icon: <AutoAwesomeIcon />, defaultOn: false },
 ] as const;
 
+interface ModuleDefaults {
+  blog: boolean;
+  pages: boolean;
+  cv: boolean;
+  legal: boolean;
+  documents: boolean;
+  ai: boolean;
+}
+
 interface SiteCreationWizardProps {
   open: boolean;
   onClose: () => void;
+  defaultModules?: ModuleDefaults;
+  defaultWorkflowMode?: 'solo' | 'team';
 }
 
-export default function SiteCreationWizard({ open, onClose }: SiteCreationWizardProps) {
+export default function SiteCreationWizard({
+  open,
+  onClose,
+  defaultModules,
+  defaultWorkflowMode,
+}: SiteCreationWizardProps) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { setSelectedSiteId } = useSiteContext();
@@ -111,22 +127,29 @@ export default function SiteCreationWizard({ open, onClose }: SiteCreationWizard
       slug: '',
       description: '',
       timezone: 'UTC',
-      modules: { blog: true, pages: true, cv: false, legal: false, documents: false, ai: false },
-      workflowMode: 'solo',
+      modules: defaultModules ?? { blog: true, pages: true, cv: false, legal: false, documents: false, ai: false },
+      workflowMode: defaultWorkflowMode ?? 'solo',
     },
     mode: 'onChange',
   });
 
-  // Reset when dialog opens
+  // Reset when dialog opens (apply survey-derived defaults if provided)
   useEffect(() => {
     if (open) {
       setActiveStep(0);
       setSelectedLocales([]);
       setDefaultLocaleId(null);
       setLocaleError(null);
-      reset();
+      reset({
+        name: '',
+        slug: '',
+        description: '',
+        timezone: 'UTC',
+        modules: defaultModules ?? { blog: true, pages: true, cv: false, legal: false, documents: false, ai: false },
+        workflowMode: defaultWorkflowMode ?? 'solo',
+      });
     }
-  }, [open, reset]);
+  }, [open, reset, defaultModules, defaultWorkflowMode]);
 
   // Auto-set default locale
   useEffect(() => {

@@ -1323,7 +1323,38 @@
       "description": "Legen Sie Ihre bevorzugte Sprache und Ihr Design fest, bevor Sie beginnen."
     },
     "createSite": "Erste Website erstellen",
-    "stepPrefix": "Schritt 1 von 1"
+    "stepPrefix": "Schritt 1 von 1",
+    "survey": {
+      "subtitle": "Richten wir alles für Sie ein.",
+      "description": "Beantworten Sie ein paar kurze Fragen, damit wir Ihre Erfahrung anpassen können.",
+      "getStarted": "Loslegen",
+      "skip": "Überspringen",
+      "finish": "Abschließen & Seite erstellen",
+      "userTypeTitle": "Was beschreibt Sie am besten?",
+      "userTypeDescription": "So können wir die Oberfläche und Standardeinstellungen auf Ihre Bedürfnisse abstimmen.",
+      "userTypes": {
+        "solo": "Einzelperson",
+        "soloDesc": "Ich erstelle Inhalte für mich selbst",
+        "team": "Kleines Team",
+        "teamDesc": "2–10 Personen arbeiten zusammen",
+        "agency": "Agentur / Studio",
+        "agencyDesc": "Verwaltung mehrerer Kundenseiten"
+      },
+      "intentTitle": "Was möchten Sie erstellen?",
+      "intentDescription": "Wählen Sie alles Zutreffende aus. Wir konfigurieren die passenden Module für Sie vor.",
+      "intents": {
+        "blog": "Blog / Newsletter",
+        "blogDesc": "Artikel, Neuigkeiten oder Newsletter veröffentlichen",
+        "portfolio": "Portfolio / Showcase",
+        "portfolioDesc": "Projekte, Arbeitsproben oder einen Lebenslauf präsentieren",
+        "marketing": "Marketing-Website / Landingpages",
+        "marketingDesc": "Produktseiten, Kampagnen oder Landingpages",
+        "docs": "Dokumentation / Wissensdatenbank",
+        "docsDesc": "Technische Dokumentation, Anleitungen oder Hilfeartikel",
+        "company": "Unternehmenswebsite",
+        "companyDesc": "Firmenauftritt mit Blog, Seiten und rechtlichen Inhalten"
+      }
+    }
   },
   "setupChecklist": {
     "title": "Erste Schritte",

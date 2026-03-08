@@ -55,6 +55,8 @@ use utoipa::{Modify, OpenApi};
         crate::handlers::auth::get_profile,
         crate::handlers::auth::get_preferences,
         crate::handlers::auth::update_preferences,
+        crate::handlers::auth::get_onboarding,
+        crate::handlers::auth::complete_onboarding,
         crate::handlers::auth::export_user_data,
         crate::handlers::auth::delete_account,
         // Sites
@@ -280,6 +282,9 @@ use utoipa::{Modify, OpenApi};
         // User Preferences DTOs
         crate::dto::user_preferences::UserPreferencesResponse,
         crate::dto::user_preferences::UpdateUserPreferencesRequest,
+        // Onboarding DTOs
+        crate::dto::onboarding::OnboardingResponse,
+        crate::dto::onboarding::CompleteOnboardingRequest,
         // Error types
         crate::errors::ProblemDetails,
         crate::errors::FieldError,

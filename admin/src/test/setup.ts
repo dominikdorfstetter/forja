@@ -111,6 +111,9 @@ vi.mock('@/services/api', () => {
     // User Preferences
     getUserPreferences: vi.fn(),
     updateUserPreferences: vi.fn(),
+    // Onboarding
+    getOnboarding: vi.fn(),
+    completeOnboarding: vi.fn(),
     // Locale & template methods
     getSiteLocales: vi.fn(),
     getContentTemplates: vi.fn(),

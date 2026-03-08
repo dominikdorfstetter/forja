@@ -1323,7 +1323,38 @@
       "description": "Imposta la lingua e il tema preferiti prima di iniziare."
     },
     "createSite": "Crea il tuo primo sito",
-    "stepPrefix": "Passaggio 1 di 1"
+    "stepPrefix": "Passaggio 1 di 1",
+    "survey": {
+      "subtitle": "Configuriamo tutto per te.",
+      "description": "Rispondi a qualche domanda veloce per personalizzare la tua esperienza.",
+      "getStarted": "Inizia",
+      "skip": "Salta",
+      "finish": "Concludi e crea il sito",
+      "userTypeTitle": "Cosa ti descrive meglio?",
+      "userTypeDescription": "Questo ci aiuta ad adattare l'interfaccia e le impostazioni predefinite alle tue esigenze.",
+      "userTypes": {
+        "solo": "Creatore singolo",
+        "soloDesc": "Sto creando per me stesso/a",
+        "team": "Piccolo team",
+        "teamDesc": "2–10 persone che collaborano",
+        "agency": "Agenzia / Studio",
+        "agencyDesc": "Gestione di più siti per clienti"
+      },
+      "intentTitle": "Cosa stai creando?",
+      "intentDescription": "Seleziona tutto ciò che si applica. Preconfigureremo i moduli giusti per te.",
+      "intents": {
+        "blog": "Blog / Newsletter",
+        "blogDesc": "Pubblicare articoli, notizie o newsletter",
+        "portfolio": "Portfolio / Vetrina",
+        "portfolioDesc": "Mostrare progetti, esempi di lavoro o un CV",
+        "marketing": "Sito marketing / Landing page",
+        "marketingDesc": "Pagine prodotto, campagne o landing page",
+        "docs": "Documentazione / Knowledge base",
+        "docsDesc": "Documentazione tecnica, guide o articoli di supporto",
+        "company": "Sito aziendale",
+        "companyDesc": "Sito aziendale con blog, pagine e contenuti legali"
+      }
+    }
   },
   "setupChecklist": {
     "title": "Primi passi",

@@ -24,10 +24,11 @@ import KeyIcon from '@mui/icons-material/Key';
 import DescriptionIcon from '@mui/icons-material/Description';
 import BoltIcon from '@mui/icons-material/Bolt';
 import DnsIcon from '@mui/icons-material/Dns';
+import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import apiService from '@/services/api';
@@ -35,16 +36,17 @@ import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import { useAuth } from '@/store/AuthContext';
 import { useSiteContext } from '@/store/SiteContext';
 import { useDashboardData } from '@/hooks/useDashboardData';
-import Onboarding from '@/components/Onboarding';
+import OnboardingSurvey from '@/components/OnboardingSurvey';
 import SetupChecklist from '@/components/SetupChecklist';
-import SiteFormDialog from '@/components/sites/SiteFormDialog';
+import SiteCreationWizard from '@/components/sites/SiteCreationWizard';
 import ContentStatusChart from '@/components/dashboard/ContentStatusChart';
 import AttentionPanel from '@/components/dashboard/AttentionPanel';
 import RecentActivityPanel from '@/components/dashboard/RecentActivityPanel';
 import QuickPostDialog from '@/components/blogs/QuickPostDialog';
 import TeamWorkflowPrompt from '@/components/TeamWorkflowPrompt';
 import AnalyticsWidget from '@/components/dashboard/AnalyticsWidget';
-import type { CreateSiteRequest, ContentStatus } from '@/types/api';
+import { computeWizardDefaults } from '@/utils/onboardingDefaults';
+import type { ContentStatus, UserType, ContentIntent } from '@/types/api';
 
 
 // ---------------------------------------------------------------------------
@@ -150,32 +152,47 @@ export default function DashboardHome() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { showError, showSuccess } = useErrorSnackbar();
-  const { permission, isMaster, isAdmin, canWrite, isSystemAdmin, currentSiteRole, isOwner, refreshAuth } = useAuth();
+  const { showError } = useErrorSnackbar();
+  const { permission, isMaster, isAdmin, canWrite, isSystemAdmin, currentSiteRole, isOwner } = useAuth();
   const { selectedSiteId, selectedSite, sites, isLoading: sitesLoading2 } = useSiteContext();
-  const { setSelectedSiteId } = useSiteContext();
 
-  const [siteFormOpen, setSiteFormOpen] = useState(false);
+  const [wizardOpen, setWizardOpen] = useState(false);
+  const [wizardDismissed, setWizardDismissed] = useState(false);
   const [quickPostOpen, setQuickPostOpen] = useState(false);
+  const [wizardDefaults, setWizardDefaults] = useState<ReturnType<typeof computeWizardDefaults> | undefined>();
 
   const hasSite = !!selectedSiteId;
   const hasNoSites = !sitesLoading2 && (!sites || sites.length === 0);
 
   const dashboard = useDashboardData();
 
-  const createSiteMutation = useMutation({
-    mutationFn: (data: CreateSiteRequest) => apiService.createSite(data),
-    onSuccess: async (newSite) => {
-      await refreshAuth();
-      queryClient.invalidateQueries({ queryKey: ['sites'] });
-      setSelectedSiteId(newSite.id);
-      setSiteFormOpen(false);
-      showSuccess(t('sites.messages.created'));
-    },
-    onError: (error) => {
-      showError(error);
-    },
+  // Fetch onboarding state (only when user has no sites)
+  const { data: onboarding, isLoading: onboardingLoading } = useQuery({
+    queryKey: ['onboarding'],
+    queryFn: () => apiService.getOnboarding(),
+    enabled: hasNoSites,
   });
+
+  const completeOnboardingMutation = useMutation({
+    mutationFn: ({ userType, intents }: { userType: UserType; intents: ContentIntent[] }) =>
+      apiService.completeOnboarding({ user_type: userType, intents }),
+    onSuccess: (_, { userType, intents }) => {
+      queryClient.invalidateQueries({ queryKey: ['onboarding'] });
+      const defaults = computeWizardDefaults(userType, intents);
+      setWizardDefaults(defaults);
+      setWizardOpen(true);
+    },
+    onError: showError,
+  });
+
+  const handleSurveyComplete = (userType: UserType, intents: ContentIntent[]) => {
+    completeOnboardingMutation.mutate({ userType, intents });
+  };
+
+  const handleSurveySkip = () => {
+    // Skip defaults to solo + blog
+    completeOnboardingMutation.mutate({ userType: 'solo', intents: ['blog'] });
+  };
 
   // Derive effective permission level
   const effectivePermission: string | null = isSystemAdmin
@@ -229,14 +246,53 @@ export default function DashboardHome() {
   // ---------- Render ----------
 
   if (hasNoSites) {
+    const showSurvey = !onboardingLoading && !onboarding?.completed && !wizardOpen;
+
+    if (showSurvey) {
+      return (
+        <OnboardingSurvey
+          onComplete={handleSurveyComplete}
+          onSkip={handleSurveySkip}
+          loading={completeOnboardingMutation.isPending}
+        />
+      );
+    }
+
+    // Survey done — show wizard with a landing page behind it
     return (
       <>
-        <Onboarding onCreateSite={() => setSiteFormOpen(true)} />
-        <SiteFormDialog
-          open={siteFormOpen}
-          onSubmit={(data) => createSiteMutation.mutate(data)}
-          onClose={() => setSiteFormOpen(false)}
-          loading={createSiteMutation.isPending}
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: 'calc(100vh - 120px)',
+            textAlign: 'center',
+            px: 2,
+          }}
+        >
+          <RocketLaunchIcon sx={{ fontSize: 64, color: 'primary.main', mb: 2 }} />
+          <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
+            {t('onboarding.welcome')}
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 520, mb: 4 }}>
+            {t('onboarding.description')}
+          </Typography>
+          <Button
+            variant="contained"
+            size="large"
+            onClick={() => setWizardOpen(true)}
+            sx={{ px: 5, py: 1.5 }}
+          >
+            {t('onboarding.createSite')}
+          </Button>
+        </Box>
+        <SiteCreationWizard
+          open={wizardOpen || (onboarding?.completed === true && !wizardDismissed)}
+          onClose={() => { setWizardOpen(false); setWizardDismissed(true); }}
+          defaultModules={wizardDefaults?.modules}
+          defaultWorkflowMode={wizardDefaults?.workflowMode}
         />
       </>
     );

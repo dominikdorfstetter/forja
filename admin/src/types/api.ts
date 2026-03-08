@@ -1239,6 +1239,22 @@ export interface UpdateUserPreferencesRequest {
   page_size?: number;
 }
 
+// Onboarding Survey
+export type UserType = 'solo' | 'team' | 'agency';
+export type ContentIntent = 'blog' | 'portfolio' | 'marketing' | 'docs' | 'company';
+
+export interface OnboardingResponse {
+  completed: boolean;
+  user_type: UserType | null;
+  intents: ContentIntent[];
+  completed_at: string | null;
+}
+
+export interface CompleteOnboardingRequest {
+  user_type: UserType;
+  intents: ContentIntent[];
+}
+
 // Clerk User Management
 export interface ClerkUser {
   id: string;
