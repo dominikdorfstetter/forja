@@ -3,7 +3,7 @@
 //! Privacy-first pageview tracking and reporting endpoints.
 //! No cookies, no IP storage, no PII. GDPR-compliant by design.
 
-use chrono::{Duration, Utc};
+use chrono::{DateTime, Duration, NaiveDate, Utc};
 use rocket::http::Status;
 use rocket::request::{FromRequest, Outcome, Request};
 use rocket::serde::json::Json;
@@ -12,12 +12,14 @@ use uuid::Uuid;
 use validator::Validate;
 
 use crate::dto::analytics::{
-    AnalyticsMaintenanceResponse, AnalyticsReportResponse, TopContentItem, TrackPageviewRequest,
-    TrackPageviewResponse, TrendDataPoint,
+    AnalyticsMaintenanceResponse, AnalyticsPageDetailResponse, AnalyticsReportResponse,
+    ReferrerItem, TopContentItem, TrackPageviewRequest, TrackPageviewResponse, TrendDataPoint,
 };
 use crate::errors::{codes, ApiError};
 use crate::guards::auth_guard::ReadKey;
-use crate::models::analytics::{compute_visitor_hash, extract_referrer_domain, AnalyticsPageview};
+use crate::models::analytics::{
+    compute_visitor_hash, extract_referrer_domain, AnalyticsPageview, ReferrerRow,
+};
 use crate::models::audit::AuditAction;
 use crate::models::site_membership::SiteRole;
 use crate::models::site_settings::{
@@ -69,6 +71,30 @@ async fn require_analytics_enabled(pool: &sqlx::PgPool, site_id: Uuid) -> Result
         );
     }
     Ok(())
+}
+
+/// Resolve a date range from optional start/end dates or a day count.
+///
+/// Priority: if start_date and/or end_date are provided, use them.
+/// Otherwise fall back to `days` (default 30).
+fn resolve_date_range(
+    start_date: Option<NaiveDate>,
+    end_date: Option<NaiveDate>,
+    days: Option<i64>,
+) -> (DateTime<Utc>, DateTime<Utc>) {
+    let now = Utc::now();
+    let until = match end_date {
+        Some(d) => d.and_hms_opt(23, 59, 59).expect("valid time").and_utc(),
+        None => now,
+    };
+    let since = match start_date {
+        Some(d) => d.and_hms_opt(0, 0, 0).expect("valid time").and_utc(),
+        None => {
+            let d = days.unwrap_or(30).clamp(1, 365);
+            until - Duration::days(d)
+        }
+    };
+    (since, until)
 }
 
 /// Record a pageview event.
@@ -129,6 +155,7 @@ pub async fn track_pageview(
 /// Get analytics report for a site.
 ///
 /// Returns top content, view trends, and summary stats for the given period.
+/// Use `start_date`/`end_date` (YYYY-MM-DD) for an explicit range, or `days` for a rolling window.
 #[utoipa::path(
     get,
     path = "/sites/{site_id}/analytics/report",
@@ -136,21 +163,26 @@ pub async fn track_pageview(
     operation_id = "get_analytics_report",
     params(
         ("site_id" = Uuid, Path, description = "Site ID"),
-        ("days" = Option<i64>, Query, description = "Number of days to look back (default: 30)"),
+        ("days" = Option<i64>, Query, description = "Number of days to look back (default: 30, ignored when start_date is set)"),
         ("top_n" = Option<i64>, Query, description = "Number of top content items (default: 10)"),
+        ("start_date" = Option<String>, Query, description = "Start date (YYYY-MM-DD)"),
+        ("end_date" = Option<String>, Query, description = "End date (YYYY-MM-DD, default: today)"),
     ),
     responses(
         (status = 200, description = "Analytics report", body = AnalyticsReportResponse),
+        (status = 400, description = "Invalid date format"),
         (status = 403, description = "Analytics not enabled or insufficient permissions"),
     ),
     security(("api_key" = []), ("bearer_auth" = []))
 )]
-#[get("/sites/<site_id>/analytics/report?<days>&<top_n>")]
+#[get("/sites/<site_id>/analytics/report?<days>&<top_n>&<start_date>&<end_date>")]
 pub async fn get_analytics_report(
     state: &State<AppState>,
     site_id: Uuid,
     days: Option<i64>,
     top_n: Option<i64>,
+    start_date: Option<String>,
+    end_date: Option<String>,
     auth: ReadKey,
 ) -> Result<Json<AnalyticsReportResponse>, ApiError> {
     auth.0
@@ -159,24 +191,38 @@ pub async fn get_analytics_report(
 
     require_analytics_enabled(&state.db, site_id).await?;
 
-    let days = days.unwrap_or(30).clamp(1, 365);
-    let top_n = top_n.unwrap_or(10).clamp(1, 50);
-    let since = Utc::now() - Duration::days(days);
+    let parsed_start = start_date
+        .map(|s| {
+            NaiveDate::parse_from_str(&s, "%Y-%m-%d").map_err(|_| {
+                ApiError::BadRequest("Invalid start_date format (expected YYYY-MM-DD)".to_string())
+            })
+        })
+        .transpose()?;
+    let parsed_end = end_date
+        .map(|s| {
+            NaiveDate::parse_from_str(&s, "%Y-%m-%d").map_err(|_| {
+                ApiError::BadRequest("Invalid end_date format (expected YYYY-MM-DD)".to_string())
+            })
+        })
+        .transpose()?;
 
-    let top_content = AnalyticsPageview::top_content(&state.db, site_id, since, top_n)
+    let top_n = top_n.unwrap_or(10).clamp(1, 50);
+    let (since, until) = resolve_date_range(parsed_start, parsed_end, days);
+
+    let top_content = AnalyticsPageview::top_content_range(&state.db, site_id, since, until, top_n)
         .await?
         .into_iter()
         .map(TopContentItem::from)
         .collect();
 
-    let trend = AnalyticsPageview::daily_trend(&state.db, site_id, since)
+    let trend = AnalyticsPageview::daily_trend_range(&state.db, site_id, since, until)
         .await?
         .into_iter()
         .map(TrendDataPoint::from)
         .collect();
 
     let (total_views, total_unique_visitors) =
-        AnalyticsPageview::summary(&state.db, site_id, since).await?;
+        AnalyticsPageview::summary_range(&state.db, site_id, since, until).await?;
 
     Ok(Json(AnalyticsReportResponse {
         total_views,
@@ -255,6 +301,101 @@ pub async fn aggregate_analytics(
     }))
 }
 
+/// Get per-page analytics detail.
+///
+/// Returns daily trend, summary stats, and top referrers for a single page path.
+#[utoipa::path(
+    get,
+    path = "/sites/{site_id}/analytics/report/page",
+    tag = "Analytics",
+    operation_id = "get_page_analytics",
+    params(
+        ("site_id" = Uuid, Path, description = "Site ID"),
+        ("path" = String, Query, description = "Page path to analyze (e.g., /blog/my-post)"),
+        ("days" = Option<i64>, Query, description = "Number of days to look back (default: 30, ignored when start_date is set)"),
+        ("start_date" = Option<String>, Query, description = "Start date (YYYY-MM-DD)"),
+        ("end_date" = Option<String>, Query, description = "End date (YYYY-MM-DD, default: today)"),
+    ),
+    responses(
+        (status = 200, description = "Page analytics detail", body = AnalyticsPageDetailResponse),
+        (status = 400, description = "Missing or invalid parameters"),
+        (status = 403, description = "Analytics not enabled or insufficient permissions"),
+    ),
+    security(("api_key" = []), ("bearer_auth" = []))
+)]
+#[get("/sites/<site_id>/analytics/report/page?<path>&<days>&<start_date>&<end_date>")]
+pub async fn get_page_analytics(
+    state: &State<AppState>,
+    site_id: Uuid,
+    path: String,
+    days: Option<i64>,
+    start_date: Option<String>,
+    end_date: Option<String>,
+    auth: ReadKey,
+) -> Result<Json<AnalyticsPageDetailResponse>, ApiError> {
+    auth.0
+        .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)
+        .await?;
+
+    require_analytics_enabled(&state.db, site_id).await?;
+
+    if path.is_empty() {
+        return Err(ApiError::BadRequest(
+            "path query parameter is required".to_string(),
+        ));
+    }
+
+    let parsed_start = start_date
+        .map(|s| {
+            NaiveDate::parse_from_str(&s, "%Y-%m-%d").map_err(|_| {
+                ApiError::BadRequest("Invalid start_date format (expected YYYY-MM-DD)".to_string())
+            })
+        })
+        .transpose()?;
+    let parsed_end = end_date
+        .map(|s| {
+            NaiveDate::parse_from_str(&s, "%Y-%m-%d").map_err(|_| {
+                ApiError::BadRequest("Invalid end_date format (expected YYYY-MM-DD)".to_string())
+            })
+        })
+        .transpose()?;
+
+    let (since, until) = resolve_date_range(parsed_start, parsed_end, days);
+
+    let trend: Vec<TrendDataPoint> =
+        AnalyticsPageview::page_trend(&state.db, site_id, &path, since, until)
+            .await?
+            .into_iter()
+            .map(TrendDataPoint::from)
+            .collect();
+
+    let (total_views, total_unique_visitors) =
+        AnalyticsPageview::page_summary(&state.db, site_id, &path, since, until).await?;
+
+    let referrers: Vec<ReferrerItem> =
+        AnalyticsPageview::page_referrers(&state.db, site_id, &path, since, until, 20)
+            .await?
+            .into_iter()
+            .map(|r: ReferrerRow| ReferrerItem {
+                domain: r.domain,
+                views: r.views,
+            })
+            .collect();
+
+    Ok(Json(AnalyticsPageDetailResponse {
+        path,
+        total_views,
+        total_unique_visitors,
+        trend,
+        referrers,
+    }))
+}
+
 pub fn routes() -> Vec<Route> {
-    routes![track_pageview, get_analytics_report, aggregate_analytics]
+    routes![
+        track_pageview,
+        get_analytics_report,
+        aggregate_analytics,
+        get_page_analytics
+    ]
 }

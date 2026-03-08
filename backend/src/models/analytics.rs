@@ -51,6 +51,13 @@ pub struct DailyTrendRow {
     pub unique_visitors: i64,
 }
 
+/// Referrer domain with view count (query result)
+#[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
+pub struct ReferrerRow {
+    pub domain: String,
+    pub views: i64,
+}
+
 /// Compute a GDPR-compliant visitor hash.
 ///
 /// Uses SHA-256(site_id || date || IP || UA) truncated to 16 hex chars.
@@ -182,6 +189,173 @@ impl AnalyticsPageview {
         Ok(row)
     }
 
+    /// Get top content by views within a closed date range.
+    pub async fn top_content_range(
+        pool: &PgPool,
+        site_id: Uuid,
+        since: DateTime<Utc>,
+        until: DateTime<Utc>,
+        limit: i64,
+    ) -> Result<Vec<TopContentRow>, ApiError> {
+        let rows = sqlx::query_as::<_, TopContentRow>(
+            r#"
+            SELECT
+                path,
+                COUNT(*) AS total_views,
+                COUNT(DISTINCT visitor_hash) AS unique_visitors
+            FROM analytics_pageviews
+            WHERE site_id = $1 AND created_at >= $2 AND created_at <= $3
+            GROUP BY path
+            ORDER BY total_views DESC
+            LIMIT $4
+            "#,
+        )
+        .bind(site_id)
+        .bind(since)
+        .bind(until)
+        .bind(limit)
+        .fetch_all(pool)
+        .await?;
+        Ok(rows)
+    }
+
+    /// Get daily view trend within a closed date range.
+    pub async fn daily_trend_range(
+        pool: &PgPool,
+        site_id: Uuid,
+        since: DateTime<Utc>,
+        until: DateTime<Utc>,
+    ) -> Result<Vec<DailyTrendRow>, ApiError> {
+        let rows = sqlx::query_as::<_, DailyTrendRow>(
+            r#"
+            SELECT
+                created_at::date AS date,
+                COUNT(*) AS total_views,
+                COUNT(DISTINCT visitor_hash) AS unique_visitors
+            FROM analytics_pageviews
+            WHERE site_id = $1 AND created_at >= $2 AND created_at <= $3
+            GROUP BY date
+            ORDER BY date ASC
+            "#,
+        )
+        .bind(site_id)
+        .bind(since)
+        .bind(until)
+        .fetch_all(pool)
+        .await?;
+        Ok(rows)
+    }
+
+    /// Get total views and unique visitors for a site within a closed date range.
+    pub async fn summary_range(
+        pool: &PgPool,
+        site_id: Uuid,
+        since: DateTime<Utc>,
+        until: DateTime<Utc>,
+    ) -> Result<(i64, i64), ApiError> {
+        let row: (i64, i64) = sqlx::query_as(
+            r#"
+            SELECT
+                COUNT(*) AS total_views,
+                COUNT(DISTINCT visitor_hash) AS unique_visitors
+            FROM analytics_pageviews
+            WHERE site_id = $1 AND created_at >= $2 AND created_at <= $3
+            "#,
+        )
+        .bind(site_id)
+        .bind(since)
+        .bind(until)
+        .fetch_one(pool)
+        .await?;
+        Ok(row)
+    }
+
+    /// Get daily trend for a specific page within a closed date range.
+    pub async fn page_trend(
+        pool: &PgPool,
+        site_id: Uuid,
+        path: &str,
+        since: DateTime<Utc>,
+        until: DateTime<Utc>,
+    ) -> Result<Vec<DailyTrendRow>, ApiError> {
+        let rows = sqlx::query_as::<_, DailyTrendRow>(
+            r#"
+            SELECT
+                created_at::date AS date,
+                COUNT(*) AS total_views,
+                COUNT(DISTINCT visitor_hash) AS unique_visitors
+            FROM analytics_pageviews
+            WHERE site_id = $1 AND path = $2 AND created_at >= $3 AND created_at <= $4
+            GROUP BY date
+            ORDER BY date ASC
+            "#,
+        )
+        .bind(site_id)
+        .bind(path)
+        .bind(since)
+        .bind(until)
+        .fetch_all(pool)
+        .await?;
+        Ok(rows)
+    }
+
+    /// Get total views and unique visitors for a specific page within a closed date range.
+    pub async fn page_summary(
+        pool: &PgPool,
+        site_id: Uuid,
+        path: &str,
+        since: DateTime<Utc>,
+        until: DateTime<Utc>,
+    ) -> Result<(i64, i64), ApiError> {
+        let row: (i64, i64) = sqlx::query_as(
+            r#"
+            SELECT
+                COUNT(*) AS total_views,
+                COUNT(DISTINCT visitor_hash) AS unique_visitors
+            FROM analytics_pageviews
+            WHERE site_id = $1 AND path = $2 AND created_at >= $3 AND created_at <= $4
+            "#,
+        )
+        .bind(site_id)
+        .bind(path)
+        .bind(since)
+        .bind(until)
+        .fetch_one(pool)
+        .await?;
+        Ok(row)
+    }
+
+    /// Get top referrer domains for a specific page within a closed date range.
+    pub async fn page_referrers(
+        pool: &PgPool,
+        site_id: Uuid,
+        path: &str,
+        since: DateTime<Utc>,
+        until: DateTime<Utc>,
+        limit: i64,
+    ) -> Result<Vec<ReferrerRow>, ApiError> {
+        let rows = sqlx::query_as::<_, ReferrerRow>(
+            r#"
+            SELECT
+                COALESCE(referrer_domain, '(direct)') AS domain,
+                COUNT(*) AS views
+            FROM analytics_pageviews
+            WHERE site_id = $1 AND path = $2 AND created_at >= $3 AND created_at <= $4
+            GROUP BY domain
+            ORDER BY views DESC
+            LIMIT $5
+            "#,
+        )
+        .bind(site_id)
+        .bind(path)
+        .bind(since)
+        .bind(until)
+        .bind(limit)
+        .fetch_all(pool)
+        .await?;
+        Ok(rows)
+    }
+
     /// Aggregate raw events into daily stats and return the number of days aggregated.
     pub async fn aggregate_daily(
         pool: &PgPool,
@@ -256,6 +430,91 @@ impl AnalyticsDailyStat {
         .bind(site_id)
         .bind(since)
         .bind(limit)
+        .fetch_all(pool)
+        .await?;
+        Ok(rows)
+    }
+
+    /// Get top content from aggregated daily stats within a closed date range.
+    pub async fn top_content_range(
+        pool: &PgPool,
+        site_id: Uuid,
+        since: NaiveDate,
+        until: NaiveDate,
+        limit: i64,
+    ) -> Result<Vec<TopContentRow>, ApiError> {
+        let rows = sqlx::query_as::<_, TopContentRow>(
+            r#"
+            SELECT
+                path,
+                SUM(view_count)::bigint AS total_views,
+                SUM(unique_visitors)::bigint AS unique_visitors
+            FROM analytics_daily_stats
+            WHERE site_id = $1 AND date >= $2 AND date <= $3
+            GROUP BY path
+            ORDER BY total_views DESC
+            LIMIT $4
+            "#,
+        )
+        .bind(site_id)
+        .bind(since)
+        .bind(until)
+        .bind(limit)
+        .fetch_all(pool)
+        .await?;
+        Ok(rows)
+    }
+
+    /// Get daily trend from aggregated stats within a closed date range.
+    pub async fn daily_trend_range(
+        pool: &PgPool,
+        site_id: Uuid,
+        since: NaiveDate,
+        until: NaiveDate,
+    ) -> Result<Vec<DailyTrendRow>, ApiError> {
+        let rows = sqlx::query_as::<_, DailyTrendRow>(
+            r#"
+            SELECT
+                date,
+                SUM(view_count)::bigint AS total_views,
+                SUM(unique_visitors)::bigint AS unique_visitors
+            FROM analytics_daily_stats
+            WHERE site_id = $1 AND date >= $2 AND date <= $3
+            GROUP BY date
+            ORDER BY date ASC
+            "#,
+        )
+        .bind(site_id)
+        .bind(since)
+        .bind(until)
+        .fetch_all(pool)
+        .await?;
+        Ok(rows)
+    }
+
+    /// Get daily trend from aggregated stats for a specific page within a closed date range.
+    pub async fn page_trend(
+        pool: &PgPool,
+        site_id: Uuid,
+        path: &str,
+        since: NaiveDate,
+        until: NaiveDate,
+    ) -> Result<Vec<DailyTrendRow>, ApiError> {
+        let rows = sqlx::query_as::<_, DailyTrendRow>(
+            r#"
+            SELECT
+                date,
+                view_count::bigint AS total_views,
+                unique_visitors::bigint AS unique_visitors
+            FROM analytics_daily_stats
+            WHERE site_id = $1 AND path = $2 AND date >= $3 AND date <= $4
+            ORDER BY date ASC
+            "#,
+        )
+        .bind(site_id)
+        .bind(path)
+        .bind(since)
+        .bind(until)
         .fetch_all(pool)
         .await?;
         Ok(rows)

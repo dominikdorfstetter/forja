@@ -515,6 +515,7 @@ pub struct ConsumerApiDoc;
         // Analytics
         crate::handlers::analytics::track_pageview,
         crate::handlers::analytics::get_analytics_report,
+        crate::handlers::analytics::get_page_analytics,
         crate::handlers::analytics::aggregate_analytics,
         // Config
         crate::handlers::config::get_config,
@@ -590,6 +591,8 @@ pub struct ConsumerApiDoc;
         crate::dto::analytics::TopContentItem,
         crate::dto::analytics::TrendDataPoint,
         crate::dto::analytics::AnalyticsReportResponse,
+        crate::dto::analytics::ReferrerItem,
+        crate::dto::analytics::AnalyticsPageDetailResponse,
         crate::dto::analytics::AnalyticsMaintenanceResponse,
         // Site DTOs
         crate::dto::site::CreateSiteRequest,
