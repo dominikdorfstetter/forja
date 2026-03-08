@@ -26,6 +26,7 @@ jobs:
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
       admin: ${{ steps.filter.outputs.admin }}
+      analytics: ${{ steps.filter.outputs.analytics }}
       actions: ${{ steps.filter.outputs.actions }}
     steps:
       - uses: actions/checkout@v6
@@ -38,6 +39,8 @@ jobs:
               - 'backend/**'
             admin:
               - 'admin/**'
+            analytics:
+              - 'libs/analytics/**'
             actions:
               - '.github/workflows/**'
 
@@ -73,7 +76,8 @@ jobs:
     needs: changes
     if: >-
       github.event_name == 'schedule' ||
-      needs.changes.outputs.admin == 'true'
+      needs.changes.outputs.admin == 'true' ||
+      needs.changes.outputs.analytics == 'true'
     runs-on: ubuntu-latest
     permissions:
       security-events: write
