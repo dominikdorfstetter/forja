@@ -1323,7 +1323,38 @@
       "description": "Ustaw preferowany język i motyw przed rozpoczęciem."
     },
     "createSite": "Utwórz swoją pierwszą stronę",
-    "stepPrefix": "Krok 1 z 1"
+    "stepPrefix": "Krok 1 z 1",
+    "survey": {
+      "subtitle": "Skonfigurujmy wszystko dla Ciebie.",
+      "description": "Odpowiedz na kilka krótkich pytań, abyśmy mogli dostosować Twoje doświadczenie.",
+      "getStarted": "Zaczynamy",
+      "skip": "Pomiń",
+      "finish": "Zakończ i utwórz stronę",
+      "userTypeTitle": "Co najlepiej Cię opisuje?",
+      "userTypeDescription": "Pomoże nam to dostosować interfejs i ustawienia domyślne do Twoich potrzeb.",
+      "userTypes": {
+        "solo": "Twórca indywidualny",
+        "soloDesc": "Tworzę dla siebie",
+        "team": "Mały zespół",
+        "teamDesc": "2–10 osób współpracujących",
+        "agency": "Agencja / Studio",
+        "agencyDesc": "Zarządzanie wieloma stronami klientów"
+      },
+      "intentTitle": "Co tworzysz?",
+      "intentDescription": "Zaznacz wszystko, co pasuje. Wstępnie skonfigurujemy odpowiednie moduły.",
+      "intents": {
+        "blog": "Blog / Newsletter",
+        "blogDesc": "Publikowanie artykułów, aktualności lub newsletterów",
+        "portfolio": "Portfolio / Prezentacja",
+        "portfolioDesc": "Prezentacja projektów, próbek pracy lub CV",
+        "marketing": "Strona marketingowa / Landing page",
+        "marketingDesc": "Strony produktowe, kampanie lub landing page",
+        "docs": "Dokumentacja / Baza wiedzy",
+        "docsDesc": "Dokumentacja techniczna, poradniki lub artykuły pomocy",
+        "company": "Strona firmowa",
+        "companyDesc": "Strona korporacyjna z blogiem, podstronami i treściami prawnymi"
+      }
+    }
   },
   "setupChecklist": {
     "title": "Pierwsze kroki",

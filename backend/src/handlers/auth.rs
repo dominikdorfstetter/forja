@@ -13,6 +13,7 @@ use crate::dto::audit::{AuditLogResponse, ChangeHistoryResponse};
 use crate::dto::auth::{
     AuthInfoResponse, ExportApiKeyRecord, ProfileResponse, UserDataExportResponse,
 };
+use crate::dto::onboarding::{CompleteOnboardingRequest, OnboardingResponse};
 use crate::dto::site_membership::{MembershipSummary, MembershipWithSite};
 use crate::dto::user_preferences::{UpdateUserPreferencesRequest, UserPreferencesResponse};
 use crate::guards::auth_guard::{AuthSource, AuthenticatedKey};
@@ -368,6 +369,80 @@ pub async fn update_preferences(
     Ok(Json(UserPreferencesResponse::from_json(&effective)))
 }
 
+/// Get the current user's onboarding state.
+///
+/// Returns whether the onboarding survey has been completed, along with
+/// user type and content intents if available.
+/// Only available for Clerk-authenticated users.
+#[utoipa::path(
+    tag = "Auth",
+    operation_id = "get_onboarding",
+    description = "Return the onboarding survey state for the authenticated user",
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 200, description = "Onboarding state", body = OnboardingResponse),
+        (status = 400, description = "Only available for Clerk-authenticated users"),
+        (status = 401, description = "Missing or invalid credentials")
+    )
+)]
+#[get("/auth/onboarding")]
+pub async fn get_onboarding(
+    auth: AuthenticatedKey,
+    state: &rocket::State<AppState>,
+) -> Result<Json<OnboardingResponse>, crate::errors::ApiError> {
+    let clerk_user_id = match &auth.auth_source {
+        AuthSource::ClerkJwt { clerk_user_id } => clerk_user_id,
+        AuthSource::ApiKey => {
+            return Err(crate::errors::ApiError::BadRequest(
+                "Onboarding is only available for Clerk-authenticated users".to_string(),
+            ));
+        }
+    };
+
+    let effective = UserPreferences::get_effective(&state.db, clerk_user_id).await?;
+    Ok(Json(OnboardingResponse::from_json(&effective)))
+}
+
+/// Complete the onboarding survey.
+///
+/// Stores user type and content intents on the user profile.
+/// Only available for Clerk-authenticated users.
+#[utoipa::path(
+    tag = "Auth",
+    operation_id = "complete_onboarding",
+    description = "Complete the onboarding survey with user type and content intents",
+    security(("bearer_auth" = [])),
+    request_body = CompleteOnboardingRequest,
+    responses(
+        (status = 200, description = "Updated onboarding state", body = OnboardingResponse),
+        (status = 400, description = "Validation error or not a Clerk user"),
+        (status = 401, description = "Missing or invalid credentials")
+    )
+)]
+#[put("/auth/onboarding", data = "<body>")]
+pub async fn complete_onboarding(
+    auth: AuthenticatedKey,
+    state: &rocket::State<AppState>,
+    body: Json<CompleteOnboardingRequest>,
+) -> Result<Json<OnboardingResponse>, crate::errors::ApiError> {
+    let clerk_user_id = match &auth.auth_source {
+        AuthSource::ClerkJwt { clerk_user_id } => clerk_user_id,
+        AuthSource::ApiKey => {
+            return Err(crate::errors::ApiError::BadRequest(
+                "Onboarding is only available for Clerk-authenticated users".to_string(),
+            ));
+        }
+    };
+
+    body.validate()?;
+    body.validate_values()
+        .map_err(crate::errors::ApiError::BadRequest)?;
+
+    let partial = body.into_inner().to_json();
+    let effective = UserPreferences::upsert(&state.db, clerk_user_id, partial).await?;
+    Ok(Json(OnboardingResponse::from_json(&effective)))
+}
+
 /// Delete the authenticated user's account.
 ///
 /// For Clerk users: blocks if user is sole owner of any site. Deletes memberships,
@@ -466,6 +541,8 @@ pub fn routes() -> Vec<Route> {
         get_profile,
         get_preferences,
         update_preferences,
+        get_onboarding,
+        complete_onboarding,
         export_user_data,
         delete_account
     ]

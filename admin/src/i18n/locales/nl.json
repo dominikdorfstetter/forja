@@ -1323,7 +1323,38 @@
       "description": "Stel uw voorkeurstaal en thema in voordat u begint."
     },
     "createSite": "Maak uw eerste site",
-    "stepPrefix": "Stap 1 van 1"
+    "stepPrefix": "Stap 1 van 1",
+    "survey": {
+      "subtitle": "Laten we alles voor u instellen.",
+      "description": "Beantwoord een paar korte vragen zodat we uw ervaring kunnen afstemmen.",
+      "getStarted": "Aan de slag",
+      "skip": "Overslaan",
+      "finish": "Afronden & site aanmaken",
+      "userTypeTitle": "Wat beschrijft u het beste?",
+      "userTypeDescription": "Dit helpt ons de interface en standaardinstellingen op uw behoeften af te stemmen.",
+      "userTypes": {
+        "solo": "Solo-maker",
+        "soloDesc": "Ik maak iets voor mezelf",
+        "team": "Klein team",
+        "teamDesc": "2–10 personen die samenwerken",
+        "agency": "Bureau / Studio",
+        "agencyDesc": "Beheer van meerdere klantsites"
+      },
+      "intentTitle": "Wat gaat u maken?",
+      "intentDescription": "Selecteer alles wat van toepassing is. We configureren de juiste modules voor u.",
+      "intents": {
+        "blog": "Blog / Nieuwsbrief",
+        "blogDesc": "Artikelen, nieuws of nieuwsbrieven publiceren",
+        "portfolio": "Portfolio / Etalage",
+        "portfolioDesc": "Projecten, werkvoorbeelden of een CV tonen",
+        "marketing": "Marketingsite / Landingspagina's",
+        "marketingDesc": "Productpagina's, campagnes of landingspagina's",
+        "docs": "Documentatie / Kennisbank",
+        "docsDesc": "Technische documentatie, handleidingen of hulpartikelen",
+        "company": "Bedrijfswebsite",
+        "companyDesc": "Bedrijfssite met blog, pagina's en juridische inhoud"
+      }
+    }
   },
   "setupChecklist": {
     "title": "Aan de slag",

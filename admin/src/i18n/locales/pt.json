@@ -1323,7 +1323,38 @@
       "description": "Defina o seu idioma e tema preferidos antes de começar."
     },
     "createSite": "Criar o seu primeiro site",
-    "stepPrefix": "Passo 1 de 1"
+    "stepPrefix": "Passo 1 de 1",
+    "survey": {
+      "subtitle": "Vamos configurar tudo para si.",
+      "description": "Responda a algumas perguntas rápidas para personalizarmos a sua experiência.",
+      "getStarted": "Começar",
+      "skip": "Saltar",
+      "finish": "Concluir e criar site",
+      "userTypeTitle": "O que melhor o descreve?",
+      "userTypeDescription": "Isto ajuda-nos a adaptar a interface e as predefinições às suas necessidades.",
+      "userTypes": {
+        "solo": "Criador individual",
+        "soloDesc": "Estou a criar para mim próprio/a",
+        "team": "Pequena equipa",
+        "teamDesc": "2–10 pessoas a colaborar",
+        "agency": "Agência / Estúdio",
+        "agencyDesc": "Gestão de múltiplos sites de clientes"
+      },
+      "intentTitle": "O que está a criar?",
+      "intentDescription": "Selecione tudo o que se aplica. Vamos pré-configurar os módulos certos para si.",
+      "intents": {
+        "blog": "Blog / Newsletter",
+        "blogDesc": "Publicar artigos, notícias ou newsletters",
+        "portfolio": "Portfólio / Vitrina",
+        "portfolioDesc": "Apresentar projetos, amostras de trabalho ou um CV",
+        "marketing": "Site de marketing / Landing pages",
+        "marketingDesc": "Páginas de produto, campanhas ou landing pages",
+        "docs": "Documentação / Base de conhecimento",
+        "docsDesc": "Documentação técnica, guias ou artigos de ajuda",
+        "company": "Site empresarial",
+        "companyDesc": "Site corporativo com blog, páginas e conteúdo legal"
+      }
+    }
   },
   "setupChecklist": {
     "title": "Primeiros passos",

@@ -1403,7 +1403,38 @@
       "description": "Set your preferred language and theme before getting started."
     },
     "createSite": "Create Your First Site",
-    "stepPrefix": "Step 1 of 1"
+    "stepPrefix": "Step 1 of 1",
+    "survey": {
+      "subtitle": "Let's set things up for you.",
+      "description": "Answer a few quick questions so we can tailor your experience.",
+      "getStarted": "Get Started",
+      "skip": "Skip",
+      "finish": "Finish & Create Site",
+      "userTypeTitle": "What best describes you?",
+      "userTypeDescription": "This helps us tailor the interface and defaults to your needs.",
+      "userTypes": {
+        "solo": "Solo creator",
+        "soloDesc": "I'm building for myself",
+        "team": "Small team",
+        "teamDesc": "2\u201310 people collaborating",
+        "agency": "Agency / Studio",
+        "agencyDesc": "Managing multiple client sites"
+      },
+      "intentTitle": "What are you building?",
+      "intentDescription": "Select all that apply. We'll pre-configure the right modules for you.",
+      "intents": {
+        "blog": "Blog / Newsletter",
+        "blogDesc": "Publish articles, news, or newsletters",
+        "portfolio": "Portfolio / Showcase",
+        "portfolioDesc": "Display projects, work samples, or a CV",
+        "marketing": "Marketing site / Landing pages",
+        "marketingDesc": "Product pages, campaigns, or landing pages",
+        "docs": "Documentation / Knowledge base",
+        "docsDesc": "Technical docs, guides, or help articles",
+        "company": "Company website",
+        "companyDesc": "Corporate site with blog, pages, and legal content"
+      }
+    }
   },
   "setupChecklist": {
     "title": "Getting Started",

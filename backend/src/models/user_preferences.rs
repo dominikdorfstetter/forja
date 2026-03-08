@@ -13,6 +13,12 @@ pub const KEY_LANGUAGE: &str = "language";
 pub const KEY_THEME_ID: &str = "theme_id";
 pub const KEY_PAGE_SIZE: &str = "page_size";
 
+// Onboarding keys (stored in the same preferences JSON blob)
+pub const KEY_ONBOARDING_COMPLETED: &str = "onboarding_completed";
+pub const KEY_ONBOARDING_USER_TYPE: &str = "onboarding_user_type";
+pub const KEY_ONBOARDING_INTENTS: &str = "onboarding_intents";
+pub const KEY_ONBOARDING_COMPLETED_AT: &str = "onboarding_completed_at";
+
 /// Returns the default preferences as a JSON object.
 pub fn default_preferences() -> serde_json::Value {
     serde_json::json!({

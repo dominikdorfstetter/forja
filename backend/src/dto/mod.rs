@@ -24,6 +24,7 @@ pub mod media_folder;
 pub mod navigation;
 pub mod navigation_menu;
 pub mod notification;
+pub mod onboarding;
 pub mod page;
 pub mod redirect;
 pub mod review;

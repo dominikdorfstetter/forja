@@ -137,6 +137,8 @@ import type {
   ListModelsResponse,
   AnalyticsReportResponse,
   AnalyticsMaintenanceResponse,
+  OnboardingResponse,
+  CompleteOnboardingRequest,
 } from '@/types/api';
 
 const API_BASE_URL = '/api/v1';
@@ -242,6 +244,15 @@ export class ApiService {
 
   async updateUserPreferences(data: UpdateUserPreferencesRequest): Promise<UserPreferencesResponse> {
     return apiRequest<UserPreferencesResponse>('PUT', '/auth/preferences', data);
+  }
+
+  // Onboarding
+  async getOnboarding(): Promise<OnboardingResponse> {
+    return apiRequest<OnboardingResponse>('GET', '/auth/onboarding');
+  }
+
+  async completeOnboarding(data: CompleteOnboardingRequest): Promise<OnboardingResponse> {
+    return apiRequest<OnboardingResponse>('PUT', '/auth/onboarding', data);
   }
 
   // Health (mounted at root, not under /api/v1)
