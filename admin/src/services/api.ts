@@ -135,6 +135,8 @@ import type {
   AiGenerateResponse,
   ListModelsRequest,
   ListModelsResponse,
+  AnalyticsReportResponse,
+  AnalyticsMaintenanceResponse,
 } from '@/types/api';
 
 const API_BASE_URL = '/api/v1';
@@ -1048,6 +1050,29 @@ export class ApiService {
 
   async listAiModels(siteId: string, data: ListModelsRequest): Promise<ListModelsResponse> {
     return apiRequest<ListModelsResponse>('POST', `/sites/${siteId}/ai/models`, data);
+  }
+
+  // Analytics
+  async getAnalyticsReport(
+    siteId: string,
+    days?: number,
+    topN?: number,
+  ): Promise<AnalyticsReportResponse> {
+    return apiRequest<AnalyticsReportResponse>('GET', `/sites/${siteId}/analytics/report`, undefined, {
+      params: { days, top_n: topN },
+    });
+  }
+
+  async aggregateAnalytics(
+    siteId: string,
+    retentionDays?: number,
+  ): Promise<AnalyticsMaintenanceResponse> {
+    return apiRequest<AnalyticsMaintenanceResponse>(
+      'POST',
+      `/sites/${siteId}/analytics/aggregate`,
+      undefined,
+      { params: { retention_days: retentionDays } },
+    );
   }
 }
 

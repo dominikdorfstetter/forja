@@ -153,6 +153,9 @@ vi.mock('@/services/api', () => {
     getLocales: vi.fn(),
     // API key methods
     getApiKeys: vi.fn(),
+    // Analytics methods
+    getAnalyticsReport: vi.fn(),
+    aggregateAnalytics: vi.fn(),
     // AI methods
     getAiConfig: vi.fn(),
     upsertAiConfig: vi.fn(),

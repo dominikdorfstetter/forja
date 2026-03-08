@@ -1481,3 +1481,39 @@ export interface AiTestResponse {
   success: boolean;
   message: string;
 }
+
+// ── Analytics ──────────────────────────────────────────────────────
+
+export interface TopContentItem {
+  path: string;
+  total_views: number;
+  unique_visitors: number;
+}
+
+export interface TrendDataPoint {
+  date: string;
+  total_views: number;
+  unique_visitors: number;
+}
+
+export interface AnalyticsReportResponse {
+  total_views: number;
+  total_unique_visitors: number;
+  top_content: TopContentItem[];
+  trend: TrendDataPoint[];
+}
+
+export interface TrackPageviewRequest {
+  path: string;
+  referrer?: string;
+  user_agent_hash?: string;
+}
+
+export interface TrackPageviewResponse {
+  ok: boolean;
+}
+
+export interface AnalyticsMaintenanceResponse {
+  rows_affected: number;
+  action: string;
+}
