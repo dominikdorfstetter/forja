@@ -83,7 +83,7 @@ mod tests {
     #[test]
     fn test_decrypt_wrong_key_fails() {
         let key1 = resolve_key("").unwrap();
-        let key2 = [1u8; 32];
+        let key2: [u8; 32] = Aes256Gcm::generate_key(&mut OsRng).into();
         let (ciphertext, nonce) = encrypt("secret", &key1).unwrap();
         let result = decrypt(&ciphertext, &nonce, &key2);
         assert!(result.is_err());
