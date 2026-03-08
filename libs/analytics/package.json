@@ -8,12 +8,18 @@
   "files": ["dist"],
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts --minify",
-    "dev": "tsup src/index.ts --format cjs,esm --dts --watch"
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "test": "vitest run --coverage",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit"
   },
   "keywords": ["analytics", "privacy", "gdpr", "forja", "cms"],
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
+    "@vitest/coverage-v8": "^3.0.0",
+    "happy-dom": "^17.0.0",
     "tsup": "^8.0.0",
-    "typescript": "^5.5.0"
+    "typescript": "^5.5.0",
+    "vitest": "^3.0.0"
   }
 }
