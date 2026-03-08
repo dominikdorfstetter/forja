@@ -5,7 +5,6 @@ use serde::{Deserialize, Serialize};
 use validator::Validate;
 
 use crate::models::analytics::{DailyTrendRow, TopContentRow};
-use crate::utils::pagination::Paginated;
 
 /// Request to record a pageview (from tracking snippet)
 #[derive(Debug, Clone, Deserialize, Validate, utoipa::ToSchema)]
@@ -104,6 +103,3 @@ pub struct AnalyticsMaintenanceResponse {
     pub rows_affected: u64,
     pub action: String,
 }
-
-/// Paginated type alias for top content
-pub type PaginatedTopContent = Paginated<TopContentItem>;

@@ -18,8 +18,12 @@ use crate::dto::analytics::{
 use crate::errors::ApiError;
 use crate::guards::auth_guard::ReadKey;
 use crate::models::analytics::{compute_visitor_hash, extract_referrer_domain, AnalyticsPageview};
+use crate::models::audit::AuditAction;
 use crate::models::site_membership::SiteRole;
-use crate::models::site_settings::{SiteSetting, KEY_ANALYTICS_ENABLED};
+use crate::models::site_settings::{
+    SiteSetting, KEY_ANALYTICS_ENABLED, KEY_ANALYTICS_RETENTION_DAYS,
+};
+use crate::services::audit_service;
 use crate::AppState;
 
 /// Wrapper to extract client IP from the request (for hashing only, never stored)
@@ -210,20 +214,42 @@ pub async fn aggregate_analytics(
         .authorize_site_action(&state.db, site_id, &SiteRole::Admin)
         .await?;
 
+    require_analytics_enabled(&state.db, site_id).await?;
+
     let today = Utc::now().date_naive();
     let rows = AnalyticsPageview::aggregate_daily(&state.db, site_id, today).await?;
 
-    // Prune old raw events
-    let retention = retention_days.unwrap_or(90).max(1);
+    // Prune old raw events (use site setting if no query param provided)
+    let retention = match retention_days {
+        Some(days) => days.max(1),
+        None => {
+            let val =
+                SiteSetting::get_value(&state.db, site_id, KEY_ANALYTICS_RETENTION_DAYS).await?;
+            val.as_i64().unwrap_or(90).max(1)
+        }
+    };
     let cutoff = Utc::now() - Duration::days(retention);
     let pruned = AnalyticsPageview::prune(&state.db, site_id, cutoff).await?;
 
+    let action = format!(
+        "Aggregated {} rows, pruned {} raw events older than {} days",
+        rows, pruned, retention
+    );
+
+    audit_service::log_action(
+        &state.db,
+        Some(site_id),
+        Some(auth.0.id),
+        AuditAction::Update,
+        "analytics",
+        site_id,
+        Some(serde_json::json!({ "action": &action })),
+    )
+    .await;
+
     Ok(Json(AnalyticsMaintenanceResponse {
         rows_affected: rows + pruned,
-        action: format!(
-            "Aggregated {} rows, pruned {} raw events older than {} days",
-            rows, pruned, retention
-        ),
+        action,
     }))
 }
 
