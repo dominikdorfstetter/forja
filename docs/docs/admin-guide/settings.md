@@ -55,6 +55,15 @@ Configuration for the auto-generated RSS feed:
 | **RSS description** | The description of the RSS feed. |
 | **RSS items count** | How many items to include in the feed. |
 
+## AI Settings
+
+:::info
+AI settings have their own dedicated page. Navigate to **AI Settings** in the sidebar to configure your AI provider.
+This section is only visible when the **AI module** is enabled for your site.
+:::
+
+For full details on provider setup, model selection, system prompts, and capabilities, see the [AI Content Assist](./ai-content-assist) guide.
+
 ## Saving Settings
 
 After making changes to any setting, click **Save** at the bottom of the page. Settings take effect immediately.
