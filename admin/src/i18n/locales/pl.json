@@ -290,7 +290,9 @@
         "template": "Z szablonu",
         "templateDesc": "Użyj gotowego szablonu treści",
         "import": "Importuj Markdown",
-        "importDesc": "Importuj treść z pliku .md"
+        "importDesc": "Importuj treść z pliku .md",
+        "ai": "Asystent AI",
+        "aiDesc": "Wygeneruj wpis na blogu z pomysłu za pomocą AI"
       },
       "fields": {
         "slug": "Slug",
@@ -2029,6 +2031,34 @@
       "horizontalRule": "Linia pozioma",
       "image": "Obraz",
       "table": "Tabela"
+    }
+  },
+  "quickPost": {
+    "title": "Szybki wpis",
+    "titlePlaceholder": "Tytuł wpisu...",
+    "bodyPlaceholder": "Zacznij pisać...",
+    "publish": "Opublikuj",
+    "publishNow": "Opublikuj teraz",
+    "saveAsDraft": "Zapisz jako szkic",
+    "moreOptions": "Więcej opcji",
+    "success": "Wpis na blogu utworzony",
+    "dashboardButton": "Szybki wpis",
+    "ai": {
+      "manualMode": "Pisz",
+      "aiMode": "Asystent AI",
+      "ideaTitle": "O czym chcesz napisać?",
+      "ideaPlaceholder": "Opisz swój pomysł na wpis, temat lub kluczowe punkty, które chcesz poruszyć...",
+      "generateOutline": "Wygeneruj konspekt",
+      "generating": "Generowanie...",
+      "titleLabel": "Tytuł",
+      "subtitleLabel": "Podtytuł",
+      "outlineLabel": "Konspekt",
+      "addPoint": "Dodaj punkt",
+      "generatePost": "Wygeneruj wpis",
+      "startOver": "Zacznij od nowa",
+      "regenerateOutline": "Wróć i spróbuj nowego pomysłu",
+      "outlineError": "Nie udało się wygenerować konspektu. Spróbuj ponownie.",
+      "postError": "Nie udało się wygenerować wpisu. Spróbuj ponownie."
     }
   },
   "aiSettings": {

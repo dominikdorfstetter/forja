@@ -290,7 +290,9 @@
         "template": "Desde plantilla",
         "templateDesc": "Usar una plantilla de contenido predefinida",
         "import": "Importar Markdown",
-        "importDesc": "Importar contenido desde un archivo .md"
+        "importDesc": "Importar contenido desde un archivo .md",
+        "ai": "Asistente IA",
+        "aiDesc": "Generar una publicación de blog a partir de una idea usando IA"
       },
       "fields": {
         "slug": "Slug",
@@ -2029,6 +2031,34 @@
       "horizontalRule": "Línea horizontal",
       "image": "Imagen",
       "table": "Tabla"
+    }
+  },
+  "quickPost": {
+    "title": "Publicación rápida",
+    "titlePlaceholder": "Título de la publicación...",
+    "bodyPlaceholder": "Empieza a escribir...",
+    "publish": "Publicar",
+    "publishNow": "Publicar ahora",
+    "saveAsDraft": "Guardar como borrador",
+    "moreOptions": "Más opciones",
+    "success": "Publicación de blog creada",
+    "dashboardButton": "Publicación rápida",
+    "ai": {
+      "manualMode": "Escribir",
+      "aiMode": "Asistente IA",
+      "ideaTitle": "¿Sobre qué quieres escribir?",
+      "ideaPlaceholder": "Describe tu idea para el artículo, el tema o los puntos clave que quieres cubrir...",
+      "generateOutline": "Generar esquema",
+      "generating": "Generando...",
+      "titleLabel": "Título",
+      "subtitleLabel": "Subtítulo",
+      "outlineLabel": "Esquema",
+      "addPoint": "Añadir punto",
+      "generatePost": "Generar publicación",
+      "startOver": "Empezar de nuevo",
+      "regenerateOutline": "Volver e intentar una nueva idea",
+      "outlineError": "No se pudo generar el esquema. Por favor, inténtalo de nuevo.",
+      "postError": "No se pudo generar la publicación. Por favor, inténtalo de nuevo."
     }
   },
   "aiSettings": {

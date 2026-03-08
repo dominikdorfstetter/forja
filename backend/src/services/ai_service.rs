@@ -137,6 +137,36 @@ const XML_FORMAT_TRANSLATE: &str = "\nRespond using ONLY these XML tags, with no
 <meta_title>translated meta title</meta_title>\n\
 <meta_description>translated meta description</meta_description>";
 
+const DEFAULT_PROMPT_DRAFT_OUTLINE: &str =
+    "You are a creative blog content strategist. Given a topic idea, generate a compelling blog \
+post title, subtitle, and a structured outline with 5-8 bullet points. Each bullet should be a \
+concise section heading or key point that could be expanded into a paragraph.";
+
+const JSON_FORMAT_DRAFT_OUTLINE: &str = "\nRespond with ONLY valid JSON in this exact format: \
+{\"title\": \"...\", \"subtitle\": \"...\", \"outline\": [\"point 1\", \"point 2\", ...]}";
+
+const XML_FORMAT_DRAFT_OUTLINE: &str = "\nRespond using ONLY these XML tags, with no other text:\n\
+<title>blog post title</title>\n\
+<subtitle>blog post subtitle</subtitle>\n\
+<outline>first outline point</outline>\n\
+<outline>second outline point</outline>\n\
+<outline>...</outline>";
+
+const DEFAULT_PROMPT_DRAFT_POST: &str =
+    "You are a skilled blog writer. Given a title and outline, write a complete, well-structured \
+blog post in markdown format. Write engaging, informative content that expands each outline point \
+into full paragraphs. Also generate a concise excerpt (1-2 sentences) and SEO metadata.";
+
+const JSON_FORMAT_DRAFT_POST: &str = "\nRespond with ONLY valid JSON in this exact format: \
+{\"body\": \"full blog post in markdown...\", \"excerpt\": \"1-2 sentence summary\", \
+\"meta_title\": \"SEO title (max 60 chars)\", \"meta_description\": \"SEO description (max 160 chars)\"}";
+
+const XML_FORMAT_DRAFT_POST: &str = "\nRespond using ONLY these XML tags, with no other text:\n\
+<body>full blog post in markdown</body>\n\
+<excerpt>1-2 sentence summary</excerpt>\n\
+<meta_title>SEO title (max 60 chars)</meta_title>\n\
+<meta_description>SEO description (max 160 chars)</meta_description>";
+
 fn default_content_prompt(action: &AiAction, target_locale: Option<&str>) -> String {
     match action {
         AiAction::Seo => DEFAULT_PROMPT_SEO.to_string(),
@@ -145,6 +175,8 @@ fn default_content_prompt(action: &AiAction, target_locale: Option<&str>) -> Str
             let locale = target_locale.unwrap_or("en");
             format!("{DEFAULT_PROMPT_TRANSLATE_PREFIX}{locale}{DEFAULT_PROMPT_TRANSLATE_SUFFIX}")
         }
+        AiAction::DraftOutline => DEFAULT_PROMPT_DRAFT_OUTLINE.to_string(),
+        AiAction::DraftPost => DEFAULT_PROMPT_DRAFT_POST.to_string(),
     }
 }
 
@@ -157,12 +189,16 @@ fn format_suffix(action: &AiAction, use_json: bool) -> &'static str {
             AiAction::Seo => JSON_FORMAT_SEO,
             AiAction::Excerpt => JSON_FORMAT_EXCERPT,
             AiAction::Translate => JSON_FORMAT_TRANSLATE,
+            AiAction::DraftOutline => JSON_FORMAT_DRAFT_OUTLINE,
+            AiAction::DraftPost => JSON_FORMAT_DRAFT_POST,
         }
     } else {
         match action {
             AiAction::Seo => XML_FORMAT_SEO,
             AiAction::Excerpt => XML_FORMAT_EXCERPT,
             AiAction::Translate => XML_FORMAT_TRANSLATE,
+            AiAction::DraftOutline => XML_FORMAT_DRAFT_OUTLINE,
+            AiAction::DraftPost => XML_FORMAT_DRAFT_POST,
         }
     }
 }
@@ -370,6 +406,27 @@ fn extract_xml_field(s: &str, tag: &str) -> Option<String> {
     Some(s[start + open.len()..end].trim().to_string())
 }
 
+/// Extract all occurrences of a repeated XML tag (e.g. multiple `<outline>` elements).
+fn extract_all_xml_fields(s: &str, tag: &str) -> Vec<String> {
+    let open = format!("<{tag}>");
+    let close = format!("</{tag}>");
+    let mut results = Vec::new();
+    let mut search_from = 0;
+    while let Some(start) = s[search_from..].find(&open) {
+        let abs_start = search_from + start + open.len();
+        if let Some(end) = s[abs_start..].find(&close) {
+            let text = s[abs_start..abs_start + end].trim().to_string();
+            if !text.is_empty() {
+                results.push(text);
+            }
+            search_from = abs_start + end + close.len();
+        } else {
+            break;
+        }
+    }
+    results
+}
+
 /// Try to parse the AI response as XML-tagged output.
 /// Returns None if no recognized XML tags are found.
 fn parse_xml_response(content: &str, action: &AiAction) -> Option<AiGenerateResponse> {
@@ -389,6 +446,7 @@ fn parse_xml_response(content: &str, action: &AiAction) -> Option<AiGenerateResp
                 title: None,
                 subtitle: None,
                 body: None,
+                outline: None,
             })
         }
         AiAction::Excerpt => {
@@ -400,10 +458,10 @@ fn parse_xml_response(content: &str, action: &AiAction) -> Option<AiGenerateResp
                 title: None,
                 subtitle: None,
                 body: None,
+                outline: None,
             })
         }
         AiAction::Translate => {
-            // At least one field must be present
             let title = x("title");
             let subtitle = x("subtitle");
             let excerpt = x("excerpt");
@@ -420,6 +478,41 @@ fn parse_xml_response(content: &str, action: &AiAction) -> Option<AiGenerateResp
                 title,
                 subtitle,
                 body,
+                outline: None,
+            })
+        }
+        AiAction::DraftOutline => {
+            let title = x("title");
+            let subtitle = x("subtitle");
+            // Collect all <outline> tags
+            let outline = extract_all_xml_fields(content, "outline");
+            if title.is_none() && outline.is_empty() {
+                return None;
+            }
+            Some(AiGenerateResponse {
+                title,
+                subtitle,
+                meta_title: None,
+                meta_description: None,
+                excerpt: None,
+                body: None,
+                outline: Some(outline),
+            })
+        }
+        AiAction::DraftPost => {
+            let body = x("body");
+            body.as_ref()?;
+            let excerpt = x("excerpt");
+            let mt = x("meta_title");
+            let md = x("meta_description");
+            Some(AiGenerateResponse {
+                body,
+                excerpt,
+                meta_title: mt,
+                meta_description: md,
+                title: None,
+                subtitle: None,
+                outline: None,
             })
         }
     }
@@ -589,6 +682,8 @@ pub async fn generate(
         AiAction::Seo => "seo",
         AiAction::Excerpt => "excerpt",
         AiAction::Translate => unreachable!(),
+        AiAction::DraftOutline => "draft_outline",
+        AiAction::DraftPost => "draft_post",
     };
 
     // Build system prompt: content instructions + format suffix
@@ -721,6 +816,7 @@ async fn generate_translate_parallel(
         title: None,
         subtitle: None,
         body: None,
+        outline: None,
     };
 
     for ((name, original), result) in tasks.iter().zip(results) {
@@ -962,6 +1058,7 @@ fn build_response(json: &serde_json::Value, action: &AiAction) -> AiGenerateResp
             title: None,
             subtitle: None,
             body: None,
+            outline: None,
         },
         AiAction::Excerpt => AiGenerateResponse {
             meta_title: None,
@@ -970,15 +1067,33 @@ fn build_response(json: &serde_json::Value, action: &AiAction) -> AiGenerateResp
             title: None,
             subtitle: None,
             body: None,
+            outline: None,
         },
-        AiAction::Translate => AiGenerateResponse {
+        AiAction::Translate | AiAction::DraftPost => AiGenerateResponse {
             meta_title: s("meta_title"),
             meta_description: s("meta_description"),
             excerpt: s("excerpt"),
             title: s("title"),
             subtitle: s("subtitle"),
             body: s("body"),
+            outline: None,
         },
+        AiAction::DraftOutline => {
+            let outline = json.get("outline").and_then(|v| v.as_array()).map(|arr| {
+                arr.iter()
+                    .filter_map(|v| v.as_str().map(String::from))
+                    .collect()
+            });
+            AiGenerateResponse {
+                title: s("title"),
+                subtitle: s("subtitle"),
+                meta_title: None,
+                meta_description: None,
+                excerpt: None,
+                body: None,
+                outline,
+            }
+        }
     }
 }
 
@@ -1429,5 +1544,111 @@ mod tests {
     fn test_anthropic_models_static_list() {
         assert!(!ANTHROPIC_MODELS.is_empty());
         assert!(ANTHROPIC_MODELS.iter().any(|m| m.contains("claude")));
+    }
+
+    #[test]
+    fn test_parse_draft_outline_json() {
+        let json = r#"{"title": "10 Tips for Rust", "subtitle": "A beginner's guide", "outline": ["Tip 1: Ownership", "Tip 2: Borrowing", "Tip 3: Lifetimes"]}"#;
+        let result = parse_ai_response(json, &AiAction::DraftOutline).unwrap();
+        assert_eq!(result.title.unwrap(), "10 Tips for Rust");
+        assert_eq!(result.subtitle.unwrap(), "A beginner's guide");
+        let outline = result.outline.unwrap();
+        assert_eq!(outline.len(), 3);
+        assert_eq!(outline[0], "Tip 1: Ownership");
+    }
+
+    #[test]
+    fn test_parse_draft_post_json() {
+        let json = r##"{"body": "# Introduction\n\nGreat content here.", "excerpt": "A summary.", "meta_title": "SEO Title", "meta_description": "SEO description"}"##;
+        let result = parse_ai_response(json, &AiAction::DraftPost).unwrap();
+        assert_eq!(
+            result.body.unwrap(),
+            "# Introduction\n\nGreat content here."
+        );
+        assert_eq!(result.excerpt.unwrap(), "A summary.");
+        assert_eq!(result.meta_title.unwrap(), "SEO Title");
+        assert!(result.title.is_none());
+        assert!(result.outline.is_none());
+    }
+
+    #[test]
+    fn test_parse_xml_draft_outline() {
+        let input = "<title>10 Tips for Rust</title>\n<subtitle>A beginner's guide</subtitle>\n<outline>Tip 1: Ownership</outline>\n<outline>Tip 2: Borrowing</outline>\n<outline>Tip 3: Lifetimes</outline>";
+        let result = parse_xml_response(input, &AiAction::DraftOutline).unwrap();
+        assert_eq!(result.title.unwrap(), "10 Tips for Rust");
+        assert_eq!(result.subtitle.unwrap(), "A beginner's guide");
+        let outline = result.outline.unwrap();
+        assert_eq!(outline.len(), 3);
+        assert_eq!(outline[2], "Tip 3: Lifetimes");
+    }
+
+    #[test]
+    fn test_parse_xml_draft_post() {
+        let input = "<body>## Heading\n\nContent here.</body>\n<excerpt>A short summary.</excerpt>\n<meta_title>SEO</meta_title>\n<meta_description>Description</meta_description>";
+        let result = parse_xml_response(input, &AiAction::DraftPost).unwrap();
+        assert_eq!(result.body.unwrap(), "## Heading\n\nContent here.");
+        assert_eq!(result.excerpt.unwrap(), "A short summary.");
+        assert_eq!(result.meta_title.unwrap(), "SEO");
+        assert!(result.title.is_none());
+    }
+
+    #[test]
+    fn test_extract_all_xml_fields() {
+        let input =
+            "<outline>Point 1</outline>\n<outline>Point 2</outline>\n<outline>Point 3</outline>";
+        let results = extract_all_xml_fields(input, "outline");
+        assert_eq!(results.len(), 3);
+        assert_eq!(results[0], "Point 1");
+        assert_eq!(results[1], "Point 2");
+        assert_eq!(results[2], "Point 3");
+    }
+
+    #[test]
+    fn test_extract_all_xml_fields_empty() {
+        let input = "No outline tags here";
+        let results = extract_all_xml_fields(input, "outline");
+        assert!(results.is_empty());
+    }
+
+    #[test]
+    fn test_format_suffix_json_draft_outline() {
+        let suffix = format_suffix(&AiAction::DraftOutline, true);
+        assert!(suffix.contains("JSON"));
+        assert!(suffix.contains("outline"));
+    }
+
+    #[test]
+    fn test_format_suffix_xml_draft_outline() {
+        let suffix = format_suffix(&AiAction::DraftOutline, false);
+        assert!(suffix.contains("<outline>"));
+        assert!(suffix.contains("<title>"));
+    }
+
+    #[test]
+    fn test_format_suffix_json_draft_post() {
+        let suffix = format_suffix(&AiAction::DraftPost, true);
+        assert!(suffix.contains("JSON"));
+        assert!(suffix.contains("body"));
+    }
+
+    #[test]
+    fn test_format_suffix_xml_draft_post() {
+        let suffix = format_suffix(&AiAction::DraftPost, false);
+        assert!(suffix.contains("<body>"));
+        assert!(suffix.contains("<excerpt>"));
+    }
+
+    #[test]
+    fn test_content_prompt_draft_outline() {
+        let prompt = default_content_prompt(&AiAction::DraftOutline, None);
+        assert!(prompt.contains("outline"));
+        assert!(prompt.contains("bullet"));
+    }
+
+    #[test]
+    fn test_content_prompt_draft_post() {
+        let prompt = default_content_prompt(&AiAction::DraftPost, None);
+        assert!(prompt.contains("blog post"));
+        assert!(prompt.contains("markdown"));
     }
 }

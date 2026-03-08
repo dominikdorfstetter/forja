@@ -299,7 +299,9 @@
         "template": "From Template",
         "templateDesc": "Use a pre-built content template",
         "import": "Import Markdown",
-        "importDesc": "Import content from a .md file"
+        "importDesc": "Import content from a .md file",
+        "ai": "AI Assist",
+        "aiDesc": "Generate a blog post from an idea using AI"
       },
       "fields": {
         "slug": "Slug",
@@ -2139,7 +2141,24 @@
     "saveAsDraft": "Save as draft",
     "moreOptions": "More options",
     "success": "Blog post created",
-    "dashboardButton": "Quick Post"
+    "dashboardButton": "Quick Post",
+    "ai": {
+      "manualMode": "Write",
+      "aiMode": "AI Assist",
+      "ideaTitle": "What do you want to write about?",
+      "ideaPlaceholder": "Describe your blog post idea, topic, or key points you want to cover...",
+      "generateOutline": "Generate Outline",
+      "generating": "Generating...",
+      "titleLabel": "Title",
+      "subtitleLabel": "Subtitle",
+      "outlineLabel": "Outline",
+      "addPoint": "Add point",
+      "generatePost": "Generate Post",
+      "startOver": "Start over",
+      "regenerateOutline": "Go back and try a new idea",
+      "outlineError": "Failed to generate outline. Please try again.",
+      "postError": "Failed to generate post. Please try again."
+    }
   },
   "aiSettings": {
     "title": "AI Settings",

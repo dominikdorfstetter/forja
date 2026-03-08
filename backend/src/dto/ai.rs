@@ -12,6 +12,10 @@ pub enum AiAction {
     Seo,
     Excerpt,
     Translate,
+    /// Generate a blog outline from an idea
+    DraftOutline,
+    /// Generate a full blog post from a title + outline
+    DraftPost,
 }
 
 /// Request to generate AI content
@@ -33,6 +37,9 @@ pub struct AiGenerateResponse {
     pub title: Option<String>,
     pub subtitle: Option<String>,
     pub body: Option<String>,
+    /// Outline bullet points (draft_outline action only)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub outline: Option<Vec<String>>,
 }
 
 /// Request to create or update AI config

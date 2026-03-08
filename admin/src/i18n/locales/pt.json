@@ -290,7 +290,9 @@
         "template": "A partir de modelo",
         "templateDesc": "Usar um modelo de conteúdo pré-definido",
         "import": "Importar Markdown",
-        "importDesc": "Importar conteúdo de um arquivo .md"
+        "importDesc": "Importar conteúdo de um arquivo .md",
+        "ai": "Assistente IA",
+        "aiDesc": "Gerar uma publicação de blog a partir de uma ideia usando IA"
       },
       "fields": {
         "slug": "Slug",
@@ -2029,6 +2031,34 @@
       "horizontalRule": "Linha horizontal",
       "image": "Imagem",
       "table": "Tabela"
+    }
+  },
+  "quickPost": {
+    "title": "Publicação rápida",
+    "titlePlaceholder": "Título da publicação...",
+    "bodyPlaceholder": "Comece a escrever...",
+    "publish": "Publicar",
+    "publishNow": "Publicar agora",
+    "saveAsDraft": "Salvar como rascunho",
+    "moreOptions": "Mais opções",
+    "success": "Publicação de blog criada",
+    "dashboardButton": "Publicação rápida",
+    "ai": {
+      "manualMode": "Escrever",
+      "aiMode": "Assistente IA",
+      "ideaTitle": "Sobre o que você quer escrever?",
+      "ideaPlaceholder": "Descreva sua ideia para o artigo, o tema ou os pontos-chave que deseja abordar...",
+      "generateOutline": "Gerar esboço",
+      "generating": "Gerando...",
+      "titleLabel": "Título",
+      "subtitleLabel": "Subtítulo",
+      "outlineLabel": "Esboço",
+      "addPoint": "Adicionar ponto",
+      "generatePost": "Gerar publicação",
+      "startOver": "Recomeçar",
+      "regenerateOutline": "Voltar e tentar uma nova ideia",
+      "outlineError": "Não foi possível gerar o esboço. Tente novamente.",
+      "postError": "Não foi possível gerar a publicação. Tente novamente."
     }
   },
   "aiSettings": {

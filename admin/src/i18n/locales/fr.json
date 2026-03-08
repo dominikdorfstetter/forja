@@ -290,7 +290,9 @@
         "template": "Depuis un modèle",
         "templateDesc": "Utiliser un modèle de contenu prédéfini",
         "import": "Importer Markdown",
-        "importDesc": "Importer du contenu depuis un fichier .md"
+        "importDesc": "Importer du contenu depuis un fichier .md",
+        "ai": "Assistant IA",
+        "aiDesc": "Générer un article de blog à partir d'une idée avec l'IA"
       },
       "fields": {
         "slug": "Slug",
@@ -2029,6 +2031,34 @@
       "horizontalRule": "Ligne horizontale",
       "image": "Image",
       "table": "Tableau"
+    }
+  },
+  "quickPost": {
+    "title": "Publication rapide",
+    "titlePlaceholder": "Titre de la publication...",
+    "bodyPlaceholder": "Commencez à écrire...",
+    "publish": "Publier",
+    "publishNow": "Publier maintenant",
+    "saveAsDraft": "Enregistrer comme brouillon",
+    "moreOptions": "Plus d'options",
+    "success": "Article de blog créé",
+    "dashboardButton": "Publication rapide",
+    "ai": {
+      "manualMode": "Écrire",
+      "aiMode": "Assistant IA",
+      "ideaTitle": "Sur quoi voulez-vous écrire ?",
+      "ideaPlaceholder": "Décrivez votre idée d'article, le sujet ou les points clés que vous souhaitez aborder...",
+      "generateOutline": "Générer un plan",
+      "generating": "Génération en cours...",
+      "titleLabel": "Titre",
+      "subtitleLabel": "Sous-titre",
+      "outlineLabel": "Plan",
+      "addPoint": "Ajouter un point",
+      "generatePost": "Générer l'article",
+      "startOver": "Recommencer",
+      "regenerateOutline": "Revenir en arrière et essayer une nouvelle idée",
+      "outlineError": "Impossible de générer le plan. Veuillez réessayer.",
+      "postError": "Impossible de générer l'article. Veuillez réessayer."
     }
   },
   "aiSettings": {

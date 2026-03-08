@@ -1426,7 +1426,7 @@ export interface BulkContentResponse {
 }
 
 // AI Content Assist
-export type AiAction = 'seo' | 'excerpt' | 'translate';
+export type AiAction = 'seo' | 'excerpt' | 'translate' | 'draft_outline' | 'draft_post';
 
 export interface AiGenerateRequest {
   action: AiAction;
@@ -1441,6 +1441,7 @@ export interface AiGenerateResponse {
   title?: string;
   subtitle?: string;
   body?: string;
+  outline?: string[];
 }
 
 export interface CreateAiConfigRequest {

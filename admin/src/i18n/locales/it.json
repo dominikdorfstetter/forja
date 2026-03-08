@@ -290,7 +290,9 @@
         "template": "Da modello",
         "templateDesc": "Usa un modello di contenuto predefinito",
         "import": "Importa Markdown",
-        "importDesc": "Importa contenuto da un file .md"
+        "importDesc": "Importa contenuto da un file .md",
+        "ai": "Assistente IA",
+        "aiDesc": "Genera un articolo del blog da un'idea usando l'IA"
       },
       "fields": {
         "slug": "Slug",
@@ -2029,6 +2031,34 @@
       "horizontalRule": "Linea orizzontale",
       "image": "Immagine",
       "table": "Tabella"
+    }
+  },
+  "quickPost": {
+    "title": "Pubblicazione rapida",
+    "titlePlaceholder": "Titolo dell'articolo...",
+    "bodyPlaceholder": "Inizia a scrivere...",
+    "publish": "Pubblica",
+    "publishNow": "Pubblica ora",
+    "saveAsDraft": "Salva come bozza",
+    "moreOptions": "Altre opzioni",
+    "success": "Articolo del blog creato",
+    "dashboardButton": "Pubblicazione rapida",
+    "ai": {
+      "manualMode": "Scrivi",
+      "aiMode": "Assistente IA",
+      "ideaTitle": "Di cosa vuoi scrivere?",
+      "ideaPlaceholder": "Descrivi la tua idea per l'articolo, l'argomento o i punti chiave che vuoi trattare...",
+      "generateOutline": "Genera scaletta",
+      "generating": "Generazione in corso...",
+      "titleLabel": "Titolo",
+      "subtitleLabel": "Sottotitolo",
+      "outlineLabel": "Scaletta",
+      "addPoint": "Aggiungi punto",
+      "generatePost": "Genera articolo",
+      "startOver": "Ricomincia",
+      "regenerateOutline": "Torna indietro e prova una nuova idea",
+      "outlineError": "Impossibile generare la scaletta. Riprova.",
+      "postError": "Impossibile generare l'articolo. Riprova."
     }
   },
   "aiSettings": {

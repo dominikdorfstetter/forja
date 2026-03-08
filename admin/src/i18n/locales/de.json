@@ -290,7 +290,9 @@
         "template": "Aus Vorlage",
         "templateDesc": "Eine vorgefertigte Inhaltsvorlage verwenden",
         "import": "Markdown importieren",
-        "importDesc": "Inhalt aus einer .md-Datei importieren"
+        "importDesc": "Inhalt aus einer .md-Datei importieren",
+        "ai": "KI-Assistent",
+        "aiDesc": "Einen Blogbeitrag aus einer Idee mit KI generieren"
       },
       "fields": {
         "slug": "Slug",
@@ -2029,6 +2031,34 @@
       "horizontalRule": "Horizontale Linie",
       "image": "Bild",
       "table": "Tabelle"
+    }
+  },
+  "quickPost": {
+    "title": "Schnellbeitrag",
+    "titlePlaceholder": "Beitragstitel...",
+    "bodyPlaceholder": "Schreiben beginnen...",
+    "publish": "Veröffentlichen",
+    "publishNow": "Jetzt veröffentlichen",
+    "saveAsDraft": "Als Entwurf speichern",
+    "moreOptions": "Weitere Optionen",
+    "success": "Blogbeitrag erstellt",
+    "dashboardButton": "Schnellbeitrag",
+    "ai": {
+      "manualMode": "Schreiben",
+      "aiMode": "KI-Assistent",
+      "ideaTitle": "Worüber möchten Sie schreiben?",
+      "ideaPlaceholder": "Beschreiben Sie Ihre Blogbeitragsidee, das Thema oder die wichtigsten Punkte, die Sie behandeln möchten...",
+      "generateOutline": "Gliederung erstellen",
+      "generating": "Wird generiert...",
+      "titleLabel": "Titel",
+      "subtitleLabel": "Untertitel",
+      "outlineLabel": "Gliederung",
+      "addPoint": "Punkt hinzufügen",
+      "generatePost": "Beitrag generieren",
+      "startOver": "Neu beginnen",
+      "regenerateOutline": "Zurück und eine neue Idee ausprobieren",
+      "outlineError": "Gliederung konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
+      "postError": "Beitrag konnte nicht generiert werden. Bitte versuchen Sie es erneut."
     }
   },
   "aiSettings": {
