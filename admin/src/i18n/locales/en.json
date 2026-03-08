@@ -2302,12 +2302,19 @@
     "viewAnalytics": "View Analytics",
     "pageDetail": "Page Detail",
     "notEnabled": "Analytics is not enabled for this site. Enable it in Settings.",
+    "trend": "Trend",
+    "path": "Path",
+    "views": "Views",
+    "visitors": "Visitors",
     "dateRange": {
       "7days": "7 days",
       "30days": "30 days",
       "90days": "90 days",
       "allTime": "All time",
-      "custom": "Custom"
+      "custom": "Custom",
+      "start": "Start date",
+      "end": "End date",
+      "apply": "Apply"
     }
   }
 }
