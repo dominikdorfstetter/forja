@@ -57,6 +57,7 @@ const sidebars: SidebarsConfig = {
             'api/endpoints/audit',
             'api/endpoints/notifications',
             'api/endpoints/ai',
+            'api/endpoints/analytics',
             'api/endpoints/system',
           ],
         },
@@ -70,6 +71,7 @@ const sidebars: SidebarsConfig = {
         'admin-guide/authentication',
         'admin-guide/dashboard',
         'admin-guide/sites',
+        'admin-guide/site-modules',
         {
           type: 'category',
           label: 'Content',
@@ -93,6 +95,7 @@ const sidebars: SidebarsConfig = {
         'admin-guide/notifications',
         'admin-guide/settings',
         'admin-guide/ai-content-assist',
+        'admin-guide/analytics',
         'admin-guide/locales',
         'admin-guide/command-palette',
         'admin-guide/content-templates',
@@ -129,6 +132,7 @@ const sidebars: SidebarsConfig = {
       items: [
         'templates/overview',
         'templates/astro-blog',
+        'templates/analytics-integration',
       ],
     },
     'changelog',

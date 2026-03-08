@@ -10,7 +10,7 @@ into something useful, Forja lets you shape, manage, and deliver content across 
 
 | Component              | Stack                                         | Directory               |
 |------------------------|-----------------------------------------------|-------------------------|
-| **Backend API**        | Rust (Rocket 0.5) + SQLx + PostgreSQL         | `backend/`              |
+| **Backend API**        | Rust (Rocket 0.5.1) + SQLx + PostgreSQL       | `backend/`              |
 | **Admin Dashboard**    | React (Vite) + MUI + React Query + Clerk Auth | `admin/`                |
 | **Frontend Templates** | Astro, more to come                           | `templates/astro-blog/` |
 
@@ -19,6 +19,10 @@ into something useful, Forja lets you shape, manage, and deliver content across 
 - Multi-site / multi-tenant content management
 - Internationalization (i18n) with per-locale content
 - Blog posts, pages, CV entries, legal documents, navigation, media library
+- Rich block editor with slash commands, tables, code highlighting, and image picker
+- AI Content Assist -- generate blog drafts, SEO metadata, excerpts, and translations via configurable LLM providers
+- Privacy-first analytics -- pageview tracking without cookies or PII (GDPR-friendly by design)
+- Site modules -- enable only the features you need per site
 - Role-based access control (Master > Admin > Write > Read)
 - Dual authentication: API keys (`X-API-Key`) and Clerk JWT (`Authorization: Bearer`)
 - Redis-backed rate limiting
@@ -181,6 +185,8 @@ All content endpoints are under `/api/v1` and scoped to a site:
 | Webhooks   | `GET/POST /api/v1/sites/{site_id}/webhooks`        |
 | Documents  | `GET/POST /api/v1/sites/{site_id}/documents`       |
 | Audit Logs | `GET /api/v1/sites/{site_id}/audit-logs`           |
+| AI         | `POST /api/v1/sites/{site_id}/ai/generate`         |
+| Analytics  | `GET /api/v1/sites/{site_id}/analytics/report`     |
 
 Authentication is via `X-API-Key` header or `Authorization: Bearer <Clerk JWT>`.
 
