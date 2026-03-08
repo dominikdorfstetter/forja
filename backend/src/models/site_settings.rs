@@ -12,6 +12,7 @@ use crate::errors::ApiError;
 pub const KEY_MAX_DOCUMENT_FILE_SIZE: &str = "max_document_file_size";
 pub const KEY_MAX_MEDIA_FILE_SIZE: &str = "max_media_file_size";
 pub const KEY_ANALYTICS_ENABLED: &str = "analytics_enabled";
+pub const KEY_ANALYTICS_RETENTION_DAYS: &str = "analytics_retention_days";
 pub const KEY_MAINTENANCE_MODE: &str = "maintenance_mode";
 pub const KEY_CONTACT_EMAIL: &str = "contact_email";
 pub const KEY_EDITORIAL_WORKFLOW_ENABLED: &str = "editorial_workflow_enabled";
@@ -26,6 +27,7 @@ pub const KEY_MODULE_PAGES_ENABLED: &str = "module_pages_enabled";
 pub const KEY_MODULE_CV_ENABLED: &str = "module_cv_enabled";
 pub const KEY_MODULE_LEGAL_ENABLED: &str = "module_legal_enabled";
 pub const KEY_MODULE_DOCUMENTS_ENABLED: &str = "module_documents_enabled";
+pub const KEY_MODULE_AI_ENABLED: &str = "module_ai_enabled";
 
 /// Returns the known defaults as a HashMap.
 pub fn defaults() -> HashMap<String, serde_json::Value> {
@@ -39,6 +41,7 @@ pub fn defaults() -> HashMap<String, serde_json::Value> {
         serde_json::json!(52_428_800),
     ); // 50 MB
     m.insert(KEY_ANALYTICS_ENABLED.into(), serde_json::json!(false));
+    m.insert(KEY_ANALYTICS_RETENTION_DAYS.into(), serde_json::json!(90));
     m.insert(KEY_MAINTENANCE_MODE.into(), serde_json::json!(false));
     m.insert(KEY_CONTACT_EMAIL.into(), serde_json::json!(""));
     m.insert(
@@ -60,6 +63,7 @@ pub fn defaults() -> HashMap<String, serde_json::Value> {
         KEY_MODULE_DOCUMENTS_ENABLED.into(),
         serde_json::json!(false),
     );
+    m.insert(KEY_MODULE_AI_ENABLED.into(), serde_json::json!(false));
     m
 }
 
@@ -169,10 +173,11 @@ mod tests {
     #[test]
     fn test_defaults_contains_all_keys() {
         let d = defaults();
-        assert_eq!(d.len(), 15);
+        assert_eq!(d.len(), 17);
         assert!(d.contains_key(KEY_MAX_DOCUMENT_FILE_SIZE));
         assert!(d.contains_key(KEY_MAX_MEDIA_FILE_SIZE));
         assert!(d.contains_key(KEY_ANALYTICS_ENABLED));
+        assert!(d.contains_key(KEY_ANALYTICS_RETENTION_DAYS));
         assert!(d.contains_key(KEY_MAINTENANCE_MODE));
         assert!(d.contains_key(KEY_CONTACT_EMAIL));
         assert!(d.contains_key(KEY_EDITORIAL_WORKFLOW_ENABLED));
@@ -185,6 +190,7 @@ mod tests {
         assert!(d.contains_key(KEY_MODULE_CV_ENABLED));
         assert!(d.contains_key(KEY_MODULE_LEGAL_ENABLED));
         assert!(d.contains_key(KEY_MODULE_DOCUMENTS_ENABLED));
+        assert!(d.contains_key(KEY_MODULE_AI_ENABLED));
     }
 
     #[test]
@@ -193,6 +199,7 @@ mod tests {
         assert_eq!(d[KEY_MAX_DOCUMENT_FILE_SIZE], serde_json::json!(10_485_760));
         assert_eq!(d[KEY_MAX_MEDIA_FILE_SIZE], serde_json::json!(52_428_800));
         assert_eq!(d[KEY_ANALYTICS_ENABLED], serde_json::json!(false));
+        assert_eq!(d[KEY_ANALYTICS_RETENTION_DAYS], serde_json::json!(90));
         assert_eq!(d[KEY_MAINTENANCE_MODE], serde_json::json!(false));
         assert_eq!(d[KEY_CONTACT_EMAIL], serde_json::json!(""));
         assert_eq!(d[KEY_EDITORIAL_WORKFLOW_ENABLED], serde_json::json!(false));
@@ -208,6 +215,7 @@ mod tests {
         assert_eq!(d[KEY_MODULE_CV_ENABLED], serde_json::json!(false));
         assert_eq!(d[KEY_MODULE_LEGAL_ENABLED], serde_json::json!(false));
         assert_eq!(d[KEY_MODULE_DOCUMENTS_ENABLED], serde_json::json!(false));
+        assert_eq!(d[KEY_MODULE_AI_ENABLED], serde_json::json!(false));
     }
 
     #[test]

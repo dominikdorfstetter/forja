@@ -9,6 +9,7 @@ const DEFAULT_MODULES = {
   cv: false,
   legal: false,
   documents: false,
+  ai: false,
 };
 
 const DEFAULT_CONTEXT: SiteContextResponse = {

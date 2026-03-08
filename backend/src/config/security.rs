@@ -78,6 +78,10 @@ pub struct SecurityConfig {
     /// Path to TLS private key (PEM format)
     #[serde(default)]
     pub tls_key_path: String,
+
+    /// Base64-encoded 32-byte key for AES-256-GCM encryption of AI API keys
+    #[serde(default)]
+    pub ai_encryption_key: String,
 }
 
 // 10 MB
@@ -157,6 +161,7 @@ impl Default for SecurityConfig {
             system_admin_clerk_ids: String::new(),
             tls_cert_path: String::new(),
             tls_key_path: String::new(),
+            ai_encryption_key: String::new(),
         }
     }
 }

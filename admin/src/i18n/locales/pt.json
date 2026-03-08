@@ -290,7 +290,9 @@
         "template": "A partir de modelo",
         "templateDesc": "Usar um modelo de conteúdo pré-definido",
         "import": "Importar Markdown",
-        "importDesc": "Importar conteúdo de um arquivo .md"
+        "importDesc": "Importar conteúdo de um arquivo .md",
+        "ai": "Assistente IA",
+        "aiDesc": "Gerar uma publicação de blog a partir de uma ideia usando IA"
       },
       "fields": {
         "slug": "Slug",
@@ -405,6 +407,18 @@
       "general": "Geral",
       "media": "Mídia",
       "relations": "Relações"
+    },
+    "ai": {
+      "generateSeo": "Gerar SEO",
+      "generateExcerpt": "Gerar resumo",
+      "translate": "Tradução IA",
+      "generating": "Gerando...",
+      "writeContentFirst": "Escreva conteúdo primeiro",
+      "selectTargetLocale": "Idioma de destino",
+      "suggestTranslation": "Sugerir tradução",
+      "applyTranslation": "Aplicar",
+      "refreshField": "Retraduzir este campo",
+      "translationPreview": "Pré-visualização da tradução"
     }
   },
   "pages": {
@@ -2017,6 +2031,79 @@
       "horizontalRule": "Linha horizontal",
       "image": "Imagem",
       "table": "Tabela"
+    }
+  },
+  "quickPost": {
+    "title": "Publicação rápida",
+    "titlePlaceholder": "Título da publicação...",
+    "bodyPlaceholder": "Comece a escrever...",
+    "publish": "Publicar",
+    "publishNow": "Publicar agora",
+    "saveAsDraft": "Salvar como rascunho",
+    "moreOptions": "Mais opções",
+    "success": "Publicação de blog criada",
+    "dashboardButton": "Publicação rápida",
+    "ai": {
+      "manualMode": "Escrever",
+      "aiMode": "Assistente IA",
+      "ideaTitle": "Sobre o que você quer escrever?",
+      "ideaPlaceholder": "Descreva sua ideia para o artigo, o tema ou os pontos-chave que deseja abordar...",
+      "generateOutline": "Gerar esboço",
+      "generating": "Gerando...",
+      "titleLabel": "Título",
+      "subtitleLabel": "Subtítulo",
+      "outlineLabel": "Esboço",
+      "addPoint": "Adicionar ponto",
+      "generatePost": "Gerar publicação",
+      "startOver": "Recomeçar",
+      "regenerateOutline": "Voltar e tentar uma nova ideia",
+      "outlineError": "Não foi possível gerar o esboço. Tente novamente.",
+      "postError": "Não foi possível gerar a publicação. Tente novamente."
+    }
+  },
+  "aiSettings": {
+    "title": "Configurações de IA",
+    "advanced": "Configurações avançadas",
+    "fields": {
+      "providerPreset": "Provedor",
+      "providerName": "Nome do provedor",
+      "providerNameHelp": "Nome de exibição para esta configuração",
+      "baseUrl": "URL base",
+      "baseUrlHelp": "Endpoint da API — preenchido automaticamente ao selecionar um provedor",
+      "apiKey": "Chave API",
+      "apiKeyHelp": "Chave API do seu provedor",
+      "apiKeyOptional": "Opcional — este provedor não requer chave API",
+      "apiKeyExisting": "Chave atual",
+      "model": "Modelo",
+      "modelHelp": "Digite o nome de um modelo ou clique em Atualizar para descobrir modelos disponíveis",
+      "temperature": "Temperatura",
+      "maxTokens": "Tokens máx.",
+      "systemPromptsHelp": "Deixe vazio para valores padrão. Prompts personalizados substituem completamente os valores padrão.",
+      "systemPromptSeo": "Prompt de geração SEO",
+      "systemPromptExcerpt": "Prompt de geração de resumo",
+      "systemPromptTranslate": "Prompt de tradução",
+      "defaultPromptSeo": "Você é um especialista em SEO. Gere um meta título otimizado para SEO (máx. 60 caracteres) e uma meta descrição (máx. 160 caracteres) a partir do conteúdo fornecido.",
+      "defaultPromptExcerpt": "Você é um editor de conteúdo. Gere um resumo conciso de 1-2 frases que resuma os pontos-chave do conteúdo fornecido.",
+      "defaultPromptTranslate": "Você é um tradutor profissional. Traduza o seguinte conteúdo para o idioma de destino. Mantenha o tom, estilo e formatação markdown originais."
+    },
+    "actions": {
+      "save": "Salvar",
+      "testConnection": "Testar conexão",
+      "remove": "Remover configuração",
+      "discoverModels": "Descobrir modelos disponíveis"
+    },
+    "messages": {
+      "saved": "Configuração de IA salva",
+      "saveFailed": "Falha ao salvar configuração de IA",
+      "deleted": "Configuração de IA removida",
+      "testFailed": "Teste de conexão falhou",
+      "modelsFound": "{{count}} modelo(s) encontrado(s)",
+      "noModels": "Nenhum modelo encontrado — verifique a URL base e a chave API",
+      "modelsFailed": "Não foi possível descobrir modelos — verifique a URL base e a chave API"
+    },
+    "deleteConfirm": {
+      "title": "Remover configuração de IA?",
+      "message": "Isso desabilitará os recursos de IA para este site. Você pode reconfigurar mais tarde."
     }
   }
 }

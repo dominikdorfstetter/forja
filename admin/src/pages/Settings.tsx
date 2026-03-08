@@ -64,8 +64,10 @@ import { useAuth } from '@/store/AuthContext';
 import { useSiteContextData } from '@/hooks/useSiteContextData';
 import { useUserPreferences } from '@/store/UserPreferencesContext';
 import { useThemeMode } from '@/theme/ThemeContext';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import LegalPage from '@/pages/Legal';
 import ApiKeysPage from '@/pages/ApiKeys';
+import AiSettingsPage from '@/pages/ai-settings/AiSettingsPage';
 
 const STATUS_CONFIG = {
   healthy: { icon: <CheckCircleIcon color="success" />, color: 'success' as const, labelKey: 'common.status.healthy' },
@@ -488,6 +490,7 @@ const MODULE_DEFS = [
   { key: 'module_cv_enabled' as const, labelKey: 'settings.modules.cv', descKey: 'settings.modules.cvDesc' },
   { key: 'module_legal_enabled' as const, labelKey: 'settings.modules.legal', descKey: 'settings.modules.legalDesc' },
   { key: 'module_documents_enabled' as const, labelKey: 'settings.modules.documents', descKey: 'settings.modules.documentsDesc' },
+  { key: 'module_ai_enabled' as const, labelKey: 'settings.modules.ai', descKey: 'settings.modules.aiDesc' },
 ] as const;
 
 type ModuleKey = typeof MODULE_DEFS[number]['key'];
@@ -510,6 +513,7 @@ function ModulesTab() {
     module_cv_enabled: false,
     module_legal_enabled: false,
     module_documents_enabled: false,
+    module_ai_enabled: false,
   });
   const [dirty, setDirty] = useState(false);
 
@@ -521,6 +525,7 @@ function ModulesTab() {
         module_cv_enabled: settings.module_cv_enabled,
         module_legal_enabled: settings.module_legal_enabled,
         module_documents_enabled: settings.module_documents_enabled,
+        module_ai_enabled: settings.module_ai_enabled,
       });
       setDirty(false);
     }
@@ -1012,7 +1017,17 @@ export default function SettingsPage() {
     });
   }
 
-  // 4. System Info — master only
+  // 4. AI Settings — admin + site selected + ai module enabled
+  if (isAdmin && selectedSiteId && modules.ai) {
+    tabs.push({
+      key: 'ai',
+      icon: <AutoAwesomeIcon />,
+      label: t('settings.tabs.ai'),
+      content: <AiSettingsPage embedded />,
+    });
+  }
+
+  // 5. System Info — master only
   if (isMaster) {
     tabs.push({
       key: 'systemInfo',

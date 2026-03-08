@@ -43,6 +43,7 @@ import AttentionPanel from '@/components/dashboard/AttentionPanel';
 import RecentActivityPanel from '@/components/dashboard/RecentActivityPanel';
 import QuickPostDialog from '@/components/blogs/QuickPostDialog';
 import TeamWorkflowPrompt from '@/components/TeamWorkflowPrompt';
+import AnalyticsWidget from '@/components/dashboard/AnalyticsWidget';
 import type { CreateSiteRequest, ContentStatus } from '@/types/api';
 
 
@@ -407,6 +408,9 @@ export default function DashboardHome() {
 
         <Grid size={{ xs: 12, md: hasSite ? 5 : 12 }}>
           <Stack spacing={3}>
+            {/* Analytics — self-hides when feature is disabled */}
+            <AnalyticsWidget />
+
             {/* System Health */}
             {dashboard.healthData && (
               <Paper sx={{ p: 2.5 }}>

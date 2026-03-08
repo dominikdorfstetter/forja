@@ -20,7 +20,11 @@ pub mod dashboard;
 // System (health, index)
 pub mod system;
 
+// AI content assist
+pub mod ai;
+
 // Domain handlers
+pub mod analytics;
 pub mod audit;
 pub mod blog;
 pub mod content_template;
@@ -98,6 +102,9 @@ pub fn routes() -> Vec<Route> {
     // Audit
     routes.extend(audit::routes());
 
+    // Analytics
+    routes.extend(analytics::routes());
+
     // Clerk user management
     routes.extend(clerk_user::routes());
 
@@ -106,6 +113,9 @@ pub fn routes() -> Vec<Route> {
 
     // Site membership management
     routes.extend(site_membership::routes());
+
+    // AI content assist
+    routes.extend(ai::routes());
 
     // Public configuration (no auth)
     routes.extend(config::routes());

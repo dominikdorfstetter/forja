@@ -290,7 +290,9 @@
         "template": "Z szablonu",
         "templateDesc": "Użyj gotowego szablonu treści",
         "import": "Importuj Markdown",
-        "importDesc": "Importuj treść z pliku .md"
+        "importDesc": "Importuj treść z pliku .md",
+        "ai": "Asystent AI",
+        "aiDesc": "Wygeneruj wpis na blogu z pomysłu za pomocą AI"
       },
       "fields": {
         "slug": "Slug",
@@ -405,6 +407,18 @@
       "general": "Ogólne",
       "media": "Media",
       "relations": "Relacje"
+    },
+    "ai": {
+      "generateSeo": "Generuj SEO",
+      "generateExcerpt": "Generuj fragment",
+      "translate": "Tłumaczenie AI",
+      "generating": "Generowanie...",
+      "writeContentFirst": "Najpierw napisz treść",
+      "selectTargetLocale": "Język docelowy",
+      "suggestTranslation": "Zaproponuj tłumaczenie",
+      "applyTranslation": "Zastosuj",
+      "refreshField": "Przetłumacz to pole ponownie",
+      "translationPreview": "Podgląd tłumaczenia"
     }
   },
   "pages": {
@@ -2017,6 +2031,79 @@
       "horizontalRule": "Linia pozioma",
       "image": "Obraz",
       "table": "Tabela"
+    }
+  },
+  "quickPost": {
+    "title": "Szybki wpis",
+    "titlePlaceholder": "Tytuł wpisu...",
+    "bodyPlaceholder": "Zacznij pisać...",
+    "publish": "Opublikuj",
+    "publishNow": "Opublikuj teraz",
+    "saveAsDraft": "Zapisz jako szkic",
+    "moreOptions": "Więcej opcji",
+    "success": "Wpis na blogu utworzony",
+    "dashboardButton": "Szybki wpis",
+    "ai": {
+      "manualMode": "Pisz",
+      "aiMode": "Asystent AI",
+      "ideaTitle": "O czym chcesz napisać?",
+      "ideaPlaceholder": "Opisz swój pomysł na wpis, temat lub kluczowe punkty, które chcesz poruszyć...",
+      "generateOutline": "Wygeneruj konspekt",
+      "generating": "Generowanie...",
+      "titleLabel": "Tytuł",
+      "subtitleLabel": "Podtytuł",
+      "outlineLabel": "Konspekt",
+      "addPoint": "Dodaj punkt",
+      "generatePost": "Wygeneruj wpis",
+      "startOver": "Zacznij od nowa",
+      "regenerateOutline": "Wróć i spróbuj nowego pomysłu",
+      "outlineError": "Nie udało się wygenerować konspektu. Spróbuj ponownie.",
+      "postError": "Nie udało się wygenerować wpisu. Spróbuj ponownie."
+    }
+  },
+  "aiSettings": {
+    "title": "Ustawienia AI",
+    "advanced": "Ustawienia zaawansowane",
+    "fields": {
+      "providerPreset": "Dostawca",
+      "providerName": "Nazwa dostawcy",
+      "providerNameHelp": "Nazwa wyświetlana dla tej konfiguracji",
+      "baseUrl": "Bazowy URL",
+      "baseUrlHelp": "Punkt końcowy API — wypełniany automatycznie po wybraniu dostawcy",
+      "apiKey": "Klucz API",
+      "apiKeyHelp": "Klucz API dostawcy",
+      "apiKeyOptional": "Opcjonalny — ten dostawca nie wymaga klucza API",
+      "apiKeyExisting": "Aktualny klucz",
+      "model": "Model",
+      "modelHelp": "Wpisz nazwę modelu lub kliknij Odśwież, aby odkryć dostępne modele",
+      "temperature": "Temperatura",
+      "maxTokens": "Maks. tokenów",
+      "systemPromptsHelp": "Pozostaw puste, aby użyć wartości domyślnych. Niestandardowe prompty całkowicie zastępują wartości domyślne.",
+      "systemPromptSeo": "Prompt generowania SEO",
+      "systemPromptExcerpt": "Prompt generowania fragmentu",
+      "systemPromptTranslate": "Prompt tłumaczenia",
+      "defaultPromptSeo": "Jesteś ekspertem SEO. Wygeneruj zoptymalizowany pod SEO meta tytuł (maks. 60 znaków) i meta opis (maks. 160 znaków) na podstawie dostarczonej treści.",
+      "defaultPromptExcerpt": "Jesteś redaktorem treści. Wygeneruj zwięzły fragment w 1-2 zdaniach podsumowujący kluczowe punkty dostarczonej treści.",
+      "defaultPromptTranslate": "Jesteś profesjonalnym tłumaczem. Przetłumacz poniższą treść na język docelowy. Zachowaj oryginalny ton, styl i formatowanie markdown."
+    },
+    "actions": {
+      "save": "Zapisz",
+      "testConnection": "Test połączenia",
+      "remove": "Usuń konfigurację",
+      "discoverModels": "Odkryj dostępne modele"
+    },
+    "messages": {
+      "saved": "Konfiguracja AI zapisana",
+      "saveFailed": "Nie udało się zapisać konfiguracji AI",
+      "deleted": "Konfiguracja AI usunięta",
+      "testFailed": "Test połączenia nie powiódł się",
+      "modelsFound": "Znaleziono {{count}} model(i)",
+      "noModels": "Nie znaleziono modeli — sprawdź bazowy URL i klucz API",
+      "modelsFailed": "Nie udało się odkryć modeli — sprawdź bazowy URL i klucz API"
+    },
+    "deleteConfirm": {
+      "title": "Usunąć konfigurację AI?",
+      "message": "Spowoduje to wyłączenie funkcji AI dla tej witryny. Możesz skonfigurować ponownie później."
     }
   }
 }

@@ -1,5 +1,6 @@
-import { Box, TextField } from '@mui/material';
-import { Controller, type Control, type UseFormWatch } from 'react-hook-form';
+import { Box, Button, CircularProgress, TextField, Tooltip } from '@mui/material';
+import { AutoAwesome as AiIcon } from '@mui/icons-material';
+import { Controller, type Control, type UseFormWatch, type UseFormSetValue } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import type { BlogContentFormData } from './blogDetailSchema';
@@ -7,10 +8,12 @@ import CharCounter from './CharCounter';
 import SerpPreview from './SerpPreview';
 import InlineEditField from '@/components/shared/InlineEditField';
 import apiService from '@/services/api';
+import { useAiAssist } from '@/hooks/useAiAssist';
 
 interface BlogSeoTabProps {
   control: Control<BlogContentFormData>;
   watch: UseFormWatch<BlogContentFormData>;
+  setValue: UseFormSetValue<BlogContentFormData>;
   onSnapshot: () => void;
   blogId: string;
   slug: string;
@@ -20,6 +23,7 @@ interface BlogSeoTabProps {
 export default function BlogSeoTab({
   control,
   watch,
+  setValue,
   onSnapshot,
   blogId,
   slug,
@@ -31,6 +35,25 @@ export default function BlogSeoTab({
   const metaTitle = watch('meta_title');
   const metaDescription = watch('meta_description');
   const excerpt = watch('excerpt');
+  const body = watch('body');
+
+  const { isConfigured, generate, isGenerating } = useAiAssist();
+  const hasContent = (body?.length ?? 0) > 50;
+
+  const handleGenerateSeo = async () => {
+    if (!hasContent) return;
+    const result = await generate('seo', body);
+    if (result.meta_title) setValue('meta_title', result.meta_title, { shouldDirty: true });
+    if (result.meta_description) setValue('meta_description', result.meta_description, { shouldDirty: true });
+    onSnapshot();
+  };
+
+  const handleGenerateExcerpt = async () => {
+    if (!hasContent) return;
+    const result = await generate('excerpt', body);
+    if (result.excerpt) setValue('excerpt', result.excerpt, { shouldDirty: true });
+    onSnapshot();
+  };
 
   return (
     <Box>
@@ -67,7 +90,21 @@ export default function BlogSeoTab({
               onBlur={() => { field.onBlur(); onSnapshot(); }}
               inputProps={{ maxLength: 200 }}
             />
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 0.5 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 0.5 }}>
+              {isConfigured && (
+                <Tooltip title={hasContent ? '' : t('blogDetail.ai.writeContentFirst')}>
+                  <span>
+                    <Button
+                      size="small"
+                      startIcon={isGenerating ? <CircularProgress size={14} /> : <AiIcon />}
+                      onClick={handleGenerateSeo}
+                      disabled={!hasContent || isGenerating}
+                    >
+                      {t('blogDetail.ai.generateSeo')}
+                    </Button>
+                  </span>
+                </Tooltip>
+              )}
               <CharCounter current={field.value?.length || 0} max={160} />
             </Box>
           </Box>
@@ -88,7 +125,21 @@ export default function BlogSeoTab({
               onBlur={() => { field.onBlur(); onSnapshot(); }}
               inputProps={{ maxLength: 300 }}
             />
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 0.5 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 0.5 }}>
+              {isConfigured && (
+                <Tooltip title={hasContent ? '' : t('blogDetail.ai.writeContentFirst')}>
+                  <span>
+                    <Button
+                      size="small"
+                      startIcon={isGenerating ? <CircularProgress size={14} /> : <AiIcon />}
+                      onClick={handleGenerateExcerpt}
+                      disabled={!hasContent || isGenerating}
+                    >
+                      {t('blogDetail.ai.generateExcerpt')}
+                    </Button>
+                  </span>
+                </Tooltip>
+              )}
               <CharCounter current={field.value?.length || 0} max={300} />
             </Box>
           </Box>

@@ -94,6 +94,7 @@ export default function BlogEditorSidebar({
           <BlogSeoTab
             control={control}
             watch={watch}
+            setValue={setValue}
             onSnapshot={onSnapshot}
             blogId={blogId}
             slug={slug}

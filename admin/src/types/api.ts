@@ -292,6 +292,7 @@ export interface SiteContextModules {
   cv: boolean;
   legal: boolean;
   documents: boolean;
+  ai: boolean;
 }
 
 export interface SiteContextSuggestions {
@@ -1201,6 +1202,7 @@ export interface SiteSettingsResponse {
   module_cv_enabled: boolean;
   module_legal_enabled: boolean;
   module_documents_enabled: boolean;
+  module_ai_enabled: boolean;
 }
 
 export interface UpdateSiteSettingsRequest {
@@ -1217,6 +1219,7 @@ export interface UpdateSiteSettingsRequest {
   module_cv_enabled?: boolean;
   module_legal_enabled?: boolean;
   module_documents_enabled?: boolean;
+  module_ai_enabled?: boolean;
 }
 
 // User Preferences
@@ -1420,4 +1423,97 @@ export interface BulkContentResponse {
   succeeded: number;
   failed: number;
   results: BulkItemResult[];
+}
+
+// AI Content Assist
+export type AiAction = 'seo' | 'excerpt' | 'translate' | 'draft_outline' | 'draft_post';
+
+export interface AiGenerateRequest {
+  action: AiAction;
+  content: string;
+  target_locale?: string;
+}
+
+export interface AiGenerateResponse {
+  meta_title?: string;
+  meta_description?: string;
+  excerpt?: string;
+  title?: string;
+  subtitle?: string;
+  body?: string;
+  outline?: string[];
+}
+
+export interface CreateAiConfigRequest {
+  provider_name: string;
+  base_url: string;
+  api_key?: string;
+  model: string;
+  temperature?: number;
+  max_tokens?: number;
+  system_prompts?: Record<string, string>;
+}
+
+export interface ListModelsRequest {
+  base_url: string;
+  api_key?: string;
+  provider_name: string;
+}
+
+export interface ListModelsResponse {
+  models: string[];
+}
+
+export interface AiConfigResponse {
+  id: string;
+  site_id: string;
+  provider_name: string;
+  base_url: string;
+  api_key_masked: string;
+  model: string;
+  temperature: number;
+  max_tokens: number;
+  system_prompts: Record<string, string>;
+  updated_at: string;
+}
+
+export interface AiTestResponse {
+  success: boolean;
+  message: string;
+}
+
+// ── Analytics ──────────────────────────────────────────────────────
+
+export interface TopContentItem {
+  path: string;
+  total_views: number;
+  unique_visitors: number;
+}
+
+export interface TrendDataPoint {
+  date: string;
+  total_views: number;
+  unique_visitors: number;
+}
+
+export interface AnalyticsReportResponse {
+  total_views: number;
+  total_unique_visitors: number;
+  top_content: TopContentItem[];
+  trend: TrendDataPoint[];
+}
+
+export interface TrackPageviewRequest {
+  path: string;
+  referrer?: string;
+  user_agent_hash?: string;
+}
+
+export interface TrackPageviewResponse {
+  ok: boolean;
+}
+
+export interface AnalyticsMaintenanceResponse {
+  rows_affected: number;
+  action: string;
 }

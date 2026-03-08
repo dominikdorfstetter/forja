@@ -19,9 +19,9 @@ vi.mock('@/hooks/useSiteContextData', () => ({
       current_user_role: 'admin',
       features: mockFeatures,
       suggestions: { show_team_workflow_prompt: false },
-      modules: { blog: true, pages: true, cv: false, legal: false, documents: false },
+      modules: { blog: true, pages: true, cv: false, legal: false, documents: false, ai: false },
     },
-    modules: { blog: true, pages: true, cv: false, legal: false, documents: false },
+    modules: { blog: true, pages: true, cv: false, legal: false, documents: false, ai: false },
   }),
 }));
 

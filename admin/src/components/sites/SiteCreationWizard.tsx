@@ -25,6 +25,7 @@ import WebIcon from '@mui/icons-material/Web';
 import WorkIcon from '@mui/icons-material/Work';
 import GavelIcon from '@mui/icons-material/Gavel';
 import DescriptionIcon from '@mui/icons-material/Description';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -55,6 +56,7 @@ const wizardSchema = z.object({
     cv: z.boolean(),
     legal: z.boolean(),
     documents: z.boolean(),
+    ai: z.boolean(),
   }),
   workflowMode: z.enum(['solo', 'team']),
 });
@@ -67,6 +69,7 @@ const MODULE_DEFS = [
   { key: 'cv' as const, icon: <WorkIcon />, defaultOn: false },
   { key: 'legal' as const, icon: <GavelIcon />, defaultOn: false },
   { key: 'documents' as const, icon: <DescriptionIcon />, defaultOn: false },
+  { key: 'ai' as const, icon: <AutoAwesomeIcon />, defaultOn: false },
 ] as const;
 
 interface SiteCreationWizardProps {
@@ -108,7 +111,7 @@ export default function SiteCreationWizard({ open, onClose }: SiteCreationWizard
       slug: '',
       description: '',
       timezone: 'UTC',
-      modules: { blog: true, pages: true, cv: false, legal: false, documents: false },
+      modules: { blog: true, pages: true, cv: false, legal: false, documents: false, ai: false },
       workflowMode: 'solo',
     },
     mode: 'onChange',

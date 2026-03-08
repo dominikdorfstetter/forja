@@ -119,7 +119,7 @@ export default function CreatePageWizard({ open, onSubmit, onClose, loading }: C
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth aria-labelledby="create-page-wizard-title" data-testid="create-page-wizard">
+    <Dialog open={open} onClose={onClose} maxWidth={activeStep === 0 ? 'md' : 'sm'} fullWidth aria-labelledby="create-page-wizard-title" data-testid="create-page-wizard">
       <form onSubmit={handleSubmit(onFormSubmit)}>
         <DialogTitle id="create-page-wizard-title">{t('forms.page.createTitle')}</DialogTitle>
         <DialogContent>
@@ -132,7 +132,7 @@ export default function CreatePageWizard({ open, onSubmit, onClose, loading }: C
           </Stepper>
 
           {activeStep === 0 && (
-            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 1.5 }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1.5 }}>
               {PAGE_TYPE_CONFIG.map(({ type, icon, labelKey, descriptionKey }) => (
                 <Card
                   key={type}
@@ -142,11 +142,12 @@ export default function CreatePageWizard({ open, onSubmit, onClose, loading }: C
                     borderColor: selectedPageType === type ? 'primary.main' : 'divider',
                     bgcolor: selectedPageType === type ? 'action.selected' : 'background.paper',
                     transition: 'border-color 0.15s, background-color 0.15s',
+                    display: 'flex',
                   }}
                 >
                   <CardActionArea
                     onClick={() => setValue('page_type', type)}
-                    sx={{ p: 1.5, textAlign: 'center' }}
+                    sx={{ p: 1.5, textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
                   >
                     <Box sx={{ color: selectedPageType === type ? 'primary.main' : 'text.secondary', mb: 0.5 }}>
                       {icon}

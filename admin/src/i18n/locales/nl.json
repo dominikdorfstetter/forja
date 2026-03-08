@@ -290,7 +290,9 @@
         "template": "Vanuit sjabloon",
         "templateDesc": "Gebruik een kant-en-klare inhoudssjabloon",
         "import": "Markdown importeren",
-        "importDesc": "Importeer inhoud uit een .md-bestand"
+        "importDesc": "Importeer inhoud uit een .md-bestand",
+        "ai": "AI-assistent",
+        "aiDesc": "Genereer een blogbericht vanuit een idee met AI"
       },
       "fields": {
         "slug": "Slug",
@@ -405,6 +407,18 @@
       "general": "Algemeen",
       "media": "Media",
       "relations": "Relaties"
+    },
+    "ai": {
+      "generateSeo": "SEO genereren",
+      "generateExcerpt": "Samenvatting genereren",
+      "translate": "AI-vertaling",
+      "generating": "Genereren...",
+      "writeContentFirst": "Schrijf eerst inhoud",
+      "selectTargetLocale": "Doeltaal",
+      "suggestTranslation": "Vertaling voorstellen",
+      "applyTranslation": "Toepassen",
+      "refreshField": "Dit veld opnieuw vertalen",
+      "translationPreview": "Vertaalvoorbeeld"
     }
   },
   "pages": {
@@ -2017,6 +2031,79 @@
       "horizontalRule": "Horizontale lijn",
       "image": "Afbeelding",
       "table": "Tabel"
+    }
+  },
+  "quickPost": {
+    "title": "Snelle publicatie",
+    "titlePlaceholder": "Titel van bericht...",
+    "bodyPlaceholder": "Begin met schrijven...",
+    "publish": "Publiceren",
+    "publishNow": "Nu publiceren",
+    "saveAsDraft": "Opslaan als concept",
+    "moreOptions": "Meer opties",
+    "success": "Blogbericht aangemaakt",
+    "dashboardButton": "Snelle publicatie",
+    "ai": {
+      "manualMode": "Schrijven",
+      "aiMode": "AI-assistent",
+      "ideaTitle": "Waar wil je over schrijven?",
+      "ideaPlaceholder": "Beschrijf je idee voor het blogartikel, het onderwerp of de belangrijkste punten die je wilt behandelen...",
+      "generateOutline": "Overzicht genereren",
+      "generating": "Bezig met genereren...",
+      "titleLabel": "Titel",
+      "subtitleLabel": "Ondertitel",
+      "outlineLabel": "Overzicht",
+      "addPoint": "Punt toevoegen",
+      "generatePost": "Bericht genereren",
+      "startOver": "Opnieuw beginnen",
+      "regenerateOutline": "Ga terug en probeer een nieuw idee",
+      "outlineError": "Overzicht kon niet worden gegenereerd. Probeer het opnieuw.",
+      "postError": "Bericht kon niet worden gegenereerd. Probeer het opnieuw."
+    }
+  },
+  "aiSettings": {
+    "title": "AI-instellingen",
+    "advanced": "Geavanceerde instellingen",
+    "fields": {
+      "providerPreset": "Provider",
+      "providerName": "Providernaam",
+      "providerNameHelp": "Weergavenaam voor deze configuratie",
+      "baseUrl": "Basis-URL",
+      "baseUrlHelp": "API-eindpunt — automatisch ingevuld bij selectie van een provider",
+      "apiKey": "API-sleutel",
+      "apiKeyHelp": "API-sleutel van uw provider",
+      "apiKeyOptional": "Optioneel — deze provider vereist geen API-sleutel",
+      "apiKeyExisting": "Huidige sleutel",
+      "model": "Model",
+      "modelHelp": "Voer een modelnaam in of klik op Vernieuwen om beschikbare modellen te ontdekken",
+      "temperature": "Temperatuur",
+      "maxTokens": "Max. tokens",
+      "systemPromptsHelp": "Laat leeg voor standaardwaarden. Aangepaste prompts vervangen de standaardwaarden volledig.",
+      "systemPromptSeo": "SEO-generatieprompt",
+      "systemPromptExcerpt": "Samenvattingsprompt",
+      "systemPromptTranslate": "Vertaalprompt",
+      "defaultPromptSeo": "Je bent een SEO-expert. Genereer een SEO-geoptimaliseerde metatitel (max 60 tekens) en metabeschrijving (max 160 tekens) op basis van de verstrekte inhoud.",
+      "defaultPromptExcerpt": "Je bent een contenteditor. Genereer een beknopte samenvatting van 1-2 zinnen die de belangrijkste punten van de verstrekte inhoud samenvat.",
+      "defaultPromptTranslate": "Je bent een professionele vertaler. Vertaal de volgende inhoud naar de doeltaal. Behoud de originele toon, stijl en markdown-opmaak."
+    },
+    "actions": {
+      "save": "Opslaan",
+      "testConnection": "Verbinding testen",
+      "remove": "Configuratie verwijderen",
+      "discoverModels": "Beschikbare modellen ontdekken"
+    },
+    "messages": {
+      "saved": "AI-configuratie opgeslagen",
+      "saveFailed": "Opslaan van AI-configuratie mislukt",
+      "deleted": "AI-configuratie verwijderd",
+      "testFailed": "Verbindingstest mislukt",
+      "modelsFound": "{{count}} model(len) gevonden",
+      "noModels": "Geen modellen gevonden — controleer de basis-URL en API-sleutel",
+      "modelsFailed": "Modellen konden niet worden ontdekt — controleer de basis-URL en API-sleutel"
+    },
+    "deleteConfirm": {
+      "title": "AI-configuratie verwijderen?",
+      "message": "Dit schakelt AI-functies voor deze site uit. U kunt later opnieuw configureren."
     }
   }
 }

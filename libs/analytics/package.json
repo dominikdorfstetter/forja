@@ -1,0 +1,26 @@
+{
+  "name": "@forja/analytics",
+  "version": "1.0.4",
+  "description": "Privacy-first analytics tracker for Forja CMS. No cookies, no PII.",
+  "author": "Dominik Dorfstetter <dominik@dorfstetter.at>",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --minify",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "test": "vitest run --coverage",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": ["analytics", "privacy", "gdpr", "forja", "cms"],
+  "license": "AGPL-3.0-or-later",
+  "devDependencies": {
+    "@vitest/coverage-v8": "^4.0.18",
+    "happy-dom": "^20.8.3",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  }
+}

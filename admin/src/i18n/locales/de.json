@@ -290,7 +290,9 @@
         "template": "Aus Vorlage",
         "templateDesc": "Eine vorgefertigte Inhaltsvorlage verwenden",
         "import": "Markdown importieren",
-        "importDesc": "Inhalt aus einer .md-Datei importieren"
+        "importDesc": "Inhalt aus einer .md-Datei importieren",
+        "ai": "KI-Assistent",
+        "aiDesc": "Einen Blogbeitrag aus einer Idee mit KI generieren"
       },
       "fields": {
         "slug": "Slug",
@@ -405,6 +407,18 @@
       "general": "Allgemein",
       "media": "Medien",
       "relations": "Verknüpfungen"
+    },
+    "ai": {
+      "generateSeo": "SEO generieren",
+      "generateExcerpt": "Auszug generieren",
+      "translate": "KI-Übersetzung",
+      "generating": "Wird generiert...",
+      "writeContentFirst": "Schreiben Sie zuerst Inhalt",
+      "selectTargetLocale": "Zielsprache",
+      "suggestTranslation": "Übersetzung vorschlagen",
+      "applyTranslation": "Anwenden",
+      "refreshField": "Dieses Feld neu übersetzen",
+      "translationPreview": "Übersetzungsvorschau"
     }
   },
   "pages": {
@@ -2017,6 +2031,79 @@
       "horizontalRule": "Horizontale Linie",
       "image": "Bild",
       "table": "Tabelle"
+    }
+  },
+  "quickPost": {
+    "title": "Schnellbeitrag",
+    "titlePlaceholder": "Beitragstitel...",
+    "bodyPlaceholder": "Schreiben beginnen...",
+    "publish": "Veröffentlichen",
+    "publishNow": "Jetzt veröffentlichen",
+    "saveAsDraft": "Als Entwurf speichern",
+    "moreOptions": "Weitere Optionen",
+    "success": "Blogbeitrag erstellt",
+    "dashboardButton": "Schnellbeitrag",
+    "ai": {
+      "manualMode": "Schreiben",
+      "aiMode": "KI-Assistent",
+      "ideaTitle": "Worüber möchten Sie schreiben?",
+      "ideaPlaceholder": "Beschreiben Sie Ihre Blogbeitragsidee, das Thema oder die wichtigsten Punkte, die Sie behandeln möchten...",
+      "generateOutline": "Gliederung erstellen",
+      "generating": "Wird generiert...",
+      "titleLabel": "Titel",
+      "subtitleLabel": "Untertitel",
+      "outlineLabel": "Gliederung",
+      "addPoint": "Punkt hinzufügen",
+      "generatePost": "Beitrag generieren",
+      "startOver": "Neu beginnen",
+      "regenerateOutline": "Zurück und eine neue Idee ausprobieren",
+      "outlineError": "Gliederung konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
+      "postError": "Beitrag konnte nicht generiert werden. Bitte versuchen Sie es erneut."
+    }
+  },
+  "aiSettings": {
+    "title": "KI-Einstellungen",
+    "advanced": "Erweiterte Einstellungen",
+    "fields": {
+      "providerPreset": "Anbieter",
+      "providerName": "Anbietername",
+      "providerNameHelp": "Anzeigename für diese Anbieterkonfiguration",
+      "baseUrl": "Basis-URL",
+      "baseUrlHelp": "API-Endpunkt — wird automatisch ausgefüllt bei Anbieterauswahl",
+      "apiKey": "API-Schlüssel",
+      "apiKeyHelp": "API-Schlüssel Ihres Anbieters",
+      "apiKeyOptional": "Optional — dieser Anbieter benötigt keinen API-Schlüssel",
+      "apiKeyExisting": "Aktueller Schlüssel",
+      "model": "Modell",
+      "modelHelp": "Modellnamen eingeben oder Aktualisieren klicken, um verfügbare Modelle zu entdecken",
+      "temperature": "Temperatur",
+      "maxTokens": "Max. Tokens",
+      "systemPromptsHelp": "Leer lassen für integrierte Standardwerte. Benutzerdefinierte Prompts ersetzen die Standardwerte vollständig.",
+      "systemPromptSeo": "SEO-Generierungs-Prompt",
+      "systemPromptExcerpt": "Auszug-Generierungs-Prompt",
+      "systemPromptTranslate": "Übersetzungs-Prompt",
+      "defaultPromptSeo": "Sie sind ein SEO-Experte. Generieren Sie einen SEO-optimierten Meta-Titel (max. 60 Zeichen) und eine Meta-Beschreibung (max. 160 Zeichen) aus dem bereitgestellten Blog-Inhalt.",
+      "defaultPromptExcerpt": "Sie sind ein Content-Editor. Generieren Sie einen prägnanten Auszug in 1-2 Sätzen, der die wichtigsten Punkte des bereitgestellten Blog-Inhalts zusammenfasst.",
+      "defaultPromptTranslate": "Sie sind ein professioneller Übersetzer. Übersetzen Sie den folgenden Inhalt in die Zielsprache. Behalten Sie den ursprünglichen Ton, Stil und die Markdown-Formatierung bei."
+    },
+    "actions": {
+      "save": "Speichern",
+      "testConnection": "Verbindung testen",
+      "remove": "Konfiguration entfernen",
+      "discoverModels": "Verfügbare Modelle entdecken"
+    },
+    "messages": {
+      "saved": "KI-Konfiguration gespeichert",
+      "saveFailed": "Fehler beim Speichern der KI-Konfiguration",
+      "deleted": "KI-Konfiguration entfernt",
+      "testFailed": "Verbindungstest fehlgeschlagen",
+      "modelsFound": "{{count}} Modell(e) gefunden",
+      "noModels": "Keine Modelle gefunden — Basis-URL und API-Schlüssel prüfen",
+      "modelsFailed": "Modelle konnten nicht entdeckt werden — Basis-URL und API-Schlüssel prüfen"
+    },
+    "deleteConfirm": {
+      "title": "KI-Konfiguration entfernen?",
+      "message": "Dadurch werden KI-Funktionen für diese Website deaktiviert. Sie können später neu konfigurieren."
     }
   }
 }

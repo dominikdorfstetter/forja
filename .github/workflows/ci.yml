@@ -24,6 +24,7 @@ jobs:
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
       admin: ${{ steps.filter.outputs.admin }}
+      analytics: ${{ steps.filter.outputs.analytics }}
     steps:
       - uses: actions/checkout@v6
 
@@ -37,6 +38,8 @@ jobs:
             admin:
               - 'admin/**'
               - 'Dockerfile'
+            analytics:
+              - 'libs/analytics/**'
 
   backend:
     name: Backend (Rust)
@@ -135,6 +138,33 @@ jobs:
       - name: Run tests
         run: npm test
 
+  analytics:
+    name: Analytics Library
+    needs: changes
+    if: needs.changes.outputs.analytics == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: libs/analytics
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: libs/analytics/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Run tests with coverage
+        run: npm test
+
   docker-build:
     name: Docker Build
     needs: changes
@@ -149,12 +179,12 @@ jobs:
   ci-pass:
     name: CI Pass
     if: always()
-    needs: [backend, admin, docker-build]
+    needs: [backend, admin, analytics, docker-build]
     runs-on: ubuntu-latest
     steps:
       - name: Check required jobs
         run: |
-          if [[ "${{ needs.backend.result }}" == "failure" || "${{ needs.admin.result }}" == "failure" || "${{ needs.docker-build.result }}" == "failure" ]]; then
+          if [[ "${{ needs.backend.result }}" == "failure" || "${{ needs.admin.result }}" == "failure" || "${{ needs.analytics.result }}" == "failure" || "${{ needs.docker-build.result }}" == "failure" ]]; then
             echo "One or more required jobs failed"
             exit 1
           fi

@@ -12,10 +12,13 @@ import {
   DialogTitle,
   IconButton,
   InputAdornment,
+  LinearProgress,
+  Stack,
   Step,
   StepLabel,
   Stepper,
   TextField,
+  Tooltip,
   Typography,
   Alert,
   useTheme,
@@ -38,6 +41,8 @@ import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import StarIcon from '@mui/icons-material/Star';
 import AnnouncementIcon from '@mui/icons-material/Announcement';
 import SettingsIcon from '@mui/icons-material/Settings';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -48,12 +53,15 @@ import apiService from '@/services/api';
 import { useSiteContext } from '@/store/SiteContext';
 import { useAuth } from '@/store/AuthContext';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
+import { useAiAssist } from '@/hooks/useAiAssist';
 import { slugField, requiredString } from '@/utils/validation';
+import { slugify } from '@/utils/slugify';
 import { validateMarkdownFile, parseMarkdown, type MarkdownParseResult } from '@/utils/markdownImport';
 import { blogTemplates, type BlogTemplate } from '@/data/blogTemplates';
 import type { ContentTemplate, SiteLocaleResponse } from '@/types/api';
 
-type CreationMethod = 'scratch' | 'template' | 'import';
+type CreationMethod = 'scratch' | 'template' | 'import' | 'ai';
+type AiPhase = 'idea' | 'outline' | 'post';
 
 const scratchSchema = z.object({
   slug: slugField,
@@ -114,9 +122,22 @@ export default function CreateBlogWizard({
   const { selectedSiteId } = useSiteContext();
   const { userFullName, isAdmin } = useAuth();
   const { showError, showSuccess } = useErrorSnackbar();
+  const { isConfigured: aiAvailable, generate: aiGenerate, isGenerating } = useAiAssist();
 
   const [activeStep, setActiveStep] = useState(0);
   const [method, setMethod] = useState<CreationMethod | null>(null);
+
+  // AI state
+  const [aiPhase, setAiPhase] = useState<AiPhase>('idea');
+  const [aiIdea, setAiIdea] = useState('');
+  const [aiTitle, setAiTitle] = useState('');
+  const [aiSubtitle, setAiSubtitle] = useState('');
+  const [aiOutline, setAiOutline] = useState<string[]>([]);
+  const [aiBody, setAiBody] = useState('');
+  const [aiExcerpt, setAiExcerpt] = useState('');
+  const [aiMetaTitle, setAiMetaTitle] = useState('');
+  const [aiMetaDescription, setAiMetaDescription] = useState('');
+  const [aiError, setAiError] = useState<string | null>(null);
 
   // Template state
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
@@ -159,6 +180,16 @@ export default function CreateBlogWizard({
       setImportTitle('');
       setImportExcerpt('');
       setImportSlug('');
+      setAiPhase('idea');
+      setAiIdea('');
+      setAiTitle('');
+      setAiSubtitle('');
+      setAiOutline([]);
+      setAiBody('');
+      setAiExcerpt('');
+      setAiMetaTitle('');
+      setAiMetaDescription('');
+      setAiError(null);
       resetForm({ slug: '', author: userFullName || '' });
     }
   }, [open, resetForm, userFullName]);
@@ -276,7 +307,75 @@ export default function CreateBlogWizard({
     onError: showError,
   });
 
-  const isCreating = scratchMutation.isPending || templateMutation.isPending || importMutation.isPending;
+  const aiMutation = useMutation({
+    mutationFn: async () => {
+      const slug = slugify(aiTitle) || `ai-post-${Date.now()}`;
+      const blog = await apiService.createBlog({
+        slug,
+        author: userFullName || 'Author',
+        published_date: new Date().toISOString().split('T')[0],
+        is_featured: false,
+        allow_comments: true,
+        status: 'Draft',
+        site_ids: [selectedSiteId],
+      });
+      const defaultLocale = siteLocales?.find((l) => l.is_default);
+      if (defaultLocale) {
+        await apiService.createBlogLocalization(blog.id, {
+          locale_id: defaultLocale.locale_id,
+          title: aiTitle,
+          subtitle: aiSubtitle || undefined,
+          excerpt: aiExcerpt || undefined,
+          body: aiBody || undefined,
+          meta_title: aiMetaTitle || undefined,
+          meta_description: aiMetaDescription || undefined,
+        });
+      }
+      return blog;
+    },
+    onSuccess: (blog) => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] });
+      showSuccess(t('blogs.messages.created'));
+      onClose();
+      onCreated(blog.id);
+    },
+    onError: showError,
+  });
+
+  const isCreating = scratchMutation.isPending || templateMutation.isPending || importMutation.isPending || aiMutation.isPending;
+
+  // --- AI handlers ---
+  const handleAiGenerateOutline = async () => {
+    setAiError(null);
+    try {
+      const result = await aiGenerate('draft_outline', aiIdea);
+      if (result.title) setAiTitle(result.title);
+      if (result.subtitle) setAiSubtitle(result.subtitle);
+      if (result.outline) setAiOutline(result.outline);
+      setAiPhase('outline');
+    } catch {
+      setAiError(t('quickPost.ai.outlineError'));
+    }
+  };
+
+  const handleAiGeneratePost = async () => {
+    setAiError(null);
+    const content = JSON.stringify({
+      title: aiTitle,
+      subtitle: aiSubtitle,
+      outline: aiOutline,
+    });
+    try {
+      const result = await aiGenerate('draft_post', content);
+      if (result.body) setAiBody(result.body);
+      if (result.excerpt) setAiExcerpt(result.excerpt);
+      if (result.meta_title) setAiMetaTitle(result.meta_title);
+      if (result.meta_description) setAiMetaDescription(result.meta_description);
+      setAiPhase('post');
+    } catch {
+      setAiError(t('quickPost.ai.postError'));
+    }
+  };
 
   // --- Template helpers ---
   const mergedTemplates = (() => {
@@ -379,6 +478,16 @@ export default function CreateBlogWizard({
       setImportError(null);
       return;
     }
+    if (method === 'ai') {
+      if (aiPhase === 'post') {
+        setAiPhase('outline');
+        return;
+      }
+      if (aiPhase === 'outline') {
+        setAiPhase('idea');
+        return;
+      }
+    }
     setActiveStep(0);
     setMethod(null);
   };
@@ -389,13 +498,16 @@ export default function CreateBlogWizard({
 
   // --- Method cards for Step 0 ---
   const methodCards: { key: CreationMethod; icon: React.ReactNode; labelKey: string; descKey: string }[] = [
+    ...(aiAvailable
+      ? [{ key: 'ai' as const, icon: <AutoAwesomeIcon sx={{ fontSize: 32 }} />, labelKey: 'blogs.wizard.methods.ai', descKey: 'blogs.wizard.methods.aiDesc' }]
+      : []),
     { key: 'scratch', icon: <CreateIcon sx={{ fontSize: 32 }} />, labelKey: 'blogs.wizard.methods.scratch', descKey: 'blogs.wizard.methods.scratchDesc' },
     { key: 'template', icon: <DescriptionIcon sx={{ fontSize: 32 }} />, labelKey: 'blogs.wizard.methods.template', descKey: 'blogs.wizard.methods.templateDesc' },
     { key: 'import', icon: <UploadFileIcon sx={{ fontSize: 32 }} />, labelKey: 'blogs.wizard.methods.import', descKey: 'blogs.wizard.methods.importDesc' },
   ];
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth={method === 'template' ? 'md' : 'sm'} fullWidth aria-labelledby="create-blog-wizard-title" data-testid="create-blog-wizard">
+    <Dialog open={open} onClose={onClose} maxWidth={method === 'template' || method === 'ai' || (activeStep === 0 && aiAvailable) ? 'md' : 'sm'} fullWidth aria-labelledby="create-blog-wizard-title" data-testid="create-blog-wizard">
       <DialogTitle id="create-blog-wizard-title">{t('blogs.wizard.title')}</DialogTitle>
       <DialogContent>
         <Stepper activeStep={activeStep} sx={{ mb: 3, mt: 1 }}>
@@ -408,7 +520,7 @@ export default function CreateBlogWizard({
 
         {/* Step 0 — Choose method */}
         {activeStep === 0 && (
-          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2 }}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 2 }}>
             {methodCards.map(({ key, icon, labelKey, descKey }) => (
               <Card
                 key={key}
@@ -418,11 +530,12 @@ export default function CreateBlogWizard({
                   borderColor: method === key ? 'primary.main' : 'divider',
                   bgcolor: method === key ? 'action.selected' : 'background.paper',
                   transition: 'border-color 0.15s, background-color 0.15s',
+                  display: 'flex',
                 }}
               >
                 <CardActionArea
                   onClick={() => handleMethodSelect(key)}
-                  sx={{ p: 2.5, textAlign: 'center' }}
+                  sx={{ p: 2.5, textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
                 >
                   <Box sx={{ color: method === key ? 'primary.main' : 'text.secondary', mb: 1 }}>
                     {icon}
@@ -631,6 +744,123 @@ export default function CreateBlogWizard({
             {importError && <Alert severity="error" sx={{ mt: 2 }}>{importError}</Alert>}
           </>
         )}
+
+        {/* Step 1 — AI Assist */}
+        {activeStep === 1 && method === 'ai' && (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {isGenerating && <LinearProgress />}
+            {aiError && (
+              <Alert severity="error" onClose={() => setAiError(null)}>
+                {aiError}
+              </Alert>
+            )}
+
+            {/* AI Phase 1: Idea */}
+            {aiPhase === 'idea' && (
+              <>
+                <Typography variant="subtitle1" fontWeight={600}>
+                  {t('quickPost.ai.ideaTitle')}
+                </Typography>
+                <TextField
+                  placeholder={t('quickPost.ai.ideaPlaceholder')}
+                  fullWidth
+                  multiline
+                  minRows={3}
+                  maxRows={8}
+                  value={aiIdea}
+                  onChange={(e) => setAiIdea(e.target.value)}
+                  disabled={isGenerating}
+                  autoFocus
+                />
+              </>
+            )}
+
+            {/* AI Phase 2: Outline Review */}
+            {aiPhase === 'outline' && (
+              <>
+                <TextField
+                  label={t('quickPost.ai.titleLabel')}
+                  fullWidth
+                  value={aiTitle}
+                  onChange={(e) => setAiTitle(e.target.value)}
+                  disabled={isGenerating}
+                />
+                <TextField
+                  label={t('quickPost.ai.subtitleLabel')}
+                  fullWidth
+                  value={aiSubtitle}
+                  onChange={(e) => setAiSubtitle(e.target.value)}
+                  disabled={isGenerating}
+                />
+                <Box>
+                  <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                    {t('quickPost.ai.outlineLabel')}
+                  </Typography>
+                  <Stack spacing={1}>
+                    {aiOutline.map((item, index) => (
+                      <Stack key={index} direction="row" spacing={1} alignItems="center">
+                        <Chip label={index + 1} size="small" variant="outlined" />
+                        <TextField
+                          fullWidth
+                          size="small"
+                          value={item}
+                          onChange={(e) => setAiOutline((prev) => prev.map((v, i) => (i === index ? e.target.value : v)))}
+                          disabled={isGenerating}
+                        />
+                        <Tooltip title={t('common.actions.delete')} arrow>
+                          <IconButton
+                            size="small"
+                            onClick={() => setAiOutline((prev) => prev.filter((_, i) => i !== index))}
+                            disabled={isGenerating}
+                            aria-label={t('common.actions.delete')}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Stack>
+                    ))}
+                    <Button size="small" onClick={() => setAiOutline((prev) => [...prev, ''])} disabled={isGenerating}>
+                      {t('quickPost.ai.addPoint')}
+                    </Button>
+                  </Stack>
+                </Box>
+              </>
+            )}
+
+            {/* AI Phase 3: Post Preview */}
+            {aiPhase === 'post' && (
+              <>
+                <TextField
+                  label={t('quickPost.ai.titleLabel')}
+                  fullWidth
+                  value={aiTitle}
+                  onChange={(e) => setAiTitle(e.target.value)}
+                  disabled={isCreating}
+                />
+                <TextField
+                  label={t('blogDetail.fields.body')}
+                  fullWidth
+                  multiline
+                  minRows={6}
+                  maxRows={12}
+                  value={aiBody}
+                  onChange={(e) => setAiBody(e.target.value)}
+                  disabled={isCreating}
+                  InputProps={{ sx: { fontFamily: 'monospace', fontSize: '0.875rem' } }}
+                />
+                <TextField
+                  label={t('blogDetail.fields.excerpt')}
+                  fullWidth
+                  multiline
+                  rows={2}
+                  value={aiExcerpt}
+                  onChange={(e) => setAiExcerpt(e.target.value)}
+                  disabled={isCreating}
+                />
+              </>
+            )}
+          </Box>
+        )}
       </DialogContent>
 
       <DialogActions sx={{ px: 3, pb: 2, justifyContent: 'space-between' }}>
@@ -669,6 +899,33 @@ export default function CreateBlogWizard({
           {activeStep === 1 && method === 'import' && importPhase === 'preview' && (
             <Button variant="contained" onClick={handleImportConfirm} disabled={isCreating || !importTitle.trim() || !importSlug.trim()}>
               {isCreating ? t('blogs.wizard.creating') : t('markdownImport.import')}
+            </Button>
+          )}
+
+          {/* AI: phase-specific actions */}
+          {activeStep === 1 && method === 'ai' && aiPhase === 'idea' && (
+            <Button
+              variant="contained"
+              startIcon={<AutoAwesomeIcon />}
+              onClick={handleAiGenerateOutline}
+              disabled={isGenerating || !aiIdea.trim()}
+            >
+              {isGenerating ? t('quickPost.ai.generating') : t('quickPost.ai.generateOutline')}
+            </Button>
+          )}
+          {activeStep === 1 && method === 'ai' && aiPhase === 'outline' && (
+            <Button
+              variant="contained"
+              startIcon={<AutoAwesomeIcon />}
+              onClick={handleAiGeneratePost}
+              disabled={isGenerating || !aiTitle.trim() || aiOutline.length === 0}
+            >
+              {isGenerating ? t('quickPost.ai.generating') : t('quickPost.ai.generatePost')}
+            </Button>
+          )}
+          {activeStep === 1 && method === 'ai' && aiPhase === 'post' && (
+            <Button variant="contained" onClick={() => aiMutation.mutate()} disabled={isCreating || !aiTitle.trim()}>
+              {isCreating ? t('blogs.wizard.creating') : t('blogs.wizard.create')}
             </Button>
           )}
         </Box>
