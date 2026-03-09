@@ -19,6 +19,11 @@ pub const KEY_ONBOARDING_USER_TYPE: &str = "onboarding_user_type";
 pub const KEY_ONBOARDING_INTENTS: &str = "onboarding_intents";
 pub const KEY_ONBOARDING_COMPLETED_AT: &str = "onboarding_completed_at";
 
+// Help system keys (stored in the same preferences JSON blob)
+pub const KEY_HELP_TOUR_COMPLETED: &str = "help_tour_completed";
+pub const KEY_HELP_HOTSPOTS_SEEN: &str = "help_hotspots_seen";
+pub const KEY_HELP_FIELD_HELP_SEEN: &str = "help_field_help_seen";
+
 /// Returns the default preferences as a JSON object.
 pub fn default_preferences() -> serde_json::Value {
     serde_json::json!({

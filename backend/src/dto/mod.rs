@@ -17,6 +17,7 @@ pub mod cv;
 pub mod document;
 pub mod environment;
 pub mod health;
+pub mod help_state;
 pub mod legal;
 pub mod locale;
 pub mod media;
