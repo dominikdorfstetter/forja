@@ -2,18 +2,17 @@
 
 A server-rendered blog and portfolio site powered by [Astro](https://astro.build) and the Forja CMS backend.
 
-Note: the template now uses SSR (server rendering with @astrojs/node), NOT static site generation.
+> Full documentation: **[dominikdorfstetter.github.io/forja](https://dominikdorfstetter.github.io/forja/)**
 
 ## Tech Stack
 
 - **Framework**: Astro 5 with SSR (`output: 'server'`)
 - **Adapter**: @astrojs/node (standalone mode)
 - **Markdown**: marked (GFM + line breaks)
+- **Analytics**: @forja/analytics (privacy-first pageview tracking)
 - **Styling**: Minimal CSS with custom properties
 
 ## Quick Start
-
-Two options:
 
 ### Option A: Helper script (recommended)
 
@@ -54,59 +53,20 @@ npm run dev
 | `/blog/{slug}` | Full blog post with markdown rendering |
 | `/cv` | Work/education timeline + skills |
 | `/legal/{slug}` | Legal documents (imprint, privacy, etc.) |
-| `/rss.xml` | RSS 2.0 feed (proxied from backend) |
-| `/rss` | Redirect to `/rss.xml` |
+| `/rss.xml` | RSS 2.0 feed |
 | `/{route}` | Dynamic CMS pages with sections |
-
-## Project Structure
-
-```
-templates/astro-blog/
-├── src/
-│   ├── lib/
-│   │   ├── api.ts           # API client and TypeScript types
-│   │   └── markdown.ts      # Markdown-to-HTML helper (marked)
-│   ├── layouts/
-│   │   └── Base.astro       # HTML shell with nav and footer
-│   ├── components/
-│   │   ├── Nav.astro        # Navigation bar
-│   │   ├── Footer.astro     # Site footer
-│   │   └── PageSection.astro # Generic page section renderer
-│   ├── pages/
-│   │   ├── index.astro      # Home page
-│   │   ├── cv.astro         # CV page
-│   │   ├── blog/
-│   │   │   ├── index.astro  # Blog listing
-│   │   │   └── [slug].astro # Blog detail
-│   │   ├── legal/
-│   │   │   └── [slug].astro # Legal documents
-│   │   ├── rss.xml.ts       # RSS feed endpoint
-│   │   ├── rss.ts           # RSS redirect
-│   │   └── [...route].astro # CMS page catch-all
-│   └── styles/
-│       └── global.css       # CSS custom properties
-├── start-preview.sh         # Helper to start dev server per site
-├── astro.config.mjs
-├── .env.example
-└── package.json
-```
 
 ## Admin Integration
 
-This template is designed to work with the Forja admin's **Preview** feature. In the admin Settings page, add a preview template pointing to your local dev server URL (e.g., `http://localhost:4321`). Then use the preview buttons in the blog and page editors to open content in this template.
-
-## Customization
-
-Edit CSS custom properties in `src/styles/global.css` to change colors, fonts, and spacing. The template uses semantic HTML and minimal styling -- it's meant to be a starting point.
+This template works with the Forja admin's **Preview** feature. In the admin Settings page, add a preview template pointing to your dev server URL (e.g., `http://localhost:4321`), then use preview buttons in the blog and page editors.
 
 ## Building for Production
 
 ```bash
 npm run build
-```
-
-Since the template uses SSR, the build output is a Node.js server. Run it with:
-
-```bash
 node dist/server/entry.mjs
 ```
+
+Since the template uses SSR, the build output is a Node.js server.
+
+See the [Templates guide](https://dominikdorfstetter.github.io/forja/guides/templates) for customization details.
