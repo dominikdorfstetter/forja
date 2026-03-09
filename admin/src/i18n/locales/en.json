@@ -2235,5 +2235,36 @@
       "title": "Remove AI Configuration?",
       "message": "This will disable AI features for this site. You can reconfigure later."
     }
+  },
+  "help": {
+    "menu": {
+      "title": "Help & Resources",
+      "documentation": "Documentation",
+      "quickTour": "Quick tour",
+      "keyboardShortcuts": "Keyboard shortcuts",
+      "feedback": "Feedback",
+      "version": "Forja v{{version}}"
+    },
+    "tour": {
+      "skip": "Skip tour",
+      "next": "Next",
+      "done": "Done",
+      "stepOf": "{{current}} of {{total}}",
+      "step1": "This is your dashboard — see your site's activity at a glance",
+      "step2": "Manage your content, structure, and settings from the sidebar",
+      "step3": "Switch between your sites here",
+      "step4": "Press {{shortcut}} to quickly navigate anywhere",
+      "step5": "Need help? Find docs, shortcuts, and this tour here anytime"
+    },
+    "shortcuts": {
+      "title": "Keyboard shortcuts",
+      "commandPalette": "Open command palette",
+      "save": "Save",
+      "undo": "Undo",
+      "redo": "Redo",
+      "bold": "Bold",
+      "italic": "Italic",
+      "underline": "Underline"
+    }
   }
 }
