@@ -76,7 +76,7 @@ infer = "0.19"
 
 # S3 storage (optional)
 aws-sdk-s3 = "1.124"
-aws-config = "1.6"
+aws-config = "1.8"
 
 # Filesystem stats (disk usage for health checks)
 nix = { version = "0.31", features = ["fs"] }
