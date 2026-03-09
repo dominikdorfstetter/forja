@@ -1533,3 +1533,16 @@ export interface AnalyticsMaintenanceResponse {
   rows_affected: number;
   action: string;
 }
+
+// Help system state
+export interface HelpStateResponse {
+  tour_completed: boolean;
+  hotspots_seen: string[];
+  field_help_seen: string[];
+}
+
+export interface UpdateHelpStateRequest {
+  tour_completed?: boolean;
+  dismiss_hotspot?: string;
+  dismiss_field_help?: string;
+}

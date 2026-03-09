@@ -40,6 +40,22 @@ vi.mock('@/store/UserPreferencesContext', () => ({
   }),
 }));
 
+// Mock HelpStateContext (used by help system components)
+vi.mock('@/store/HelpStateContext', () => ({
+  useHelpState: () => ({
+    state: { tour_completed: false, hotspots_seen: [], field_help_seen: [] },
+    isLoading: false,
+    tourActive: false,
+    startTour: vi.fn(),
+    completeTour: vi.fn(),
+    resetTour: vi.fn(),
+    dismissHotspot: vi.fn(),
+    dismissFieldHelp: vi.fn(),
+    isHotspotSeen: () => false,
+    isFieldHelpSeen: () => false,
+  }),
+}));
+
 // Mock window.matchMedia (needed by MUI)
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
@@ -114,6 +130,10 @@ vi.mock('@/services/api', () => {
     // Onboarding
     getOnboarding: vi.fn(),
     completeOnboarding: vi.fn(),
+    // Help state
+    getHelpState: vi.fn(),
+    updateHelpState: vi.fn(),
+    resetHelpState: vi.fn(),
     // Locale & template methods
     getSiteLocales: vi.fn(),
     getContentTemplates: vi.fn(),
