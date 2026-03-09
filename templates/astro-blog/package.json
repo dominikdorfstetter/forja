@@ -14,7 +14,7 @@
     "@astrojs/node": "^9.5.4",
     "@forja/analytics": "file:../../libs/analytics",
     "astro": "^5.18.0",
-    "marked": "^17.0.3",
+    "marked": "^17.0.4",
     "typescript": "^5.9.3"
   },
   "overrides": {
