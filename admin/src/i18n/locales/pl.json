@@ -551,6 +551,7 @@
       "navOrder": "Kolejność nawigacji",
       "metaTitle": "Tytuł meta",
       "metaDescription": "Opis meta",
+      "excerpt": "Fragment",
       "slug": "Slug",
       "id": "ID",
       "published": "Opublikowany",
@@ -559,7 +560,11 @@
     },
     "tabs": {
       "info": "Info",
+      "seo": "SEO",
       "sections": "Sekcje"
+    },
+    "seo": {
+      "serpPreview": "Podgląd wyszukiwarki"
     },
     "toolbar": {
       "saving": "Zapisywanie...",

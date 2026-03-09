@@ -89,11 +89,17 @@ vi.mock('@/services/api', () => {
     createBlogLocalization: vi.fn(),
     // Page methods
     getPages: vi.fn(),
+    getPage: vi.fn(),
     createPage: vi.fn(),
     updatePage: vi.fn(),
     deletePage: vi.fn(),
     clonePage: vi.fn(),
     bulkPages: vi.fn(),
+    getPageDetail: vi.fn(),
+    getPageLocalizations: vi.fn(),
+    createPageLocalization: vi.fn(),
+    updatePageLocalization: vi.fn(),
+    deletePageLocalization: vi.fn(),
     // Media methods
     getMedia: vi.fn(),
     uploadMediaFile: vi.fn(),

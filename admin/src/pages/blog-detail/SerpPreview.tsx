@@ -5,13 +5,17 @@ interface SerpPreviewProps {
   title: string;
   description: string;
   slug?: string;
+  /** Override the full URL path shown in the preview (e.g. "/about") */
+  urlPath?: string;
 }
 
-export default function SerpPreview({ title, description, slug }: SerpPreviewProps) {
+export default function SerpPreview({ title, description, slug, urlPath }: SerpPreviewProps) {
   const { t } = useTranslation();
   const displayTitle = title || 'Untitled';
   const displayDesc = description || 'No description provided.';
-  const displayUrl = slug ? `example.com/blog/${slug}` : 'example.com/blog/...';
+  const displayUrl = urlPath
+    ? `example.com${urlPath}`
+    : slug ? `example.com/blog/${slug}` : 'example.com/blog/...';
 
   return (
     <Paper variant="outlined" sx={{ p: 2, mt: 2 }}>

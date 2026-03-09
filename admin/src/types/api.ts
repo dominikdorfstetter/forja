@@ -988,6 +988,10 @@ export interface CreatePageRequest {
   site_ids: string[];
 }
 
+export interface PageDetailResponse extends PageResponse {
+  localizations: ContentLocalizationResponse[];
+}
+
 export interface UpdatePageRequest {
   route?: string;
   slug?: string;

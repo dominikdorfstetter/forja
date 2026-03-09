@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import apiService from '@/services/api';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
-import type { UpdatePageRequest, ContentStatus, ReviewActionRequest, ReorderItem } from '@/types/api';
+import type { UpdatePageRequest, UpdateLocalizationRequest, ContentStatus, ReviewActionRequest, ReorderItem } from '@/types/api';
 import { useAuth } from '@/store/AuthContext';
 import { useSiteContext } from '@/store/SiteContext';
 import { useEditorialWorkflow } from '@/hooks/useEditorialWorkflow';
@@ -27,19 +27,27 @@ import { pageDetailSchema, type PageDetailFormData } from './pageDetailSchema';
 import PageEditorToolbar from './PageEditorToolbar';
 import PageInfoTab from './PageInfoTab';
 import PageSectionsTab from './PageSectionsTab';
+import PageSeoTab from './PageSeoTab';
 
-function buildFormDefaults(page: {
-  route: string;
-  slug?: string;
-  page_type: string;
-  template?: string;
-  status: string;
-  is_in_navigation: boolean;
-  navigation_order?: number;
-  parent_page_id?: string;
-  publish_start?: string;
-  publish_end?: string;
-}): PageDetailFormData {
+function buildFormDefaults(
+  page: {
+    route: string;
+    slug?: string;
+    page_type: string;
+    template?: string;
+    status: string;
+    is_in_navigation: boolean;
+    navigation_order?: number;
+    parent_page_id?: string;
+    publish_start?: string;
+    publish_end?: string;
+  },
+  localization?: {
+    meta_title?: string | null;
+    meta_description?: string | null;
+    excerpt?: string | null;
+  },
+): PageDetailFormData {
   return {
     route: page.route,
     slug: page.slug ?? '',
@@ -51,6 +59,9 @@ function buildFormDefaults(page: {
     parent_page_id: page.parent_page_id ?? '',
     publish_start: page.publish_start ?? null,
     publish_end: page.publish_end ?? null,
+    meta_title: localization?.meta_title ?? '',
+    meta_description: localization?.meta_description ?? '',
+    excerpt: localization?.excerpt ?? '',
   };
 }
 
@@ -80,6 +91,12 @@ export default function PageDetailPage() {
     enabled: !!id,
   });
 
+  const { data: pageLocalizations } = useQuery({
+    queryKey: ['page-localizations', id],
+    queryFn: () => apiService.getPageLocalizations(id!),
+    enabled: !!id,
+  });
+
   const { data: sections, isLoading: sectionsLoading } = useQuery({
     queryKey: ['page-sections', id],
     queryFn: () => apiService.getPageSections(id!),
@@ -102,6 +119,10 @@ export default function PageDetailPage() {
     .filter((sl) => sl.is_active)
     .map((sl) => ({ id: sl.locale_id, code: sl.code }));
 
+  // Pick the first localization (default locale) for SEO fields
+  const currentLocalization = pageLocalizations?.[0];
+  const defaultLocaleId = activeLocales[0]?.id;
+
   // Form
   const {
     control,
@@ -112,10 +133,13 @@ export default function PageDetailPage() {
     formState: { isDirty },
   } = useForm<PageDetailFormData>({
     resolver: zodResolver(pageDetailSchema),
-    defaultValues: buildFormDefaults(page ?? {
-      route: '', slug: '', page_type: 'Static', template: '',
-      status: 'Draft', is_in_navigation: false,
-    }),
+    defaultValues: buildFormDefaults(
+      page ?? {
+        route: '', slug: '', page_type: 'Static', template: '',
+        status: 'Draft', is_in_navigation: false,
+      },
+      currentLocalization,
+    ),
   });
 
   // Bump formVersion on every form value change (restarts autosave debounce)
@@ -136,6 +160,30 @@ export default function PageDetailPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['page', id] });
       queryClient.invalidateQueries({ queryKey: ['pages'] });
+    },
+    onError: (err) => showError(err),
+  });
+
+  const updateLocalizationMutation = useMutation({
+    mutationFn: ({ locId, data }: { locId: string; data: UpdateLocalizationRequest }) =>
+      apiService.updatePageLocalization(locId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['page-localizations', id] });
+    },
+    onError: (err) => showError(err),
+  });
+
+  const createLocalizationMutation = useMutation({
+    mutationFn: (data: { pageId: string; localeId: string; meta_title: string; meta_description: string; excerpt: string }) =>
+      apiService.createPageLocalization(data.pageId, {
+        locale_id: data.localeId,
+        title: '-',
+        meta_title: data.meta_title || undefined,
+        meta_description: data.meta_description || undefined,
+        excerpt: data.excerpt || undefined,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['page-localizations', id] });
     },
     onError: (err) => showError(err),
   });
@@ -178,7 +226,7 @@ export default function PageDetailPage() {
     },
   });
 
-  // Unified save
+  // Unified save — handles both page metadata and SEO localization
   const handleSave = useCallback(async () => {
     if (!page) return;
 
@@ -198,7 +246,7 @@ export default function PageDetailPage() {
     const parentId = values.parent_page_id || undefined;
     if (parentId !== page.parent_page_id) updates.parent_page_id = parentId;
 
-    // Scheduling fields — always send current values explicitly
+    // Scheduling fields
     const formStart = values.publish_start || null;
     const formEnd = values.publish_end || null;
     if (formStart !== (page.publish_start ?? null)) updates.publish_start = formStart;
@@ -208,9 +256,36 @@ export default function PageDetailPage() {
       await updatePageMutation.mutateAsync(updates);
     }
 
+    // Save SEO fields via localization
+    const hasSeoChanges =
+      values.meta_title !== (currentLocalization?.meta_title ?? '') ||
+      values.meta_description !== (currentLocalization?.meta_description ?? '') ||
+      values.excerpt !== (currentLocalization?.excerpt ?? '');
+
+    if (hasSeoChanges) {
+      if (currentLocalization) {
+        await updateLocalizationMutation.mutateAsync({
+          locId: currentLocalization.id,
+          data: {
+            meta_title: values.meta_title || undefined,
+            meta_description: values.meta_description || undefined,
+            excerpt: values.excerpt || undefined,
+          },
+        });
+      } else if (defaultLocaleId) {
+        await createLocalizationMutation.mutateAsync({
+          pageId: id!,
+          localeId: defaultLocaleId,
+          meta_title: values.meta_title,
+          meta_description: values.meta_description,
+          excerpt: values.excerpt,
+        });
+      }
+    }
+
     reset(values);
     showSuccess(t('pageDetail.messages.saved'));
-  }, [page, getValues, reset, updatePageMutation, showSuccess, t]);
+  }, [page, currentLocalization, defaultLocaleId, id, getValues, reset, updatePageMutation, updateLocalizationMutation, createLocalizationMutation, showSuccess, t]);
 
   // Autosave
   const { status: autosaveStatus, flush } = useAutosave({
@@ -226,13 +301,13 @@ export default function PageDetailPage() {
   const formSyncKey = useRef('');
   useEffect(() => {
     if (!page) return;
-    const key = page.id;
+    const key = `${page.id}-${currentLocalization?.id ?? 'no-loc'}`;
     if (formSyncKey.current === key) return;
     formSyncKey.current = key;
-    reset(buildFormDefaults(page));
+    reset(buildFormDefaults(page, currentLocalization));
     formHistory.clear();
     formHistory.snapshot();
-  }, [page, reset, formHistory]);
+  }, [page, currentLocalization, reset, formHistory]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -252,7 +327,8 @@ export default function PageDetailPage() {
     return () => window.removeEventListener('keydown', handler);
   }, [flush, formHistory]);
 
-  const isSaving = updatePageMutation.isPending || reviewPageMutation.isPending;
+  const isSaving = updatePageMutation.isPending || reviewPageMutation.isPending
+    || updateLocalizationMutation.isPending || createLocalizationMutation.isPending;
 
   // Editorial workflow
   const currentFormStatus = watch('status') as ContentStatus;
@@ -331,6 +407,7 @@ export default function PageDetailPage() {
 
   const tabs = [
     { key: 'info', label: t('pageDetail.tabs.info') },
+    { key: 'seo', label: t('pageDetail.tabs.seo') },
     { key: 'sections', label: t('pageDetail.tabs.sections') },
   ];
 
@@ -399,6 +476,14 @@ export default function PageDetailPage() {
             />
           )}
           {activeTab === 1 && (
+            <PageSeoTab
+              control={control}
+              watch={watch}
+              onSnapshot={() => formHistory.snapshot()}
+              route={page.route}
+            />
+          )}
+          {activeTab === 2 && (
             <PageSectionsTab
               pageId={page.id}
               sections={sections}

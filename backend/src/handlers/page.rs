@@ -7,17 +7,20 @@ use uuid::Uuid;
 use validator::Validate;
 
 use crate::dto::bulk::{BulkAction, BulkContentRequest, BulkContentResponse};
+use crate::dto::content::{
+    CreateLocalizationRequest, LocalizationResponse, UpdateLocalizationRequest,
+};
 use crate::dto::page::{
-    CreatePageRequest, CreatePageSectionRequest, PageListItem, PageResponse, PageSectionResponse,
-    PaginatedPages, ReorderPageSectionsRequest, SectionLocalizationResponse, UpdatePageRequest,
-    UpdatePageSectionRequest, UpsertSectionLocalizationRequest,
+    CreatePageRequest, CreatePageSectionRequest, PageDetailResponse, PageListItem, PageResponse,
+    PageSectionResponse, PaginatedPages, ReorderPageSectionsRequest, SectionLocalizationResponse,
+    UpdatePageRequest, UpdatePageSectionRequest, UpsertSectionLocalizationRequest,
 };
 use crate::dto::review::{ReviewActionRequest, ReviewActionResponse};
 use crate::errors::{ApiError, ProblemDetails};
 use crate::guards::auth_guard::ReadKey;
 use crate::guards::module_guard::{ModuleGuard, PagesModule};
 use crate::models::audit::AuditAction;
-use crate::models::content::{Content, ContentStatus};
+use crate::models::content::{Content, ContentLocalization, ContentStatus};
 use crate::models::page::{Page, PageSection, PageSectionLocalization};
 use crate::models::site_membership::SiteRole;
 use crate::services::{
@@ -959,12 +962,246 @@ pub async fn bulk_pages(
     Ok(Json(response))
 }
 
+/// Get page detail (page + all localizations)
+#[utoipa::path(
+    tag = "Pages",
+    operation_id = "get_page_detail",
+    description = "Get page with all content localizations (SEO metadata)",
+    params(("id" = Uuid, Path, description = "Page UUID")),
+    responses(
+        (status = 200, description = "Page detail with localizations", body = PageDetailResponse),
+        (status = 401, description = "Unauthorized", body = ProblemDetails),
+        (status = 404, description = "Page not found", body = ProblemDetails)
+    ),
+    security(("api_key" = []))
+)]
+#[get("/pages/<id>/detail")]
+pub async fn get_page_detail(
+    state: &State<AppState>,
+    id: Uuid,
+    auth: ReadKey,
+) -> Result<Json<PageDetailResponse>, ApiError> {
+    let page = Page::find_by_id(&state.db, id).await?;
+    let site_ids = Content::find_site_ids(&state.db, page.content_id).await?;
+    for site_id in &site_ids {
+        auth.0
+            .authorize_site_action(&state.db, *site_id, &SiteRole::Viewer)
+            .await?;
+    }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<PagesModule>::check(&state.db, site_id).await?;
+    }
+    let localizations =
+        ContentLocalization::find_all_for_content(&state.db, page.content_id).await?;
+    let loc_responses: Vec<LocalizationResponse> = localizations
+        .into_iter()
+        .map(LocalizationResponse::from)
+        .collect();
+
+    Ok(Json(PageDetailResponse {
+        page: PageResponse::from(page),
+        localizations: loc_responses,
+    }))
+}
+
+/// Get page localizations
+#[utoipa::path(
+    tag = "Pages",
+    operation_id = "get_page_localizations",
+    description = "Get all content localizations for a page",
+    params(("id" = Uuid, Path, description = "Page UUID")),
+    responses(
+        (status = 200, description = "Page localizations", body = Vec<LocalizationResponse>),
+        (status = 401, description = "Unauthorized", body = ProblemDetails),
+        (status = 404, description = "Page not found", body = ProblemDetails)
+    ),
+    security(("api_key" = []))
+)]
+#[get("/pages/<id>/localizations")]
+pub async fn get_page_localizations(
+    state: &State<AppState>,
+    id: Uuid,
+    auth: ReadKey,
+) -> Result<Json<Vec<LocalizationResponse>>, ApiError> {
+    let page = Page::find_by_id(&state.db, id).await?;
+    let site_ids = Content::find_site_ids(&state.db, page.content_id).await?;
+    for site_id in &site_ids {
+        auth.0
+            .authorize_site_action(&state.db, *site_id, &SiteRole::Viewer)
+            .await?;
+    }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<PagesModule>::check(&state.db, site_id).await?;
+    }
+    let localizations =
+        ContentLocalization::find_all_for_content(&state.db, page.content_id).await?;
+    let responses: Vec<LocalizationResponse> = localizations
+        .into_iter()
+        .map(LocalizationResponse::from)
+        .collect();
+    Ok(Json(responses))
+}
+
+/// Create a localization for a page
+#[utoipa::path(
+    tag = "Pages",
+    operation_id = "create_page_localization",
+    description = "Create a content localization for a page (SEO metadata)",
+    params(("id" = Uuid, Path, description = "Page UUID")),
+    request_body(content = CreateLocalizationRequest, description = "Localization data"),
+    responses(
+        (status = 201, description = "Localization created", body = LocalizationResponse),
+        (status = 400, description = "Validation error or duplicate locale", body = ProblemDetails),
+        (status = 401, description = "Unauthorized", body = ProblemDetails),
+        (status = 403, description = "Forbidden", body = ProblemDetails)
+    ),
+    security(("api_key" = []))
+)]
+#[post("/pages/<id>/localizations", data = "<body>")]
+pub async fn create_page_localization(
+    state: &State<AppState>,
+    id: Uuid,
+    body: Json<CreateLocalizationRequest>,
+    auth: ReadKey,
+) -> Result<(Status, Json<LocalizationResponse>), ApiError> {
+    let req = body.into_inner();
+    req.validate()
+        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+
+    let page = Page::find_by_id(&state.db, id).await?;
+    let site_ids = Content::find_site_ids(&state.db, page.content_id).await?;
+    for site_id in &site_ids {
+        auth.0
+            .authorize_site_action(&state.db, *site_id, &SiteRole::Author)
+            .await?;
+    }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<PagesModule>::check(&state.db, site_id).await?;
+    }
+
+    // Check for duplicate locale
+    let existing = ContentLocalization::find_all_for_content(&state.db, page.content_id).await?;
+    if existing.iter().any(|l| l.locale_id == req.locale_id) {
+        return Err(ApiError::BadRequest(format!(
+            "Localization for locale {} already exists",
+            req.locale_id
+        )));
+    }
+
+    let localization = ContentLocalization::create(
+        &state.db,
+        page.content_id,
+        req.locale_id,
+        &req.title,
+        req.subtitle.as_deref(),
+        req.excerpt.as_deref(),
+        req.body.as_deref(),
+        req.meta_title.as_deref(),
+        req.meta_description.as_deref(),
+    )
+    .await?;
+
+    Ok((
+        Status::Created,
+        Json(LocalizationResponse::from(localization)),
+    ))
+}
+
+/// Update a page localization
+#[utoipa::path(
+    tag = "Pages",
+    operation_id = "update_page_localization",
+    description = "Update a content localization for a page",
+    params(("loc_id" = Uuid, Path, description = "Localization UUID")),
+    request_body(content = UpdateLocalizationRequest, description = "Localization update data"),
+    responses(
+        (status = 200, description = "Localization updated", body = LocalizationResponse),
+        (status = 401, description = "Unauthorized", body = ProblemDetails),
+        (status = 403, description = "Forbidden", body = ProblemDetails),
+        (status = 404, description = "Localization not found", body = ProblemDetails)
+    ),
+    security(("api_key" = []))
+)]
+#[put("/pages/localizations/<loc_id>", data = "<body>")]
+pub async fn update_page_localization(
+    state: &State<AppState>,
+    loc_id: Uuid,
+    body: Json<UpdateLocalizationRequest>,
+    auth: ReadKey,
+) -> Result<Json<LocalizationResponse>, ApiError> {
+    let existing_loc = ContentLocalization::find_by_id(&state.db, loc_id).await?;
+    let site_ids = Content::find_site_ids(&state.db, existing_loc.content_id).await?;
+    for site_id in &site_ids {
+        auth.0
+            .authorize_site_action(&state.db, *site_id, &SiteRole::Author)
+            .await?;
+    }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<PagesModule>::check(&state.db, site_id).await?;
+    }
+
+    let req = body.into_inner();
+    req.validate()
+        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+
+    let localization = ContentLocalization::update(
+        &state.db,
+        loc_id,
+        req.title.as_deref(),
+        req.subtitle.as_deref(),
+        req.excerpt.as_deref(),
+        req.body.as_deref(),
+        req.meta_title.as_deref(),
+        req.meta_description.as_deref(),
+        req.translation_status.as_ref(),
+    )
+    .await?;
+
+    Ok(Json(LocalizationResponse::from(localization)))
+}
+
+/// Delete a page localization
+#[utoipa::path(
+    tag = "Pages",
+    operation_id = "delete_page_localization",
+    description = "Delete a content localization for a page",
+    params(("loc_id" = Uuid, Path, description = "Localization UUID")),
+    responses(
+        (status = 204, description = "Localization deleted"),
+        (status = 401, description = "Unauthorized", body = ProblemDetails),
+        (status = 403, description = "Forbidden", body = ProblemDetails),
+        (status = 404, description = "Localization not found", body = ProblemDetails)
+    ),
+    security(("api_key" = []))
+)]
+#[delete("/pages/localizations/<loc_id>")]
+pub async fn delete_page_localization(
+    state: &State<AppState>,
+    loc_id: Uuid,
+    auth: ReadKey,
+) -> Result<Status, ApiError> {
+    let existing_loc = ContentLocalization::find_by_id(&state.db, loc_id).await?;
+    let site_ids = Content::find_site_ids(&state.db, existing_loc.content_id).await?;
+    for site_id in &site_ids {
+        auth.0
+            .authorize_site_action(&state.db, *site_id, &SiteRole::Editor)
+            .await?;
+    }
+    if let Some(&site_id) = site_ids.first() {
+        ModuleGuard::<PagesModule>::check(&state.db, site_id).await?;
+    }
+
+    ContentLocalization::delete(&state.db, loc_id).await?;
+    Ok(Status::NoContent)
+}
+
 /// Collect page routes
 pub fn routes() -> Vec<Route> {
     routes![
         list_pages,
         get_page,
         get_page_by_route,
+        get_page_detail,
         get_page_sections,
         create_page,
         update_page,
@@ -977,8 +1214,12 @@ pub fn routes() -> Vec<Route> {
         reorder_page_sections,
         get_section_localizations,
         get_page_section_localizations,
+        get_page_localizations,
         upsert_section_localization,
         delete_section_localization,
+        create_page_localization,
+        update_page_localization,
+        delete_page_localization,
         bulk_pages
     ]
 }
@@ -990,6 +1231,6 @@ mod tests {
     #[test]
     fn test_routes_count() {
         let routes = routes();
-        assert_eq!(routes.len(), 18, "Should have 18 page routes");
+        assert_eq!(routes.len(), 23, "Should have 23 page routes");
     }
 }

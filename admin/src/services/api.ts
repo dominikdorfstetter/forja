@@ -52,6 +52,7 @@ import type {
   MediaResponse,
   PageListItem,
   PageResponse,
+  PageDetailResponse,
   CreatePageRequest,
   UpdatePageRequest,
   PageSectionResponse,
@@ -640,6 +641,27 @@ export class ApiService {
 
   async reorderPageSections(pageId: string, items: ReorderItem[]): Promise<void> {
     return apiRequest<void>('POST', `/pages/${pageId}/sections/reorder`, { items });
+  }
+
+  // Page Localizations (content-level SEO metadata)
+  async getPageDetail(id: string): Promise<PageDetailResponse> {
+    return apiRequest<PageDetailResponse>('GET', `/pages/${id}/detail`);
+  }
+
+  async getPageLocalizations(id: string): Promise<ContentLocalizationResponse[]> {
+    return apiRequest<ContentLocalizationResponse[]>('GET', `/pages/${id}/localizations`);
+  }
+
+  async createPageLocalization(pageId: string, data: CreateLocalizationRequest): Promise<ContentLocalizationResponse> {
+    return apiRequest<ContentLocalizationResponse>('POST', `/pages/${pageId}/localizations`, data);
+  }
+
+  async updatePageLocalization(locId: string, data: UpdateLocalizationRequest): Promise<ContentLocalizationResponse> {
+    return apiRequest<ContentLocalizationResponse>('PUT', `/pages/localizations/${locId}`, data);
+  }
+
+  async deletePageLocalization(locId: string): Promise<void> {
+    return apiRequest<void>('DELETE', `/pages/localizations/${locId}`);
   }
 
   // Section Localizations
