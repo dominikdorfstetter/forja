@@ -154,7 +154,7 @@ export default function Layout() {
       const timer = setTimeout(startTour, 500);
       return () => clearTimeout(timer);
     }
-  }, [location.pathname, helpState.tour_completed, tourActive, helpLoading]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [location.pathname, helpState.tour_completed, tourActive, helpLoading, startTour]);
 
   // Sidebar: site-workspace items only
   const allMenuSections = [

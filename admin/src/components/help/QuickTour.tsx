@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Backdrop, Paper, Typography, Button, Stack, Box, Popper } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
@@ -22,11 +22,13 @@ export default function QuickTour({ active, onComplete }: QuickTourProps) {
   const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const popperRef = useRef<HTMLDivElement>(null);
 
-  // Find available steps (skip any whose target doesn't exist in the DOM)
-  const availableSteps = TOUR_STEPS.filter(
-    (step) => document.querySelector(`[data-tour="${step.target}"]`) !== null,
+  // Memoize available steps to avoid re-creating the array every render
+  const availableSteps = useMemo(
+    () => TOUR_STEPS.filter(
+      (step) => document.querySelector(`[data-tour="${step.target}"]`) !== null,
+    ),
+    [active], // eslint-disable-line react-hooks/exhaustive-deps -- re-check DOM when tour activates
   );
 
   const updateAnchor = useCallback(() => {
@@ -84,7 +86,6 @@ export default function QuickTour({ active, onComplete }: QuickTourProps) {
         ]}
       >
         <Paper
-          ref={popperRef}
           elevation={8}
           sx={{
             p: 2.5,
