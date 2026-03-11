@@ -3,14 +3,7 @@ import { useNavigate, useLocation } from 'react-router';
 import {
   Dialog,
   InputAdornment,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  ListSubheader,
   TextField,
-  Typography,
   Box,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
@@ -40,6 +33,7 @@ import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/store/AuthContext';
 import { useCommandPalette, type Command } from './useCommandPalette';
+import CommandList from './CommandList';
 
 const NAV_ICON_MAP: Record<string, ReactNode> = {
   '/dashboard': <DashboardIcon fontSize="small" />,
@@ -63,20 +57,8 @@ const NAV_ICON_MAP: Record<string, ReactNode> = {
   '/api-keys': <VpnKeyIcon fontSize="small" />,
 };
 
-const CATEGORY_ORDER = ['context', 'navigation', 'action', 'blog', 'page', 'site'] as const;
-
 function dispatchAction(detail: string) {
   window.dispatchEvent(new CustomEvent('command-palette:action', { detail }));
-}
-
-function groupByCategory(commands: Command[]): Map<string, Command[]> {
-  const map = new Map<string, Command[]>();
-  for (const cmd of commands) {
-    const list = map.get(cmd.category) || [];
-    list.push(cmd);
-    map.set(cmd.category, list);
-  }
-  return map;
 }
 
 export default function CommandPalette() {
@@ -113,12 +95,10 @@ export default function CommandPalette() {
     const path = location.pathname;
     const cmds: Command[] = [];
 
-    // Global quick post — available from any page
     if (canWrite) {
       cmds.push({ id: 'ctx:quick-post', label: t('quickPost.title'), icon: <BoltIcon fontSize="small" />, category: 'context', action: () => dispatchAction('quick-post') });
     }
 
-    // Content list pages
     if (path === '/blogs') {
       cmds.push({ id: 'ctx:create-blog', label: t('commandPalette.contextActions.createBlog'), icon: <AddIcon fontSize="small" />, category: 'context', action: () => dispatchAction('create-blog') });
     } else if (/^\/blogs\/.+/.test(path)) {
@@ -139,7 +119,6 @@ export default function CommandPalette() {
       cmds.push({ id: 'ctx:create-template', label: t('commandPalette.contextActions.createTemplate'), icon: <AddIcon fontSize="small" />, category: 'context', action: () => dispatchAction('create-template') });
     }
 
-    // Structure pages
     if (path === '/navigation') {
       cmds.push({ id: 'ctx:add-nav-item', label: t('commandPalette.contextActions.addNavItem'), icon: <AddIcon fontSize="small" />, category: 'context', action: () => dispatchAction('add-nav-item') });
     }
@@ -151,7 +130,6 @@ export default function CommandPalette() {
       );
     }
 
-    // Site pages
     if (path === '/social-links') {
       cmds.push({ id: 'ctx:add-social-link', label: t('commandPalette.contextActions.addSocialLink'), icon: <AddIcon fontSize="small" />, category: 'context', action: () => dispatchAction('add-social-link') });
     }
@@ -168,7 +146,6 @@ export default function CommandPalette() {
       cmds.push({ id: 'ctx:add-member', label: t('commandPalette.contextActions.addMember'), icon: <AddIcon fontSize="small" />, category: 'context', action: () => dispatchAction('add-member') });
     }
 
-    // CV page (dual create)
     if (path === '/cv') {
       cmds.push(
         { id: 'ctx:add-cv-entry', label: t('commandPalette.contextActions.addCvEntry'), icon: <AddIcon fontSize="small" />, category: 'context', action: () => dispatchAction('add-cv-entry') },
@@ -176,7 +153,6 @@ export default function CommandPalette() {
       );
     }
 
-    // Admin pages
     if (path === '/sites') {
       cmds.push({ id: 'ctx:create-site', label: t('commandPalette.contextActions.createSite'), icon: <AddIcon fontSize="small" />, category: 'context', action: () => dispatchAction('create-site') });
     } else if (/^\/sites\/.+/.test(path)) {
@@ -213,7 +189,6 @@ export default function CommandPalette() {
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Tab') {
-      // Keep focus in the search field — navigation is via Arrow keys
       e.preventDefault();
     } else if (e.key === 'ArrowDown') {
       e.preventDefault();
@@ -230,36 +205,8 @@ export default function CommandPalette() {
     }
   }, [selectedIndex, commands, setSelectedIndex, execute, setOpen]);
 
-  const grouped = groupByCategory(commands);
-
-  const categoryLabel = (cat: string) => {
-    switch (cat) {
-      case 'context': return t('commandPalette.categories.context');
-      case 'navigation': return t('commandPalette.categories.navigation');
-      case 'action': return t('commandPalette.categories.actions');
-      case 'blog': return t('commandPalette.categories.blogs');
-      case 'page': return t('commandPalette.categories.pages');
-      case 'site': return t('commandPalette.categories.sites');
-      default: return cat;
-    }
-  };
-
   const inputRef = useRef<HTMLInputElement>(null);
   const uniqueId = useId();
-
-  // Pre-compute flat index mapping so we don't mutate during render
-  const flatIndexMap = useMemo(() => {
-    const map = new Map<string, number>();
-    let idx = 0;
-    for (const cat of CATEGORY_ORDER) {
-      const group = grouped.get(cat);
-      if (!group || group.length === 0) continue;
-      for (const cmd of group) {
-        map.set(cmd.id, idx++);
-      }
-    }
-    return map;
-  }, [grouped]);
 
   const hasResults = commands.length > 0;
 
@@ -323,67 +270,13 @@ export default function CommandPalette() {
         }
       </Box>
 
-      {!hasResults ? (
-        <Box sx={{ p: 3, textAlign: 'center' }}>
-          <Typography variant="body2" color="text.secondary">
-            {t('commandPalette.noResults')}
-          </Typography>
-        </Box>
-      ) : (
-        <List sx={{ overflow: 'auto', py: 0 }} role="listbox" id="command-palette-listbox">
-          {CATEGORY_ORDER.map((cat) => {
-            const group = grouped.get(cat);
-            if (!group || group.length === 0) return null;
-            const groupLabelId = `${uniqueId}-group-${cat}`;
-            return (
-              <li key={cat} role="group" aria-labelledby={groupLabelId}>
-                <ListSubheader
-                  id={groupLabelId}
-                  component="div"
-                  role="presentation"
-                  sx={{
-                    lineHeight: '32px',
-                    fontSize: '0.7rem',
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
-                  }}
-                >
-                  {categoryLabel(cat)}
-                </ListSubheader>
-                <List disablePadding role="presentation">
-                  {group.map((cmd) => {
-                    const idx = flatIndexMap.get(cmd.id) ?? 0;
-                    return (
-                      <ListItem
-                        key={cmd.id}
-                        disablePadding
-                        role="option"
-                        id={`command-palette-option-${cmd.id}`}
-                        aria-selected={idx === selectedIndex}
-                      >
-                        <ListItemButton
-                          tabIndex={-1}
-                          selected={idx === selectedIndex}
-                          onClick={() => execute(cmd)}
-                          onMouseEnter={() => setSelectedIndex(idx)}
-                          sx={{ py: 0.75 }}
-                        >
-                          {cmd.icon && <ListItemIcon sx={{ minWidth: 36 }}>{cmd.icon}</ListItemIcon>}
-                          <ListItemText
-                            primary={cmd.label}
-                            primaryTypographyProps={{ fontSize: '0.875rem' }}
-                          />
-                        </ListItemButton>
-                      </ListItem>
-                    );
-                  })}
-                </List>
-              </li>
-            );
-          })}
-        </List>
-      )}
+      <CommandList
+        commands={commands}
+        selectedIndex={selectedIndex}
+        onSelect={setSelectedIndex}
+        onExecute={execute}
+        uniqueId={uniqueId}
+      />
     </Dialog>
   );
 }

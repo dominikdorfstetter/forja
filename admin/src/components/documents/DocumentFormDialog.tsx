@@ -1,4 +1,4 @@
-import { useMemo, useState, useRef } from 'react';
+import { useMemo, useReducer, useRef } from 'react';
 import {
   Button,
   Dialog,
@@ -8,16 +8,7 @@ import {
   TextField,
   Stack,
   MenuItem,
-  Tabs,
-  Tab,
-  Box,
-  ToggleButtonGroup,
-  ToggleButton,
-  Typography,
-  Alert,
 } from '@mui/material';
-import LinkIcon from '@mui/icons-material/Link';
-import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -30,8 +21,8 @@ import type {
   CreateDocumentLocalizationRequest,
 } from '@/types/api';
 import { useTranslation } from 'react-i18next';
-
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+import DocumentSourceSection from './DocumentSourceSection';
+import DocumentLocaleSection from './DocumentLocaleSection';
 
 const DOCUMENT_TYPES = [
   { value: 'pdf', label: 'PDF' },
@@ -41,8 +32,6 @@ const DOCUMENT_TYPES = [
   { value: 'link', label: 'External Link' },
   { value: 'other', label: 'Other' },
 ] as const;
-
-const ACCEPTED_FILE_TYPES = '.pdf,.doc,.docx,.xlsx,.xls,.zip,.txt,.csv,.pptx,.ppt';
 
 const localizationSchema = z.object({
   locale_id: z.string().min(1),
@@ -72,10 +61,32 @@ const documentFormSchema = z.discriminatedUnion('source_type', [linkSchema, uplo
 
 type DocumentFormData = z.infer<typeof documentFormSchema>;
 
-function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+interface DocFormState {
+  activeTab: number;
+  sourceType: 'link' | 'upload';
+  selectedFile: File | null;
+  fileError: string | null;
+}
+
+type DocFormAction =
+  | { type: 'RESET'; sourceType: 'link' | 'upload' }
+  | { type: 'SET_ACTIVE_TAB'; value: number }
+  | { type: 'SET_SOURCE_TYPE'; value: 'link' | 'upload' }
+  | { type: 'SET_SELECTED_FILE'; file: File | null }
+  | { type: 'SET_FILE_ERROR'; error: string | null };
+
+const initialDocFormState: DocFormState = {
+  activeTab: 0, sourceType: 'link', selectedFile: null, fileError: null,
+};
+
+function docFormReducer(state: DocFormState, action: DocFormAction): DocFormState {
+  switch (action.type) {
+    case 'RESET': return { ...initialDocFormState, sourceType: action.sourceType };
+    case 'SET_ACTIVE_TAB': return { ...state, activeTab: action.value };
+    case 'SET_SOURCE_TYPE': return { ...state, sourceType: action.value, selectedFile: null, fileError: null };
+    case 'SET_SELECTED_FILE': return { ...state, selectedFile: action.file };
+    case 'SET_FILE_ERROR': return { ...state, fileError: action.error };
+  }
 }
 
 interface DocumentFormDialogProps {
@@ -88,6 +99,19 @@ interface DocumentFormDialogProps {
   loading: boolean;
 }
 
+const readFileAsBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      const base64 = result.split(',')[1];
+      resolve(base64);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+};
+
 export default function DocumentFormDialog({
   open,
   document,
@@ -98,12 +122,8 @@ export default function DocumentFormDialog({
   loading,
 }: DocumentFormDialogProps) {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState(0);
-  const [sourceType, setSourceType] = useState<'link' | 'upload'>('link');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [fileError, setFileError] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const isEditing = !!document;
+  const [formState, formDispatch] = useReducer(docFormReducer, initialDocFormState);
 
   const activeLocales = useMemo(() => locales.filter((l) => l.is_active), [locales]);
 
@@ -160,76 +180,35 @@ export default function DocumentFormDialog({
   if (open && !prevOpenRef.current) {
     const defaults = buildDefaults;
     reset(defaults);
-    setSourceType(defaults.source_type);
-    setActiveTab(0);
-    setSelectedFile(null);
-    setFileError(null);
+    formDispatch({ type: 'RESET', sourceType: defaults.source_type });
   }
   prevOpenRef.current = open;
 
-  const handleSourceTypeChange = (_: React.MouseEvent<HTMLElement>, value: string | null) => {
-    if (value === 'link' || value === 'upload') {
-      setSourceType(value);
-      setValue('source_type', value);
-      setSelectedFile(null);
-      setFileError(null);
-    }
-  };
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    setFileError(null);
-
-    if (!file) {
-      setSelectedFile(null);
-      return;
-    }
-
-    if (file.size > MAX_FILE_SIZE) {
-      setFileError(`File too large (${formatFileSize(file.size)}). Maximum is ${formatFileSize(MAX_FILE_SIZE)}.`);
-      setSelectedFile(null);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-      return;
-    }
-
-    setSelectedFile(file);
-  };
-
-  const readFileAsBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result as string;
-        // Remove the data URL prefix (e.g., "data:application/pdf;base64,")
-        const base64 = result.split(',')[1];
-        resolve(base64);
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
+  const handleSourceTypeChange = (value: 'link' | 'upload') => {
+    formDispatch({ type: 'SET_SOURCE_TYPE', value });
+    setValue('source_type', value);
   };
 
   const onFormSubmit = async (data: DocumentFormData) => {
-    if (sourceType === 'upload' && !selectedFile && !isEditing) {
-      setFileError('Please select a file to upload');
+    if (formState.sourceType === 'upload' && !formState.selectedFile && !isEditing) {
+      formDispatch({ type: 'SET_FILE_ERROR', error: 'Please select a file to upload' });
       return;
     }
 
     let request: CreateDocumentRequest;
 
-    if (sourceType === 'upload' && selectedFile) {
-      const base64Data = await readFileAsBase64(selectedFile);
+    if (formState.sourceType === 'upload' && formState.selectedFile) {
+      const base64Data = await readFileAsBase64(formState.selectedFile);
       request = {
         document_type: data.document_type,
         folder_id: data.folder_id || undefined,
         display_order: data.display_order,
         file_data: base64Data,
-        file_name: selectedFile.name,
-        file_size: selectedFile.size,
-        mime_type: selectedFile.type || 'application/octet-stream',
+        file_name: formState.selectedFile.name,
+        file_size: formState.selectedFile.size,
+        mime_type: formState.selectedFile.type || 'application/octet-stream',
       };
-    } else if (sourceType === 'upload' && isEditing && !selectedFile) {
-      // Editing an uploaded doc without changing the file
+    } else if (formState.sourceType === 'upload' && isEditing && !formState.selectedFile) {
       request = {
         document_type: data.document_type,
         folder_id: data.folder_id || undefined,
@@ -268,80 +247,18 @@ export default function DocumentFormDialog({
         </DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
-            {/* Source Type Toggle */}
-            <Box>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                Source Type
-              </Typography>
-              <ToggleButtonGroup
-                value={sourceType}
-                exclusive
-                onChange={handleSourceTypeChange}
-                size="small"
-                fullWidth
-              >
-                <ToggleButton value="link">
-                  <LinkIcon sx={{ mr: 0.5 }} fontSize="small" />
-                  Link
-                </ToggleButton>
-                <ToggleButton value="upload">
-                  <UploadFileIcon sx={{ mr: 0.5 }} fontSize="small" />
-                  Upload
-                </ToggleButton>
-              </ToggleButtonGroup>
-            </Box>
-
-            {/* Link mode: URL field */}
-            {sourceType === 'link' && (
-              <TextField
-                label="URL"
-                fullWidth
-                required
-                {...register('url')}
-                error={!!errors.url}
-                helperText={errors.url?.message || 'Full URL to the document or resource'}
-              />
-            )}
-
-            {/* Upload mode: file input */}
-            {sourceType === 'upload' && (
-              <Box>
-                {isEditing && document?.has_file && document?.file_name && !selectedFile && (
-                  <Alert severity="info" sx={{ mb: 1 }}>
-                    Current file: <strong>{document.file_name}</strong>
-                    {document.file_size && ` (${formatFileSize(document.file_size)})`}
-                  </Alert>
-                )}
-                <Button
-                  variant="outlined"
-                  component="label"
-                  startIcon={<UploadFileIcon />}
-                  fullWidth
-                >
-                  {selectedFile ? selectedFile.name : 'Choose File'}
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    hidden
-                    accept={ACCEPTED_FILE_TYPES}
-                    onChange={handleFileSelect}
-                  />
-                </Button>
-                {selectedFile && (
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                    {formatFileSize(selectedFile.size)} &middot; {selectedFile.type || 'unknown type'}
-                  </Typography>
-                )}
-                {fileError && (
-                  <Typography variant="caption" color="error" sx={{ mt: 0.5, display: 'block' }}>
-                    {fileError}
-                  </Typography>
-                )}
-                <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                  Max {formatFileSize(MAX_FILE_SIZE)}. Accepted: PDF, Word, Excel, ZIP, and more.
-                </Typography>
-              </Box>
-            )}
+            <DocumentSourceSection
+              sourceType={formState.sourceType}
+              onSourceTypeChange={handleSourceTypeChange}
+              selectedFile={formState.selectedFile}
+              onFileSelect={(file) => formDispatch({ type: 'SET_SELECTED_FILE', file })}
+              fileError={formState.fileError}
+              onFileError={(error) => formDispatch({ type: 'SET_FILE_ERROR', error })}
+              document={document}
+              isEditing={isEditing}
+              register={register as never}
+              errors={errors}
+            />
 
             <Controller
               name="document_type"
@@ -398,58 +315,14 @@ export default function DocumentFormDialog({
               helperText={errors.display_order?.message}
             />
 
-            {/* Locale tabs for name + description */}
-            {activeLocales.length > 0 && (
-              <Box sx={{ mt: 1 }}>
-                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                  <Tabs
-                    value={activeTab}
-                    onChange={(_, newValue: number) => setActiveTab(newValue)}
-                    variant="scrollable"
-                    scrollButtons="auto"
-                    aria-label="Locale tabs"
-                  >
-                    {activeLocales.map((locale) => (
-                      <Tab key={locale.id} label={locale.code.toUpperCase()} />
-                    ))}
-                  </Tabs>
-                </Box>
-                {fields.map((field, index) => {
-                  const locale = activeLocales[index];
-                  if (!locale) return null;
-                  return (
-                    <Box
-                      key={field.id}
-                      role="tabpanel"
-                      hidden={activeTab !== index}
-                      sx={{ px: 0, py: 2 }}
-                    >
-                      {activeTab === index && (
-                        <Stack spacing={2}>
-                          <TextField
-                            label={`Name (${locale.code})`}
-                            fullWidth
-                            {...register(`localizations.${index}.name`)}
-                            error={!!errors.localizations?.[index]?.name}
-                            helperText={errors.localizations?.[index]?.name?.message}
-                          />
-                          <TextField
-                            label={`Description (${locale.code})`}
-                            fullWidth
-                            multiline
-                            minRows={2}
-                            maxRows={4}
-                            {...register(`localizations.${index}.description`)}
-                            error={!!errors.localizations?.[index]?.description}
-                            helperText={errors.localizations?.[index]?.description?.message}
-                          />
-                        </Stack>
-                      )}
-                    </Box>
-                  );
-                })}
-              </Box>
-            )}
+            <DocumentLocaleSection
+              activeTab={formState.activeTab}
+              onTabChange={(v) => formDispatch({ type: 'SET_ACTIVE_TAB', value: v })}
+              activeLocales={activeLocales}
+              fields={fields}
+              register={register as never}
+              errors={errors}
+            />
           </Stack>
         </DialogContent>
         <DialogActions>

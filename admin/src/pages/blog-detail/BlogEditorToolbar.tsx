@@ -6,10 +6,7 @@ import {
   IconButton,
   Menu,
   MenuItem,
-  Popover,
-  Stack,
   Tooltip,
-  Typography,
 } from '@mui/material';
 import UndoIcon from '@mui/icons-material/Undo';
 import RedoIcon from '@mui/icons-material/Redo';
@@ -17,22 +14,16 @@ import HistoryIcon from '@mui/icons-material/History';
 import ViewSidebarIcon from '@mui/icons-material/ViewSidebar';
 import SaveIcon from '@mui/icons-material/Save';
 import ScheduleIcon from '@mui/icons-material/CalendarMonth';
-import ClearIcon from '@mui/icons-material/Clear';
-import SendIcon from '@mui/icons-material/Send';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import PublishIcon from '@mui/icons-material/Publish';
-import UnpublishedIcon from '@mui/icons-material/Unpublished';
-import ArchiveIcon from '@mui/icons-material/Archive';
-import UnarchiveIcon from '@mui/icons-material/Unarchive';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { type Control, type UseFormWatch, type UseFormSetValue } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import type { AutosaveStatus } from '@/hooks/useAutosave';
 import type { PreviewTemplate } from '@/types/api';
 import StatusChip from '@/components/shared/StatusChip';
+import SchedulePopover from '@/components/shared/SchedulePopover';
+import WorkflowActions from '@/components/shared/WorkflowActions';
 import type { BlogContentFormData } from './blogDetailSchema';
 
 interface BlogEditorToolbarProps {
@@ -251,89 +242,25 @@ export default function BlogEditorToolbar({
 
       <Box sx={{ borderLeft: 1, borderColor: 'divider', height: 24, mx: 0.5 }} />
 
-      {/* Group 4: Workflow Actions (secondary → primary → save) */}
-      {canRequestChanges && currentStatus === 'InReview' && onRequestChanges && (
-        <Button
-          size="small"
-          variant="outlined"
-          color="warning"
-          startIcon={<UndoIcon />}
-          onClick={onRequestChanges}
-          disabled={isSaving}
-        >
-          {t('workflow.requestChanges')}
-        </Button>
-      )}
-      {canUnpublish && onUnpublish && (
-        <Button
-          size="small"
-          variant="outlined"
-          startIcon={<UnpublishedIcon />}
-          onClick={onUnpublish}
-          disabled={isSaving}
-        >
-          {t('workflow.unpublish')}
-        </Button>
-      )}
-      {canArchive && onArchive && (
-        <Button
-          size="small"
-          variant="outlined"
-          color="warning"
-          startIcon={<ArchiveIcon />}
-          onClick={onArchive}
-          disabled={isSaving}
-        >
-          {t('workflow.archive')}
-        </Button>
-      )}
-      {canRestore && onRestore && (
-        <Button
-          size="small"
-          variant="outlined"
-          startIcon={<UnarchiveIcon />}
-          onClick={onRestore}
-          disabled={isSaving}
-        >
-          {t('workflow.restore')}
-        </Button>
-      )}
-      {canSubmitForReview && currentStatus === 'Draft' && onSubmitForReview && (
-        <Button
-          size="small"
-          variant="contained"
-          color="info"
-          startIcon={<SendIcon />}
-          onClick={onSubmitForReview}
-          disabled={isSaving}
-        >
-          {t('workflow.submitForReview')}
-        </Button>
-      )}
-      {canApprove && currentStatus === 'InReview' && onApprove && (
-        <Button
-          size="small"
-          variant="contained"
-          color="success"
-          startIcon={<CheckCircleIcon />}
-          onClick={onApprove}
-          disabled={isSaving}
-        >
-          {t('workflow.approve')}
-        </Button>
-      )}
-      {canPublish && onPublish && (
-        <Button
-          size="small"
-          variant="contained"
-          color="success"
-          startIcon={<PublishIcon />}
-          onClick={onPublish}
-          disabled={isSaving}
-        >
-          {t('workflow.publish')}
-        </Button>
-      )}
+      {/* Group 4: Workflow Actions */}
+      <WorkflowActions
+        currentStatus={currentStatus}
+        isSaving={isSaving}
+        canSubmitForReview={canSubmitForReview}
+        canApprove={canApprove}
+        canRequestChanges={canRequestChanges}
+        canPublish={canPublish}
+        canUnpublish={canUnpublish}
+        canArchive={canArchive}
+        canRestore={canRestore}
+        onSubmitForReview={onSubmitForReview}
+        onApprove={onApprove}
+        onRequestChanges={onRequestChanges}
+        onPublish={onPublish}
+        onUnpublish={onUnpublish}
+        onArchive={onArchive}
+        onRestore={onRestore}
+      />
 
       <Button
         variant="contained"
@@ -346,45 +273,25 @@ export default function BlogEditorToolbar({
       </Button>
 
       {/* Schedule Popover */}
-      <Popover
-        open={Boolean(scheduleAnchor)}
+      <SchedulePopover
         anchorEl={scheduleAnchor}
         onClose={() => setScheduleAnchor(null)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-      >
-        <Stack spacing={2} sx={{ p: 2, minWidth: 300 }}>
-          <Typography variant="subtitle2">{t('scheduling.publishAt')}</Typography>
-          <DateTimePicker
-            label={t('scheduling.publishAt')}
-            value={publishStart ? new Date(publishStart) : null}
-            onChange={(date) => {
-              const iso = date ? date.toISOString() : null;
-              setValue('publish_start', iso, { shouldDirty: true });
-              if (date && date > new Date()) {
-                setValue('status', 'Scheduled', { shouldDirty: true });
-              }
-            }}
-            slotProps={{ textField: { size: 'small', fullWidth: true } }}
-          />
-          <DateTimePicker
-            label={t('scheduling.unpublishAt')}
-            value={publishEnd ? new Date(publishEnd) : null}
-            onChange={(date) => {
-              const iso = date ? date.toISOString() : null;
-              setValue('publish_end', iso, { shouldDirty: true });
-            }}
-            slotProps={{ textField: { size: 'small', fullWidth: true } }}
-          />
-          <Button
-            size="small"
-            startIcon={<ClearIcon />}
-            onClick={handleClearSchedule}
-            disabled={!publishStart && !publishEnd}
-          >
-            {t('scheduling.clearSchedule')}
-          </Button>
-        </Stack>
-      </Popover>
+        publishStart={publishStart}
+        publishEnd={publishEnd}
+        onPublishStartChange={(iso) => {
+          setValue('publish_start', iso, { shouldDirty: true });
+          if (iso) {
+            const date = new Date(iso);
+            if (date > new Date()) {
+              setValue('status', 'Scheduled', { shouldDirty: true });
+            }
+          }
+        }}
+        onPublishEndChange={(iso) => {
+          setValue('publish_end', iso, { shouldDirty: true });
+        }}
+        onClear={handleClearSchedule}
+      />
 
       {/* Preview Menu */}
       <Menu

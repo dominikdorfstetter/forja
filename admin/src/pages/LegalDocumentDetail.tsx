@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useReducer, useEffect, useRef } from 'react';
 import { useParams } from 'react-router';
 import {
   Box,
@@ -270,6 +270,49 @@ function GroupItemsSection({ groupId }: GroupItemsSectionProps) {
   );
 }
 
+// --- Main detail page reducer ---
+
+interface DetailDialogState {
+  editDocOpen: boolean;
+  groupFormOpen: boolean;
+  editingGroup: LegalGroupResponse | null;
+  deletingGroup: LegalGroupResponse | null;
+}
+
+type DetailDialogAction =
+  | { type: 'OPEN_EDIT_DOC' }
+  | { type: 'CLOSE_EDIT_DOC' }
+  | { type: 'OPEN_GROUP_FORM' }
+  | { type: 'CLOSE_GROUP_FORM' }
+  | { type: 'SET_EDITING_GROUP'; payload: LegalGroupResponse | null }
+  | { type: 'SET_DELETING_GROUP'; payload: LegalGroupResponse | null };
+
+const initialDialogState: DetailDialogState = {
+  editDocOpen: false,
+  groupFormOpen: false,
+  editingGroup: null,
+  deletingGroup: null,
+};
+
+function detailDialogReducer(state: DetailDialogState, action: DetailDialogAction): DetailDialogState {
+  switch (action.type) {
+    case 'OPEN_EDIT_DOC':
+      return { ...state, editDocOpen: true };
+    case 'CLOSE_EDIT_DOC':
+      return { ...state, editDocOpen: false };
+    case 'OPEN_GROUP_FORM':
+      return { ...state, groupFormOpen: true };
+    case 'CLOSE_GROUP_FORM':
+      return { ...state, groupFormOpen: false };
+    case 'SET_EDITING_GROUP':
+      return { ...state, editingGroup: action.payload };
+    case 'SET_DELETING_GROUP':
+      return { ...state, deletingGroup: action.payload };
+    default:
+      return state;
+  }
+}
+
 // --- Main detail page ---
 
 export default function LegalDocumentDetailPage() {
@@ -279,10 +322,7 @@ export default function LegalDocumentDetailPage() {
   const { showError, showSuccess } = useErrorSnackbar();
 
   const { canWrite, isAdmin } = useAuth();
-  const [editDocOpen, setEditDocOpen] = useState(false);
-  const [groupFormOpen, setGroupFormOpen] = useState(false);
-  const [editingGroup, setEditingGroup] = useState<LegalGroupResponse | null>(null);
-  const [deletingGroup, setDeletingGroup] = useState<LegalGroupResponse | null>(null);
+  const [dialogState, dialogDispatch] = useReducer(detailDialogReducer, initialDialogState);
 
   // Fetch groups for this document
   const { data: groups, isLoading: groupsLoading, error: groupsError } = useQuery({
@@ -326,7 +366,7 @@ export default function LegalDocumentDetailPage() {
     mutationFn: (data: UpdateLegalDocumentRequest) => apiService.updateLegalDocument(id!, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['legal'] });
-      setEditDocOpen(false);
+      dialogDispatch({ type: 'CLOSE_EDIT_DOC' });
       showSuccess(t('legalDetail.updatedMessage'));
       // Refresh document info
       if (sites) {
@@ -343,19 +383,19 @@ export default function LegalDocumentDetailPage() {
 
   const createGroupMutation = useMutation({
     mutationFn: (data: CreateLegalGroupRequest) => apiService.createLegalGroup(id!, data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['legalGroups', id] }); setGroupFormOpen(false); showSuccess(t('legalDetail.groups.messages.created')); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['legalGroups', id] }); dialogDispatch({ type: 'CLOSE_GROUP_FORM' }); showSuccess(t('legalDetail.groups.messages.created')); },
     onError: (error) => showError(error),
   });
 
   const updateGroupMutation = useMutation({
     mutationFn: ({ groupId, data }: { groupId: string; data: UpdateLegalGroupRequest }) => apiService.updateLegalGroup(groupId, data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['legalGroups', id] }); setEditingGroup(null); showSuccess(t('legalDetail.groups.messages.updated')); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['legalGroups', id] }); dialogDispatch({ type: 'SET_EDITING_GROUP', payload: null }); showSuccess(t('legalDetail.groups.messages.updated')); },
     onError: (error) => showError(error),
   });
 
   const deleteGroupMutation = useMutation({
     mutationFn: (groupId: string) => apiService.deleteLegalGroup(groupId),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['legalGroups', id] }); setDeletingGroup(null); showSuccess(t('legalDetail.groups.messages.deleted')); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['legalGroups', id] }); dialogDispatch({ type: 'SET_DELETING_GROUP', payload: null }); showSuccess(t('legalDetail.groups.messages.deleted')); },
     onError: (error) => showError(error),
   });
 
@@ -368,7 +408,7 @@ export default function LegalDocumentDetailPage() {
           { label: t('layout.sidebar.legal'), path: '/legal' },
           { label: document?.cookie_name || t('legalDetail.title') },
         ]}
-        action={{ label: t('legalDetail.editDocument'), icon: <EditIcon />, onClick: () => setEditDocOpen(true), hidden: !canWrite }}
+        action={{ label: t('legalDetail.editDocument'), icon: <EditIcon />, onClick: () => dialogDispatch({ type: 'OPEN_EDIT_DOC' }), hidden: !canWrite }}
       />
 
       {/* Document info */}
@@ -392,7 +432,7 @@ export default function LegalDocumentDetailPage() {
       {/* Groups section */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Typography variant="h6">{t('legalDetail.groups.title')}</Typography>
-        {canWrite && <Button variant="outlined" startIcon={<AddIcon />} onClick={() => setGroupFormOpen(true)}>{t('legalDetail.groups.add')}</Button>}
+        {canWrite && <Button variant="outlined" startIcon={<AddIcon />} onClick={() => dialogDispatch({ type: 'OPEN_GROUP_FORM' })}>{t('legalDetail.groups.add')}</Button>}
       </Box>
 
       {groupsLoading ? (
@@ -400,7 +440,7 @@ export default function LegalDocumentDetailPage() {
       ) : groupsError ? (
         <Alert severity="error">{t('legalDetail.loadGroupsFailed')}</Alert>
       ) : !groups || groups.length === 0 ? (
-        <EmptyState icon={<GavelIcon sx={{ fontSize: 48 }} />} title={t('legalDetail.groups.empty')} description={t('legalDetail.groups.emptyDescription')} action={{ label: t('legalDetail.groups.add'), onClick: () => setGroupFormOpen(true) }} />
+        <EmptyState icon={<GavelIcon sx={{ fontSize: 48 }} />} title={t('legalDetail.groups.empty')} description={t('legalDetail.groups.emptyDescription')} action={{ label: t('legalDetail.groups.add'), onClick: () => dialogDispatch({ type: 'OPEN_GROUP_FORM' }) }} />
       ) : (
         groups.map((group) => (
           <Accordion key={group.id} defaultExpanded>
@@ -411,12 +451,12 @@ export default function LegalDocumentDetailPage() {
                 <Chip label={group.is_required ? t('legalDetail.groups.required') : t('legalDetail.groups.optional')} size="small" color={group.is_required ? 'warning' : 'default'} variant="outlined" />
                 <Chip label={group.default_enabled ? t('legalDetail.groups.enabled') : t('legalDetail.groups.disabled')} size="small" color={group.default_enabled ? 'success' : 'default'} variant="outlined" />
                 {canWrite && <Tooltip title={t('legalDetail.groups.editGroup')}>
-                  <IconButton size="small" onClick={(e) => { e.stopPropagation(); setEditingGroup(group); }}>
+                  <IconButton size="small" onClick={(e) => { e.stopPropagation(); dialogDispatch({ type: 'SET_EDITING_GROUP', payload: group }); }}>
                     <EditIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>}
                 {isAdmin && <Tooltip title={t('legalDetail.groups.deleteGroup')}>
-                  <IconButton size="small" color="error" onClick={(e) => { e.stopPropagation(); setDeletingGroup(group); }}>
+                  <IconButton size="small" color="error" onClick={(e) => { e.stopPropagation(); dialogDispatch({ type: 'SET_DELETING_GROUP', payload: group }); }}>
                     <DeleteIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>}
@@ -431,18 +471,18 @@ export default function LegalDocumentDetailPage() {
 
       {/* Document edit dialog */}
       <LegalDocumentFormDialog
-        open={editDocOpen}
+        open={dialogState.editDocOpen}
         siteId=""
         document={document ? { id: id!, cookie_name: document.cookie_name, document_type: document.document_type, created_at: '', updated_at: '' } : null}
         onSubmit={(data) => updateDocMutation.mutate({ cookie_name: data.cookie_name, document_type: data.document_type })}
-        onClose={() => setEditDocOpen(false)}
+        onClose={() => dialogDispatch({ type: 'CLOSE_EDIT_DOC' })}
         loading={updateDocMutation.isPending}
       />
 
       {/* Group form dialogs */}
-      <GroupFormDialog open={groupFormOpen} onSubmit={(data) => createGroupMutation.mutate(data)} onClose={() => setGroupFormOpen(false)} loading={createGroupMutation.isPending} />
-      <GroupFormDialog open={!!editingGroup} group={editingGroup} onSubmit={(data) => editingGroup && updateGroupMutation.mutate({ groupId: editingGroup.id, data })} onClose={() => setEditingGroup(null)} loading={updateGroupMutation.isPending} />
-      <ConfirmDialog open={!!deletingGroup} title={t('legalDetail.groups.deleteGroup')} message={t('legalDetail.groups.deleteMessage', { name: deletingGroup?.cookie_name })} confirmLabel={t('common.actions.delete')} onConfirm={() => deletingGroup && deleteGroupMutation.mutate(deletingGroup.id)} onCancel={() => setDeletingGroup(null)} loading={deleteGroupMutation.isPending} confirmationText={t('common.actions.delete')} />
+      <GroupFormDialog open={dialogState.groupFormOpen} onSubmit={(data) => createGroupMutation.mutate(data)} onClose={() => dialogDispatch({ type: 'CLOSE_GROUP_FORM' })} loading={createGroupMutation.isPending} />
+      <GroupFormDialog open={!!dialogState.editingGroup} group={dialogState.editingGroup} onSubmit={(data) => dialogState.editingGroup && updateGroupMutation.mutate({ groupId: dialogState.editingGroup.id, data })} onClose={() => dialogDispatch({ type: 'SET_EDITING_GROUP', payload: null })} loading={updateGroupMutation.isPending} />
+      <ConfirmDialog open={!!dialogState.deletingGroup} title={t('legalDetail.groups.deleteGroup')} message={t('legalDetail.groups.deleteMessage', { name: dialogState.deletingGroup?.cookie_name })} confirmLabel={t('common.actions.delete')} onConfirm={() => dialogState.deletingGroup && deleteGroupMutation.mutate(dialogState.deletingGroup.id)} onCancel={() => dialogDispatch({ type: 'SET_DELETING_GROUP', payload: null })} loading={deleteGroupMutation.isPending} confirmationText={t('common.actions.delete')} />
     </Box>
   );
 }

@@ -1,33 +1,20 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Alert,
-  Autocomplete,
   Box,
   Button,
   CircularProgress,
-  FormControl,
-  InputLabel,
-  MenuItem,
   Paper,
-  Select,
-  Slider,
   Stack,
-  TextField,
   Typography,
 } from '@mui/material';
 import {
   AutoAwesome as AiIcon,
   Delete as DeleteIcon,
-  ExpandMore as ExpandMoreIcon,
-  Refresh as RefreshIcon,
   Save as SaveIcon,
   Science as TestIcon,
 } from '@mui/icons-material';
@@ -37,6 +24,8 @@ import apiService from '@/services/api';
 import { useSiteContext } from '@/store/SiteContext';
 import type { AiConfigResponse, CreateAiConfigRequest } from '@/types/api';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
+import AiAdvancedSettings from './AiAdvancedSettings';
+import AiProviderForm from './AiProviderForm';
 
 interface ProviderPreset {
   key: string;
@@ -252,209 +241,21 @@ export default function AiSettingsPage({ embedded }: AiSettingsTabProps = {}) {
       <Paper sx={{ p: 3 }} elevation={embedded ? 0 : 1}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Stack spacing={3}>
-            <FormControl fullWidth>
-              <InputLabel id="provider-preset-label">
-                {t('aiSettings.fields.providerPreset')}
-              </InputLabel>
-              <Select
-                labelId="provider-preset-label"
-                value={selectedPreset}
-                label={t('aiSettings.fields.providerPreset')}
-                onChange={(e) => handlePresetChange(e.target.value)}
-              >
-                {PROVIDER_PRESETS.map((preset) => (
-                  <MenuItem key={preset.key} value={preset.key}>
-                    {preset.label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <Controller
-              name="provider_name"
+            <AiProviderForm
               control={control}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label={t('aiSettings.fields.providerName')}
-                  helperText={fieldState.error?.message ?? t('aiSettings.fields.providerNameHelp')}
-                  error={!!fieldState.error}
-                  fullWidth
-                  required
-                />
-              )}
+              presets={PROVIDER_PRESETS}
+              selectedPreset={selectedPreset}
+              onPresetChange={handlePresetChange}
+              requiresApiKey={requiresApiKey}
+              hasExistingConfig={hasExistingConfig}
+              apiKeyMasked={configQuery.data?.api_key_masked}
+              discoveredModels={discoveredModels}
+              watchBaseUrl={watchBaseUrl}
+              onDiscoverModels={() => discoverModelsMutation.mutate()}
+              discoverLoading={discoverModelsMutation.isPending}
             />
 
-            <Controller
-              name="base_url"
-              control={control}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label={t('aiSettings.fields.baseUrl')}
-                  helperText={fieldState.error?.message ?? t('aiSettings.fields.baseUrlHelp')}
-                  error={!!fieldState.error}
-                  fullWidth
-                  required
-                />
-              )}
-            />
-
-            <Controller
-              name="api_key"
-              control={control}
-              render={({ field, fieldState }) => (
-                <TextField
-                  {...field}
-                  label={t('aiSettings.fields.apiKey')}
-                  type="password"
-                  helperText={
-                    fieldState.error?.message ??
-                    (!requiresApiKey
-                      ? t('aiSettings.fields.apiKeyOptional')
-                      : hasExistingConfig
-                        ? `${t('aiSettings.fields.apiKeyExisting')}: ${configQuery.data?.api_key_masked}`
-                        : t('aiSettings.fields.apiKeyHelp'))
-                  }
-                  error={!!fieldState.error}
-                  fullWidth
-                  required={requiresApiKey}
-                />
-              )}
-            />
-
-            <Controller
-              name="model"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Stack direction="row" spacing={1} alignItems="flex-start">
-                  <Autocomplete
-                    freeSolo
-                    fullWidth
-                    options={discoveredModels}
-                    value={field.value}
-                    onChange={(_, newValue) => field.onChange(newValue ?? '')}
-                    onInputChange={(_, newValue) => field.onChange(newValue)}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label={t('aiSettings.fields.model')}
-                        helperText={fieldState.error?.message ?? t('aiSettings.fields.modelHelp')}
-                        error={!!fieldState.error}
-                        required
-                      />
-                    )}
-                  />
-                  <Button
-                    variant="outlined"
-                    onClick={() => discoverModelsMutation.mutate()}
-                    disabled={!watchBaseUrl || discoverModelsMutation.isPending}
-                    sx={{ minWidth: 'auto', mt: '8px', px: 1.5, height: 40 }}
-                    aria-label={t('aiSettings.actions.discoverModels')}
-                  >
-                    {discoverModelsMutation.isPending ? (
-                      <CircularProgress size={20} />
-                    ) : (
-                      <RefreshIcon />
-                    )}
-                  </Button>
-                </Stack>
-              )}
-            />
-
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>{t('aiSettings.advanced')}</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Stack spacing={3}>
-                  <Controller
-                    name="temperature"
-                    control={control}
-                    render={({ field }) => (
-                      <Box>
-                        <Typography gutterBottom>
-                          {t('aiSettings.fields.temperature')}: {field.value}
-                        </Typography>
-                        <Slider
-                          {...field}
-                          onChange={(_, val) => field.onChange(val)}
-                          min={0}
-                          max={2}
-                          step={0.1}
-                          valueLabelDisplay="auto"
-                        />
-                      </Box>
-                    )}
-                  />
-
-                  <Controller
-                    name="max_tokens"
-                    control={control}
-                    render={({ field, fieldState }) => (
-                      <TextField
-                        {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
-                        label={t('aiSettings.fields.maxTokens')}
-                        type="number"
-                        error={!!fieldState.error}
-                        helperText={fieldState.error?.message}
-                        fullWidth
-                      />
-                    )}
-                  />
-
-                  <Alert severity="info" sx={{ mb: 1 }}>
-                    {t('aiSettings.fields.systemPromptsHelp')}
-                  </Alert>
-
-                  <Controller
-                    name="system_prompt_seo"
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        label={t('aiSettings.fields.systemPromptSeo')}
-                        placeholder={t('aiSettings.fields.defaultPromptSeo')}
-                        multiline
-                        minRows={2}
-                        fullWidth
-                      />
-                    )}
-                  />
-
-                  <Controller
-                    name="system_prompt_excerpt"
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        label={t('aiSettings.fields.systemPromptExcerpt')}
-                        placeholder={t('aiSettings.fields.defaultPromptExcerpt')}
-                        multiline
-                        minRows={2}
-                        fullWidth
-                      />
-                    )}
-                  />
-
-                  <Controller
-                    name="system_prompt_translate"
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        label={t('aiSettings.fields.systemPromptTranslate')}
-                        placeholder={t('aiSettings.fields.defaultPromptTranslate')}
-                        multiline
-                        minRows={2}
-                        fullWidth
-                      />
-                    )}
-                  />
-                </Stack>
-              </AccordionDetails>
-            </Accordion>
+            <AiAdvancedSettings control={control} />
 
             <Stack direction="row" spacing={2} justifyContent="space-between">
               <Stack direction="row" spacing={2}>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useReducer, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
@@ -49,6 +49,81 @@ function maxPermissionForRole(role: SiteRole | null, isSysAdmin: boolean): ApiKe
   }
 }
 
+interface UIState {
+  statusFilter: string;
+  permissionFilter: string;
+  page: number;
+  perPage: number;
+  createOpen: boolean;
+  blockingKey: ApiKeyListItem | null;
+  revokingKey: ApiKeyListItem | null;
+  deletingKey: ApiKeyListItem | null;
+  usageKey: ApiKeyListItem | null;
+}
+
+type UIAction =
+  | { type: 'setStatusFilter'; value: string }
+  | { type: 'setPermissionFilter'; value: string }
+  | { type: 'setPage'; value: number }
+  | { type: 'setPerPage'; value: number }
+  | { type: 'openCreate' }
+  | { type: 'closeCreate' }
+  | { type: 'openBlock'; key: ApiKeyListItem }
+  | { type: 'closeBlock' }
+  | { type: 'openRevoke'; key: ApiKeyListItem }
+  | { type: 'closeRevoke' }
+  | { type: 'openDelete'; key: ApiKeyListItem }
+  | { type: 'closeDelete' }
+  | { type: 'openUsage'; key: ApiKeyListItem }
+  | { type: 'closeUsage' };
+
+const initialUIState: UIState = {
+  statusFilter: '',
+  permissionFilter: '',
+  page: 1,
+  perPage: 25,
+  createOpen: false,
+  blockingKey: null,
+  revokingKey: null,
+  deletingKey: null,
+  usageKey: null,
+};
+
+function uiReducer(state: UIState, action: UIAction): UIState {
+  switch (action.type) {
+    case 'setStatusFilter':
+      return { ...state, statusFilter: action.value, page: 1 };
+    case 'setPermissionFilter':
+      return { ...state, permissionFilter: action.value, page: 1 };
+    case 'setPage':
+      return { ...state, page: action.value };
+    case 'setPerPage':
+      return { ...state, perPage: action.value, page: 1 };
+    case 'openCreate':
+      return { ...state, createOpen: true };
+    case 'closeCreate':
+      return { ...state, createOpen: false };
+    case 'openBlock':
+      return { ...state, blockingKey: action.key };
+    case 'closeBlock':
+      return { ...state, blockingKey: null };
+    case 'openRevoke':
+      return { ...state, revokingKey: action.key };
+    case 'closeRevoke':
+      return { ...state, revokingKey: null };
+    case 'openDelete':
+      return { ...state, deletingKey: action.key };
+    case 'closeDelete':
+      return { ...state, deletingKey: null };
+    case 'openUsage':
+      return { ...state, usageKey: action.key };
+    case 'closeUsage':
+      return { ...state, usageKey: null };
+    default:
+      return state;
+  }
+}
+
 export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
@@ -56,20 +131,12 @@ export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
 
   const { isMaster, isAdmin, currentSiteRole } = useAuth();
   const { selectedSiteId } = useSiteContext();
-  const [statusFilter, setStatusFilter] = useState<string>('');
-  const [permissionFilter, setPermissionFilter] = useState<string>('');
-  const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(25);
-  const [createOpen, setCreateOpen] = useState(false);
-  const [blockingKey, setBlockingKey] = useState<ApiKeyListItem | null>(null);
-  const [revokingKey, setRevokingKey] = useState<ApiKeyListItem | null>(null);
-  const [deletingKey, setDeletingKey] = useState<ApiKeyListItem | null>(null);
-  const [usageKey, setUsageKey] = useState<ApiKeyListItem | null>(null);
+  const [ui, dispatch] = useReducer(uiReducer, initialUIState);
 
   // Command palette action listener
   useEffect(() => {
     const handler = (e: Event) => {
-      if ((e as CustomEvent).detail === 'create-api-key') setCreateOpen(true);
+      if ((e as CustomEvent).detail === 'create-api-key') dispatch({ type: 'openCreate' });
     };
     window.addEventListener('command-palette:action', handler);
     return () => window.removeEventListener('command-palette:action', handler);
@@ -81,13 +148,13 @@ export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
   });
 
   const { data: apiKeysData, isLoading, error } = useQuery({
-    queryKey: ['apiKeys', statusFilter, permissionFilter, page, perPage, selectedSiteId],
+    queryKey: ['apiKeys', ui.statusFilter, ui.permissionFilter, ui.page, ui.perPage, selectedSiteId],
     queryFn: () => apiService.getApiKeys({
-      status: statusFilter || undefined,
-      permission: permissionFilter || undefined,
+      status: ui.statusFilter || undefined,
+      permission: ui.permissionFilter || undefined,
       site_id: isMaster ? undefined : selectedSiteId || undefined,
-      page,
-      per_page: perPage,
+      page: ui.page,
+      per_page: ui.perPage,
     }),
     enabled: isMaster || !!selectedSiteId,
   });
@@ -100,7 +167,7 @@ export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
     mutationFn: ({ id, reason }: { id: string; reason: string }) => apiService.blockApiKey(id, reason),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['apiKeys'] });
-      setBlockingKey(null);
+      dispatch({ type: 'closeBlock' });
       showSuccess(t('apiKeys.messages.blocked'));
     },
     onError: (error) => { showError(error); },
@@ -119,7 +186,7 @@ export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
     mutationFn: (id: string) => apiService.revokeApiKey(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['apiKeys'] });
-      setRevokingKey(null);
+      dispatch({ type: 'closeRevoke' });
       showSuccess(t('apiKeys.messages.revoked'));
     },
     onError: (error) => { showError(error); },
@@ -129,7 +196,7 @@ export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
     mutationFn: (id: string) => apiService.deleteApiKey(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['apiKeys'] });
-      setDeletingKey(null);
+      dispatch({ type: 'closeDelete' });
       showSuccess(t('apiKeys.messages.deleted'));
     },
     onError: (error) => { showError(error); },
@@ -150,12 +217,12 @@ export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
         <PageHeader
           title={t('apiKeys.title')}
           subtitle={t('apiKeys.subtitle')}
-          action={{ label: t('apiKeys.createButton'), icon: <AddIcon />, onClick: () => setCreateOpen(true), hidden: !isAdmin }}
+          action={{ label: t('apiKeys.createButton'), icon: <AddIcon />, onClick: () => dispatch({ type: 'openCreate' }), hidden: !isAdmin }}
         />
       )}
       {embedded && isAdmin && (
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-          <Button variant="outlined" startIcon={<AddIcon />} onClick={() => setCreateOpen(true)}>
+          <Button variant="outlined" startIcon={<AddIcon />} onClick={() => dispatch({ type: 'openCreate' })}>
             {t('apiKeys.createButton')}
           </Button>
         </Box>
@@ -167,8 +234,8 @@ export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
           select
           label={t('common.filters.status')}
           size="small"
-          value={statusFilter}
-          onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
+          value={ui.statusFilter}
+          onChange={(e) => dispatch({ type: 'setStatusFilter', value: e.target.value })}
           sx={{ minWidth: 140 }}
         >
           <MenuItem value="">{t('apiKeys.filters.allStatuses')}</MenuItem>
@@ -180,8 +247,8 @@ export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
           select
           label={t('common.filters.permission')}
           size="small"
-          value={permissionFilter}
-          onChange={(e) => { setPermissionFilter(e.target.value); setPage(1); }}
+          value={ui.permissionFilter}
+          onChange={(e) => dispatch({ type: 'setPermissionFilter', value: e.target.value })}
           sx={{ minWidth: 140 }}
         >
           <MenuItem value="">{t('apiKeys.filters.allPermissions')}</MenuItem>
@@ -232,11 +299,11 @@ export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
                   <TableCell align="right">
                     <ApiKeyActionsMenu
                       apiKey={key}
-                      onBlock={(k) => setBlockingKey(k)}
+                      onBlock={(k) => dispatch({ type: 'openBlock', key: k })}
                       onUnblock={(k) => unblockMutation.mutate(k.id)}
-                      onRevoke={(k) => setRevokingKey(k)}
-                      onDelete={(k) => setDeletingKey(k)}
-                      onViewUsage={(k) => setUsageKey(k)}
+                      onRevoke={(k) => dispatch({ type: 'openRevoke', key: k })}
+                      onDelete={(k) => dispatch({ type: 'openDelete', key: k })}
+                      onViewUsage={(k) => dispatch({ type: 'openUsage', key: k })}
                     />
                   </TableCell>
                 </TableRow>
@@ -249,9 +316,9 @@ export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
             component="div"
             count={apiKeysData.meta.total_items}
             page={apiKeysData.meta.page - 1}
-            onPageChange={(_, p) => setPage(() => p + 1)}
+            onPageChange={(_, p) => dispatch({ type: 'setPage', value: p + 1 })}
             rowsPerPage={apiKeysData.meta.page_size}
-            onRowsPerPageChange={(e) => { setPerPage(() => +e.target.value); setPage(1); }}
+            onRowsPerPageChange={(e) => dispatch({ type: 'setPerPage', value: +e.target.value })}
             rowsPerPageOptions={[10, 25, 50]}
           />
         )}
@@ -260,56 +327,56 @@ export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
         <EmptyState
           icon={<KeyIcon sx={{ fontSize: 64 }} />}
           title={t('apiKeys.empty.title')}
-          description={statusFilter || permissionFilter ? t('apiKeys.empty.filterHint') : t('apiKeys.empty.description')}
-          action={!statusFilter && !permissionFilter ? { label: t('apiKeys.createButton'), onClick: () => setCreateOpen(true) } : undefined}
+          description={ui.statusFilter || ui.permissionFilter ? t('apiKeys.empty.filterHint') : t('apiKeys.empty.description')}
+          action={!ui.statusFilter && !ui.permissionFilter ? { label: t('apiKeys.createButton'), onClick: () => dispatch({ type: 'openCreate' }) } : undefined}
         />
       )}
 
       <CreateApiKeyDialog
-        open={createOpen}
+        open={ui.createOpen}
         sites={sites || []}
         maxPermission={maxPermissionForRole(currentSiteRole, isMaster)}
         isSystemAdmin={isMaster}
         onSubmit={handleCreateKey}
-        onClose={() => setCreateOpen(false)}
+        onClose={() => dispatch({ type: 'closeCreate' })}
       />
 
       <BlockKeyDialog
-        open={!!blockingKey}
-        keyName={blockingKey?.name || ''}
-        onConfirm={(reason) => blockingKey && blockMutation.mutate({ id: blockingKey.id, reason })}
-        onCancel={() => setBlockingKey(null)}
+        open={!!ui.blockingKey}
+        keyName={ui.blockingKey?.name || ''}
+        onConfirm={(reason) => ui.blockingKey && blockMutation.mutate({ id: ui.blockingKey.id, reason })}
+        onCancel={() => dispatch({ type: 'closeBlock' })}
         loading={blockMutation.isPending}
       />
 
       <ConfirmDialog
-        open={!!revokingKey}
+        open={!!ui.revokingKey}
         title={t('apiKeys.revokeDialog.title')}
-        message={t('apiKeys.revokeDialog.message', { name: revokingKey?.name })}
+        message={t('apiKeys.revokeDialog.message', { name: ui.revokingKey?.name })}
         confirmLabel={t('apiKeys.actionsMenu.revoke')}
         confirmColor="warning"
-        onConfirm={() => revokingKey && revokeMutation.mutate(revokingKey.id)}
-        onCancel={() => setRevokingKey(null)}
+        onConfirm={() => ui.revokingKey && revokeMutation.mutate(ui.revokingKey.id)}
+        onCancel={() => dispatch({ type: 'closeRevoke' })}
         loading={revokeMutation.isPending}
         confirmationText={t('apiKeys.revokeDialog.confirmWord')}
       />
 
       <ConfirmDialog
-        open={!!deletingKey}
+        open={!!ui.deletingKey}
         title={t('apiKeys.deleteDialog.title')}
-        message={t('apiKeys.deleteDialog.message', { name: deletingKey?.name })}
+        message={t('apiKeys.deleteDialog.message', { name: ui.deletingKey?.name })}
         confirmLabel={t('common.actions.delete')}
-        onConfirm={() => deletingKey && deleteMutation.mutate(deletingKey.id)}
-        onCancel={() => setDeletingKey(null)}
+        onConfirm={() => ui.deletingKey && deleteMutation.mutate(ui.deletingKey.id)}
+        onCancel={() => dispatch({ type: 'closeDelete' })}
         loading={deleteMutation.isPending}
         confirmationText={t('common.actions.delete')}
       />
 
       <ApiKeyUsageDialog
-        open={!!usageKey}
-        keyId={usageKey?.id || null}
-        keyName={usageKey?.name || ''}
-        onClose={() => setUsageKey(null)}
+        open={!!ui.usageKey}
+        keyId={ui.usageKey?.id || null}
+        keyName={ui.usageKey?.name || ''}
+        onClose={() => dispatch({ type: 'closeUsage' })}
       />
     </Box>
   );

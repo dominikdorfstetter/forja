@@ -1,37 +1,19 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useReducer, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
   Alert,
-  Grid,
-  Card,
-  CardContent,
-  CardActions,
-  Typography,
-  Chip,
-  IconButton,
-  Tooltip,
   Paper,
+  Typography,
   Divider,
-  TextField,
-  InputAdornment,
-  Stack,
-  TablePagination,
   Tabs,
   Tab,
+  TablePagination,
 } from '@mui/material';
 import PermMediaIcon from '@mui/icons-material/PermMedia';
 import ArticleIcon from '@mui/icons-material/Article';
 import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import ImageIcon from '@mui/icons-material/Image';
-import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
-import VideoFileIcon from '@mui/icons-material/VideoFile';
-import AudioFileIcon from '@mui/icons-material/AudioFile';
-import SearchIcon from '@mui/icons-material/Search';
-import ClearIcon from '@mui/icons-material/Clear';
 import {
   DndContext,
   PointerSensor,
@@ -42,7 +24,6 @@ import {
   type DragEndEvent,
 } from '@dnd-kit/core';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { format } from 'date-fns';
 import apiService from '@/services/api';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import type { MediaListItem, MediaFolder } from '@/types/api';
@@ -55,44 +36,99 @@ import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import MediaUploadDialog from '@/components/media/MediaUploadDialog';
 import MediaDetailDialog from '@/components/media/MediaDetailDialog';
 import FolderTree from '@/components/shared/FolderTree';
-import DraggableMediaCard from '@/components/media/DraggableMediaCard';
 import DocumentsPage, { type DocumentsPageHandle } from '@/pages/Documents';
 import { useSiteContextData } from '@/hooks/useSiteContextData';
+import MediaGrid from '@/components/media/MediaGrid';
+import MediaDragOverlay from '@/components/media/MediaDragOverlay';
+import MediaSearchBar from '@/components/media/MediaSearchBar';
+import MediaFilterChips from '@/components/media/MediaFilterChips';
 
-function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+// --- Reducer ---
+
+interface MediaPageState {
+  assetsTab: number;
+  page: number;
+  perPage: number;
+  uploadOpen: boolean;
+  deletingFile: MediaListItem | null;
+  deletingFolderId: string | null;
+  detailFile: MediaListItem | null;
+  selectedFolderId: string | null;
+  activeId: string | null;
+  searchInput: string;
+  debouncedSearch: string;
+  mimeCategory: string | null;
 }
 
-function getMimeIcon(mimeType: string) {
-  if (mimeType.startsWith('image/')) return <ImageIcon sx={{ fontSize: 48 }} color="primary" />;
-  if (mimeType.startsWith('video/')) return <VideoFileIcon sx={{ fontSize: 48 }} color="secondary" />;
-  if (mimeType.startsWith('audio/')) return <AudioFileIcon sx={{ fontSize: 48 }} color="info" />;
-  return <InsertDriveFileIcon sx={{ fontSize: 48 }} color="action" />;
-}
+type MediaPageAction =
+  | { type: 'SET_ASSETS_TAB'; payload: number }
+  | { type: 'SET_PAGE'; payload: number }
+  | { type: 'SET_PER_PAGE'; payload: number }
+  | { type: 'SET_UPLOAD_OPEN'; payload: boolean }
+  | { type: 'SET_DELETING_FILE'; payload: MediaListItem | null }
+  | { type: 'SET_DELETING_FOLDER_ID'; payload: string | null }
+  | { type: 'SET_DETAIL_FILE'; payload: MediaListItem | null }
+  | { type: 'SET_SELECTED_FOLDER'; payload: string | null }
+  | { type: 'SET_ACTIVE_ID'; payload: string | null }
+  | { type: 'SET_SEARCH_INPUT'; payload: string }
+  | { type: 'SET_DEBOUNCED_SEARCH'; payload: string }
+  | { type: 'SET_MIME_CATEGORY'; payload: string | null }
+  | { type: 'SELECT_FOLDER'; payload: string | null }
+  | { type: 'TOGGLE_MIME_CATEGORY'; payload: string };
 
-function getMimeChipColor(mimeType: string): 'primary' | 'secondary' | 'info' | 'warning' | 'default' {
-  if (mimeType.startsWith('image/')) return 'primary';
-  if (mimeType.startsWith('video/')) return 'secondary';
-  if (mimeType.startsWith('audio/')) return 'info';
-  if (mimeType.startsWith('application/')) return 'warning';
-  return 'default';
-}
+const initialState: MediaPageState = {
+  assetsTab: 0,
+  page: 1,
+  perPage: 25,
+  uploadOpen: false,
+  deletingFile: null,
+  deletingFolderId: null,
+  detailFile: null,
+  selectedFolderId: null,
+  activeId: null,
+  searchInput: '',
+  debouncedSearch: '',
+  mimeCategory: null,
+};
 
-function getMimeSmallIcon(mimeType: string) {
-  if (mimeType.startsWith('image/')) return <ImageIcon fontSize="small" color="primary" />;
-  if (mimeType.startsWith('video/')) return <VideoFileIcon fontSize="small" color="secondary" />;
-  if (mimeType.startsWith('audio/')) return <AudioFileIcon fontSize="small" color="info" />;
-  return <InsertDriveFileIcon fontSize="small" color="action" />;
+function mediaReducer(state: MediaPageState, action: MediaPageAction): MediaPageState {
+  switch (action.type) {
+    case 'SET_ASSETS_TAB':
+      return { ...state, assetsTab: action.payload };
+    case 'SET_PAGE':
+      return { ...state, page: action.payload };
+    case 'SET_PER_PAGE':
+      return { ...state, perPage: action.payload, page: 1 };
+    case 'SET_UPLOAD_OPEN':
+      return { ...state, uploadOpen: action.payload };
+    case 'SET_DELETING_FILE':
+      return { ...state, deletingFile: action.payload };
+    case 'SET_DELETING_FOLDER_ID':
+      return { ...state, deletingFolderId: action.payload };
+    case 'SET_DETAIL_FILE':
+      return { ...state, detailFile: action.payload };
+    case 'SET_SELECTED_FOLDER':
+      return { ...state, selectedFolderId: action.payload };
+    case 'SET_ACTIVE_ID':
+      return { ...state, activeId: action.payload };
+    case 'SET_SEARCH_INPUT':
+      return { ...state, searchInput: action.payload };
+    case 'SET_DEBOUNCED_SEARCH':
+      return { ...state, debouncedSearch: action.payload };
+    case 'SET_MIME_CATEGORY':
+      return { ...state, mimeCategory: action.payload };
+    case 'SELECT_FOLDER':
+      return { ...state, selectedFolderId: action.payload, page: 1 };
+    case 'TOGGLE_MIME_CATEGORY':
+      return {
+        ...state,
+        mimeCategory: state.mimeCategory === action.payload ? null : action.payload,
+        page: 1,
+      };
+    default:
+      return state;
+  }
 }
-
-const MIME_CATEGORIES = [
-  { key: 'image', labelKey: 'media.categories.images', icon: <ImageIcon fontSize="small" /> },
-  { key: 'video', labelKey: 'media.categories.videos', icon: <VideoFileIcon fontSize="small" /> },
-  { key: 'audio', labelKey: 'media.categories.audio', icon: <AudioFileIcon fontSize="small" /> },
-  { key: 'document', labelKey: 'media.categories.documents', icon: <InsertDriveFileIcon fontSize="small" /> },
-] as const;
 
 export default function MediaPage() {
   const { t } = useTranslation();
@@ -103,51 +139,38 @@ export default function MediaPage() {
   const { modules } = useSiteContextData();
 
   const documentsRef = useRef<DocumentsPageHandle>(null);
-  const [assetsTab, setAssetsTab] = useState(0);
-  const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(25);
-  const [uploadOpen, setUploadOpen] = useState(false);
-  const [deletingFile, setDeletingFile] = useState<MediaListItem | null>(null);
-  const [deletingFolderId, setDeletingFolderId] = useState<string | null>(null);
-  const [detailFile, setDetailFile] = useState<MediaListItem | null>(null);
-  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
-  const [activeId, setActiveId] = useState<string | null>(null);
+  const [state, dispatch] = useReducer(mediaReducer, initialState);
 
   // Command palette action listener
   useEffect(() => {
     const handler = (e: Event) => {
-      if ((e as CustomEvent).detail === 'upload-media') setUploadOpen(true);
+      if ((e as CustomEvent).detail === 'upload-media') dispatch({ type: 'SET_UPLOAD_OPEN', payload: true });
     };
     window.addEventListener('command-palette:action', handler);
     return () => window.removeEventListener('command-palette:action', handler);
   }, []);
 
-  // Search & filter state
-  const [searchInput, setSearchInput] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [mimeCategory, setMimeCategory] = useState<string | null>(null);
-
   // 300ms debounce for search input
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(searchInput), 300);
+    const timer = setTimeout(() => dispatch({ type: 'SET_DEBOUNCED_SEARCH', payload: state.searchInput }), 300);
     return () => clearTimeout(timer);
-  }, [searchInput]);
+  }, [state.searchInput]);
 
   // Reset page when search query changes
-  const prevSearchRef = useRef(debouncedSearch);
-  if (prevSearchRef.current !== debouncedSearch) {
-    prevSearchRef.current = debouncedSearch;
-    setPage(1);
+  const prevSearchRef = useRef(state.debouncedSearch);
+  if (prevSearchRef.current !== state.debouncedSearch) {
+    prevSearchRef.current = state.debouncedSearch;
+    dispatch({ type: 'SET_PAGE', payload: 1 });
   }
 
   // Build query params for server-side filtering
-  const queryParams: Record<string, string | number> = { page, per_page: perPage };
-  if (debouncedSearch) queryParams.search = debouncedSearch;
-  if (mimeCategory) queryParams.mime_category = mimeCategory;
-  if (selectedFolderId) queryParams.folder_id = selectedFolderId;
+  const queryParams: Record<string, string | number> = { page: state.page, per_page: state.perPage };
+  if (state.debouncedSearch) queryParams.search = state.debouncedSearch;
+  if (state.mimeCategory) queryParams.mime_category = state.mimeCategory;
+  if (state.selectedFolderId) queryParams.folder_id = state.selectedFolderId;
 
   const { data: mediaData, isLoading, error } = useQuery({
-    queryKey: ['media', selectedSiteId, debouncedSearch, mimeCategory, selectedFolderId, page, perPage],
+    queryKey: ['media', selectedSiteId, state.debouncedSearch, state.mimeCategory, state.selectedFolderId, state.page, state.perPage],
     queryFn: () => apiService.getMedia(selectedSiteId, queryParams),
     enabled: !!selectedSiteId,
   });
@@ -169,16 +192,16 @@ export default function MediaPage() {
       apiService.uploadMediaFile(
         file,
         [selectedSiteId],
-        selectedFolderId ?? undefined,
+        state.selectedFolderId ?? undefined,
         isGlobal,
       ),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['media'] }); setUploadOpen(false); showSuccess(t('media.upload.success')); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['media'] }); dispatch({ type: 'SET_UPLOAD_OPEN', payload: false }); showSuccess(t('media.upload.success')); },
     onError: (error) => { showError(error); },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => apiService.deleteMedia(id),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['media'] }); setDeletingFile(null); showSuccess(t('media.messages.deleted')); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['media'] }); dispatch({ type: 'SET_DELETING_FILE', payload: null }); showSuccess(t('media.messages.deleted')); },
     onError: (error) => { showError(error); },
   });
 
@@ -209,7 +232,7 @@ export default function MediaPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['media-folders'] });
       queryClient.invalidateQueries({ queryKey: ['media'] });
-      if (selectedFolderId) setSelectedFolderId(null);
+      if (state.selectedFolderId) dispatch({ type: 'SET_SELECTED_FOLDER', payload: null });
       showSuccess(t('media.messages.folderDeleted'));
     },
     onError: (error) => { showError(error); },
@@ -222,14 +245,14 @@ export default function MediaPage() {
     display_order: f.display_order,
   }));
 
-  const hasActiveFilters = !!debouncedSearch || !!mimeCategory || !!selectedFolderId;
+  const hasActiveFilters = !!state.debouncedSearch || !!state.mimeCategory || !!state.selectedFolderId;
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
-    setActiveId(event.active.id as string);
+    dispatch({ type: 'SET_ACTIVE_ID', payload: event.active.id as string });
   }, []);
 
   const handleDragEnd = useCallback((event: DragEndEvent) => {
-    setActiveId(null);
+    dispatch({ type: 'SET_ACTIVE_ID', payload: null });
     const { active, over } = event;
     if (!over) return;
 
@@ -247,12 +270,12 @@ export default function MediaPage() {
     });
   }, [mediaFiles, moveToFolderMutation]);
 
-  const activeFile = activeId ? mediaFiles.find((f) => f.id === activeId) : null;
+  const activeFile = state.activeId ? mediaFiles.find((f) => f.id === state.activeId) : null;
 
   // Determine the PageHeader action based on which tab is active
   const headerAction = selectedSiteId && canWrite
-    ? assetsTab === 0
-      ? { label: t('media.uploadButton'), icon: <AddIcon />, onClick: () => setUploadOpen(true) }
+    ? state.assetsTab === 0
+      ? { label: t('media.uploadButton'), icon: <AddIcon />, onClick: () => dispatch({ type: 'SET_UPLOAD_OPEN', payload: true }) }
       : { label: t('documents.createButton'), icon: <AddIcon />, onClick: () => documentsRef.current?.openCreate() }
     : undefined;
 
@@ -260,20 +283,20 @@ export default function MediaPage() {
     <Box data-testid="media.page">
       <PageHeader
         title={t('layout.sidebar.assets')}
-        subtitle={assetsTab === 0 ? t('media.subtitle') : t('documents.subtitle')}
+        subtitle={state.assetsTab === 0 ? t('media.subtitle') : t('documents.subtitle')}
         action={headerAction}
       />
 
       {modules.documents && (
-        <Tabs value={assetsTab} onChange={(_, v) => setAssetsTab(v)} sx={{ mb: 3 }}>
+        <Tabs value={state.assetsTab} onChange={(_, v) => dispatch({ type: 'SET_ASSETS_TAB', payload: v })} sx={{ mb: 3 }}>
           <Tab icon={<PermMediaIcon />} iconPosition="start" label={t('layout.sidebar.media')} />
           <Tab icon={<ArticleIcon />} iconPosition="start" label={t('layout.sidebar.documents')} />
         </Tabs>
       )}
 
-      {modules.documents && assetsTab === 1 && <DocumentsPage ref={documentsRef} embedded />}
+      {modules.documents && state.assetsTab === 1 && <DocumentsPage ref={documentsRef} embedded />}
 
-      {assetsTab === 0 && (<>
+      {state.assetsTab === 0 && (<>
 
       {!selectedSiteId ? (
         <EmptyState icon={<ImageIcon sx={{ fontSize: 64 }} />} title={t('common.noSiteSelected')} description={t('media.empty.noSite')} />
@@ -305,11 +328,11 @@ export default function MediaPage() {
               <Divider />
               <FolderTree
                 folders={folderItems}
-                selectedFolderId={selectedFolderId}
-                onSelectFolder={(id) => { setSelectedFolderId(id); setPage(1); }}
+                selectedFolderId={state.selectedFolderId}
+                onSelectFolder={(id) => dispatch({ type: 'SELECT_FOLDER', payload: id })}
                 onCreateFolder={(name) => createFolderMutation.mutate(name)}
                 onRenameFolder={(id, name) => renameFolderMutation.mutate({ id, name })}
-                onDeleteFolder={(id) => setDeletingFolderId(id)}
+                onDeleteFolder={(id) => dispatch({ type: 'SET_DELETING_FOLDER_ID', payload: id })}
                 canWrite={canWrite}
                 droppable={canWrite}
               />
@@ -317,158 +340,35 @@ export default function MediaPage() {
 
             {/* Main content */}
             <Box sx={{ flex: 1, minWidth: 0 }}>
-              {/* Search bar */}
-              <TextField
-                fullWidth
-                size="small"
-                placeholder={t('media.searchPlaceholder')}
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon color="action" />
-                    </InputAdornment>
-                  ),
-                  endAdornment: searchInput ? (
-                    <InputAdornment position="end">
-                      <IconButton size="small" onClick={() => setSearchInput('')} edge="end">
-                        <ClearIcon fontSize="small" />
-                      </IconButton>
-                    </InputAdornment>
-                  ) : null,
-                }}
-                sx={{ mb: 2 }}
+              <MediaSearchBar
+                searchInput={state.searchInput}
+                onSearchChange={(value) => dispatch({ type: 'SET_SEARCH_INPUT', payload: value })}
               />
 
-              {/* MIME category filter chips */}
-              <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-                {MIME_CATEGORIES.map((cat) => (
-                  <Chip
-                    key={cat.key}
-                    icon={cat.icon}
-                    label={t(cat.labelKey)}
-                    variant={mimeCategory === cat.key ? 'filled' : 'outlined'}
-                    color={mimeCategory === cat.key ? 'primary' : 'default'}
-                    onClick={() => { setMimeCategory(mimeCategory === cat.key ? null : cat.key); setPage(1); }}
-                    size="small"
-                  />
-                ))}
-              </Stack>
+              <MediaFilterChips
+                mimeCategory={state.mimeCategory}
+                onToggleCategory={(key) => dispatch({ type: 'TOGGLE_MIME_CATEGORY', payload: key })}
+              />
 
-              {/* Media grid */}
-              {mediaFiles.length === 0 ? (
-                <EmptyState
-                  icon={<ImageIcon sx={{ fontSize: 64 }} />}
-                  title={hasActiveFilters ? t('media.empty.noMatch') : t('media.empty.title')}
-                  description={
-                    hasActiveFilters
-                      ? t('media.empty.noMatchDescription')
-                      : selectedFolderId
-                        ? t('media.empty.noFilesInFolder')
-                        : t('media.empty.description')
-                  }
-                  action={!hasActiveFilters && !selectedFolderId && canWrite ? { label: t('media.uploadButton'), onClick: () => setUploadOpen(true) } : undefined}
-                />
-              ) : (
-                <Grid container spacing={2}>
-                  {mediaFiles.map((file) => (
-                    <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={file.id}>
-                      <DraggableMediaCard file={file}>
-                        <Card
-                          sx={{
-                            height: '100%',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            transition: 'box-shadow 0.2s, transform 0.2s',
-                            '&:hover': {
-                              boxShadow: 6,
-                              transform: 'translateY(-2px)',
-                            },
-                            '&:hover .media-actions': { opacity: 1 },
-                          }}
-                        >
-                          <Box
-                            sx={{
-                              display: 'flex',
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                              pt: 2,
-                            }}
-                          >
-                            {file.public_url && file.mime_type.startsWith('image/') ? (
-                              <Box component="img" src={file.public_url} alt={file.filename} sx={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 1 }} />
-                            ) : (
-                              getMimeIcon(file.mime_type)
-                            )}
-                          </Box>
-                          <CardContent sx={{ pb: 0, flexGrow: 1 }}>
-                            <Typography variant="body2" noWrap title={file.original_filename}>{file.original_filename}</Typography>
-                            <Typography variant="caption" color="text.secondary" display="block" noWrap sx={{ mt: 0.5 }}>
-                              {formatFileSize(file.file_size)}
-                            </Typography>
-                            <Box sx={{ display: 'flex', gap: 0.5, mt: 1, flexWrap: 'wrap' }}>
-                              <Chip
-                                label={file.mime_type.split('/')[1]}
-                                size="small"
-                                variant="outlined"
-                                color={getMimeChipColor(file.mime_type)}
-                              />
-                              {file.width && file.height && (
-                                <Chip
-                                  label={`${file.width}x${file.height}`}
-                                  size="small"
-                                  variant="outlined"
-                                />
-                              )}
-                            </Box>
-                            <Typography variant="caption" color="text.disabled" display="block" sx={{ mt: 0.5 }}>{format(new Date(file.created_at), 'PP')}</Typography>
-                          </CardContent>
-                          {(canWrite || isAdmin) && (
-                            <CardActions
-                              className="media-actions"
-                              sx={{
-                                justifyContent: 'flex-end',
-                                pt: 0,
-                                opacity: 0,
-                                transition: 'opacity 0.15s',
-                              }}
-                            >
-                              <Tooltip title={t('common.actions.edit')}>
-                                <IconButton size="small" aria-label={t('common.actions.edit')} onClick={() => setDetailFile(file)}>
-                                  <EditIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                              {file.public_url && (
-                                <Tooltip title={t('media.openUrl')}>
-                                  <IconButton size="small" aria-label={t('media.openUrl')} color="primary" onClick={() => window.open(file.public_url!, '_blank')}>
-                                    <OpenInNewIcon fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                              )}
-                              {isAdmin && (
-                                <Tooltip title={t('common.actions.delete')}>
-                                  <IconButton size="small" aria-label={t('common.actions.delete')} color="error" onClick={() => setDeletingFile(file)}>
-                                    <DeleteIcon fontSize="small" />
-                                  </IconButton>
-                                </Tooltip>
-                              )}
-                            </CardActions>
-                          )}
-                        </Card>
-                      </DraggableMediaCard>
-                    </Grid>
-                  ))}
-                </Grid>
-              )}
+              <MediaGrid
+                mediaFiles={mediaFiles}
+                hasActiveFilters={hasActiveFilters}
+                selectedFolderId={state.selectedFolderId}
+                canWrite={canWrite}
+                isAdmin={isAdmin}
+                onUploadClick={() => dispatch({ type: 'SET_UPLOAD_OPEN', payload: true })}
+                onEditFile={(file) => dispatch({ type: 'SET_DETAIL_FILE', payload: file })}
+                onDeleteFile={(file) => dispatch({ type: 'SET_DELETING_FILE', payload: file })}
+              />
+
               {mediaData?.meta && (
                 <TablePagination
                   component="div"
                   count={mediaData.meta.total_items}
                   page={mediaData.meta.page - 1}
-                  onPageChange={(_, p) => setPage(() => p + 1)}
+                  onPageChange={(_, p) => dispatch({ type: 'SET_PAGE', payload: p + 1 })}
                   rowsPerPage={mediaData.meta.page_size}
-                  onRowsPerPageChange={(e) => { setPerPage(() => +e.target.value); setPage(1); }}
+                  onRowsPerPageChange={(e) => dispatch({ type: 'SET_PER_PAGE', payload: +e.target.value })}
                   rowsPerPageOptions={[10, 25, 50]}
                 />
               )}
@@ -476,42 +376,22 @@ export default function MediaPage() {
           </Box>
 
           <DragOverlay dropAnimation={{ duration: 200, easing: 'ease' }}>
-            {activeFile ? (
-              <Paper
-                elevation={12}
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  px: 2,
-                  py: 1,
-                  borderRadius: 2,
-                  bgcolor: 'background.paper',
-                  border: '1px solid',
-                  borderColor: 'primary.main',
-                  maxWidth: 220,
-                  pointerEvents: 'none',
-                }}
-              >
-                {getMimeSmallIcon(activeFile.mime_type)}
-                <Typography variant="body2" fontWeight={500} noWrap>{activeFile.original_filename}</Typography>
-              </Paper>
-            ) : null}
+            {activeFile ? <MediaDragOverlay file={activeFile} /> : null}
           </DragOverlay>
         </DndContext>
       )}
 
       <MediaUploadDialog
-        open={uploadOpen}
+        open={state.uploadOpen}
         onSubmit={async (file, isGlobal) => {
           await uploadMutation.mutateAsync({ file, isGlobal });
         }}
-        onClose={() => setUploadOpen(false)}
+        onClose={() => dispatch({ type: 'SET_UPLOAD_OPEN', payload: false })}
         loading={uploadMutation.isPending}
       />
-      <MediaDetailDialog open={!!detailFile} media={detailFile} folders={folders} onClose={() => setDetailFile(null)} />
-      <ConfirmDialog open={!!deletingFile} title={t('media.deleteDialog.title')} message={t('media.deleteDialog.message', { filename: deletingFile?.original_filename })} confirmLabel={t('common.actions.delete')} onConfirm={() => deletingFile && deleteMutation.mutate(deletingFile.id)} onCancel={() => setDeletingFile(null)} loading={deleteMutation.isPending} confirmationText={t('common.actions.delete')} />
-      <ConfirmDialog open={!!deletingFolderId} title={t('media.deleteFolderDialog.title')} message={t('media.deleteFolderDialog.message')} confirmLabel={t('common.actions.delete')} onConfirm={() => { if (deletingFolderId) { deleteFolderMutation.mutate(deletingFolderId); setDeletingFolderId(null); } }} onCancel={() => setDeletingFolderId(null)} confirmationText={t('common.actions.delete')} />
+      <MediaDetailDialog open={!!state.detailFile} media={state.detailFile} folders={folders} onClose={() => dispatch({ type: 'SET_DETAIL_FILE', payload: null })} />
+      <ConfirmDialog open={!!state.deletingFile} title={t('media.deleteDialog.title')} message={t('media.deleteDialog.message', { filename: state.deletingFile?.original_filename })} confirmLabel={t('common.actions.delete')} onConfirm={() => state.deletingFile && deleteMutation.mutate(state.deletingFile.id)} onCancel={() => dispatch({ type: 'SET_DELETING_FILE', payload: null })} loading={deleteMutation.isPending} confirmationText={t('common.actions.delete')} />
+      <ConfirmDialog open={!!state.deletingFolderId} title={t('media.deleteFolderDialog.title')} message={t('media.deleteFolderDialog.message')} confirmLabel={t('common.actions.delete')} onConfirm={() => { if (state.deletingFolderId) { deleteFolderMutation.mutate(state.deletingFolderId); dispatch({ type: 'SET_DELETING_FOLDER_ID', payload: null }); } }} onCancel={() => dispatch({ type: 'SET_DELETING_FOLDER_ID', payload: null })} confirmationText={t('common.actions.delete')} />
       </>)}
     </Box>
   );

@@ -1,73 +1,126 @@
-import { useState, useRef, useCallback } from 'react';
+import { useReducer, useRef } from 'react';
 import {
-  alpha,
   Box,
   Button,
-  Card,
-  CardActionArea,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  IconButton,
-  InputAdornment,
   Step,
   StepLabel,
   Stepper,
-  TextField,
-  Typography,
-  Alert,
-  useTheme,
 } from '@mui/material';
-import CreateIcon from '@mui/icons-material/Create';
-import DescriptionIcon from '@mui/icons-material/Description';
-import UploadFileIcon from '@mui/icons-material/UploadFile';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import SearchIcon from '@mui/icons-material/Search';
-import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import ArticleIcon from '@mui/icons-material/Article';
-import SchoolIcon from '@mui/icons-material/School';
-import NewReleasesIcon from '@mui/icons-material/NewReleases';
-import RateReviewIcon from '@mui/icons-material/RateReview';
-import CampaignIcon from '@mui/icons-material/Campaign';
-import CodeIcon from '@mui/icons-material/Code';
-import BuildIcon from '@mui/icons-material/Build';
-import LightbulbIcon from '@mui/icons-material/Lightbulb';
-import StarIcon from '@mui/icons-material/Star';
-import AnnouncementIcon from '@mui/icons-material/Announcement';
 import { useTranslation } from 'react-i18next';
 import type { CreateContentTemplateRequest } from '@/types/api';
-import { validateMarkdownFile, parseMarkdown, type MarkdownParseResult } from '@/utils/markdownImport';
-import { blogTemplates, type BlogTemplate } from '@/data/blogTemplates';
+import type { MarkdownParseResult } from '@/utils/markdownImport';
+import { blogTemplates } from '@/data/blogTemplates';
+import TemplateWizardMethodStep from './TemplateWizardMethodStep';
+import TemplateWizardScratchStep from './TemplateWizardScratchStep';
+import TemplateWizardTemplateStep from './TemplateWizardTemplateStep';
+import TemplateWizardImportStep from './TemplateWizardImportStep';
 
 type CreationMethod = 'scratch' | 'template' | 'import';
 
 const STEP_KEYS = ['contentTemplates.wizard.steps.method', 'contentTemplates.wizard.steps.details'] as const;
 
-const iconMap: Record<string, typeof ArticleIcon> = {
-  Article: ArticleIcon,
-  School: SchoolIcon,
-  NewReleases: NewReleasesIcon,
-  RateReview: RateReviewIcon,
-  Campaign: CampaignIcon,
-  Code: CodeIcon,
-  Build: BuildIcon,
-  Lightbulb: LightbulbIcon,
-  Star: StarIcon,
-  Announcement: AnnouncementIcon,
-};
+// --- Reducer ---
 
-interface MergedTemplate {
-  id: string;
+interface WizardState {
+  activeStep: number;
+  method: CreationMethod | null;
+  // Template
+  selectedTemplate: string | null;
+  templateSearch: string;
+  templatePage: number;
+  // Import
+  dragOver: boolean;
+  importError: string | null;
+  fileName: string;
+  fileSize: number;
+  parsed: MarkdownParseResult | null;
+  // Scratch
   name: string;
-  description: string;
-  icon: string;
-  bodyPreview: string;
-  builtin: BlogTemplate;
+  slugPrefix: string;
+  body: string;
+  // Import edit fields
+  editName: string;
+  editSlugPrefix: string;
+  editBody: string;
 }
 
-const ITEMS_PER_PAGE = 4;
+type WizardAction =
+  | { type: 'RESET' }
+  | { type: 'SELECT_METHOD'; method: CreationMethod }
+  | { type: 'GO_BACK' }
+  | { type: 'SET_SELECTED_TEMPLATE'; value: string }
+  | { type: 'SET_TEMPLATE_SEARCH'; value: string }
+  | { type: 'SET_TEMPLATE_PAGE'; value: number }
+  | { type: 'SET_DRAG_OVER'; value: boolean }
+  | { type: 'SET_IMPORT_ERROR'; value: string | null }
+  | { type: 'SET_FILE_NAME'; value: string }
+  | { type: 'SET_FILE_SIZE'; value: number }
+  | { type: 'SET_PARSED'; result: MarkdownParseResult; editName: string; editSlugPrefix: string; editBody: string }
+  | { type: 'SET_NAME'; value: string }
+  | { type: 'SET_SLUG_PREFIX'; value: string }
+  | { type: 'SET_BODY'; value: string }
+  | { type: 'SET_EDIT_NAME'; value: string }
+  | { type: 'SET_EDIT_SLUG_PREFIX'; value: string };
+
+const initialWizardState: WizardState = {
+  activeStep: 0,
+  method: null,
+  selectedTemplate: null,
+  templateSearch: '',
+  templatePage: 0,
+  dragOver: false,
+  importError: null,
+  fileName: '',
+  fileSize: 0,
+  parsed: null,
+  name: '',
+  slugPrefix: 'post',
+  body: '',
+  editName: '',
+  editSlugPrefix: '',
+  editBody: '',
+};
+
+function wizardReducer(state: WizardState, action: WizardAction): WizardState {
+  switch (action.type) {
+    case 'RESET':
+      return initialWizardState;
+    case 'SELECT_METHOD':
+      return { ...state, method: action.method, activeStep: 1 };
+    case 'GO_BACK':
+      return { ...state, activeStep: 0, method: null };
+    case 'SET_SELECTED_TEMPLATE':
+      return { ...state, selectedTemplate: action.value || null };
+    case 'SET_TEMPLATE_SEARCH':
+      return { ...state, templateSearch: action.value, templatePage: 0, selectedTemplate: null };
+    case 'SET_TEMPLATE_PAGE':
+      return { ...state, templatePage: action.value };
+    case 'SET_DRAG_OVER':
+      return { ...state, dragOver: action.value };
+    case 'SET_IMPORT_ERROR':
+      return { ...state, importError: action.value };
+    case 'SET_FILE_NAME':
+      return { ...state, fileName: action.value };
+    case 'SET_FILE_SIZE':
+      return { ...state, fileSize: action.value };
+    case 'SET_PARSED':
+      return { ...state, parsed: action.result, editName: action.editName, editSlugPrefix: action.editSlugPrefix, editBody: action.editBody };
+    case 'SET_NAME':
+      return { ...state, name: action.value };
+    case 'SET_SLUG_PREFIX':
+      return { ...state, slugPrefix: action.value };
+    case 'SET_BODY':
+      return { ...state, body: action.value };
+    case 'SET_EDIT_NAME':
+      return { ...state, editName: action.value };
+    case 'SET_EDIT_SLUG_PREFIX':
+      return { ...state, editSlugPrefix: action.value };
+  }
+}
 
 interface CreateTemplateWizardProps {
   open: boolean;
@@ -78,115 +131,22 @@ interface CreateTemplateWizardProps {
 
 export default function CreateTemplateWizard({ open, onClose, onSubmit, loading }: CreateTemplateWizardProps) {
   const { t } = useTranslation();
-  const theme = useTheme();
-
-  const [activeStep, setActiveStep] = useState(0);
-  const [method, setMethod] = useState<CreationMethod | null>(null);
-
-  // Template state
-  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
-  const [templateSearch, setTemplateSearch] = useState('');
-  const [templatePage, setTemplatePage] = useState(0);
-
-  // Import state
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [dragOver, setDragOver] = useState(false);
-  const [importError, setImportError] = useState<string | null>(null);
-  const [fileName, setFileName] = useState('');
-  const [fileSize, setFileSize] = useState(0);
-  const [parsed, setParsed] = useState<MarkdownParseResult | null>(null);
-
-  // Scratch form state
-  const [name, setName] = useState('');
-  const [slugPrefix, setSlugPrefix] = useState('post');
-  const [body, setBody] = useState('');
-
-  // Shared editable fields for import/template prefill
-  const [editName, setEditName] = useState('');
-  const [editSlugPrefix, setEditSlugPrefix] = useState('');
-  const [editBody, setEditBody] = useState('');
+  const [state, dispatch] = useReducer(wizardReducer, initialWizardState);
 
   // Reset all state when dialog opens
   const prevOpenRef = useRef(false);
   if (open && !prevOpenRef.current) {
-    setActiveStep(0);
-    setMethod(null);
-    setSelectedTemplate(null);
-    setTemplateSearch('');
-    setTemplatePage(0);
-    setDragOver(false);
-    setImportError(null);
-    setFileName('');
-    setFileSize(0);
-    setParsed(null);
-    setName('');
-    setSlugPrefix('post');
-    setBody('');
-    setEditName('');
-    setEditSlugPrefix('');
-    setEditBody('');
+    dispatch({ type: 'RESET' });
   }
   prevOpenRef.current = open;
 
-  // --- Template helpers ---
-  const mergedTemplates: MergedTemplate[] = blogTemplates.map((tpl) => ({
-    id: tpl.id,
-    name: t(tpl.nameKey),
-    description: t(tpl.descriptionKey),
-    icon: tpl.icon,
-    bodyPreview: tpl.content.body.trimStart().slice(0, 100),
-    builtin: tpl,
-  }));
-
-  const filteredTemplates = (() => {
-    if (!templateSearch.trim()) return mergedTemplates;
-    const q = templateSearch.toLowerCase();
-    return mergedTemplates.filter(
-      (tpl) => tpl.name.toLowerCase().includes(q) || tpl.description.toLowerCase().includes(q),
-    );
-  })();
-
-  const totalTemplatePages = Math.max(1, Math.ceil(filteredTemplates.length / ITEMS_PER_PAGE));
-  const currentTemplatePage = Math.min(templatePage, totalTemplatePages - 1);
-  const pageTemplateItems = filteredTemplates.slice(currentTemplatePage * ITEMS_PER_PAGE, (currentTemplatePage + 1) * ITEMS_PER_PAGE);
-
-  // --- Import helpers ---
-  const processFile = useCallback(async (file: File) => {
-    setImportError(null);
-    const validationError = validateMarkdownFile(file);
-    if (validationError) {
-      setImportError(t(validationError));
-      return;
-    }
-    setFileName(file.name);
-    setFileSize(file.size);
-    let content: string;
-    try {
-      content = await file.text();
-    } catch {
-      setImportError(t('markdownImport.errors.readFailed'));
-      return;
-    }
-    const { result, error: parseError } = parseMarkdown(content);
-    if (parseError) {
-      setImportError(t(parseError, { max: parseError.includes('title') ? 500 : 200000 }));
-      return;
-    }
-    if (result) {
-      setParsed(result);
-      setEditName(result.title);
-      setEditSlugPrefix(result.slug.replace(/-\d+$/, ''));
-      setEditBody(result.body);
-    }
-  }, [t]);
-
   // --- Confirm handlers ---
   const handleScratchSubmit = () => {
-    if (!name.trim()) return;
+    if (!state.name.trim()) return;
     onSubmit({
-      name: name.trim(),
-      slug_prefix: slugPrefix || 'post',
-      body: body || undefined,
+      name: state.name.trim(),
+      slug_prefix: state.slugPrefix || 'post',
+      body: state.body || undefined,
       icon: 'Article',
       is_featured: false,
       allow_comments: true,
@@ -194,63 +154,54 @@ export default function CreateTemplateWizard({ open, onClose, onSubmit, loading 
   };
 
   const handleTemplateConfirm = () => {
-    const tpl = mergedTemplates.find((t) => t.id === selectedTemplate);
+    const tpl = blogTemplates.find((bt) => bt.id === state.selectedTemplate);
     if (!tpl) return;
-    const bt = tpl.builtin;
     onSubmit({
-      name: tpl.name,
-      description: tpl.description,
+      name: t(tpl.nameKey),
+      description: t(tpl.descriptionKey),
       icon: tpl.icon,
-      slug_prefix: bt.defaults.slug,
-      is_featured: bt.defaults.is_featured,
-      allow_comments: bt.defaults.allow_comments,
-      title: bt.content.title,
-      subtitle: bt.content.subtitle,
-      excerpt: bt.content.excerpt,
-      body: bt.content.body,
-      meta_title: bt.content.meta_title,
-      meta_description: bt.content.meta_description,
+      slug_prefix: tpl.defaults.slug,
+      is_featured: tpl.defaults.is_featured,
+      allow_comments: tpl.defaults.allow_comments,
+      title: tpl.content.title,
+      subtitle: tpl.content.subtitle,
+      excerpt: tpl.content.excerpt,
+      body: tpl.content.body,
+      meta_title: tpl.content.meta_title,
+      meta_description: tpl.content.meta_description,
     });
   };
 
   const handleImportConfirm = () => {
-    if (!parsed || !editName.trim()) return;
+    if (!state.parsed || !state.editName.trim()) return;
     onSubmit({
-      name: editName.trim(),
-      slug_prefix: editSlugPrefix || 'post',
-      body: editBody,
-      title: parsed.title,
-      excerpt: parsed.excerpt,
-      meta_title: parsed.meta_title,
+      name: state.editName.trim(),
+      slug_prefix: state.editSlugPrefix || 'post',
+      body: state.editBody,
+      title: state.parsed.title,
+      excerpt: state.parsed.excerpt,
+      meta_title: state.parsed.meta_title,
       icon: 'Article',
       is_featured: false,
       allow_comments: true,
     });
   };
 
-  // --- Step navigation ---
-  const handleMethodSelect = (m: CreationMethod) => {
-    setMethod(m);
-    setActiveStep(1);
+  const handleParsed = (result: MarkdownParseResult) => {
+    dispatch({
+      type: 'SET_PARSED',
+      result,
+      editName: result.title,
+      editSlugPrefix: result.slug.replace(/-\d+$/, ''),
+      editBody: result.body,
+    });
   };
-
-  const handleBack = () => {
-    setActiveStep(0);
-    setMethod(null);
-  };
-
-  // --- Method cards for Step 0 ---
-  const methodCards: { key: CreationMethod; icon: React.ReactNode; labelKey: string; descKey: string }[] = [
-    { key: 'scratch', icon: <CreateIcon sx={{ fontSize: 32 }} />, labelKey: 'contentTemplates.wizard.methods.scratch', descKey: 'contentTemplates.wizard.methods.scratchDesc' },
-    { key: 'template', icon: <DescriptionIcon sx={{ fontSize: 32 }} />, labelKey: 'contentTemplates.wizard.methods.template', descKey: 'contentTemplates.wizard.methods.templateDesc' },
-    { key: 'import', icon: <UploadFileIcon sx={{ fontSize: 32 }} />, labelKey: 'contentTemplates.wizard.methods.import', descKey: 'contentTemplates.wizard.methods.importDesc' },
-  ];
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth={method === 'template' ? 'md' : 'sm'} fullWidth aria-labelledby="create-template-wizard-title" data-testid="create-template-wizard">
+    <Dialog open={open} onClose={onClose} maxWidth={state.method === 'template' ? 'md' : 'sm'} fullWidth aria-labelledby="create-template-wizard-title" data-testid="create-template-wizard">
       <DialogTitle id="create-template-wizard-title">{t('contentTemplates.wizard.title')}</DialogTitle>
       <DialogContent>
-        <Stepper activeStep={activeStep} sx={{ mb: 3, mt: 1 }}>
+        <Stepper activeStep={state.activeStep} sx={{ mb: 3, mt: 1 }}>
           {STEP_KEYS.map((key) => (
             <Step key={key}>
               <StepLabel>{t(key)}</StepLabel>
@@ -258,177 +209,53 @@ export default function CreateTemplateWizard({ open, onClose, onSubmit, loading 
           ))}
         </Stepper>
 
-        {/* Step 0 — Choose method */}
-        {activeStep === 0 && (
-          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2 }}>
-            {methodCards.map(({ key, icon, labelKey, descKey }) => (
-              <Card
-                key={key}
-                variant="outlined"
-                sx={{
-                  border: 2,
-                  borderColor: method === key ? 'primary.main' : 'divider',
-                  bgcolor: method === key ? 'action.selected' : 'background.paper',
-                  transition: 'border-color 0.15s, background-color 0.15s',
-                }}
-              >
-                <CardActionArea onClick={() => handleMethodSelect(key)} sx={{ p: 2.5, textAlign: 'center' }}>
-                  <Box sx={{ color: method === key ? 'primary.main' : 'text.secondary', mb: 1 }}>{icon}</Box>
-                  <Typography variant="body2" fontWeight={600}>{t(labelKey)}</Typography>
-                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', lineHeight: 1.3, mt: 0.5 }}>
-                    {t(descKey)}
-                  </Typography>
-                </CardActionArea>
-              </Card>
-            ))}
-          </Box>
+        {state.activeStep === 0 && (
+          <TemplateWizardMethodStep
+            method={state.method}
+            onSelect={(m) => dispatch({ type: 'SELECT_METHOD', method: m })}
+          />
         )}
 
-        {/* Step 1 — From Scratch */}
-        {activeStep === 1 && method === 'scratch' && (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <TextField autoFocus label={t('forms.contentTemplate.fields.name')} fullWidth required value={name} onChange={(e) => setName(e.target.value)} />
-            <TextField label={t('forms.contentTemplate.fields.slugPrefix')} fullWidth value={slugPrefix} onChange={(e) => setSlugPrefix(e.target.value)} helperText={t('contentTemplates.wizard.slugPrefixHint')} />
-            <TextField label={t('forms.contentTemplate.fields.body')} fullWidth multiline rows={6} value={body} onChange={(e) => setBody(e.target.value)} />
-          </Box>
+        {state.activeStep === 1 && state.method === 'scratch' && (
+          <TemplateWizardScratchStep
+            name={state.name}
+            slugPrefix={state.slugPrefix}
+            body={state.body}
+            onNameChange={(v) => dispatch({ type: 'SET_NAME', value: v })}
+            onSlugPrefixChange={(v) => dispatch({ type: 'SET_SLUG_PREFIX', value: v })}
+            onBodyChange={(v) => dispatch({ type: 'SET_BODY', value: v })}
+          />
         )}
 
-        {/* Step 1 — From Built-in Template */}
-        {activeStep === 1 && method === 'template' && (
-          <>
-            <TextField
-              autoFocus
-              fullWidth
-              size="small"
-              placeholder={t('templates.searchPlaceholder')}
-              value={templateSearch}
-              onChange={(e) => { setTemplateSearch(e.target.value); setTemplatePage(0); setSelectedTemplate(null); }}
-              sx={{ mb: 2 }}
-              InputProps={{
-                startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment>,
-              }}
-            />
-            {filteredTemplates.length === 0 ? (
-              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
-                {t('templates.noResults')}
-              </Typography>
-            ) : (
-              <>
-                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2, minHeight: 280 }}>
-                  {pageTemplateItems.map((template) => {
-                    const Icon = iconMap[template.icon] || ArticleIcon;
-                    const isSelected = selectedTemplate === template.id;
-                    return (
-                      <CardActionArea
-                        key={template.id}
-                        onClick={() => setSelectedTemplate(template.id)}
-                        sx={{
-                          borderRadius: 2,
-                          border: 2,
-                          borderColor: isSelected ? 'primary.main' : 'divider',
-                          bgcolor: isSelected ? alpha(theme.palette.primary.main, 0.04) : 'transparent',
-                          transition: 'all 0.15s ease-in-out',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'stretch',
-                          height: '100%',
-                          '&:hover': { borderColor: isSelected ? 'primary.main' : 'action.hover' },
-                        }}
-                      >
-                        <Box sx={{ p: 2.5, display: 'flex', flexDirection: 'column', height: '100%' }}>
-                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
-                            <Box
-                              sx={{
-                                width: 40, height: 40, borderRadius: 1.5,
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                bgcolor: isSelected ? alpha(theme.palette.primary.main, 0.12) : alpha(theme.palette.action.active, 0.08),
-                              }}
-                            >
-                              <Icon sx={{ fontSize: 22, color: isSelected ? 'primary.main' : 'action.active' }} />
-                            </Box>
-                            {isSelected && <CheckCircleIcon color="primary" sx={{ fontSize: 22 }} />}
-                          </Box>
-                          <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 0.5 }}>{template.name}</Typography>
-                          <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5, minHeight: 40 }}>{template.description}</Typography>
-                          <Box sx={{ mt: 'auto', p: 1.5, borderRadius: 1, bgcolor: alpha(theme.palette.action.active, 0.04) }}>
-                            <Typography
-                              variant="caption"
-                              color="text.disabled"
-                              component="pre"
-                              sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap', lineHeight: 1.5, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', m: 0 }}
-                            >
-                              {template.bodyPreview}
-                            </Typography>
-                          </Box>
-                        </Box>
-                      </CardActionArea>
-                    );
-                  })}
-                </Box>
-                {totalTemplatePages > 1 && (
-                  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1, mt: 2 }}>
-                    <IconButton size="small" disabled={currentTemplatePage === 0} onClick={() => setTemplatePage(prev => prev - 1)}>
-                      <NavigateBeforeIcon />
-                    </IconButton>
-                    <Typography variant="body2" color="text.secondary">
-                      {t('templates.page', { current: currentTemplatePage + 1, total: totalTemplatePages })}
-                    </Typography>
-                    <IconButton size="small" disabled={currentTemplatePage >= totalTemplatePages - 1} onClick={() => setTemplatePage(prev => prev + 1)}>
-                      <NavigateNextIcon />
-                    </IconButton>
-                  </Box>
-                )}
-              </>
-            )}
-          </>
+        {state.activeStep === 1 && state.method === 'template' && (
+          <TemplateWizardTemplateStep
+            selectedTemplate={state.selectedTemplate}
+            onSelectTemplate={(v) => dispatch({ type: 'SET_SELECTED_TEMPLATE', value: v })}
+            templateSearch={state.templateSearch}
+            onSearchChange={(v) => dispatch({ type: 'SET_TEMPLATE_SEARCH', value: v })}
+            templatePage={state.templatePage}
+            onPageChange={(v) => dispatch({ type: 'SET_TEMPLATE_PAGE', value: v })}
+          />
         )}
 
-        {/* Step 1 — Import Markdown */}
-        {activeStep === 1 && method === 'import' && (
-          <>
-            {!parsed ? (
-              <>
-                <Box
-                  onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-                  onDragLeave={() => setDragOver(false)}
-                  onDrop={(e) => { e.preventDefault(); setDragOver(false); const file = e.dataTransfer.files[0]; if (file) processFile(file); }}
-                  onClick={() => fileInputRef.current?.click()}
-                  sx={{
-                    border: '2px dashed',
-                    borderColor: dragOver ? 'primary.main' : 'divider',
-                    borderRadius: 2, p: 4, textAlign: 'center', cursor: 'pointer',
-                    bgcolor: dragOver ? 'action.hover' : 'transparent',
-                    transition: 'all 0.2s',
-                    '&:hover': { borderColor: 'primary.light', bgcolor: 'action.hover' },
-                  }}
-                >
-                  <UploadFileIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 1 }} />
-                  <Typography variant="body1">
-                    {dragOver ? t('markdownImport.dropZoneActive') : t('markdownImport.dropZone')}
-                  </Typography>
-                </Box>
-                <input ref={fileInputRef} type="file" accept=".md,.markdown" hidden onChange={(e) => { const file = e.target.files?.[0]; if (file) processFile(file); }} />
-                {fileName && !importError && (
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                    {fileName} ({(fileSize / 1024).toFixed(1)} KB)
-                  </Typography>
-                )}
-              </>
-            ) : (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <TextField autoFocus label={t('forms.contentTemplate.fields.name')} value={editName} onChange={(e) => setEditName(e.target.value)} fullWidth required />
-                <TextField label={t('forms.contentTemplate.fields.slugPrefix')} value={editSlugPrefix} onChange={(e) => setEditSlugPrefix(e.target.value)} fullWidth InputProps={{ sx: { fontFamily: 'monospace' } }} />
-                <TextField
-                  label={t('forms.contentTemplate.fields.body')}
-                  value={editBody}
-                  fullWidth
-                  multiline
-                  InputProps={{ readOnly: true, sx: { fontFamily: 'monospace', maxHeight: 200, overflow: 'auto' } }}
-                />
-              </Box>
-            )}
-            {importError && <Alert severity="error" sx={{ mt: 2 }}>{importError}</Alert>}
-          </>
+        {state.activeStep === 1 && state.method === 'import' && (
+          <TemplateWizardImportStep
+            parsed={state.parsed}
+            editName={state.editName}
+            editSlugPrefix={state.editSlugPrefix}
+            editBody={state.editBody}
+            importError={state.importError}
+            fileName={state.fileName}
+            dragOver={state.dragOver}
+            fileSize={state.fileSize}
+            onParsed={handleParsed}
+            onEditNameChange={(v) => dispatch({ type: 'SET_EDIT_NAME', value: v })}
+            onEditSlugPrefixChange={(v) => dispatch({ type: 'SET_EDIT_SLUG_PREFIX', value: v })}
+            onImportError={(v) => dispatch({ type: 'SET_IMPORT_ERROR', value: v })}
+            onFileName={(v) => dispatch({ type: 'SET_FILE_NAME', value: v })}
+            onFileSize={(v) => dispatch({ type: 'SET_FILE_SIZE', value: v })}
+            onDragOver={(v) => dispatch({ type: 'SET_DRAG_OVER', value: v })}
+          />
         )}
       </DialogContent>
 
@@ -436,24 +263,24 @@ export default function CreateTemplateWizard({ open, onClose, onSubmit, loading 
         <Box />
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Button onClick={onClose} disabled={loading}>{t('common.actions.cancel')}</Button>
-          {activeStep === 1 && (
-            <Button onClick={handleBack} disabled={loading}>{t('common.actions.back')}</Button>
+          {state.activeStep === 1 && (
+            <Button onClick={() => dispatch({ type: 'GO_BACK' })} disabled={loading}>{t('common.actions.back')}</Button>
           )}
 
-          {activeStep === 1 && method === 'scratch' && (
-            <Button variant="contained" onClick={handleScratchSubmit} disabled={!name.trim() || loading}>
+          {state.activeStep === 1 && state.method === 'scratch' && (
+            <Button variant="contained" onClick={handleScratchSubmit} disabled={!state.name.trim() || loading}>
               {loading ? t('common.actions.saving') : t('common.actions.create')}
             </Button>
           )}
 
-          {activeStep === 1 && method === 'template' && (
-            <Button variant="contained" onClick={handleTemplateConfirm} disabled={!selectedTemplate || loading}>
+          {state.activeStep === 1 && state.method === 'template' && (
+            <Button variant="contained" onClick={handleTemplateConfirm} disabled={!state.selectedTemplate || loading}>
               {loading ? t('common.actions.saving') : t('common.actions.create')}
             </Button>
           )}
 
-          {activeStep === 1 && method === 'import' && parsed && (
-            <Button variant="contained" onClick={handleImportConfirm} disabled={!editName.trim() || loading}>
+          {state.activeStep === 1 && state.method === 'import' && state.parsed && (
+            <Button variant="contained" onClick={handleImportConfirm} disabled={!state.editName.trim() || loading}>
               {loading ? t('common.actions.saving') : t('common.actions.create')}
             </Button>
           )}

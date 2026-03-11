@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useReducer, useEffect } from 'react';
 import {
   Box,
   Table,
@@ -39,6 +39,63 @@ import ConfirmDialog from '@/components/shared/ConfirmDialog';
 
 const ROLES: SiteRole[] = ['owner', 'admin', 'editor', 'author', 'reviewer', 'viewer'];
 
+interface UIState {
+  addOpen: boolean;
+  addRole: SiteRole;
+  addClerkUserId: string;
+  clerkSearch: string;
+  removingMember: SiteMembership | null;
+  transferTarget: SiteMembership | null;
+}
+
+type UIAction =
+  | { type: 'openAdd' }
+  | { type: 'closeAdd' }
+  | { type: 'setAddRole'; value: SiteRole }
+  | { type: 'setAddClerkUserId'; value: string }
+  | { type: 'setClerkSearch'; value: string }
+  | { type: 'resetAddForm' }
+  | { type: 'openRemove'; member: SiteMembership }
+  | { type: 'closeRemove' }
+  | { type: 'openTransfer'; member: SiteMembership }
+  | { type: 'closeTransfer' };
+
+const initialUIState: UIState = {
+  addOpen: false,
+  addRole: 'viewer',
+  addClerkUserId: '',
+  clerkSearch: '',
+  removingMember: null,
+  transferTarget: null,
+};
+
+function uiReducer(state: UIState, action: UIAction): UIState {
+  switch (action.type) {
+    case 'openAdd':
+      return { ...state, addOpen: true };
+    case 'closeAdd':
+      return { ...state, addOpen: false };
+    case 'setAddRole':
+      return { ...state, addRole: action.value };
+    case 'setAddClerkUserId':
+      return { ...state, addClerkUserId: action.value };
+    case 'setClerkSearch':
+      return { ...state, clerkSearch: action.value };
+    case 'resetAddForm':
+      return { ...state, addOpen: false, addClerkUserId: '', addRole: 'viewer' };
+    case 'openRemove':
+      return { ...state, removingMember: action.member };
+    case 'closeRemove':
+      return { ...state, removingMember: null };
+    case 'openTransfer':
+      return { ...state, transferTarget: action.member };
+    case 'closeTransfer':
+      return { ...state, transferTarget: null };
+    default:
+      return state;
+  }
+}
+
 export default function MembersPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
@@ -46,27 +103,22 @@ export default function MembersPage() {
   const { selectedSiteId } = useSiteContext();
   const { canManageMembers, isOwner, clerkUserId } = useAuth();
 
-  const [addOpen, setAddOpen] = useState(false);
-  const [addRole, setAddRole] = useState<SiteRole>('viewer');
-  const [addClerkUserId, setAddClerkUserId] = useState('');
-  const [removingMember, setRemovingMember] = useState<SiteMembership | null>(null);
-  const [transferTarget, setTransferTarget] = useState<SiteMembership | null>(null);
+  const [ui, dispatch] = useReducer(uiReducer, initialUIState);
 
   // Command palette action listener
   useEffect(() => {
     const handler = (e: Event) => {
-      if ((e as CustomEvent).detail === 'add-member') setAddOpen(true);
+      if ((e as CustomEvent).detail === 'add-member') dispatch({ type: 'openAdd' });
     };
     window.addEventListener('command-palette:action', handler);
     return () => window.removeEventListener('command-palette:action', handler);
   }, []);
 
   // Clerk users for the add member dialog
-  const [clerkSearch, setClerkSearch] = useState('');
   const { data: clerkUsers } = useQuery({
     queryKey: ['clerkUsers'],
     queryFn: () => apiService.getClerkUsers({ limit: 100 }),
-    enabled: addOpen,
+    enabled: ui.addOpen,
   });
 
   const { data: members, isLoading, error } = useQuery({
@@ -76,13 +128,11 @@ export default function MembersPage() {
   });
 
   const addMemberMutation = useMutation({
-    mutationFn: () => apiService.addSiteMember(selectedSiteId, { clerk_user_id: addClerkUserId, role: addRole }),
+    mutationFn: () => apiService.addSiteMember(selectedSiteId, { clerk_user_id: ui.addClerkUserId, role: ui.addRole }),
     onSuccess: () => {
       showSuccess(t('members.messages.added'));
       queryClient.invalidateQueries({ queryKey: ['members', selectedSiteId] });
-      setAddOpen(false);
-      setAddClerkUserId('');
-      setAddRole('viewer');
+      dispatch({ type: 'resetAddForm' });
     },
     onError: (err) => { showError(err); },
   });
@@ -102,7 +152,7 @@ export default function MembersPage() {
     onSuccess: () => {
       showSuccess(t('members.messages.removed'));
       queryClient.invalidateQueries({ queryKey: ['members', selectedSiteId] });
-      setRemovingMember(null);
+      dispatch({ type: 'closeRemove' });
     },
     onError: (err) => { showError(err); },
   });
@@ -114,7 +164,7 @@ export default function MembersPage() {
       showSuccess(t('members.messages.ownershipTransferred'));
       queryClient.invalidateQueries({ queryKey: ['members', selectedSiteId] });
       queryClient.invalidateQueries({ queryKey: ['auth'] });
-      setTransferTarget(null);
+      dispatch({ type: 'closeTransfer' });
     },
     onError: (err) => { showError(err); },
   });
@@ -144,8 +194,8 @@ export default function MembersPage() {
   const filteredClerkUsers = (clerkUsers?.data ?? []).filter((u: ClerkUser) => {
     const existing = new Set(members?.map((m) => m.clerk_user_id) ?? []);
     if (existing.has(u.id)) return false;
-    if (!clerkSearch) return true;
-    const q = clerkSearch.toLowerCase();
+    if (!ui.clerkSearch) return true;
+    const q = ui.clerkSearch.toLowerCase();
     return (
       u.id.toLowerCase().includes(q) ||
       (u.email ?? '').toLowerCase().includes(q) ||
@@ -158,7 +208,7 @@ export default function MembersPage() {
       <PageHeader
         title={t('members.title')}
         subtitle={t('members.subtitle')}
-        action={{ label: t('members.addMember'), onClick: () => setAddOpen(true), hidden: !canManageMembers }}
+        action={{ label: t('members.addMember'), onClick: () => dispatch({ type: 'openAdd' }), hidden: !canManageMembers }}
       />
 
       {!members?.length ? (
@@ -187,7 +237,7 @@ export default function MembersPage() {
                     </Stack>
                   </TableCell>
                   <TableCell>
-                    <Typography variant="body2" color="text.secondary">{member.email || '—'}</Typography>
+                    <Typography variant="body2" color="text.secondary">{member.email || '\u2014'}</Typography>
                   </TableCell>
                   <TableCell>
                     {canManageMembers && member.role !== 'owner' ? (
@@ -217,7 +267,7 @@ export default function MembersPage() {
                         <IconButton
                           size="small"
                           color="error"
-                          onClick={() => setRemovingMember(member)}
+                          onClick={() => dispatch({ type: 'openRemove', member })}
                           aria-label={t('common.actions.delete')}
                         >
                           <DeleteIcon fontSize="small" />
@@ -226,7 +276,7 @@ export default function MembersPage() {
                       {isOwner && member.role !== 'owner' && member.clerk_user_id !== clerkUserId && (
                         <IconButton
                           size="small"
-                          onClick={() => setTransferTarget(member)}
+                          onClick={() => dispatch({ type: 'openTransfer', member })}
                           aria-label={t('members.transferDialog.title')}
                         >
                           <SwapHorizIcon fontSize="small" />
@@ -242,23 +292,23 @@ export default function MembersPage() {
       )}
 
       {/* Add Member Dialog */}
-      <Dialog open={addOpen} onClose={() => setAddOpen(false)} maxWidth="sm" fullWidth aria-labelledby="add-member-dialog-title">
+      <Dialog open={ui.addOpen} onClose={() => dispatch({ type: 'closeAdd' })} maxWidth="sm" fullWidth aria-labelledby="add-member-dialog-title">
         <DialogTitle id="add-member-dialog-title">{t('members.addDialog.title')}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField
               autoFocus
               label={t('members.addDialog.searchPlaceholder')}
-              value={clerkSearch}
-              onChange={(e) => setClerkSearch(e.target.value)}
+              value={ui.clerkSearch}
+              onChange={(e) => dispatch({ type: 'setClerkSearch', value: e.target.value })}
               size="small"
               fullWidth
             />
             <TextField
               label={t('members.addDialog.selectRole')}
               select
-              value={addRole}
-              onChange={(e) => setAddRole(e.target.value as SiteRole)}
+              value={ui.addRole}
+              onChange={(e) => dispatch({ type: 'setAddRole', value: e.target.value as SiteRole })}
               size="small"
               fullWidth
             >
@@ -280,14 +330,14 @@ export default function MembersPage() {
                 filteredClerkUsers.map((u: ClerkUser) => (
                   <Box
                     key={u.id}
-                    onClick={() => setAddClerkUserId(u.id)}
+                    onClick={() => dispatch({ type: 'setAddClerkUserId', value: u.id })}
                     sx={{
                       p: 1.5,
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       gap: 1.5,
-                      bgcolor: addClerkUserId === u.id ? 'action.selected' : 'transparent',
+                      bgcolor: ui.addClerkUserId === u.id ? 'action.selected' : 'transparent',
                       '&:hover': { bgcolor: 'action.hover' },
                     }}
                   >
@@ -305,10 +355,10 @@ export default function MembersPage() {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setAddOpen(false)}>{t('common.actions.cancel')}</Button>
+          <Button onClick={() => dispatch({ type: 'closeAdd' })}>{t('common.actions.cancel')}</Button>
           <Button
             variant="contained"
-            disabled={!addClerkUserId || addMemberMutation.isPending}
+            disabled={!ui.addClerkUserId || addMemberMutation.isPending}
             onClick={() => addMemberMutation.mutate()}
           >
             {t('common.actions.add')}
@@ -318,23 +368,23 @@ export default function MembersPage() {
 
       {/* Remove Member Confirmation */}
       <ConfirmDialog
-        open={!!removingMember}
+        open={!!ui.removingMember}
         title={t('members.removeDialog.title')}
         message={t('members.removeDialog.message')}
         confirmLabel={t('common.actions.delete')}
-        onConfirm={() => removingMember && removeMemberMutation.mutate(removingMember.id)}
-        onCancel={() => setRemovingMember(null)}
+        onConfirm={() => ui.removingMember && removeMemberMutation.mutate(ui.removingMember.id)}
+        onCancel={() => dispatch({ type: 'closeRemove' })}
         confirmationText={t('common.actions.delete')}
       />
 
       {/* Transfer Ownership Confirmation */}
       <ConfirmDialog
-        open={!!transferTarget}
+        open={!!ui.transferTarget}
         title={t('members.transferDialog.title')}
-        message={t('members.transferDialog.message', { name: transferTarget?.name || transferTarget?.clerk_user_id })}
+        message={t('members.transferDialog.message', { name: ui.transferTarget?.name || ui.transferTarget?.clerk_user_id })}
         confirmLabel={t('members.transferDialog.confirm')}
-        onConfirm={() => transferTarget && transferMutation.mutate(transferTarget.clerk_user_id)}
-        onCancel={() => setTransferTarget(null)}
+        onConfirm={() => ui.transferTarget && transferMutation.mutate(ui.transferTarget.clerk_user_id)}
+        onCancel={() => dispatch({ type: 'closeTransfer' })}
       />
     </Box>
   );

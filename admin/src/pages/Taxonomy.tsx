@@ -3,22 +3,11 @@ import { useTranslation } from 'react-i18next';
 import {
   Alert,
   Box,
-  Paper,
   Typography,
   Grid,
-  Chip,
-  Divider,
-  IconButton,
-  Tooltip,
-  Button,
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
-import CategoryIcon from '@mui/icons-material/Category';
 import { useQuery } from '@tanstack/react-query';
-import { format } from 'date-fns';
 import apiService from '@/services/api';
 import type {
   Tag,
@@ -31,12 +20,12 @@ import type {
 import { useSiteContext } from '@/store/SiteContext';
 import { useAuth } from '@/store/AuthContext';
 import PageHeader from '@/components/shared/PageHeader';
-import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import TagFormDialog from '@/components/taxonomy/TagFormDialog';
 import CategoryFormDialog from '@/components/taxonomy/CategoryFormDialog';
-import DataTable, { type DataTableColumn } from '@/components/shared/DataTable';
+import TagsSection from '@/components/taxonomy/TagsSection';
+import CategoriesSection from '@/components/taxonomy/CategoriesSection';
 import { useListPageState } from '@/hooks/useListPageState';
 import { useCrudMutations } from '@/hooks/useCrudMutations';
 
@@ -133,75 +122,6 @@ export default function TaxonomyPage() {
     },
   });
 
-  const tagColumns: DataTableColumn<Tag>[] = [
-    {
-      header: t('taxonomy.tags.table.slug'),
-      scope: 'col',
-      render: (tag) => <Typography variant="body2" fontFamily="monospace">{tag.slug}</Typography>,
-    },
-    {
-      header: t('taxonomy.tags.table.scope'),
-      scope: 'col',
-      render: (tag) => tag.is_global
-        ? <Chip label={t('common.labels.global')} size="small" color="info" variant="outlined" />
-        : <Chip label={t('common.labels.site')} size="small" variant="outlined" />,
-    },
-    {
-      header: t('taxonomy.tags.table.created'),
-      scope: 'col',
-      render: (tag) => format(new Date(tag.created_at), 'PP'),
-    },
-    {
-      header: t('taxonomy.tags.table.actions'),
-      scope: 'col',
-      align: 'right',
-      render: (tag) => (
-        <>
-          {canWrite && <Tooltip title={t('common.actions.edit')}><IconButton size="small" aria-label={t('common.actions.edit')} onClick={() => setEditingTag(tag)}><EditIcon fontSize="small" /></IconButton></Tooltip>}
-          {isAdmin && <Tooltip title={t('common.actions.delete')}><IconButton size="small" aria-label={t('common.actions.delete')} color="error" onClick={() => setDeletingTag(tag)}><DeleteIcon fontSize="small" /></IconButton></Tooltip>}
-        </>
-      ),
-    },
-  ];
-
-  const catColumns: DataTableColumn<Category>[] = [
-    {
-      header: t('taxonomy.categories.table.slug'),
-      scope: 'col',
-      render: (cat) => <Typography variant="body2" fontFamily="monospace">{cat.slug}</Typography>,
-    },
-    {
-      header: t('taxonomy.categories.table.parent'),
-      scope: 'col',
-      render: (cat) => cat.parent_id
-        ? <Chip label={t('common.labels.child')} size="small" variant="outlined" />
-        : '\u2014',
-    },
-    {
-      header: t('taxonomy.categories.table.scope'),
-      scope: 'col',
-      render: (cat) => cat.is_global
-        ? <Chip label={t('common.labels.global')} size="small" color="info" variant="outlined" />
-        : <Chip label={t('common.labels.site')} size="small" variant="outlined" />,
-    },
-    {
-      header: t('taxonomy.categories.table.created'),
-      scope: 'col',
-      render: (cat) => format(new Date(cat.created_at), 'PP'),
-    },
-    {
-      header: t('taxonomy.categories.table.actions'),
-      scope: 'col',
-      align: 'right',
-      render: (cat) => (
-        <>
-          {canWrite && <Tooltip title={t('common.actions.edit')}><IconButton size="small" aria-label={t('common.actions.edit')} onClick={() => setEditingCat(cat)}><EditIcon fontSize="small" /></IconButton></Tooltip>}
-          {isAdmin && <Tooltip title={t('common.actions.delete')}><IconButton size="small" aria-label={t('common.actions.delete')} color="error" onClick={() => setDeletingCat(cat)}><DeleteIcon fontSize="small" /></IconButton></Tooltip>}
-        </>
-      ),
-    },
-  ];
-
   return (
     <Box data-testid="taxonomy.page">
       <PageHeader title={t('taxonomy.title')} subtitle={t('taxonomy.subtitle')} />
@@ -220,86 +140,38 @@ export default function TaxonomyPage() {
           </Alert>
         )}
         <Grid container spacing={3}>
-          {/* Tags */}
           <Grid size={{ xs: 12, md: 6 }}>
-            <Paper sx={{ p: 3, height: '100%' }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                <Typography variant="h6" component="h2">
-                  {t('taxonomy.tags.title')} {tagsData?.meta && `(${tagsData.meta.total_items})`}
-                </Typography>
-                {canWrite && <Button
-                  size="small"
-                  startIcon={<AddIcon />}
-                  onClick={openTagCreate}
-                >
-                  {t('taxonomy.tags.addTag')}
-                </Button>}
-              </Box>
-              <Divider sx={{ mb: 2 }} />
-
-              {tagsLoading ? (
-                <LoadingState label={t('taxonomy.tags.loading')} />
-              ) : !tags || tags.length === 0 ? (
-                <EmptyState
-                  icon={<LocalOfferIcon sx={{ fontSize: 48 }} />}
-                  title={t('taxonomy.tags.empty.title')}
-                  description={t('taxonomy.tags.empty.description')}
-                  action={{ label: t('taxonomy.tags.addTag'), onClick: openTagCreate }}
-                />
-              ) : (
-                <DataTable<Tag>
-                  data={tags}
-                  columns={tagColumns}
-                  getRowKey={(tag) => tag.id}
-                  meta={tagsData?.meta}
-                  page={tagPage}
-                  onPageChange={handleTagPageChange}
-                  rowsPerPage={tagPerPage}
-                  onRowsPerPageChange={handleTagRowsPerPageChange}
-                />
-              )}
-            </Paper>
+            <TagsSection
+              tags={tags}
+              meta={tagsData?.meta}
+              loading={tagsLoading}
+              page={tagPage}
+              rowsPerPage={tagPerPage}
+              canWrite={canWrite}
+              isAdmin={isAdmin}
+              onPageChange={handleTagPageChange}
+              onRowsPerPageChange={handleTagRowsPerPageChange}
+              onOpenCreate={openTagCreate}
+              onEdit={setEditingTag}
+              onDelete={setDeletingTag}
+            />
           </Grid>
 
-          {/* Categories */}
           <Grid size={{ xs: 12, md: 6 }}>
-            <Paper sx={{ p: 3, height: '100%' }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                <Typography variant="h6" component="h2">
-                  {t('taxonomy.categories.title')} {categoriesData?.meta && `(${categoriesData.meta.total_items})`}
-                </Typography>
-                {canWrite && <Button
-                  size="small"
-                  startIcon={<AddIcon />}
-                  onClick={openCatCreate}
-                >
-                  {t('taxonomy.categories.addCategory')}
-                </Button>}
-              </Box>
-              <Divider sx={{ mb: 2 }} />
-
-              {catsLoading ? (
-                <LoadingState label={t('taxonomy.categories.loading')} />
-              ) : !categories || categories.length === 0 ? (
-                <EmptyState
-                  icon={<CategoryIcon sx={{ fontSize: 48 }} />}
-                  title={t('taxonomy.categories.empty.title')}
-                  description={t('taxonomy.categories.empty.description')}
-                  action={{ label: t('taxonomy.categories.addCategory'), onClick: openCatCreate }}
-                />
-              ) : (
-                <DataTable<Category>
-                  data={categories}
-                  columns={catColumns}
-                  getRowKey={(cat) => cat.id}
-                  meta={categoriesData?.meta}
-                  page={catPage}
-                  onPageChange={handleCatPageChange}
-                  rowsPerPage={catPerPage}
-                  onRowsPerPageChange={handleCatRowsPerPageChange}
-                />
-              )}
-            </Paper>
+            <CategoriesSection
+              categories={categories}
+              meta={categoriesData?.meta}
+              loading={catsLoading}
+              page={catPage}
+              rowsPerPage={catPerPage}
+              canWrite={canWrite}
+              isAdmin={isAdmin}
+              onPageChange={handleCatPageChange}
+              onRowsPerPageChange={handleCatRowsPerPageChange}
+              onOpenCreate={openCatCreate}
+              onEdit={setEditingCat}
+              onDelete={setDeletingCat}
+            />
           </Grid>
         </Grid>
       </>)}
