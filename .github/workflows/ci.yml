@@ -12,7 +12,7 @@ concurrency:
 
 permissions:
   contents: read
-  pull-requests: read
+  pull-requests: write
 
 env:
   CARGO_TERM_COLOR: always
@@ -118,6 +118,8 @@ jobs:
         working-directory: admin
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -134,6 +136,26 @@ jobs:
 
       - name: Lint
         run: npm run lint
+
+      - name: React Doctor
+        if: github.event_name == 'pull_request'
+        id: doctor
+        uses: millionco/react-doctor@main
+        with:
+          directory: admin
+          diff: main
+          verbose: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check health score
+        if: github.event_name == 'pull_request'
+        env:
+          SCORE: ${{ steps.doctor.outputs.score }}
+        run: |
+          echo "React Doctor score: $SCORE"
+          if [ "$SCORE" -lt 50 ]; then
+            echo "::warning::React health score is below threshold: $SCORE/100"
+          fi
 
       - name: Run tests
         run: npm test
