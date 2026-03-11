@@ -12,6 +12,10 @@ export const pageDetailSchema = z.object({
   parent_page_id: z.string().optional().or(z.literal('')),
   publish_start: z.string().nullable().optional(),
   publish_end: z.string().nullable().optional(),
+  // SEO metadata (from content localization)
+  meta_title: z.string().max(60),
+  meta_description: z.string().max(160),
+  excerpt: z.string().max(300),
 });
 
 export type PageDetailFormData = z.infer<typeof pageDetailSchema>;

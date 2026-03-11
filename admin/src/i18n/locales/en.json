@@ -565,6 +565,7 @@
       "navOrder": "Navigation Order",
       "metaTitle": "Meta Title",
       "metaDescription": "Meta Description",
+      "excerpt": "Excerpt",
       "slug": "Slug",
       "id": "ID",
       "published": "Published",
@@ -573,7 +574,11 @@
     },
     "tabs": {
       "info": "Info",
+      "seo": "SEO",
       "sections": "Sections"
+    },
+    "seo": {
+      "serpPreview": "Search Engine Preview"
     },
     "toolbar": {
       "saving": "Saving...",

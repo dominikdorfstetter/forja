@@ -347,6 +347,15 @@ pub struct ReorderPageSectionsRequest {
     pub items: Vec<crate::dto::social::ReorderItem>,
 }
 
+/// Page detail response with localizations
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+#[schema(description = "Page with content localizations (SEO metadata)")]
+pub struct PageDetailResponse {
+    #[serde(flatten)]
+    pub page: PageResponse,
+    pub localizations: Vec<crate::dto::content::LocalizationResponse>,
+}
+
 /// Paginated page list
 pub type PaginatedPages = Paginated<PageListItem>;
 

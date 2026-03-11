@@ -551,6 +551,7 @@
       "navOrder": "Navigatievolgorde",
       "metaTitle": "Metatitel",
       "metaDescription": "Metabeschrijving",
+      "excerpt": "Uittreksel",
       "slug": "Slug",
       "id": "ID",
       "published": "Gepubliceerd",
@@ -559,7 +560,11 @@
     },
     "tabs": {
       "info": "Info",
+      "seo": "SEO",
       "sections": "Secties"
+    },
+    "seo": {
+      "serpPreview": "Zoekmachine-voorbeeld"
     },
     "toolbar": {
       "saving": "Opslaan...",
