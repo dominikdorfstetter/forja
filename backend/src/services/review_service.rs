@@ -7,10 +7,8 @@ use uuid::Uuid;
 
 use crate::dto::review::{ReviewAction, ReviewActionRequest, ReviewActionResponse};
 use crate::errors::ApiError;
-use crate::guards::auth_guard::CLERK_UUID_NAMESPACE;
 use crate::models::audit::AuditAction;
 use crate::models::content::{Content, ContentStatus};
-use crate::models::site_membership::SiteMembership;
 use crate::services::{
     audit_service, content_service::ContentService, notification_service, webhook_service,
 };
@@ -104,10 +102,6 @@ impl ReviewService {
                 }),
             );
 
-            // Resolve the reviewer's clerk_user_id from the DB so handlers
-            // don't need to pass sensitive identifiers through the call chain.
-            let actor_clerk_id = Self::resolve_clerk_user_id(pool, sid, user_id).await;
-
             // Notify the content creator about the review result
             let content = Content::find_by_id(pool, ctx.content_id).await?;
             if is_approve {
@@ -118,7 +112,7 @@ impl ReviewService {
                     ctx.entity_id,
                     ctx.entity_slug,
                     content.created_by,
-                    actor_clerk_id,
+                    Some(user_id),
                 );
             } else {
                 notification_service::notify_changes_requested(
@@ -128,7 +122,7 @@ impl ReviewService {
                     ctx.entity_id,
                     ctx.entity_slug,
                     content.created_by,
-                    actor_clerk_id,
+                    Some(user_id),
                     request.comment,
                 );
             }
@@ -137,22 +131,6 @@ impl ReviewService {
         Ok(ReviewActionResponse {
             status: new_status,
             message: message.to_string(),
-        })
-    }
-
-    /// Resolve a user's UUID back to the original clerk_user_id by matching
-    /// against site membership records (UUID v5 derivation).
-    async fn resolve_clerk_user_id(
-        pool: &PgPool,
-        site_id: Uuid,
-        user_uuid: Uuid,
-    ) -> Option<String> {
-        let members = SiteMembership::find_all_for_site(pool, site_id)
-            .await
-            .ok()?;
-        members.into_iter().find_map(|m| {
-            let derived = Uuid::new_v5(&CLERK_UUID_NAMESPACE, m.clerk_user_id.as_bytes());
-            (derived == user_uuid).then_some(m.clerk_user_id)
         })
     }
 }
