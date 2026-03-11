@@ -129,12 +129,16 @@ export default function MediaPage() {
 
   // 300ms debounce for search input
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchInput);
-      setPage(1);
-    }, 300);
+    const timer = setTimeout(() => setDebouncedSearch(searchInput), 300);
     return () => clearTimeout(timer);
   }, [searchInput]);
+
+  // Reset page when search query changes
+  const prevSearchRef = useRef(debouncedSearch);
+  if (prevSearchRef.current !== debouncedSearch) {
+    prevSearchRef.current = debouncedSearch;
+    setPage(1);
+  }
 
   // Build query params for server-side filtering
   const queryParams: Record<string, string | number> = { page, per_page: perPage };

@@ -124,23 +124,23 @@ function SiteSettingsTab({ highlightField }: { highlightField?: string }) {
 
   useUnsavedChanges(isDirty || previewTemplatesDirty);
 
-  useEffect(() => {
-    if (settings) {
-      reset({
-        max_document_file_size_mb: Math.round(settings.max_document_file_size / BYTES_PER_MB),
-        max_media_file_size_mb: Math.round(settings.max_media_file_size / BYTES_PER_MB),
-        analytics_enabled: settings.analytics_enabled,
-        maintenance_mode: settings.maintenance_mode,
-        contact_email: settings.contact_email,
-        editorial_workflow_enabled: settings.editorial_workflow_enabled,
-      });
-      setPreviewTemplates((settings.preview_templates ?? []).map(pt => ({
-        ...pt,
-        _id: templateIdCounter.current++,
-      })));
-      setPreviewTemplatesDirty(false);
-    }
-  }, [settings, reset]);
+  const prevSettingsRef = useRef<typeof settings>(undefined);
+  if (settings && settings !== prevSettingsRef.current) {
+    prevSettingsRef.current = settings;
+    reset({
+      max_document_file_size_mb: Math.round(settings.max_document_file_size / BYTES_PER_MB),
+      max_media_file_size_mb: Math.round(settings.max_media_file_size / BYTES_PER_MB),
+      analytics_enabled: settings.analytics_enabled,
+      maintenance_mode: settings.maintenance_mode,
+      contact_email: settings.contact_email,
+      editorial_workflow_enabled: settings.editorial_workflow_enabled,
+    });
+    setPreviewTemplates((settings.preview_templates ?? []).map(pt => ({
+      ...pt,
+      _id: templateIdCounter.current++,
+    })));
+    setPreviewTemplatesDirty(false);
+  }
 
   // Scroll to and highlight the editorial workflow toggle when linked from prompt
   useEffect(() => {
@@ -525,19 +525,19 @@ function ModulesTab() {
   });
   const [dirty, setDirty] = useState(false);
 
-  useEffect(() => {
-    if (settings) {
-      setModules({
-        module_blog_enabled: settings.module_blog_enabled,
-        module_pages_enabled: settings.module_pages_enabled,
-        module_cv_enabled: settings.module_cv_enabled,
-        module_legal_enabled: settings.module_legal_enabled,
-        module_documents_enabled: settings.module_documents_enabled,
-        module_ai_enabled: settings.module_ai_enabled,
-      });
-      setDirty(false);
-    }
-  }, [settings]);
+  const prevSettingsRef = useRef<typeof settings>(undefined);
+  if (settings && settings !== prevSettingsRef.current) {
+    prevSettingsRef.current = settings;
+    setModules({
+      module_blog_enabled: settings.module_blog_enabled,
+      module_pages_enabled: settings.module_pages_enabled,
+      module_cv_enabled: settings.module_cv_enabled,
+      module_legal_enabled: settings.module_legal_enabled,
+      module_documents_enabled: settings.module_documents_enabled,
+      module_ai_enabled: settings.module_ai_enabled,
+    });
+    setDirty(false);
+  }
 
   const mutation = useMutation({
     mutationFn: (data: UpdateSiteSettingsRequest) =>
@@ -1066,12 +1066,12 @@ export default function SettingsPage() {
   }
 
   // Auto-switch to siteSettings tab when highlight param is set
-  useEffect(() => {
-    if (highlightField) {
-      const idx = tabs.findIndex((t) => t.key === 'siteSettings');
-      if (idx >= 0) setTabIndex(idx);
-    }
-  }, [highlightField]); // eslint-disable-line react-hooks/exhaustive-deps
+  const prevHighlightRef = useRef<string | undefined>(undefined);
+  if (highlightField && highlightField !== prevHighlightRef.current) {
+    const idx = tabs.findIndex((t) => t.key === 'siteSettings');
+    if (idx >= 0) setTabIndex(idx);
+  }
+  prevHighlightRef.current = highlightField;
 
   // Clamp tabIndex if tab list shrinks (e.g. site deselected)
   const safeTabIndex = Math.min(tabIndex, tabs.length - 1);

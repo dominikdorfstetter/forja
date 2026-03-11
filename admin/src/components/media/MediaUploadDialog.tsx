@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Box,
   Button,
@@ -43,7 +43,6 @@ export default function MediaUploadDialog({ open, onSubmit, onClose, loading }: 
   const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [isGlobal, setIsGlobal] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
@@ -53,7 +52,6 @@ export default function MediaUploadDialog({ open, onSubmit, onClose, loading }: 
   const prevOpenRef = useRef(false);
   if (open && !prevOpenRef.current) {
     setSelectedFile(null);
-    setPreview(null);
     setDragOver(false);
     setIsGlobal(false);
     setUploadProgress(null);
@@ -61,20 +59,14 @@ export default function MediaUploadDialog({ open, onSubmit, onClose, loading }: 
   }
   prevOpenRef.current = open;
 
-  // Generate image preview
+  // Derive image preview URL from selected file (with cleanup for object URLs)
+  const preview = useMemo(
+    () => selectedFile?.type.startsWith('image/') ? URL.createObjectURL(selectedFile) : null,
+    [selectedFile],
+  );
   useEffect(() => {
-    if (!selectedFile) {
-      setPreview(null);
-      return;
-    }
-    if (!selectedFile.type.startsWith('image/')) {
-      setPreview(null);
-      return;
-    }
-    const url = URL.createObjectURL(selectedFile);
-    setPreview(url);
-    return () => URL.revokeObjectURL(url);
-  }, [selectedFile]);
+    return () => { if (preview) URL.revokeObjectURL(preview); };
+  }, [preview]);
 
   const validateFile = useCallback((file: File): boolean => {
     setValidationError(null);

@@ -61,10 +61,8 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
   // Locale tab state
   const [activeTab, setActiveTab] = useState(0);
 
-  // Localization form state
-  const [title, setTitle] = useState('');
-  const [text, setText] = useState('');
-  const [buttonText, setButtonText] = useState('');
+  // Localization form state (combined to avoid multiple setState calls)
+  const [localeForm, setLocaleForm] = useState<LocaleFormData>({ title: '', text: '', buttonText: '' });
 
   // Track dirty locales: map of locale_id -> form data
   const dirtyLocalesRef = useRef<Map<string, LocaleFormData>>(new Map());
@@ -101,9 +99,7 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
 
   // Populate localization form when switching tabs or data loads
   const populateLocForm = (loc: SectionLocalizationResponse | undefined) => {
-    setTitle(loc?.title || '');
-    setText(loc?.text || '');
-    setButtonText(loc?.button_text || '');
+    setLocaleForm({ title: loc?.title || '', text: loc?.text || '', buttonText: loc?.button_text || '' });
   };
 
   // Mark a locale as dirty and bump version to trigger tab re-render
@@ -115,9 +111,9 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
   // Save current locale form data to dirty map before switching tabs
   const stashCurrentLocale = useCallback(() => {
     if (currentLocale) {
-      markLocaleDirty(currentLocale.id, { title, text, buttonText });
+      markLocaleDirty(currentLocale.id, localeForm);
     }
-  }, [currentLocale, title, text, buttonText, markLocaleDirty]);
+  }, [currentLocale, localeForm, markLocaleDirty]);
 
   const handleTabChange = (_: unknown, newValue: number) => {
     stashCurrentLocale();
@@ -126,9 +122,7 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
     // Check dirty map first, then fall back to API data
     const dirty = locale ? dirtyLocalesRef.current.get(locale.id) : undefined;
     if (dirty) {
-      setTitle(dirty.title);
-      setText(dirty.text);
-      setButtonText(dirty.buttonText);
+      setLocaleForm(dirty);
     } else {
       const loc = localizations?.find((l) => locale && l.locale_id === locale.id);
       populateLocForm(loc);
@@ -136,7 +130,11 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
   };
 
   // Initialize section metadata when dialog opens or section changes
-  useEffect(() => {
+  const prevSectionRef = useRef<{ open: boolean; sectionId: string | null }>({ open: false, sectionId: null });
+  const currentSectionKey = `${open}-${section?.id ?? null}`;
+  const prevSectionKey = `${prevSectionRef.current.open}-${prevSectionRef.current.sectionId}`;
+  if (currentSectionKey !== prevSectionKey) {
+    prevSectionRef.current = { open, sectionId: section?.id ?? null };
     if (open && section) {
       setCoverImageId(section.cover_image_id || '');
       setCtaRoute(section.call_to_action_route || '');
@@ -145,19 +143,16 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
       dirtyLocalesRef.current.clear();
       setDirtyVersion(0);
     }
-  }, [open, section]);
+  }
 
   // Initialize localization form when data loads
   useEffect(() => {
     if (localizations && currentLocale) {
       const dirty = dirtyLocalesRef.current.get(currentLocale.id);
       if (dirty) {
-        setTitle(dirty.title);
-        setText(dirty.text);
-        setButtonText(dirty.buttonText);
+        setLocaleForm(dirty);
       } else {
-        const loc = localizations.find((l) => l.locale_id === currentLocale.id);
-        populateLocForm(loc);
+        populateLocForm(localizations.find((l) => l.locale_id === currentLocale.id));
       }
     }
   }, [localizations, currentLocale]);
@@ -202,9 +197,9 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
     if (currentLocale && !dirtyLocalesRef.current.has(currentLocale.id)) {
       await upsertLocMutation.mutateAsync({
         locale_id: currentLocale.id,
-        title: title || undefined,
-        text: text || undefined,
-        button_text: buttonText || undefined,
+        title: localeForm.title || undefined,
+        text: localeForm.text || undefined,
+        button_text: localeForm.buttonText || undefined,
       });
     }
 
@@ -217,18 +212,18 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
 
     dirtyLocalesRef.current.clear();
     setDirtyVersion((v) => v + 1);
-  }, [stashCurrentLocale, currentLocale, title, text, buttonText,
+  }, [stashCurrentLocale, currentLocale, localeForm,
       coverImageId, ctaRoute, settings, upsertLocMutation, updateSectionMutation]);
 
   // Track current locale form data in dirty map (ref-only, no state bump to avoid
   // infinite re-render — the active tab's dot is visible because parent re-renders
-  // from title/text/buttonText state, and stashCurrentLocale bumps version on tab switch)
+  // from localeForm state, and stashCurrentLocale bumps version on tab switch)
   useEffect(() => {
     if (currentLocale && open) {
-      dirtyLocalesRef.current.set(currentLocale.id, { title, text, buttonText });
+      dirtyLocalesRef.current.set(currentLocale.id, localeForm);
       setFormVersion((v) => v + 1);
     }
-  }, [title, text, buttonText, currentLocale, open]);
+  }, [localeForm, currentLocale, open]);
 
   // Autosave — uses same hook as blog/page detail editors (3s debounce, retries)
   const isDirty = dirtyLocalesRef.current.size > 0;
@@ -324,13 +319,13 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
                     label={t('blogDetail.fields.title')}
                     fullWidth
                     size="small"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+                    value={localeForm.title}
+                    onChange={(e) => setLocaleForm((prev) => ({ ...prev, title: e.target.value }))}
                   />
 
                   <ForjaEditor
-                    value={text}
-                    onChange={(val) => setText(val)}
+                    value={localeForm.text}
+                    onChange={(val) => setLocaleForm((prev) => ({ ...prev, text: val }))}
                     height={250}
                     placeholder={t('editor.sectionPlaceholder')}
                     siteId={selectedSiteId}
@@ -340,8 +335,8 @@ export default function SectionEditorDialog({ open, section, onClose }: SectionE
                     label={t('forms.section.fields.buttonText')}
                     fullWidth
                     size="small"
-                    value={buttonText}
-                    onChange={(e) => setButtonText(e.target.value)}
+                    value={localeForm.buttonText}
+                    onChange={(e) => setLocaleForm((prev) => ({ ...prev, buttonText: e.target.value }))}
                   />
                 </Stack>
               </>

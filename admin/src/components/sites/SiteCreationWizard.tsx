@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import {
   Box,
   Button,
@@ -151,30 +151,25 @@ export default function SiteCreationWizard({
   }
   prevOpenRef.current = open;
 
-  // Auto-set default locale
-  useEffect(() => {
-    if (selectedLocales.length === 1 && !defaultLocaleId) {
-      setDefaultLocaleId(selectedLocales[0].id);
-    }
-    if (selectedLocales.length === 0) {
-      setDefaultLocaleId(null);
-    }
-    if (defaultLocaleId && !selectedLocales.find((l) => l.id === defaultLocaleId)) {
-      setDefaultLocaleId(selectedLocales.length > 0 ? selectedLocales[0].id : null);
-    }
-  }, [selectedLocales, defaultLocaleId]);
+  // Derive effective default locale from selection (no useEffect needed)
+  const effectiveDefaultLocaleId = (() => {
+    if (selectedLocales.length === 0) return null;
+    if (selectedLocales.length === 1) return selectedLocales[0].id;
+    if (defaultLocaleId && selectedLocales.find((l) => l.id === defaultLocaleId)) return defaultLocaleId;
+    return selectedLocales[0].id;
+  })();
 
   const createMutation = useMutation({
     mutationFn: async (data: WizardFormData) => {
       // Validate locales
-      if (selectedLocales.length > 0 && !defaultLocaleId) {
+      if (selectedLocales.length > 0 && !effectiveDefaultLocaleId) {
         throw new Error(t('forms.site.validation.exactlyOneDefault'));
       }
 
       const locales = selectedLocales.length > 0
         ? selectedLocales.map((l) => ({
             locale_id: l.id,
-            is_default: l.id === defaultLocaleId,
+            is_default: l.id === effectiveDefaultLocaleId,
             url_prefix: l.code,
           }))
         : undefined;
@@ -218,7 +213,7 @@ export default function SiteCreationWizard({
     }
     if (activeStep === 3) {
       // Final step: validate locales and submit
-      if (selectedLocales.length > 0 && !defaultLocaleId) {
+      if (selectedLocales.length > 0 && !effectiveDefaultLocaleId) {
         setLocaleError(t('forms.site.validation.exactlyOneDefault'));
         return;
       }
@@ -412,7 +407,7 @@ export default function SiteCreationWizard({
                       key={key}
                       label={`${option.code} — ${option.name}`}
                       {...tagProps}
-                      color={option.id === defaultLocaleId ? 'primary' : 'default'}
+                      color={option.id === effectiveDefaultLocaleId ? 'primary' : 'default'}
                       size="small"
                     />
                   );
@@ -442,14 +437,14 @@ export default function SiteCreationWizard({
                       size="small"
                       icon={
                         <Radio
-                          checked={locale.id === defaultLocaleId}
+                          checked={locale.id === effectiveDefaultLocaleId}
                           size="small"
                           sx={{ p: 0 }}
                         />
                       }
                       onClick={() => setDefaultLocaleId(locale.id)}
-                      variant={locale.id === defaultLocaleId ? 'filled' : 'outlined'}
-                      color={locale.id === defaultLocaleId ? 'primary' : 'default'}
+                      variant={locale.id === effectiveDefaultLocaleId ? 'filled' : 'outlined'}
+                      color={locale.id === effectiveDefaultLocaleId ? 'primary' : 'default'}
                       sx={{ cursor: 'pointer' }}
                     />
                   ))}

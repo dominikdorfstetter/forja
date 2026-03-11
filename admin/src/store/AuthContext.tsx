@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, useEffect, useMemo, type ReactNode } from 'react';
+import { createContext, useContext, useState, useReducer, useCallback, useEffect, useMemo, type ReactNode } from 'react';
 import { useAuth as useClerkAuth, useUser } from '@clerk/clerk-react';
 import type { ApiKeyPermission, MembershipSummary, SiteRole } from '@/types/api';
 import apiService from '@/services/api';
@@ -9,6 +9,36 @@ interface AuthState {
   loading: boolean;
   memberships: MembershipSummary[];
   isSystemAdmin: boolean;
+}
+
+type AuthAction =
+  | { type: 'loading' }
+  | { type: 'reset' }
+  | { type: 'loaded'; permission: ApiKeyPermission; siteId: string | null; memberships: MembershipSummary[]; isSystemAdmin: boolean };
+
+const INITIAL_AUTH_STATE: AuthState = {
+  permission: null,
+  siteId: null,
+  loading: true,
+  memberships: [],
+  isSystemAdmin: false,
+};
+
+function authReducer(state: AuthState, action: AuthAction): AuthState {
+  switch (action.type) {
+    case 'loading':
+      return { ...state, loading: true };
+    case 'reset':
+      return { ...INITIAL_AUTH_STATE, loading: false };
+    case 'loaded':
+      return {
+        permission: action.permission,
+        siteId: action.siteId,
+        loading: false,
+        memberships: action.memberships,
+        isSystemAdmin: action.isSystemAdmin,
+      };
+  }
 }
 
 /** Role rank for comparison */
@@ -60,13 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const { isSignedIn, isLoaded, getToken, signOut } = useClerkAuth();
   const { user } = useUser();
 
-  const [state, setState] = useState<AuthState>({
-    permission: null,
-    siteId: null,
-    loading: true,
-    memberships: [],
-    isSystemAdmin: false,
-  });
+  const [state, dispatch] = useReducer(authReducer, INITIAL_AUTH_STATE);
 
   // Track selected site for role derivation
   const [activeSiteId, setActiveSiteId] = useState(_selectedSiteId);
@@ -89,47 +113,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!isLoaded) return;
 
     if (!isSignedIn) {
-      setState({ permission: null, siteId: null, loading: false, memberships: [], isSystemAdmin: false });
+      dispatch({ type: 'reset' });
       return;
     }
 
+    dispatch({ type: 'loading' });
+
     let cancelled = false;
-    const fetchMe = async () => {
-      try {
-        setState((s) => ({ ...s, loading: true }));
-        const info = await apiService.getAuthMe();
+    apiService.getAuthMe().then(
+      (info) => {
         if (!cancelled) {
-          setState({
+          dispatch({
+            type: 'loaded',
             permission: info.permission,
             siteId: info.site_id ?? null,
-            loading: false,
             memberships: info.memberships ?? [],
             isSystemAdmin: info.is_system_admin ?? false,
           });
         }
-      } catch {
+      },
+      () => {
         if (!cancelled) {
-          setState({ permission: null, siteId: null, loading: false, memberships: [], isSystemAdmin: false });
+          dispatch({ type: 'reset' });
         }
-      }
-    };
-
-    fetchMe();
+      },
+    );
     return () => { cancelled = true; };
   }, [isSignedIn, isLoaded]);
 
   const logout = useCallback(async () => {
     await signOut();
-    setState({ permission: null, siteId: null, loading: false, memberships: [], isSystemAdmin: false });
+    dispatch({ type: 'reset' });
   }, [signOut]);
 
   const refreshAuth = useCallback(async () => {
     try {
       const info = await apiService.getAuthMe();
-      setState({
+      dispatch({
+        type: 'loaded',
         permission: info.permission,
         siteId: info.site_id ?? null,
-        loading: false,
         memberships: info.memberships ?? [],
         isSystemAdmin: info.is_system_admin ?? false,
       });

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useRef } from 'react';
+import { useMemo, useState, useRef } from 'react';
 import {
   Button,
   Dialog,
