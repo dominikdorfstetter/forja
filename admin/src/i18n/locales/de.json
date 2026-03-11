@@ -2136,5 +2136,36 @@
       "title": "KI-Konfiguration entfernen?",
       "message": "Dadurch werden KI-Funktionen für diese Website deaktiviert. Sie können später neu konfigurieren."
     }
+  },
+  "help": {
+    "menu": {
+      "title": "Hilfe & Ressourcen",
+      "documentation": "Dokumentation",
+      "quickTour": "Schnelltour",
+      "keyboardShortcuts": "Tastenkürzel",
+      "feedback": "Feedback",
+      "version": "Forja v{{version}}"
+    },
+    "tour": {
+      "skip": "Tour überspringen",
+      "next": "Weiter",
+      "done": "Fertig",
+      "stepOf": "{{current}} von {{total}}",
+      "step1": "Dies ist Ihr Dashboard — sehen Sie die Aktivität Ihrer Website auf einen Blick",
+      "step2": "Verwalten Sie Ihre Inhalte, Struktur und Einstellungen über die Seitenleiste",
+      "step3": "Wechseln Sie hier zwischen Ihren Websites",
+      "step4": "Drücken Sie {{shortcut}}, um schnell überall hin zu navigieren",
+      "step5": "Brauchen Sie Hilfe? Finden Sie Dokumentation, Tastenkürzel und diese Tour jederzeit hier"
+    },
+    "shortcuts": {
+      "title": "Tastenkürzel",
+      "commandPalette": "Befehlspalette öffnen",
+      "save": "Speichern",
+      "undo": "Rückgängig",
+      "redo": "Wiederholen",
+      "bold": "Fett",
+      "italic": "Kursiv",
+      "underline": "Unterstrichen"
+    }
   }
 }

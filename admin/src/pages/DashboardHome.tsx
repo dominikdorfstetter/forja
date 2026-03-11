@@ -352,7 +352,7 @@ export default function DashboardHome() {
       {/* ================================================================ */}
       {/* Stat cards */}
       {/* ================================================================ */}
-      <Grid container spacing={3} sx={{ mb: 3 }}>
+      <Grid container spacing={3} sx={{ mb: 3 }} data-tour="dashboard-stats">
         <Grid size={{ xs: 12, sm: 6, md: isAdmin ? 2.4 : 3 }}>
           <StatCard
             icon={<WebIcon color="primary" />}

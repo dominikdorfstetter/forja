@@ -13,6 +13,7 @@ use crate::dto::audit::{AuditLogResponse, ChangeHistoryResponse};
 use crate::dto::auth::{
     AuthInfoResponse, ExportApiKeyRecord, ProfileResponse, UserDataExportResponse,
 };
+use crate::dto::help_state::{HelpStateResponse, UpdateHelpStateRequest};
 use crate::dto::onboarding::{CompleteOnboardingRequest, OnboardingResponse};
 use crate::dto::site_membership::{MembershipSummary, MembershipWithSite};
 use crate::dto::user_preferences::{UpdateUserPreferencesRequest, UserPreferencesResponse};
@@ -443,6 +444,118 @@ pub async fn complete_onboarding(
     Ok(Json(OnboardingResponse::from_json(&effective)))
 }
 
+/// Get the current user's help system state.
+///
+/// Returns tour completion, dismissed hotspots, and dismissed field help.
+/// Only available for Clerk-authenticated users.
+#[utoipa::path(
+    tag = "Auth",
+    operation_id = "get_help_state",
+    description = "Return the help system state for the authenticated user",
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 200, description = "Help state", body = HelpStateResponse),
+        (status = 400, description = "Only available for Clerk-authenticated users"),
+        (status = 401, description = "Missing or invalid credentials")
+    )
+)]
+#[get("/auth/help-state")]
+pub async fn get_help_state(
+    auth: AuthenticatedKey,
+    state: &rocket::State<AppState>,
+) -> Result<Json<HelpStateResponse>, crate::errors::ApiError> {
+    let clerk_user_id = match &auth.auth_source {
+        AuthSource::ClerkJwt { clerk_user_id } => clerk_user_id,
+        AuthSource::ApiKey => {
+            return Err(crate::errors::ApiError::BadRequest(
+                "Help state is only available for Clerk-authenticated users".to_string(),
+            ));
+        }
+    };
+
+    let effective = UserPreferences::get_effective(&state.db, clerk_user_id).await?;
+    Ok(Json(HelpStateResponse::from_json(&effective)))
+}
+
+/// Update the current user's help system state.
+///
+/// Partially updates help state — mark tour complete, dismiss a hotspot,
+/// or dismiss a field help tooltip.
+/// Only available for Clerk-authenticated users.
+#[utoipa::path(
+    tag = "Auth",
+    operation_id = "update_help_state",
+    description = "Update the authenticated user's help system state (partial update)",
+    security(("bearer_auth" = [])),
+    request_body = UpdateHelpStateRequest,
+    responses(
+        (status = 200, description = "Updated help state", body = HelpStateResponse),
+        (status = 400, description = "Validation error or not a Clerk user"),
+        (status = 401, description = "Missing or invalid credentials")
+    )
+)]
+#[patch("/auth/help-state", data = "<body>")]
+pub async fn update_help_state(
+    auth: AuthenticatedKey,
+    state: &rocket::State<AppState>,
+    body: Json<UpdateHelpStateRequest>,
+) -> Result<Json<HelpStateResponse>, crate::errors::ApiError> {
+    let clerk_user_id = match &auth.auth_source {
+        AuthSource::ClerkJwt { clerk_user_id } => clerk_user_id,
+        AuthSource::ApiKey => {
+            return Err(crate::errors::ApiError::BadRequest(
+                "Help state is only available for Clerk-authenticated users".to_string(),
+            ));
+        }
+    };
+
+    body.validate()?;
+
+    // Read current state so we can append to arrays
+    let effective = UserPreferences::get_effective(&state.db, clerk_user_id).await?;
+    let current = HelpStateResponse::from_json(&effective);
+
+    let partial = body
+        .into_inner()
+        .to_json(&current.hotspots_seen, &current.field_help_seen);
+    let updated = UserPreferences::upsert(&state.db, clerk_user_id, partial).await?;
+    Ok(Json(HelpStateResponse::from_json(&updated)))
+}
+
+/// Reset the current user's help system state to defaults.
+///
+/// Clears tour completion, dismissed hotspots, and dismissed field help.
+/// Only available for Clerk-authenticated users.
+#[utoipa::path(
+    tag = "Auth",
+    operation_id = "reset_help_state",
+    description = "Reset the authenticated user's help system state to defaults",
+    security(("bearer_auth" = [])),
+    responses(
+        (status = 200, description = "Reset help state", body = HelpStateResponse),
+        (status = 400, description = "Only available for Clerk-authenticated users"),
+        (status = 401, description = "Missing or invalid credentials")
+    )
+)]
+#[post("/auth/help-state/reset")]
+pub async fn reset_help_state(
+    auth: AuthenticatedKey,
+    state: &rocket::State<AppState>,
+) -> Result<Json<HelpStateResponse>, crate::errors::ApiError> {
+    let clerk_user_id = match &auth.auth_source {
+        AuthSource::ClerkJwt { clerk_user_id } => clerk_user_id,
+        AuthSource::ApiKey => {
+            return Err(crate::errors::ApiError::BadRequest(
+                "Help state is only available for Clerk-authenticated users".to_string(),
+            ));
+        }
+    };
+
+    let partial = UpdateHelpStateRequest::reset_json();
+    let updated = UserPreferences::upsert(&state.db, clerk_user_id, partial).await?;
+    Ok(Json(HelpStateResponse::from_json(&updated)))
+}
+
 /// Delete the authenticated user's account.
 ///
 /// For Clerk users: blocks if user is sole owner of any site. Deletes memberships,
@@ -543,6 +656,9 @@ pub fn routes() -> Vec<Route> {
         update_preferences,
         get_onboarding,
         complete_onboarding,
+        get_help_state,
+        update_help_state,
+        reset_help_state,
         export_user_data,
         delete_account
     ]

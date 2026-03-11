@@ -2136,5 +2136,36 @@
       "title": "Usunąć konfigurację AI?",
       "message": "Spowoduje to wyłączenie funkcji AI dla tej witryny. Możesz skonfigurować ponownie później."
     }
+  },
+  "help": {
+    "menu": {
+      "title": "Pomoc i zasoby",
+      "documentation": "Dokumentacja",
+      "quickTour": "Szybka wycieczka",
+      "keyboardShortcuts": "Skróty klawiszowe",
+      "feedback": "Opinie",
+      "version": "Forja v{{version}}"
+    },
+    "tour": {
+      "skip": "Pomiń wycieczkę",
+      "next": "Dalej",
+      "done": "Gotowe",
+      "stepOf": "{{current}} z {{total}}",
+      "step1": "To jest Twój pulpit — zobacz aktywność swojej witryny na pierwszy rzut oka",
+      "step2": "Zarządzaj treścią, strukturą i ustawieniami z paska bocznego",
+      "step3": "Przełączaj się między swoimi witrynami tutaj",
+      "step4": "Naciśnij {{shortcut}}, aby szybko nawigować w dowolne miejsce",
+      "step5": "Potrzebujesz pomocy? Znajdź dokumentację, skróty i tę wycieczkę tutaj w każdej chwili"
+    },
+    "shortcuts": {
+      "title": "Skróty klawiszowe",
+      "commandPalette": "Otwórz paletę poleceń",
+      "save": "Zapisz",
+      "undo": "Cofnij",
+      "redo": "Ponów",
+      "bold": "Pogrubienie",
+      "italic": "Kursywa",
+      "underline": "Podkreślenie"
+    }
   }
 }

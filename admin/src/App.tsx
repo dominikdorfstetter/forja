@@ -46,6 +46,7 @@ import RequireAuth from '@/components/auth/RequireAuth';
 import { SiteProvider } from '@/store/SiteContext';
 import { AuthProvider } from '@/store/AuthContext';
 import { UserPreferencesProvider } from '@/store/UserPreferencesContext';
+import { HelpStateProvider } from '@/store/HelpStateContext';
 import { NavigationGuardProvider } from '@/store/NavigationGuardContext';
 import ErrorBoundary from '@/components/shared/ErrorBoundary';
 import BlogDetailPage from '@/pages/BlogDetail';
@@ -105,6 +106,7 @@ function App() {
           <BrowserRouter basename="/dashboard">
             <AuthProvider>
             <UserPreferencesProvider>
+            <HelpStateProvider>
             <SiteProvider>
             <NavigationGuardProvider>
               <Routes>
@@ -162,6 +164,7 @@ function App() {
               </Routes>
             </NavigationGuardProvider>
             </SiteProvider>
+            </HelpStateProvider>
             </UserPreferencesProvider>
             </AuthProvider>
           </BrowserRouter>

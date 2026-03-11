@@ -2136,5 +2136,36 @@
       "title": "Supprimer la configuration IA ?",
       "message": "Cela désactivera les fonctionnalités IA pour ce site. Vous pourrez reconfigurer plus tard."
     }
+  },
+  "help": {
+    "menu": {
+      "title": "Aide & Ressources",
+      "documentation": "Documentation",
+      "quickTour": "Visite rapide",
+      "keyboardShortcuts": "Raccourcis clavier",
+      "feedback": "Commentaires",
+      "version": "Forja v{{version}}"
+    },
+    "tour": {
+      "skip": "Passer la visite",
+      "next": "Suivant",
+      "done": "Terminé",
+      "stepOf": "{{current}} sur {{total}}",
+      "step1": "Voici votre tableau de bord — consultez l'activité de votre site en un coup d'œil",
+      "step2": "Gérez votre contenu, votre structure et vos paramètres depuis la barre latérale",
+      "step3": "Basculez entre vos sites ici",
+      "step4": "Appuyez sur {{shortcut}} pour naviguer rapidement n'importe où",
+      "step5": "Besoin d'aide ? Trouvez la documentation, les raccourcis et cette visite ici à tout moment"
+    },
+    "shortcuts": {
+      "title": "Raccourcis clavier",
+      "commandPalette": "Ouvrir la palette de commandes",
+      "save": "Enregistrer",
+      "undo": "Annuler",
+      "redo": "Rétablir",
+      "bold": "Gras",
+      "italic": "Italique",
+      "underline": "Souligné"
+    }
   }
 }

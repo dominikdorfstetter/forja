@@ -139,6 +139,8 @@ import type {
   AnalyticsMaintenanceResponse,
   OnboardingResponse,
   CompleteOnboardingRequest,
+  HelpStateResponse,
+  UpdateHelpStateRequest,
 } from '@/types/api';
 
 const API_BASE_URL = '/api/v1';
@@ -253,6 +255,19 @@ export class ApiService {
 
   async completeOnboarding(data: CompleteOnboardingRequest): Promise<OnboardingResponse> {
     return apiRequest<OnboardingResponse>('PUT', '/auth/onboarding', data);
+  }
+
+  // Help state
+  async getHelpState(): Promise<HelpStateResponse> {
+    return apiRequest<HelpStateResponse>('GET', '/auth/help-state');
+  }
+
+  async updateHelpState(data: UpdateHelpStateRequest): Promise<HelpStateResponse> {
+    return apiRequest<HelpStateResponse>('PATCH', '/auth/help-state', data);
+  }
+
+  async resetHelpState(): Promise<HelpStateResponse> {
+    return apiRequest<HelpStateResponse>('POST', '/auth/help-state/reset');
   }
 
   // Health (mounted at root, not under /api/v1)

@@ -2136,5 +2136,36 @@
       "title": "AI-configuratie verwijderen?",
       "message": "Dit schakelt AI-functies voor deze site uit. U kunt later opnieuw configureren."
     }
+  },
+  "help": {
+    "menu": {
+      "title": "Hulp & bronnen",
+      "documentation": "Documentatie",
+      "quickTour": "Snelle rondleiding",
+      "keyboardShortcuts": "Sneltoetsen",
+      "feedback": "Feedback",
+      "version": "Forja v{{version}}"
+    },
+    "tour": {
+      "skip": "Rondleiding overslaan",
+      "next": "Volgende",
+      "done": "Klaar",
+      "stepOf": "{{current}} van {{total}}",
+      "step1": "Dit is uw dashboard — bekijk de activiteit van uw site in één oogopslag",
+      "step2": "Beheer uw inhoud, structuur en instellingen vanuit de zijbalk",
+      "step3": "Wissel hier tussen uw sites",
+      "step4": "Druk op {{shortcut}} om snel overal naartoe te navigeren",
+      "step5": "Hulp nodig? Vind documentatie, sneltoetsen en deze rondleiding hier op elk moment"
+    },
+    "shortcuts": {
+      "title": "Sneltoetsen",
+      "commandPalette": "Opdrachtenpalet openen",
+      "save": "Opslaan",
+      "undo": "Ongedaan maken",
+      "redo": "Opnieuw",
+      "bold": "Vet",
+      "italic": "Cursief",
+      "underline": "Onderstreept"
+    }
   }
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import { styled, useTheme, type Theme, type CSSObject } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -44,8 +44,11 @@ import { useAuth } from '@/store/AuthContext';
 import { useNavigationGuardContext } from '@/store/NavigationGuardContext';
 import { CommandPalette } from '@/components/command-palette';
 import NotificationBell from '@/components/notifications/NotificationBell';
+import HelpMenu from '@/components/help/HelpMenu';
+import QuickTour from '@/components/help/QuickTour';
 import ErrorBoundary from '@/components/shared/ErrorBoundary';
 import { useSiteContextData } from '@/hooks/useSiteContextData';
+import { useHelpState } from '@/store/HelpStateContext';
 
 const isMac = typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
 const modifierKey = isMac ? '⌘' : 'Ctrl+';
@@ -136,8 +139,22 @@ export default function Layout() {
   const { isAdmin, canManageMembers, siteId: authSiteId, logout, userFullName, userImageUrl } = useAuth();
   const { guardedNavigate } = useNavigationGuardContext();
   const { modules, context } = useSiteContextData();
+  const { state: helpState, tourActive, completeTour, startTour, isLoading: helpLoading } = useHelpState();
   const isSolo = context.member_count <= 1;
   const isTeamWithWorkflow = !isSolo && context.features.editorial_workflow;
+
+  // Auto-launch tour on first visit to dashboard
+  useEffect(() => {
+    if (
+      location.pathname === '/dashboard' &&
+      !helpState.tour_completed &&
+      !tourActive &&
+      !helpLoading
+    ) {
+      const timer = setTimeout(startTour, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [location.pathname, helpState.tour_completed, tourActive, helpLoading, startTour]);
 
   // Sidebar: site-workspace items only
   const allMenuSections = [
@@ -220,6 +237,7 @@ export default function Layout() {
               onChange={(e) => setSelectedSiteId(e.target.value)}
               disabled={!!authSiteId}
               data-testid="layout.btn.site-selector"
+              data-tour="site-selector"
               inputProps={{ 'aria-label': t('layout.toolbar.siteSelector') }}
               sx={{
                 mx: 3,
@@ -262,6 +280,7 @@ export default function Layout() {
               color="inherit"
               aria-label={t('commandPalette.open')}
               data-testid="layout.btn.search"
+              data-tour="command-palette"
               onClick={() => {
                 window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: isMac, ctrlKey: !isMac }));
               }}
@@ -284,6 +303,8 @@ export default function Layout() {
           <Box sx={{ flexGrow: 1 }} />
 
           <NotificationBell />
+
+          <HelpMenu />
 
           <Box sx={{ flexGrow: 0, ml: 1.5 }}>
             <Tooltip title={t('layout.toolbar.account')}>
@@ -382,6 +403,7 @@ export default function Layout() {
         {menuSections.map((section, idx) => (
           <List
             key={idx}
+            {...(idx === 0 ? { 'data-tour': 'sidebar-nav' } : {})}
             subheader={
               section.label ? (
                 <ListSubheader
@@ -530,6 +552,7 @@ export default function Layout() {
         </ErrorBoundary>
       </Box>
       <CommandPalette />
+      <QuickTour active={tourActive} onComplete={completeTour} />
     </Box>
   );
 }
