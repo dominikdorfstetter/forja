@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useRef } from 'react';
 import {
   Button,
   Dialog,
@@ -42,17 +42,17 @@ export default function SocialLinkFormDialog({ open, siteId, link, onSubmit, onC
     mode: 'onChange',
   });
 
-  useEffect(() => {
-    if (open) {
-      reset(link ? {
-        title: link.title,
-        url: link.url,
-        icon: link.icon,
-        alt_text: link.alt_text || '',
-        display_order: link.display_order,
-      } : { title: '', url: '', icon: '', alt_text: '', display_order: 0 });
-    }
-  }, [open, link, reset]);
+  const prevOpenRef = useRef(false);
+  if (open && !prevOpenRef.current) {
+    reset(link ? {
+      title: link.title,
+      url: link.url,
+      icon: link.icon,
+      alt_text: link.alt_text || '',
+      display_order: link.display_order,
+    } : { title: '', url: '', icon: '', alt_text: '', display_order: 0 });
+  }
+  prevOpenRef.current = open;
 
   const onFormSubmit = (data: SocialLinkFormData) => {
     onSubmit({

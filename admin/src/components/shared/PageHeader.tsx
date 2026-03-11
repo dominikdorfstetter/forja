@@ -4,7 +4,7 @@ import { Link as RouterLink } from 'react-router';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
-export interface BreadcrumbItem {
+interface BreadcrumbItem {
   label: string;
   path?: string;
 }
@@ -35,10 +35,10 @@ export default function PageHeader({ title, subtitle, breadcrumbs, action, secon
     <Box sx={{ mb: 3 }} data-testid="page-header">
       {breadcrumbs && breadcrumbs.length > 0 && (
         <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} sx={{ mb: 1 }}>
-          {breadcrumbs.map((crumb, idx) =>
+          {breadcrumbs.map((crumb) =>
             crumb.path ? (
               <Link
-                key={idx}
+                key={crumb.path}
                 component={RouterLink}
                 to={crumb.path}
                 underline="hover"
@@ -48,7 +48,7 @@ export default function PageHeader({ title, subtitle, breadcrumbs, action, secon
                 {crumb.label}
               </Link>
             ) : (
-              <Typography key={idx} color="text.primary" sx={{ fontSize: '0.875rem' }}>
+              <Typography key={crumb.label} color="text.primary" sx={{ fontSize: '0.875rem' }}>
                 {crumb.label}
               </Typography>
             )
@@ -81,9 +81,9 @@ export default function PageHeader({ title, subtitle, breadcrumbs, action, secon
                 open={Boolean(anchorEl)}
                 onClose={() => setAnchorEl(null)}
               >
-                {visibleSecondaryActions.map((item, idx) => (
+                {visibleSecondaryActions.map((item) => (
                   <MenuItem
-                    key={idx}
+                    key={item.label}
                     onClick={() => {
                       setAnchorEl(null);
                       item.onClick();

@@ -13,8 +13,6 @@ export const optionalUrl = z
   .transform((v) => (v === '' ? undefined : v))
   .pipe(z.string().url('Must be a valid URL').optional());
 
-export const emailField = z.string().min(1, 'Required').email('Must be a valid email');
-
 export const positiveInt = z.coerce.number().int().min(1, 'Must be at least 1');
 
 export const nonNegativeInt = z.coerce.number().int().min(0, 'Must be 0 or greater');

@@ -1,7 +1,5 @@
 import { slugify } from './slugify';
 
-export { slugify, MAX_SLUG_LENGTH } from './slugify';
-
 export interface MarkdownParseResult {
   title: string;
   body: string;

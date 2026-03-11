@@ -1,6 +1,6 @@
 import Image from '@tiptap/extension-image';
 
-export interface ImagePickerOptions {
+interface ImagePickerOptions {
   onImageInsert?: () => void;
 }
 

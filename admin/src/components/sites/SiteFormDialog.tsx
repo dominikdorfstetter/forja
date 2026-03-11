@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   Button,
   Dialog,
@@ -72,47 +72,42 @@ export default function SiteFormDialog({ open, site, onSubmit, onClose, loading 
     enabled: open && isCreateMode,
   });
 
-  useEffect(() => {
-    if (open) {
-      clear();
-      reset(site ? {
-        name: site.name,
-        slug: site.slug,
-        description: site.description || '',
-        timezone: site.timezone,
-      } : {
-        name: '',
-        slug: '',
-        description: '',
-        timezone: 'UTC',
-      });
-      if (!site) {
-        setSelectedLocales([]);
-        setDefaultLocaleId(null);
-        setLocaleError(null);
-      }
-      setTimeout(() => snapshot(), 0);
-    }
-  }, [open, site, reset, clear, snapshot]);
-
-  // Auto-set default when first locale is selected
-  useEffect(() => {
-    if (selectedLocales.length === 1 && !defaultLocaleId) {
-      setDefaultLocaleId(selectedLocales[0].id);
-    }
-    if (selectedLocales.length === 0) {
+  // Reset form when dialog opens
+  const prevOpenRef = useRef(false);
+  if (open && !prevOpenRef.current) {
+    clear();
+    reset(site ? {
+      name: site.name,
+      slug: site.slug,
+      description: site.description || '',
+      timezone: site.timezone,
+    } : {
+      name: '',
+      slug: '',
+      description: '',
+      timezone: 'UTC',
+    });
+    if (!site) {
+      setSelectedLocales([]);
       setDefaultLocaleId(null);
+      setLocaleError(null);
     }
-    // Clear default if selected locale was removed
-    if (defaultLocaleId && !selectedLocales.find((l) => l.id === defaultLocaleId)) {
-      setDefaultLocaleId(selectedLocales.length > 0 ? selectedLocales[0].id : null);
-    }
-  }, [selectedLocales, defaultLocaleId]);
+    setTimeout(() => snapshot(), 0);
+  }
+  prevOpenRef.current = open;
+
+  // Derive effective default locale from selection (no useEffect needed)
+  const effectiveDefaultLocaleId = (() => {
+    if (selectedLocales.length === 0) return null;
+    if (selectedLocales.length === 1) return selectedLocales[0].id;
+    if (defaultLocaleId && selectedLocales.find((l) => l.id === defaultLocaleId)) return defaultLocaleId;
+    return selectedLocales[0].id;
+  })();
 
   const onFormSubmit = (data: SiteFormData) => {
     // Validate locales in create mode
     if (isCreateMode && selectedLocales.length > 0) {
-      if (!defaultLocaleId) {
+      if (!effectiveDefaultLocaleId) {
         setLocaleError(t('forms.site.validation.exactlyOneDefault'));
         return;
       }
@@ -123,7 +118,7 @@ export default function SiteFormDialog({ open, site, onSubmit, onClose, loading 
       isCreateMode && selectedLocales.length > 0
         ? selectedLocales.map((l) => ({
             locale_id: l.id,
-            is_default: l.id === defaultLocaleId,
+            is_default: l.id === effectiveDefaultLocaleId,
             url_prefix: l.code,
           }))
         : undefined;
@@ -201,7 +196,7 @@ export default function SiteFormDialog({ open, site, onSubmit, onClose, loading 
                           key={key}
                           label={`${option.code} — ${option.name}`}
                           {...tagProps}
-                          color={option.id === defaultLocaleId ? 'primary' : 'default'}
+                          color={option.id === effectiveDefaultLocaleId ? 'primary' : 'default'}
                           size="small"
                         />
                       );
@@ -230,14 +225,14 @@ export default function SiteFormDialog({ open, site, onSubmit, onClose, loading 
                           size="small"
                           icon={
                             <Radio
-                              checked={locale.id === defaultLocaleId}
+                              checked={locale.id === effectiveDefaultLocaleId}
                               size="small"
                               sx={{ p: 0 }}
                             />
                           }
                           onClick={() => setDefaultLocaleId(locale.id)}
-                          variant={locale.id === defaultLocaleId ? 'filled' : 'outlined'}
-                          color={locale.id === defaultLocaleId ? 'primary' : 'default'}
+                          variant={locale.id === effectiveDefaultLocaleId ? 'filled' : 'outlined'}
+                          color={locale.id === effectiveDefaultLocaleId ? 'primary' : 'default'}
                           sx={{ cursor: 'pointer' }}
                         />
                       ))}

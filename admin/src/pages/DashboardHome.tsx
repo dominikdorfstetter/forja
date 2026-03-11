@@ -1,52 +1,35 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useReducer, useCallback, useEffect } from 'react';
 import {
   Alert,
   Box,
   Button,
-  Card,
-  CardContent,
   Chip,
   Grid,
-  LinearProgress,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
   Paper,
-  Skeleton,
   Stack,
   Typography,
 } from '@mui/material';
-import WebIcon from '@mui/icons-material/Web';
-import ArticleIcon from '@mui/icons-material/Article';
-import ImageIcon from '@mui/icons-material/Image';
-import KeyIcon from '@mui/icons-material/Key';
-import DescriptionIcon from '@mui/icons-material/Description';
 import BoltIcon from '@mui/icons-material/Bolt';
-import DnsIcon from '@mui/icons-material/Dns';
-import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import ErrorIcon from '@mui/icons-material/Error';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import apiService from '@/services/api';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import { useAuth } from '@/store/AuthContext';
 import { useSiteContext } from '@/store/SiteContext';
 import { useDashboardData } from '@/hooks/useDashboardData';
-import OnboardingSurvey from '@/components/OnboardingSurvey';
 import SetupChecklist from '@/components/SetupChecklist';
-import SiteCreationWizard from '@/components/sites/SiteCreationWizard';
 import ContentStatusChart from '@/components/dashboard/ContentStatusChart';
 import AttentionPanel from '@/components/dashboard/AttentionPanel';
 import RecentActivityPanel from '@/components/dashboard/RecentActivityPanel';
 import QuickPostDialog from '@/components/blogs/QuickPostDialog';
 import TeamWorkflowPrompt from '@/components/TeamWorkflowPrompt';
 import AnalyticsWidget from '@/components/dashboard/AnalyticsWidget';
+import SystemHealthPanel from '@/components/dashboard/SystemHealthPanel';
+import ApiKeysPanel from '@/components/dashboard/ApiKeysPanel';
 import { computeWizardDefaults } from '@/utils/onboardingDefaults';
-import type { ContentStatus, UserType, ContentIntent } from '@/types/api';
+import type { UserType, ContentIntent } from '@/types/api';
+import DashboardStatCards from '@/pages/DashboardStatCards';
+import DashboardWelcome from '@/pages/DashboardWelcome';
 
 
 // ---------------------------------------------------------------------------
@@ -61,87 +44,43 @@ const PERMISSION_META: Record<string, { labelKey: string; color: 'default' | 'in
   Read: { labelKey: 'dashboard.permissions.readOnly', color: 'default' },
 };
 
-const STATUS_COLORS: Record<ContentStatus, string> = {
-  Draft: '#ed6c02',
-  InReview: '#9c27b0',
-  Scheduled: '#0288d1',
-  Published: '#2e7d32',
-  Archived: '#757575',
-};
+// ---------------------------------------------------------------------------
+// Reducer
+// ---------------------------------------------------------------------------
 
-function StatCard({
-  icon,
-  label,
-  value,
-  loading,
-  onClick,
-  statusBreakdown,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: number | string;
-  loading?: boolean;
-  onClick?: () => void;
-  statusBreakdown?: Record<ContentStatus, number>;
-}) {
-  const total = statusBreakdown
-    ? Object.values(statusBreakdown).reduce((s, n) => s + n, 0)
-    : 0;
+interface DashboardUIState {
+  wizardOpen: boolean;
+  wizardDismissed: boolean;
+  quickPostOpen: boolean;
+  wizardDefaults: ReturnType<typeof computeWizardDefaults> | undefined;
+  checklistDismissed: boolean;
+}
 
-  return (
-    <Card
-      sx={{
-        height: '100%',
-        cursor: onClick ? 'pointer' : 'default',
-        transition: 'box-shadow 0.2s',
-        '&:hover': onClick ? { boxShadow: 6 } : undefined,
-      }}
-      onClick={onClick}
-      role={onClick ? 'button' : undefined}
-      tabIndex={onClick ? 0 : undefined}
-      onKeyDown={onClick ? (e: React.KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } } : undefined}
-    >
-      <CardContent>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-          {icon}
-          <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
-            {label}
-          </Typography>
-        </Box>
-        {loading ? (
-          <Skeleton variant="text" width={60} height={48} />
-        ) : (
-          <Typography variant="h3" fontWeight="bold">
-            {value}
-          </Typography>
-        )}
-        {/* Mini status bar */}
-        {statusBreakdown && total > 0 && !loading && (
-          <Box
-            sx={{
-              display: 'flex',
-              height: 4,
-              borderRadius: 2,
-              overflow: 'hidden',
-              mt: 1.5,
-            }}
-          >
-            {(Object.entries(statusBreakdown) as [ContentStatus, number][])
-              .filter(([, count]) => count > 0)
-              .map(([status, count]) => (
-                <Box
-                  key={status}
-                  sx={{
-                    width: `${(count / total) * 100}%`,
-                    bgcolor: STATUS_COLORS[status],
-                  }}
-                />
-              ))}
-          </Box>
-        )}
-      </CardContent>
-    </Card>
-  );
+type DashboardUIAction =
+  | { type: 'SET_WIZARD_OPEN'; payload: boolean }
+  | { type: 'SET_WIZARD_DISMISSED'; payload: boolean }
+  | { type: 'SET_QUICK_POST_OPEN'; payload: boolean }
+  | { type: 'SET_WIZARD_DEFAULTS'; payload: ReturnType<typeof computeWizardDefaults> | undefined }
+  | { type: 'SET_CHECKLIST_DISMISSED'; payload: boolean }
+  | { type: 'OPEN_WIZARD_WITH_DEFAULTS'; payload: ReturnType<typeof computeWizardDefaults> };
+
+function dashboardReducer(state: DashboardUIState, action: DashboardUIAction): DashboardUIState {
+  switch (action.type) {
+    case 'SET_WIZARD_OPEN':
+      return { ...state, wizardOpen: action.payload };
+    case 'SET_WIZARD_DISMISSED':
+      return { ...state, wizardDismissed: action.payload };
+    case 'SET_QUICK_POST_OPEN':
+      return { ...state, quickPostOpen: action.payload };
+    case 'SET_WIZARD_DEFAULTS':
+      return { ...state, wizardDefaults: action.payload };
+    case 'SET_CHECKLIST_DISMISSED':
+      return { ...state, checklistDismissed: action.payload };
+    case 'OPEN_WIZARD_WITH_DEFAULTS':
+      return { ...state, wizardDefaults: action.payload, wizardOpen: true };
+    default:
+      return state;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -150,16 +89,20 @@ function StatCard({
 
 export default function DashboardHome() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { showError } = useErrorSnackbar();
   const { permission, isMaster, isAdmin, canWrite, isSystemAdmin, currentSiteRole, isOwner } = useAuth();
   const { selectedSiteId, selectedSite, sites, isLoading: sitesLoading2 } = useSiteContext();
 
-  const [wizardOpen, setWizardOpen] = useState(false);
-  const [wizardDismissed, setWizardDismissed] = useState(false);
-  const [quickPostOpen, setQuickPostOpen] = useState(false);
-  const [wizardDefaults, setWizardDefaults] = useState<ReturnType<typeof computeWizardDefaults> | undefined>();
+  const initialUIState: DashboardUIState = {
+    wizardOpen: false,
+    wizardDismissed: false,
+    quickPostOpen: false,
+    wizardDefaults: undefined,
+    checklistDismissed: !!selectedSiteId && localStorage.getItem(`forja_checklist_dismissed_${selectedSiteId}`) === '1',
+  };
+
+  const [ui, uiDispatch] = useReducer(dashboardReducer, initialUIState);
 
   const hasSite = !!selectedSiteId;
   const hasNoSites = !sitesLoading2 && (!sites || sites.length === 0);
@@ -179,8 +122,7 @@ export default function DashboardHome() {
     onSuccess: (_, { userType, intents }) => {
       queryClient.invalidateQueries({ queryKey: ['onboarding'] });
       const defaults = computeWizardDefaults(userType, intents);
-      setWizardDefaults(defaults);
-      setWizardOpen(true);
+      uiDispatch({ type: 'OPEN_WIZARD_WITH_DEFAULTS', payload: defaults });
     },
     onError: showError,
   });
@@ -213,7 +155,7 @@ export default function DashboardHome() {
   // Command palette listener for quick-post
   useEffect(() => {
     const handler = (e: Event) => {
-      if ((e as CustomEvent).detail === 'quick-post') setQuickPostOpen(true);
+      if ((e as CustomEvent).detail === 'quick-post') uiDispatch({ type: 'SET_QUICK_POST_OPEN', payload: true });
     };
     window.addEventListener('command-palette:action', handler);
     return () => window.removeEventListener('command-palette:action', handler);
@@ -222,79 +164,43 @@ export default function DashboardHome() {
   // ---------- Setup checklist ----------
 
   const checklistKey = `forja_checklist_dismissed_${selectedSiteId}`;
-  const [checklistDismissed, setChecklistDismissed] = useState(
-    () => !!selectedSiteId && localStorage.getItem(`forja_checklist_dismissed_${selectedSiteId}`) === '1',
-  );
 
   useEffect(() => {
-    setChecklistDismissed(
-      !!selectedSiteId && localStorage.getItem(checklistKey) === '1',
-    );
+    uiDispatch({
+      type: 'SET_CHECKLIST_DISMISSED',
+      payload: !!selectedSiteId && localStorage.getItem(checklistKey) === '1',
+    });
   }, [selectedSiteId, checklistKey]);
 
   const dismissChecklist = useCallback(() => {
     if (selectedSiteId) {
       localStorage.setItem(checklistKey, '1');
     }
-    setChecklistDismissed(true);
+    uiDispatch({ type: 'SET_CHECKLIST_DISMISSED', payload: true });
   }, [checklistKey, selectedSiteId]);
 
   const hasLocales = (dashboard.siteLocales ?? []).length > 0;
   const hasNavigation = (dashboard.navMenus ?? []).length > 0;
-  const showChecklist = hasSite && !checklistDismissed;
+  const showChecklist = hasSite && !ui.checklistDismissed;
 
   // ---------- Render ----------
 
   if (hasNoSites) {
-    const showSurvey = !onboardingLoading && !onboarding?.completed && !wizardOpen;
+    const showSurvey = !onboardingLoading && !onboarding?.completed && !ui.wizardOpen;
 
-    if (showSurvey) {
-      return (
-        <OnboardingSurvey
-          onComplete={handleSurveyComplete}
-          onSkip={handleSurveySkip}
-          loading={completeOnboardingMutation.isPending}
-        />
-      );
-    }
-
-    // Survey done — show wizard with a landing page behind it
     return (
-      <>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: 'calc(100vh - 120px)',
-            textAlign: 'center',
-            px: 2,
-          }}
-        >
-          <RocketLaunchIcon sx={{ fontSize: 64, color: 'primary.main', mb: 2 }} />
-          <Typography variant="h4" component="h1" fontWeight="bold" gutterBottom>
-            {t('onboarding.welcome')}
-          </Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 520, mb: 4 }}>
-            {t('onboarding.description')}
-          </Typography>
-          <Button
-            variant="contained"
-            size="large"
-            onClick={() => setWizardOpen(true)}
-            sx={{ px: 5, py: 1.5 }}
-          >
-            {t('onboarding.createSite')}
-          </Button>
-        </Box>
-        <SiteCreationWizard
-          open={wizardOpen || (onboarding?.completed === true && !wizardDismissed)}
-          onClose={() => { setWizardOpen(false); setWizardDismissed(true); }}
-          defaultModules={wizardDefaults?.modules}
-          defaultWorkflowMode={wizardDefaults?.workflowMode}
-        />
-      </>
+      <DashboardWelcome
+        showSurvey={showSurvey}
+        onSurveyComplete={handleSurveyComplete}
+        onSurveySkip={handleSurveySkip}
+        surveyLoading={completeOnboardingMutation.isPending}
+        wizardOpen={ui.wizardOpen}
+        wizardDismissed={ui.wizardDismissed}
+        onboardingCompleted={onboarding?.completed === true}
+        onOpenWizard={() => uiDispatch({ type: 'SET_WIZARD_OPEN', payload: true })}
+        onCloseWizard={() => { uiDispatch({ type: 'SET_WIZARD_OPEN', payload: false }); uiDispatch({ type: 'SET_WIZARD_DISMISSED', payload: true }); }}
+        wizardDefaults={ui.wizardDefaults}
+      />
     );
   }
 
@@ -320,7 +226,7 @@ export default function DashboardHome() {
           <Button
             variant="contained"
             startIcon={<BoltIcon />}
-            onClick={() => setQuickPostOpen(true)}
+            onClick={() => uiDispatch({ type: 'SET_QUICK_POST_OPEN', payload: true })}
             size="small"
           >
             {t('quickPost.dashboardButton')}
@@ -345,74 +251,27 @@ export default function DashboardHome() {
       {/* Read-only notice */}
       {effectivePermission === 'Read' && (
         <Alert severity="info" sx={{ mb: 3 }}>
-          <span dangerouslySetInnerHTML={{ __html: t('dashboard.readOnlyNotice') }} />
+          <Trans i18nKey="dashboard.readOnlyNotice" components={{ strong: <strong /> }} />
         </Alert>
       )}
 
-      {/* ================================================================ */}
       {/* Stat cards */}
-      {/* ================================================================ */}
-      <Grid container spacing={3} sx={{ mb: 3 }} data-tour="dashboard-stats">
-        <Grid size={{ xs: 12, sm: 6, md: isAdmin ? 2.4 : 3 }}>
-          <StatCard
-            icon={<WebIcon color="primary" />}
-            label={t('dashboard.stats.sites')}
-            value={dashboard.totalSites}
-            loading={dashboard.sitesLoading}
-            onClick={() => navigate('/sites')}
-          />
-        </Grid>
-
-        {hasSite && (
-          <Grid size={{ xs: 12, sm: 6, md: isAdmin ? 2.4 : 3 }}>
-            <StatCard
-              icon={<ArticleIcon color="primary" />}
-              label={t('dashboard.stats.blogPosts')}
-              value={dashboard.totalBlogs}
-              loading={dashboard.blogsLoading}
-              onClick={() => navigate('/blogs')}
-              statusBreakdown={dashboard.blogStatusCounts}
-            />
-          </Grid>
-        )}
-
-        {hasSite && (
-          <Grid size={{ xs: 12, sm: 6, md: isAdmin ? 2.4 : 3 }}>
-            <StatCard
-              icon={<DescriptionIcon color="primary" />}
-              label={t('dashboard.stats.pages')}
-              value={dashboard.totalPages}
-              loading={dashboard.pagesLoading}
-              onClick={() => navigate('/pages')}
-              statusBreakdown={dashboard.pageStatusCounts}
-            />
-          </Grid>
-        )}
-
-        {hasSite && (
-          <Grid size={{ xs: 12, sm: 6, md: isAdmin ? 2.4 : 3 }}>
-            <StatCard
-              icon={<ImageIcon color="primary" />}
-              label={t('dashboard.stats.mediaFiles')}
-              value={dashboard.totalMedia}
-              loading={dashboard.mediaLoading}
-              onClick={() => navigate('/media')}
-            />
-          </Grid>
-        )}
-
-        {isAdmin && (
-          <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
-            <StatCard
-              icon={<KeyIcon color="primary" />}
-              label={t('dashboard.stats.apiKeys')}
-              value={dashboard.totalApiKeys}
-              loading={dashboard.apiKeysLoading}
-              onClick={() => navigate('/api-keys')}
-            />
-          </Grid>
-        )}
-      </Grid>
+      <DashboardStatCards
+        hasSite={hasSite}
+        isAdmin={isAdmin}
+        totalSites={dashboard.totalSites}
+        sitesLoading={dashboard.sitesLoading}
+        totalBlogs={dashboard.totalBlogs}
+        blogsLoading={dashboard.blogsLoading}
+        blogStatusCounts={dashboard.blogStatusCounts}
+        totalPages={dashboard.totalPages}
+        pagesLoading={dashboard.pagesLoading}
+        pageStatusCounts={dashboard.pageStatusCounts}
+        totalMedia={dashboard.totalMedia}
+        mediaLoading={dashboard.mediaLoading}
+        totalApiKeys={dashboard.totalApiKeys}
+        apiKeysLoading={dashboard.apiKeysLoading}
+      />
 
       {/* ================================================================ */}
       {/* Content Overview + Attention Panel */}
@@ -469,124 +328,25 @@ export default function DashboardHome() {
 
             {/* System Health */}
             {dashboard.healthData && (
-              <Paper sx={{ p: 2.5 }}>
-                <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5 }}>
-                  <DnsIcon color="primary" fontSize="small" />
-                  <Typography variant="subtitle2" component="h2" fontWeight={600}>
-                    {t('dashboard.systemHealth')}
-                  </Typography>
-                  {dashboard.healthLoading && <LinearProgress sx={{ flex: 1, ml: 2 }} />}
-                </Stack>
-                <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                  {isMaster && dashboard.healthData.services.map((svc) => {
-                    const icon = svc.status === 'up'
-                      ? <CheckCircleIcon />
-                      : svc.status === 'disabled'
-                        ? <InfoOutlinedIcon />
-                        : <ErrorIcon />;
-                    const color = svc.status === 'up'
-                      ? 'success' as const
-                      : svc.status === 'disabled'
-                        ? 'default' as const
-                        : 'error' as const;
-                    const suffix = svc.status === 'disabled'
-                      ? ' (disabled)'
-                      : svc.latency_ms != null
-                        ? ` (${svc.latency_ms}ms)`
-                        : '';
-                    return (
-                      <Chip
-                        key={svc.name}
-                        icon={icon}
-                        label={`${svc.name}${suffix}`}
-                        color={color}
-                        variant="outlined"
-                        size="small"
-                      />
-                    );
-                  })}
-                  {isMaster && dashboard.healthData.storage && (() => {
-                    const s = dashboard.healthData.storage;
-                    const icon = s.status === 'up' ? <CheckCircleIcon /> : <ErrorIcon />;
-                    const color = s.status === 'up' ? 'success' as const : 'error' as const;
-                    const suffix = s.latency_ms != null ? ` (${s.latency_ms}ms)` : '';
-                    return (
-                      <Chip
-                        key={s.name}
-                        icon={icon}
-                        label={`${s.name}${suffix}`}
-                        color={color}
-                        variant="outlined"
-                        size="small"
-                      />
-                    );
-                  })()}
-                  <Chip
-                    icon={dashboard.healthData.status === 'healthy' ? <CheckCircleIcon /> : <ErrorIcon />}
-                    label={t('dashboard.overall', { status: dashboard.healthData.status })}
-                    color={dashboard.healthData.status === 'healthy' ? 'success' : 'warning'}
-                    size="small"
-                  />
-                  {dashboard.healthData.version && (
-                    <Chip
-                      label={`v${dashboard.healthData.version}`}
-                      size="small"
-                      variant="outlined"
-                    />
-                  )}
-                </Stack>
-              </Paper>
+              <SystemHealthPanel
+                healthData={dashboard.healthData}
+                healthLoading={dashboard.healthLoading}
+                isMaster={isMaster}
+              />
             )}
 
             {/* Admin: API Keys overview */}
             {isAdmin && (
-              <Paper sx={{ p: 3 }}>
-                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
-                  <Typography variant="h6" component="h2">{t('dashboard.stats.apiKeys')}</Typography>
-                  <Button size="small" onClick={() => navigate('/api-keys')}>
-                    {t('common.actions.manage')}
-                  </Button>
-                </Stack>
-                {dashboard.apiKeysLoading ? (
-                  <Stack spacing={1}>
-                    {[0, 1, 2].map((i) => (
-                      <Skeleton key={i} variant="rectangular" height={40} sx={{ borderRadius: 1 }} />
-                    ))}
-                  </Stack>
-                ) : (
-                  <List disablePadding>
-                    {(dashboard.apiKeysData?.data ?? []).slice(0, 5).map((key) => (
-                      <ListItem key={key.id} divider>
-                        <ListItemIcon sx={{ minWidth: 36 }}>
-                          <KeyIcon fontSize="small" color={key.status === 'Active' ? 'primary' : 'disabled'} />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={key.name}
-                          secondary={
-                            <Stack direction="row" spacing={1} alignItems="center" component="span">
-                              <Chip
-                                label={key.permission}
-                                size="small"
-                                variant="outlined"
-                                sx={{ height: 20, fontSize: '0.7rem' }}
-                              />
-                              <Typography variant="caption" component="span">
-                                {t('dashboard.requests', { count: key.total_requests.toLocaleString() } as Record<string, unknown>)}
-                              </Typography>
-                            </Stack>
-                          }
-                        />
-                      </ListItem>
-                    ))}
-                  </List>
-                )}
-              </Paper>
+              <ApiKeysPanel
+                loading={dashboard.apiKeysLoading}
+                apiKeys={dashboard.apiKeysData?.data ?? []}
+              />
             )}
           </Stack>
         </Grid>
       </Grid>
 
-      <QuickPostDialog open={quickPostOpen} onClose={() => setQuickPostOpen(false)} />
+      <QuickPostDialog open={ui.quickPostOpen} onClose={() => uiDispatch({ type: 'SET_QUICK_POST_OPEN', payload: false })} />
     </Box>
   );
 }

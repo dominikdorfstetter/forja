@@ -1,13 +1,9 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useReducer, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
   Alert,
-  Checkbox,
   Paper,
-  Typography,
-  Chip,
-  TableSortLabel,
   Tabs,
   Tab,
 } from '@mui/material';
@@ -17,7 +13,6 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
-import { format } from 'date-fns';
 import apiService from '@/services/api';
 import type { PageListItem, CreatePageRequest, UpdatePageRequest, BulkContentRequest, PageResponse } from '@/types/api';
 import { useSiteContext } from '@/store/SiteContext';
@@ -25,23 +20,19 @@ import { useAuth } from '@/store/AuthContext';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
-import StatusChip from '@/components/shared/StatusChip';
-import PageTypeChip from '@/components/shared/PageTypeChip';
-import ConfirmDialog from '@/components/shared/ConfirmDialog';
-import RestoreDialog from '@/components/shared/RestoreDialog';
 import BulkActionToolbar from '@/components/shared/BulkActionToolbar';
+import PagesDialogs from '@/pages/PagesDialogs';
 import TableFilterBar from '@/components/shared/TableFilterBar';
-import PageActionsMenu from '@/components/pages/PageActionsMenu';
 import CreatePageWizard from '@/components/pages/CreatePageWizard';
-import DataTable, { type DataTableColumn } from '@/components/shared/DataTable';
+import DataTable from '@/components/shared/DataTable';
 import { useListPageState } from '@/hooks/useListPageState';
 import { useCrudMutations } from '@/hooks/useCrudMutations';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import { useBulkSelection } from '@/hooks/useBulkSelection';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useSiteContextData } from '@/hooks/useSiteContextData';
-
-type SortDir = 'asc' | 'desc';
+import { uiReducer, initialUIState } from '@/pages/PagesReducer';
+import { buildPagesColumns, buildPagesFilters } from '@/pages/PagesTableConfig';
 
 export default function PagesPage() {
   const { t } = useTranslation();
@@ -60,23 +51,9 @@ export default function PagesPage() {
     handlePageChange, handleRowsPerPageChange,
   } = useListPageState<PageListItem>();
 
-  const [viewTab, setViewTab] = useState<'active' | 'archived'>('active');
-  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
-  const [publishingPage, setPublishingPage] = useState<PageListItem | null>(null);
-  const [unpublishingPage, setUnpublishingPage] = useState<PageListItem | null>(null);
-  const [archivingPage, setArchivingPage] = useState<PageListItem | null>(null);
-  const [restoringPage, setRestoringPage] = useState<PageListItem | null>(null);
-  const [bulkPublishOpen, setBulkPublishOpen] = useState(false);
-  const [bulkUnpublishOpen, setBulkUnpublishOpen] = useState(false);
-  const [bulkArchiveOpen, setBulkArchiveOpen] = useState(false);
-  const [bulkRestoreOpen, setBulkRestoreOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
-  const [typeFilter, setTypeFilter] = useState('');
-  const [sortBy, setSortBy] = useState('route');
-  const [sortDir, setSortDir] = useState<SortDir>('asc');
+  const [ui, dispatch] = useReducer(uiReducer, initialUIState);
 
-  const debouncedSearch = useDebouncedValue(searchQuery);
+  const debouncedSearch = useDebouncedValue(ui.searchQuery);
 
   // Reset to page 1 when debounced search changes (not on mount)
   const prevDebouncedSearch = useRef(debouncedSearch);
@@ -88,20 +65,18 @@ export default function PagesPage() {
   }, [debouncedSearch, setPage]);
 
   const handleStatusFilterChange = useCallback((value: string) => {
-    setStatusFilter(value);
+    dispatch({ type: 'setStatusFilter', value });
     setPage(1);
   }, [setPage]);
 
   const handleTypeFilterChange = useCallback((value: string) => {
-    setTypeFilter(value);
+    dispatch({ type: 'setTypeFilter', value });
     setPage(1);
   }, [setPage]);
 
   const handleTabChange = useCallback((_: React.SyntheticEvent, newValue: 'active' | 'archived') => {
-    setViewTab(newValue);
+    dispatch({ type: 'setViewTab', value: newValue });
     setPage(1);
-    setStatusFilter('');
-    setSearchQuery('');
     bulk.clear();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setPage]);
@@ -115,18 +90,18 @@ export default function PagesPage() {
     return () => window.removeEventListener('command-palette:action', handler);
   }, [openCreate]);
 
-  const isArchived = viewTab === 'archived';
+  const isArchived = ui.viewTab === 'archived';
 
   const { data: pageData, isLoading, error } = useQuery({
-    queryKey: ['pages', selectedSiteId, page, perPage, debouncedSearch, statusFilter, typeFilter, sortBy, sortDir, viewTab],
+    queryKey: ['pages', selectedSiteId, page, perPage, debouncedSearch, ui.statusFilter, ui.typeFilter, ui.sortBy, ui.sortDir, ui.viewTab],
     queryFn: () => apiService.getPages(selectedSiteId, {
       page,
       per_page: perPage,
       search: debouncedSearch || undefined,
-      status: isArchived ? 'Archived' : (statusFilter || undefined),
-      page_type: typeFilter || undefined,
-      sort_by: sortBy,
-      sort_dir: sortDir,
+      status: isArchived ? 'Archived' : (ui.statusFilter || undefined),
+      page_type: ui.typeFilter || undefined,
+      sort_by: ui.sortBy,
+      sort_dir: ui.sortDir,
       exclude_status: isArchived ? undefined : 'Archived',
     }),
     enabled: !!selectedSiteId,
@@ -139,14 +114,13 @@ export default function PagesPage() {
   const bulk = useBulkSelection([page, perPage, pageData]);
 
   const handleSort = useCallback((column: string) => {
-    if (sortBy === column) {
-      setSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    if (ui.sortBy === column) {
+      dispatch({ type: 'setSort', sortBy: column, sortDir: ui.sortDir === 'asc' ? 'desc' : 'asc' });
     } else {
-      setSortBy(column);
-      setSortDir('asc');
+      dispatch({ type: 'setSort', sortBy: column, sortDir: 'asc' });
     }
     setPage(1);
-  }, [sortBy, setPage]);
+  }, [ui.sortBy, ui.sortDir, setPage]);
 
   const { createMutation, updateMutation, deleteMutation } = useCrudMutations<CreatePageRequest, UpdatePageRequest>({
     queryKey: 'pages',
@@ -184,11 +158,7 @@ export default function PagesPage() {
     onSuccess: (resp) => {
       queryClient.invalidateQueries({ queryKey: ['pages'] });
       bulk.clear();
-      setBulkDeleteOpen(false);
-      setBulkPublishOpen(false);
-      setBulkUnpublishOpen(false);
-      setBulkArchiveOpen(false);
-      setBulkRestoreOpen(false);
+      dispatch({ type: 'closeAllBulk' });
       if (resp.failed === 0) {
         enqueueSnackbar(t('bulk.messages.success', { count: resp.succeeded }), { variant: 'success' });
       } else {
@@ -198,135 +168,40 @@ export default function PagesPage() {
     onError: showError,
   });
 
-  const handleBulkPublish = () => setBulkPublishOpen(true);
-  const handleBulkUnpublish = () => setBulkUnpublishOpen(true);
-  const handleBulkArchive = () => setBulkArchiveOpen(true);
-  const handleBulkRestore = () => setBulkRestoreOpen(true);
   const confirmBulkPublish = () => bulkMutation.mutate({ ids: [...bulk.selectedIds], action: 'UpdateStatus', status: 'Published' });
   const confirmBulkUnpublish = () => bulkMutation.mutate({ ids: [...bulk.selectedIds], action: 'UpdateStatus', status: 'Draft' });
   const confirmBulkArchive = () => bulkMutation.mutate({ ids: [...bulk.selectedIds], action: 'UpdateStatus', status: 'Archived' });
   const confirmBulkRestore = () => bulkMutation.mutate({ ids: [...bulk.selectedIds], action: 'UpdateStatus', status: 'Draft' });
-  const handleBulkDelete = () => setBulkDeleteOpen(true);
   const confirmBulkDelete = () => bulkMutation.mutate({ ids: [...bulk.selectedIds], action: 'Delete' });
 
-  const statusFilterOptions = [
-    { value: '', label: t('common.filters.all') },
-    { value: 'Draft', label: t('common.status.draft') },
-    ...(workflowEnabled ? [{ value: 'InReview', label: t('common.status.inReview') }] : []),
-    ...(workflowEnabled ? [{ value: 'Scheduled', label: t('common.status.scheduled') }] : []),
-    { value: 'Published', label: t('common.status.published') },
-  ];
-
-  const typeFilterOptions = [
-    { value: '', label: t('common.filters.all') },
-    { value: 'Static', label: t('pages.wizard.types.static') },
-    { value: 'Landing', label: t('pages.wizard.types.landing') },
-    { value: 'Contact', label: t('pages.wizard.types.contact') },
-    { value: 'BlogIndex', label: t('pages.wizard.types.blogIndex') },
-    { value: 'Custom', label: t('pages.wizard.types.custom') },
-  ];
-
-  const filters = [];
-  if (!isArchived) {
-    filters.push({
-      key: 'status',
-      label: t('common.filters.status'),
-      options: statusFilterOptions,
-      value: statusFilter,
-      onChange: handleStatusFilterChange,
-    });
-  }
-  filters.push({
-    key: 'type',
-    label: t('common.filters.filterByType'),
-    options: typeFilterOptions,
-    value: typeFilter,
-    onChange: handleTypeFilterChange,
+  const filters = buildPagesFilters({
+    t,
+    workflowEnabled,
+    isArchived,
+    statusFilter: ui.statusFilter,
+    typeFilter: ui.typeFilter,
+    onStatusFilterChange: handleStatusFilterChange,
+    onTypeFilterChange: handleTypeFilterChange,
   });
 
-  const columns: DataTableColumn<PageListItem>[] = [
-    {
-      header: (
-        <Checkbox
-          indeterminate={bulk.count > 0 && !bulk.allSelected(pageIds)}
-          checked={bulk.allSelected(pageIds)}
-          onChange={() => bulk.selectAll(pageIds)}
-          aria-label={t('pages.table.selectAll')}
-        />
-      ),
-      padding: 'checkbox',
-      render: (pg) => (
-        <Checkbox
-          checked={bulk.isSelected(pg.id)}
-          onChange={() => bulk.toggle(pg.id)}
-          aria-label={t('pages.table.selectRow', { route: pg.route })}
-        />
-      ),
-    },
-    {
-      header: (
-        <TableSortLabel active={sortBy === 'route'} direction={sortBy === 'route' ? sortDir : 'asc'} onClick={() => handleSort('route')}>
-          {t('pages.table.route')}
-        </TableSortLabel>
-      ),
-      scope: 'col',
-      render: (pg) => <Typography variant="body2" fontFamily="monospace">{pg.route}</Typography>,
-    },
-    {
-      header: (
-        <TableSortLabel active={sortBy === 'page_type'} direction={sortBy === 'page_type' ? sortDir : 'asc'} onClick={() => handleSort('page_type')}>
-          {t('pages.table.type')}
-        </TableSortLabel>
-      ),
-      scope: 'col',
-      render: (pg) => <PageTypeChip value={pg.page_type} />,
-    },
-    {
-      header: (
-        <TableSortLabel active={sortBy === 'status'} direction={sortBy === 'status' ? sortDir : 'asc'} onClick={() => handleSort('status')}>
-          {t('pages.table.status')}
-        </TableSortLabel>
-      ),
-      scope: 'col',
-      render: (pg) => <StatusChip value={pg.status} />,
-    },
-    {
-      header: t('pages.table.inNav'),
-      scope: 'col',
-      render: (pg) => pg.is_in_navigation
-        ? <Chip label={t('common.labels.yes')} size="small" color="primary" variant="outlined" />
-        : <Chip label={t('common.labels.no')} size="small" variant="outlined" />,
-    },
-    {
-      header: (
-        <TableSortLabel active={sortBy === 'created_at'} direction={sortBy === 'created_at' ? sortDir : 'asc'} onClick={() => handleSort('created_at')}>
-          {t('pages.table.created')}
-        </TableSortLabel>
-      ),
-      scope: 'col',
-      render: (pg) => format(new Date(pg.created_at), 'PP'),
-    },
-    {
-      header: t('pages.table.actions'),
-      scope: 'col',
-      align: 'right',
-      render: (pg) => (
-        <PageActionsMenu
-          page={pg}
-          canWrite={canWrite}
-          isAdmin={isAdmin}
-          onView={(p) => navigate(`/pages/${p.id}`)}
-          onPublish={(p) => setPublishingPage(p)}
-          onUnpublish={(p) => setUnpublishingPage(p)}
-          onClone={(p) => cloneMutation.mutate(p.id)}
-          onDelete={(p) => setDeletingPage(p)}
-          onArchive={(p) => setArchivingPage(p)}
-          onRestore={(p) => setRestoringPage(p)}
-          cloneDisabled={cloneMutation.isPending}
-        />
-      ),
-    },
-  ];
+  const columns = buildPagesColumns({
+    t,
+    bulk,
+    pageIds,
+    sortBy: ui.sortBy,
+    sortDir: ui.sortDir,
+    canWrite,
+    isAdmin,
+    handleSort,
+    onView: (p) => navigate(`/pages/${p.id}`),
+    onPublish: (p) => dispatch({ type: 'openPublish', page: p }),
+    onUnpublish: (p) => dispatch({ type: 'openUnpublish', page: p }),
+    onClone: (p) => cloneMutation.mutate(p.id),
+    onDelete: (p) => setDeletingPage(p),
+    onArchive: (p) => dispatch({ type: 'openArchive', page: p }),
+    onRestore: (p) => dispatch({ type: 'openRestore', page: p }),
+    cloneDisabled: cloneMutation.isPending,
+  });
 
   return (
     <Box data-testid="pages.page">
@@ -342,21 +217,21 @@ export default function PagesPage() {
         <LoadingState label={t('pages.loading')} />
       ) : error ? (
         <Alert severity="error">{t('pages.loadError')}</Alert>
-      ) : pages.length === 0 && !searchQuery && !statusFilter && !typeFilter && !isArchived ? (
+      ) : pages.length === 0 && !ui.searchQuery && !ui.statusFilter && !ui.typeFilter && !isArchived ? (
         <EmptyState icon={<DescriptionIcon sx={{ fontSize: 64 }} />} title={t('pages.empty.title')} description={t('pages.empty.description')} action={{ label: t('pages.createButton'), onClick: openCreate }} />
       ) : (
         <>
-          <Tabs value={viewTab} onChange={handleTabChange} sx={{ mb: 2 }}>
+          <Tabs value={ui.viewTab} onChange={handleTabChange} sx={{ mb: 2 }}>
             <Tab icon={<CheckCircleOutlineIcon fontSize="small" />} iconPosition="start" label={t('pages.tabs.active')} value="active" />
             <Tab icon={<ArchiveIcon fontSize="small" />} iconPosition="start" label={t('pages.tabs.archived')} value="archived" />
           </Tabs>
           <BulkActionToolbar
             selectedCount={bulk.count}
-            onPublish={isArchived ? undefined : handleBulkPublish}
-            onUnpublish={isArchived ? undefined : handleBulkUnpublish}
-            onArchive={isArchived ? undefined : handleBulkArchive}
-            onRestore={isArchived ? handleBulkRestore : undefined}
-            onDelete={handleBulkDelete}
+            onPublish={isArchived ? undefined : () => dispatch({ type: 'openBulkPublish' })}
+            onUnpublish={isArchived ? undefined : () => dispatch({ type: 'openBulkUnpublish' })}
+            onArchive={isArchived ? undefined : () => dispatch({ type: 'openBulkArchive' })}
+            onRestore={isArchived ? () => dispatch({ type: 'openBulkRestore' }) : undefined}
+            onDelete={() => dispatch({ type: 'openBulkDelete' })}
             onClear={bulk.clear}
             canWrite={canWrite}
             isAdmin={isAdmin}
@@ -364,8 +239,8 @@ export default function PagesPage() {
           />
           <Paper>
             <TableFilterBar
-              searchValue={searchQuery}
-              onSearchChange={setSearchQuery}
+              searchValue={ui.searchQuery}
+              onSearchChange={(v) => dispatch({ type: 'setSearchQuery', value: v })}
               searchPlaceholder={t('pages.searchPlaceholder')}
               filters={filters}
             />
@@ -386,16 +261,38 @@ export default function PagesPage() {
       )}
 
       <CreatePageWizard open={formOpen} onSubmit={(data) => createMutation.mutate(data)} onClose={closeForm} loading={createMutation.isPending} />
-      <ConfirmDialog open={!!deletingPage} title={t('pages.deleteDialog.title')} message={t('pages.deleteDialog.message', { route: deletingPage?.route })} confirmLabel={t('common.actions.delete')} onConfirm={() => deletingPage && deleteMutation.mutate(deletingPage.id)} onCancel={closeDelete} loading={deleteMutation.isPending} confirmationText={t('common.actions.delete')} />
-      <ConfirmDialog open={bulkDeleteOpen} title={t('bulk.deleteDialog.title')} message={t('bulk.deleteDialog.message', { count: bulk.count })} confirmLabel={t('common.actions.delete')} onConfirm={confirmBulkDelete} onCancel={() => setBulkDeleteOpen(false)} loading={bulkMutation.isPending} confirmationText={t('common.actions.delete')} />
-      <ConfirmDialog open={!!publishingPage} title={t('pages.publishDialog.title')} message={t('pages.publishDialog.message', { route: publishingPage?.route })} confirmLabel={t('bulk.publish')} confirmColor="primary" onConfirm={() => { if (publishingPage) { updateMutation.mutate({ id: publishingPage.id, data: { status: 'Published' } }); setPublishingPage(null); } }} onCancel={() => setPublishingPage(null)} />
-      <ConfirmDialog open={!!unpublishingPage} title={t('pages.unpublishDialog.title')} message={t('pages.unpublishDialog.message', { route: unpublishingPage?.route })} confirmLabel={t('bulk.unpublish')} confirmColor="warning" onConfirm={() => { if (unpublishingPage) { updateMutation.mutate({ id: unpublishingPage.id, data: { status: 'Draft' } }); setUnpublishingPage(null); } }} onCancel={() => setUnpublishingPage(null)} />
-      <ConfirmDialog open={!!archivingPage} title={t('pages.archiveDialog.title')} message={t('pages.archiveDialog.message', { route: archivingPage?.route })} confirmLabel={t('bulk.archive')} confirmColor="warning" onConfirm={() => { if (archivingPage) { updateMutation.mutate({ id: archivingPage.id, data: { status: 'Archived' } }); setArchivingPage(null); } }} onCancel={() => setArchivingPage(null)} />
-      <RestoreDialog open={!!restoringPage} title={t('pages.restoreDialog.title')} message={t('pages.restoreDialog.message', { route: restoringPage?.route })} onRestore={() => { if (restoringPage) { updateMutation.mutate({ id: restoringPage.id, data: { status: 'Published' } }); setRestoringPage(null); } }} onRestoreAsDraft={() => { if (restoringPage) { updateMutation.mutate({ id: restoringPage.id, data: { status: 'Draft' } }); setRestoringPage(null); } }} onCancel={() => setRestoringPage(null)} />
-      <ConfirmDialog open={bulkPublishOpen} title={t('bulk.publishDialog.title')} message={t('bulk.publishDialog.message', { count: bulk.count })} confirmLabel={t('bulk.publish')} confirmColor="primary" onConfirm={confirmBulkPublish} onCancel={() => setBulkPublishOpen(false)} loading={bulkMutation.isPending} />
-      <ConfirmDialog open={bulkUnpublishOpen} title={t('bulk.unpublishDialog.title')} message={t('bulk.unpublishDialog.message', { count: bulk.count })} confirmLabel={t('bulk.unpublish')} confirmColor="warning" onConfirm={confirmBulkUnpublish} onCancel={() => setBulkUnpublishOpen(false)} loading={bulkMutation.isPending} />
-      <ConfirmDialog open={bulkArchiveOpen} title={t('bulk.archiveDialog.title')} message={t('bulk.archiveDialog.message', { count: bulk.count })} confirmLabel={t('bulk.archive')} confirmColor="warning" onConfirm={confirmBulkArchive} onCancel={() => setBulkArchiveOpen(false)} loading={bulkMutation.isPending} />
-      <ConfirmDialog open={bulkRestoreOpen} title={t('bulk.restoreDialog.title')} message={t('bulk.restoreDialog.message', { count: bulk.count })} confirmLabel={t('bulk.restore')} confirmColor="primary" onConfirm={confirmBulkRestore} onCancel={() => setBulkRestoreOpen(false)} loading={bulkMutation.isPending} />
+      <PagesDialogs
+        publishingPage={ui.publishingPage}
+        onPublishConfirm={() => { if (ui.publishingPage) { updateMutation.mutate({ id: ui.publishingPage.id, data: { status: 'Published' } }); dispatch({ type: 'closePublish' }); } }}
+        onPublishCancel={() => dispatch({ type: 'closePublish' })}
+        unpublishingPage={ui.unpublishingPage}
+        onUnpublishConfirm={() => { if (ui.unpublishingPage) { updateMutation.mutate({ id: ui.unpublishingPage.id, data: { status: 'Draft' } }); dispatch({ type: 'closeUnpublish' }); } }}
+        onUnpublishCancel={() => dispatch({ type: 'closeUnpublish' })}
+        archivingPage={ui.archivingPage}
+        onArchiveConfirm={() => { if (ui.archivingPage) { updateMutation.mutate({ id: ui.archivingPage.id, data: { status: 'Archived' } }); dispatch({ type: 'closeArchive' }); } }}
+        onArchiveCancel={() => dispatch({ type: 'closeArchive' })}
+        restoringPage={ui.restoringPage}
+        onRestorePublish={() => { if (ui.restoringPage) { updateMutation.mutate({ id: ui.restoringPage.id, data: { status: 'Published' } }); dispatch({ type: 'closeRestore' }); } }}
+        onRestoreAsDraft={() => { if (ui.restoringPage) { updateMutation.mutate({ id: ui.restoringPage.id, data: { status: 'Draft' } }); dispatch({ type: 'closeRestore' }); } }}
+        onRestoreCancel={() => dispatch({ type: 'closeRestore' })}
+        deletingPage={deletingPage}
+        onDeleteConfirm={() => deletingPage && deleteMutation.mutate(deletingPage.id)}
+        onDeleteCancel={closeDelete}
+        deleteLoading={deleteMutation.isPending}
+        bulkCount={bulk.count}
+        bulkDeleteOpen={ui.bulkDeleteOpen}
+        bulkPublishOpen={ui.bulkPublishOpen}
+        bulkUnpublishOpen={ui.bulkUnpublishOpen}
+        bulkArchiveOpen={ui.bulkArchiveOpen}
+        bulkRestoreOpen={ui.bulkRestoreOpen}
+        onBulkDeleteConfirm={confirmBulkDelete}
+        onBulkPublishConfirm={confirmBulkPublish}
+        onBulkUnpublishConfirm={confirmBulkUnpublish}
+        onBulkArchiveConfirm={confirmBulkArchive}
+        onBulkRestoreConfirm={confirmBulkRestore}
+        onBulkCancel={() => dispatch({ type: 'closeAllBulk' })}
+        bulkLoading={bulkMutation.isPending}
+      />
     </Box>
   );
 }

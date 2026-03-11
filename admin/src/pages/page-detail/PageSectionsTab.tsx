@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useReducer, useCallback, useRef } from 'react';
 import {
   Box,
   Button,
@@ -49,6 +49,7 @@ import {
   arrayMove,
 } from '@dnd-kit/sortable';
 import { useTranslation } from 'react-i18next';
+import { useState } from 'react';
 import type {
   PageSectionResponse,
   SectionLocalizationResponse,
@@ -112,9 +113,12 @@ function QuickAddDialog({
   const { t } = useTranslation();
   const [selectedType, setSelectedType] = useState<SectionType>('Hero');
 
-  useEffect(() => {
-    if (open) setSelectedType('Hero');
-  }, [open]);
+  // Reset selected type when dialog opens
+  const prevOpenRef = useRef(false);
+  if (open && !prevOpenRef.current) {
+    setSelectedType('Hero');
+  }
+  prevOpenRef.current = open;
 
   const handleAdd = () => {
     onSubmit({
@@ -172,6 +176,53 @@ function stripMarkdown(md: string): string {
     .trim();
 }
 
+// --- Reducer ---
+
+interface SectionsTabState {
+  viewMode: 'edit' | 'preview';
+  quickAddOpen: boolean;
+  editorSection: PageSectionResponse | null;
+  deletingSection: PageSectionResponse | null;
+  orderedSections: PageSectionResponse[];
+  activeId: string | null;
+}
+
+type SectionsTabAction =
+  | { type: 'SET_VIEW_MODE'; payload: 'edit' | 'preview' }
+  | { type: 'SET_QUICK_ADD_OPEN'; payload: boolean }
+  | { type: 'SET_EDITOR_SECTION'; payload: PageSectionResponse | null }
+  | { type: 'SET_DELETING_SECTION'; payload: PageSectionResponse | null }
+  | { type: 'SET_ORDERED_SECTIONS'; payload: PageSectionResponse[] }
+  | { type: 'SET_ACTIVE_ID'; payload: string | null };
+
+const initialSectionsState: SectionsTabState = {
+  viewMode: 'edit',
+  quickAddOpen: false,
+  editorSection: null,
+  deletingSection: null,
+  orderedSections: [],
+  activeId: null,
+};
+
+function sectionsReducer(state: SectionsTabState, action: SectionsTabAction): SectionsTabState {
+  switch (action.type) {
+    case 'SET_VIEW_MODE':
+      return { ...state, viewMode: action.payload };
+    case 'SET_QUICK_ADD_OPEN':
+      return { ...state, quickAddOpen: action.payload };
+    case 'SET_EDITOR_SECTION':
+      return { ...state, editorSection: action.payload };
+    case 'SET_DELETING_SECTION':
+      return { ...state, deletingSection: action.payload };
+    case 'SET_ORDERED_SECTIONS':
+      return { ...state, orderedSections: action.payload };
+    case 'SET_ACTIVE_ID':
+      return { ...state, activeId: action.payload };
+    default:
+      return state;
+  }
+}
+
 export default function PageSectionsTab({
   sections,
   sectionsLoading,
@@ -187,44 +238,40 @@ export default function PageSectionsTab({
   deleteLoading,
 }: PageSectionsTabProps) {
   const { t } = useTranslation();
-  const [viewMode, setViewMode] = useState<'edit' | 'preview'>('edit');
-  const [quickAddOpen, setQuickAddOpen] = useState(false);
-  const [editorSection, setEditorSection] = useState<PageSectionResponse | null>(null);
-  const [deletingSection, setDeletingSection] = useState<PageSectionResponse | null>(null);
-  const [orderedSections, setOrderedSections] = useState<PageSectionResponse[]>([]);
-  const [activeId, setActiveId] = useState<string | null>(null);
+  const [state, dispatch] = useReducer(sectionsReducer, initialSectionsState);
 
-  useEffect(() => {
-    if (sections) {
-      setOrderedSections([...sections].sort((a, b) => a.display_order - b.display_order));
-    }
-  }, [sections]);
+  const prevSectionsRef = useRef(sections);
+  if (sections && sections !== prevSectionsRef.current) {
+    dispatch({
+      type: 'SET_ORDERED_SECTIONS',
+      payload: [...sections].sort((a, b) => a.display_order - b.display_order),
+    });
+  }
+  prevSectionsRef.current = sections;
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
   );
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
-    setActiveId(event.active.id as string);
+    dispatch({ type: 'SET_ACTIVE_ID', payload: event.active.id as string });
   }, []);
 
   const handleDragEnd = useCallback((event: DragEndEvent) => {
-    setActiveId(null);
+    dispatch({ type: 'SET_ACTIVE_ID', payload: null });
     const { active, over } = event;
     if (!over || active.id === over.id) return;
 
-    setOrderedSections((prev) => {
-      const oldIndex = prev.findIndex((s) => s.id === active.id);
-      const newIndex = prev.findIndex((s) => s.id === over.id);
-      const reordered = arrayMove(prev, oldIndex, newIndex);
-      const items: ReorderItem[] = reordered.map((section, index) => ({
-        id: section.id,
-        display_order: index,
-      }));
-      onReorderSections(items);
-      return reordered;
-    });
-  }, [onReorderSections]);
+    const oldIndex = state.orderedSections.findIndex((s) => s.id === active.id);
+    const newIndex = state.orderedSections.findIndex((s) => s.id === over.id);
+    const reordered = arrayMove(state.orderedSections, oldIndex, newIndex);
+    const items: ReorderItem[] = reordered.map((section, index) => ({
+      id: section.id,
+      display_order: index,
+    }));
+    dispatch({ type: 'SET_ORDERED_SECTIONS', payload: reordered });
+    onReorderSections(items);
+  }, [onReorderSections, state.orderedSections]);
 
   const getLocaleChips = (sectionId: string) => {
     if (!sectionLocalizations || !activeLocales.length) return [];
@@ -248,16 +295,16 @@ export default function PageSectionsTab({
     return stripped.length > 60 ? stripped.slice(0, 60) + '...' : stripped;
   };
 
-  const activeSection = activeId ? orderedSections.find((s) => s.id === activeId) : null;
+  const activeSection = state.activeId ? state.orderedSections.find((s) => s.id === state.activeId) : null;
 
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <ToggleButtonGroup
-            value={viewMode}
+            value={state.viewMode}
             exclusive
-            onChange={(_, val) => val && setViewMode(val)}
+            onChange={(_, val) => val && dispatch({ type: 'SET_VIEW_MODE', payload: val })}
             size="small"
           >
             <ToggleButton value="edit" aria-label={t('common.actions.edit')}>
@@ -268,26 +315,26 @@ export default function PageSectionsTab({
             </ToggleButton>
           </ToggleButtonGroup>
         </Box>
-        {canWrite && viewMode === 'edit' && (
-          <Button variant="outlined" startIcon={<AddIcon />} onClick={() => setQuickAddOpen(true)}>
+        {canWrite && state.viewMode === 'edit' && (
+          <Button variant="outlined" startIcon={<AddIcon />} onClick={() => dispatch({ type: 'SET_QUICK_ADD_OPEN', payload: true })}>
             {t('pageDetail.sections.add')}
           </Button>
         )}
       </Box>
 
-      {viewMode === 'preview' ? (
+      {state.viewMode === 'preview' ? (
         <PagePreview
           sections={sections || []}
           localizations={sectionLocalizations || []}
         />
       ) : sectionsLoading ? (
         <LoadingState label={t('pageDetail.sections.loadingSections')} />
-      ) : !orderedSections || orderedSections.length === 0 ? (
+      ) : !state.orderedSections || state.orderedSections.length === 0 ? (
         <EmptyState
           icon={<AddIcon sx={{ fontSize: 48 }} />}
           title={t('pageDetail.sections.empty')}
           description={t('pageDetail.sections.emptyDescription')}
-          action={canWrite ? { label: t('pageDetail.sections.add'), onClick: () => setQuickAddOpen(true) } : undefined}
+          action={canWrite ? { label: t('pageDetail.sections.add'), onClick: () => dispatch({ type: 'SET_QUICK_ADD_OPEN', payload: true }) } : undefined}
         />
       ) : (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
@@ -302,9 +349,9 @@ export default function PageSectionsTab({
                   <TableCell scope="col" align="right">{t('pageDetail.table.actions')}</TableCell>
                 </TableRow>
               </TableHead>
-              <SortableContext items={orderedSections.map((s) => s.id)} strategy={verticalListSortingStrategy}>
+              <SortableContext items={state.orderedSections.map((s) => s.id)} strategy={verticalListSortingStrategy}>
                 <TableBody>
-                  {orderedSections.map((section) => (
+                  {state.orderedSections.map((section) => (
                     <SortableSectionRow
                       key={section.id}
                       section={section}
@@ -313,8 +360,8 @@ export default function PageSectionsTab({
                       subtitle={getSubtitle(section.id)}
                       canWrite={canWrite}
                       isAdmin={isAdmin}
-                      onEdit={setEditorSection}
-                      onDelete={setDeletingSection}
+                      onEdit={(s) => dispatch({ type: 'SET_EDITOR_SECTION', payload: s })}
+                      onDelete={(s) => dispatch({ type: 'SET_DELETING_SECTION', payload: s })}
                     />
                   ))}
                 </TableBody>
@@ -335,37 +382,37 @@ export default function PageSectionsTab({
       )}
 
       <QuickAddDialog
-        open={quickAddOpen}
+        open={state.quickAddOpen}
         onSubmit={(data) => {
           onCreateSection(data);
-          setQuickAddOpen(false);
+          dispatch({ type: 'SET_QUICK_ADD_OPEN', payload: false });
         }}
-        onClose={() => setQuickAddOpen(false)}
+        onClose={() => dispatch({ type: 'SET_QUICK_ADD_OPEN', payload: false })}
         loading={createLoading}
-        nextOrder={orderedSections.length}
+        nextOrder={state.orderedSections.length}
       />
 
       <SectionEditorDialog
-        open={!!editorSection}
-        section={editorSection}
+        open={!!state.editorSection}
+        section={state.editorSection}
         onClose={() => {
-          setEditorSection(null);
+          dispatch({ type: 'SET_EDITOR_SECTION', payload: null });
           onSectionEditorClose();
         }}
       />
 
       <ConfirmDialog
-        open={!!deletingSection}
+        open={!!state.deletingSection}
         title={t('pageDetail.sections.deleteTitle')}
-        message={t('pageDetail.sections.deleteMessage', { type: deletingSection?.section_type })}
+        message={t('pageDetail.sections.deleteMessage', { type: state.deletingSection?.section_type })}
         confirmLabel={t('common.actions.delete')}
         onConfirm={() => {
-          if (deletingSection) {
-            onDeleteSection(deletingSection.id);
-            setDeletingSection(null);
+          if (state.deletingSection) {
+            onDeleteSection(state.deletingSection.id);
+            dispatch({ type: 'SET_DELETING_SECTION', payload: null });
           }
         }}
-        onCancel={() => setDeletingSection(null)}
+        onCancel={() => dispatch({ type: 'SET_DELETING_SECTION', payload: null })}
         loading={deleteLoading}
         confirmationText={t('common.actions.delete')}
       />

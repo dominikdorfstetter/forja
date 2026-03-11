@@ -22,8 +22,6 @@ export const SUPPORTED_LANGUAGES = [
   { code: 'pl', name: 'Polish', nativeName: 'Polski' },
 ] as const;
 
-export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number]['code'];
-
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)

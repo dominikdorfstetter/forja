@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useRef } from 'react';
 import {
   Button,
   Dialog,
@@ -34,11 +34,11 @@ export default function BlockKeyDialog({ open, keyName: _keyName, onConfirm, onC
     mode: 'onChange',
   });
 
-  useEffect(() => {
-    if (open) {
-      reset({ reason: '' });
-    }
-  }, [open, reset]);
+  const prevOpenRef = useRef(false);
+  if (open && !prevOpenRef.current) {
+    reset({ reason: '' });
+  }
+  prevOpenRef.current = open;
 
   const onFormSubmit = (data: BlockKeyFormData) => {
     onConfirm(data.reason.trim());

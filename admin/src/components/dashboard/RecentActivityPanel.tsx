@@ -76,8 +76,8 @@ export default function RecentActivityPanel({ blogs, pages, loading }: RecentAct
 
       {loading ? (
         <Stack spacing={1}>
-          {[0, 1, 2, 3].map((i) => (
-            <Skeleton key={i} variant="rectangular" height={48} sx={{ borderRadius: 1 }} />
+          {(['activity-skel-0', 'activity-skel-1', 'activity-skel-2', 'activity-skel-3'] as const).map((id) => (
+            <Skeleton key={id} variant="rectangular" height={48} sx={{ borderRadius: 1 }} />
           ))}
         </Stack>
       ) : items.length === 0 ? (

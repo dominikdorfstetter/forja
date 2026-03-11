@@ -19,7 +19,7 @@ function isAtLeast(role: SiteRole | null, min: SiteRole): boolean {
   return ROLE_RANK[role] >= ROLE_RANK[min];
 }
 
-export interface WorkflowActions {
+interface WorkflowActions {
   workflowEnabled: boolean;
   canSubmitForReview: boolean;
   canApprove: boolean;

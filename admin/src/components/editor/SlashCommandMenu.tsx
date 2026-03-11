@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, forwardRef, useImperativeHandle } from 'react';
+import { useState, useCallback, useRef, forwardRef, useImperativeHandle } from 'react';
 import { Paper, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { Extension } from '@tiptap/core';
 import './types';
@@ -129,10 +129,12 @@ const CommandList = forwardRef<CommandListRef, CommandListProps>(({ items, comma
   const { t } = useTranslation();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const listRef = useRef<HTMLUListElement>(null);
+  const prevItemsRef = useRef(items);
 
-  useEffect(() => {
+  if (prevItemsRef.current !== items) {
+    prevItemsRef.current = items;
     setSelectedIndex(0);
-  }, [items]);
+  }
 
   const selectItem = useCallback(
     (index: number) => {

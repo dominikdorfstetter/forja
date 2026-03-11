@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -70,11 +70,11 @@ export default function MediaDetailDialog({ open, media, folders, onClose }: Med
     enabled: !!media?.id,
   });
 
-  useEffect(() => {
-    if (media) {
-      setSelectedFolderId(media.folder_id || '');
-    }
-  }, [media]);
+  const prevOpenRef = useRef(false);
+  if (open && !prevOpenRef.current) {
+    setSelectedFolderId(media?.folder_id || '');
+  }
+  prevOpenRef.current = open;
 
   useEffect(() => {
     const map: Record<string, { alt_text: string; caption: string; title: string }> = {};

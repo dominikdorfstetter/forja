@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useRef } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -55,13 +55,13 @@ export default function CategoryFormDialog({
     mode: 'onChange',
   });
 
-  useEffect(() => {
-    if (open) {
-      reset(category
-        ? { slug: category.slug, parent_id: category.parent_id || '', is_global: category.is_global }
-        : { slug: '', parent_id: '', is_global: false });
-    }
-  }, [open, category, reset]);
+  const prevOpenRef = useRef(false);
+  if (open && !prevOpenRef.current) {
+    reset(category
+      ? { slug: category.slug, parent_id: category.parent_id || '', is_global: category.is_global }
+      : { slug: '', parent_id: '', is_global: false });
+  }
+  prevOpenRef.current = open;
 
   // Filter out current category from parent options to prevent circular references
   const parentOptions = categories.filter((c) => !category || c.id !== category.id);

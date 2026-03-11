@@ -4,7 +4,7 @@ import { useSiteContext } from '@/store/SiteContext';
 import { useAuth } from '@/store/AuthContext';
 import type { ContentStatus, BlogListItem, PageListItem } from '@/types/api';
 
-export interface DashboardData {
+interface DashboardData {
   // Totals
   totalSites: number;
   totalBlogs: number;

@@ -5,7 +5,7 @@ import ViewListIcon from '@mui/icons-material/ViewList';
 import ExtensionIcon from '@mui/icons-material/Extension';
 import type { PageType } from '@/types/api';
 
-export interface PageTypeInfo {
+interface PageTypeInfo {
   type: PageType;
   icon: React.ReactNode;
   labelKey: string;

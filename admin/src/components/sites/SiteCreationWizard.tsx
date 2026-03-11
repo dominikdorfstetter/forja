@@ -1,32 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useReducer, useRef } from 'react';
 import {
-  Box,
   Button,
-  Card,
-  CardActionArea,
-  Chip,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  Radio,
   Step,
   StepLabel,
   Stepper,
-  Switch,
-  TextField,
-  Typography,
-  Autocomplete,
 } from '@mui/material';
-import PersonIcon from '@mui/icons-material/Person';
-import GroupIcon from '@mui/icons-material/Group';
-import ArticleIcon from '@mui/icons-material/Article';
-import WebIcon from '@mui/icons-material/Web';
-import WorkIcon from '@mui/icons-material/Work';
-import GavelIcon from '@mui/icons-material/Gavel';
-import DescriptionIcon from '@mui/icons-material/Description';
-import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -37,6 +20,10 @@ import { useAuth } from '@/store/AuthContext';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import { slugField, requiredString, optionalString } from '@/utils/validation';
 import type { Locale } from '@/types/api';
+import SiteWizardBasicsStep from './SiteWizardBasicsStep';
+import SiteWizardModulesStep from './SiteWizardModulesStep';
+import SiteWizardWorkflowStep from './SiteWizardWorkflowStep';
+import SiteWizardLanguagesStep from './SiteWizardLanguagesStep';
 
 const STEP_KEYS = [
   'sites.wizard.steps.basics',
@@ -63,15 +50,6 @@ const wizardSchema = z.object({
 
 type WizardFormData = z.infer<typeof wizardSchema>;
 
-const MODULE_DEFS = [
-  { key: 'blog' as const, icon: <ArticleIcon />, defaultOn: true },
-  { key: 'pages' as const, icon: <WebIcon />, defaultOn: true },
-  { key: 'cv' as const, icon: <WorkIcon />, defaultOn: false },
-  { key: 'legal' as const, icon: <GavelIcon />, defaultOn: false },
-  { key: 'documents' as const, icon: <DescriptionIcon />, defaultOn: false },
-  { key: 'ai' as const, icon: <AutoAwesomeIcon />, defaultOn: false },
-] as const;
-
 interface ModuleDefaults {
   blog: boolean;
   pages: boolean;
@@ -79,6 +57,36 @@ interface ModuleDefaults {
   legal: boolean;
   documents: boolean;
   ai: boolean;
+}
+
+// --- Reducer ---
+
+interface WizardUiState {
+  activeStep: number;
+  selectedLocales: Locale[];
+  defaultLocaleId: string | null;
+  localeError: string | null;
+}
+
+type WizardUiAction =
+  | { type: 'RESET' }
+  | { type: 'SET_ACTIVE_STEP'; value: number }
+  | { type: 'SET_SELECTED_LOCALES'; value: Locale[] }
+  | { type: 'SET_DEFAULT_LOCALE_ID'; value: string | null }
+  | { type: 'SET_LOCALE_ERROR'; value: string | null };
+
+const initialUiState: WizardUiState = {
+  activeStep: 0, selectedLocales: [], defaultLocaleId: null, localeError: null,
+};
+
+function uiReducer(state: WizardUiState, action: WizardUiAction): WizardUiState {
+  switch (action.type) {
+    case 'RESET': return initialUiState;
+    case 'SET_ACTIVE_STEP': return { ...state, activeStep: action.value };
+    case 'SET_SELECTED_LOCALES': return { ...state, selectedLocales: action.value };
+    case 'SET_DEFAULT_LOCALE_ID': return { ...state, defaultLocaleId: action.value };
+    case 'SET_LOCALE_ERROR': return { ...state, localeError: action.value };
+  }
 }
 
 interface SiteCreationWizardProps {
@@ -100,12 +108,7 @@ export default function SiteCreationWizard({
   const { refreshAuth } = useAuth();
   const { showError, showSuccess } = useErrorSnackbar();
 
-  const [activeStep, setActiveStep] = useState(0);
-
-  // Locale state (managed outside react-hook-form for Autocomplete compatibility)
-  const [selectedLocales, setSelectedLocales] = useState<Locale[]>([]);
-  const [defaultLocaleId, setDefaultLocaleId] = useState<string | null>(null);
-  const [localeError, setLocaleError] = useState<string | null>(null);
+  const [ui, uiDispatch] = useReducer(uiReducer, initialUiState);
 
   const { data: allLocales = [] } = useQuery({
     queryKey: ['locales'],
@@ -133,53 +136,43 @@ export default function SiteCreationWizard({
     mode: 'onChange',
   });
 
-  // Reset when dialog opens (apply survey-derived defaults if provided)
-  useEffect(() => {
-    if (open) {
-      setActiveStep(0);
-      setSelectedLocales([]);
-      setDefaultLocaleId(null);
-      setLocaleError(null);
-      reset({
-        name: '',
-        slug: '',
-        description: '',
-        timezone: 'UTC',
-        modules: defaultModules ?? { blog: true, pages: true, cv: false, legal: false, documents: false, ai: false },
-        workflowMode: defaultWorkflowMode ?? 'solo',
-      });
-    }
-  }, [open, reset, defaultModules, defaultWorkflowMode]);
+  // Reset when dialog opens
+  const prevOpenRef = useRef(false);
+  if (open && !prevOpenRef.current) {
+    uiDispatch({ type: 'RESET' });
+    reset({
+      name: '',
+      slug: '',
+      description: '',
+      timezone: 'UTC',
+      modules: defaultModules ?? { blog: true, pages: true, cv: false, legal: false, documents: false, ai: false },
+      workflowMode: defaultWorkflowMode ?? 'solo',
+    });
+  }
+  prevOpenRef.current = open;
 
-  // Auto-set default locale
-  useEffect(() => {
-    if (selectedLocales.length === 1 && !defaultLocaleId) {
-      setDefaultLocaleId(selectedLocales[0].id);
-    }
-    if (selectedLocales.length === 0) {
-      setDefaultLocaleId(null);
-    }
-    if (defaultLocaleId && !selectedLocales.find((l) => l.id === defaultLocaleId)) {
-      setDefaultLocaleId(selectedLocales.length > 0 ? selectedLocales[0].id : null);
-    }
-  }, [selectedLocales, defaultLocaleId]);
+  // Derive effective default locale from selection
+  const effectiveDefaultLocaleId = (() => {
+    if (ui.selectedLocales.length === 0) return null;
+    if (ui.selectedLocales.length === 1) return ui.selectedLocales[0].id;
+    if (ui.defaultLocaleId && ui.selectedLocales.find((l) => l.id === ui.defaultLocaleId)) return ui.defaultLocaleId;
+    return ui.selectedLocales[0].id;
+  })();
 
   const createMutation = useMutation({
     mutationFn: async (data: WizardFormData) => {
-      // Validate locales
-      if (selectedLocales.length > 0 && !defaultLocaleId) {
+      if (ui.selectedLocales.length > 0 && !effectiveDefaultLocaleId) {
         throw new Error(t('forms.site.validation.exactlyOneDefault'));
       }
 
-      const locales = selectedLocales.length > 0
-        ? selectedLocales.map((l) => ({
+      const locales = ui.selectedLocales.length > 0
+        ? ui.selectedLocales.map((l) => ({
             locale_id: l.id,
-            is_default: l.id === defaultLocaleId,
+            is_default: l.id === effectiveDefaultLocaleId,
             url_prefix: l.code,
           }))
         : undefined;
 
-      // 1. Create the site
       const site = await apiService.createSite({
         name: data.name,
         slug: data.slug,
@@ -188,7 +181,6 @@ export default function SiteCreationWizard({
         locales,
       });
 
-      // 2. Save module settings + workflow mode
       await apiService.updateSiteSettings(site.id, {
         module_blog_enabled: data.modules.blog,
         module_pages_enabled: data.modules.pages,
@@ -212,25 +204,24 @@ export default function SiteCreationWizard({
   });
 
   const handleNext = async () => {
-    if (activeStep === 0) {
+    if (ui.activeStep === 0) {
       const valid = await trigger(['name', 'slug', 'description', 'timezone']);
       if (!valid) return;
     }
-    if (activeStep === 3) {
-      // Final step: validate locales and submit
-      if (selectedLocales.length > 0 && !defaultLocaleId) {
-        setLocaleError(t('forms.site.validation.exactlyOneDefault'));
+    if (ui.activeStep === 3) {
+      if (ui.selectedLocales.length > 0 && !effectiveDefaultLocaleId) {
+        uiDispatch({ type: 'SET_LOCALE_ERROR', value: t('forms.site.validation.exactlyOneDefault') });
         return;
       }
-      setLocaleError(null);
+      uiDispatch({ type: 'SET_LOCALE_ERROR', value: null });
       handleSubmit((data) => createMutation.mutate(data))();
       return;
     }
-    setActiveStep((s) => s + 1);
+    uiDispatch({ type: 'SET_ACTIVE_STEP', value: ui.activeStep + 1 });
   };
 
   const handleBack = () => {
-    setActiveStep((s) => s - 1);
+    uiDispatch({ type: 'SET_ACTIVE_STEP', value: ui.activeStep - 1 });
   };
 
   const isCreating = createMutation.isPending;
@@ -246,7 +237,7 @@ export default function SiteCreationWizard({
     >
       <DialogTitle id="site-wizard-title">{t('sites.wizard.title')}</DialogTitle>
       <DialogContent>
-        <Stepper activeStep={activeStep} sx={{ mb: 3, mt: 1 }} alternativeLabel>
+        <Stepper activeStep={ui.activeStep} sx={{ mb: 3, mt: 1 }} alternativeLabel>
           {STEP_KEYS.map((key) => (
             <Step key={key}>
               <StepLabel>{t(key)}</StepLabel>
@@ -254,209 +245,29 @@ export default function SiteCreationWizard({
           ))}
         </Stepper>
 
-        {/* Step 0: Basics */}
-        {activeStep === 0 && (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <TextField
-              autoFocus
-              label={t('forms.site.fields.name')}
-              fullWidth
-              required
-              {...register('name')}
-              error={!!errors.name}
-              helperText={errors.name?.message}
-              data-testid="site-wizard.input.name"
-            />
-            <TextField
-              label={t('forms.site.fields.slug')}
-              fullWidth
-              required
-              {...register('slug')}
-              error={!!errors.slug}
-              helperText={errors.slug?.message}
-              data-testid="site-wizard.input.slug"
-            />
-            <TextField
-              label={t('forms.site.fields.description')}
-              fullWidth
-              multiline
-              rows={3}
-              {...register('description')}
-              error={!!errors.description}
-              helperText={errors.description?.message}
-            />
-            <TextField
-              label="Timezone"
-              fullWidth
-              {...register('timezone')}
-              error={!!errors.timezone}
-              helperText={errors.timezone?.message || 'e.g. Europe/Vienna, UTC'}
-            />
-          </Box>
+        {ui.activeStep === 0 && (
+          <SiteWizardBasicsStep register={register as never} errors={errors} />
         )}
 
-        {/* Step 1: Content Modules */}
-        {activeStep === 1 && (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-              {t('sites.wizard.modulesDescription')}
-            </Typography>
-            {MODULE_DEFS.map(({ key, icon }) => (
-              <Controller
-                key={key}
-                name={`modules.${key}`}
-                control={control}
-                render={({ field }) => (
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      p: 1.5,
-                      borderRadius: 1,
-                      border: 1,
-                      borderColor: field.value ? 'primary.main' : 'divider',
-                      bgcolor: field.value ? 'action.selected' : 'transparent',
-                      transition: 'all 0.15s',
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                      <Box sx={{ color: field.value ? 'primary.main' : 'text.secondary' }}>
-                        {icon}
-                      </Box>
-                      <Box>
-                        <Typography variant="body2" fontWeight={600}>
-                          {t(`sites.wizard.modules.${key}`)}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {t(`sites.wizard.modules.${key}Desc`)}
-                        </Typography>
-                      </Box>
-                    </Box>
-                    <Switch
-                      checked={field.value}
-                      onChange={(_, checked) => field.onChange(checked)}
-                      data-testid={`site-wizard.module.${key}`}
-                    />
-                  </Box>
-                )}
-              />
-            ))}
-          </Box>
+        {ui.activeStep === 1 && (
+          <SiteWizardModulesStep control={control as never} />
         )}
 
-        {/* Step 2: Team & Workflow */}
-        {activeStep === 2 && (
-          <Controller
-            name="workflowMode"
-            control={control}
-            render={({ field }) => (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                  {t('sites.wizard.workflowDescription')}
-                </Typography>
-                {(['solo', 'team'] as const).map((mode) => (
-                  <Card
-                    key={mode}
-                    variant="outlined"
-                    sx={{
-                      border: 2,
-                      borderColor: field.value === mode ? 'primary.main' : 'divider',
-                      bgcolor: field.value === mode ? 'action.selected' : 'background.paper',
-                      transition: 'border-color 0.15s, background-color 0.15s',
-                    }}
-                  >
-                    <CardActionArea
-                      onClick={() => field.onChange(mode)}
-                      sx={{ p: 2.5, display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start', gap: 2 }}
-                      data-testid={`site-wizard.workflow.${mode}`}
-                    >
-                      <Box sx={{ color: field.value === mode ? 'primary.main' : 'text.secondary', mt: 0.5 }}>
-                        {mode === 'solo' ? <PersonIcon sx={{ fontSize: 32 }} /> : <GroupIcon sx={{ fontSize: 32 }} />}
-                      </Box>
-                      <Box>
-                        <Typography variant="body1" fontWeight={600}>
-                          {t(`sites.wizard.workflow.${mode}`)}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {t(`sites.wizard.workflow.${mode}Desc`)}
-                        </Typography>
-                      </Box>
-                    </CardActionArea>
-                  </Card>
-                ))}
-              </Box>
-            )}
+        {ui.activeStep === 2 && (
+          <SiteWizardWorkflowStep control={control as never} />
+        )}
+
+        {ui.activeStep === 3 && (
+          <SiteWizardLanguagesStep
+            allLocales={allLocales}
+            selectedLocales={ui.selectedLocales}
+            onSelectedLocalesChange={(v) => uiDispatch({ type: 'SET_SELECTED_LOCALES', value: v })}
+            defaultLocaleId={ui.defaultLocaleId}
+            onDefaultLocaleIdChange={(v) => uiDispatch({ type: 'SET_DEFAULT_LOCALE_ID', value: v })}
+            effectiveDefaultLocaleId={effectiveDefaultLocaleId}
+            localeError={ui.localeError}
+            onLocaleErrorClear={() => uiDispatch({ type: 'SET_LOCALE_ERROR', value: null })}
           />
-        )}
-
-        {/* Step 3: Languages */}
-        {activeStep === 3 && (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Typography variant="body2" color="text.secondary">
-              {t('sites.wizard.languagesDescription')}
-            </Typography>
-            <Autocomplete
-              multiple
-              options={allLocales}
-              getOptionLabel={(option) =>
-                `${option.code} — ${option.name}${option.native_name ? ` (${option.native_name})` : ''}`
-              }
-              value={selectedLocales}
-              onChange={(_, value) => { setSelectedLocales(value); setLocaleError(null); }}
-              renderTags={(value, getTagProps) =>
-                value.map((option, index) => {
-                  const { key, ...tagProps } = getTagProps({ index });
-                  return (
-                    <Chip
-                      key={key}
-                      label={`${option.code} — ${option.name}`}
-                      {...tagProps}
-                      color={option.id === defaultLocaleId ? 'primary' : 'default'}
-                      size="small"
-                    />
-                  );
-                })
-              }
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label={t('forms.site.fields.initialLanguages')}
-                  helperText={localeError || t('forms.site.fields.initialLanguagesHelper')}
-                  error={!!localeError}
-                />
-              )}
-              data-testid="site-wizard.locales"
-            />
-
-            {selectedLocales.length > 1 && (
-              <Box>
-                <Typography variant="caption" color="text.secondary">
-                  {t('forms.site.fields.defaultLanguage')}:
-                </Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5 }}>
-                  {selectedLocales.map((locale) => (
-                    <Chip
-                      key={locale.id}
-                      label={`${locale.code} — ${locale.name}`}
-                      size="small"
-                      icon={
-                        <Radio
-                          checked={locale.id === defaultLocaleId}
-                          size="small"
-                          sx={{ p: 0 }}
-                        />
-                      }
-                      onClick={() => setDefaultLocaleId(locale.id)}
-                      variant={locale.id === defaultLocaleId ? 'filled' : 'outlined'}
-                      color={locale.id === defaultLocaleId ? 'primary' : 'default'}
-                      sx={{ cursor: 'pointer' }}
-                    />
-                  ))}
-                </Box>
-              </Box>
-            )}
-          </Box>
         )}
       </DialogContent>
 
@@ -464,7 +275,7 @@ export default function SiteCreationWizard({
         <Button onClick={onClose} disabled={isCreating}>
           {t('common.actions.cancel')}
         </Button>
-        {activeStep > 0 && (
+        {ui.activeStep > 0 && (
           <Button onClick={handleBack} disabled={isCreating} data-testid="site-wizard.btn.back">
             {t('common.actions.back')}
           </Button>
@@ -475,7 +286,7 @@ export default function SiteCreationWizard({
           disabled={isCreating}
           data-testid="site-wizard.btn.next"
         >
-          {activeStep === 3
+          {ui.activeStep === 3
             ? (isCreating ? t('common.actions.saving') : t('common.actions.create'))
             : t('common.actions.next')}
         </Button>

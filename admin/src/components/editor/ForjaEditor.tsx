@@ -24,7 +24,7 @@ import apiService from '@/services/api';
 
 const lowlight = createLowlight(common);
 
-export interface ForjaEditorProps {
+interface ForjaEditorProps {
   value: string;
   onChange: (markdown: string) => void;
   onBlur?: () => void;

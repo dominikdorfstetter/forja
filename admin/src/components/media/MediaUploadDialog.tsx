@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
 import {
   Box,
   Button,
@@ -39,53 +39,79 @@ const ACCEPTED_TYPES = [
   'audio/mpeg', 'audio/wav', 'audio/ogg',
 ];
 
+// --- Reducer ---
+
+interface UploadState {
+  selectedFile: File | null;
+  dragOver: boolean;
+  isGlobal: boolean;
+  uploadProgress: number | null;
+  validationError: string | null;
+}
+
+type UploadAction =
+  | { type: 'RESET' }
+  | { type: 'SET_FILE'; file: File }
+  | { type: 'SET_DRAG_OVER'; value: boolean }
+  | { type: 'SET_IS_GLOBAL'; value: boolean }
+  | { type: 'SET_UPLOAD_PROGRESS'; value: number | null }
+  | { type: 'SET_VALIDATION_ERROR'; error: string };
+
+const initialUploadState: UploadState = {
+  selectedFile: null,
+  dragOver: false,
+  isGlobal: false,
+  uploadProgress: null,
+  validationError: null,
+};
+
+function uploadReducer(state: UploadState, action: UploadAction): UploadState {
+  switch (action.type) {
+    case 'RESET':
+      return initialUploadState;
+    case 'SET_FILE':
+      return { ...state, selectedFile: action.file, validationError: null };
+    case 'SET_DRAG_OVER':
+      return { ...state, dragOver: action.value };
+    case 'SET_IS_GLOBAL':
+      return { ...state, isGlobal: action.value };
+    case 'SET_UPLOAD_PROGRESS':
+      return { ...state, uploadProgress: action.value };
+    case 'SET_VALIDATION_ERROR':
+      return { ...state, validationError: action.error, selectedFile: null };
+  }
+}
+
 export default function MediaUploadDialog({ open, onSubmit, onClose, loading }: MediaUploadDialogProps) {
   const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
-  const [dragOver, setDragOver] = useState(false);
-  const [isGlobal, setIsGlobal] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
-  const [validationError, setValidationError] = useState<string | null>(null);
+  const [state, dispatch] = useReducer(uploadReducer, initialUploadState);
 
-  // Reset state when dialog opens/closes
-  useEffect(() => {
-    if (open) {
-      setSelectedFile(null);
-      setPreview(null);
-      setDragOver(false);
-      setIsGlobal(false);
-      setUploadProgress(null);
-      setValidationError(null);
-    }
-  }, [open]);
+  // Reset state when dialog opens
+  const prevOpenRef = useRef(false);
+  if (open && !prevOpenRef.current) {
+    dispatch({ type: 'RESET' });
+  }
+  prevOpenRef.current = open;
 
-  // Generate image preview
+  // Derive image preview URL from selected file (with cleanup for object URLs)
+  const preview = useMemo(
+    () => state.selectedFile?.type.startsWith('image/') ? URL.createObjectURL(state.selectedFile) : null,
+    [state.selectedFile],
+  );
   useEffect(() => {
-    if (!selectedFile) {
-      setPreview(null);
-      return;
-    }
-    if (!selectedFile.type.startsWith('image/')) {
-      setPreview(null);
-      return;
-    }
-    const url = URL.createObjectURL(selectedFile);
-    setPreview(url);
-    return () => URL.revokeObjectURL(url);
-  }, [selectedFile]);
+    return () => { if (preview) URL.revokeObjectURL(preview); };
+  }, [preview]);
 
   const validateFile = useCallback((file: File): boolean => {
-    setValidationError(null);
     if (file.size > MAX_FILE_SIZE) {
-      setValidationError(t('media.upload.tooLarge', { maxSize: formatFileSize(MAX_FILE_SIZE) }));
+      dispatch({ type: 'SET_VALIDATION_ERROR', error: t('media.upload.tooLarge', { maxSize: formatFileSize(MAX_FILE_SIZE) }) });
       return false;
     }
     if (ACCEPTED_TYPES.length > 0 && !ACCEPTED_TYPES.includes(file.type)) {
       // Allow files with no MIME type (will be detected server-side)
       if (file.type) {
-        setValidationError(t('media.upload.invalidType'));
+        dispatch({ type: 'SET_VALIDATION_ERROR', error: t('media.upload.invalidType') });
         return false;
       }
     }
@@ -94,26 +120,26 @@ export default function MediaUploadDialog({ open, onSubmit, onClose, loading }: 
 
   const handleFileSelect = useCallback((file: File) => {
     if (validateFile(file)) {
-      setSelectedFile(file);
+      dispatch({ type: 'SET_FILE', file });
     }
   }, [validateFile]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setDragOver(true);
+    dispatch({ type: 'SET_DRAG_OVER', value: true });
   }, []);
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setDragOver(false);
+    dispatch({ type: 'SET_DRAG_OVER', value: false });
   }, []);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setDragOver(false);
+    dispatch({ type: 'SET_DRAG_OVER', value: false });
     const file = e.dataTransfer.files[0];
     if (file) handleFileSelect(file);
   }, [handleFileSelect]);
@@ -126,13 +152,13 @@ export default function MediaUploadDialog({ open, onSubmit, onClose, loading }: 
   }, [handleFileSelect]);
 
   const handleSubmit = async () => {
-    if (!selectedFile) return;
-    setUploadProgress(0);
-    await onSubmit(selectedFile, isGlobal);
-    setUploadProgress(null);
+    if (!state.selectedFile) return;
+    dispatch({ type: 'SET_UPLOAD_PROGRESS', value: 0 });
+    await onSubmit(state.selectedFile, state.isGlobal);
+    dispatch({ type: 'SET_UPLOAD_PROGRESS', value: null });
   };
 
-  const isUploading = loading || uploadProgress !== null;
+  const isUploading = loading || state.uploadProgress !== null;
 
   return (
     <Dialog open={open} onClose={isUploading ? undefined : onClose} maxWidth="sm" fullWidth aria-labelledby="media-upload-title">
@@ -147,36 +173,36 @@ export default function MediaUploadDialog({ open, onSubmit, onClose, loading }: 
             onClick={() => !isUploading && fileInputRef.current?.click()}
             sx={{
               border: '2px dashed',
-              borderColor: dragOver ? 'primary.main' : validationError ? 'error.main' : 'divider',
+              borderColor: state.dragOver ? 'primary.main' : state.validationError ? 'error.main' : 'divider',
               borderRadius: 2,
               p: 4,
               textAlign: 'center',
               cursor: isUploading ? 'default' : 'pointer',
-              bgcolor: dragOver ? 'action.hover' : 'background.default',
+              bgcolor: state.dragOver ? 'action.hover' : 'background.default',
               transition: 'all 0.2s ease',
               '&:hover': !isUploading ? { borderColor: 'primary.main', bgcolor: 'action.hover' } : {},
             }}
           >
-            {selectedFile ? (
+            {state.selectedFile ? (
               <Stack spacing={1} alignItems="center">
                 {preview ? (
                   <Box
                     component="img"
                     src={preview}
-                    alt={selectedFile.name}
+                    alt={state.selectedFile.name}
                     sx={{ maxWidth: 200, maxHeight: 150, objectFit: 'contain', borderRadius: 1 }}
                   />
                 ) : (
                   <InsertDriveFileIcon sx={{ fontSize: 48 }} color="action" />
                 )}
-                <Typography variant="body2" fontWeight={500}>{selectedFile.name}</Typography>
+                <Typography variant="body2" fontWeight={500}>{state.selectedFile.name}</Typography>
                 <Typography variant="caption" color="text.secondary">
-                  {formatFileSize(selectedFile.size)} &middot; {selectedFile.type || 'unknown type'}
+                  {formatFileSize(state.selectedFile.size)} &middot; {state.selectedFile.type || 'unknown type'}
                 </Typography>
               </Stack>
             ) : (
               <Stack spacing={1} alignItems="center">
-                <CloudUploadIcon sx={{ fontSize: 48 }} color={dragOver ? 'primary' : 'action'} />
+                <CloudUploadIcon sx={{ fontSize: 48 }} color={state.dragOver ? 'primary' : 'action'} />
                 <Typography variant="body1" color="text.secondary">
                   {t('media.upload.dragDrop')}
                 </Typography>
@@ -192,27 +218,27 @@ export default function MediaUploadDialog({ open, onSubmit, onClose, loading }: 
             onChange={handleInputChange}
           />
 
-          {validationError && (
-            <Typography variant="body2" color="error">{validationError}</Typography>
+          {state.validationError && (
+            <Typography variant="body2" color="error">{state.validationError}</Typography>
           )}
 
           {/* Upload progress */}
           {isUploading && (
             <Box>
               <LinearProgress
-                variant={uploadProgress !== null && uploadProgress > 0 ? 'determinate' : 'indeterminate'}
-                value={uploadProgress ?? 0}
+                variant={state.uploadProgress !== null && state.uploadProgress > 0 ? 'determinate' : 'indeterminate'}
+                value={state.uploadProgress ?? 0}
               />
               <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block', textAlign: 'center' }}>
-                {uploadProgress !== null && uploadProgress > 0
-                  ? t('media.upload.progress', { percent: Math.round(uploadProgress) })
+                {state.uploadProgress !== null && state.uploadProgress > 0
+                  ? t('media.upload.progress', { percent: Math.round(state.uploadProgress) })
                   : t('media.upload.uploading')}
               </Typography>
             </Box>
           )}
 
           <FormControlLabel
-            control={<Switch checked={isGlobal} onChange={(e) => setIsGlobal(e.target.checked)} disabled={isUploading} />}
+            control={<Switch checked={state.isGlobal} onChange={(e) => dispatch({ type: 'SET_IS_GLOBAL', value: e.target.checked })} disabled={isUploading} />}
             label={t('common.labels.global')}
           />
         </Stack>
@@ -222,7 +248,7 @@ export default function MediaUploadDialog({ open, onSubmit, onClose, loading }: 
         <Button
           variant="contained"
           onClick={handleSubmit}
-          disabled={!selectedFile || isUploading}
+          disabled={!state.selectedFile || isUploading}
           startIcon={<CloudUploadIcon />}
         >
           {isUploading ? t('media.upload.uploading') : t('common.actions.upload')}

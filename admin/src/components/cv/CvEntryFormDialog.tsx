@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useRef } from 'react';
 import {
   Button,
   Dialog,
@@ -63,22 +63,22 @@ export default function CvEntryFormDialog({ open, entry, onSubmit, onClose, load
 
   const { data: sites } = useQuery({ queryKey: ['sites'], queryFn: () => apiService.getSites() });
 
-  useEffect(() => {
-    if (open) {
-      reset(entry ? {
-        company: entry.company,
-        company_url: entry.company_url || '',
-        location: entry.location,
-        start_date: entry.start_date,
-        end_date: entry.end_date || '',
-        is_current: entry.is_current,
-        entry_type: entry.entry_type,
-        display_order: entry.display_order,
-        status: 'Draft' as const,
-        site_ids: [],
-      } : { company: '', company_url: '', location: '', start_date: '', end_date: '', is_current: false, entry_type: 'Work' as CvEntryType, display_order: 0, status: 'Draft' as const, site_ids: [] });
-    }
-  }, [open, entry, reset]);
+  const prevOpenRef = useRef(false);
+  if (open && !prevOpenRef.current) {
+    reset(entry ? {
+      company: entry.company,
+      company_url: entry.company_url || '',
+      location: entry.location,
+      start_date: entry.start_date,
+      end_date: entry.end_date || '',
+      is_current: entry.is_current,
+      entry_type: entry.entry_type,
+      display_order: entry.display_order,
+      status: 'Draft' as const,
+      site_ids: [],
+    } : { company: '', company_url: '', location: '', start_date: '', end_date: '', is_current: false, entry_type: 'Work' as CvEntryType, display_order: 0, status: 'Draft' as const, site_ids: [] });
+  }
+  prevOpenRef.current = open;
 
   const onFormSubmit = (data: CvEntryFormData) => {
     onSubmit({

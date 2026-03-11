@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useRef } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -54,19 +54,19 @@ export default function RedirectFormDialog({
     mode: 'onChange',
   });
 
-  useEffect(() => {
-    if (open) {
-      reset(redirect
-        ? {
-            source_path: redirect.source_path,
-            destination_path: redirect.destination_path,
-            status_code: redirect.status_code as 301 | 302,
-            description: redirect.description || '',
-            is_active: redirect.is_active,
-          }
-        : { source_path: '', destination_path: '', status_code: 301, description: '', is_active: true });
-    }
-  }, [open, redirect, reset]);
+  const prevOpenRef = useRef(false);
+  if (open && !prevOpenRef.current) {
+    reset(redirect
+      ? {
+          source_path: redirect.source_path,
+          destination_path: redirect.destination_path,
+          status_code: redirect.status_code as 301 | 302,
+          description: redirect.description || '',
+          is_active: redirect.is_active,
+        }
+      : { source_path: '', destination_path: '', status_code: 301, description: '', is_active: true });
+  }
+  prevOpenRef.current = open;
 
   const onFormSubmit = (data: RedirectFormData) => {
     if (redirect && onSubmitUpdate) {
