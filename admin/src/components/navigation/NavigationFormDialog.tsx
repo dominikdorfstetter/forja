@@ -42,6 +42,9 @@ const navigationSchema = z.object({
 
 type NavigationFormData = z.infer<typeof navigationSchema>;
 
+const EMPTY_ITEMS: NavigationItem[] = [];
+const EMPTY_LOCALES: Locale[] = [];
+
 interface NavigationFormDialogProps {
   open: boolean;
   siteId: string;
@@ -60,9 +63,9 @@ export default function NavigationFormDialog({
   siteId,
   menuId,
   item,
-  allItems = [],
+  allItems = EMPTY_ITEMS,
   maxDepth = 3,
-  locales = [],
+  locales = EMPTY_LOCALES,
   onSubmit,
   onClose,
   loading,

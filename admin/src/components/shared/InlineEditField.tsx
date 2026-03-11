@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Box,
   TextField,
@@ -27,9 +27,14 @@ export default function InlineEditField({
 }: InlineEditFieldProps) {
   const { t } = useTranslation();
   const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(value);
+  const [draft, setDraft] = useState('');
   const [saving, setSaving] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const startEditing = useCallback(() => {
+    setDraft(value);
+    setEditing(true);
+  }, [value]);
 
   useEffect(() => {
     if (editing && inputRef.current) {
@@ -37,10 +42,6 @@ export default function InlineEditField({
       inputRef.current.select();
     }
   }, [editing]);
-
-  useEffect(() => {
-    setDraft(value);
-  }, [value]);
 
   const handleSave = async () => {
     if (draft === value) {
@@ -96,7 +97,7 @@ export default function InlineEditField({
         cursor: disabled ? 'default' : 'pointer',
         '&:hover .edit-icon': disabled ? {} : { opacity: 1 },
       }}
-      onClick={disabled ? undefined : () => setEditing(true)}
+      onClick={disabled ? undefined : startEditing}
       data-testid="inline-edit"
     >
       <Typography variant={variant} sx={{ fontFamily }}>

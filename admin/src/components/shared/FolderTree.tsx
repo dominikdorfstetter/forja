@@ -25,7 +25,7 @@ import AllInboxIcon from '@mui/icons-material/AllInbox';
 import { useDroppable } from '@dnd-kit/core';
 import { useTranslation } from 'react-i18next';
 
-export interface FolderNode {
+interface FolderNode {
   id: string;
   parent_id?: string;
   name: string;

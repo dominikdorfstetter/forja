@@ -216,7 +216,7 @@ async function apiRequest<T>(
   }
 }
 
-export class ApiService {
+class ApiService {
   // Clerk token getter management
   setClerkTokenGetter(getter: ClerkTokenGetter): void {
     clerkTokenGetter = getter;

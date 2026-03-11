@@ -27,7 +27,7 @@ export interface MembershipSummary {
 export type ContentStatus = 'Draft' | 'InReview' | 'Scheduled' | 'Published' | 'Archived';
 export type EnvironmentType = 'Development' | 'Staging' | 'Production';
 export type TextDirection = 'Ltr' | 'Rtl';
-export type UserRole = 'Owner' | 'Admin' | 'Editor' | 'Author' | 'Viewer';
+// UserRole removed — was never used
 
 // RFC 7807 Problem Details (matches backend ProblemDetails struct)
 export interface ProblemDetails {
@@ -112,10 +112,7 @@ export interface UpdateRedirectRequest {
   description?: string;
 }
 
-export interface RedirectLookupResponse {
-  destination_path: string;
-  status_code: number;
-}
+// RedirectLookupResponse removed — was never used
 
 // Content Templates
 export interface ContentTemplate {
@@ -178,14 +175,14 @@ export interface HealthResponse {
   storage?: StorageHealth;
 }
 
-export interface ServiceHealth {
+interface ServiceHealth {
   name: string;
   status: 'up' | 'down' | 'disabled';
   latency_ms?: number;
   error?: string;
 }
 
-export interface StorageHealth {
+interface StorageHealth {
   name: string;
   status: 'up' | 'down';
   latency_ms?: number;
@@ -286,7 +283,7 @@ export interface SiteContextFeatures {
   analytics: boolean;
 }
 
-export interface SiteContextModules {
+interface SiteContextModules {
   blog: boolean;
   pages: boolean;
   cv: boolean;
@@ -295,7 +292,7 @@ export interface SiteContextModules {
   ai: boolean;
 }
 
-export interface SiteContextSuggestions {
+interface SiteContextSuggestions {
   show_team_workflow_prompt: boolean;
 }
 
@@ -495,7 +492,7 @@ export interface MediaListItem {
   created_at: string;
 }
 
-export interface MediaVariantResponse {
+interface MediaVariantResponse {
   id: string;
   variant_name: string;
   width: number;
@@ -649,9 +646,7 @@ export interface ReorderItem {
   display_order: number;
 }
 
-export interface ReorderSocialLinksRequest {
-  items: ReorderItem[];
-}
+// ReorderSocialLinksRequest removed — was never used
 
 // Navigation Menus
 export interface NavigationMenu {
@@ -1363,7 +1358,7 @@ export interface ProfileResponse {
   is_system_admin?: boolean;
 }
 
-export interface ExportApiKeyRecord {
+interface ExportApiKeyRecord {
   id: string;
   name: string;
   permission: ApiKeyPermission;
@@ -1432,7 +1427,7 @@ export interface BulkContentRequest {
   status?: ContentStatus;
 }
 
-export interface BulkItemResult {
+interface BulkItemResult {
   id: string;
   success: boolean;
   error?: string;
@@ -1504,13 +1499,13 @@ export interface AiTestResponse {
 
 // ── Analytics ──────────────────────────────────────────────────────
 
-export interface TopContentItem {
+interface TopContentItem {
   path: string;
   total_views: number;
   unique_visitors: number;
 }
 
-export interface TrendDataPoint {
+interface TrendDataPoint {
   date: string;
   total_views: number;
   unique_visitors: number;
@@ -1523,15 +1518,8 @@ export interface AnalyticsReportResponse {
   trend: TrendDataPoint[];
 }
 
-export interface TrackPageviewRequest {
-  path: string;
-  referrer?: string;
-  user_agent_hash?: string;
-}
-
-export interface TrackPageviewResponse {
-  ok: boolean;
-}
+// TrackPageviewRequest removed — was never used
+// TrackPageviewResponse removed — was never used
 
 export interface AnalyticsMaintenanceResponse {
   rows_affected: number;

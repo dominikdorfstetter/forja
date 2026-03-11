@@ -99,9 +99,9 @@ export default function WebhookDeliveryLog({ open, webhookId, onClose }: Webhook
             component="div"
             count={data.meta.total_items}
             page={data.meta.page - 1}
-            onPageChange={(_, p) => setPage(p + 1)}
+            onPageChange={(_, p) => setPage(() => p + 1)}
             rowsPerPage={data.meta.page_size}
-            onRowsPerPageChange={(e) => { setPerPage(+e.target.value); setPage(1); }}
+            onRowsPerPageChange={(e) => { setPerPage(() => +e.target.value); setPage(1); }}
             rowsPerPageOptions={[10, 25, 50]}
           />
         )}

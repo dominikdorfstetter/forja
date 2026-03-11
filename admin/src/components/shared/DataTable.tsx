@@ -18,13 +18,13 @@ export interface DataTableColumn<T> {
   scope?: string;
 }
 
-export interface PaginationMeta {
+interface PaginationMeta {
   total_items: number;
   page: number;
   page_size: number;
 }
 
-export interface DataTableProps<T> {
+interface DataTableProps<T> {
   data: T[];
   columns: DataTableColumn<T>[];
   getRowKey: (item: T) => string;
@@ -66,9 +66,9 @@ export default function DataTable<T>({
           )}
           <TableHead>
             <TableRow>
-              {columns.map((col, i) => (
+              {columns.map((col) => (
                 <TableCell
-                  key={i}
+                  key={String(col.header)}
                   align={col.align}
                   padding={col.padding}
                   scope="col"
@@ -81,8 +81,8 @@ export default function DataTable<T>({
           <TableBody>
             {data.map((item) => (
               <TableRow key={getRowKey(item)} selected={isRowSelected?.(item)}>
-                {columns.map((col, i) => (
-                  <TableCell key={i} align={col.align} padding={col.padding}>
+                {columns.map((col) => (
+                  <TableCell key={String(col.header)} align={col.align} padding={col.padding}>
                     {col.render(item)}
                   </TableCell>
                 ))}

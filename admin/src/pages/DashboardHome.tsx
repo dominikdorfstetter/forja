@@ -549,8 +549,8 @@ export default function DashboardHome() {
                 </Stack>
                 {dashboard.apiKeysLoading ? (
                   <Stack spacing={1}>
-                    {[0, 1, 2].map((i) => (
-                      <Skeleton key={i} variant="rectangular" height={40} sx={{ borderRadius: 1 }} />
+                    {(['apikey-skel-0', 'apikey-skel-1', 'apikey-skel-2'] as const).map((id) => (
+                      <Skeleton key={id} variant="rectangular" height={40} sx={{ borderRadius: 1 }} />
                     ))}
                   </Stack>
                 ) : (

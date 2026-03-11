@@ -3,7 +3,7 @@
  * https://github.com/catppuccin/catppuccin
  */
 
-export interface CatppuccinPalette {
+interface CatppuccinPalette {
   rosewater: string;
   flamingo: string;
   pink: string;

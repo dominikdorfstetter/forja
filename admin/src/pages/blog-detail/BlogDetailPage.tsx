@@ -679,8 +679,8 @@ export default function BlogDetailPage() {
                           {t('blogDetail.toc')}
                         </Typography>
                         <List dense>
-                          {tocItems.map((item, idx) => (
-                            <ListItem key={idx} sx={{ pl: (item.level - 1) * 2 }}>
+                          {tocItems.map((item) => (
+                            <ListItem key={item.id} sx={{ pl: (item.level - 1) * 2 }}>
                               <ListItemText
                                 primary={item.text}
                                 primaryTypographyProps={{

@@ -249,9 +249,9 @@ export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
             component="div"
             count={apiKeysData.meta.total_items}
             page={apiKeysData.meta.page - 1}
-            onPageChange={(_, p) => setPage(p + 1)}
+            onPageChange={(_, p) => setPage(() => p + 1)}
             rowsPerPage={apiKeysData.meta.page_size}
-            onRowsPerPageChange={(e) => { setPerPage(+e.target.value); setPage(1); }}
+            onRowsPerPageChange={(e) => { setPerPage(() => +e.target.value); setPage(1); }}
             rowsPerPageOptions={[10, 25, 50]}
           />
         )}

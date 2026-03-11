@@ -402,7 +402,7 @@ export default function Layout() {
         <Divider />
         {menuSections.map((section, idx) => (
           <List
-            key={idx}
+            key={section.label ?? `section-${idx}`}
             {...(idx === 0 ? { 'data-tour': 'sidebar-nav' } : {})}
             subheader={
               section.label ? (

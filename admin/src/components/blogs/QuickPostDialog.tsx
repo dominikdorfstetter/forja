@@ -49,6 +49,7 @@ interface QuickPostDialogProps {
 
 type DialogMode = 'manual' | 'ai';
 type AiStep = 'idea' | 'outline' | 'post';
+type OutlineItem = { id: number; value: string };
 
 export default function QuickPostDialog({ open, onClose }: QuickPostDialogProps) {
   const { t } = useTranslation();
@@ -70,7 +71,8 @@ export default function QuickPostDialog({ open, onClose }: QuickPostDialogProps)
   const [mode, setMode] = useState<DialogMode>('manual');
   const [aiStep, setAiStep] = useState<AiStep>('idea');
   const [idea, setIdea] = useState('');
-  const [outline, setOutline] = useState<string[]>([]);
+  const [outline, setOutline] = useState<OutlineItem[]>([]);
+  const outlineIdCounter = useRef(0);
   const [aiError, setAiError] = useState<string | null>(null);
 
   const { data: siteLocales } = useQuery({
@@ -113,7 +115,7 @@ export default function QuickPostDialog({ open, onClose }: QuickPostDialogProps)
       const result = await aiGenerate('draft_outline', idea);
       if (result.title) setTitle(result.title);
       if (result.subtitle) setSubtitle(result.subtitle);
-      if (result.outline) setOutline(result.outline);
+      if (result.outline) setOutline(result.outline.map((v: string) => ({ id: outlineIdCounter.current++, value: v })));
       setAiStep('outline');
     } catch {
       setAiError(t('quickPost.ai.outlineError'));
@@ -125,7 +127,7 @@ export default function QuickPostDialog({ open, onClose }: QuickPostDialogProps)
     const content = JSON.stringify({
       title,
       subtitle,
-      outline,
+      outline: outline.map(item => item.value),
     });
     try {
       const result = await aiGenerate('draft_post', content);
@@ -136,16 +138,16 @@ export default function QuickPostDialog({ open, onClose }: QuickPostDialogProps)
     }
   };
 
-  const handleRemoveOutlineItem = (index: number) => {
-    setOutline((prev) => prev.filter((_, i) => i !== index));
+  const handleRemoveOutlineItem = (id: number) => {
+    setOutline((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const handleEditOutlineItem = (index: number, value: string) => {
-    setOutline((prev) => prev.map((item, i) => (i === index ? value : item)));
+  const handleEditOutlineItem = (id: number, value: string) => {
+    setOutline((prev) => prev.map((item) => (item.id === id ? { ...item, value } : item)));
   };
 
   const handleAddOutlineItem = () => {
-    setOutline((prev) => [...prev, '']);
+    setOutline((prev) => [...prev, { id: outlineIdCounter.current++, value: '' }]);
   };
 
   const handleRegenerateOutline = async () => {
@@ -329,19 +331,19 @@ export default function QuickPostDialog({ open, onClose }: QuickPostDialogProps)
                 </Typography>
                 <Stack spacing={1}>
                   {outline.map((item, index) => (
-                    <Stack key={index} direction="row" spacing={1} alignItems="center">
+                    <Stack key={item.id} direction="row" spacing={1} alignItems="center">
                       <Chip label={index + 1} size="small" variant="outlined" />
                       <TextField
                         fullWidth
                         size="small"
-                        value={item}
-                        onChange={(e) => handleEditOutlineItem(index, e.target.value)}
+                        value={item.value}
+                        onChange={(e) => handleEditOutlineItem(item.id, e.target.value)}
                         disabled={isGenerating}
                       />
                       <Tooltip title={t('common.actions.delete')} arrow>
                         <IconButton
                           size="small"
-                          onClick={() => handleRemoveOutlineItem(index)}
+                          onClick={() => handleRemoveOutlineItem(item.id)}
                           disabled={isGenerating}
                           aria-label={t('common.actions.delete')}
                         >

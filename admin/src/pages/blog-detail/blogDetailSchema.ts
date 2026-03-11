@@ -31,7 +31,8 @@ export function calculateReadingTime(markdown: string | undefined): number {
   return Math.max(1, Math.ceil(words / 200));
 }
 
-export interface TocItem {
+interface TocItem {
+  id: number;
   level: number;
   text: string;
 }
@@ -40,10 +41,11 @@ export function parseToc(body: string | undefined): TocItem[] {
   if (!body) return [];
   const lines = body.split('\n');
   const items: TocItem[] = [];
+  let id = 0;
   for (const line of lines) {
     const match = line.match(/^(#{1,3})\s+(.+)$/);
     if (match) {
-      items.push({ level: match[1].length, text: match[2] });
+      items.push({ id: id++, level: match[1].length, text: match[2] });
     }
   }
   return items;

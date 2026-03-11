@@ -90,14 +90,17 @@ const BYTES_PER_MB = 1_048_576;
 
 // ─── Site Settings Tab ──────────────────────────────────────────────
 
+type TemplateWithId = PreviewTemplate & { _id: number };
+
 function SiteSettingsTab({ highlightField }: { highlightField?: string }) {
   const { t } = useTranslation();
   const { selectedSiteId } = useSiteContext();
   const queryClient = useQueryClient();
   const { enqueueSnackbar } = useSnackbar();
   const workflowRef = useRef<HTMLDivElement>(null);
+  const templateIdCounter = useRef(0);
 
-  const [previewTemplates, setPreviewTemplates] = useState<PreviewTemplate[]>([]);
+  const [previewTemplates, setPreviewTemplates] = useState<TemplateWithId[]>([]);
   const [previewTemplatesDirty, setPreviewTemplatesDirty] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(highlightField === 'editorial_workflow');
 
@@ -131,7 +134,10 @@ function SiteSettingsTab({ highlightField }: { highlightField?: string }) {
         contact_email: settings.contact_email,
         editorial_workflow_enabled: settings.editorial_workflow_enabled,
       });
-      setPreviewTemplates(settings.preview_templates ?? []);
+      setPreviewTemplates((settings.preview_templates ?? []).map(pt => ({
+        ...pt,
+        _id: templateIdCounter.current++,
+      })));
       setPreviewTemplatesDirty(false);
     }
   }, [settings, reset]);
@@ -166,13 +172,15 @@ function SiteSettingsTab({ highlightField }: { highlightField?: string }) {
       maintenance_mode: values.maintenance_mode,
       contact_email: values.contact_email || '',
       editorial_workflow_enabled: values.editorial_workflow_enabled,
-      preview_templates: previewTemplates.filter(pt => pt.name.trim() && pt.url.trim()),
+      preview_templates: previewTemplates
+        .filter(pt => pt.name.trim() && pt.url.trim())
+        .map(({ _id: _, ...pt }) => pt),
     });
     setPreviewTemplatesDirty(false);
   };
 
   const handleAddTemplate = () => {
-    setPreviewTemplates(prev => [...prev, { name: '', url: '' }]);
+    setPreviewTemplates(prev => [...prev, { name: '', url: '', _id: templateIdCounter.current++ }]);
     setPreviewTemplatesDirty(true);
   };
 
@@ -412,7 +420,7 @@ function SiteSettingsTab({ highlightField }: { highlightField?: string }) {
 
                   <Stack spacing={1.5}>
                     {previewTemplates.map((pt, index) => (
-                      <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box key={pt._id} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <TextField
                           value={pt.name}
                           onChange={(e) => handleTemplateChange(index, 'name', e.target.value)}

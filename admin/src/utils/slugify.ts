@@ -1,4 +1,4 @@
-export const MAX_SLUG_LENGTH = 80;
+const MAX_SLUG_LENGTH = 80;
 
 /**
  * Converts text to a URL-friendly slug.

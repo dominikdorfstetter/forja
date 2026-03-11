@@ -1,12 +1,12 @@
 import { ProblemDetails, FieldError } from '@/types/api';
 
-export interface ResolvedError {
+interface ResolvedError {
   title: string;
   detail: string;
   fieldErrors?: FieldError[];
 }
 
-export function isProblemDetails(error: unknown): error is ProblemDetails {
+function isProblemDetails(error: unknown): error is ProblemDetails {
   if (typeof error !== 'object' || error === null) return false;
   const obj = error as Record<string, unknown>;
   return (

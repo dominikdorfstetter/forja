@@ -367,13 +367,13 @@ export default function CreateTemplateWizard({ open, onClose, onSubmit, loading 
                 </Box>
                 {totalTemplatePages > 1 && (
                   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1, mt: 2 }}>
-                    <IconButton size="small" disabled={currentTemplatePage === 0} onClick={() => setTemplatePage(currentTemplatePage - 1)}>
+                    <IconButton size="small" disabled={currentTemplatePage === 0} onClick={() => setTemplatePage(prev => prev - 1)}>
                       <NavigateBeforeIcon />
                     </IconButton>
                     <Typography variant="body2" color="text.secondary">
                       {t('templates.page', { current: currentTemplatePage + 1, total: totalTemplatePages })}
                     </Typography>
-                    <IconButton size="small" disabled={currentTemplatePage >= totalTemplatePages - 1} onClick={() => setTemplatePage(currentTemplatePage + 1)}>
+                    <IconButton size="small" disabled={currentTemplatePage >= totalTemplatePages - 1} onClick={() => setTemplatePage(prev => prev + 1)}>
                       <NavigateNextIcon />
                     </IconButton>
                   </Box>

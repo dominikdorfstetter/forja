@@ -694,9 +694,9 @@ function DocumentsPage({ embedded = false, ref }: { embedded?: boolean; ref?: Re
                   component="div"
                   count={documentsData.meta.total_items}
                   page={documentsData.meta.page - 1}
-                  onPageChange={(_, p) => setPage(p + 1)}
+                  onPageChange={(_, p) => setPage(() => p + 1)}
                   rowsPerPage={documentsData.meta.page_size}
-                  onRowsPerPageChange={(e) => { setPerPage(+e.target.value); setPage(1); }}
+                  onRowsPerPageChange={(e) => { setPerPage(() => +e.target.value); setPage(1); }}
                   rowsPerPageOptions={[10, 25, 50]}
                 />
               )}

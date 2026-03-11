@@ -62,6 +62,7 @@ import type { ContentTemplate, SiteLocaleResponse } from '@/types/api';
 
 type CreationMethod = 'scratch' | 'template' | 'import' | 'ai';
 type AiPhase = 'idea' | 'outline' | 'post';
+type OutlineItem = { id: number; value: string };
 
 const scratchSchema = z.object({
   slug: slugField,
@@ -107,12 +108,14 @@ interface CreateBlogWizardProps {
   siteTemplatesLoading: boolean;
 }
 
+const EMPTY_TEMPLATES: ContentTemplate[] = [];
+
 export default function CreateBlogWizard({
   open,
   onClose,
   onCreated,
   siteLocales,
-  siteTemplates = [],
+  siteTemplates = EMPTY_TEMPLATES,
   siteTemplatesLoading,
 }: CreateBlogWizardProps) {
   const { t } = useTranslation();
@@ -132,7 +135,8 @@ export default function CreateBlogWizard({
   const [aiIdea, setAiIdea] = useState('');
   const [aiTitle, setAiTitle] = useState('');
   const [aiSubtitle, setAiSubtitle] = useState('');
-  const [aiOutline, setAiOutline] = useState<string[]>([]);
+  const [aiOutline, setAiOutline] = useState<OutlineItem[]>([]);
+  const outlineIdCounter = useRef(0);
   const [aiBody, setAiBody] = useState('');
   const [aiExcerpt, setAiExcerpt] = useState('');
   const [aiMetaTitle, setAiMetaTitle] = useState('');
@@ -351,7 +355,7 @@ export default function CreateBlogWizard({
       const result = await aiGenerate('draft_outline', aiIdea);
       if (result.title) setAiTitle(result.title);
       if (result.subtitle) setAiSubtitle(result.subtitle);
-      if (result.outline) setAiOutline(result.outline);
+      if (result.outline) setAiOutline(result.outline.map((v: string) => ({ id: outlineIdCounter.current++, value: v })));
       setAiPhase('outline');
     } catch {
       setAiError(t('quickPost.ai.outlineError'));
@@ -363,7 +367,7 @@ export default function CreateBlogWizard({
     const content = JSON.stringify({
       title: aiTitle,
       subtitle: aiSubtitle,
-      outline: aiOutline,
+      outline: aiOutline.map(item => item.value),
     });
     try {
       const result = await aiGenerate('draft_post', content);
@@ -670,13 +674,13 @@ export default function CreateBlogWizard({
                 </Box>
                 {totalTemplatePages > 1 && (
                   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1, mt: 2 }}>
-                    <IconButton size="small" disabled={currentTemplatePage === 0} onClick={() => setTemplatePage(currentTemplatePage - 1)}>
+                    <IconButton size="small" disabled={currentTemplatePage === 0} onClick={() => setTemplatePage(prev => prev - 1)}>
                       <NavigateBeforeIcon />
                     </IconButton>
                     <Typography variant="body2" color="text.secondary">
                       {t('templates.page', { current: currentTemplatePage + 1, total: totalTemplatePages })}
                     </Typography>
-                    <IconButton size="small" disabled={currentTemplatePage >= totalTemplatePages - 1} onClick={() => setTemplatePage(currentTemplatePage + 1)}>
+                    <IconButton size="small" disabled={currentTemplatePage >= totalTemplatePages - 1} onClick={() => setTemplatePage(prev => prev + 1)}>
                       <NavigateNextIcon />
                     </IconButton>
                   </Box>
@@ -798,19 +802,19 @@ export default function CreateBlogWizard({
                   </Typography>
                   <Stack spacing={1}>
                     {aiOutline.map((item, index) => (
-                      <Stack key={index} direction="row" spacing={1} alignItems="center">
+                      <Stack key={item.id} direction="row" spacing={1} alignItems="center">
                         <Chip label={index + 1} size="small" variant="outlined" />
                         <TextField
                           fullWidth
                           size="small"
-                          value={item}
-                          onChange={(e) => setAiOutline((prev) => prev.map((v, i) => (i === index ? e.target.value : v)))}
+                          value={item.value}
+                          onChange={(e) => setAiOutline((prev) => prev.map((v) => (v.id === item.id ? { ...v, value: e.target.value } : v)))}
                           disabled={isGenerating}
                         />
                         <Tooltip title={t('common.actions.delete')} arrow>
                           <IconButton
                             size="small"
-                            onClick={() => setAiOutline((prev) => prev.filter((_, i) => i !== index))}
+                            onClick={() => setAiOutline((prev) => prev.filter((v) => v.id !== item.id))}
                             disabled={isGenerating}
                             aria-label={t('common.actions.delete')}
                           >
@@ -819,7 +823,7 @@ export default function CreateBlogWizard({
                         </Tooltip>
                       </Stack>
                     ))}
-                    <Button size="small" onClick={() => setAiOutline((prev) => [...prev, ''])} disabled={isGenerating}>
+                    <Button size="small" onClick={() => setAiOutline((prev) => [...prev, { id: outlineIdCounter.current++, value: '' }])} disabled={isGenerating}>
                       {t('quickPost.ai.addPoint')}
                     </Button>
                   </Stack>

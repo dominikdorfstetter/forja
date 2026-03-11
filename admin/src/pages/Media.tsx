@@ -462,9 +462,9 @@ export default function MediaPage() {
                   component="div"
                   count={mediaData.meta.total_items}
                   page={mediaData.meta.page - 1}
-                  onPageChange={(_, p) => setPage(p + 1)}
+                  onPageChange={(_, p) => setPage(() => p + 1)}
                   rowsPerPage={mediaData.meta.page_size}
-                  onRowsPerPageChange={(e) => { setPerPage(+e.target.value); setPage(1); }}
+                  onRowsPerPageChange={(e) => { setPerPage(() => +e.target.value); setPage(1); }}
                   rowsPerPageOptions={[10, 25, 50]}
                 />
               )}
