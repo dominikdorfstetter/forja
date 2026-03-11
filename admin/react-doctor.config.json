@@ -1,0 +1,12 @@
+{
+  "ignore": {
+    "rules": [
+      "jsx-a11y/no-autofocus"
+    ],
+    "files": [
+      "src/test/**",
+      "**/*.test.tsx",
+      "**/*.test.ts"
+    ]
+  }
+}
