@@ -1,4 +1,4 @@
-import { useReducer, useRef } from 'react';
+import { useReducer, useRef, useState, useCallback } from 'react';
 import {
   Box,
   Button,
@@ -26,7 +26,7 @@ import type { ContentTemplate, SiteLocaleResponse } from '@/types/api';
 import BlogWizardMethodStep from './BlogWizardMethodStep';
 import BlogWizardTemplateStep, { buildMergedTemplates } from './BlogWizardTemplateStep';
 import BlogWizardImportStep from './BlogWizardImportStep';
-import BlogWizardAiStep from './BlogWizardAiStep';
+import BlogWizardAiStep, { type RegenerateField } from './BlogWizardAiStep';
 import { useBlogWizardMutations } from './useBlogWizardMutations';
 
 type CreationMethod = 'scratch' | 'template' | 'import' | 'ai';
@@ -79,6 +79,8 @@ type WizardAction =
   | { type: 'SET_AI_OUTLINE'; value: OutlineItem[] }
   | { type: 'SET_AI_BODY'; value: string }
   | { type: 'SET_AI_EXCERPT'; value: string }
+  | { type: 'SET_AI_META_TITLE'; value: string }
+  | { type: 'SET_AI_META_DESCRIPTION'; value: string }
   | { type: 'SET_AI_ERROR'; value: string | null }
   | { type: 'OUTLINE_GENERATED'; title: string; subtitle: string; outline: OutlineItem[] }
   | { type: 'POST_GENERATED'; body: string; excerpt: string; metaTitle: string; metaDescription: string }
@@ -117,6 +119,8 @@ function reducer(state: WizardState, action: WizardAction): WizardState {
     case 'SET_AI_OUTLINE': return { ...state, aiOutline: action.value };
     case 'SET_AI_BODY': return { ...state, aiBody: action.value };
     case 'SET_AI_EXCERPT': return { ...state, aiExcerpt: action.value };
+    case 'SET_AI_META_TITLE': return { ...state, aiMetaTitle: action.value };
+    case 'SET_AI_META_DESCRIPTION': return { ...state, aiMetaDescription: action.value };
     case 'SET_AI_ERROR': return { ...state, aiError: action.value };
     case 'OUTLINE_GENERATED': return { ...state, aiTitle: action.title || state.aiTitle, aiSubtitle: action.subtitle || state.aiSubtitle, aiOutline: action.outline, aiPhase: 'outline', aiError: null };
     case 'POST_GENERATED': return { ...state, aiBody: action.body || state.aiBody, aiExcerpt: action.excerpt || state.aiExcerpt, aiMetaTitle: action.metaTitle || state.aiMetaTitle, aiMetaDescription: action.metaDescription || state.aiMetaDescription, aiPhase: 'post', aiError: null };
@@ -154,6 +158,7 @@ export default function CreateBlogWizard({
   const { isConfigured: aiAvailable, generate: aiGenerate, isGenerating } = useAiAssist();
 
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [regeneratingField, setRegeneratingField] = useState<RegenerateField | null>(null);
   const outlineIdCounter = useRef(0);
   const stateRef = useRef(state);
   stateRef.current = state;
@@ -177,6 +182,7 @@ export default function CreateBlogWizard({
   if (open && !prevOpenRef.current) {
     dispatch({ type: 'RESET' });
     outlineIdCounter.current = 0;
+    setRegeneratingField(null);
     resetForm({ slug: '', author: userFullName || '' });
   }
   prevOpenRef.current = open;
@@ -207,6 +213,37 @@ export default function CreateBlogWizard({
       dispatch({ type: 'SET_AI_ERROR', value: t('quickPost.ai.postError') });
     }
   };
+
+  const handleRegenerate = useCallback(async (field: RegenerateField) => {
+    const s = stateRef.current;
+    dispatch({ type: 'SET_AI_ERROR', value: null });
+    setRegeneratingField(field);
+    try {
+      if (field === 'all') {
+        const content = JSON.stringify({ title: s.aiTitle, subtitle: s.aiSubtitle, outline: s.aiOutline.map(item => item.value) });
+        const result = await aiGenerate('draft_post', content);
+        if (result.body) dispatch({ type: 'SET_AI_BODY', value: result.body });
+        if (result.excerpt) dispatch({ type: 'SET_AI_EXCERPT', value: result.excerpt });
+        if (result.meta_title) dispatch({ type: 'SET_AI_META_TITLE', value: result.meta_title });
+        if (result.meta_description) dispatch({ type: 'SET_AI_META_DESCRIPTION', value: result.meta_description });
+      } else if (field === 'body') {
+        const content = JSON.stringify({ title: s.aiTitle, subtitle: s.aiSubtitle, outline: s.aiOutline.map(item => item.value) });
+        const result = await aiGenerate('draft_post', content);
+        if (result.body) dispatch({ type: 'SET_AI_BODY', value: result.body });
+      } else if (field === 'excerpt') {
+        const result = await aiGenerate('excerpt', s.aiBody);
+        if (result.excerpt) dispatch({ type: 'SET_AI_EXCERPT', value: result.excerpt });
+      } else if (field === 'seo') {
+        const result = await aiGenerate('seo', s.aiBody);
+        if (result.meta_title) dispatch({ type: 'SET_AI_META_TITLE', value: result.meta_title });
+        if (result.meta_description) dispatch({ type: 'SET_AI_META_DESCRIPTION', value: result.meta_description });
+      }
+    } catch {
+      dispatch({ type: 'SET_AI_ERROR', value: t('quickPost.ai.regenerateError', 'Regeneration failed. Please try again.') });
+    } finally {
+      setRegeneratingField(null);
+    }
+  }, [aiGenerate, t]);
 
   const handleTemplateConfirm = () => {
     const tpl = buildMergedTemplates(t, siteTemplates).find((mt) => mt.id === state.selectedTemplate);
@@ -257,7 +294,24 @@ export default function CreateBlogWizard({
         )}
 
         {state.activeStep === 1 && state.method === 'ai' && (
-          <BlogWizardAiStep aiPhase={state.aiPhase} aiIdea={state.aiIdea} aiTitle={state.aiTitle} aiSubtitle={state.aiSubtitle} aiOutline={state.aiOutline} aiBody={state.aiBody} aiExcerpt={state.aiExcerpt} aiError={state.aiError} isGenerating={isGenerating} isCreating={isCreating} onIdeaChange={(v) => dispatch({ type: 'SET_AI_IDEA', value: v })} onTitleChange={(v) => dispatch({ type: 'SET_AI_TITLE', value: v })} onSubtitleChange={(v) => dispatch({ type: 'SET_AI_SUBTITLE', value: v })} onOutlineChange={(v) => dispatch({ type: 'SET_AI_OUTLINE', value: v })} onBodyChange={(v) => dispatch({ type: 'SET_AI_BODY', value: v })} onExcerptChange={(v) => dispatch({ type: 'SET_AI_EXCERPT', value: v })} onErrorDismiss={() => dispatch({ type: 'SET_AI_ERROR', value: null })} onAddOutlineItem={() => dispatch({ type: 'SET_AI_OUTLINE', value: [...state.aiOutline, { id: outlineIdCounter.current++, value: '' }] })} />
+          <BlogWizardAiStep
+            aiPhase={state.aiPhase} aiIdea={state.aiIdea} aiTitle={state.aiTitle} aiSubtitle={state.aiSubtitle}
+            aiOutline={state.aiOutline} aiBody={state.aiBody} aiExcerpt={state.aiExcerpt}
+            aiMetaTitle={state.aiMetaTitle} aiMetaDescription={state.aiMetaDescription}
+            aiError={state.aiError} isGenerating={isGenerating} isCreating={isCreating}
+            regeneratingField={regeneratingField}
+            onIdeaChange={(v) => dispatch({ type: 'SET_AI_IDEA', value: v })}
+            onTitleChange={(v) => dispatch({ type: 'SET_AI_TITLE', value: v })}
+            onSubtitleChange={(v) => dispatch({ type: 'SET_AI_SUBTITLE', value: v })}
+            onOutlineChange={(v) => dispatch({ type: 'SET_AI_OUTLINE', value: v })}
+            onBodyChange={(v) => dispatch({ type: 'SET_AI_BODY', value: v })}
+            onExcerptChange={(v) => dispatch({ type: 'SET_AI_EXCERPT', value: v })}
+            onMetaTitleChange={(v) => dispatch({ type: 'SET_AI_META_TITLE', value: v })}
+            onMetaDescriptionChange={(v) => dispatch({ type: 'SET_AI_META_DESCRIPTION', value: v })}
+            onErrorDismiss={() => dispatch({ type: 'SET_AI_ERROR', value: null })}
+            onAddOutlineItem={() => dispatch({ type: 'SET_AI_OUTLINE', value: [...state.aiOutline, { id: outlineIdCounter.current++, value: '' }] })}
+            onRegenerate={handleRegenerate}
+          />
         )}
       </DialogContent>
 

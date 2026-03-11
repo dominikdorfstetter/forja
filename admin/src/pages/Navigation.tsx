@@ -78,7 +78,7 @@ export default function NavigationPage() {
   });
 
   // Sync ordered list from query data
-  const prevItemsRef = useRef(items);
+  const prevItemsRef = useRef<NavigationItem[] | undefined>(undefined);
   if (items && items !== prevItemsRef.current) {
     setOrderedItems(items);
   }

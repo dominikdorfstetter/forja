@@ -12,6 +12,9 @@ interface PostData {
   title: string;
   subtitle: string;
   body: string;
+  excerpt: string;
+  metaTitle: string;
+  metaDescription: string;
 }
 
 interface UseQuickPostPublishOptions {
@@ -55,6 +58,9 @@ export function useQuickPostPublish({ open, getPostData, onClose }: UseQuickPost
           title: postData.title,
           subtitle: postData.subtitle || undefined,
           body: postData.body || undefined,
+          excerpt: postData.excerpt || undefined,
+          meta_title: postData.metaTitle || undefined,
+          meta_description: postData.metaDescription || undefined,
         });
       }
 
