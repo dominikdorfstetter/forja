@@ -539,7 +539,7 @@ pub async fn update_blog(
                 "blog",
                 id,
                 &slug,
-                auth.0.clerk_user_id().map(String::from),
+                Some(auth.0.id),
             );
         }
     }

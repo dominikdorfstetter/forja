@@ -76,21 +76,15 @@ impl ClerkService {
             base_url.starts_with("https://"),
             "Clerk API base URL must use HTTPS"
         );
+        let client = reqwest::Client::builder()
+            .https_only(true)
+            .build()
+            .expect("Failed to build HTTPS-only HTTP client");
         Self {
             secret_key,
-            client: reqwest::Client::new(),
+            client,
             base_url,
         }
-    }
-
-    /// Validate that a URL uses HTTPS before sending credentials
-    fn require_https(url: &str) -> Result<(), ApiError> {
-        if !url.starts_with("https://") {
-            return Err(ApiError::Internal(
-                "Refusing to send credentials over non-HTTPS connection".to_string(),
-            ));
-        }
-        Ok(())
     }
 
     /// Sanitize and validate a path parameter to prevent injection and
@@ -116,7 +110,7 @@ impl ClerkService {
         offset: i64,
     ) -> Result<(Vec<ClerkApiUser>, i64), ApiError> {
         let url = format!("{}/users", self.base_url);
-        Self::require_https(&url)?;
+
         let resp = self
             .client
             .get(&url)
@@ -150,7 +144,7 @@ impl ClerkService {
     pub async fn get_user(&self, user_id: &str) -> Result<ClerkApiUser, ApiError> {
         let safe_id = Self::sanitize_path_param(user_id)?;
         let url = format!("{}/users/{}", self.base_url, safe_id);
-        Self::require_https(&url)?;
+
         let resp = self
             .client
             .get(&url)
@@ -183,7 +177,7 @@ impl ClerkService {
     ) -> Result<ClerkApiUser, ApiError> {
         let safe_id = Self::sanitize_path_param(user_id)?;
         let url = format!("{}/users/{}", self.base_url, safe_id);
-        Self::require_https(&url)?;
+
         let body = serde_json::json!({
             "public_metadata": { "role": role }
         });
@@ -217,7 +211,7 @@ impl ClerkService {
     pub async fn delete_user(&self, user_id: &str) -> Result<(), ApiError> {
         let safe_id = Self::sanitize_path_param(user_id)?;
         let url = format!("{}/users/{}", self.base_url, safe_id);
-        Self::require_https(&url)?;
+
         let resp = self
             .client
             .delete(&url)

@@ -16,22 +16,13 @@ pub fn notify_content_submitted(
     entity_type: &str,
     entity_id: Uuid,
     slug: &str,
-    actor_clerk_id: Option<String>,
+    actor_id: Option<Uuid>,
 ) {
     let entity_type = entity_type.to_string();
     let slug = slug.to_string();
     tokio::spawn(async move {
-        let result = notify_submitted_inner(
-            &pool,
-            site_id,
-            &entity_type,
-            entity_id,
-            &slug,
-            actor_clerk_id.as_deref(),
-        )
-        .await;
-        // Drop sensitive identifier before logging to prevent cleartext exposure
-        drop(actor_clerk_id);
+        let result =
+            notify_submitted_inner(&pool, site_id, &entity_type, entity_id, &slug, actor_id).await;
         if let Err(e) = result {
             tracing::warn!("Notification dispatch (submitted) failed: {e}");
         }
@@ -46,7 +37,7 @@ pub fn notify_content_approved(
     entity_id: Uuid,
     slug: &str,
     creator_user_id: Option<Uuid>,
-    actor_clerk_id: Option<String>,
+    actor_id: Option<Uuid>,
 ) {
     let Some(creator_id) = creator_user_id else {
         return;
@@ -62,14 +53,12 @@ pub fn notify_content_approved(
             entity_id,
             &slug,
             creator_id,
-            actor_clerk_id.as_deref(),
+            actor_id,
             "content_approved",
             &title,
             None,
         )
         .await;
-        // Drop sensitive identifier before logging to prevent cleartext exposure
-        drop(actor_clerk_id);
         if let Err(e) = result {
             tracing::warn!("Notification dispatch (approved) failed: {e}");
         }
@@ -85,7 +74,7 @@ pub fn notify_changes_requested(
     entity_id: Uuid,
     slug: &str,
     creator_user_id: Option<Uuid>,
-    actor_clerk_id: Option<String>,
+    actor_id: Option<Uuid>,
     comment: Option<String>,
 ) {
     let Some(creator_id) = creator_user_id else {
@@ -102,18 +91,27 @@ pub fn notify_changes_requested(
             entity_id,
             &slug,
             creator_id,
-            actor_clerk_id.as_deref(),
+            actor_id,
             "changes_requested",
             &title,
             comment.as_deref(),
         )
         .await;
-        // Drop sensitive identifier before logging to prevent cleartext exposure
-        drop(actor_clerk_id);
         if let Err(e) = result {
             tracing::warn!("Notification dispatch (changes_requested) failed: {e}");
         }
     });
+}
+
+/// Resolve a user UUID (v5 hash of clerk_user_id) back to the original clerk_user_id
+/// by matching against the provided member list.
+fn resolve_actor(members: &[SiteMembership], actor_id: Option<Uuid>) -> Option<String> {
+    actor_id.and_then(|uuid| {
+        members.iter().find_map(|m| {
+            let derived = Uuid::new_v5(&CLERK_UUID_NAMESPACE, m.clerk_user_id.as_bytes());
+            (derived == uuid).then(|| m.clerk_user_id.clone())
+        })
+    })
 }
 
 async fn notify_submitted_inner(
@@ -122,25 +120,30 @@ async fn notify_submitted_inner(
     entity_type: &str,
     entity_id: Uuid,
     slug: &str,
-    actor_clerk_id: Option<&str>,
+    actor_id: Option<Uuid>,
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let reviewer_ids = find_reviewer_clerk_ids(pool, site_id).await?;
+    let members = SiteMembership::find_all_for_site(pool, site_id).await?;
+    let actor_clerk_id = resolve_actor(&members, actor_id);
+
     let title = format!(
         "{} '{}' submitted for review",
         capitalize(entity_type),
         slug
     );
 
-    for clerk_id in reviewer_ids {
+    for member in &members {
+        if !member.role.can_review() {
+            continue;
+        }
         // Don't notify the actor themselves
-        if actor_clerk_id == Some(clerk_id.as_str()) {
+        if actor_clerk_id.as_deref() == Some(member.clerk_user_id.as_str()) {
             continue;
         }
         let _ = Notification::create(
             pool,
             site_id,
-            &clerk_id,
-            actor_clerk_id,
+            &member.clerk_user_id,
+            actor_clerk_id.as_deref(),
             "content_submitted",
             entity_type,
             entity_id,
@@ -160,20 +163,32 @@ async fn notify_review_result_inner(
     entity_id: Uuid,
     _slug: &str,
     creator_user_id: Uuid,
-    actor_clerk_id: Option<&str>,
+    actor_id: Option<Uuid>,
     notification_type: &str,
     title: &str,
     message: Option<&str>,
 ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    let recipient = resolve_clerk_user_id(pool, site_id, creator_user_id).await?;
+    let members = SiteMembership::find_all_for_site(pool, site_id).await?;
+
+    // Resolve both UUIDs to clerk_user_ids from the member list
+    let resolve = |uuid: Uuid| -> Option<String> {
+        members.iter().find_map(|m| {
+            let derived = Uuid::new_v5(&CLERK_UUID_NAMESPACE, m.clerk_user_id.as_bytes());
+            (derived == uuid).then(|| m.clerk_user_id.clone())
+        })
+    };
+
+    let recipient = resolve(creator_user_id);
+    let actor_clerk_id = actor_id.and_then(&resolve);
+
     if let Some(clerk_id) = recipient {
         // Don't notify the actor themselves
-        if actor_clerk_id != Some(clerk_id.as_str()) {
+        if actor_clerk_id.as_deref() != Some(clerk_id.as_str()) {
             let _ = Notification::create(
                 pool,
                 site_id,
                 &clerk_id,
-                actor_clerk_id,
+                actor_clerk_id.as_deref(),
                 notification_type,
                 entity_type,
                 entity_id,
@@ -184,37 +199,6 @@ async fn notify_review_result_inner(
         }
     }
     Ok(())
-}
-
-/// Resolve a UUID v5 (derived from clerk_user_id) back to the original clerk_user_id
-/// by iterating site members and matching the hash.
-async fn resolve_clerk_user_id(
-    pool: &PgPool,
-    site_id: Uuid,
-    user_uuid: Uuid,
-) -> Result<Option<String>, Box<dyn std::error::Error + Send + Sync>> {
-    let members = SiteMembership::find_all_for_site(pool, site_id).await?;
-    for member in members {
-        let derived = Uuid::new_v5(&CLERK_UUID_NAMESPACE, member.clerk_user_id.as_bytes());
-        if derived == user_uuid {
-            return Ok(Some(member.clerk_user_id));
-        }
-    }
-    Ok(None)
-}
-
-/// Find clerk_user_ids of all site members who can review content.
-async fn find_reviewer_clerk_ids(
-    pool: &PgPool,
-    site_id: Uuid,
-) -> Result<Vec<String>, Box<dyn std::error::Error + Send + Sync>> {
-    let members = SiteMembership::find_all_for_site(pool, site_id).await?;
-    let ids: Vec<String> = members
-        .into_iter()
-        .filter(|m| m.role.can_review())
-        .map(|m| m.clerk_user_id)
-        .collect();
-    Ok(ids)
 }
 
 fn capitalize(s: &str) -> String {
