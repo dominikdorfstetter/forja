@@ -25,6 +25,7 @@ jobs:
       backend: ${{ steps.filter.outputs.backend }}
       admin: ${{ steps.filter.outputs.admin }}
       analytics: ${{ steps.filter.outputs.analytics }}
+      astro-blog: ${{ steps.filter.outputs.astro-blog }}
     steps:
       - uses: actions/checkout@v6
 
@@ -40,6 +41,8 @@ jobs:
               - 'Dockerfile'
             analytics:
               - 'libs/analytics/**'
+            astro-blog:
+              - 'templates/astro-blog/**'
 
   backend:
     name: Backend (Rust)
@@ -181,11 +184,38 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint
+      - name: Type check
         run: npm run lint
 
       - name: Run tests with coverage
         run: npm test
+
+  astro-blog:
+    name: Astro Blog Template
+    needs: changes
+    if: needs.changes.outputs.astro-blog == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: templates/astro-blog/package-lock.json
+
+      - name: Build analytics dependency
+        working-directory: libs/analytics
+        run: npm ci && npm run build
+
+      - name: Install dependencies
+        working-directory: templates/astro-blog
+        run: npm ci
+
+      - name: Type check
+        working-directory: templates/astro-blog
+        run: npx astro check
 
   docker-build:
     name: Docker Build
@@ -201,12 +231,12 @@ jobs:
   ci-pass:
     name: CI Pass
     if: always()
-    needs: [backend, admin, analytics, docker-build]
+    needs: [backend, admin, analytics, astro-blog, docker-build]
     runs-on: ubuntu-latest
     steps:
       - name: Check required jobs
         run: |
-          if [[ "${{ needs.backend.result }}" == "failure" || "${{ needs.admin.result }}" == "failure" || "${{ needs.analytics.result }}" == "failure" || "${{ needs.docker-build.result }}" == "failure" ]]; then
+          if [[ "${{ needs.backend.result }}" == "failure" || "${{ needs.admin.result }}" == "failure" || "${{ needs.analytics.result }}" == "failure" || "${{ needs.astro-blog.result }}" == "failure" || "${{ needs.docker-build.result }}" == "failure" ]]; then
             echo "One or more required jobs failed"
             exit 1
           fi
