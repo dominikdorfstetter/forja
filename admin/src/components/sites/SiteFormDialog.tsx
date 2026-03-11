@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Button,
   Dialog,
@@ -72,28 +72,29 @@ export default function SiteFormDialog({ open, site, onSubmit, onClose, loading 
     enabled: open && isCreateMode,
   });
 
-  useEffect(() => {
-    if (open) {
-      clear();
-      reset(site ? {
-        name: site.name,
-        slug: site.slug,
-        description: site.description || '',
-        timezone: site.timezone,
-      } : {
-        name: '',
-        slug: '',
-        description: '',
-        timezone: 'UTC',
-      });
-      if (!site) {
-        setSelectedLocales([]);
-        setDefaultLocaleId(null);
-        setLocaleError(null);
-      }
-      setTimeout(() => snapshot(), 0);
+  // Reset form when dialog opens
+  const prevOpenRef = useRef(false);
+  if (open && !prevOpenRef.current) {
+    clear();
+    reset(site ? {
+      name: site.name,
+      slug: site.slug,
+      description: site.description || '',
+      timezone: site.timezone,
+    } : {
+      name: '',
+      slug: '',
+      description: '',
+      timezone: 'UTC',
+    });
+    if (!site) {
+      setSelectedLocales([]);
+      setDefaultLocaleId(null);
+      setLocaleError(null);
     }
-  }, [open, site, reset, clear, snapshot]);
+    setTimeout(() => snapshot(), 0);
+  }
+  prevOpenRef.current = open;
 
   // Auto-set default when first locale is selected
   useEffect(() => {

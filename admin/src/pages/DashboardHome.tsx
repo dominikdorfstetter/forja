@@ -30,7 +30,7 @@ import ErrorIcon from '@mui/icons-material/Error';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import apiService from '@/services/api';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import { useAuth } from '@/store/AuthContext';
@@ -345,7 +345,7 @@ export default function DashboardHome() {
       {/* Read-only notice */}
       {effectivePermission === 'Read' && (
         <Alert severity="info" sx={{ mb: 3 }}>
-          <span dangerouslySetInnerHTML={{ __html: t('dashboard.readOnlyNotice') }} />
+          <Trans i18nKey="dashboard.readOnlyNotice" components={{ strong: <strong /> }} />
         </Alert>
       )}
 

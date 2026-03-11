@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useRef } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -62,21 +62,21 @@ export default function LocaleFormDialog({
     mode: 'onChange',
   });
 
-  useEffect(() => {
-    if (open) {
-      reset(
-        locale
-          ? {
-              code: locale.code,
-              name: locale.name,
-              native_name: locale.native_name || '',
-              direction: locale.direction,
-              is_active: locale.is_active,
-            }
-          : { code: '', name: '', native_name: '', direction: 'Ltr', is_active: true },
-      );
-    }
-  }, [open, locale, reset]);
+  const prevOpenRef = useRef(false);
+  if (open && !prevOpenRef.current) {
+    reset(
+      locale
+        ? {
+            code: locale.code,
+            name: locale.name,
+            native_name: locale.native_name || '',
+            direction: locale.direction,
+            is_active: locale.is_active,
+          }
+        : { code: '', name: '', native_name: '', direction: 'Ltr', is_active: true },
+    );
+  }
+  prevOpenRef.current = open;
 
   const onFormSubmit = (data: LocaleFormData) => {
     if (locale && onSubmitUpdate) {

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useRef } from 'react';
 import {
   Button,
   Dialog,
@@ -61,19 +61,19 @@ export default function SkillFormDialog({ open, skill, onSubmit, onClose, loadin
 
   const { data: sites } = useQuery({ queryKey: ['sites'], queryFn: () => apiService.getSites() });
 
-  useEffect(() => {
-    if (open) {
-      reset(skill ? {
-        name: skill.name,
-        slug: skill.slug,
-        category: skill.category || '',
-        icon: skill.icon || '',
-        proficiency_level: skill.proficiency_level ?? '',
-        is_global: false,
-        site_ids: [],
-      } : { name: '', slug: '', category: '', icon: '', proficiency_level: '', is_global: false, site_ids: [] });
-    }
-  }, [open, skill, reset]);
+  const prevOpenRef = useRef(false);
+  if (open && !prevOpenRef.current) {
+    reset(skill ? {
+      name: skill.name,
+      slug: skill.slug,
+      category: skill.category || '',
+      icon: skill.icon || '',
+      proficiency_level: skill.proficiency_level ?? '',
+      is_global: false,
+      site_ids: [],
+    } : { name: '', slug: '', category: '', icon: '', proficiency_level: '', is_global: false, site_ids: [] });
+  }
+  prevOpenRef.current = open;
 
   const onFormSubmit = (data: SkillFormData) => {
     onSubmit({

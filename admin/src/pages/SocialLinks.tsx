@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
@@ -76,9 +76,11 @@ export default function SocialLinksPage() {
     enabled: !!selectedSiteId,
   });
 
-  useEffect(() => {
-    if (links) setOrderedLinks(links);
-  }, [links]);
+  const prevLinksRef = useRef(links);
+  if (links && links !== prevLinksRef.current) {
+    setOrderedLinks(links);
+  }
+  prevLinksRef.current = links;
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import {
   Box,
   Button,
@@ -49,17 +49,17 @@ export default function MediaUploadDialog({ open, onSubmit, onClose, loading }: 
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
 
-  // Reset state when dialog opens/closes
-  useEffect(() => {
-    if (open) {
-      setSelectedFile(null);
-      setPreview(null);
-      setDragOver(false);
-      setIsGlobal(false);
-      setUploadProgress(null);
-      setValidationError(null);
-    }
-  }, [open]);
+  // Reset state when dialog opens
+  const prevOpenRef = useRef(false);
+  if (open && !prevOpenRef.current) {
+    setSelectedFile(null);
+    setPreview(null);
+    setDragOver(false);
+    setIsGlobal(false);
+    setUploadProgress(null);
+    setValidationError(null);
+  }
+  prevOpenRef.current = open;
 
   // Generate image preview
   useEffect(() => {

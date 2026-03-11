@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Backdrop, Paper, Typography, Button, Stack, Box, Popper } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
@@ -47,9 +47,11 @@ export default function QuickTour({ active, onComplete }: QuickTourProps) {
   }, [updateAnchor]);
 
   // Reset step when tour becomes active
-  useEffect(() => {
-    if (active) setCurrentStep(0);
-  }, [active]);
+  const prevActiveRef = useRef(false);
+  if (active && !prevActiveRef.current) {
+    setCurrentStep(0);
+  }
+  prevActiveRef.current = active;
 
   if (!active || availableSteps.length === 0) return null;
 

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useRef } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -80,32 +80,32 @@ export default function ContentTemplateFormDialog({
     mode: 'onChange',
   });
 
-  useEffect(() => {
-    if (open) {
-      reset(template
-        ? {
-            name: template.name,
-            description: template.description || '',
-            icon: template.icon,
-            slug_prefix: template.slug_prefix,
-            is_featured: template.is_featured,
-            allow_comments: template.allow_comments,
-            is_active: template.is_active,
-            title: template.title,
-            subtitle: template.subtitle,
-            excerpt: template.excerpt,
-            body: template.body,
-            meta_title: template.meta_title,
-            meta_description: template.meta_description,
-          }
-        : {
-            name: '', description: '', icon: 'Article', slug_prefix: 'post',
-            is_featured: false, allow_comments: true, is_active: true,
-            title: '', subtitle: '', excerpt: '', body: '',
-            meta_title: '', meta_description: '',
-          });
-    }
-  }, [open, template, reset]);
+  const prevOpenRef = useRef(false);
+  if (open && !prevOpenRef.current) {
+    reset(template
+      ? {
+          name: template.name,
+          description: template.description || '',
+          icon: template.icon,
+          slug_prefix: template.slug_prefix,
+          is_featured: template.is_featured,
+          allow_comments: template.allow_comments,
+          is_active: template.is_active,
+          title: template.title,
+          subtitle: template.subtitle,
+          excerpt: template.excerpt,
+          body: template.body,
+          meta_title: template.meta_title,
+          meta_description: template.meta_description,
+        }
+      : {
+          name: '', description: '', icon: 'Article', slug_prefix: 'post',
+          is_featured: false, allow_comments: true, is_active: true,
+          title: '', subtitle: '', excerpt: '', body: '',
+          meta_title: '', meta_description: '',
+        });
+  }
+  prevOpenRef.current = open;
 
   const onFormSubmit = (data: ContentTemplateFormData) => {
     if (template && onSubmitUpdate) {

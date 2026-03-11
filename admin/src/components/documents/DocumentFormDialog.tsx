@@ -155,16 +155,17 @@ export default function DocumentFormDialog({
 
   const { fields } = useFieldArray({ control, name: 'localizations' });
 
-  useEffect(() => {
-    if (open) {
-      const defaults = buildDefaults;
-      reset(defaults);
-      setSourceType(defaults.source_type);
-      setActiveTab(0);
-      setSelectedFile(null);
-      setFileError(null);
-    }
-  }, [open, reset, buildDefaults]);
+  // Reset form when dialog opens
+  const prevOpenRef = useRef(false);
+  if (open && !prevOpenRef.current) {
+    const defaults = buildDefaults;
+    reset(defaults);
+    setSourceType(defaults.source_type);
+    setActiveTab(0);
+    setSelectedFile(null);
+    setFileError(null);
+  }
+  prevOpenRef.current = open;
 
   const handleSourceTypeChange = (_: React.MouseEvent<HTMLElement>, value: string | null) => {
     if (value === 'link' || value === 'upload') {

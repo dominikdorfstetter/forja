@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, type KeyboardEvent, type ReactNode } from 'react';
+import { useState, useCallback, useMemo, type Dispatch, type KeyboardEvent, type ReactNode, type SetStateAction } from 'react';
 import {
   Box,
   List,
@@ -86,6 +86,40 @@ function DroppableFolderEntry({
   );
 }
 
+interface InlineEditorProps {
+  editor: InlineEditorState | null;
+  setEditor: Dispatch<SetStateAction<InlineEditorState | null>>;
+  onConfirm: () => void;
+  onCancel: () => void;
+  onKeyDown: (e: KeyboardEvent<HTMLInputElement>) => void;
+}
+
+function InlineEditor({ editor, setEditor, onConfirm, onCancel, onKeyDown }: InlineEditorProps) {
+  const { t } = useTranslation();
+
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'center', px: 1, py: 0.5, gap: 0.5 }}>
+      <TextField
+        autoFocus
+        size="small"
+        variant="standard"
+        placeholder={t('shared.folderTree.folderName')}
+        value={editor?.value ?? ''}
+        onChange={(e) => setEditor((prev) => (prev ? { ...prev, value: e.target.value } : null))}
+        onKeyDown={onKeyDown}
+        sx={{ flex: 1 }}
+        inputProps={{ 'aria-label': t('shared.folderTree.folderName') }}
+      />
+      <IconButton size="small" onClick={onConfirm} color="primary" aria-label={t('common.actions.confirm')}>
+        <CheckIcon fontSize="small" />
+      </IconButton>
+      <IconButton size="small" onClick={onCancel} aria-label={t('common.actions.cancel')}>
+        <CloseIcon fontSize="small" />
+      </IconButton>
+    </Box>
+  );
+}
+
 export default function FolderTree({
   folders,
   selectedFolderId,
@@ -165,26 +199,14 @@ export default function FolderTree({
     [confirmEditor, cancelEditor],
   );
 
-  const renderInlineEditor = () => (
-    <Box sx={{ display: 'flex', alignItems: 'center', px: 1, py: 0.5, gap: 0.5 }}>
-      <TextField
-        autoFocus
-        size="small"
-        variant="standard"
-        placeholder={t('shared.folderTree.folderName')}
-        value={editor?.value ?? ''}
-        onChange={(e) => setEditor((prev) => (prev ? { ...prev, value: e.target.value } : null))}
-        onKeyDown={handleEditorKeyDown}
-        sx={{ flex: 1 }}
-        inputProps={{ 'aria-label': t('shared.folderTree.folderName') }}
-      />
-      <IconButton size="small" onClick={confirmEditor} color="primary" aria-label={t('common.actions.confirm')}>
-        <CheckIcon fontSize="small" />
-      </IconButton>
-      <IconButton size="small" onClick={cancelEditor} aria-label={t('common.actions.cancel')}>
-        <CloseIcon fontSize="small" />
-      </IconButton>
-    </Box>
+  const inlineEditorElement = (
+    <InlineEditor
+      editor={editor}
+      setEditor={setEditor}
+      onConfirm={confirmEditor}
+      onCancel={cancelEditor}
+      onKeyDown={handleEditorKeyDown}
+    />
   );
 
   const renderFolder = (folder: FolderNode, depth: number) => {
@@ -198,7 +220,7 @@ export default function FolderTree({
     if (isRenaming) {
       return (
         <Box key={folder.id} sx={{ pl: depth * 2 }}>
-          {renderInlineEditor()}
+          {inlineEditorElement}
         </Box>
       );
     }
@@ -299,7 +321,7 @@ export default function FolderTree({
             <List component="div" disablePadding>
               {children.map((child) => renderFolder(child, depth + 1))}
               {isCreatingChild && (
-                <Box sx={{ pl: (depth + 1) * 2 }}>{renderInlineEditor()}</Box>
+                <Box sx={{ pl: (depth + 1) * 2 }}>{inlineEditorElement}</Box>
               )}
             </List>
           </Collapse>
@@ -347,7 +369,7 @@ export default function FolderTree({
         {rootFolders.map((folder) => renderFolder(folder, 0))}
 
         {/* Inline editor for new root folder */}
-        {isCreatingRoot && renderInlineEditor()}
+        {isCreatingRoot && inlineEditorElement}
       </List>
 
       {/* New Folder button */}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router';
 import {
   Box,
@@ -78,16 +78,17 @@ function GroupFormDialog({ open, group, onSubmit, onClose, loading }: GroupFormD
     defaultValues: { cookie_name: '', display_order: 0, is_required: false, default_enabled: false },
   });
 
-  useEffect(() => {
-    if (open) {
-      reset(group ? {
-        cookie_name: group.cookie_name,
-        display_order: group.display_order,
-        is_required: group.is_required,
-        default_enabled: group.default_enabled,
-      } : { cookie_name: '', display_order: 0, is_required: false, default_enabled: false });
-    }
-  }, [open, group, reset]);
+  // Reset form when dialog opens
+  const prevOpenRef = useRef(false);
+  if (open && !prevOpenRef.current) {
+    reset(group ? {
+      cookie_name: group.cookie_name,
+      display_order: group.display_order,
+      is_required: group.is_required,
+      default_enabled: group.default_enabled,
+    } : { cookie_name: '', display_order: 0, is_required: false, default_enabled: false });
+  }
+  prevOpenRef.current = open;
 
   const onFormSubmit = (data: GroupFormData) => {
     onSubmit({
@@ -145,15 +146,16 @@ function ItemFormDialog({ open, item, onSubmit, onClose, loading }: ItemFormDial
     defaultValues: { cookie_name: '', display_order: 0, is_required: false },
   });
 
-  useEffect(() => {
-    if (open) {
-      reset(item ? {
-        cookie_name: item.cookie_name,
-        display_order: item.display_order,
-        is_required: item.is_required,
-      } : { cookie_name: '', display_order: 0, is_required: false });
-    }
-  }, [open, item, reset]);
+  // Reset form when dialog opens
+  const prevOpenRef = useRef(false);
+  if (open && !prevOpenRef.current) {
+    reset(item ? {
+      cookie_name: item.cookie_name,
+      display_order: item.display_order,
+      is_required: item.is_required,
+    } : { cookie_name: '', display_order: 0, is_required: false });
+  }
+  prevOpenRef.current = open;
 
   const onFormSubmit = (data: ItemFormData) => {
     onSubmit({

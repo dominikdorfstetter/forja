@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Button,
@@ -134,22 +134,22 @@ export default function SiteCreationWizard({
   });
 
   // Reset when dialog opens (apply survey-derived defaults if provided)
-  useEffect(() => {
-    if (open) {
-      setActiveStep(0);
-      setSelectedLocales([]);
-      setDefaultLocaleId(null);
-      setLocaleError(null);
-      reset({
-        name: '',
-        slug: '',
-        description: '',
-        timezone: 'UTC',
-        modules: defaultModules ?? { blog: true, pages: true, cv: false, legal: false, documents: false, ai: false },
-        workflowMode: defaultWorkflowMode ?? 'solo',
-      });
-    }
-  }, [open, reset, defaultModules, defaultWorkflowMode]);
+  const prevOpenRef = useRef(false);
+  if (open && !prevOpenRef.current) {
+    setActiveStep(0);
+    setSelectedLocales([]);
+    setDefaultLocaleId(null);
+    setLocaleError(null);
+    reset({
+      name: '',
+      slug: '',
+      description: '',
+      timezone: 'UTC',
+      modules: defaultModules ?? { blog: true, pages: true, cv: false, legal: false, documents: false, ai: false },
+      workflowMode: defaultWorkflowMode ?? 'solo',
+    });
+  }
+  prevOpenRef.current = open;
 
   // Auto-set default locale
   useEffect(() => {

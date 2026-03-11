@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useRef } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -63,13 +63,13 @@ export default function WebhookFormDialog({
     mode: 'onChange',
   });
 
-  useEffect(() => {
-    if (open) {
-      reset(webhook
-        ? { url: webhook.url, description: webhook.description || '', events: webhook.events, is_active: webhook.is_active }
-        : { url: '', description: '', events: [], is_active: true });
-    }
-  }, [open, webhook, reset]);
+  const prevOpenRef = useRef(false);
+  if (open && !prevOpenRef.current) {
+    reset(webhook
+      ? { url: webhook.url, description: webhook.description || '', events: webhook.events, is_active: webhook.is_active }
+      : { url: '', description: '', events: [], is_active: true });
+  }
+  prevOpenRef.current = open;
 
   const onFormSubmit = (data: WebhookFormData) => {
     if (webhook && onSubmitUpdate) {

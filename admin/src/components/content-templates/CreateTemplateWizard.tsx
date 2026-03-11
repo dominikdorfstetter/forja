@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import {
   alpha,
   Box,
@@ -106,27 +106,27 @@ export default function CreateTemplateWizard({ open, onClose, onSubmit, loading 
   const [editSlugPrefix, setEditSlugPrefix] = useState('');
   const [editBody, setEditBody] = useState('');
 
-  // Reset all state when dialog opens/closes
-  useEffect(() => {
-    if (open) {
-      setActiveStep(0);
-      setMethod(null);
-      setSelectedTemplate(null);
-      setTemplateSearch('');
-      setTemplatePage(0);
-      setDragOver(false);
-      setImportError(null);
-      setFileName('');
-      setFileSize(0);
-      setParsed(null);
-      setName('');
-      setSlugPrefix('post');
-      setBody('');
-      setEditName('');
-      setEditSlugPrefix('');
-      setEditBody('');
-    }
-  }, [open]);
+  // Reset all state when dialog opens
+  const prevOpenRef = useRef(false);
+  if (open && !prevOpenRef.current) {
+    setActiveStep(0);
+    setMethod(null);
+    setSelectedTemplate(null);
+    setTemplateSearch('');
+    setTemplatePage(0);
+    setDragOver(false);
+    setImportError(null);
+    setFileName('');
+    setFileSize(0);
+    setParsed(null);
+    setName('');
+    setSlugPrefix('post');
+    setBody('');
+    setEditName('');
+    setEditSlugPrefix('');
+    setEditBody('');
+  }
+  prevOpenRef.current = open;
 
   // --- Template helpers ---
   const mergedTemplates: MergedTemplate[] = blogTemplates.map((tpl) => ({

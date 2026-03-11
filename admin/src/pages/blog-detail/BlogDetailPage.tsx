@@ -30,7 +30,7 @@ import {
 } from '@mui/material';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import apiService from '@/services/api';
@@ -732,7 +732,7 @@ export default function BlogDetailPage() {
         </>
       ) : (
         <Alert severity="info">
-          <span dangerouslySetInnerHTML={{ __html: t('blogDetail.noLocalesAlert') }} />
+          <Trans i18nKey="blogDetail.noLocalesAlert" components={{ strong: <strong /> }} />
         </Alert>
       )}
 

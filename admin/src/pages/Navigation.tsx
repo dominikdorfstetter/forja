@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
@@ -132,9 +132,11 @@ export default function NavigationPage() {
   });
 
   // Sync ordered list from query data
-  useEffect(() => {
-    if (items) setOrderedItems(items);
-  }, [items]);
+  const prevItemsRef = useRef(items);
+  if (items && items !== prevItemsRef.current) {
+    setOrderedItems(items);
+  }
+  prevItemsRef.current = items;
 
   // Reset tab when menus change
   useEffect(() => {

@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useRef, useMemo } from 'react';
 import {
   Box,
   Button,
@@ -86,19 +86,20 @@ export default function NavigationFormDialog({
     enabled: !!item?.id && open,
   });
 
-  useEffect(() => {
-    if (open) {
-      reset(item ? {
-        link_type: item.external_url ? 'external' : 'page',
-        page_id: item.page_id || '',
-        external_url: item.external_url || '',
-        icon: item.icon || '',
-        display_order: item.display_order,
-        open_in_new_tab: item.open_in_new_tab,
-        parent_id: item.parent_id || '',
-      } : { link_type: 'page', page_id: '', external_url: '', icon: '', display_order: 0, open_in_new_tab: false, parent_id: '' });
-    }
-  }, [open, item, reset]);
+  // Reset form when dialog opens
+  const prevOpenRef = useRef(false);
+  if (open && !prevOpenRef.current) {
+    reset(item ? {
+      link_type: item.external_url ? 'external' : 'page',
+      page_id: item.page_id || '',
+      external_url: item.external_url || '',
+      icon: item.icon || '',
+      display_order: item.display_order,
+      open_in_new_tab: item.open_in_new_tab,
+      parent_id: item.parent_id || '',
+    } : { link_type: 'page', page_id: '', external_url: '', icon: '', display_order: 0, open_in_new_tab: false, parent_id: '' });
+  }
+  prevOpenRef.current = open;
 
   // Build parent options with indentation (excluding current item and its descendants)
   const parentOptions = useMemo(() => {

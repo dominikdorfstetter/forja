@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Box,
   Button,
@@ -112,9 +112,12 @@ function QuickAddDialog({
   const { t } = useTranslation();
   const [selectedType, setSelectedType] = useState<SectionType>('Hero');
 
-  useEffect(() => {
-    if (open) setSelectedType('Hero');
-  }, [open]);
+  // Reset selected type when dialog opens
+  const prevOpenRef = useRef(false);
+  if (open && !prevOpenRef.current) {
+    setSelectedType('Hero');
+  }
+  prevOpenRef.current = open;
 
   const handleAdd = () => {
     onSubmit({
@@ -194,11 +197,11 @@ export default function PageSectionsTab({
   const [orderedSections, setOrderedSections] = useState<PageSectionResponse[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (sections) {
-      setOrderedSections([...sections].sort((a, b) => a.display_order - b.display_order));
-    }
-  }, [sections]);
+  const prevSectionsRef = useRef(sections);
+  if (sections && sections !== prevSectionsRef.current) {
+    setOrderedSections([...sections].sort((a, b) => a.display_order - b.display_order));
+  }
+  prevSectionsRef.current = sections;
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),

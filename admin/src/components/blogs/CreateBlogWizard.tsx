@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import {
   alpha,
   Box,
@@ -167,36 +167,36 @@ export default function CreateBlogWizard({
     mode: 'onChange',
   });
 
-  // Reset all state when dialog opens/closes
-  useEffect(() => {
-    if (open) {
-      setActiveStep(0);
-      setMethod(null);
-      setSelectedTemplate(null);
-      setTemplateSearch('');
-      setTemplatePage(0);
-      setImportPhase('upload');
-      setDragOver(false);
-      setImportError(null);
-      setFileName('');
-      setFileSize(0);
-      setParsed(null);
-      setImportTitle('');
-      setImportExcerpt('');
-      setImportSlug('');
-      setAiPhase('idea');
-      setAiIdea('');
-      setAiTitle('');
-      setAiSubtitle('');
-      setAiOutline([]);
-      setAiBody('');
-      setAiExcerpt('');
-      setAiMetaTitle('');
-      setAiMetaDescription('');
-      setAiError(null);
-      resetForm({ slug: '', author: userFullName || '' });
-    }
-  }, [open, resetForm, userFullName]);
+  // Reset all state when dialog opens
+  const prevOpenRef = useRef(false);
+  if (open && !prevOpenRef.current) {
+    setActiveStep(0);
+    setMethod(null);
+    setSelectedTemplate(null);
+    setTemplateSearch('');
+    setTemplatePage(0);
+    setImportPhase('upload');
+    setDragOver(false);
+    setImportError(null);
+    setFileName('');
+    setFileSize(0);
+    setParsed(null);
+    setImportTitle('');
+    setImportExcerpt('');
+    setImportSlug('');
+    setAiPhase('idea');
+    setAiIdea('');
+    setAiTitle('');
+    setAiSubtitle('');
+    setAiOutline([]);
+    setAiBody('');
+    setAiExcerpt('');
+    setAiMetaTitle('');
+    setAiMetaDescription('');
+    setAiError(null);
+    resetForm({ slug: '', author: userFullName || '' });
+  }
+  prevOpenRef.current = open;
 
   // --- Mutations ---
   const scratchMutation = useMutation({

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useRef } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -51,11 +51,11 @@ export default function TagFormDialog({
     mode: 'onChange',
   });
 
-  useEffect(() => {
-    if (open) {
-      reset(tag ? { slug: tag.slug, is_global: tag.is_global } : { slug: '', is_global: false });
-    }
-  }, [open, tag, reset]);
+  const prevOpenRef = useRef(false);
+  if (open && !prevOpenRef.current) {
+    reset(tag ? { slug: tag.slug, is_global: tag.is_global } : { slug: '', is_global: false });
+  }
+  prevOpenRef.current = open;
 
   const onFormSubmit = (data: TagFormData) => {
     if (tag && onSubmitUpdate) {
