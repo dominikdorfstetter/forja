@@ -29,7 +29,7 @@ pub struct AiGenerateRequest {
 }
 
 /// Response from AI content generation
-#[derive(Debug, Serialize, ToSchema)]
+#[derive(Debug, Default, Serialize, ToSchema)]
 pub struct AiGenerateResponse {
     pub meta_title: Option<String>,
     pub meta_description: Option<String>,

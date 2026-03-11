@@ -153,16 +153,23 @@ const XML_FORMAT_DRAFT_OUTLINE: &str = "\nRespond using ONLY these XML tags, wit
 <outline>...</outline>";
 
 const DEFAULT_PROMPT_DRAFT_POST: &str =
-    "You are a skilled blog writer. Given a title and outline, write a complete, well-structured \
-blog post in markdown format. Write engaging, informative content that expands each outline point \
-into full paragraphs. Also generate a concise excerpt (1-2 sentences) and SEO metadata.";
+    "You are a skilled blog writer who produces clean, minimal markdown.\n\
+STRICT FORMATTING RULES — violating these is an error:\n\
+1. NEVER use # (h1). The highest heading allowed is ## (h2).\n\
+2. NEVER use **bold** or __bold__. Not for tool names, not for emphasis, not at all. Write everything in plain text.\n\
+3. NEVER insert horizontal rules (---).\n\
+4. Use *italics* only for a single foreign word or book title, never for emphasis.\n\
+5. Each ## heading must be short (under 8 words) and derived from an outline bullet point.\n\n\
+Given a title and outline, write a complete blog post following the rules above. \
+Expand each outline point into one or two concise paragraphs of plain prose. \
+Also generate a concise excerpt (1-2 sentences) and SEO metadata.";
 
 const JSON_FORMAT_DRAFT_POST: &str = "\nRespond with ONLY valid JSON in this exact format: \
-{\"body\": \"full blog post in markdown...\", \"excerpt\": \"1-2 sentence summary\", \
+{\"body\": \"clean markdown with ## headings, no bold, no horizontal rules\", \"excerpt\": \"1-2 sentence summary\", \
 \"meta_title\": \"SEO title (max 60 chars)\", \"meta_description\": \"SEO description (max 160 chars)\"}";
 
 const XML_FORMAT_DRAFT_POST: &str = "\nRespond using ONLY these XML tags, with no other text:\n\
-<body>full blog post in markdown</body>\n\
+<body>clean markdown with ## headings, no bold, no horizontal rules</body>\n\
 <excerpt>1-2 sentence summary</excerpt>\n\
 <meta_title>SEO title (max 60 chars)</meta_title>\n\
 <meta_description>SEO description (max 160 chars)</meta_description>";
@@ -403,7 +410,8 @@ fn extract_xml_field(s: &str, tag: &str) -> Option<String> {
     if end <= start {
         return None;
     }
-    Some(s[start + open.len()..end].trim().to_string())
+    let raw = s[start + open.len()..end].trim();
+    Some(unescape_json_string(raw))
 }
 
 /// Extract all occurrences of a repeated XML tag (e.g. multiple `<outline>` elements).
@@ -838,6 +846,7 @@ async fn generate_translate_parallel(
         }
     }
 
+    truncate_seo_fields(&mut response);
     Ok(response)
 }
 
@@ -1026,12 +1035,12 @@ fn parse_ai_response(content: &str, action: &AiAction) -> Result<AiGenerateRespo
     // 1. Try strict JSON parsing (handles well-formed output from json_object mode)
     let sanitized = sanitize_json_strings(content);
     if let Ok(json) = serde_json::from_str::<serde_json::Value>(&sanitized) {
-        return Ok(build_response(&json, action));
+        return Ok(postprocess_response(build_response(&json, action), action));
     }
 
     // 2. Try XML tag extraction (handles local/Anthropic models with XML prompts)
     if let Some(response) = parse_xml_response(content, action) {
-        return Ok(response);
+        return Ok(postprocess_response(response, action));
     }
 
     // 3. Fall back to lenient key-based extraction for models that produce
@@ -1044,7 +1053,100 @@ fn parse_ai_response(content: &str, action: &AiAction) -> Result<AiGenerateRespo
     }
 
     let json = serde_json::Value::Object(fields);
-    Ok(build_response(&json, action))
+    Ok(postprocess_response(build_response(&json, action), action))
+}
+
+/// Clean up the parsed AI response:
+/// - Strip leading horizontal rules and whitespace from body
+/// - Downgrade any h1 headings to h2
+/// - Derive excerpt from body if missing
+fn postprocess_response(mut resp: AiGenerateResponse, action: &AiAction) -> AiGenerateResponse {
+    // SEO truncation applies to all actions that may return meta fields
+    truncate_seo_fields(&mut resp);
+
+    if !matches!(action, AiAction::DraftPost) {
+        return resp;
+    }
+
+    if let Some(ref mut body) = resp.body {
+        // Strip leading horizontal rules (--- or ***) and surrounding whitespace
+        let mut s = body.trim().to_string();
+        while s.starts_with("---") || s.starts_with("***") || s.starts_with("___") {
+            s = s
+                .trim_start_matches("---")
+                .trim_start_matches("***")
+                .trim_start_matches("___")
+                .trim_start()
+                .to_string();
+        }
+
+        // Downgrade # headings to ## (only at line start)
+        let lines: Vec<String> = s
+            .lines()
+            .map(|line| {
+                if line.starts_with("# ") && !line.starts_with("## ") {
+                    format!("#{line}")
+                } else {
+                    line.to_string()
+                }
+            })
+            .collect();
+        s = lines.join("\n");
+
+        *body = s;
+    }
+
+    // Derive excerpt from body if missing
+    if resp.excerpt.as_ref().is_none_or(|e| e.trim().is_empty()) {
+        if let Some(ref body) = resp.body {
+            // Take the first non-heading, non-empty paragraph
+            let first_para = body
+                .split("\n\n")
+                .map(|p| p.trim())
+                .find(|p| !p.is_empty() && !p.starts_with('#'));
+            if let Some(para) = first_para {
+                // Truncate to ~200 chars at a sentence boundary
+                let excerpt = if para.len() <= 200 {
+                    para.to_string()
+                } else if let Some(end) = para[..200].rfind(". ") {
+                    format!("{}.", &para[..end])
+                } else {
+                    format!("{}...", &para[..197])
+                };
+                resp.excerpt = Some(excerpt);
+            }
+        }
+    }
+
+    resp
+}
+
+/// Hard-truncate SEO fields to their maximum allowed lengths.
+/// Models frequently exceed the character limits specified in prompts,
+/// so this acts as a safety net for meta_title (60) and meta_description (160).
+fn truncate_seo_fields(resp: &mut AiGenerateResponse) {
+    if let Some(ref mut mt) = resp.meta_title {
+        if mt.len() > 60 {
+            // Try to break at a word boundary
+            let truncated = &mt[..60];
+            *mt = match truncated.rfind(' ') {
+                Some(pos) if pos > 40 => truncated[..pos].to_string(),
+                _ => truncated.to_string(),
+            };
+        }
+    }
+    if let Some(ref mut md) = resp.meta_description {
+        if md.len() > 160 {
+            let truncated = &md[..160];
+            *md = match truncated.rfind(". ") {
+                Some(pos) if pos > 100 => format!("{}.", &truncated[..pos]),
+                _ => match truncated.rfind(' ') {
+                    Some(pos) if pos > 120 => format!("{}...", &truncated[..pos]),
+                    _ => format!("{}...", &truncated[..157]),
+                },
+            };
+        }
+    }
 }
 
 fn build_response(json: &serde_json::Value, action: &AiAction) -> AiGenerateResponse {
@@ -1149,10 +1251,37 @@ fn extract_fields_lenient(raw: &str) -> serde_json::Map<String, serde_json::Valu
 
         result.insert(
             key.to_string(),
-            serde_json::Value::String(value.to_string()),
+            serde_json::Value::String(unescape_json_string(value)),
         );
     }
 
+    result
+}
+
+/// Convert literal JSON escape sequences (backslash-n, backslash-t, etc.)
+/// to their actual characters. Needed when extracting values outside of
+/// serde_json's normal parsing (lenient extractor, XML extractor).
+fn unescape_json_string(s: &str) -> String {
+    let mut result = String::with_capacity(s.len());
+    let mut chars = s.chars();
+    while let Some(c) = chars.next() {
+        if c == '\\' {
+            match chars.next() {
+                Some('n') => result.push('\n'),
+                Some('r') => result.push('\r'),
+                Some('t') => result.push('\t'),
+                Some('\\') => result.push('\\'),
+                Some('"') => result.push('"'),
+                Some(other) => {
+                    result.push('\\');
+                    result.push(other);
+                }
+                None => result.push('\\'),
+            }
+        } else {
+            result.push(c);
+        }
+    }
     result
 }
 
@@ -1561,14 +1690,68 @@ mod tests {
     fn test_parse_draft_post_json() {
         let json = r##"{"body": "# Introduction\n\nGreat content here.", "excerpt": "A summary.", "meta_title": "SEO Title", "meta_description": "SEO description"}"##;
         let result = parse_ai_response(json, &AiAction::DraftPost).unwrap();
+        // h1 gets downgraded to h2 by postprocessor
         assert_eq!(
             result.body.unwrap(),
-            "# Introduction\n\nGreat content here."
+            "## Introduction\n\nGreat content here."
         );
         assert_eq!(result.excerpt.unwrap(), "A summary.");
         assert_eq!(result.meta_title.unwrap(), "SEO Title");
         assert!(result.title.is_none());
         assert!(result.outline.is_none());
+    }
+
+    #[test]
+    fn test_postprocess_strips_leading_hr() {
+        let resp = AiGenerateResponse {
+            body: Some("---\n\n## Heading\n\nContent here.".to_string()),
+            excerpt: Some("An excerpt.".to_string()),
+            ..Default::default()
+        };
+        let result = postprocess_response(resp, &AiAction::DraftPost);
+        assert!(
+            !result.body.as_ref().unwrap().starts_with("---"),
+            "Leading --- should be stripped"
+        );
+        assert!(result.body.as_ref().unwrap().starts_with("## Heading"));
+    }
+
+    #[test]
+    fn test_postprocess_derives_excerpt_from_body() {
+        let resp = AiGenerateResponse {
+            body: Some("## Heading\n\nThis is the first paragraph of the post.".to_string()),
+            excerpt: None,
+            ..Default::default()
+        };
+        let result = postprocess_response(resp, &AiAction::DraftPost);
+        assert_eq!(
+            result.excerpt.unwrap(),
+            "This is the first paragraph of the post."
+        );
+    }
+
+    #[test]
+    fn test_postprocess_downgrades_h1_to_h2() {
+        let resp = AiGenerateResponse {
+            body: Some("# Big Heading\n\nSome text.\n\n## Already H2".to_string()),
+            excerpt: Some("test".to_string()),
+            ..Default::default()
+        };
+        let result = postprocess_response(resp, &AiAction::DraftPost);
+        let body = result.body.unwrap();
+        assert!(body.starts_with("## Big Heading"));
+        assert!(body.contains("## Already H2"));
+        // Should not triple-hash existing h2
+        assert!(!body.contains("### Already H2"));
+    }
+
+    #[test]
+    fn test_unescape_json_string() {
+        assert_eq!(unescape_json_string(r"hello\nworld"), "hello\nworld");
+        assert_eq!(unescape_json_string(r"tab\there"), "tab\there");
+        assert_eq!(unescape_json_string(r#"quote\"here"#), "quote\"here");
+        assert_eq!(unescape_json_string(r"backslash\\end"), "backslash\\end");
+        assert_eq!(unescape_json_string("no escapes"), "no escapes");
     }
 
     #[test]
