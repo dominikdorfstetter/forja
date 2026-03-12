@@ -196,43 +196,21 @@ async fn try_clerk_jwt(request: &Request<'_>, state: &AppState) -> Option<Authen
     let auth_header = request.headers().get_one("Authorization")?;
     let token = auth_header.strip_prefix("Bearer ")?;
 
-    // Get JWKS state (cached keys)
+    // Validate token via JWKS
     let jwks_state = request.rocket().state::<ClerkJwksState>()?;
-    let keys = jwks_state.get_keys().await.ok()?;
-
-    // Decode the JWT header to get the key ID
-    let header = jsonwebtoken::decode_header(token).ok()?;
-    let kid = header.kid?;
-
-    // Find the matching key in JWKS
-    let jwk = keys
-        .keys
-        .iter()
-        .find(|k| k.common.key_id.as_deref() == Some(&kid))?;
-    let decoding_key = jsonwebtoken::DecodingKey::from_jwk(jwk).ok()?;
-
-    // Validate the token
-    let mut validation = jsonwebtoken::Validation::new(jsonwebtoken::Algorithm::RS256);
-    // Clerk tokens may not have a standard audience; disable audience validation
-    validation.validate_aud = false;
-
-    let token_data =
-        jsonwebtoken::decode::<ClerkJwtClaims>(token, &decoding_key, &validation).ok()?;
-    let claims = token_data.claims;
+    let clerk_user_id = jwks_state.validate_token(token).await?;
 
     // Baseline permission — real permissions come from site_memberships
     let permission = ApiKeyPermission::Read;
 
     // Generate a deterministic UUID from Clerk user ID
-    let id = Uuid::new_v5(&CLERK_UUID_NAMESPACE, claims.sub.as_bytes());
+    let id = Uuid::new_v5(&CLERK_UUID_NAMESPACE, clerk_user_id.as_bytes());
 
     Some(AuthenticatedKey {
         id,
         permission,
         site_id: None, // Clerk users get all-site access
-        auth_source: AuthSource::ClerkJwt {
-            clerk_user_id: claims.sub,
-        },
+        auth_source: AuthSource::ClerkJwt { clerk_user_id },
     })
 }
 
@@ -447,6 +425,24 @@ impl ClerkJwksState {
             jwks_url,
             cache: tokio::sync::RwLock::new(None),
         }
+    }
+
+    /// Validate a JWT token and return the Clerk user ID (sub claim).
+    /// Used by both Bearer token auth and session cookie auth.
+    pub async fn validate_token(&self, token: &str) -> Option<String> {
+        let keys = self.get_keys().await.ok()?;
+        let header = jsonwebtoken::decode_header(token).ok()?;
+        let kid = header.kid?;
+        let jwk = keys
+            .keys
+            .iter()
+            .find(|k| k.common.key_id.as_deref() == Some(&kid))?;
+        let decoding_key = jsonwebtoken::DecodingKey::from_jwk(jwk).ok()?;
+        let mut validation = jsonwebtoken::Validation::new(jsonwebtoken::Algorithm::RS256);
+        validation.validate_aud = false;
+        let token_data =
+            jsonwebtoken::decode::<ClerkJwtClaims>(token, &decoding_key, &validation).ok()?;
+        Some(token_data.claims.sub)
     }
 
     pub async fn get_keys(&self) -> Result<jsonwebtoken::jwk::JwkSet, ApiError> {

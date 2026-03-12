@@ -21,7 +21,7 @@ use rocket::fs::FileServer;
 use forja::guards::auth_guard::ClerkJwksState;
 use forja::middleware::rate_limit::RateLimitHeaderInfo;
 use forja::services::storage;
-use forja::{handlers, openapi::ApiDoc, AppState, Settings};
+use forja::{handlers, openapi::ConsumerApiDoc, AppState, Settings};
 
 #[launch]
 async fn rocket() -> _ {
@@ -330,6 +330,8 @@ async fn rocket() -> _ {
         .mount("/", handlers::system::routes())
         .mount("/api/v1", handlers::routes())
         .mount("/dashboard", handlers::dashboard::routes())
-        .mount("/", SwaggerUi::new("/api-docs/<tail..>")
-            .url("/api-docs/openapi.json", ApiDoc::openapi()))
+        // API documentation: consumer (public) + admin (session-protected) + redirect
+        .mount("/", handlers::docs::routes())
+        .mount("/", SwaggerUi::new("/api-docs/consumer/<tail..>")
+            .url("/api-docs/consumer/openapi.json", ConsumerApiDoc::openapi()))
 }
