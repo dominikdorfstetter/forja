@@ -25,7 +25,9 @@
       "preview": "Voorbeeld",
       "viewDetails": "Details bekijken",
       "clickToCopy": "Klik om te kopiëren",
-      "copied": "Gekopieerd!"
+      "copied": "Gekopieerd!",
+      "next": "Volgende",
+      "copyLabel": "{{value}} naar klembord kopiëren"
     },
     "status": {
       "active": "Actief",
@@ -129,14 +131,18 @@
       "locales": "Talen",
       "apiDocs": "API-documentatie",
       "myDrafts": "Mijn concepten",
-      "logout": "Uitloggen"
+      "logout": "Uitloggen",
+      "invite": "Uitnodigen",
+      "reviews": "Beoordelingen",
+      "aiSettings": "AI-instellingen"
     },
     "toolbar": {
       "toggleDrawer": "Zijbalk in-/uitschakelen",
       "account": "Account",
       "profile": "Profiel",
       "theme": "Thema",
-      "language": "Taal"
+      "language": "Taal",
+      "siteSelector": "Site selecteren"
     },
     "accountMenu": {
       "system": "Systeem",
@@ -236,7 +242,10 @@
       "status": "Status",
       "featured": "Uitgelicht",
       "published": "Gepubliceerd",
-      "actions": "Acties"
+      "actions": "Acties",
+      "selectAll": "Alle blogs selecteren",
+      "selectRow": "Blog {{slug}} selecteren",
+      "caption": "Lijst met blogberichten"
     },
     "viewDetail": "Details bekijken",
     "empty": {
@@ -433,7 +442,10 @@
       "status": "Status",
       "inNav": "In navigatie",
       "created": "Aangemaakt",
-      "actions": "Acties"
+      "actions": "Acties",
+      "selectAll": "Alle pagina's selecteren",
+      "selectRow": "Pagina {{route}} selecteren",
+      "caption": "Paginalijst"
     },
     "viewDetails": "Details bekijken",
     "empty": {
@@ -526,11 +538,13 @@
       "added": "Sectie toegevoegd",
       "loadingSections": "Secties laden...",
       "deleteTitle": "Sectie verwijderen",
-      "deleteMessage": "Deze {{type}} sectie verwijderen? Dit kan niet ongedaan worden gemaakt."
+      "deleteMessage": "Deze {{type}} sectie verwijderen? Dit kan niet ongedaan worden gemaakt.",
+      "untitled": "Naamloos"
     },
     "table": {
       "type": "Type",
       "order": "Volgorde",
+      "content": "Inhoud",
       "localizations": "Vertalingen",
       "coverImage": "Omslagafbeelding",
       "ctaRoute": "CTA-route",
@@ -910,6 +924,13 @@
       "reviewer": "Beoordelaar",
       "viewer": "Lezer"
     },
+    "roleDescriptions": {
+      "admin": "Volledige toegang tot sitebeheer",
+      "editor": "Kan alle inhoud en auteurs beheren",
+      "author": "Kan eigen inhoud schrijven en bewerken",
+      "reviewer": "Kan ingediende inhoud beoordelen",
+      "viewer": "Kan inhoud bekijken (alleen lezen)"
+    },
     "empty": {
       "noSite": "Selecteer een site in de werkbalk om leden te beheren",
       "title": "Nog geen teamleden",
@@ -1191,6 +1212,38 @@
       "view": "Bekijken",
       "edit": "Bewerken",
       "delete": "Verwijderen"
+    },
+    "wizard": {
+      "title": "Nieuwe site aanmaken",
+      "steps": {
+        "basics": "Basis",
+        "modules": "Modules",
+        "workflow": "Werkstroom",
+        "languages": "Talen"
+      },
+      "modulesDescription": "Kies welke inhoudsmodules je wilt activeren. Je kunt deze later wijzigen in Instellingen.",
+      "modules": {
+        "blog": "Blog",
+        "blogDesc": "Publiceer artikelen, handleidingen en nieuwsberichten",
+        "pages": "Pagina's",
+        "pagesDesc": "Maak statische pagina's met secties en lay-outs",
+        "cv": "CV",
+        "cvDesc": "Beheer werkervaring, opleiding en vaardigheden",
+        "legal": "Juridisch",
+        "legalDesc": "Privacybeleid, gebruiksvoorwaarden en juridische documenten",
+        "documents": "Documenten",
+        "documentsDesc": "Upload en beheer downloadbare bestanden",
+        "ai": "AI-assistent",
+        "aiDesc": "SEO-generatie, automatische samenvattingen en vertaalsuggesties"
+      },
+      "workflowDescription": "Hoe ga je de inhoud op deze site beheren?",
+      "workflow": {
+        "solo": "Solo",
+        "soloDesc": "Je bent de enige auteur. Inhoud wordt gepubliceerd wanneer je op Publiceren klikt.",
+        "team": "Team",
+        "teamDesc": "Meerdere auteurs werken samen. Schakelt de redactionele beoordelingsworkflow in."
+      },
+      "languagesDescription": "Selecteer de talen die je site zal ondersteunen. Je kunt er later meer toevoegen."
     }
   },
   "siteDetail": {
@@ -1229,7 +1282,25 @@
       "systemInfo": "Systeeminformatie",
       "preferences": "Voorkeuren",
       "legal": "Juridisch",
-      "apiKeys": "API-sleutels"
+      "apiKeys": "API-sleutels",
+      "modules": "Modules",
+      "ai": "AI-assistent"
+    },
+    "modules": {
+      "title": "Inhoudsmodules",
+      "description": "Schakel inhoudsmodules in of uit voor deze site. Uitgeschakelde modules worden verborgen in de zijbalk en hun API-eindpunten geven 403 terug.",
+      "blog": "Blog",
+      "blogDesc": "Publiceer artikelen, handleidingen en nieuwsberichten",
+      "pages": "Pagina's",
+      "pagesDesc": "Maak statische pagina's met secties en lay-outs",
+      "cv": "CV",
+      "cvDesc": "Beheer werkervaring, opleiding en vaardigheden",
+      "legal": "Juridisch",
+      "legalDesc": "Privacybeleid, gebruiksvoorwaarden en juridische documenten",
+      "documents": "Documenten",
+      "documentsDesc": "Upload en beheer downloadbare bestanden",
+      "ai": "AI-assistent",
+      "aiDesc": "SEO-generatie, automatische samenvattingen en vertaalsuggesties"
     },
     "selectSiteAlert": "Selecteer een site in de koptekst om de instellingen te beheren.",
     "loadingSiteSettings": "Site-instellingen laden...",
@@ -1241,6 +1312,10 @@
     "general": {
       "title": "Algemeen",
       "contactEmail": "Contact-e-mail"
+    },
+    "advanced": {
+      "title": "Geavanceerde instellingen",
+      "description": "Configuratieopties voor ervaren gebruikers en teamworkflows"
     },
     "featureToggles": {
       "title": "Functieschakelaars",
@@ -1310,6 +1385,11 @@
         "debounceLabel": "Opslagvertraging",
         "debounceDescription": "Wachttijd na de laatste bewerking voordat wordt opgeslagen (1–60)",
         "seconds": "seconden"
+      },
+      "tableDisplay": {
+        "title": "Tabelweergave",
+        "pageSizeLabel": "Rijen per pagina",
+        "pageSizeDescription": "Standaard aantal rijen in beheertabellen"
       }
     }
   },
@@ -1410,6 +1490,11 @@
     "description": "Uw eerste bericht is gepubliceerd.",
     "viewPost": "Bekijk uw bericht",
     "writeAnother": "Nog een schrijven"
+  },
+  "teamWorkflowPrompt": {
+    "message": "Je site heeft nu meerdere bijdragers. Schakel redactionele beoordeling in zodat inhoud wordt beoordeeld voordat deze wordt gepubliceerd.",
+    "enableButton": "Activeren in Instellingen",
+    "dismissButton": "Negeren"
   },
   "activity": {
     "title": "Activiteit",
@@ -1718,7 +1803,8 @@
       "localizedContent": "Gelokaliseerde inhoud",
       "sectionConfiguration": "Sectieconfiguratie",
       "noActiveLocales": "Geen actieve talen geconfigureerd",
-      "localeExists": "bestaat"
+      "localeExists": "bestaat",
+      "sectionSaved": "Sectie opgeslagen"
     },
     "undo": "Ongedaan maken",
     "redo": "Opnieuw",
@@ -1738,7 +1824,8 @@
     },
     "confirmDialog": {
       "defaultTitle": "Bevestigen",
-      "defaultCancel": "Annuleren"
+      "defaultCancel": "Annuleren",
+      "confirmationInput": "Bevestigingstekst"
     },
     "loadingState": {
       "defaultLabel": "Laden..."
@@ -1752,7 +1839,9 @@
       "rename": "Hernoemen",
       "delete": "Verwijderen",
       "createFolder": "Map aanmaken",
-      "folderName": "Mapnaam"
+      "folderName": "Mapnaam",
+      "collapse": "{{name}} inklappen",
+      "expand": "{{name}} uitklappen"
     },
     "pageHeader": {},
     "statusChip": {},
@@ -1916,6 +2005,7 @@
   "notifications": {
     "title": "Meldingen",
     "bell": "Meldingen",
+    "bellWithCount": "Meldingen, {{count}} ongelezen",
     "empty": "Nog geen meldingen",
     "markAllRead": "Alles als gelezen markeren",
     "viewAll": "Alles bekijken",
@@ -1938,6 +2028,7 @@
     }
   },
   "bulk": {
+    "toolbar": "Werkbalk voor bulkacties",
     "selectedCount": "{{count}} geselecteerd",
     "publish": "Publiceren",
     "unpublish": "Depubliceren",
@@ -2070,6 +2161,13 @@
     "placeholder": "Typ / om blokken in te voegen...",
     "sectionPlaceholder": "Sectie-inhoud...",
     "toolbar": {
+      "label": "Tekstopmaak",
+      "linkDialog": {
+        "title": "Link invoegen",
+        "urlLabel": "URL",
+        "insert": "Invoegen",
+        "remove": "Link verwijderen"
+      },
       "bold": "Vet (Ctrl+B)",
       "italic": "Cursief (Ctrl+I)",
       "underline": "Onderstreept (Ctrl+U)",

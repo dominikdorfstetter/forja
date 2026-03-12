@@ -1,18 +1,18 @@
 [
   {
-    "slug": "welcome-to-your-new-site",
+    "slug": "benvenuto-nel-tuo-nuovo-sito",
     "title": "Benvenuto nel tuo nuovo sito",
     "excerpt": "Il tuo sito è pronto — ecco cosa puoi fare.",
     "body": "Questo è il tuo primo articolo. Puoi modificarlo, eliminarlo o ricominciare da zero — è tutto tuo.\n\nUsa la barra degli strumenti dell'editor per aggiungere **testo in grassetto**, *corsivo*, intestazioni, immagini e altro. Quando sei soddisfatto, clicca su **Pubblica** per condividerlo con il mondo."
   },
   {
-    "slug": "getting-started-with-forja",
+    "slug": "iniziare-con-forja",
     "title": "Iniziare con Forja",
     "excerpt": "Una rapida panoramica delle funzionalità principali di Forja.",
     "body": "Forja è un sistema di gestione dei contenuti moderno progettato per velocità e flessibilità.\n\n## Funzionalità principali\n\n- **Editor avanzato** — Scrivi con un editor a blocchi che supporta intestazioni, immagini, blocchi di codice e altro\n- **Categorie e tag** — Organizza i tuoi contenuti con un sistema di tassonomia flessibile\n- **Multilingua** — Pubblica contenuti in più lingue con la localizzazione integrata\n- **Libreria multimediale** — Carica e gestisci immagini, documenti e altri file\n\n## Prossimi passi\n\n1. Modifica questo articolo e rendilo tuo\n2. Crea il tuo primo articolo originale\n3. Configura la navigazione del tuo sito"
   },
   {
-    "slug": "your-first-real-post",
+    "slug": "il-tuo-primo-vero-articolo",
     "title": "Il tuo primo vero articolo (cancellami)",
     "excerpt": "Una tela bianca pronta per le tue idee.",
     "body": "Sostituisci questo testo con il tuo contenuto. Di cosa scriverai?\n\nSuggerimento: Usa il tasto `/` per inserire blocchi come intestazioni, immagini e citazioni."

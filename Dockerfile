@@ -31,6 +31,7 @@ ENV CARGO_PROFILE_RELEASE_CODEGEN_UNITS=2
 WORKDIR /app/backend
 COPY backend/Cargo.toml backend/Cargo.lock* ./
 COPY backend/src/ src/
+COPY backend/resources/ resources/
 COPY backend/migrations/ migrations/
 
 # Copy admin build output into the expected location

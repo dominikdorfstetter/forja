@@ -1,18 +1,18 @@
 [
   {
-    "slug": "welcome-to-your-new-site",
+    "slug": "bem-vindo-ao-seu-novo-site",
     "title": "Bem-vindo ao seu novo site",
     "excerpt": "O seu site está pronto — veja o que pode fazer com ele.",
     "body": "Esta é a sua primeira publicação. Pode editá-la, eliminá-la ou começar do zero — é toda sua.\n\nUse a barra de ferramentas do editor para adicionar **texto em negrito**, *itálico*, cabeçalhos, imagens e mais. Quando estiver satisfeito, clique em **Publicar** para partilhar com o mundo."
   },
   {
-    "slug": "getting-started-with-forja",
+    "slug": "comecar-com-o-forja",
     "title": "Começar com o Forja",
     "excerpt": "Um tour rápido pelas funcionalidades principais do Forja.",
     "body": "Forja é um sistema de gestão de conteúdos moderno concebido para rapidez e flexibilidade.\n\n## Funcionalidades principais\n\n- **Editor avançado** — Escreva com um editor baseado em blocos que suporta cabeçalhos, imagens, blocos de código e mais\n- **Categorias e tags** — Organize o seu conteúdo com um sistema de taxonomia flexível\n- **Multilingue** — Publique conteúdo em vários idiomas com localização integrada\n- **Biblioteca multimédia** — Carregue e gira imagens, documentos e outros ficheiros\n\n## Próximos passos\n\n1. Edite esta publicação e personalize-a\n2. Crie a sua primeira publicação original\n3. Configure a navegação do seu site"
   },
   {
-    "slug": "your-first-real-post",
+    "slug": "a-sua-primeira-publicacao-real",
     "title": "A sua primeira publicação real (elimine-me)",
     "excerpt": "Uma tela em branco pronta para as suas ideias.",
     "body": "Substitua este texto pelo seu próprio conteúdo. Sobre o que vai escrever?\n\nDica: Use a tecla `/` para inserir blocos como cabeçalhos, imagens e citações."

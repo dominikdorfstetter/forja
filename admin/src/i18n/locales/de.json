@@ -25,7 +25,9 @@
       "preview": "Vorschau",
       "viewDetails": "Details ansehen",
       "clickToCopy": "Klicken zum Kopieren",
-      "copied": "Kopiert!"
+      "copied": "Kopiert!",
+      "next": "Weiter",
+      "copyLabel": "{{value}} in die Zwischenablage kopieren"
     },
     "status": {
       "active": "Aktiv",
@@ -129,14 +131,18 @@
       "locales": "Sprachen",
       "apiDocs": "API-Dokumentation",
       "myDrafts": "Meine Entwürfe",
-      "logout": "Abmelden"
+      "logout": "Abmelden",
+      "invite": "Einladen",
+      "reviews": "Überprüfungen",
+      "aiSettings": "KI-Einstellungen"
     },
     "toolbar": {
       "toggleDrawer": "Seitenleiste umschalten",
       "account": "Konto",
       "profile": "Profil",
       "theme": "Design",
-      "language": "Sprache"
+      "language": "Sprache",
+      "siteSelector": "Seite auswählen"
     },
     "accountMenu": {
       "system": "System",
@@ -236,7 +242,10 @@
       "status": "Status",
       "featured": "Hervorgehoben",
       "published": "Veröffentlicht",
-      "actions": "Aktionen"
+      "actions": "Aktionen",
+      "selectAll": "Alle Blogbeiträge auswählen",
+      "selectRow": "Blogbeitrag {{slug}} auswählen",
+      "caption": "Liste der Blogbeiträge"
     },
     "viewDetail": "Details ansehen",
     "empty": {
@@ -433,7 +442,10 @@
       "status": "Status",
       "inNav": "In Navigation",
       "created": "Erstellt",
-      "actions": "Aktionen"
+      "actions": "Aktionen",
+      "selectAll": "Alle Seiten auswählen",
+      "selectRow": "Seite {{route}} auswählen",
+      "caption": "Seitenliste"
     },
     "viewDetails": "Details ansehen",
     "empty": {
@@ -526,7 +538,8 @@
       "added": "Abschnitt hinzugefügt",
       "loadingSections": "Abschnitte werden geladen...",
       "deleteTitle": "Abschnitt löschen",
-      "deleteMessage": "Sind Sie sicher, dass Sie diesen Abschnitt löschen möchten?"
+      "deleteMessage": "Sind Sie sicher, dass Sie diesen Abschnitt löschen möchten?",
+      "untitled": "Ohne Titel"
     },
     "table": {
       "type": "Typ",
@@ -534,7 +547,8 @@
       "localizations": "Lokalisierungen",
       "coverImage": "Titelbild",
       "ctaRoute": "CTA-Route",
-      "actions": "Aktionen"
+      "actions": "Aktionen",
+      "content": "Inhalt"
     },
     "dialog": {
       "sectionType": "Abschnittstyp",
@@ -910,6 +924,13 @@
       "reviewer": "Prüfer",
       "viewer": "Betrachter"
     },
+    "roleDescriptions": {
+      "admin": "Vollständiger Zugriff auf die Seitenverwaltung",
+      "editor": "Kann alle Inhalte und Autoren verwalten",
+      "author": "Kann eigene Inhalte schreiben und bearbeiten",
+      "reviewer": "Kann zur Genehmigung eingereichte Inhalte überprüfen",
+      "viewer": "Kann Inhalte ansehen (nur lesen)"
+    },
     "empty": {
       "noSite": "Wählen Sie eine Seite aus der Symbolleiste, um deren Mitglieder zu verwalten",
       "title": "Noch keine Teammitglieder",
@@ -1191,6 +1212,38 @@
       "view": "Ansehen",
       "edit": "Bearbeiten",
       "delete": "Löschen"
+    },
+    "wizard": {
+      "title": "Neue Seite erstellen",
+      "steps": {
+        "basics": "Grundlagen",
+        "modules": "Module",
+        "workflow": "Workflow",
+        "languages": "Sprachen"
+      },
+      "modulesDescription": "Wähle aus, welche Inhaltsmodule aktiviert werden sollen. Du kannst diese später in den Einstellungen ändern.",
+      "modules": {
+        "blog": "Blog",
+        "blogDesc": "Artikel, Tutorials und Neuigkeiten veröffentlichen",
+        "pages": "Seiten",
+        "pagesDesc": "Statische Seiten mit Abschnitten und Layouts erstellen",
+        "cv": "Lebenslauf",
+        "cvDesc": "Berufserfahrung, Ausbildung und Fähigkeiten verwalten",
+        "legal": "Rechtliches",
+        "legalDesc": "Datenschutzrichtlinie, Nutzungsbedingungen und rechtliche Dokumente",
+        "documents": "Dokumente",
+        "documentsDesc": "Herunterladbare Dateien hochladen und verwalten",
+        "ai": "KI-Assistent",
+        "aiDesc": "SEO-Generierung, automatische Auszüge und Übersetzungsvorschläge"
+      },
+      "workflowDescription": "Wie möchtest du Inhalte auf dieser Seite verwalten?",
+      "workflow": {
+        "solo": "Einzelperson",
+        "soloDesc": "Du bist der einzige Autor. Inhalte werden veröffentlicht, wenn du auf Veröffentlichen klickst.",
+        "team": "Team",
+        "teamDesc": "Mehrere Autoren arbeiten zusammen. Aktiviert den redaktionellen Überprüfungs-Workflow."
+      },
+      "languagesDescription": "Wähle die Sprachen aus, die deine Seite unterstützen soll. Du kannst später weitere hinzufügen."
     }
   },
   "siteDetail": {
@@ -1229,7 +1282,9 @@
       "systemInfo": "Systeminfo",
       "preferences": "Präferenzen",
       "legal": "Rechtliches",
-      "apiKeys": "API-Schlüssel"
+      "apiKeys": "API-Schlüssel",
+      "modules": "Module",
+      "ai": "KI-Assistent"
     },
     "selectSiteAlert": "Wählen Sie eine Seite in der Kopfzeile aus, um deren Einstellungen zu verwalten.",
     "loadingSiteSettings": "Seiteneinstellungen werden geladen...",
@@ -1241,6 +1296,10 @@
     "general": {
       "title": "Allgemein",
       "contactEmail": "Kontakt-E-Mail"
+    },
+    "advanced": {
+      "title": "Erweiterte Einstellungen",
+      "description": "Konfigurationsoptionen für erfahrene Benutzer und Team-Workflows"
     },
     "featureToggles": {
       "title": "Funktionsschalter",
@@ -1310,7 +1369,28 @@
         "debounceLabel": "Speicherverzögerung",
         "debounceDescription": "Wartezeit nach der letzten Bearbeitung vor dem Speichern (1–60)",
         "seconds": "Sekunden"
+      },
+      "tableDisplay": {
+        "title": "Tabellenanzeige",
+        "pageSizeLabel": "Zeilen pro Seite",
+        "pageSizeDescription": "Standardanzahl der Zeilen in Admin-Tabellen"
       }
+    },
+    "modules": {
+      "title": "Inhaltsmodule",
+      "description": "Inhaltsmodule für diese Seite aktivieren oder deaktivieren. Deaktivierte Module werden in der Seitenleiste ausgeblendet und ihre API-Endpunkte geben 403 zurück.",
+      "blog": "Blog",
+      "blogDesc": "Artikel, Tutorials und Neuigkeiten veröffentlichen",
+      "pages": "Seiten",
+      "pagesDesc": "Statische Seiten mit Abschnitten und Layouts erstellen",
+      "cv": "Lebenslauf",
+      "cvDesc": "Berufserfahrung, Ausbildung und Fähigkeiten verwalten",
+      "legal": "Rechtliches",
+      "legalDesc": "Datenschutzrichtlinie, Nutzungsbedingungen und rechtliche Dokumente",
+      "documents": "Dokumente",
+      "documentsDesc": "Herunterladbare Dateien hochladen und verwalten",
+      "ai": "KI-Assistent",
+      "aiDesc": "SEO-Generierung, automatische Auszüge und Übersetzungsvorschläge"
     }
   },
   "onboarding": {
@@ -1362,6 +1442,11 @@
         "companyDesc": "Firmenauftritt mit Blog, Seiten und rechtlichen Inhalten"
       }
     }
+  },
+  "teamWorkflowPrompt": {
+    "message": "Deine Seite hat jetzt mehrere Mitwirkende. Aktiviere die redaktionelle Überprüfung, damit Inhalte vor der Veröffentlichung geprüft werden.",
+    "enableButton": "In Einstellungen aktivieren",
+    "dismissButton": "Verwerfen"
   },
   "setupChecklist": {
     "title": "Erste Schritte",
@@ -1718,7 +1803,8 @@
       "localizedContent": "Lokalisierter Inhalt",
       "sectionConfiguration": "Abschnittskonfiguration",
       "noActiveLocales": "Keine aktiven Sprachen konfiguriert",
-      "localeExists": "vorhanden"
+      "localeExists": "vorhanden",
+      "sectionSaved": "Abschnitt gespeichert"
     },
     "undo": "Rückgängig",
     "redo": "Wiederholen",
@@ -1738,7 +1824,8 @@
     },
     "confirmDialog": {
       "defaultTitle": "Bestätigen",
-      "defaultCancel": "Abbrechen"
+      "defaultCancel": "Abbrechen",
+      "confirmationInput": "Bestätigungstext"
     },
     "loadingState": {
       "defaultLabel": "Wird geladen..."
@@ -1752,7 +1839,9 @@
       "rename": "Umbenennen",
       "delete": "Löschen",
       "createFolder": "Ordner erstellen",
-      "folderName": "Ordnername"
+      "folderName": "Ordnername",
+      "collapse": "{{name}} einklappen",
+      "expand": "{{name}} ausklappen"
     },
     "pageHeader": {},
     "statusChip": {},
@@ -1916,6 +2005,7 @@
   "notifications": {
     "title": "Benachrichtigungen",
     "bell": "Benachrichtigungen",
+    "bellWithCount": "Benachrichtigungen, {{count}} ungelesen",
     "empty": "Noch keine Benachrichtigungen",
     "markAllRead": "Alle als gelesen markieren",
     "viewAll": "Alle anzeigen",
@@ -1938,6 +2028,7 @@
     }
   },
   "bulk": {
+    "toolbar": "Massenaktionen-Werkzeugleiste",
     "selectedCount": "{{count}} ausgewählt",
     "publish": "Veröffentlichen",
     "unpublish": "Zurückziehen",
@@ -2087,7 +2178,14 @@
       "codeBlock": "Codeblock",
       "insertTable": "Tabelle einfügen",
       "undo": "Rückgängig (Strg+Z)",
-      "redo": "Wiederholen (Strg+Y)"
+      "redo": "Wiederholen (Strg+Y)",
+      "label": "Textformatierung",
+      "linkDialog": {
+        "title": "Link einfügen",
+        "urlLabel": "URL",
+        "insert": "Einfügen",
+        "remove": "Link entfernen"
+      }
     },
     "commands": {
       "paragraph": "Absatz",

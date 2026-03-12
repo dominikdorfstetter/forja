@@ -1,18 +1,18 @@
 [
   {
-    "slug": "welcome-to-your-new-site",
+    "slug": "willkommen-auf-deiner-neuen-seite",
     "title": "Willkommen auf deiner neuen Seite",
     "excerpt": "Deine Seite ist bereit — hier erfährst du, was du damit machen kannst.",
     "body": "Das ist dein erster Beitrag. Du kannst ihn bearbeiten, löschen oder ganz von vorne anfangen — er gehört dir.\n\nVerwende die Editor-Toolbar, um **fetten Text**, *Kursivschrift*, Überschriften, Bilder und mehr hinzuzufügen. Wenn du zufrieden bist, klicke auf **Veröffentlichen**, um deinen Beitrag mit der Welt zu teilen."
   },
   {
-    "slug": "getting-started-with-forja",
+    "slug": "erste-schritte-mit-forja",
     "title": "Erste Schritte mit Forja",
     "excerpt": "Ein kurzer Überblick über die wichtigsten Funktionen von Forja.",
     "body": "Forja ist ein modernes Content-Management-System, das auf Geschwindigkeit und Flexibilität ausgelegt ist.\n\n## Wichtige Funktionen\n\n- **Rich Editor** — Schreibe mit einem blockbasierten Editor, der Überschriften, Bilder, Code-Blöcke und mehr unterstützt\n- **Kategorien & Tags** — Organisiere deine Inhalte mit einem flexiblen Taxonomie-System\n- **Mehrsprachigkeit** — Veröffentliche Inhalte in mehreren Sprachen mit integrierter Lokalisierung\n- **Mediathek** — Lade Bilder, Dokumente und andere Dateien hoch und verwalte sie\n\n## Nächste Schritte\n\n1. Bearbeite diesen Beitrag und mache ihn zu deinem eigenen\n2. Erstelle deinen ersten eigenen Beitrag\n3. Richte die Navigation deiner Seite ein"
   },
   {
-    "slug": "your-first-real-post",
+    "slug": "dein-erster-eigener-beitrag",
     "title": "Dein erster eigener Beitrag (lösch mich)",
     "excerpt": "Eine leere Leinwand für deine Ideen.",
     "body": "Ersetze diesen Text durch deinen eigenen Inhalt. Worüber wirst du schreiben?\n\nTipp: Verwende die `/`-Taste, um Blöcke wie Überschriften, Bilder und Zitate einzufügen."
