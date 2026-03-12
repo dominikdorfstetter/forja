@@ -59,7 +59,7 @@ impl OnboardingProgress {
         step_key: &str,
     ) -> Result<(), ApiError> {
         if !VALID_STEPS.contains(&step_key) {
-            return Err(ApiError::BadRequest(format!(
+            return Err(ApiError::bad_request(format!(
                 "Invalid step key: '{}'. Valid keys: {:?}",
                 step_key, VALID_STEPS
             )));

@@ -6,6 +6,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::dto::blog::{CreateBlogRequest, UpdateBlogRequest};
+use crate::errors::codes;
 use crate::errors::ApiError;
 use crate::models::content::{ContentLocalization, ContentStatus};
 use crate::services::content_service::ContentService;
@@ -184,7 +185,7 @@ impl Blog {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Blog with ID {} not found", id)))?;
+        .ok_or_else(|| ApiError::not_found(format!("Blog with ID {} not found", id)).with_code(codes::BLOG_NOT_FOUND))?;
 
         Ok(blog)
     }
@@ -212,7 +213,7 @@ impl Blog {
         .bind(slug)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Blog with slug '{}' not found", slug)))?;
+        .ok_or_else(|| ApiError::not_found(format!("Blog with slug '{}' not found", slug)).with_code(codes::BLOG_NOT_FOUND))?;
 
         Ok(blog)
     }
@@ -374,16 +375,16 @@ impl Blog {
         exclude_status: Option<&str>,
     ) -> Result<Vec<BlogWithContent>, ApiError> {
         // Normalize status to DB enum value early so we can reject invalid values
-        let db_status = match status {
-            Some(s) => Some(
-                normalize_content_status(s)
-                    .ok_or_else(|| ApiError::BadRequest(format!("Invalid status filter: {}", s)))?,
-            ),
-            None => None,
-        };
+        let db_status =
+            match status {
+                Some(s) => Some(normalize_content_status(s).ok_or_else(|| {
+                    ApiError::bad_request(format!("Invalid status filter: {}", s))
+                })?),
+                None => None,
+            };
         let db_exclude_status = match exclude_status {
             Some(s) => Some(normalize_content_status(s).ok_or_else(|| {
-                ApiError::BadRequest(format!("Invalid exclude_status filter: {}", s))
+                ApiError::bad_request(format!("Invalid exclude_status filter: {}", s))
             })?),
             None => None,
         };
@@ -469,16 +470,16 @@ impl Blog {
         status: Option<&str>,
         exclude_status: Option<&str>,
     ) -> Result<i64, ApiError> {
-        let db_status = match status {
-            Some(s) => Some(
-                normalize_content_status(s)
-                    .ok_or_else(|| ApiError::BadRequest(format!("Invalid status filter: {}", s)))?,
-            ),
-            None => None,
-        };
+        let db_status =
+            match status {
+                Some(s) => Some(normalize_content_status(s).ok_or_else(|| {
+                    ApiError::bad_request(format!("Invalid status filter: {}", s))
+                })?),
+                None => None,
+            };
         let db_exclude_status = match exclude_status {
             Some(s) => Some(normalize_content_status(s).ok_or_else(|| {
-                ApiError::BadRequest(format!("Invalid exclude_status filter: {}", s))
+                ApiError::bad_request(format!("Invalid exclude_status filter: {}", s))
             })?),
             None => None,
         };

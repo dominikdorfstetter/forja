@@ -9,7 +9,7 @@ use rocket::http::Status;
 use validator::Validate;
 
 use crate::dto::clerk::{ClerkUserListResponse, ClerkUserResponse, UpdateClerkUserRoleRequest};
-use crate::errors::{ApiError, ProblemDetails};
+use crate::errors::{codes, ApiError, ProblemDetails};
 use crate::guards::auth_guard::{AdminKey, AuthenticatedKey};
 use crate::models::site_membership::SiteMembership;
 use crate::AppState;
@@ -58,20 +58,21 @@ pub async fn list_clerk_users(
     if !is_sys_admin {
         // Check if the caller has admin+ role on at least one site
         let clerk_user_id = auth.clerk_user_id().ok_or_else(|| {
-            ApiError::Forbidden("Insufficient permissions to list users".to_string())
+            ApiError::forbidden("Insufficient permissions to list users")
+                .with_code(codes::AUTH_INSUFFICIENT_ROLE)
         })?;
         let has_admin = SiteMembership::has_admin_on_any_site(&state.db, clerk_user_id).await?;
         if !has_admin && !auth.can_manage_keys() {
-            return Err(ApiError::Forbidden(
-                "Requires Admin role on at least one site".to_string(),
-            ));
+            return Err(
+                ApiError::forbidden("Requires Admin role on at least one site")
+                    .with_code(codes::AUTH_INSUFFICIENT_ROLE),
+            );
         }
     }
 
-    let clerk = state
-        .clerk_service
-        .as_ref()
-        .ok_or_else(|| ApiError::Internal("Clerk service is not configured".to_string()))?;
+    let clerk = state.clerk_service.as_ref().ok_or_else(|| {
+        ApiError::internal("Clerk service is not configured").with_code(codes::CLERK_NOT_CONFIGURED)
+    })?;
 
     let limit = limit.unwrap_or(20).min(100);
     let offset = offset.unwrap_or(0);
@@ -110,21 +111,21 @@ pub async fn get_clerk_user(
     // Same permission check as list
     let is_sys_admin = auth.is_system_admin(&state.db).await?;
     if !is_sys_admin {
-        let clerk_user_id = auth
-            .clerk_user_id()
-            .ok_or_else(|| ApiError::Forbidden("Insufficient permissions".to_string()))?;
+        let clerk_user_id = auth.clerk_user_id().ok_or_else(|| {
+            ApiError::forbidden("Insufficient permissions").with_code(codes::AUTH_INSUFFICIENT_ROLE)
+        })?;
         let has_admin = SiteMembership::has_admin_on_any_site(&state.db, clerk_user_id).await?;
         if !has_admin && !auth.can_manage_keys() {
-            return Err(ApiError::Forbidden(
-                "Requires Admin role on at least one site".to_string(),
-            ));
+            return Err(
+                ApiError::forbidden("Requires Admin role on at least one site")
+                    .with_code(codes::AUTH_INSUFFICIENT_ROLE),
+            );
         }
     }
 
-    let clerk = state
-        .clerk_service
-        .as_ref()
-        .ok_or_else(|| ApiError::Internal("Clerk service is not configured".to_string()))?;
+    let clerk = state.clerk_service.as_ref().ok_or_else(|| {
+        ApiError::internal("Clerk service is not configured").with_code(codes::CLERK_NOT_CONFIGURED)
+    })?;
 
     let user = clerk.get_user(id).await?;
 
@@ -162,17 +163,17 @@ pub async fn update_clerk_user_role(
 
     let valid_roles = ["read", "write", "admin", "master"];
     if !valid_roles.contains(&body.role.as_str()) {
-        return Err(ApiError::Validation(format!(
+        return Err(ApiError::validation(format!(
             "Invalid role '{}'. Must be one of: {}",
             body.role,
             valid_roles.join(", ")
-        )));
+        ))
+        .with_code(codes::CLERK_INVALID_ROLE));
     }
 
-    let clerk = state
-        .clerk_service
-        .as_ref()
-        .ok_or_else(|| ApiError::Internal("Clerk service is not configured".to_string()))?;
+    let clerk = state.clerk_service.as_ref().ok_or_else(|| {
+        ApiError::internal("Clerk service is not configured").with_code(codes::CLERK_NOT_CONFIGURED)
+    })?;
 
     let user = clerk.update_user_role(id, &body.role).await?;
 

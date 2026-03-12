@@ -68,7 +68,7 @@ pub async fn create_media_folder(
         .await?;
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let folder = MediaFolder::create(&state.db, site_id, req).await?;
     Ok((Status::Created, Json(MediaFolderResponse::from(folder))))
@@ -102,7 +102,7 @@ pub async fn update_media_folder(
 
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let folder = MediaFolder::update(&state.db, id, req).await?;
     Ok(Json(MediaFolderResponse::from(folder)))

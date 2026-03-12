@@ -28,7 +28,7 @@ impl SiteAiConfig {
             .bind(site_id)
             .fetch_optional(pool)
             .await
-            .map_err(|e| ApiError::Database(e.to_string()))
+            .map_err(|e| ApiError::database(e.to_string()))
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -72,7 +72,7 @@ impl SiteAiConfig {
         .bind(system_prompts)
         .fetch_one(pool)
         .await
-        .map_err(|e| ApiError::Database(e.to_string()))
+        .map_err(|e| ApiError::database(e.to_string()))
     }
 
     pub async fn delete_by_site_id(pool: &PgPool, site_id: Uuid) -> Result<(), ApiError> {
@@ -80,7 +80,7 @@ impl SiteAiConfig {
             .bind(site_id)
             .execute(pool)
             .await
-            .map_err(|e| ApiError::Database(e.to_string()))?;
+            .map_err(|e| ApiError::database(e.to_string()))?;
         Ok(())
     }
 }

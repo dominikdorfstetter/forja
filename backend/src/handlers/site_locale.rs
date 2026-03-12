@@ -90,7 +90,7 @@ pub async fn add_site_locale(
         .into_iter()
         .find(|l| l.locale_id == site_locale.locale_id)
         .map(SiteLocaleResponse::from)
-        .ok_or_else(|| ApiError::Internal("Failed to fetch created site locale".into()))?;
+        .ok_or_else(|| ApiError::internal("Failed to fetch created site locale"))?;
 
     Ok((Status::Created, Json(response)))
 }
@@ -135,8 +135,8 @@ pub async fn update_site_locale(
         let current = locales.iter().find(|l| l.locale_id == locale_id);
         if let Some(current) = current {
             if current.is_active && active_count <= 1 {
-                return Err(ApiError::BadRequest(
-                    "At least one active language is required".into(),
+                return Err(ApiError::bad_request(
+                    "At least one active language is required",
                 ));
             }
         }
@@ -165,7 +165,7 @@ pub async fn update_site_locale(
         .into_iter()
         .find(|l| l.locale_id == locale_id)
         .map(SiteLocaleResponse::from)
-        .ok_or_else(|| ApiError::NotFound("Site locale not found".into()))?;
+        .ok_or_else(|| ApiError::not_found("Site locale not found"))?;
 
     Ok(Json(response))
 }

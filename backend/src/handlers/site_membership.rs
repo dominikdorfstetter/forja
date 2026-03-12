@@ -12,7 +12,7 @@ use crate::dto::site_membership::{
     AddSiteMemberRequest, MembershipSummary, MembershipWithSite, SiteMembershipResponse,
     TransferOwnershipRequest, UpdateMemberRoleRequest,
 };
-use crate::errors::ApiError;
+use crate::errors::{codes, ApiError};
 use crate::guards::auth_guard::AuthenticatedKey;
 use crate::models::audit::AuditAction;
 use crate::models::site_membership::{SiteMembership, SiteRole};
@@ -119,18 +119,18 @@ pub async fn add_site_member(
         && !caller_role.can_transfer_ownership()
         && !matches!(caller_role, SiteRole::Owner)
     {
-        return Err(ApiError::Forbidden(
-            "Only the site owner can assign Admin or Owner roles".into(),
-        ));
+        return Err(
+            ApiError::forbidden("Only the site owner can assign Admin or Owner roles")
+                .with_code(codes::MEMBER_ROLE_OWNER_REQUIRED),
+        );
     }
 
     // Check if already a member
     let existing =
         SiteMembership::find_by_clerk_user_and_site(&state.db, &req.clerk_user_id, site_id).await?;
     if existing.is_some() {
-        return Err(ApiError::Conflict(
-            "User is already a member of this site".into(),
-        ));
+        return Err(ApiError::conflict("User is already a member of this site")
+            .with_code(codes::MEMBER_ALREADY_EXISTS));
     }
 
     let invited_by = auth.id.to_string();
@@ -195,18 +195,17 @@ pub async fn update_member_role(
     if matches!(req.role, SiteRole::Owner | SiteRole::Admin)
         && !matches!(caller_role, SiteRole::Owner)
     {
-        return Err(ApiError::Forbidden(
-            "Only the site owner can assign Admin or Owner roles".into(),
-        ));
+        return Err(
+            ApiError::forbidden("Only the site owner can assign Admin or Owner roles")
+                .with_code(codes::MEMBER_ROLE_OWNER_REQUIRED),
+        );
     }
 
     let membership = SiteMembership::update_role(&state.db, member_id, &req.role).await?;
 
     // Verify membership belongs to this site
     if membership.site_id != site_id {
-        return Err(ApiError::NotFound(
-            "Membership not found on this site".into(),
-        ));
+        return Err(ApiError::not_found("Membership not found on this site"));
     }
 
     audit_service::log_action(
@@ -255,12 +254,13 @@ pub async fn remove_site_member(
     let target = memberships
         .iter()
         .find(|m| m.id == member_id)
-        .ok_or_else(|| ApiError::NotFound("Membership not found on this site".into()))?;
+        .ok_or_else(|| ApiError::not_found("Membership not found on this site"))?;
 
     if target.role == SiteRole::Owner {
-        return Err(ApiError::Forbidden(
-            "Cannot remove the site owner. Transfer ownership first.".into(),
-        ));
+        return Err(
+            ApiError::forbidden("Cannot remove the site owner. Transfer ownership first.")
+                .with_code(codes::MEMBER_CANNOT_REMOVE_OWNER),
+        );
     }
 
     SiteMembership::delete(&state.db, member_id).await?;
@@ -306,7 +306,8 @@ pub async fn transfer_ownership(
     req.validate().map_err(ApiError::from)?;
 
     let clerk_user_id = auth.clerk_user_id().ok_or_else(|| {
-        ApiError::BadRequest("Ownership transfer requires Clerk authentication".into())
+        ApiError::bad_request("Ownership transfer requires Clerk authentication")
+            .with_code(codes::MEMBER_REQUIRES_CLERK_AUTH)
     })?;
 
     SiteMembership::transfer_ownership(
@@ -339,7 +340,7 @@ pub async fn get_my_memberships(
     state: &rocket::State<AppState>,
 ) -> Result<Json<Vec<MembershipSummary>>, ApiError> {
     let clerk_user_id = auth.clerk_user_id().ok_or_else(|| {
-        ApiError::BadRequest("This endpoint is only available for Clerk-authenticated users".into())
+        ApiError::bad_request("This endpoint is only available for Clerk-authenticated users")
     })?;
 
     let rows: Vec<MembershipWithSite> = sqlx::query_as(

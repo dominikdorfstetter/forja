@@ -6,6 +6,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::dto::redirect::{CreateRedirectRequest, UpdateRedirectRequest};
+use crate::errors::codes;
 use crate::errors::ApiError;
 
 /// URL redirect model
@@ -71,7 +72,10 @@ impl Redirect {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Redirect with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Redirect with ID {} not found", id))
+                .with_code(codes::REDIRECT_NOT_FOUND)
+        })?;
 
         Ok(redirect)
     }
@@ -148,7 +152,10 @@ impl Redirect {
         .bind(&req.description)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Redirect with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Redirect with ID {} not found", id))
+                .with_code(codes::REDIRECT_NOT_FOUND)
+        })?;
 
         Ok(redirect)
     }
@@ -161,10 +168,10 @@ impl Redirect {
             .await?;
 
         if result.rows_affected() == 0 {
-            return Err(ApiError::NotFound(format!(
-                "Redirect with ID {} not found",
-                id
-            )));
+            return Err(
+                ApiError::not_found(format!("Redirect with ID {} not found", id))
+                    .with_code(codes::REDIRECT_NOT_FOUND),
+            );
         }
 
         Ok(())

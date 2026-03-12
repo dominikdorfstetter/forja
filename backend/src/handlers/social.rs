@@ -99,7 +99,7 @@ pub async fn create_social_link(
     let mut req = body.into_inner();
     req.site_id = site_id; // Override with path param
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let link = SocialLink::create(&state.db, req).await?;
     audit_service::log_action(
@@ -143,7 +143,7 @@ pub async fn update_social_link(
         .await?;
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let link = SocialLink::update(&state.db, id, req).await?;
     audit_service::log_action(
@@ -187,7 +187,7 @@ pub async fn reorder_social_links(
         .await?;
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let items: Vec<(Uuid, i16)> = req
         .items

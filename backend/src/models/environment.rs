@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use uuid::Uuid;
 
+use crate::errors::codes;
 use crate::errors::ApiError;
 
 /// Environment type enum matching PostgreSQL
@@ -55,7 +56,10 @@ impl Environment {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Environment with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Environment with ID {} not found", id))
+                .with_code(codes::ENVIRONMENT_NOT_FOUND)
+        })?;
 
         Ok(environment)
     }
@@ -72,7 +76,10 @@ impl Environment {
         )
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound("No default environment configured".to_string()))?;
+        .ok_or_else(|| {
+            ApiError::not_found("No default environment configured")
+                .with_code(codes::ENVIRONMENT_NO_DEFAULT)
+        })?;
 
         Ok(environment)
     }
@@ -89,7 +96,10 @@ impl Environment {
         .bind(&name)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Environment {:?} not found", name)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Environment {:?} not found", name))
+                .with_code(codes::ENVIRONMENT_NOT_FOUND)
+        })?;
 
         Ok(environment)
     }

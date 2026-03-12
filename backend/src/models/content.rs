@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use uuid::Uuid;
 
+use crate::errors::codes;
 use crate::errors::ApiError;
 
 /// Content status enum matching PostgreSQL
@@ -102,7 +103,10 @@ impl Content {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Content with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Content with ID {} not found", id))
+                .with_code(codes::CONTENT_NOT_FOUND)
+        })?;
 
         Ok(content)
     }
@@ -124,7 +128,10 @@ impl Content {
         .bind(slug)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Content with slug '{}' not found", slug)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Content with slug '{}' not found", slug))
+                .with_code(codes::CONTENT_NOT_FOUND)
+        })?;
 
         Ok(content)
     }
@@ -151,10 +158,11 @@ impl ContentLocalization {
         .fetch_optional(pool)
         .await?
         .ok_or_else(|| {
-            ApiError::NotFound(format!(
+            ApiError::not_found(format!(
                 "Localization not found for content {} and locale {}",
                 content_id, locale_id
             ))
+            .with_code(codes::CONTENT_LOCALIZATION_NOT_FOUND)
         })?;
 
         Ok(localization)
@@ -195,7 +203,10 @@ impl ContentLocalization {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Localization with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Localization with ID {} not found", id))
+                .with_code(codes::CONTENT_LOCALIZATION_NOT_FOUND)
+        })?;
 
         Ok(localization)
     }
@@ -289,10 +300,10 @@ impl ContentLocalization {
             .await?;
 
         if result.rows_affected() == 0 {
-            return Err(ApiError::NotFound(format!(
-                "Localization with ID {} not found",
-                id
-            )));
+            return Err(
+                ApiError::not_found(format!("Localization with ID {} not found", id))
+                    .with_code(codes::CONTENT_LOCALIZATION_NOT_FOUND),
+            );
         }
 
         Ok(())

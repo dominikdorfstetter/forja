@@ -7,6 +7,7 @@ use sqlx::PgPool;
 use std::fmt::Write;
 use uuid::Uuid;
 
+use crate::errors::codes;
 use crate::errors::ApiError;
 use crate::middleware::rate_limit::RateLimits;
 
@@ -202,7 +203,7 @@ impl ApiKey {
         .bind(key_hash)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::Unauthorized("Invalid API key".to_string()))?;
+        .ok_or_else(|| ApiError::unauthorized("Invalid API key").with_code(codes::AUTH_API_KEY_INVALID))?;
 
         Ok(key)
     }
@@ -222,7 +223,7 @@ impl ApiKey {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("API key with ID {} not found", id)))?;
+        .ok_or_else(|| ApiError::not_found(format!("API key with ID {} not found", id)).with_code(codes::API_KEY_NOT_FOUND))?;
 
         Ok(key)
     }
@@ -406,7 +407,7 @@ impl ApiKey {
         .bind(reason)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("API key with ID {} not found", id)))?;
+        .ok_or_else(|| ApiError::not_found(format!("API key with ID {} not found", id)).with_code(codes::API_KEY_NOT_FOUND))?;
 
         Ok(key)
     }
@@ -430,7 +431,7 @@ impl ApiKey {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("API key with ID {} not found", id)))?;
+        .ok_or_else(|| ApiError::not_found(format!("API key with ID {} not found", id)).with_code(codes::API_KEY_NOT_FOUND))?;
 
         Ok(key)
     }
@@ -452,7 +453,7 @@ impl ApiKey {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("API key with ID {} not found", id)))?;
+        .ok_or_else(|| ApiError::not_found(format!("API key with ID {} not found", id)).with_code(codes::API_KEY_NOT_FOUND))?;
 
         Ok(key)
     }
@@ -509,7 +510,7 @@ impl ApiKey {
         .bind(expires_at.flatten())
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("API key with ID {} not found", id)))?;
+        .ok_or_else(|| ApiError::not_found(format!("API key with ID {} not found", id)).with_code(codes::API_KEY_NOT_FOUND))?;
 
         Ok(key)
     }
@@ -522,10 +523,10 @@ impl ApiKey {
             .await?;
 
         if result.rows_affected() == 0 {
-            return Err(ApiError::NotFound(format!(
-                "API key with ID {} not found",
-                id
-            )));
+            return Err(
+                ApiError::not_found(format!("API key with ID {} not found", id))
+                    .with_code(codes::API_KEY_NOT_FOUND),
+            );
         }
 
         Ok(())

@@ -8,7 +8,7 @@ use validator::Validate;
 use crate::dto::onboarding_progress::{
     CompleteStepRequest, OnboardingProgressResponse, OnboardingStepResponse,
 };
-use crate::errors::{ApiError, ProblemDetails};
+use crate::errors::{codes, ApiError, ProblemDetails};
 use crate::guards::auth_guard::{AuthSource, ReadKey};
 use crate::models::onboarding_progress::OnboardingProgress;
 use crate::models::site_membership::SiteRole;
@@ -107,7 +107,7 @@ pub async fn complete_onboarding_step(
 
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     OnboardingProgress::complete_step(&state.db, &clerk_user_id, site_id, &req.step_key).await?;
 
@@ -148,9 +148,10 @@ pub async fn complete_onboarding_step(
 fn extract_clerk_user_id(auth: &ReadKey) -> Result<String, ApiError> {
     match &auth.0.auth_source {
         AuthSource::ClerkJwt { clerk_user_id } => Ok(clerk_user_id.clone()),
-        AuthSource::ApiKey => Err(ApiError::BadRequest(
-            "Onboarding progress requires Clerk authentication".to_string(),
-        )),
+        AuthSource::ApiKey => Err(ApiError::bad_request(
+            "Onboarding progress requires Clerk authentication",
+        )
+        .with_code(codes::ONBOARDING_REQUIRES_CLERK)),
     }
 }
 

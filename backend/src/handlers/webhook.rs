@@ -10,7 +10,7 @@ use crate::dto::webhook::{
     CreateWebhookRequest, PaginatedWebhookDeliveries, PaginatedWebhooks, UpdateWebhookRequest,
     WebhookDeliveryResponse, WebhookResponse,
 };
-use crate::errors::{ApiError, ProblemDetails};
+use crate::errors::{codes, ApiError, ProblemDetails};
 use crate::guards::auth_guard::AdminKey;
 use crate::models::audit::AuditAction;
 use crate::models::site_membership::SiteRole;
@@ -113,7 +113,7 @@ pub async fn create_webhook(
         .await?;
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let secret = Uuid::new_v4().to_string();
     let events = req.events.unwrap_or_default();
@@ -172,7 +172,7 @@ pub async fn update_webhook(
 
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let webhook = Webhook::update(
         &state.db,
@@ -267,7 +267,10 @@ pub async fn test_webhook(
 
     let delivery = crate::services::webhook_service::deliver_test(&state.db, &webhook)
         .await
-        .map_err(|e| ApiError::Internal(format!("Test delivery failed: {e}")))?;
+        .map_err(|e| {
+            ApiError::internal(format!("Test delivery failed: {e}"))
+                .with_code(codes::WEBHOOK_TEST_FAILED)
+        })?;
 
     Ok(Json(WebhookDeliveryResponse::from(delivery)))
 }

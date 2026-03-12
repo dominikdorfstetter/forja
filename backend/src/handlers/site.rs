@@ -10,7 +10,7 @@ use crate::dto::site::{
     should_show_team_workflow_prompt, CreateSiteRequest, SiteContextFeatures, SiteContextModules,
     SiteContextResponse, SiteContextSuggestions, SiteResponse, UpdateSiteRequest,
 };
-use crate::errors::{ApiError, ProblemDetails};
+use crate::errors::{codes, ApiError, ProblemDetails};
 use crate::guards::auth_guard::{AuthSource, AuthenticatedKey, ReadKey};
 use crate::models::audit::AuditAction;
 use crate::models::locale::Locale;
@@ -156,9 +156,10 @@ pub async fn create_site(
     if let Some(ref locale_inputs) = locales {
         let default_count = locale_inputs.iter().filter(|l| l.is_default).count();
         if default_count != 1 {
-            return Err(ApiError::BadRequest(
-                "Exactly one locale must be marked as default".into(),
-            ));
+            return Err(
+                ApiError::bad_request("Exactly one locale must be marked as default")
+                    .with_code(codes::SITE_CREATE_INVALID_LOCALES),
+            );
         }
         // Verify all locale IDs exist
         for input in locale_inputs {
@@ -198,14 +199,16 @@ pub async fn create_site(
         AuthSource::ApiKey => {
             // API keys require Admin+ and cannot be site-scoped
             if !auth.is_admin() {
-                return Err(ApiError::Forbidden(
-                    "Admin API key required to create sites".into(),
-                ));
+                return Err(
+                    ApiError::forbidden("Admin API key required to create sites")
+                        .with_code(codes::SITE_CREATE_REQUIRES_ADMIN),
+                );
             }
             if auth.is_site_scoped() {
-                return Err(ApiError::Forbidden(
-                    "Site-scoped API keys cannot create new sites".into(),
-                ));
+                return Err(
+                    ApiError::forbidden("Site-scoped API keys cannot create new sites")
+                        .with_code(codes::SITE_CREATE_SCOPED_KEY),
+                );
             }
             let site = Site::create(&state.db, request, None).await?;
 

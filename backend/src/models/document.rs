@@ -9,6 +9,7 @@ use crate::dto::document::{
     CreateDocumentFolderRequest, CreateDocumentLocalizationRequest, CreateDocumentRequest,
     UpdateDocumentFolderRequest, UpdateDocumentLocalizationRequest, UpdateDocumentRequest,
 };
+use crate::errors::codes;
 use crate::errors::ApiError;
 
 /// Document folder model
@@ -51,7 +52,10 @@ impl DocumentFolder {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Document folder with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Document folder with ID {} not found", id))
+                .with_code(codes::DOCUMENT_FOLDER_NOT_FOUND)
+        })?;
 
         Ok(folder)
     }
@@ -100,7 +104,10 @@ impl DocumentFolder {
         .bind(req.display_order)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Document folder with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Document folder with ID {} not found", id))
+                .with_code(codes::DOCUMENT_FOLDER_NOT_FOUND)
+        })?;
 
         Ok(folder)
     }
@@ -112,10 +119,10 @@ impl DocumentFolder {
             .await?;
 
         if result.rows_affected() == 0 {
-            return Err(ApiError::NotFound(format!(
-                "Document folder with ID {} not found",
-                id
-            )));
+            return Err(
+                ApiError::not_found(format!("Document folder with ID {} not found", id))
+                    .with_code(codes::DOCUMENT_FOLDER_NOT_FOUND),
+            );
         }
 
         Ok(())
@@ -232,7 +239,10 @@ impl Document {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Document with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Document with ID {} not found", id))
+                .with_code(codes::DOCUMENT_NOT_FOUND)
+        })?;
 
         Ok(doc)
     }
@@ -252,7 +262,10 @@ impl Document {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("No uploaded file for document {}", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("No uploaded file for document {}", id))
+                .with_code(codes::DOCUMENT_NOT_FOUND)
+        })?;
 
         Ok(row)
     }
@@ -381,7 +394,10 @@ impl Document {
             .await?
         };
 
-        doc.ok_or_else(|| ApiError::NotFound(format!("Document with ID {} not found", id)))
+        doc.ok_or_else(|| {
+            ApiError::not_found(format!("Document with ID {} not found", id))
+                .with_code(codes::DOCUMENT_NOT_FOUND)
+        })
     }
 
     pub async fn delete(pool: &PgPool, id: Uuid) -> Result<(), ApiError> {
@@ -391,10 +407,10 @@ impl Document {
             .await?;
 
         if result.rows_affected() == 0 {
-            return Err(ApiError::NotFound(format!(
-                "Document with ID {} not found",
-                id
-            )));
+            return Err(
+                ApiError::not_found(format!("Document with ID {} not found", id))
+                    .with_code(codes::DOCUMENT_NOT_FOUND),
+            );
         }
 
         Ok(())
@@ -426,7 +442,8 @@ impl DocumentLocalization {
         .fetch_optional(pool)
         .await?
         .ok_or_else(|| {
-            ApiError::NotFound(format!("Document localization with ID {} not found", id))
+            ApiError::not_found(format!("Document localization with ID {} not found", id))
+                .with_code(codes::DOCUMENT_LOCALIZATION_NOT_FOUND)
         })?;
 
         Ok(loc)
@@ -494,7 +511,8 @@ impl DocumentLocalization {
         .fetch_optional(pool)
         .await?
         .ok_or_else(|| {
-            ApiError::NotFound(format!("Document localization with ID {} not found", id))
+            ApiError::not_found(format!("Document localization with ID {} not found", id))
+                .with_code(codes::DOCUMENT_LOCALIZATION_NOT_FOUND)
         })?;
 
         Ok(loc)
@@ -507,10 +525,11 @@ impl DocumentLocalization {
             .await?;
 
         if result.rows_affected() == 0 {
-            return Err(ApiError::NotFound(format!(
+            return Err(ApiError::not_found(format!(
                 "Document localization with ID {} not found",
                 id
-            )));
+            ))
+            .with_code(codes::DOCUMENT_LOCALIZATION_NOT_FOUND));
         }
 
         Ok(())
@@ -596,9 +615,7 @@ impl BlogDocument {
                 .await?;
 
         if result.rows_affected() == 0 {
-            return Err(ApiError::NotFound(
-                "Blog-document association not found".to_string(),
-            ));
+            return Err(ApiError::not_found("Blog-document association not found"));
         }
 
         Ok(())

@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use uuid::Uuid;
 
+use crate::errors::codes;
 use crate::errors::ApiError;
 
 /// A webhook subscription for a site.
@@ -85,7 +86,9 @@ impl Webhook {
             .bind(id)
             .fetch_optional(pool)
             .await?
-            .ok_or(ApiError::NotFound("Webhook not found".into()))
+            .ok_or_else(|| {
+                ApiError::not_found("Webhook not found").with_code(codes::WEBHOOK_NOT_FOUND)
+            })
     }
 
     /// Create a new webhook.
@@ -138,7 +141,9 @@ impl Webhook {
         .bind(is_active)
         .fetch_optional(pool)
         .await?
-        .ok_or(ApiError::NotFound("Webhook not found".into()))?;
+        .ok_or_else(|| {
+            ApiError::not_found("Webhook not found").with_code(codes::WEBHOOK_NOT_FOUND)
+        })?;
         Ok(row)
     }
 
@@ -149,7 +154,9 @@ impl Webhook {
             .execute(pool)
             .await?;
         if result.rows_affected() == 0 {
-            return Err(ApiError::NotFound("Webhook not found".into()));
+            return Err(
+                ApiError::not_found("Webhook not found").with_code(codes::WEBHOOK_NOT_FOUND)
+            );
         }
         Ok(())
     }

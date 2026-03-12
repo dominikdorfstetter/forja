@@ -156,7 +156,7 @@ pub async fn create_user(
     body: Json<CreateUserRequest>,
 ) -> Result<Json<UserResponse>, ApiError> {
     body.validate()
-        .map_err(|e| ApiError::Validation(e.to_string()))?;
+        .map_err(|e| ApiError::validation(e.to_string()))?;
 
     let user = User::create(
         &state.db,
@@ -195,7 +195,7 @@ pub async fn update_user(
     body: Json<UpdateUserRequest>,
 ) -> Result<Json<UserResponse>, ApiError> {
     body.validate()
-        .map_err(|e| ApiError::Validation(e.to_string()))?;
+        .map_err(|e| ApiError::validation(e.to_string()))?;
 
     let first_name = body.first_name.as_ref().map(|v| v.as_deref());
     let last_name = body.last_name.as_ref().map(|v| v.as_deref());

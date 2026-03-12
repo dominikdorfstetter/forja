@@ -74,7 +74,7 @@ pub async fn update_site_settings(
 
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     // Upsert each provided field
     for (key, value, is_sensitive) in req.to_settings_vec() {

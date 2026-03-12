@@ -6,6 +6,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::dto::site::{CreateSiteRequest, UpdateSiteRequest};
+use crate::errors::codes;
 use crate::errors::ApiError;
 
 /// Site (tenant/website) model
@@ -58,7 +59,7 @@ impl Site {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Site with ID {} not found", id)))?;
+        .ok_or_else(|| ApiError::not_found(format!("Site with ID {} not found", id)).with_code(codes::SITE_NOT_FOUND))?;
 
         Ok(site)
     }
@@ -76,7 +77,7 @@ impl Site {
         .bind(slug)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Site with slug '{}' not found", slug)))?;
+        .ok_or_else(|| ApiError::not_found(format!("Site with slug '{}' not found", slug)).with_code(codes::SITE_NOT_FOUND))?;
 
         Ok(site)
     }
@@ -95,7 +96,7 @@ impl Site {
         .bind(domain)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Site with domain '{}' not found", domain)))?;
+        .ok_or_else(|| ApiError::not_found(format!("Site with domain '{}' not found", domain)).with_code(codes::SITE_NOT_FOUND))?;
 
         Ok(site)
     }
@@ -158,7 +159,7 @@ impl Site {
         .bind(req.is_active)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Site with ID {} not found", id)))?;
+        .ok_or_else(|| ApiError::not_found(format!("Site with ID {} not found", id)).with_code(codes::SITE_NOT_FOUND))?;
 
         Ok(site)
     }
@@ -177,7 +178,10 @@ impl Site {
         .await?;
 
         if result.rows_affected() == 0 {
-            return Err(ApiError::NotFound(format!("Site with ID {} not found", id)));
+            return Err(
+                ApiError::not_found(format!("Site with ID {} not found", id))
+                    .with_code(codes::SITE_NOT_FOUND),
+            );
         }
 
         Ok(())

@@ -4,6 +4,7 @@ use chrono::{DateTime, Utc};
 use sqlx::PgPool;
 use uuid::Uuid;
 
+use crate::errors::codes;
 use crate::errors::ApiError;
 use crate::models::content::ContentStatus;
 
@@ -47,9 +48,10 @@ impl ContentService {
         // Validate scheduling window
         if let (Some(start), Some(end)) = (publish_start, publish_end) {
             if end <= start {
-                return Err(ApiError::BadRequest(
-                    "publish_end must be after publish_start".to_string(),
-                ));
+                return Err(
+                    ApiError::bad_request("publish_end must be after publish_start")
+                        .with_code(codes::CONTENT_PUBLISH_DATE_INVALID),
+                );
             }
         }
 
@@ -73,7 +75,8 @@ impl ContentService {
                 .fetch_optional(&mut *tx)
                 .await?
                 .ok_or_else(|| {
-                    ApiError::BadRequest(format!("Unknown entity type: {}", entity_type_name))
+                    ApiError::bad_request(format!("Unknown entity type: {}", entity_type_name))
+                        .with_code(codes::CONTENT_UNKNOWN_ENTITY_TYPE)
                 })?;
 
         // Get default environment
@@ -82,7 +85,8 @@ impl ContentService {
                 .fetch_optional(&mut *tx)
                 .await?
                 .ok_or_else(|| {
-                    ApiError::BadRequest("No default environment configured".to_string())
+                    ApiError::bad_request("No default environment configured")
+                        .with_code(codes::CONTENT_NO_DEFAULT_ENVIRONMENT)
                 })?;
 
         // Determine published_at
@@ -139,9 +143,10 @@ impl ContentService {
         // Validate scheduling window
         if let (Some(start), Some(end)) = (publish_start, publish_end) {
             if end <= start {
-                return Err(ApiError::BadRequest(
-                    "publish_end must be after publish_start".to_string(),
-                ));
+                return Err(
+                    ApiError::bad_request("publish_end must be after publish_start")
+                        .with_code(codes::CONTENT_PUBLISH_DATE_INVALID),
+                );
             }
         }
 
@@ -155,10 +160,11 @@ impl ContentService {
             .await?;
 
             if &current != requested && !is_valid_status_transition(&current, requested) {
-                return Err(ApiError::BadRequest(format!(
+                return Err(ApiError::bad_request(format!(
                     "Invalid status transition from {:?} to {:?}",
                     current, requested
-                )));
+                ))
+                .with_code(codes::CONTENT_INVALID_STATUS));
             }
         }
 
@@ -266,10 +272,11 @@ impl ContentService {
             }
         }
 
-        Err(ApiError::BadRequest(format!(
+        Err(ApiError::bad_request(format!(
             "Could not generate unique slug for '{}' — too many copies",
             base_slug
-        )))
+        ))
+        .with_code(codes::CONTENT_SLUG_GENERATION_FAILED))
     }
 
     /// Generate a unique route for cloned pages.
@@ -310,10 +317,11 @@ impl ContentService {
             }
         }
 
-        Err(ApiError::BadRequest(format!(
+        Err(ApiError::bad_request(format!(
             "Could not generate unique route for '{}' — too many copies",
             base_route
-        )))
+        ))
+        .with_code(codes::CONTENT_ROUTE_GENERATION_FAILED))
     }
 
     /// Soft delete a content record.
@@ -330,10 +338,10 @@ impl ContentService {
         .await?;
 
         if result.rows_affected() == 0 {
-            return Err(ApiError::NotFound(format!(
-                "Content with ID {} not found",
-                content_id
-            )));
+            return Err(
+                ApiError::not_found(format!("Content with ID {} not found", content_id))
+                    .with_code(codes::CONTENT_NOT_FOUND),
+            );
         }
 
         Ok(())

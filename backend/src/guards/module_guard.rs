@@ -10,6 +10,7 @@ use rocket::request::{FromRequest, Outcome, Request};
 use sqlx::PgPool;
 use uuid::Uuid;
 
+use crate::errors::codes;
 use crate::errors::ApiError;
 use crate::models::site_settings::SiteSetting;
 use crate::AppState;
@@ -90,10 +91,11 @@ impl<M: ModuleMarker> ModuleGuard<M> {
         let value = SiteSetting::get_value(pool, site_id, M::SETTING_KEY).await?;
         let enabled = value.as_bool().unwrap_or(M::DEFAULT_ENABLED);
         if !enabled {
-            return Err(ApiError::Forbidden(format!(
+            return Err(ApiError::forbidden(format!(
                 "The '{}' module is not enabled for this site",
                 M::MODULE_NAME
-            )));
+            ))
+            .with_code(codes::MODULE_NOT_ENABLED));
         }
         Ok(())
     }
@@ -124,7 +126,7 @@ impl<'r, M: ModuleMarker> FromRequest<'r> for ModuleGuard<M> {
             None => {
                 return Outcome::Error((
                     Status::InternalServerError,
-                    ApiError::Internal("ModuleGuard requires site_id in route path".to_string()),
+                    ApiError::internal("ModuleGuard requires site_id in route path"),
                 ));
             }
         };
@@ -134,7 +136,7 @@ impl<'r, M: ModuleMarker> FromRequest<'r> for ModuleGuard<M> {
             None => {
                 return Outcome::Error((
                     Status::InternalServerError,
-                    ApiError::Internal("Application state not found".to_string()),
+                    ApiError::internal("Application state not found"),
                 ));
             }
         };

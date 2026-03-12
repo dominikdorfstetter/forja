@@ -16,7 +16,7 @@ use crate::dto::page::{
     UpdatePageRequest, UpdatePageSectionRequest, UpsertSectionLocalizationRequest,
 };
 use crate::dto::review::{ReviewActionRequest, ReviewActionResponse};
-use crate::errors::{ApiError, ProblemDetails};
+use crate::errors::{codes, ApiError, ProblemDetails};
 use crate::guards::auth_guard::ReadKey;
 use crate::guards::module_guard::{ModuleGuard, PagesModule};
 use crate::models::audit::AuditAction;
@@ -247,7 +247,7 @@ pub async fn create_page(
 ) -> Result<(Status, Json<PageResponse>), ApiError> {
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     for site_id in &req.site_ids {
         auth.0
@@ -338,7 +338,7 @@ pub async fn update_page(
 
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     // Validate status transition against editorial workflow rules
     if let Some(ref requested_status) = req.status {
@@ -545,7 +545,7 @@ pub async fn create_page_section(
 
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let section = PageSection::create(&state.db, page_id, req).await?;
     Ok((Status::Created, Json(PageSectionResponse::from(section))))
@@ -587,7 +587,7 @@ pub async fn update_page_section(
 
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let section = PageSection::update(&state.db, id, req).await?;
     Ok(Json(PageSectionResponse::from(section)))
@@ -665,7 +665,7 @@ pub async fn reorder_page_sections(
 
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let items: Vec<(Uuid, i16)> = req
         .items
@@ -787,7 +787,7 @@ pub async fn upsert_section_localization(
 
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let localization = PageSectionLocalization::upsert(
         &state.db,
@@ -923,7 +923,7 @@ pub async fn bulk_pages(
 ) -> Result<Json<BulkContentResponse>, ApiError> {
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let required_role = match req.action {
         BulkAction::Delete => SiteRole::Editor,
@@ -934,9 +934,10 @@ pub async fn bulk_pages(
         .await?;
 
     if matches!(req.action, BulkAction::UpdateStatus) && req.status.is_none() {
-        return Err(ApiError::BadRequest(
-            "status field is required for UpdateStatus action".to_string(),
-        ));
+        return Err(
+            ApiError::bad_request("status field is required for UpdateStatus action")
+                .with_code(codes::PAGE_BULK_STATUS_REQUIRED),
+        );
     }
 
     // Resolve page IDs → (page_id, content_id) pairs
@@ -1066,7 +1067,7 @@ pub async fn create_page_localization(
 ) -> Result<(Status, Json<LocalizationResponse>), ApiError> {
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let page = Page::find_by_id(&state.db, id).await?;
     let site_ids = Content::find_site_ids(&state.db, page.content_id).await?;
@@ -1082,10 +1083,11 @@ pub async fn create_page_localization(
     // Check for duplicate locale
     let existing = ContentLocalization::find_all_for_content(&state.db, page.content_id).await?;
     if existing.iter().any(|l| l.locale_id == req.locale_id) {
-        return Err(ApiError::BadRequest(format!(
+        return Err(ApiError::bad_request(format!(
             "Localization for locale {} already exists",
             req.locale_id
-        )));
+        ))
+        .with_code(codes::PAGE_LOCALIZATION_EXISTS));
     }
 
     let localization = ContentLocalization::create(
@@ -1142,7 +1144,7 @@ pub async fn update_page_localization(
 
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let localization = ContentLocalization::update(
         &state.db,

@@ -6,6 +6,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::errors::ApiError;
+use crate::errors::codes;
 use crate::models::api_key::ApiKeyPermission;
 
 /// User role enum matching PostgreSQL
@@ -78,7 +79,7 @@ impl User {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("User with ID {} not found", id)))?;
+        .ok_or_else(|| ApiError::not_found(format!("User with ID {} not found", id)).with_code(codes::USER_NOT_FOUND))?;
 
         Ok(user)
     }
@@ -96,7 +97,7 @@ impl User {
         .bind(username)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("User '{}' not found", username)))?;
+        .ok_or_else(|| ApiError::not_found(format!("User '{}' not found", username)).with_code(codes::USER_NOT_FOUND))?;
 
         Ok(user)
     }
@@ -114,7 +115,7 @@ impl User {
         .bind(email)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("User with email '{}' not found", email)))?;
+        .ok_or_else(|| ApiError::not_found(format!("User with email '{}' not found", email)).with_code(codes::USER_NOT_FOUND))?;
 
         Ok(user)
     }
@@ -215,7 +216,7 @@ impl User {
         .bind(is_superadmin)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("User with ID {} not found", id)))?;
+        .ok_or_else(|| ApiError::not_found(format!("User with ID {} not found", id)).with_code(codes::USER_NOT_FOUND))?;
 
         Ok(user)
     }
@@ -228,7 +229,7 @@ impl User {
             .await?;
 
         if result.rows_affected() == 0 {
-            return Err(ApiError::NotFound(format!("User with ID {} not found", id)));
+            return Err(ApiError::not_found(format!("User with ID {} not found", id)).with_code(codes::USER_NOT_FOUND));
         }
 
         Ok(())

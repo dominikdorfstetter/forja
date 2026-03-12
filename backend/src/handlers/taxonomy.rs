@@ -259,8 +259,8 @@ pub async fn create_tag(
 ) -> Result<(Status, Json<TagResponse>), ApiError> {
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
-    req.validate_site().map_err(ApiError::BadRequest)?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
+    req.validate_site().map_err(ApiError::bad_request)?;
 
     if let Some(site_id) = req.site_id {
         auth.0
@@ -306,7 +306,7 @@ pub async fn update_tag(
 ) -> Result<Json<TagResponse>, ApiError> {
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let site_id = Tag::find_site_ids(&state.db, id).await?.into_iter().next();
     let tag = Tag::update(&state.db, id, &req).await?;
@@ -380,8 +380,8 @@ pub async fn create_category(
 ) -> Result<(Status, Json<CategoryResponse>), ApiError> {
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
-    req.validate_site().map_err(ApiError::BadRequest)?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
+    req.validate_site().map_err(ApiError::bad_request)?;
 
     if let Some(site_id) = req.site_id {
         auth.0
@@ -427,7 +427,7 @@ pub async fn update_category(
 ) -> Result<Json<CategoryResponse>, ApiError> {
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let site_id = Category::find_site_ids(&state.db, id)
         .await?
@@ -509,7 +509,7 @@ pub async fn assign_category_to_content(
 ) -> Result<Status, ApiError> {
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
     let site_ids = Content::find_site_ids(&state.db, content_id).await?;
     for site_id in &site_ids {
         auth.0

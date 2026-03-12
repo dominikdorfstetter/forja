@@ -182,8 +182,8 @@ pub async fn create_navigation_item(
     }
 
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
-    req.validate_link().map_err(ApiError::BadRequest)?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
+    req.validate_link().map_err(ApiError::bad_request)?;
 
     let item = NavigationItem::create(&state.db, req.clone()).await?;
 
@@ -238,8 +238,8 @@ pub async fn create_menu_item(
     req.menu_id = menu_id;
 
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
-    req.validate_link().map_err(ApiError::BadRequest)?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
+    req.validate_link().map_err(ApiError::bad_request)?;
 
     let item = NavigationItem::create(&state.db, req.clone()).await?;
 
@@ -293,7 +293,7 @@ pub async fn update_navigation_item(
     let old = serde_json::to_value(&existing).ok();
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let item = NavigationItem::update(&state.db, id, req).await?;
     audit_service::log_action(
@@ -349,7 +349,7 @@ pub async fn reorder_navigation_items(
         .await?;
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let items: Vec<(Uuid, i16)> = req
         .items
@@ -388,7 +388,7 @@ pub async fn reorder_menu_items(
         .await?;
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let items: Vec<(Uuid, Option<Uuid>, i16)> = req
         .items
@@ -459,7 +459,7 @@ pub async fn upsert_navigation_item_localizations(
     for input in inputs {
         input
             .validate()
-            .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+            .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
         let loc = NavigationItemLocalization::upsert(&state.db, id, input.locale_id, &input.title)
             .await?;
         results.push(NavigationItemLocalizationResponse::from(loc));

@@ -6,6 +6,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::dto::locale::{CreateLocaleRequest, UpdateLocaleRequest};
+use crate::errors::codes;
 use crate::errors::ApiError;
 
 /// Text direction enum matching PostgreSQL
@@ -72,7 +73,10 @@ impl Locale {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Locale with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Locale with ID {} not found", id))
+                .with_code(codes::LOCALE_NOT_FOUND)
+        })?;
 
         Ok(locale)
     }
@@ -89,7 +93,10 @@ impl Locale {
         .bind(code)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Locale with code '{}' not found", code)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Locale with code '{}' not found", code))
+                .with_code(codes::LOCALE_NOT_FOUND)
+        })?;
 
         Ok(locale)
     }
@@ -104,10 +111,11 @@ impl Locale {
                 .await?;
 
         if exists {
-            return Err(ApiError::Conflict(format!(
+            return Err(ApiError::conflict(format!(
                 "Locale with code '{}' already exists",
                 req.code
-            )));
+            ))
+            .with_code(codes::LOCALE_CODE_TAKEN));
         }
 
         let locale = sqlx::query_as::<_, Self>(
@@ -152,7 +160,10 @@ impl Locale {
         .bind(req.is_active)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Locale with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Locale with ID {} not found", id))
+                .with_code(codes::LOCALE_NOT_FOUND)
+        })?;
 
         Ok(locale)
     }
@@ -168,9 +179,10 @@ impl Locale {
         .await?;
 
         if in_use {
-            return Err(ApiError::Conflict(
-                "Cannot delete: locale is assigned to one or more sites".to_string(),
-            ));
+            return Err(ApiError::conflict(
+                "Cannot delete: locale is assigned to one or more sites",
+            )
+            .with_code(codes::LOCALE_DELETE_IN_USE));
         }
 
         let result = sqlx::query("DELETE FROM locales WHERE id = $1")
@@ -179,10 +191,10 @@ impl Locale {
             .await?;
 
         if result.rows_affected() == 0 {
-            return Err(ApiError::NotFound(format!(
-                "Locale with ID {} not found",
-                id
-            )));
+            return Err(
+                ApiError::not_found(format!("Locale with ID {} not found", id))
+                    .with_code(codes::LOCALE_NOT_FOUND),
+            );
         }
 
         Ok(())

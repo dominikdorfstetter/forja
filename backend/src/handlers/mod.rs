@@ -23,6 +23,9 @@ pub mod system;
 // AI content assist
 pub mod ai;
 
+// Error code catalog
+pub mod error_codes;
+
 // Domain handlers
 pub mod analytics;
 pub mod audit;
@@ -123,6 +126,9 @@ pub fn routes() -> Vec<Route> {
 
     // Public configuration (no auth)
     routes.extend(config::routes());
+
+    // Error code catalog
+    routes.extend(error_codes::routes());
 
     routes
 }

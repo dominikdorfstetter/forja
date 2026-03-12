@@ -5,6 +5,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::dto::ai::{AiAction, AiGenerateRequest, AiGenerateResponse};
+use crate::errors::codes;
 use crate::errors::ApiError;
 use crate::models::ai_config::SiteAiConfig;
 use crate::services::encryption;
@@ -282,23 +283,24 @@ async fn call_openai_compatible(params: &OpenAiCallParams<'_>) -> Result<String,
     if !params.api_key.is_empty() {
         req = req.header("Authorization", format!("Bearer {}", params.api_key));
     }
-    let response =
-        req.json(&chat_request).send().await.map_err(|e| {
-            ApiError::ServiceUnavailable(format!("AI provider request failed: {e}"))
-        })?;
+    let response = req.json(&chat_request).send().await.map_err(|e| {
+        ApiError::service_unavailable(format!("AI provider request failed: {e}"))
+            .with_code(codes::AI_PROVIDER_UNAVAILABLE)
+    })?;
 
     if !response.status().is_success() {
         let status = response.status();
         let body = response.text().await.unwrap_or_default();
-        return Err(ApiError::ServiceUnavailable(format!(
+        return Err(ApiError::service_unavailable(format!(
             "AI provider returned {status}: {body}"
-        )));
+        ))
+        .with_code(codes::AI_PROVIDER_UNAVAILABLE));
     }
 
-    let completion: ChatCompletionResponse = response
-        .json()
-        .await
-        .map_err(|e| ApiError::Internal(format!("Failed to parse AI response: {e}")))?;
+    let completion: ChatCompletionResponse = response.json().await.map_err(|e| {
+        ApiError::internal(format!("Failed to parse AI response: {e}"))
+            .with_code(codes::AI_RESPONSE_PARSE_FAILED)
+    })?;
 
     Ok(completion
         .choices
@@ -336,20 +338,24 @@ async fn call_anthropic(
         .json(&request)
         .send()
         .await
-        .map_err(|e| ApiError::ServiceUnavailable(format!("Anthropic request failed: {e}")))?;
+        .map_err(|e| {
+            ApiError::service_unavailable(format!("Anthropic request failed: {e}"))
+                .with_code(codes::AI_PROVIDER_UNAVAILABLE)
+        })?;
 
     if !response.status().is_success() {
         let status = response.status();
         let body = response.text().await.unwrap_or_default();
-        return Err(ApiError::ServiceUnavailable(format!(
-            "Anthropic returned {status}: {body}"
-        )));
+        return Err(
+            ApiError::service_unavailable(format!("Anthropic returned {status}: {body}"))
+                .with_code(codes::AI_PROVIDER_UNAVAILABLE),
+        );
     }
 
-    let result: AnthropicResponse = response
-        .json()
-        .await
-        .map_err(|e| ApiError::Internal(format!("Failed to parse Anthropic response: {e}")))?;
+    let result: AnthropicResponse = response.json().await.map_err(|e| {
+        ApiError::internal(format!("Failed to parse Anthropic response: {e}"))
+            .with_code(codes::AI_RESPONSE_PARSE_FAILED)
+    })?;
 
     Ok(result
         .content
@@ -614,23 +620,24 @@ async fn list_models_openai_compatible(
         }
     }
 
-    let response = req
-        .send()
-        .await
-        .map_err(|e| ApiError::ServiceUnavailable(format!("Failed to list models: {e}")))?;
+    let response = req.send().await.map_err(|e| {
+        ApiError::service_unavailable(format!("Failed to list models: {e}"))
+            .with_code(codes::AI_PROVIDER_UNAVAILABLE)
+    })?;
 
     if !response.status().is_success() {
         let status = response.status();
         let body = response.text().await.unwrap_or_default();
-        return Err(ApiError::ServiceUnavailable(format!(
+        return Err(ApiError::service_unavailable(format!(
             "Model listing returned {status}: {body}"
-        )));
+        ))
+        .with_code(codes::AI_PROVIDER_UNAVAILABLE));
     }
 
-    let result: OpenAiModelsResponse = response
-        .json()
-        .await
-        .map_err(|e| ApiError::Internal(format!("Failed to parse models response: {e}")))?;
+    let result: OpenAiModelsResponse = response.json().await.map_err(|e| {
+        ApiError::internal(format!("Failed to parse models response: {e}"))
+            .with_code(codes::AI_RESPONSE_PARSE_FAILED)
+    })?;
 
     let mut models: Vec<String> = result.data.into_iter().map(|m| m.id).collect();
     models.sort();
@@ -640,21 +647,22 @@ async fn list_models_openai_compatible(
 async fn list_models_ollama(base_url: &str) -> Result<Vec<String>, ApiError> {
     let url = format!("{}/api/tags", base_url.trim_end_matches('/'));
     let client = reqwest::Client::new();
-    let response =
-        client.get(&url).send().await.map_err(|e| {
-            ApiError::ServiceUnavailable(format!("Failed to list Ollama models: {e}"))
-        })?;
+    let response = client.get(&url).send().await.map_err(|e| {
+        ApiError::service_unavailable(format!("Failed to list Ollama models: {e}"))
+            .with_code(codes::AI_PROVIDER_UNAVAILABLE)
+    })?;
 
     if !response.status().is_success() {
-        return Err(ApiError::ServiceUnavailable(
-            "Ollama tags endpoint returned an error".into(),
-        ));
+        return Err(
+            ApiError::service_unavailable("Ollama tags endpoint returned an error")
+                .with_code(codes::AI_PROVIDER_UNAVAILABLE),
+        );
     }
 
-    let result: OllamaTagsResponse = response
-        .json()
-        .await
-        .map_err(|e| ApiError::Internal(format!("Failed to parse Ollama tags response: {e}")))?;
+    let result: OllamaTagsResponse = response.json().await.map_err(|e| {
+        ApiError::internal(format!("Failed to parse Ollama tags response: {e}"))
+            .with_code(codes::AI_RESPONSE_PARSE_FAILED)
+    })?;
 
     let mut models: Vec<String> = result.models.into_iter().map(|m| m.name).collect();
     models.sort();
@@ -670,7 +678,10 @@ pub async fn generate(
 ) -> Result<AiGenerateResponse, ApiError> {
     let config = SiteAiConfig::find_by_site_id(pool, site_id)
         .await?
-        .ok_or_else(|| ApiError::BadRequest("AI is not configured for this site".into()))?;
+        .ok_or_else(|| {
+            ApiError::bad_request("AI is not configured for this site")
+                .with_code(codes::AI_NOT_CONFIGURED)
+        })?;
 
     let key = encryption::resolve_key(encryption_key)?;
     let api_key = encryption::decrypt(&config.api_key_encrypted, &config.api_key_nonce, &key)?;
@@ -773,7 +784,8 @@ async fn generate_translate_parallel(
 
     // Parse the incoming content as JSON with individual fields
     let fields: serde_json::Value = serde_json::from_str(&request.content).map_err(|e| {
-        ApiError::BadRequest(format!("Translation request content must be JSON: {e}"))
+        ApiError::bad_request(format!("Translation request content must be JSON: {e}"))
+            .with_code(codes::AI_TRANSLATE_INVALID)
     })?;
 
     let field_names = [
@@ -798,9 +810,8 @@ async fn generate_translate_parallel(
         .collect();
 
     if tasks.is_empty() {
-        return Err(ApiError::BadRequest(
-            "No content fields to translate".into(),
-        ));
+        return Err(ApiError::bad_request("No content fields to translate")
+            .with_code(codes::AI_TRANSLATE_INVALID));
     }
 
     // Build per-field prompts and send all translation requests in parallel
@@ -912,7 +923,10 @@ pub async fn test_connection(
 ) -> Result<(), ApiError> {
     let config = SiteAiConfig::find_by_site_id(pool, site_id)
         .await?
-        .ok_or_else(|| ApiError::BadRequest("AI is not configured for this site".into()))?;
+        .ok_or_else(|| {
+            ApiError::bad_request("AI is not configured for this site")
+                .with_code(codes::AI_NOT_CONFIGURED)
+        })?;
 
     let key = encryption::resolve_key(encryption_key)?;
     let api_key = encryption::decrypt(&config.api_key_encrypted, &config.api_key_nonce, &key)?;
@@ -942,15 +956,17 @@ pub async fn test_connection(
                 req = req.header("Authorization", format!("Bearer {api_key}"));
             }
             let response = req.json(&chat_request).send().await.map_err(|e| {
-                ApiError::ServiceUnavailable(format!("AI provider request failed: {e}"))
+                ApiError::service_unavailable(format!("AI provider request failed: {e}"))
+                    .with_code(codes::AI_PROVIDER_UNAVAILABLE)
             })?;
 
             if !response.status().is_success() {
                 let status = response.status();
                 let body = response.text().await.unwrap_or_default();
-                return Err(ApiError::ServiceUnavailable(format!(
+                return Err(ApiError::service_unavailable(format!(
                     "AI provider returned {status}: {body}"
-                )));
+                ))
+                .with_code(codes::AI_PROVIDER_UNAVAILABLE));
             }
         }
         Provider::Anthropic => {
@@ -973,15 +989,17 @@ pub async fn test_connection(
                 .send()
                 .await
                 .map_err(|e| {
-                    ApiError::ServiceUnavailable(format!("Anthropic request failed: {e}"))
+                    ApiError::service_unavailable(format!("Anthropic request failed: {e}"))
+                        .with_code(codes::AI_PROVIDER_UNAVAILABLE)
                 })?;
 
             if !response.status().is_success() {
                 let status = response.status();
                 let body = response.text().await.unwrap_or_default();
-                return Err(ApiError::ServiceUnavailable(format!(
+                return Err(ApiError::service_unavailable(format!(
                     "Anthropic returned {status}: {body}"
-                )));
+                ))
+                .with_code(codes::AI_PROVIDER_UNAVAILABLE));
             }
         }
     }
@@ -1047,9 +1065,10 @@ fn parse_ai_response(content: &str, action: &AiAction) -> Result<AiGenerateRespo
     // unescaped quotes in values (e.g. code blocks with string literals)
     let fields = extract_fields_lenient(content);
     if fields.is_empty() {
-        return Err(ApiError::Internal(format!(
+        return Err(ApiError::internal(format!(
             "AI response contains no recognizable fields. Raw: {content}"
-        )));
+        ))
+        .with_code(codes::AI_RESPONSE_PARSE_FAILED));
     }
 
     let json = serde_json::Value::Object(fields);

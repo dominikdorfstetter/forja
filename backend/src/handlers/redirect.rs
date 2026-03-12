@@ -10,7 +10,7 @@ use crate::dto::redirect::{
     CreateRedirectRequest, PaginatedRedirects, RedirectLookupResponse, RedirectResponse,
     UpdateRedirectRequest,
 };
-use crate::errors::{ApiError, ProblemDetails};
+use crate::errors::{codes, ApiError, ProblemDetails};
 use crate::guards::auth_guard::ReadKey;
 use crate::models::audit::AuditAction;
 use crate::models::redirect::Redirect;
@@ -114,13 +114,14 @@ pub async fn create_redirect(
     let mut req = body.into_inner();
     req.site_id = site_id; // Override with path param
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     // Cross-field check
     if req.source_path == req.destination_path {
-        return Err(ApiError::BadRequest(
-            "Source and destination paths must be different".to_string(),
-        ));
+        return Err(
+            ApiError::bad_request("Source and destination paths must be different")
+                .with_code(codes::REDIRECT_SAME_PATH),
+        );
     }
 
     let redirect = Redirect::create(&state.db, req).await?;
@@ -169,7 +170,7 @@ pub async fn update_redirect(
 
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     // Cross-field check: resolve effective values
     let effective_source = req.source_path.as_deref().unwrap_or(&existing.source_path);
@@ -178,9 +179,10 @@ pub async fn update_redirect(
         .as_deref()
         .unwrap_or(&existing.destination_path);
     if effective_source == effective_dest {
-        return Err(ApiError::BadRequest(
-            "Source and destination paths must be different".to_string(),
-        ));
+        return Err(
+            ApiError::bad_request("Source and destination paths must be different")
+                .with_code(codes::REDIRECT_SAME_PATH),
+        );
     }
 
     let redirect = Redirect::update(&state.db, id, req).await?;
@@ -267,7 +269,7 @@ pub async fn lookup_redirect(
 
     let redirect = Redirect::find_by_source_path(&state.db, site_id, &path)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("No active redirect for path '{}'", path)))?;
+        .ok_or_else(|| ApiError::not_found(format!("No active redirect for path '{}'", path)))?;
 
     Ok(Json(RedirectLookupResponse {
         destination_path: redirect.destination_path,

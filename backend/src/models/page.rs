@@ -8,6 +8,7 @@ use uuid::Uuid;
 use crate::dto::page::{
     CreatePageRequest, CreatePageSectionRequest, UpdatePageRequest, UpdatePageSectionRequest,
 };
+use crate::errors::codes;
 use crate::errors::ApiError;
 use crate::models::content::ContentStatus;
 use crate::services::content_service::ContentService;
@@ -163,7 +164,10 @@ impl Page {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Page with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Page with ID {} not found", id))
+                .with_code(codes::PAGE_NOT_FOUND)
+        })?;
 
         Ok(page)
     }
@@ -191,7 +195,10 @@ impl Page {
         .bind(route)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Page with route '{}' not found", route)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Page with route '{}' not found", route))
+                .with_code(codes::PAGE_NOT_FOUND)
+        })?;
 
         Ok(page)
     }
@@ -229,22 +236,22 @@ impl Page {
         exclude_status: Option<&str>,
     ) -> Result<Vec<PageWithContent>, ApiError> {
         // Normalize enum values to DB representation early
-        let db_status = match status {
-            Some(s) => Some(
-                normalize_content_status(s)
-                    .ok_or_else(|| ApiError::BadRequest(format!("Invalid status filter: {}", s)))?,
-            ),
-            None => None,
-        };
+        let db_status =
+            match status {
+                Some(s) => Some(normalize_content_status(s).ok_or_else(|| {
+                    ApiError::bad_request(format!("Invalid status filter: {}", s))
+                })?),
+                None => None,
+            };
         let db_page_type = match page_type {
             Some(pt) => Some(normalize_page_type(pt).ok_or_else(|| {
-                ApiError::BadRequest(format!("Invalid page_type filter: {}", pt))
+                ApiError::bad_request(format!("Invalid page_type filter: {}", pt))
             })?),
             None => None,
         };
         let db_exclude_status = match exclude_status {
             Some(s) => Some(normalize_content_status(s).ok_or_else(|| {
-                ApiError::BadRequest(format!("Invalid exclude_status filter: {}", s))
+                ApiError::bad_request(format!("Invalid exclude_status filter: {}", s))
             })?),
             None => None,
         };
@@ -338,22 +345,22 @@ impl Page {
         page_type: Option<&str>,
         exclude_status: Option<&str>,
     ) -> Result<i64, ApiError> {
-        let db_status = match status {
-            Some(s) => Some(
-                normalize_content_status(s)
-                    .ok_or_else(|| ApiError::BadRequest(format!("Invalid status filter: {}", s)))?,
-            ),
-            None => None,
-        };
+        let db_status =
+            match status {
+                Some(s) => Some(normalize_content_status(s).ok_or_else(|| {
+                    ApiError::bad_request(format!("Invalid status filter: {}", s))
+                })?),
+                None => None,
+            };
         let db_page_type = match page_type {
             Some(pt) => Some(normalize_page_type(pt).ok_or_else(|| {
-                ApiError::BadRequest(format!("Invalid page_type filter: {}", pt))
+                ApiError::bad_request(format!("Invalid page_type filter: {}", pt))
             })?),
             None => None,
         };
         let db_exclude_status = match exclude_status {
             Some(s) => Some(normalize_content_status(s).ok_or_else(|| {
-                ApiError::BadRequest(format!("Invalid exclude_status filter: {}", s))
+                ApiError::bad_request(format!("Invalid exclude_status filter: {}", s))
             })?),
             None => None,
         };
@@ -668,7 +675,10 @@ impl PageSection {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Page section with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Page section with ID {} not found", id))
+                .with_code(codes::PAGE_SECTION_NOT_FOUND)
+        })?;
 
         Ok(section)
     }
@@ -728,7 +738,10 @@ impl PageSection {
         .bind(&req.settings)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Page section with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Page section with ID {} not found", id))
+                .with_code(codes::PAGE_SECTION_NOT_FOUND)
+        })?;
 
         Ok(section)
     }
@@ -752,10 +765,11 @@ impl PageSection {
             .await?;
 
             if result.rows_affected() == 0 {
-                return Err(ApiError::NotFound(format!(
+                return Err(ApiError::not_found(format!(
                     "Page section with ID {} not found for page {}",
                     id, page_id
-                )));
+                ))
+                .with_code(codes::PAGE_SECTION_NOT_FOUND));
             }
         }
 
@@ -771,10 +785,10 @@ impl PageSection {
             .await?;
 
         if result.rows_affected() == 0 {
-            return Err(ApiError::NotFound(format!(
-                "Page section with ID {} not found",
-                id
-            )));
+            return Err(
+                ApiError::not_found(format!("Page section with ID {} not found", id))
+                    .with_code(codes::PAGE_SECTION_NOT_FOUND),
+            );
         }
 
         Ok(())
@@ -868,10 +882,11 @@ impl PageSectionLocalization {
         .fetch_optional(pool)
         .await?
         .ok_or_else(|| {
-            ApiError::NotFound(format!(
+            ApiError::not_found(format!(
                 "Page section localization with ID {} not found",
                 id
             ))
+            .with_code(codes::PAGE_SECTION_NOT_FOUND)
         })?;
 
         Ok(localization)
@@ -885,10 +900,11 @@ impl PageSectionLocalization {
             .await?;
 
         if result.rows_affected() == 0 {
-            return Err(ApiError::NotFound(format!(
+            return Err(ApiError::not_found(format!(
                 "Page section localization with ID {} not found",
                 id
-            )));
+            ))
+            .with_code(codes::PAGE_SECTION_NOT_FOUND));
         }
 
         Ok(())

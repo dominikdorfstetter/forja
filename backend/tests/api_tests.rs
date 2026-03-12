@@ -6,6 +6,7 @@
 
 mod common;
 
+use forja::errors::codes;
 use forja::errors::{ApiError, FieldError, ProblemDetails};
 use rocket::http::Status;
 
@@ -16,12 +17,12 @@ use rocket::http::Status;
 /// Test that API errors generate correct Problem Details format
 #[test]
 fn test_error_response_format() {
-    let error = ApiError::NotFound("Site not found".to_string());
+    let error = ApiError::not_found("Site not found");
     let details = error.to_problem_details();
 
     // Verify RFC 7807 fields
     assert_eq!(details.status, 404);
-    assert_eq!(details.code, "NOT_FOUND");
+    assert_eq!(details.code, codes::RESOURCE_NOT_FOUND);
     assert_eq!(details.title, "Resource Not Found");
     assert!(details.detail.is_some());
     assert!(details.problem_type.contains("not_found"));
@@ -36,31 +37,37 @@ fn test_error_response_format() {
     assert!(parsed.get("code").is_some(), "Must have 'code' field");
 }
 
+/// Test domain-specific error codes override defaults
+#[test]
+fn test_domain_specific_error_codes() {
+    let error = ApiError::not_found("Blog post not found").with_code(codes::BLOG_NOT_FOUND);
+    let details = error.to_problem_details();
+
+    assert_eq!(details.code, codes::BLOG_NOT_FOUND);
+    assert_eq!(details.status, 404);
+
+    // Verify the code appears in JSON output
+    let json = serde_json::to_string(&details).unwrap();
+    assert!(json.contains("BLOG_NOT_FOUND"));
+}
+
 /// Test all error types generate correct status codes
 #[test]
 fn test_error_status_codes() {
     let test_cases = vec![
-        (ApiError::NotFound("test".into()), Status::NotFound),
-        (ApiError::BadRequest("test".into()), Status::BadRequest),
+        (ApiError::not_found("test"), Status::NotFound),
+        (ApiError::bad_request("test"), Status::BadRequest),
+        (ApiError::validation("test"), Status::UnprocessableEntity),
+        (ApiError::unauthorized("test"), Status::Unauthorized),
+        (ApiError::forbidden("test"), Status::Forbidden),
+        (ApiError::conflict("test"), Status::Conflict),
+        (ApiError::database("test"), Status::InternalServerError),
+        (ApiError::internal("test"), Status::InternalServerError),
         (
-            ApiError::Validation("test".into()),
-            Status::UnprocessableEntity,
-        ),
-        (ApiError::Unauthorized("test".into()), Status::Unauthorized),
-        (ApiError::Forbidden("test".into()), Status::Forbidden),
-        (ApiError::Conflict("test".into()), Status::Conflict),
-        (
-            ApiError::Database("test".into()),
-            Status::InternalServerError,
-        ),
-        (
-            ApiError::Internal("test".into()),
-            Status::InternalServerError,
-        ),
-        (
-            ApiError::ServiceUnavailable("test".into()),
+            ApiError::service_unavailable("test"),
             Status::ServiceUnavailable,
         ),
+        (ApiError::rate_limited("test"), Status::new(429)),
     ];
 
     for (error, expected_status) in test_cases {
@@ -103,10 +110,10 @@ fn test_problem_details_rfc7807_compliance() {
 /// Test error helper functions
 #[test]
 fn test_error_helpers() {
-    let error = ApiError::not_found_resource("Site", "abc123");
+    let error = ApiError::not_found_resource("Site", "abc123", codes::SITE_NOT_FOUND);
     assert_eq!(error.to_string(), "Site with id 'abc123' not found");
     assert_eq!(error.status(), Status::NotFound);
-    assert_eq!(error.code(), "NOT_FOUND");
+    assert_eq!(error.code(), codes::SITE_NOT_FOUND);
 }
 
 /// Test validation error conversion preserves field information
@@ -183,15 +190,16 @@ fn test_problem_details_optional_fields_omitted() {
 #[test]
 fn test_all_errors_produce_valid_problem_details() {
     let errors = vec![
-        ApiError::NotFound("not found".into()),
-        ApiError::BadRequest("bad request".into()),
-        ApiError::Validation("validation".into()),
-        ApiError::Unauthorized("unauthorized".into()),
-        ApiError::Forbidden("forbidden".into()),
-        ApiError::Conflict("conflict".into()),
-        ApiError::Database("database".into()),
-        ApiError::Internal("internal".into()),
-        ApiError::ServiceUnavailable("unavailable".into()),
+        ApiError::not_found("not found"),
+        ApiError::bad_request("bad request"),
+        ApiError::validation("validation"),
+        ApiError::unauthorized("unauthorized"),
+        ApiError::forbidden("forbidden"),
+        ApiError::conflict("conflict"),
+        ApiError::database("database"),
+        ApiError::internal("internal"),
+        ApiError::service_unavailable("unavailable"),
+        ApiError::rate_limited("too many requests"),
     ];
 
     for error in errors {
@@ -208,4 +216,50 @@ fn test_all_errors_produce_valid_problem_details() {
         let _parsed: serde_json::Value =
             serde_json::from_str(&json).expect("ProblemDetails must produce valid JSON");
     }
+}
+
+/// Test error code catalog contains expected entries
+#[test]
+fn test_error_code_catalog_completeness() {
+    assert!(
+        codes::ALL.len() >= 80,
+        "Catalog should have at least 80 domain-specific codes, got {}",
+        codes::ALL.len()
+    );
+
+    // Verify some key codes exist in the catalog
+    let code_names: Vec<&str> = codes::ALL.iter().map(|c| c.code).collect();
+    assert!(code_names.contains(&codes::BLOG_NOT_FOUND));
+    assert!(code_names.contains(&codes::AUTH_TOKEN_INVALID));
+    assert!(code_names.contains(&codes::SITE_NOT_FOUND));
+    assert!(code_names.contains(&codes::MEDIA_UPLOAD_TOO_LARGE));
+}
+
+/// Test with_code builder chains correctly
+#[test]
+fn test_with_code_builder() {
+    let error = ApiError::not_found("Page not found").with_code(codes::PAGE_NOT_FOUND);
+
+    assert_eq!(error.code(), codes::PAGE_NOT_FOUND);
+    assert_eq!(error.status(), Status::NotFound);
+
+    let details = error.to_problem_details();
+    assert_eq!(details.code, codes::PAGE_NOT_FOUND);
+}
+
+/// Test with_field_errors builder chains correctly
+#[test]
+fn test_with_field_errors_builder() {
+    let error = ApiError::validation("Invalid input")
+        .with_code(codes::VALIDATION_ERROR)
+        .with_field_errors(vec![FieldError {
+            field: "title".to_string(),
+            message: "Title is required".to_string(),
+            code: Some("REQUIRED".to_string()),
+        }]);
+
+    let details = error.to_problem_details();
+    assert_eq!(details.code, codes::VALIDATION_ERROR);
+    assert!(details.errors.is_some());
+    assert_eq!(details.errors.unwrap().len(), 1);
 }

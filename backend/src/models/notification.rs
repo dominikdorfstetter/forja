@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use uuid::Uuid;
 
+use crate::errors::codes;
 use crate::errors::ApiError;
 
 /// A notification for a user.
@@ -121,7 +122,9 @@ impl Notification {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or(ApiError::NotFound("Notification not found".into()))
+        .ok_or_else(|| {
+            ApiError::not_found("Notification not found").with_code(codes::NOTIFICATION_NOT_FOUND)
+        })
     }
 
     /// Mark all notifications as read for a user in a site. Returns count of updated rows.
@@ -146,6 +149,9 @@ impl Notification {
             .bind(id)
             .fetch_optional(pool)
             .await?
-            .ok_or(ApiError::NotFound("Notification not found".into()))
+            .ok_or_else(|| {
+                ApiError::not_found("Notification not found")
+                    .with_code(codes::NOTIFICATION_NOT_FOUND)
+            })
     }
 }
