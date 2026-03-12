@@ -9,6 +9,7 @@ use crate::dto::media::{
     AddMediaMetadataRequest, MediaSearchParams, UpdateMediaMetadataRequest, UpdateMediaRequest,
     UploadMediaRequest,
 };
+use crate::errors::codes;
 use crate::errors::ApiError;
 
 /// Storage provider enum matching PostgreSQL
@@ -152,7 +153,10 @@ impl MediaFile {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Media file with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Media file with ID {} not found", id))
+                .with_code(codes::MEDIA_NOT_FOUND)
+        })?;
 
         Ok(media)
     }
@@ -404,7 +408,10 @@ impl MediaFile {
         .bind(req.folder_id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Media file with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Media file with ID {} not found", id))
+                .with_code(codes::MEDIA_NOT_FOUND)
+        })?;
 
         Ok(media)
     }
@@ -484,10 +491,10 @@ impl MediaFile {
         .await?;
 
         if result.rows_affected() == 0 {
-            return Err(ApiError::NotFound(format!(
-                "Media file with ID {} not found",
-                id
-            )));
+            return Err(
+                ApiError::not_found(format!("Media file with ID {} not found", id))
+                    .with_code(codes::MEDIA_NOT_FOUND),
+            );
         }
 
         Ok(())
@@ -570,7 +577,10 @@ impl MediaMetadata {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Media metadata with ID {} not found", id)))
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Media metadata with ID {} not found", id))
+                .with_code(codes::MEDIA_METADATA_NOT_FOUND)
+        })
     }
 
     /// Find metadata for a media file and locale
@@ -664,7 +674,10 @@ impl MediaMetadata {
         .bind(&req.title)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Media metadata with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Media metadata with ID {} not found", id))
+                .with_code(codes::MEDIA_METADATA_NOT_FOUND)
+        })?;
 
         Ok(metadata)
     }
@@ -677,10 +690,10 @@ impl MediaMetadata {
             .await?;
 
         if result.rows_affected() == 0 {
-            return Err(ApiError::NotFound(format!(
-                "Media metadata with ID {} not found",
-                id
-            )));
+            return Err(
+                ApiError::not_found(format!("Media metadata with ID {} not found", id))
+                    .with_code(codes::MEDIA_METADATA_NOT_FOUND),
+            );
         }
 
         Ok(())

@@ -13,7 +13,7 @@ use crate::dto::api_key::{
     ApiKeyListItem, ApiKeyResponse, ApiKeyUsageResponse, BlockApiKeyRequest, CreateApiKeyRequest,
     CreateApiKeyResponse, PaginatedApiKeys, UpdateApiKeyRequest,
 };
-use crate::errors::{ApiError, ProblemDetails};
+use crate::errors::{codes, ApiError, ProblemDetails};
 use crate::guards::auth_guard::AuthenticatedKey;
 use crate::models::api_key::{ApiKey, ApiKeyPermission, ApiKeyStatus, ApiKeyUsage};
 use crate::models::audit::AuditAction;
@@ -53,10 +53,11 @@ fn validate_permission_cap(
     }
     let max = max_permission_for_role(caller_role);
     if permission_rank(requested) > permission_rank(&max) {
-        return Err(ApiError::Forbidden(format!(
+        return Err(ApiError::forbidden(format!(
             "Your role ({}) can create API keys with at most {:?} permission",
             caller_role, max
-        )));
+        ))
+        .with_code(codes::API_KEY_PERMISSION_EXCEEDED));
     }
     Ok(())
 }
@@ -100,7 +101,7 @@ pub async fn create_api_key(
     body: Json<CreateApiKeyRequest>,
 ) -> Result<Json<CreateApiKeyResponse>, ApiError> {
     body.validate()
-        .map_err(|e| ApiError::Validation(e.to_string()))?;
+        .map_err(|e| ApiError::validation(e.to_string()))?;
 
     let (role, is_sys) = require_key_access(&auth, state.inner(), body.site_id).await?;
     validate_permission_cap(&body.permission, &role, is_sys)?;
@@ -194,9 +195,10 @@ pub async fn list_api_keys(
         Some(sid)
     } else {
         // Non-system-admin without site_id filter: forbidden (must specify a site)
-        return Err(ApiError::Forbidden(
-            "Site admins must specify a site_id filter".into(),
-        ));
+        return Err(
+            ApiError::forbidden("Site admins must specify a site_id filter")
+                .with_code(codes::API_KEY_SITE_FILTER_REQUIRED),
+        );
     };
 
     let status = status
@@ -205,7 +207,8 @@ pub async fn list_api_keys(
             "blocked" => Ok(ApiKeyStatus::Blocked),
             "expired" => Ok(ApiKeyStatus::Expired),
             "revoked" => Ok(ApiKeyStatus::Revoked),
-            _ => Err(ApiError::Validation(format!("Invalid status: {}", s))),
+            _ => Err(ApiError::validation(format!("Invalid status: {}", s))
+                .with_code(codes::API_KEY_INVALID_STATUS)),
         })
         .transpose()?;
 
@@ -215,7 +218,8 @@ pub async fn list_api_keys(
             "admin" => Ok(ApiKeyPermission::Admin),
             "write" => Ok(ApiKeyPermission::Write),
             "read" => Ok(ApiKeyPermission::Read),
-            _ => Err(ApiError::Validation(format!("Invalid permission: {}", p))),
+            _ => Err(ApiError::validation(format!("Invalid permission: {}", p))
+                .with_code(codes::API_KEY_INVALID_PERMISSION)),
         })
         .transpose()?;
 
@@ -282,7 +286,7 @@ pub async fn update_api_key(
     body: Json<UpdateApiKeyRequest>,
 ) -> Result<Json<ApiKeyResponse>, ApiError> {
     body.validate()
-        .map_err(|e| ApiError::Validation(e.to_string()))?;
+        .map_err(|e| ApiError::validation(e.to_string()))?;
 
     let existing = ApiKey::find_by_id(&state.db, id).await?;
     let (role, is_sys) = require_key_access(&auth, state.inner(), existing.site_id).await?;
@@ -383,7 +387,7 @@ pub async fn block_api_key(
     body: Json<BlockApiKeyRequest>,
 ) -> Result<Json<ApiKeyResponse>, ApiError> {
     body.validate()
-        .map_err(|e| ApiError::Validation(e.to_string()))?;
+        .map_err(|e| ApiError::validation(e.to_string()))?;
 
     let existing = ApiKey::find_by_id(&state.db, id).await?;
     require_key_access(&auth, state.inner(), existing.site_id).await?;

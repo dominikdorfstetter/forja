@@ -135,7 +135,7 @@ pub async fn revert_changes(
     let req = body.into_inner();
 
     if req.change_ids.is_empty() {
-        return Err(ApiError::Validation(
+        return Err(ApiError::validation(
             "change_ids must not be empty".to_string(),
         ));
     }
@@ -144,8 +144,8 @@ pub async fn revert_changes(
     let changes = ChangeHistory::find_by_ids(&state.db, &req.change_ids).await?;
 
     if changes.is_empty() {
-        return Err(ApiError::NotFound(
-            "No change history entries found for the given IDs".to_string(),
+        return Err(ApiError::not_found(
+            "No change history entries found for the given IDs",
         ));
     }
 
@@ -155,7 +155,7 @@ pub async fn revert_changes(
 
     for ch in &changes {
         if ch.entity_type != *entity_type || ch.entity_id != entity_id {
-            return Err(ApiError::Validation(
+            return Err(ApiError::validation(
                 "All change_ids must belong to the same entity_type and entity_id".to_string(),
             ));
         }
@@ -189,7 +189,7 @@ pub async fn revert_changes(
     }
 
     if field_names.is_empty() {
-        return Err(ApiError::Validation(
+        return Err(ApiError::validation(
             "No revertable fields found in the selected changes".to_string(),
         ));
     }
@@ -336,7 +336,7 @@ pub async fn revert_changes(
             .await;
         }
         _ => {
-            return Err(ApiError::Validation(format!(
+            return Err(ApiError::validation(format!(
                 "Revert not supported for entity type '{entity_type}'"
             )));
         }

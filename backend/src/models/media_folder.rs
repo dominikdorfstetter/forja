@@ -6,6 +6,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::dto::media_folder::{CreateMediaFolderRequest, UpdateMediaFolderRequest};
+use crate::errors::codes;
 use crate::errors::ApiError;
 
 /// Media folder model
@@ -48,7 +49,10 @@ impl MediaFolder {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Media folder with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Media folder with ID {} not found", id))
+                .with_code(codes::MEDIA_FOLDER_NOT_FOUND)
+        })?;
 
         Ok(folder)
     }
@@ -97,7 +101,10 @@ impl MediaFolder {
         .bind(req.display_order)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Media folder with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Media folder with ID {} not found", id))
+                .with_code(codes::MEDIA_FOLDER_NOT_FOUND)
+        })?;
 
         Ok(folder)
     }
@@ -109,10 +116,10 @@ impl MediaFolder {
             .await?;
 
         if result.rows_affected() == 0 {
-            return Err(ApiError::NotFound(format!(
-                "Media folder with ID {} not found",
-                id
-            )));
+            return Err(
+                ApiError::not_found(format!("Media folder with ID {} not found", id))
+                    .with_code(codes::MEDIA_FOLDER_NOT_FOUND),
+            );
         }
 
         Ok(())

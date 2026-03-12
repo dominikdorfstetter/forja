@@ -7,7 +7,7 @@ use uuid::Uuid;
 use crate::dto::notification::{
     MarkAllReadResponse, NotificationResponse, PaginatedNotifications, UnreadCountResponse,
 };
-use crate::errors::{ApiError, ProblemDetails};
+use crate::errors::{codes, ApiError, ProblemDetails};
 use crate::guards::auth_guard::ReadKey;
 use crate::models::notification::Notification;
 use crate::utils::pagination::PaginationParams;
@@ -16,7 +16,8 @@ use crate::AppState;
 /// Helper: extract clerk_user_id or return 403.
 fn require_clerk_user_id(auth: &ReadKey) -> Result<&str, ApiError> {
     auth.0.clerk_user_id().ok_or_else(|| {
-        ApiError::Forbidden("Notification endpoints require Clerk JWT authentication".into())
+        ApiError::forbidden("Notification endpoints require Clerk JWT authentication")
+            .with_code(codes::NOTIFICATION_REQUIRES_CLERK)
     })
 }
 
@@ -115,9 +116,10 @@ pub async fn mark_notification_read(
     // Ownership check
     let notification = Notification::find_by_id(&state.db, id).await?;
     if notification.recipient_clerk_id != clerk_id {
-        return Err(ApiError::Forbidden(
-            "You can only mark your own notifications as read".into(),
-        ));
+        return Err(
+            ApiError::forbidden("You can only mark your own notifications as read")
+                .with_code(codes::NOTIFICATION_ACCESS_DENIED),
+        );
     }
 
     let updated = Notification::mark_read(&state.db, id).await?;

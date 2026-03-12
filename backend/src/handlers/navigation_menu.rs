@@ -90,7 +90,7 @@ pub async fn create_navigation_menu(
         .await?;
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let menu = NavigationMenu::create(&state.db, site_id, req.clone()).await?;
 
@@ -269,7 +269,7 @@ pub async fn update_navigation_menu(
         .await?;
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let menu = NavigationMenu::update(&state.db, id, req.clone()).await?;
 
@@ -390,7 +390,7 @@ pub async fn get_navigation_tree(
         .bind(&code)
         .fetch_optional(&state.db)
         .await?
-        .ok_or_else(|| ApiError::BadRequest(format!("Locale '{}' not found", code)))?;
+        .ok_or_else(|| ApiError::bad_request(format!("Locale '{}' not found", code)))?;
         Some(locale.id)
     } else {
         None

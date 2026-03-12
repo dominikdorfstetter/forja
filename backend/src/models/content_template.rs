@@ -6,6 +6,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::dto::content_template::{CreateContentTemplateRequest, UpdateContentTemplateRequest};
+use crate::errors::codes;
 use crate::errors::ApiError;
 
 /// Content template model
@@ -124,7 +125,10 @@ impl ContentTemplate {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Content template with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Content template with ID {} not found", id))
+                .with_code(codes::TEMPLATE_NOT_FOUND)
+        })?;
 
         Ok(template)
     }
@@ -213,7 +217,10 @@ impl ContentTemplate {
         .bind(req.is_active)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Content template with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Content template with ID {} not found", id))
+                .with_code(codes::TEMPLATE_NOT_FOUND)
+        })?;
 
         Ok(template)
     }
@@ -226,10 +233,10 @@ impl ContentTemplate {
             .await?;
 
         if result.rows_affected() == 0 {
-            return Err(ApiError::NotFound(format!(
-                "Content template with ID {} not found",
-                id
-            )));
+            return Err(
+                ApiError::not_found(format!("Content template with ID {} not found", id))
+                    .with_code(codes::TEMPLATE_NOT_FOUND),
+            );
         }
 
         Ok(())

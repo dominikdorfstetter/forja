@@ -9,6 +9,7 @@ use crate::dto::legal::{
     CreateLegalDocumentRequest, CreateLegalGroupRequest, CreateLegalItemRequest,
     UpdateLegalDocumentRequest, UpdateLegalGroupRequest, UpdateLegalItemRequest,
 };
+use crate::errors::codes;
 use crate::errors::ApiError;
 use crate::models::content::Content;
 use crate::services::content_service::ContentService;
@@ -144,7 +145,10 @@ impl LegalDocument {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Legal document with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Legal document with ID {} not found", id))
+                .with_code(codes::LEGAL_DOC_NOT_FOUND)
+        })?;
 
         Ok(document)
     }
@@ -154,11 +158,12 @@ impl LegalDocument {
         let doc = Self::find_by_id(pool, id).await?;
         let content_id = doc
             .content_id
-            .ok_or_else(|| ApiError::BadRequest("Legal document has no content_id".to_string()))?;
+            .ok_or_else(|| ApiError::bad_request("Legal document has no content_id"))?;
         let site_ids = Content::find_site_ids(pool, content_id).await?;
-        site_ids.into_iter().next().ok_or_else(|| {
-            ApiError::BadRequest("Legal document is not associated with any site".to_string())
-        })
+        site_ids
+            .into_iter()
+            .next()
+            .ok_or_else(|| ApiError::bad_request("Legal document is not associated with any site"))
     }
 
     /// Find legal document by type for a site
@@ -181,7 +186,9 @@ impl LegalDocument {
         .bind(doc_type)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound("Legal document not found".to_string()))?;
+        .ok_or_else(|| {
+            ApiError::not_found("Legal document not found").with_code(codes::LEGAL_DOC_NOT_FOUND)
+        })?;
 
         Ok(document)
     }
@@ -207,7 +214,8 @@ impl LegalDocument {
         .fetch_optional(pool)
         .await?
         .ok_or_else(|| {
-            ApiError::NotFound(format!("Legal document with slug '{}' not found", slug))
+            ApiError::not_found(format!("Legal document with slug '{}' not found", slug))
+                .with_code(codes::LEGAL_DOC_NOT_FOUND)
         })?;
 
         Ok(document)
@@ -270,7 +278,10 @@ impl LegalDocument {
         .bind(&req.document_type)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Legal document with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Legal document with ID {} not found", id))
+                .with_code(codes::LEGAL_DOC_NOT_FOUND)
+        })?;
 
         Ok(document)
     }
@@ -281,9 +292,7 @@ impl LegalDocument {
         if let Some(content_id) = doc.content_id {
             ContentService::soft_delete_content(pool, content_id).await
         } else {
-            Err(ApiError::BadRequest(
-                "Legal document has no content_id".to_string(),
-            ))
+            Err(ApiError::bad_request("Legal document has no content_id"))
         }
     }
 }
@@ -323,7 +332,10 @@ impl LegalGroup {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Legal group with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Legal group with ID {} not found", id))
+                .with_code(codes::LEGAL_GROUP_NOT_FOUND)
+        })?;
 
         Ok(group)
     }
@@ -376,7 +388,7 @@ impl LegalGroup {
         .bind(req.default_enabled)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Legal group with ID {} not found", id)))?;
+        .ok_or_else(|| ApiError::not_found(format!("Legal group with ID {} not found", id)).with_code(codes::LEGAL_GROUP_NOT_FOUND))?;
 
         Ok(group)
     }
@@ -389,10 +401,10 @@ impl LegalGroup {
             .await?;
 
         if result.rows_affected() == 0 {
-            return Err(ApiError::NotFound(format!(
-                "Legal group with ID {} not found",
-                id
-            )));
+            return Err(
+                ApiError::not_found(format!("Legal group with ID {} not found", id))
+                    .with_code(codes::LEGAL_GROUP_NOT_FOUND),
+            );
         }
 
         Ok(())
@@ -429,7 +441,10 @@ impl LegalItem {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Legal item with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Legal item with ID {} not found", id))
+                .with_code(codes::LEGAL_ITEM_NOT_FOUND)
+        })?;
 
         Ok(item)
     }
@@ -479,7 +494,10 @@ impl LegalItem {
         .bind(req.is_required)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Legal item with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Legal item with ID {} not found", id))
+                .with_code(codes::LEGAL_ITEM_NOT_FOUND)
+        })?;
 
         Ok(item)
     }
@@ -492,10 +510,10 @@ impl LegalItem {
             .await?;
 
         if result.rows_affected() == 0 {
-            return Err(ApiError::NotFound(format!(
-                "Legal item with ID {} not found",
-                id
-            )));
+            return Err(
+                ApiError::not_found(format!("Legal item with ID {} not found", id))
+                    .with_code(codes::LEGAL_ITEM_NOT_FOUND),
+            );
         }
 
         Ok(())

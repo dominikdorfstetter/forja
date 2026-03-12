@@ -127,7 +127,7 @@ pub async fn create_skill(
 ) -> Result<(Status, Json<SkillResponse>), ApiError> {
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     for site_id in &req.site_ids {
         auth.0
@@ -178,7 +178,7 @@ pub async fn update_skill(
 ) -> Result<Json<SkillResponse>, ApiError> {
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let skill = Skill::update(&state.db, id, req).await?;
     audit_service::log_action(
@@ -323,7 +323,7 @@ pub async fn create_cv_entry(
 ) -> Result<(Status, Json<CvEntryResponse>), ApiError> {
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     for site_id in &req.site_ids {
         auth.0
@@ -374,7 +374,7 @@ pub async fn update_cv_entry(
 ) -> Result<Json<CvEntryResponse>, ApiError> {
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let entry = CvEntry::update(&state.db, id, req).await?;
     audit_service::log_action(

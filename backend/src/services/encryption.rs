@@ -16,45 +16,45 @@ pub fn resolve_key(config_value: &str) -> Result<[u8; 32], ApiError> {
         if cfg!(debug_assertions) {
             BASE64
                 .decode(DEV_ENCRYPTION_KEY)
-                .map_err(|e| ApiError::Internal(format!("Bad dev encryption key: {e}")))?
+                .map_err(|e| ApiError::internal(format!("Bad dev encryption key: {e}")))?
         } else {
-            return Err(ApiError::Internal(
-                "AI_ENCRYPTION_KEY must be set in production".into(),
+            return Err(ApiError::internal(
+                "AI_ENCRYPTION_KEY must be set in production",
             ));
         }
     } else {
         BASE64
             .decode(config_value)
-            .map_err(|e| ApiError::Internal(format!("Invalid AI_ENCRYPTION_KEY base64: {e}")))?
+            .map_err(|e| ApiError::internal(format!("Invalid AI_ENCRYPTION_KEY base64: {e}")))?
     };
 
     raw.try_into()
-        .map_err(|_| ApiError::Internal("AI_ENCRYPTION_KEY must be exactly 32 bytes".into()))
+        .map_err(|_| ApiError::internal("AI_ENCRYPTION_KEY must be exactly 32 bytes"))
 }
 
 /// Encrypt a plaintext string. Returns (ciphertext, nonce).
 pub fn encrypt(plaintext: &str, key: &[u8; 32]) -> Result<(Vec<u8>, Vec<u8>), ApiError> {
     let cipher = Aes256Gcm::new_from_slice(key)
-        .map_err(|e| ApiError::Internal(format!("Cipher init failed: {e}")))?;
+        .map_err(|e| ApiError::internal(format!("Cipher init failed: {e}")))?;
     let nonce = Aes256Gcm::generate_nonce(&mut OsRng);
     let ciphertext = cipher
         .encrypt(&nonce, plaintext.as_bytes())
-        .map_err(|e| ApiError::Internal(format!("Encryption failed: {e}")))?;
+        .map_err(|e| ApiError::internal(format!("Encryption failed: {e}")))?;
     Ok((ciphertext, nonce.to_vec()))
 }
 
 /// Decrypt ciphertext back to a string.
 pub fn decrypt(ciphertext: &[u8], nonce: &[u8], key: &[u8; 32]) -> Result<String, ApiError> {
     let cipher = Aes256Gcm::new_from_slice(key)
-        .map_err(|e| ApiError::Internal(format!("Cipher init failed: {e}")))?;
+        .map_err(|e| ApiError::internal(format!("Cipher init failed: {e}")))?;
     let nonce = aes_gcm::Nonce::from_slice(nonce);
     let plaintext = cipher.decrypt(nonce, ciphertext).map_err(|_| {
-        ApiError::Internal(
-            "API key decryption failed — key may be corrupted or encryption key changed".into(),
+        ApiError::internal(
+            "API key decryption failed — key may be corrupted or encryption key changed",
         )
     })?;
     String::from_utf8(plaintext)
-        .map_err(|e| ApiError::Internal(format!("Decrypted text is not valid UTF-8: {e}")))
+        .map_err(|e| ApiError::internal(format!("Decrypted text is not valid UTF-8: {e}")))
 }
 
 /// Mask an API key for display: "sk-abc...xyz"

@@ -6,6 +6,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::dto::review::{ReviewAction, ReviewActionRequest, ReviewActionResponse};
+use crate::errors::codes;
 use crate::errors::ApiError;
 use crate::models::audit::AuditAction;
 use crate::models::content::{Content, ContentStatus};
@@ -44,9 +45,10 @@ impl ReviewService {
     ) -> Result<ReviewActionResponse, ApiError> {
         // Content must be InReview
         if *ctx.current_status != ContentStatus::InReview {
-            return Err(ApiError::BadRequest(
-                "Content must be in 'InReview' status to perform a review action.".to_string(),
-            ));
+            return Err(ApiError::bad_request(
+                "Content must be in 'InReview' status to perform a review action.",
+            )
+            .with_code(codes::CONTENT_REVIEW_INVALID_STATUS));
         }
 
         let is_approve = matches!(request.action, ReviewAction::Approve);

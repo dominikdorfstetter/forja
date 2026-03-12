@@ -22,7 +22,7 @@ use crate::dto::content::{
 use crate::dto::document::BlogDocumentResponse;
 use crate::dto::review::{ReviewActionRequest, ReviewActionResponse};
 use crate::dto::taxonomy::CategoryResponse;
-use crate::errors::{ApiError, ProblemDetails};
+use crate::errors::{codes, ApiError, ProblemDetails};
 use crate::guards::auth_guard::ReadKey;
 use crate::guards::module_guard::{BlogModule, ModuleGuard};
 use crate::models::audit::AuditAction;
@@ -394,7 +394,7 @@ pub async fn create_blog(
 ) -> Result<(Status, Json<BlogResponse>), ApiError> {
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     for site_id in &req.site_ids {
         auth.0
@@ -485,7 +485,7 @@ pub async fn update_blog(
 
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     // Validate status transition against editorial workflow rules
     if let Some(ref requested_status) = req.status {
@@ -775,7 +775,7 @@ pub async fn create_blog_localization(
 ) -> Result<(Status, Json<LocalizationResponse>), ApiError> {
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let blog = Blog::find_by_id(&state.db, id).await?;
     let site_ids = Content::find_site_ids(&state.db, blog.content_id).await?;
@@ -791,10 +791,11 @@ pub async fn create_blog_localization(
     // Check for duplicate locale
     let existing = ContentLocalization::find_all_for_content(&state.db, blog.content_id).await?;
     if existing.iter().any(|l| l.locale_id == req.locale_id) {
-        return Err(ApiError::BadRequest(format!(
+        return Err(ApiError::bad_request(format!(
             "Localization for locale {} already exists",
             req.locale_id
-        )));
+        ))
+        .with_code(codes::BLOG_LOCALIZATION_EXISTS));
     }
 
     let localization = ContentLocalization::create(
@@ -851,7 +852,7 @@ pub async fn update_blog_localization(
 
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let localization = ContentLocalization::update(
         &state.db,
@@ -1094,7 +1095,7 @@ pub async fn bulk_blogs(
 ) -> Result<Json<BulkContentResponse>, ApiError> {
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     // Delete requires Editor role, status update requires Author
     let required_role = match req.action {
@@ -1106,9 +1107,10 @@ pub async fn bulk_blogs(
         .await?;
 
     if matches!(req.action, BulkAction::UpdateStatus) && req.status.is_none() {
-        return Err(ApiError::BadRequest(
-            "status field is required for UpdateStatus action".to_string(),
-        ));
+        return Err(
+            ApiError::bad_request("status field is required for UpdateStatus action")
+                .with_code(codes::BLOG_BULK_STATUS_REQUIRED),
+        );
     }
 
     // Resolve blog IDs → (blog_id, content_id) pairs
@@ -1162,9 +1164,10 @@ pub async fn seed_sample_content(
     // Check if samples already exist
     let existing = Blog::count_sample_for_site(&state.db, site_id).await?;
     if existing > 0 {
-        return Err(ApiError::BadRequest(
-            "Sample content already exists for this site".to_string(),
-        ));
+        return Err(
+            ApiError::bad_request("Sample content already exists for this site")
+                .with_code(codes::BLOG_SAMPLE_EXISTS),
+        );
     }
 
     // Get default locale for the site (id + code for localized sample content)
@@ -1181,7 +1184,8 @@ pub async fn seed_sample_content(
     .fetch_optional(&state.db)
     .await?
     .ok_or_else(|| {
-        ApiError::BadRequest("No default locale configured for this site".to_string())
+        ApiError::bad_request("No default locale configured for this site")
+            .with_code(codes::BLOG_NO_DEFAULT_LOCALE)
     })?;
 
     // Determine author name

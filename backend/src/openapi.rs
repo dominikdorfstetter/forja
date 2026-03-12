@@ -285,6 +285,8 @@ use utoipa::{Modify, OpenApi};
         crate::handlers::analytics::aggregate_analytics,
         // Config
         crate::handlers::config::get_config,
+        // Error Codes
+        crate::handlers::error_codes::list_error_codes,
     ),
     components(schemas(
         // Auth
@@ -304,6 +306,10 @@ use utoipa::{Modify, OpenApi};
         // Error types
         crate::errors::ProblemDetails,
         crate::errors::FieldError,
+        // Error Code Catalog
+        crate::dto::error_codes::ErrorCodeCatalogResponse,
+        crate::dto::error_codes::ErrorCodeEntry,
+        crate::errors::codes::ErrorCodeDef,
         // Health
         crate::dto::health::HealthResponse,
         crate::dto::health::ServiceHealth,

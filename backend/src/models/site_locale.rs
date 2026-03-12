@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use uuid::Uuid;
 
+use crate::errors::codes;
 use crate::errors::ApiError;
 use crate::models::locale::TextDirection;
 
@@ -73,7 +74,7 @@ impl SiteLocale {
         .fetch_optional(pool)
         .await?
         .ok_or_else(|| {
-            ApiError::NotFound(format!(
+            ApiError::not_found(format!(
                 "Locale {} not assigned to site {}",
                 locale_id, site_id
             ))
@@ -181,7 +182,7 @@ impl SiteLocale {
         .fetch_optional(&mut *tx)
         .await?
         .ok_or_else(|| {
-            ApiError::NotFound(format!(
+            ApiError::not_found(format!(
                 "Locale {} not assigned to site {}",
                 locale_id, site_id
             ))
@@ -207,17 +208,18 @@ impl SiteLocale {
         // Check that it exists and is not the default
         let existing = Self::find_one(pool, site_id, locale_id).await?;
         if existing.is_default {
-            return Err(ApiError::BadRequest(
-                "Cannot remove the default language. Change the default first.".into(),
+            return Err(ApiError::bad_request(
+                "Cannot remove the default language. Change the default first.",
             ));
         }
 
         // Check count
         let count = Self::count_for_site(pool, site_id).await?;
         if count <= 1 {
-            return Err(ApiError::Conflict(
-                "Cannot remove the last language from a site".into(),
-            ));
+            return Err(
+                ApiError::conflict("Cannot remove the last language from a site")
+                    .with_code(codes::SITE_LOCALE_LAST_LANGUAGE),
+            );
         }
 
         let result = sqlx::query("DELETE FROM site_locales WHERE site_id = $1 AND locale_id = $2")
@@ -227,10 +229,11 @@ impl SiteLocale {
             .await?;
 
         if result.rows_affected() == 0 {
-            return Err(ApiError::NotFound(format!(
+            return Err(ApiError::not_found(format!(
                 "Locale {} not assigned to site {}",
                 locale_id, site_id
-            )));
+            ))
+            .with_code(codes::SITE_LOCALE_LAST_LANGUAGE));
         }
 
         Ok(())

@@ -14,7 +14,7 @@ use crate::dto::media::{
     MediaSearchParams, PaginatedMedia, UpdateMediaMetadataRequest, UpdateMediaRequest,
     UploadMediaRequest, ALL_ALLOWED_MIMES,
 };
-use crate::errors::{ApiError, ProblemDetails};
+use crate::errors::{codes, ApiError, ProblemDetails};
 use crate::guards::auth_guard::ReadKey;
 use crate::models::audit::AuditAction;
 use crate::models::media::{MediaFile, MediaMetadata, MediaVariant, StorageProvider};
@@ -130,7 +130,7 @@ pub async fn create_media(
 ) -> Result<(Status, Json<MediaListItem>), ApiError> {
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     // Authorize against the first site_id in the request
     if let Some(&site_id) = req.site_ids.first() {
@@ -151,10 +151,11 @@ pub async fn create_media(
         .unwrap_or(52_428_800);
 
         if req.file_size > max {
-            return Err(ApiError::BadRequest(format!(
+            return Err(ApiError::bad_request(format!(
                 "File size {} exceeds the per-site maximum of {} bytes",
                 req.file_size, max
-            )));
+            ))
+            .with_code(codes::MEDIA_UPLOAD_TOO_LARGE));
         }
     }
 
@@ -206,12 +207,10 @@ pub async fn upload_media(
 ) -> Result<(Status, Json<MediaResponse>), ApiError> {
     // 1. Parse site_ids from JSON string
     let site_ids: Vec<Uuid> = serde_json::from_str(&form.site_ids)
-        .map_err(|e| ApiError::BadRequest(format!("Invalid site_ids JSON: {e}")))?;
+        .map_err(|e| ApiError::bad_request(format!("Invalid site_ids JSON: {e}")))?;
 
     if site_ids.is_empty() {
-        return Err(ApiError::BadRequest(
-            "At least one site ID is required".to_string(),
-        ));
+        return Err(ApiError::bad_request("At least one site ID is required"));
     }
 
     // Authorize against the first site
@@ -220,16 +219,18 @@ pub async fn upload_media(
         .await?;
 
     // 2. Read file bytes
-    let temp_path = form
-        .file
-        .path()
-        .ok_or_else(|| ApiError::BadRequest("No file data received".to_string()))?;
-    let file_bytes = tokio::fs::read(temp_path)
-        .await
-        .map_err(|e| ApiError::Internal(format!("Failed to read uploaded file: {e}")))?;
+    let temp_path = form.file.path().ok_or_else(|| {
+        ApiError::bad_request("No file data received").with_code(codes::MEDIA_UPLOAD_NO_DATA)
+    })?;
+    let file_bytes = tokio::fs::read(temp_path).await.map_err(|e| {
+        ApiError::internal(format!("Failed to read uploaded file: {e}"))
+            .with_code(codes::MEDIA_UPLOAD_READ_FAILED)
+    })?;
 
     if file_bytes.is_empty() {
-        return Err(ApiError::BadRequest("Uploaded file is empty".to_string()));
+        return Err(
+            ApiError::bad_request("Uploaded file is empty").with_code(codes::MEDIA_UPLOAD_EMPTY)
+        );
     }
 
     // 3. Detect MIME type via magic bytes
@@ -265,10 +266,10 @@ pub async fn upload_media(
     };
 
     if !ALL_ALLOWED_MIMES.contains(&mime_type.as_str()) {
-        return Err(ApiError::BadRequest(format!(
-            "File type '{}' is not allowed",
-            mime_type
-        )));
+        return Err(
+            ApiError::bad_request(format!("File type '{}' is not allowed", mime_type))
+                .with_code(codes::MEDIA_UPLOAD_INVALID_TYPE),
+        );
     }
 
     // 4. Validate file size against per-site limit
@@ -283,10 +284,11 @@ pub async fn upload_media(
     .unwrap_or(52_428_800);
 
     if file_size > max_size {
-        return Err(ApiError::BadRequest(format!(
+        return Err(ApiError::bad_request(format!(
             "File size {} exceeds the maximum of {} bytes",
             file_size, max_size
-        )));
+        ))
+        .with_code(codes::MEDIA_UPLOAD_TOO_LARGE));
     }
 
     // 5. Compute SHA-256 checksum
@@ -349,7 +351,7 @@ pub async fn upload_media(
         .filter(|s| !s.is_empty())
         .map(Uuid::parse_str)
         .transpose()
-        .map_err(|e| ApiError::BadRequest(format!("Invalid folder_id: {e}")))?;
+        .map_err(|e| ApiError::bad_request(format!("Invalid folder_id: {e}")))?;
     let is_global = form.is_global.unwrap_or(false);
     let storage_provider = if state.settings.storage.provider == "s3" {
         StorageProvider::S3
@@ -501,7 +503,7 @@ pub async fn update_media(
 
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let media = MediaFile::update(&state.db, id, req).await?;
     let site_id = site_ids.into_iter().next();
@@ -635,7 +637,7 @@ pub async fn create_media_metadata(
 ) -> Result<(Status, Json<MediaMetadataResponse>), ApiError> {
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     MediaFile::find_by_id(&state.db, id).await?;
     let site_ids = MediaFile::find_site_ids(&state.db, id).await?;
@@ -671,7 +673,7 @@ pub async fn update_media_metadata(
 ) -> Result<Json<MediaMetadataResponse>, ApiError> {
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let existing = MediaMetadata::find_by_id(&state.db, metadata_id).await?;
     let site_ids = MediaFile::find_site_ids(&state.db, existing.media_file_id).await?;

@@ -5,6 +5,7 @@
 use sqlx::PgPool;
 use uuid::Uuid;
 
+use crate::errors::codes;
 use crate::errors::ApiError;
 use crate::models::content::ContentStatus;
 use crate::models::site_membership::SiteRole;
@@ -50,9 +51,10 @@ pub async fn validate_status_transition(
             (ContentStatus::Draft, ContentStatus::InReview) => return Ok(()),
             // Everything else is blocked for authors
             _ => {
-                return Err(ApiError::Forbidden(
-                    "Editorial workflow is enabled. Authors must submit content for review before publishing.".to_string(),
-                ));
+                return Err(ApiError::forbidden(
+                    "Editorial workflow is enabled. Authors must submit content for review before publishing.",
+                )
+                .with_code(codes::WORKFLOW_REVIEW_REQUIRED));
             }
         }
     }
@@ -65,17 +67,19 @@ pub async fn validate_status_transition(
             (ContentStatus::InReview, ContentStatus::Scheduled) => return Ok(()),
             (ContentStatus::InReview, ContentStatus::Draft) => return Ok(()),
             _ => {
-                return Err(ApiError::Forbidden(
-                    "Reviewers can only transition content that is InReview.".to_string(),
-                ));
+                return Err(ApiError::forbidden(
+                    "Reviewers can only transition content that is InReview.",
+                )
+                .with_code(codes::WORKFLOW_INVALID_STATUS));
             }
         }
     }
 
     // Viewers should have been blocked earlier by auth guards, but just in case
-    Err(ApiError::Forbidden(
-        "You do not have permission to change content status.".to_string(),
-    ))
+    Err(
+        ApiError::forbidden("You do not have permission to change content status.")
+            .with_code(codes::WORKFLOW_NO_PERMISSION),
+    )
 }
 
 #[cfg(test)]

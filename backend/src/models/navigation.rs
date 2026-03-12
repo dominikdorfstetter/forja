@@ -9,6 +9,7 @@ use uuid::Uuid;
 use crate::dto::navigation::{
     CreateNavigationItemRequest, NavigationTree, UpdateNavigationItemRequest,
 };
+use crate::errors::codes;
 use crate::errors::ApiError;
 
 /// Navigation item model
@@ -227,7 +228,10 @@ impl NavigationItem {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Navigation item with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Navigation item with ID {} not found", id))
+                .with_code(codes::NAV_ITEM_NOT_FOUND)
+        })?;
 
         Ok(item)
     }
@@ -286,7 +290,10 @@ impl NavigationItem {
         .bind(req.open_in_new_tab)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Navigation item with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Navigation item with ID {} not found", id))
+                .with_code(codes::NAV_ITEM_NOT_FOUND)
+        })?;
 
         Ok(item)
     }
@@ -311,10 +318,11 @@ impl NavigationItem {
             .await?;
 
             if result.rows_affected() == 0 {
-                return Err(ApiError::NotFound(format!(
+                return Err(ApiError::not_found(format!(
                     "Navigation item with ID {} not found for menu {}",
                     id, menu_id
-                )));
+                ))
+                .with_code(codes::NAV_ITEM_NOT_FOUND));
             }
         }
 
@@ -341,10 +349,11 @@ impl NavigationItem {
             .await?;
 
             if result.rows_affected() == 0 {
-                return Err(ApiError::NotFound(format!(
+                return Err(ApiError::not_found(format!(
                     "Navigation item with ID {} not found for site {}",
                     id, site_id
-                )));
+                ))
+                .with_code(codes::NAV_ITEM_NOT_FOUND));
             }
         }
 
@@ -360,10 +369,10 @@ impl NavigationItem {
             .await?;
 
         if result.rows_affected() == 0 {
-            return Err(ApiError::NotFound(format!(
-                "Navigation item with ID {} not found",
-                id
-            )));
+            return Err(
+                ApiError::not_found(format!("Navigation item with ID {} not found", id))
+                    .with_code(codes::NAV_ITEM_NOT_FOUND),
+            );
         }
 
         Ok(())

@@ -6,6 +6,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::dto::navigation_menu::{CreateNavigationMenuRequest, UpdateNavigationMenuRequest};
+use crate::errors::codes;
 use crate::errors::ApiError;
 
 /// Navigation menu container model
@@ -81,7 +82,10 @@ impl NavigationMenu {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Navigation menu with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Navigation menu with ID {} not found", id))
+                .with_code(codes::NAV_MENU_NOT_FOUND)
+        })?;
 
         Ok(menu)
     }
@@ -100,10 +104,11 @@ impl NavigationMenu {
         .fetch_optional(pool)
         .await?
         .ok_or_else(|| {
-            ApiError::NotFound(format!(
+            ApiError::not_found(format!(
                 "Navigation menu '{}' not found for site {}",
                 slug, site_id
             ))
+            .with_code(codes::NAV_MENU_NOT_FOUND)
         })?;
 
         Ok(menu)
@@ -131,7 +136,7 @@ impl NavigationMenu {
         .map_err(|e| {
             if let sqlx::Error::Database(ref db_err) = e {
                 if db_err.constraint() == Some("uq_navigation_menus_site_slug") {
-                    return ApiError::BadRequest(format!(
+                    return ApiError::bad_request(format!(
                         "Menu with slug '{}' already exists for this site",
                         req.slug
                     ));
@@ -168,7 +173,10 @@ impl NavigationMenu {
         .bind(req.is_active)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Navigation menu with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Navigation menu with ID {} not found", id))
+                .with_code(codes::NAV_MENU_NOT_FOUND)
+        })?;
 
         Ok(menu)
     }
@@ -181,10 +189,10 @@ impl NavigationMenu {
             .await?;
 
         if result.rows_affected() == 0 {
-            return Err(ApiError::NotFound(format!(
-                "Navigation menu with ID {} not found",
-                id
-            )));
+            return Err(
+                ApiError::not_found(format!("Navigation menu with ID {} not found", id))
+                    .with_code(codes::NAV_MENU_NOT_FOUND),
+            );
         }
 
         Ok(())

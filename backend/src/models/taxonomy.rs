@@ -8,6 +8,7 @@ use uuid::Uuid;
 use crate::dto::taxonomy::{
     CreateCategoryRequest, CreateTagRequest, UpdateCategoryRequest, UpdateTagRequest,
 };
+use crate::errors::codes;
 use crate::errors::ApiError;
 
 /// Tag model
@@ -112,7 +113,10 @@ impl Tag {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Tag with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Tag with ID {} not found", id))
+                .with_code(codes::TAG_NOT_FOUND)
+        })?;
 
         Ok(tag)
     }
@@ -129,7 +133,10 @@ impl Tag {
         .bind(slug)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Tag with slug '{}' not found", slug)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Tag with slug '{}' not found", slug))
+                .with_code(codes::TAG_NOT_FOUND)
+        })?;
 
         Ok(tag)
     }
@@ -197,7 +204,10 @@ impl Tag {
         .bind(req.is_global)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Tag with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Tag with ID {} not found", id))
+                .with_code(codes::TAG_NOT_FOUND)
+        })?;
 
         Ok(tag)
     }
@@ -210,7 +220,8 @@ impl Tag {
             .await?;
 
         if result.rows_affected() == 0 {
-            return Err(ApiError::NotFound(format!("Tag with ID {} not found", id)));
+            return Err(ApiError::not_found(format!("Tag with ID {} not found", id))
+                .with_code(codes::TAG_NOT_FOUND));
         }
 
         Ok(())
@@ -277,7 +288,10 @@ impl Category {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Category with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Category with ID {} not found", id))
+                .with_code(codes::CATEGORY_NOT_FOUND)
+        })?;
 
         Ok(category)
     }
@@ -387,7 +401,10 @@ impl Category {
         .bind(req.is_global)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Category with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Category with ID {} not found", id))
+                .with_code(codes::CATEGORY_NOT_FOUND)
+        })?;
 
         Ok(category)
     }
@@ -400,10 +417,10 @@ impl Category {
             .await?;
 
         if result.rows_affected() == 0 {
-            return Err(ApiError::NotFound(format!(
-                "Category with ID {} not found",
-                id
-            )));
+            return Err(
+                ApiError::not_found(format!("Category with ID {} not found", id))
+                    .with_code(codes::CATEGORY_NOT_FOUND),
+            );
         }
 
         Ok(())
@@ -448,9 +465,8 @@ impl Category {
         .await?;
 
         if result.rows_affected() == 0 {
-            return Err(ApiError::NotFound(
-                "Category assignment not found".to_string(),
-            ));
+            return Err(ApiError::not_found("Category assignment not found")
+                .with_code(codes::CATEGORY_ASSIGNMENT_NOT_FOUND));
         }
 
         Ok(())

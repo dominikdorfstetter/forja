@@ -7,6 +7,7 @@ use std::path::Path;
 use std::sync::Arc;
 
 use crate::config::StorageConfig;
+use crate::errors::codes;
 use crate::errors::ApiError;
 
 /// Result of a storage backend health check
@@ -67,17 +68,18 @@ impl StorageBackend for LocalStorage {
         _content_type: &str,
     ) -> Result<String, ApiError> {
         let full_path = format!("{}/{}", self.upload_dir, path);
-        let parent = Path::new(&full_path)
-            .parent()
-            .ok_or_else(|| ApiError::Internal("Invalid storage path".to_string()))?;
+        let parent = Path::new(&full_path).parent().ok_or_else(|| {
+            ApiError::internal("Invalid storage path").with_code(codes::STORAGE_ERROR)
+        })?;
 
-        tokio::fs::create_dir_all(parent)
-            .await
-            .map_err(|e| ApiError::Internal(format!("Failed to create directory: {e}")))?;
+        tokio::fs::create_dir_all(parent).await.map_err(|e| {
+            ApiError::internal(format!("Failed to create directory: {e}"))
+                .with_code(codes::STORAGE_ERROR)
+        })?;
 
-        tokio::fs::write(&full_path, data)
-            .await
-            .map_err(|e| ApiError::Internal(format!("Failed to write file: {e}")))?;
+        tokio::fs::write(&full_path, data).await.map_err(|e| {
+            ApiError::internal(format!("Failed to write file: {e}")).with_code(codes::STORAGE_ERROR)
+        })?;
 
         Ok(self.public_url(path))
     }
@@ -85,9 +87,10 @@ impl StorageBackend for LocalStorage {
     async fn delete(&self, path: &str) -> Result<(), ApiError> {
         let full_path = format!("{}/{}", self.upload_dir, path);
         if tokio::fs::metadata(&full_path).await.is_ok() {
-            tokio::fs::remove_file(&full_path)
-                .await
-                .map_err(|e| ApiError::Internal(format!("Failed to delete file: {e}")))?;
+            tokio::fs::remove_file(&full_path).await.map_err(|e| {
+                ApiError::internal(format!("Failed to delete file: {e}"))
+                    .with_code(codes::STORAGE_ERROR)
+            })?;
         }
         Ok(())
     }
@@ -202,7 +205,10 @@ impl StorageBackend for S3Storage {
             .content_type(content_type)
             .send()
             .await
-            .map_err(|e| ApiError::Internal(format!("S3 PutObject failed: {e}")))?;
+            .map_err(|e| {
+                ApiError::internal(format!("S3 PutObject failed: {e}"))
+                    .with_code(codes::STORAGE_ERROR)
+            })?;
 
         Ok(self.public_url(path))
     }
@@ -215,7 +221,10 @@ impl StorageBackend for S3Storage {
             .key(&key)
             .send()
             .await
-            .map_err(|e| ApiError::Internal(format!("S3 DeleteObject failed: {e}")))?;
+            .map_err(|e| {
+                ApiError::internal(format!("S3 DeleteObject failed: {e}"))
+                    .with_code(codes::STORAGE_ERROR)
+            })?;
 
         Ok(())
     }
@@ -282,7 +291,10 @@ pub async fn create_storage(config: &StorageConfig) -> Result<Arc<dyn StorageBac
             // Ensure the upload directory exists
             tokio::fs::create_dir_all(&config.local_upload_dir)
                 .await
-                .map_err(|e| ApiError::Internal(format!("Failed to create upload dir: {e}")))?;
+                .map_err(|e| {
+                    ApiError::internal(format!("Failed to create upload dir: {e}"))
+                        .with_code(codes::STORAGE_ERROR)
+                })?;
 
             Ok(Arc::new(LocalStorage::new(
                 config.local_upload_dir.clone(),
@@ -293,7 +305,9 @@ pub async fn create_storage(config: &StorageConfig) -> Result<Arc<dyn StorageBac
             let bucket = config
                 .s3_bucket
                 .as_ref()
-                .ok_or_else(|| ApiError::Internal("S3 bucket not configured".to_string()))?
+                .ok_or_else(|| {
+                    ApiError::internal("S3 bucket not configured").with_code(codes::STORAGE_ERROR)
+                })?
                 .clone();
             let region = config.s3_region.as_deref().unwrap_or("us-east-1");
 
@@ -315,8 +329,9 @@ pub async fn create_storage(config: &StorageConfig) -> Result<Arc<dyn StorageBac
                 config.s3_endpoint.clone(),
             )))
         }
-        other => Err(ApiError::Internal(format!(
-            "Unknown storage provider: {other}"
-        ))),
+        other => Err(
+            ApiError::internal(format!("Unknown storage provider: {other}"))
+                .with_code(codes::STORAGE_ERROR),
+        ),
     }
 }

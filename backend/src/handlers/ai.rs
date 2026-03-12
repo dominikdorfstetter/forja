@@ -7,7 +7,7 @@ use uuid::Uuid;
 use validator::Validate;
 
 use crate::dto::ai::*;
-use crate::errors::{ApiError, ProblemDetails};
+use crate::errors::{codes, ApiError, ProblemDetails};
 use crate::guards::auth_guard::ReadKey;
 use crate::guards::module_guard::{AiModule, ModuleGuard};
 use crate::models::ai_config::SiteAiConfig;
@@ -42,7 +42,7 @@ pub async fn get_ai_config(
 
     let config = SiteAiConfig::find_by_site_id(&state.db, site_id)
         .await?
-        .ok_or_else(|| ApiError::NotFound("No AI configuration found for this site".into()))?;
+        .ok_or_else(|| ApiError::not_found("No AI configuration found for this site"))?;
 
     let key = encryption::resolve_key(&state.settings.security.ai_encryption_key)?;
     let api_key_plain =
@@ -88,7 +88,7 @@ pub async fn upsert_ai_config(
         .await?;
 
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {e}")))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {e}")))?;
 
     let api_key_plain = req.api_key.as_deref().unwrap_or("");
     let key = encryption::resolve_key(&state.settings.security.ai_encryption_key)?;
@@ -232,12 +232,13 @@ pub async fn generate_ai_content(
         .await?;
 
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {e}")))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {e}")))?;
 
     if matches!(req.action, AiAction::Translate) && req.target_locale.is_none() {
-        return Err(ApiError::BadRequest(
-            "target_locale is required for translate action".into(),
-        ));
+        return Err(
+            ApiError::bad_request("target_locale is required for translate action")
+                .with_code(codes::AI_TRANSLATE_INVALID),
+        );
     }
 
     let result = ai_service::generate(
@@ -290,7 +291,7 @@ pub async fn list_ai_models(
         .await?;
 
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {e}")))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {e}")))?;
 
     let models =
         ai_service::list_models(&req.base_url, req.api_key.as_deref(), &req.provider_name).await?;

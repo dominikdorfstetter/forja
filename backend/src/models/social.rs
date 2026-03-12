@@ -6,6 +6,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::dto::social::{CreateSocialLinkRequest, UpdateSocialLinkRequest};
+use crate::errors::codes;
 use crate::errors::ApiError;
 
 /// Social link model
@@ -76,7 +77,10 @@ impl SocialLink {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Social link with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Social link with ID {} not found", id))
+                .with_code(codes::SOCIAL_LINK_NOT_FOUND)
+        })?;
 
         Ok(link)
     }
@@ -131,7 +135,10 @@ impl SocialLink {
         .bind(req.display_order)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Social link with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Social link with ID {} not found", id))
+                .with_code(codes::SOCIAL_LINK_NOT_FOUND)
+        })?;
 
         Ok(link)
     }
@@ -155,10 +162,11 @@ impl SocialLink {
             .await?;
 
             if result.rows_affected() == 0 {
-                return Err(ApiError::NotFound(format!(
+                return Err(ApiError::not_found(format!(
                     "Social link with ID {} not found for site {}",
                     id, site_id
-                )));
+                ))
+                .with_code(codes::SOCIAL_LINK_NOT_FOUND));
             }
         }
 
@@ -174,10 +182,10 @@ impl SocialLink {
             .await?;
 
         if result.rows_affected() == 0 {
-            return Err(ApiError::NotFound(format!(
-                "Social link with ID {} not found",
-                id
-            )));
+            return Err(
+                ApiError::not_found(format!("Social link with ID {} not found", id))
+                    .with_code(codes::SOCIAL_LINK_NOT_FOUND),
+            );
         }
 
         Ok(())

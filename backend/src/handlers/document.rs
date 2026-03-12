@@ -110,7 +110,7 @@ pub async fn create_document_folder(
         .await?;
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let folder = DocumentFolder::create(&state.db, site_id, req).await?;
     audit_service::log_action(
@@ -155,7 +155,7 @@ pub async fn update_document_folder(
 
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let folder = DocumentFolder::update(&state.db, id, req).await?;
     audit_service::log_action(
@@ -279,17 +279,17 @@ pub async fn create_document(
         .await?;
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let max_file_size = Document::get_max_file_size(&state.db, site_id).await?;
     req.validate_source(max_file_size)
-        .map_err(ApiError::BadRequest)?;
+        .map_err(ApiError::bad_request)?;
 
     // Decode base64 file data if present
     let file_data = if let Some(ref b64) = req.file_data {
         let decoded = base64::engine::general_purpose::STANDARD
             .decode(b64)
-            .map_err(|e| ApiError::BadRequest(format!("Invalid base64 file_data: {}", e)))?;
+            .map_err(|e| ApiError::bad_request(format!("Invalid base64 file_data: {}", e)))?;
         Some(decoded)
     } else {
         None
@@ -367,7 +367,7 @@ pub async fn update_document(
 ) -> Result<Json<DocumentListItem>, ApiError> {
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     // Look up the document to get its site_id for the configurable max file size
     let existing = Document::find_by_id(&state.db, id).await?;
@@ -378,13 +378,13 @@ pub async fn update_document(
     let old = serde_json::to_value(&existing).ok();
     let max_file_size = Document::get_max_file_size(&state.db, existing.site_id).await?;
     req.validate_source(max_file_size)
-        .map_err(ApiError::BadRequest)?;
+        .map_err(ApiError::bad_request)?;
 
     // Decode base64 file data if present
     let file_data = if let Some(ref b64) = req.file_data {
         let decoded = base64::engine::general_purpose::STANDARD
             .decode(b64)
-            .map_err(|e| ApiError::BadRequest(format!("Invalid base64 file_data: {}", e)))?;
+            .map_err(|e| ApiError::bad_request(format!("Invalid base64 file_data: {}", e)))?;
         Some(decoded)
     } else {
         None
@@ -523,7 +523,7 @@ pub async fn create_document_localization(
 ) -> Result<(Status, Json<DocumentLocalizationResponse>), ApiError> {
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     // Verify document exists and authorize against its site
     let doc = Document::find_by_id(&state.db, id).await?;
@@ -562,7 +562,7 @@ pub async fn update_document_localization(
 ) -> Result<Json<DocumentLocalizationResponse>, ApiError> {
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     // Resolve site via parent document
     let existing = DocumentLocalization::find_by_id(&state.db, loc_id).await?;
@@ -682,7 +682,7 @@ pub async fn assign_blog_document(
 ) -> Result<(Status, Json<BlogDocumentResponse>), ApiError> {
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     // Resolve site via blog → content → site
     let blog = Blog::find_by_id(&state.db, blog_id).await?;

@@ -8,6 +8,7 @@ use uuid::Uuid;
 use crate::dto::cv::{
     CreateCvEntryRequest, CreateSkillRequest, UpdateCvEntryRequest, UpdateSkillRequest,
 };
+use crate::errors::codes;
 use crate::errors::ApiError;
 use crate::services::content_service::ContentService;
 
@@ -124,7 +125,10 @@ impl Skill {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Skill with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Skill with ID {} not found", id))
+                .with_code(codes::SKILL_NOT_FOUND)
+        })?;
 
         Ok(skill)
     }
@@ -142,7 +146,10 @@ impl Skill {
         .bind(slug)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Skill with slug '{}' not found", slug)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Skill with slug '{}' not found", slug))
+                .with_code(codes::SKILL_NOT_FOUND)
+        })?;
 
         Ok(skill)
     }
@@ -211,7 +218,10 @@ impl Skill {
         .bind(req.is_global)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Skill with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("Skill with ID {} not found", id))
+                .with_code(codes::SKILL_NOT_FOUND)
+        })?;
 
         Ok(skill)
     }
@@ -226,10 +236,10 @@ impl Skill {
         .await?;
 
         if result.rows_affected() == 0 {
-            return Err(ApiError::NotFound(format!(
-                "Skill with ID {} not found",
-                id
-            )));
+            return Err(
+                ApiError::not_found(format!("Skill with ID {} not found", id))
+                    .with_code(codes::SKILL_NOT_FOUND),
+            );
         }
 
         Ok(())
@@ -328,7 +338,10 @@ impl CvEntry {
         .bind(id)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("CV entry with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("CV entry with ID {} not found", id))
+                .with_code(codes::CV_ENTRY_NOT_FOUND)
+        })?;
 
         Ok(entry)
     }
@@ -416,7 +429,10 @@ impl CvEntry {
         .bind(req.display_order)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("CV entry with ID {} not found", id)))?;
+        .ok_or_else(|| {
+            ApiError::not_found(format!("CV entry with ID {} not found", id))
+                .with_code(codes::CV_ENTRY_NOT_FOUND)
+        })?;
 
         Ok(entry)
     }
@@ -427,9 +443,7 @@ impl CvEntry {
         if let Some(content_id) = entry.content_id {
             ContentService::soft_delete_content(pool, content_id).await
         } else {
-            Err(ApiError::BadRequest(
-                "CV entry has no content_id".to_string(),
-            ))
+            Err(ApiError::bad_request("CV entry has no content_id"))
         }
     }
 }

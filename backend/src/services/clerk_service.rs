@@ -2,6 +2,7 @@
 //!
 //! Wraps Clerk Backend API for listing/getting users.
 
+use crate::errors::codes;
 use crate::errors::ApiError;
 use serde::Deserialize;
 
@@ -97,9 +98,8 @@ impl ClerkService {
         {
             Ok(value)
         } else {
-            Err(ApiError::BadRequest(
-                "Invalid identifier format".to_string(),
-            ))
+            Err(ApiError::bad_request("Invalid identifier format")
+                .with_code(codes::CLERK_INVALID_IDENTIFIER))
         }
     }
 
@@ -118,11 +118,14 @@ impl ClerkService {
             .query(&[("limit", limit.to_string()), ("offset", offset.to_string())])
             .send()
             .await
-            .map_err(|_| ApiError::Internal("Clerk API request failed".to_string()))?;
+            .map_err(|_| {
+                ApiError::internal("Clerk API request failed").with_code(codes::CLERK_API_FAILED)
+            })?;
 
         if !resp.status().is_success() {
             let status = resp.status();
-            return Err(ApiError::Internal(format!("Clerk API returned {}", status)));
+            return Err(ApiError::internal(format!("Clerk API returned {}", status))
+                .with_code(codes::CLERK_API_FAILED));
         }
 
         let total_count: i64 = resp
@@ -132,10 +135,10 @@ impl ClerkService {
             .and_then(|v| v.parse().ok())
             .unwrap_or(0);
 
-        let users: Vec<ClerkApiUser> = resp
-            .json()
-            .await
-            .map_err(|e| ApiError::Internal(format!("Failed to parse Clerk users: {}", e)))?;
+        let users: Vec<ClerkApiUser> = resp.json().await.map_err(|e| {
+            ApiError::internal(format!("Failed to parse Clerk users: {}", e))
+                .with_code(codes::CLERK_API_FAILED)
+        })?;
 
         Ok((users, total_count))
     }
@@ -151,20 +154,24 @@ impl ClerkService {
             .bearer_auth(&self.secret_key)
             .send()
             .await
-            .map_err(|_| ApiError::Internal("Clerk API request failed".to_string()))?;
+            .map_err(|_| {
+                ApiError::internal("Clerk API request failed").with_code(codes::CLERK_API_FAILED)
+            })?;
 
         if !resp.status().is_success() {
             let status = resp.status();
             if status.as_u16() == 404 {
-                return Err(ApiError::NotFound("Clerk user not found".to_string()));
+                return Err(ApiError::not_found("Clerk user not found")
+                    .with_code(codes::CLERK_USER_NOT_FOUND));
             }
-            return Err(ApiError::Internal(format!("Clerk API returned {}", status)));
+            return Err(ApiError::internal(format!("Clerk API returned {}", status))
+                .with_code(codes::CLERK_API_FAILED));
         }
 
-        let user: ClerkApiUser = resp
-            .json()
-            .await
-            .map_err(|_| ApiError::Internal("Failed to parse Clerk user response".to_string()))?;
+        let user: ClerkApiUser = resp.json().await.map_err(|_| {
+            ApiError::internal("Failed to parse Clerk user response")
+                .with_code(codes::CLERK_API_FAILED)
+        })?;
 
         Ok(user)
     }
@@ -189,20 +196,24 @@ impl ClerkService {
             .json(&body)
             .send()
             .await
-            .map_err(|_| ApiError::Internal("Clerk API request failed".to_string()))?;
+            .map_err(|_| {
+                ApiError::internal("Clerk API request failed").with_code(codes::CLERK_API_FAILED)
+            })?;
 
         if !resp.status().is_success() {
             let status = resp.status();
             if status.as_u16() == 404 {
-                return Err(ApiError::NotFound("Clerk user not found".to_string()));
+                return Err(ApiError::not_found("Clerk user not found")
+                    .with_code(codes::CLERK_USER_NOT_FOUND));
             }
-            return Err(ApiError::Internal(format!("Clerk API returned {}", status)));
+            return Err(ApiError::internal(format!("Clerk API returned {}", status))
+                .with_code(codes::CLERK_API_FAILED));
         }
 
-        let user: ClerkApiUser = resp
-            .json()
-            .await
-            .map_err(|_| ApiError::Internal("Failed to parse Clerk user response".to_string()))?;
+        let user: ClerkApiUser = resp.json().await.map_err(|_| {
+            ApiError::internal("Failed to parse Clerk user response")
+                .with_code(codes::CLERK_API_FAILED)
+        })?;
 
         Ok(user)
     }
@@ -218,14 +229,18 @@ impl ClerkService {
             .bearer_auth(&self.secret_key)
             .send()
             .await
-            .map_err(|_| ApiError::Internal("Clerk API request failed".to_string()))?;
+            .map_err(|_| {
+                ApiError::internal("Clerk API request failed").with_code(codes::CLERK_API_FAILED)
+            })?;
 
         if !resp.status().is_success() {
             let status = resp.status();
             if status.as_u16() == 404 {
-                return Err(ApiError::NotFound("Clerk user not found".to_string()));
+                return Err(ApiError::not_found("Clerk user not found")
+                    .with_code(codes::CLERK_USER_NOT_FOUND));
             }
-            return Err(ApiError::Internal(format!("Clerk API returned {}", status)));
+            return Err(ApiError::internal(format!("Clerk API returned {}", status))
+                .with_code(codes::CLERK_API_FAILED));
         }
 
         Ok(())

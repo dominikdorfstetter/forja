@@ -229,7 +229,7 @@ impl RateLimiter {
 
             // If limit exceeded, return 429 immediately
             if count > window.limit {
-                return Err(ApiError::RateLimited(format!(
+                return Err(ApiError::rate_limited(format!(
                     "Rate limit exceeded: {} requests per {} exceeded (limit: {})",
                     count,
                     match window.suffix {

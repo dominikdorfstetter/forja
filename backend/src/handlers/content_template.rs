@@ -121,7 +121,7 @@ pub async fn create_content_template(
     let mut req = body.into_inner();
     req.site_id = site_id; // Override with path param
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let template = ContentTemplate::create(&state.db, req).await?;
     audit_service::log_action(
@@ -171,7 +171,7 @@ pub async fn update_content_template(
 
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let template = ContentTemplate::update(&state.db, id, req).await?;
     audit_service::log_action(

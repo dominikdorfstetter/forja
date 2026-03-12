@@ -69,7 +69,7 @@ pub async fn generate_variants(
 ) -> Result<Vec<GeneratedVariant>, ApiError> {
     let img = match ImageReader::new(Cursor::new(original_bytes))
         .with_guessed_format()
-        .map_err(|e| ApiError::Internal(format!("Image format detection failed: {e}")))?
+        .map_err(|e| ApiError::internal(format!("Image format detection failed: {e}")))?
         .decode()
     {
         Ok(img) => img,
@@ -141,7 +141,7 @@ fn resize_image(img: &DynamicImage, max_width: u32) -> DynamicImage {
 fn encode_webp(img: &DynamicImage) -> Result<Vec<u8>, ApiError> {
     let mut buf = Vec::new();
     img.write_to(&mut Cursor::new(&mut buf), ImageFormat::WebP)
-        .map_err(|e| ApiError::Internal(format!("WebP encoding failed: {e}")))?;
+        .map_err(|e| ApiError::internal(format!("WebP encoding failed: {e}")))?;
     Ok(buf)
 }
 
@@ -160,7 +160,7 @@ fn encode_original_format(
 
     let mut buf = Vec::new();
     img.write_to(&mut Cursor::new(&mut buf), format)
-        .map_err(|e| ApiError::Internal(format!("Image encoding failed: {e}")))?;
+        .map_err(|e| ApiError::internal(format!("Image encoding failed: {e}")))?;
 
     Ok((buf, ext, ct))
 }

@@ -203,7 +203,7 @@ impl SiteMembership {
         .bind(new_role)
         .fetch_optional(pool)
         .await?
-        .ok_or_else(|| ApiError::NotFound(format!("Membership {} not found", id)))?;
+        .ok_or_else(|| ApiError::not_found(format!("Membership {} not found", id)))?;
 
         Ok(membership)
     }
@@ -216,7 +216,7 @@ impl SiteMembership {
             .await?;
 
         if result.rows_affected() == 0 {
-            return Err(ApiError::NotFound(format!("Membership {} not found", id)));
+            return Err(ApiError::not_found(format!("Membership {} not found", id)));
         }
 
         Ok(())

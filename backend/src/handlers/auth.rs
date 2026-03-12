@@ -17,6 +17,7 @@ use crate::dto::help_state::{HelpStateResponse, UpdateHelpStateRequest};
 use crate::dto::onboarding::{CompleteOnboardingRequest, OnboardingResponse};
 use crate::dto::site_membership::{MembershipSummary, MembershipWithSite};
 use crate::dto::user_preferences::{UpdateUserPreferencesRequest, UserPreferencesResponse};
+use crate::errors::codes;
 use crate::guards::auth_guard::{AuthSource, AuthenticatedKey};
 use crate::models::audit::{AuditLog, ChangeHistory};
 use crate::models::site_membership::SiteMembership;
@@ -322,8 +323,8 @@ pub async fn get_preferences(
     let clerk_user_id = match &auth.auth_source {
         AuthSource::ClerkJwt { clerk_user_id } => clerk_user_id,
         AuthSource::ApiKey => {
-            return Err(crate::errors::ApiError::BadRequest(
-                "Preferences are only available for Clerk-authenticated users".to_string(),
+            return Err(crate::errors::ApiError::bad_request(
+                "Preferences are only available for Clerk-authenticated users",
             ));
         }
     };
@@ -357,8 +358,8 @@ pub async fn update_preferences(
     let clerk_user_id = match &auth.auth_source {
         AuthSource::ClerkJwt { clerk_user_id } => clerk_user_id,
         AuthSource::ApiKey => {
-            return Err(crate::errors::ApiError::BadRequest(
-                "Preferences are only available for Clerk-authenticated users".to_string(),
+            return Err(crate::errors::ApiError::bad_request(
+                "Preferences are only available for Clerk-authenticated users",
             ));
         }
     };
@@ -394,8 +395,8 @@ pub async fn get_onboarding(
     let clerk_user_id = match &auth.auth_source {
         AuthSource::ClerkJwt { clerk_user_id } => clerk_user_id,
         AuthSource::ApiKey => {
-            return Err(crate::errors::ApiError::BadRequest(
-                "Onboarding is only available for Clerk-authenticated users".to_string(),
+            return Err(crate::errors::ApiError::bad_request(
+                "Onboarding is only available for Clerk-authenticated users",
             ));
         }
     };
@@ -429,15 +430,15 @@ pub async fn complete_onboarding(
     let clerk_user_id = match &auth.auth_source {
         AuthSource::ClerkJwt { clerk_user_id } => clerk_user_id,
         AuthSource::ApiKey => {
-            return Err(crate::errors::ApiError::BadRequest(
-                "Onboarding is only available for Clerk-authenticated users".to_string(),
+            return Err(crate::errors::ApiError::bad_request(
+                "Onboarding is only available for Clerk-authenticated users",
             ));
         }
     };
 
     body.validate()?;
     body.validate_values()
-        .map_err(crate::errors::ApiError::BadRequest)?;
+        .map_err(crate::errors::ApiError::bad_request)?;
 
     let partial = body.into_inner().to_json();
     let effective = UserPreferences::upsert(&state.db, clerk_user_id, partial).await?;
@@ -467,8 +468,8 @@ pub async fn get_help_state(
     let clerk_user_id = match &auth.auth_source {
         AuthSource::ClerkJwt { clerk_user_id } => clerk_user_id,
         AuthSource::ApiKey => {
-            return Err(crate::errors::ApiError::BadRequest(
-                "Help state is only available for Clerk-authenticated users".to_string(),
+            return Err(crate::errors::ApiError::bad_request(
+                "Help state is only available for Clerk-authenticated users",
             ));
         }
     };
@@ -503,8 +504,8 @@ pub async fn update_help_state(
     let clerk_user_id = match &auth.auth_source {
         AuthSource::ClerkJwt { clerk_user_id } => clerk_user_id,
         AuthSource::ApiKey => {
-            return Err(crate::errors::ApiError::BadRequest(
-                "Help state is only available for Clerk-authenticated users".to_string(),
+            return Err(crate::errors::ApiError::bad_request(
+                "Help state is only available for Clerk-authenticated users",
             ));
         }
     };
@@ -545,8 +546,8 @@ pub async fn reset_help_state(
     let clerk_user_id = match &auth.auth_source {
         AuthSource::ClerkJwt { clerk_user_id } => clerk_user_id,
         AuthSource::ApiKey => {
-            return Err(crate::errors::ApiError::BadRequest(
-                "Help state is only available for Clerk-authenticated users".to_string(),
+            return Err(crate::errors::ApiError::bad_request(
+                "Help state is only available for Clerk-authenticated users",
             ));
         }
     };
@@ -581,8 +582,8 @@ pub async fn delete_account(
     let clerk_user_id = match &auth.auth_source {
         AuthSource::ClerkJwt { clerk_user_id } => clerk_user_id.clone(),
         AuthSource::ApiKey => {
-            return Err(crate::errors::ApiError::BadRequest(
-                "Account deletion is only available for Clerk-authenticated users".to_string(),
+            return Err(crate::errors::ApiError::bad_request(
+                "Account deletion is only available for Clerk-authenticated users",
             ));
         }
     };
@@ -593,17 +594,18 @@ pub async fn delete_account(
         let has_other =
             SiteMembership::site_has_other_owner(&state.db, *site_id, &clerk_user_id).await?;
         if !has_other {
-            return Err(crate::errors::ApiError::Conflict(
+            return Err(crate::errors::ApiError::conflict(
                 format!(
                     "You are the sole owner of site {}. Transfer ownership before deleting your account.",
                     site_id
                 ),
-            ));
+            ).with_code(codes::AUTH_ACCOUNT_SOLE_OWNER));
         }
     }
 
     let clerk = state.clerk_service.as_ref().ok_or_else(|| {
-        crate::errors::ApiError::Internal("Clerk service not configured".to_string())
+        crate::errors::ApiError::internal("Clerk service not configured")
+            .with_code(codes::AUTH_CLERK_NOT_CONFIGURED)
     })?;
 
     // Delete the user from Clerk

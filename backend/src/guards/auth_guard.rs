@@ -8,6 +8,7 @@ use uuid::Uuid;
 
 use sqlx::PgPool;
 
+use crate::errors::codes;
 use crate::errors::ApiError;
 use crate::middleware::rate_limit::{RateLimitHeaderInfo, RateLimiter, RateLimits};
 use crate::models::api_key::{ApiKey, ApiKeyPermission};
@@ -72,9 +73,10 @@ impl AuthenticatedKey {
         if self.has_site_access(site_id) {
             Ok(())
         } else {
-            Err(ApiError::Forbidden(
-                "API key does not have access to this site".into(),
-            ))
+            Err(
+                ApiError::forbidden("API key does not have access to this site")
+                    .with_code(codes::AUTH_API_KEY_SITE_DENIED),
+            )
         }
     }
 
@@ -139,16 +141,17 @@ impl AuthenticatedKey {
             .effective_site_role(pool, site_id)
             .await?
             .ok_or_else(|| {
-                ApiError::Forbidden("You do not have access to this site".to_string())
+                ApiError::forbidden("You do not have access to this site")
+                    .with_code(codes::AUTH_SITE_ACCESS_DENIED)
             })?;
 
         if role.has_at_least(min_role) {
             Ok(role)
         } else {
-            Err(ApiError::Forbidden(format!(
-                "Requires at least {} role on this site",
-                min_role
-            )))
+            Err(
+                ApiError::forbidden(format!("Requires at least {} role on this site", min_role))
+                    .with_code(codes::AUTH_INSUFFICIENT_ROLE),
+            )
         }
     }
 
@@ -243,7 +246,8 @@ async fn try_api_key(
         None => {
             return Err((
                 Status::Unauthorized,
-                ApiError::Unauthorized("Missing authentication: provide Authorization Bearer token or X-API-Key header".to_string()),
+                ApiError::unauthorized("Missing authentication: provide Authorization Bearer token or X-API-Key header")
+                    .with_code(codes::AUTH_MISSING_CREDENTIALS),
             ));
         }
     };
@@ -259,11 +263,12 @@ async fn try_api_key(
     if !validation.is_valid {
         return Err((
             Status::Unauthorized,
-            ApiError::Unauthorized(
+            ApiError::unauthorized(
                 validation
                     .reason
                     .unwrap_or_else(|| "Invalid API key".to_string()),
-            ),
+            )
+            .with_code(codes::AUTH_TOKEN_INVALID),
         ));
     }
 
@@ -335,7 +340,7 @@ impl<'r> FromRequest<'r> for AuthenticatedKey {
             None => {
                 return Outcome::Error((
                     Status::InternalServerError,
-                    ApiError::Internal("Application state not found".to_string()),
+                    ApiError::internal("Application state not found"),
                 ));
             }
         };
@@ -394,7 +399,8 @@ impl<'r> FromRequest<'r> for AuthenticatedKey {
             if request.headers().get_one(API_KEY_HEADER).is_none() {
                 return Outcome::Error((
                     Status::Unauthorized,
-                    ApiError::Unauthorized("Invalid Bearer token".to_string()),
+                    ApiError::unauthorized("Invalid Bearer token")
+                        .with_code(codes::AUTH_TOKEN_INVALID),
                 ));
             }
         }
@@ -456,9 +462,7 @@ impl ClerkJwksState {
 
         // If no URL configured yet, can't fetch
         if self.jwks_url.is_empty() {
-            return Err(ApiError::Internal(
-                "Clerk JWKS URL not configured".to_string(),
-            ));
+            return Err(ApiError::internal("Clerk JWKS URL not configured"));
         }
 
         // Fetch fresh JWKS
@@ -467,12 +471,12 @@ impl ClerkJwksState {
             .get(&self.jwks_url)
             .send()
             .await
-            .map_err(|e| ApiError::Internal(format!("Failed to fetch Clerk JWKS: {}", e)))?;
+            .map_err(|e| ApiError::internal(format!("Failed to fetch Clerk JWKS: {}", e)))?;
 
         let jwks: jsonwebtoken::jwk::JwkSet = resp
             .json()
             .await
-            .map_err(|e| ApiError::Internal(format!("Failed to parse Clerk JWKS: {}", e)))?;
+            .map_err(|e| ApiError::internal(format!("Failed to parse Clerk JWKS: {}", e)))?;
 
         // Update cache
         {
@@ -516,7 +520,8 @@ impl<'r> FromRequest<'r> for MasterKey {
 
         Outcome::Error((
             Status::Forbidden,
-            ApiError::Forbidden("Master API key or system admin required".to_string()),
+            ApiError::forbidden("Master API key or system admin required")
+                .with_code(codes::AUTH_INSUFFICIENT_ROLE),
         ))
     }
 }
@@ -550,7 +555,8 @@ impl<'r> FromRequest<'r> for AdminKey {
 
         Outcome::Error((
             Status::Forbidden,
-            ApiError::Forbidden("Admin permission or system admin required".to_string()),
+            ApiError::forbidden("Admin permission or system admin required")
+                .with_code(codes::AUTH_INSUFFICIENT_ROLE),
         ))
     }
 }
@@ -584,7 +590,8 @@ impl<'r> FromRequest<'r> for WriteKey {
 
         Outcome::Error((
             Status::Forbidden,
-            ApiError::Forbidden("Write permission required".to_string()),
+            ApiError::forbidden("Write permission required")
+                .with_code(codes::AUTH_INSUFFICIENT_ROLE),
         ))
     }
 }

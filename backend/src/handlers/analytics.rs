@@ -15,7 +15,7 @@ use crate::dto::analytics::{
     AnalyticsMaintenanceResponse, AnalyticsReportResponse, TopContentItem, TrackPageviewRequest,
     TrackPageviewResponse, TrendDataPoint,
 };
-use crate::errors::ApiError;
+use crate::errors::{codes, ApiError};
 use crate::guards::auth_guard::ReadKey;
 use crate::models::analytics::{compute_visitor_hash, extract_referrer_domain, AnalyticsPageview};
 use crate::models::audit::AuditAction;
@@ -63,9 +63,10 @@ impl<'r> FromRequest<'r> for UserAgent {
 async fn require_analytics_enabled(pool: &sqlx::PgPool, site_id: Uuid) -> Result<(), ApiError> {
     let value = SiteSetting::get_value(pool, site_id, KEY_ANALYTICS_ENABLED).await?;
     if !value.as_bool().unwrap_or(false) {
-        return Err(ApiError::Forbidden(
-            "Analytics is not enabled for this site".to_string(),
-        ));
+        return Err(
+            ApiError::forbidden("Analytics is not enabled for this site")
+                .with_code(codes::ANALYTICS_NOT_ENABLED),
+        );
     }
     Ok(())
 }
@@ -106,7 +107,7 @@ pub async fn track_pageview(
     require_analytics_enabled(&state.db, site_id).await?;
 
     body.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let today = Utc::now().date_naive();
     let visitor_hash = compute_visitor_hash(site_id, &today, &client_ip.0, &user_agent.0);

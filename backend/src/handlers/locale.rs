@@ -104,7 +104,7 @@ pub async fn create_locale(
 ) -> Result<(Status, Json<LocaleResponse>), ApiError> {
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let locale = Locale::create(&state.db, &req).await?;
     Ok((Status::Created, Json(LocaleResponse::from(locale))))
@@ -135,7 +135,7 @@ pub async fn update_locale(
 ) -> Result<Json<LocaleResponse>, ApiError> {
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let locale = Locale::update(&state.db, id, &req).await?;
     Ok(Json(LocaleResponse::from(locale)))

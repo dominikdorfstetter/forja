@@ -218,7 +218,7 @@ pub async fn create_legal_document(
         req.site_ids.push(site_id);
     }
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let document = LegalDocument::create(&state.db, req).await?;
     audit_service::log_action(
@@ -263,7 +263,7 @@ pub async fn update_legal_document(
     ModuleGuard::<LegalModule>::check(&state.db, site_id).await?;
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let document = LegalDocument::update(&state.db, id, req).await?;
     audit_service::log_action(
@@ -347,7 +347,7 @@ pub async fn create_legal_group(
     ModuleGuard::<LegalModule>::check(&state.db, site_id).await?;
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let group = LegalGroup::create(&state.db, doc_id, req).await?;
     audit_service::log_action(
@@ -393,7 +393,7 @@ pub async fn update_legal_group(
     ModuleGuard::<LegalModule>::check(&state.db, site_id).await?;
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let updated = LegalGroup::update(&state.db, id, req).await?;
     audit_service::log_action(
@@ -479,7 +479,7 @@ pub async fn create_legal_item(
     ModuleGuard::<LegalModule>::check(&state.db, site_id).await?;
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let item = LegalItem::create(&state.db, group_id, req).await?;
     audit_service::log_action(
@@ -526,7 +526,7 @@ pub async fn update_legal_item(
     ModuleGuard::<LegalModule>::check(&state.db, site_id).await?;
     let req = body.into_inner();
     req.validate()
-        .map_err(|e| ApiError::BadRequest(format!("Validation error: {}", e)))?;
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {}", e)))?;
 
     let updated = LegalItem::update(&state.db, id, req).await?;
     audit_service::log_action(
