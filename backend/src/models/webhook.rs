@@ -9,6 +9,7 @@ use uuid::Uuid;
 
 use crate::errors::codes;
 use crate::errors::ApiError;
+use crate::utils::list_params::ListParams;
 
 /// A webhook subscription for a site.
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
@@ -63,6 +64,84 @@ impl Webhook {
             .bind(site_id)
             .fetch_one(pool)
             .await?;
+        Ok(row.0)
+    }
+
+    /// Find all webhooks for a site with optional search and sort.
+    pub async fn find_all_for_site_filtered(
+        pool: &PgPool,
+        site_id: Uuid,
+        params: &ListParams,
+    ) -> Result<Vec<Webhook>, ApiError> {
+        let (limit, offset) = params.limit_offset();
+
+        let mut where_clauses = vec!["w.site_id = $1".to_string()];
+        let mut bind_idx = 4u32; // $1=site_id, $2=limit, $3=offset
+
+        if params.search_ref().is_some() {
+            where_clauses.push(format!(
+                "(w.url ILIKE '%' || ${bind_idx} || '%' OR w.description ILIKE '%' || ${bind_idx} || '%')"
+            ));
+            bind_idx += 1;
+        }
+        let _ = bind_idx;
+
+        let order_col = match params.sort.field_or("created_at") {
+            "url" => "w.url",
+            "created_at" => "w.created_at",
+            _ => "w.created_at",
+        };
+        let order_dir = params.sort.direction();
+
+        let sql = format!(
+            "SELECT w.* FROM webhooks w WHERE {} ORDER BY {} {} LIMIT $2 OFFSET $3",
+            where_clauses.join(" AND "),
+            order_col,
+            order_dir,
+        );
+
+        let mut query = sqlx::query_as::<_, Webhook>(&sql)
+            .bind(site_id)
+            .bind(limit)
+            .bind(offset);
+
+        if let Some(s) = params.search_ref() {
+            query = query.bind(s);
+        }
+
+        let rows = query.fetch_all(pool).await?;
+        Ok(rows)
+    }
+
+    /// Count webhooks for a site with optional search filter.
+    pub async fn count_for_site_filtered(
+        pool: &PgPool,
+        site_id: Uuid,
+        search: Option<&str>,
+    ) -> Result<i64, ApiError> {
+        let mut where_clauses = vec!["w.site_id = $1".to_string()];
+        let mut bind_idx = 2u32;
+
+        if search.is_some() {
+            where_clauses.push(format!(
+                "(w.url ILIKE '%' || ${bind_idx} || '%' OR w.description ILIKE '%' || ${bind_idx} || '%')"
+            ));
+            bind_idx += 1;
+        }
+        let _ = bind_idx;
+
+        let sql = format!(
+            "SELECT COUNT(*) FROM webhooks w WHERE {}",
+            where_clauses.join(" AND "),
+        );
+
+        let mut query = sqlx::query_as::<_, (i64,)>(&sql).bind(site_id);
+
+        if let Some(s) = search {
+            query = query.bind(s);
+        }
+
+        let row = query.fetch_one(pool).await?;
         Ok(row.0)
     }
 
@@ -219,5 +298,42 @@ impl WebhookDelivery {
                 .fetch_one(pool)
                 .await?;
         Ok(row.0)
+    }
+
+    /// Find deliveries for a webhook with sort support (paginated).
+    pub async fn find_for_webhook_filtered(
+        pool: &PgPool,
+        webhook_id: Uuid,
+        params: &ListParams,
+    ) -> Result<Vec<WebhookDelivery>, ApiError> {
+        let (limit, offset) = params.limit_offset();
+
+        let order_col = match params.sort.field_or("created_at") {
+            "created_at" => "d.delivered_at",
+            _ => "d.delivered_at",
+        };
+        let order_dir = params.sort.direction();
+
+        let sql = format!(
+            "SELECT d.* FROM webhook_deliveries d WHERE d.webhook_id = $1 ORDER BY {} {} LIMIT $2 OFFSET $3",
+            order_col,
+            order_dir,
+        );
+
+        let rows = sqlx::query_as::<_, WebhookDelivery>(&sql)
+            .bind(webhook_id)
+            .bind(limit)
+            .bind(offset)
+            .fetch_all(pool)
+            .await?;
+        Ok(rows)
+    }
+
+    /// Count deliveries for a webhook (filtered variant for consistency).
+    pub async fn count_for_webhook_filtered(
+        pool: &PgPool,
+        webhook_id: Uuid,
+    ) -> Result<i64, ApiError> {
+        Self::count_for_webhook(pool, webhook_id).await
     }
 }

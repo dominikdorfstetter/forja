@@ -52,7 +52,7 @@ export default function CVPage() {
 
   // Entry list state
   const {
-    page: entryPage, perPage: entryPerPage,
+    page: entryPage, pageSize: entryPageSize,
     formOpen: entryFormOpen, editing: editingEntry, deleting: deletingEntry,
     openCreate: openEntryCreate, closeForm: closeEntryForm,
     openEdit: setEditingEntry, closeEdit: closeEntryEdit,
@@ -63,7 +63,7 @@ export default function CVPage() {
 
   // Skill list state
   const {
-    page: skillPage, perPage: skillPerPage,
+    page: skillPage, pageSize: skillPageSize,
     formOpen: skillFormOpen, editing: editingSkill, deleting: deletingSkill,
     openCreate: openSkillCreate, closeForm: closeSkillForm,
     openEdit: setEditingSkill, closeEdit: closeSkillEdit,
@@ -84,19 +84,19 @@ export default function CVPage() {
 
   // Queries
   const { data: entriesData, isLoading: entriesLoading, error: entriesError } = useQuery({
-    queryKey: ['cv-entries', selectedSiteId, entryTypeFilter, entryPage, entryPerPage],
+    queryKey: ['cv-entries', selectedSiteId, entryTypeFilter, entryPage, entryPageSize],
     queryFn: () => apiService.getCvEntries(selectedSiteId, {
       entry_type: entryTypeFilter ? entryTypeFilter.toLowerCase() : undefined,
       page: entryPage,
-      per_page: entryPerPage,
+      page_size: entryPageSize,
     }),
     enabled: !!selectedSiteId,
   });
   const entries = entriesData?.data;
 
   const { data: skillsData, isLoading: skillsLoading, error: skillsError } = useQuery({
-    queryKey: ['skills', selectedSiteId, skillPage, skillPerPage],
-    queryFn: () => apiService.getSkills(selectedSiteId, { page: skillPage, per_page: skillPerPage }),
+    queryKey: ['skills', selectedSiteId, skillPage, skillPageSize],
+    queryFn: () => apiService.getSkills(selectedSiteId, { page: skillPage, page_size: skillPageSize }),
     enabled: !!selectedSiteId,
   });
   const skills = skillsData?.data;
@@ -276,7 +276,7 @@ export default function CVPage() {
                     meta={entriesData?.meta}
                     page={entryPage}
                     onPageChange={handleEntryPageChange}
-                    rowsPerPage={entryPerPage}
+                    rowsPerPage={entryPageSize}
                     onRowsPerPageChange={handleEntryRowsPerPageChange}
                     size="medium"
                   />
@@ -303,7 +303,7 @@ export default function CVPage() {
                     meta={skillsData?.meta}
                     page={skillPage}
                     onPageChange={handleSkillPageChange}
-                    rowsPerPage={skillPerPage}
+                    rowsPerPage={skillPageSize}
                     onRowsPerPageChange={handleSkillRowsPerPageChange}
                     size="medium"
                   />

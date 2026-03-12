@@ -20,26 +20,26 @@ vi.mock('@/store/UserPreferencesContext', () => ({
 }));
 
 describe('useListPageState', () => {
-  it('starts with default page=1 and perPage from user preferences', () => {
+  it('starts with default page=1 and pageSize from user preferences', () => {
     mockPageSize = 25;
     const { result } = renderHook(() => useListPageState());
     expect(result.current.page).toBe(1);
-    expect(result.current.perPage).toBe(25);
+    expect(result.current.pageSize).toBe(25);
   });
 
   it('uses user preference page_size as default', () => {
     mockPageSize = 50;
     const { result } = renderHook(() => useListPageState());
-    expect(result.current.perPage).toBe(50);
+    expect(result.current.pageSize).toBe(50);
   });
 
   it('respects custom initial values over user preference', () => {
     mockPageSize = 25;
     const { result } = renderHook(() =>
-      useListPageState({ initialPage: 3, initialPerPage: 50 }),
+      useListPageState({ initialPage: 3, initialPageSize: 50 }),
     );
     expect(result.current.page).toBe(3);
-    expect(result.current.perPage).toBe(50);
+    expect(result.current.pageSize).toBe(50);
   });
 
   it('handlePageChange converts 0-based MUI index to 1-based page', () => {
@@ -50,7 +50,7 @@ describe('useListPageState', () => {
     expect(result.current.page).toBe(3);
   });
 
-  it('handleRowsPerPageChange updates perPage and resets page to 1', () => {
+  it('handleRowsPerPageChange updates pageSize and resets page to 1', () => {
     mockPageSize = 25;
     const { result } = renderHook(() => useListPageState());
 
@@ -64,7 +64,7 @@ describe('useListPageState', () => {
         target: { value: '50' },
       } as React.ChangeEvent<HTMLInputElement>),
     );
-    expect(result.current.perPage).toBe(50);
+    expect(result.current.pageSize).toBe(50);
     expect(result.current.page).toBe(1);
   });
 

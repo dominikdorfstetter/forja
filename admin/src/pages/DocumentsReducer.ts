@@ -2,7 +2,7 @@ import type { DocumentResponse, DocumentListItem } from '@/types/api';
 
 interface UIState {
   page: number;
-  perPage: number;
+  pageSize: number;
   selectedFolderId: string | null;
   formOpen: boolean;
   editingDocument: DocumentResponse | null;
@@ -14,7 +14,7 @@ interface UIState {
 
 export type UIAction =
   | { type: 'setPage'; value: number }
-  | { type: 'setPerPage'; value: number }
+  | { type: 'setPageSize'; value: number }
   | { type: 'setSelectedFolder'; id: string | null }
   | { type: 'openForm' }
   | { type: 'closeForm' }
@@ -28,7 +28,7 @@ export type UIAction =
 
 export const initialUIState: UIState = {
   page: 1,
-  perPage: 25,
+  pageSize: 25,
   selectedFolderId: null,
   formOpen: false,
   editingDocument: null,
@@ -42,8 +42,8 @@ export function uiReducer(state: UIState, action: UIAction): UIState {
   switch (action.type) {
     case 'setPage':
       return { ...state, page: action.value };
-    case 'setPerPage':
-      return { ...state, perPage: action.value, page: 1 };
+    case 'setPageSize':
+      return { ...state, pageSize: action.value, page: 1 };
     case 'setSelectedFolder':
       return { ...state, selectedFolderId: action.id, page: 1 };
     case 'openForm':

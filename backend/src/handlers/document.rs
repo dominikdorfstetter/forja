@@ -24,7 +24,7 @@ use crate::models::content::Content;
 use crate::models::document::{BlogDocument, Document, DocumentFolder, DocumentLocalization};
 use crate::models::site_membership::SiteRole;
 use crate::services::{audit_service, webhook_service};
-use crate::utils::pagination::PaginationParams;
+use crate::utils::list_params::ListParams;
 use crate::AppState;
 
 /// Response struct for file downloads
@@ -222,8 +222,11 @@ pub async fn delete_document_folder(
     params(
         ("site_id" = Uuid, Path, description = "Site UUID"),
         ("folder_id" = Option<Uuid>, Query, description = "Filter by folder ID"),
-        ("page" = Option<i64>, Query, description = "Page number (default 1)"),
-        ("per_page" = Option<i64>, Query, description = "Items per page (default 10, max 100)")
+        ("page" = Option<i64>, Query, description = "Page number (default: 1)"),
+        ("page_size" = Option<i64>, Query, description = "Items per page (default: 10)"),
+        ("search" = Option<String>, Query, description = "Search by file name (ILIKE)"),
+        ("sort_by" = Option<String>, Query, description = "Sort field: created_at (default), file_name"),
+        ("sort_dir" = Option<String>, Query, description = "Sort direction: asc, desc (default)"),
     ),
     responses(
         (status = 200, description = "List of documents", body = PaginatedDocuments),
@@ -231,23 +234,28 @@ pub async fn delete_document_folder(
     ),
     security(("api_key" = []))
 )]
-#[get("/sites/<site_id>/documents?<folder_id>&<page>&<per_page>")]
+#[get("/sites/<site_id>/documents?<folder_id>&<page>&<page_size>&<search>&<sort_by>&<sort_dir>")]
+#[allow(clippy::too_many_arguments)]
 pub async fn list_documents(
     state: &State<AppState>,
     site_id: Uuid,
     folder_id: Option<Uuid>,
     page: Option<i64>,
-    per_page: Option<i64>,
+    page_size: Option<i64>,
+    search: Option<String>,
+    sort_by: Option<String>,
+    sort_dir: Option<String>,
     auth: ReadKey,
     _module: ModuleGuard<DocumentsModule>,
 ) -> Result<Json<PaginatedDocuments>, ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)
         .await?;
-    let params = PaginationParams::new(page, per_page);
-    let (limit, offset) = params.limit_offset();
-    let docs = Document::find_all_for_site(&state.db, site_id, folder_id, limit, offset).await?;
-    let total = Document::count_for_site(&state.db, site_id, folder_id).await?;
+    let params = ListParams::new(page, page_size, search, sort_by, sort_dir);
+    let docs = Document::find_all_for_site_filtered(&state.db, site_id, folder_id, &params).await?;
+    let total =
+        Document::count_for_site_filtered(&state.db, site_id, folder_id, params.search_ref())
+            .await?;
     let items: Vec<DocumentListItem> = docs.into_iter().map(DocumentListItem::from).collect();
     Ok(Json(params.paginate(items, total)))
 }

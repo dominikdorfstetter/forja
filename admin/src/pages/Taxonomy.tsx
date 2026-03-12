@@ -39,7 +39,7 @@ export default function TaxonomyPage() {
 
   // Tag list state
   const {
-    page: tagPage, perPage: tagPerPage,
+    page: tagPage, pageSize: tagPageSize,
     formOpen: tagFormOpen, editing: editingTag, deleting: deletingTag,
     openCreate: openTagCreate, closeForm: closeTagForm,
     openEdit: setEditingTag, closeEdit: closeTagEdit,
@@ -49,7 +49,7 @@ export default function TaxonomyPage() {
 
   // Category list state
   const {
-    page: catPage, perPage: catPerPage,
+    page: catPage, pageSize: catPageSize,
     formOpen: catFormOpen, editing: editingCat, deleting: deletingCat,
     openCreate: openCatCreate, closeForm: closeCatForm,
     openEdit: setEditingCat, closeEdit: closeCatEdit,
@@ -69,15 +69,15 @@ export default function TaxonomyPage() {
   }, [openTagCreate, openCatCreate]);
 
   const { data: tagsData, isLoading: tagsLoading } = useQuery({
-    queryKey: ['tags', selectedSiteId, tagPage, tagPerPage],
-    queryFn: () => apiService.getTags(selectedSiteId, { page: tagPage, per_page: tagPerPage }),
+    queryKey: ['tags', selectedSiteId, tagPage, tagPageSize],
+    queryFn: () => apiService.getTags(selectedSiteId, { page: tagPage, page_size: tagPageSize }),
     enabled: !!selectedSiteId,
   });
   const tags = tagsData?.data;
 
   const { data: categoriesData, isLoading: catsLoading } = useQuery({
-    queryKey: ['categories', selectedSiteId, catPage, catPerPage],
-    queryFn: () => apiService.getCategories(selectedSiteId, { page: catPage, per_page: catPerPage }),
+    queryKey: ['categories', selectedSiteId, catPage, catPageSize],
+    queryFn: () => apiService.getCategories(selectedSiteId, { page: catPage, page_size: catPageSize }),
     enabled: !!selectedSiteId,
   });
   const categories = categoriesData?.data;
@@ -146,7 +146,7 @@ export default function TaxonomyPage() {
               meta={tagsData?.meta}
               loading={tagsLoading}
               page={tagPage}
-              rowsPerPage={tagPerPage}
+              rowsPerPage={tagPageSize}
               canWrite={canWrite}
               isAdmin={isAdmin}
               onPageChange={handleTagPageChange}
@@ -163,7 +163,7 @@ export default function TaxonomyPage() {
               meta={categoriesData?.meta}
               loading={catsLoading}
               page={catPage}
-              rowsPerPage={catPerPage}
+              rowsPerPage={catPageSize}
               canWrite={canWrite}
               isAdmin={isAdmin}
               onPageChange={handleCatPageChange}

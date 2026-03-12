@@ -41,7 +41,7 @@ use crate::AppState;
     params(
         ("site_id" = Uuid, Path, description = "Site UUID"),
         ("page" = Option<i64>, Query, description = "Page number (default 1)"),
-        ("per_page" = Option<i64>, Query, description = "Items per page (default 10, max 100)"),
+        ("page_size" = Option<i64>, Query, description = "Items per page (default 10, max 100)"),
         ("search" = Option<String>, Query, description = "Search by ID, route, or slug (ILIKE)"),
         ("status" = Option<String>, Query, description = "Filter by status"),
         ("page_type" = Option<String>, Query, description = "Filter by page type"),
@@ -57,12 +57,12 @@ use crate::AppState;
     security(("api_key" = []))
 )]
 #[allow(clippy::too_many_arguments)]
-#[get("/sites/<site_id>/pages?<page>&<per_page>&<search>&<status>&<page_type>&<sort_by>&<sort_dir>&<exclude_status>")]
+#[get("/sites/<site_id>/pages?<page>&<page_size>&<search>&<status>&<page_type>&<sort_by>&<sort_dir>&<exclude_status>")]
 pub async fn list_pages(
     state: &State<AppState>,
     site_id: Uuid,
     page: Option<i64>,
-    per_page: Option<i64>,
+    page_size: Option<i64>,
     search: Option<String>,
     status: Option<String>,
     page_type: Option<String>,
@@ -75,7 +75,7 @@ pub async fn list_pages(
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)
         .await?;
-    let params = PaginationParams::new(page, per_page);
+    let params = PaginationParams::new(page, page_size);
     let (limit, offset) = params.limit_offset();
 
     let has_filters = search.is_some()

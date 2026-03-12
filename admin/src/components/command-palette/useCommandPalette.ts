@@ -114,14 +114,14 @@ export function useCommandPalette(
 
   const { data: blogsData } = useQuery({
     queryKey: ['cmd-search-blogs', selectedSiteId, debouncedQuery],
-    queryFn: () => apiService.getBlogs(selectedSiteId, { per_page: 5 }),
+    queryFn: () => apiService.getBlogs(selectedSiteId, { page_size: 5 }),
     enabled: shouldSearch,
     staleTime: 30_000,
   });
 
   const { data: pagesData } = useQuery({
     queryKey: ['cmd-search-pages', selectedSiteId, debouncedQuery],
-    queryFn: () => apiService.getPages(selectedSiteId, { per_page: 5 }),
+    queryFn: () => apiService.getPages(selectedSiteId, { page_size: 5 }),
     enabled: shouldSearch,
     staleTime: 30_000,
   });

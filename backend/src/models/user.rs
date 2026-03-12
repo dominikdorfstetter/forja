@@ -235,42 +235,62 @@ impl User {
         Ok(())
     }
 
-    /// List users with optional active filter
+    /// List users with optional active filter, search, and sort
+    #[allow(clippy::too_many_arguments)]
     pub async fn list(
         pool: &PgPool,
         is_active: Option<bool>,
         limit: i64,
         offset: i64,
+        search: Option<&str>,
+        sort_by: Option<&str>,
+        sort_dir: Option<&str>,
     ) -> Result<Vec<Self>, ApiError> {
-        let users = sqlx::query_as::<_, Self>(
+        let search_pattern = search.map(|s| format!("%{}%", s));
+        let order_clause = match sort_by {
+            Some("username") => "u.username",
+            _ => "u.created_at",
+        };
+        let dir = match sort_dir {
+            Some("asc" | "ASC") => "ASC",
+            _ => "DESC",
+        };
+        let query = format!(
             r#"
-            SELECT id, username, email, first_name, last_name, display_name, avatar_url,
-                   is_active, is_superadmin, created_at, updated_at
-            FROM users
-            WHERE ($1::BOOLEAN IS NULL OR is_active = $1)
-            ORDER BY created_at DESC
-            LIMIT $2 OFFSET $3
+            SELECT u.id, u.username, u.email, u.first_name, u.last_name, u.display_name, u.avatar_url,
+                   u.is_active, u.is_superadmin, u.created_at, u.updated_at
+            FROM users u
+            WHERE ($1::BOOLEAN IS NULL OR u.is_active = $1)
+              AND ($2::TEXT IS NULL OR u.username ILIKE $2 OR u.email ILIKE $2)
+            ORDER BY {} {}
+            LIMIT $3 OFFSET $4
             "#,
-        )
-        .bind(is_active)
-        .bind(limit)
-        .bind(offset)
-        .fetch_all(pool)
-        .await?;
+            order_clause, dir
+        );
+        let users = sqlx::query_as::<_, Self>(&query)
+            .bind(is_active)
+            .bind(&search_pattern)
+            .bind(limit)
+            .bind(offset)
+            .fetch_all(pool)
+            .await?;
 
         Ok(users)
     }
 
     /// Count users
-    pub async fn count(pool: &PgPool, is_active: Option<bool>) -> Result<i64, ApiError> {
+    pub async fn count(pool: &PgPool, is_active: Option<bool>, search: Option<&str>) -> Result<i64, ApiError> {
+        let search_pattern = search.map(|s| format!("%{}%", s));
         let row: (i64,) = sqlx::query_as(
             r#"
             SELECT COUNT(*)
-            FROM users
-            WHERE ($1::BOOLEAN IS NULL OR is_active = $1)
+            FROM users u
+            WHERE ($1::BOOLEAN IS NULL OR u.is_active = $1)
+              AND ($2::TEXT IS NULL OR u.username ILIKE $2 OR u.email ILIKE $2)
             "#,
         )
         .bind(is_active)
+        .bind(&search_pattern)
         .fetch_one(pool)
         .await?;
 

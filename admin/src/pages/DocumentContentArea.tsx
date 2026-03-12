@@ -29,7 +29,7 @@ interface DocumentContentAreaProps {
   onOpenCreate: () => void;
   meta?: PaginationMeta;
   onPageChange: (page: number) => void;
-  onPerPageChange: (perPage: number) => void;
+  onPageSizeChange: (pageSize: number) => void;
   detailError: boolean;
   activeDoc: DocumentListItem | null;
   t: (key: string, opts?: Record<string, unknown>) => string;
@@ -48,7 +48,7 @@ export default function DocumentContentArea({
   onOpenCreate,
   meta,
   onPageChange,
-  onPerPageChange,
+  onPageSizeChange,
   detailError,
   activeDoc,
   t,
@@ -109,7 +109,7 @@ export default function DocumentContentArea({
             page={meta.page - 1}
             onPageChange={(_, p) => onPageChange(p + 1)}
             rowsPerPage={meta.page_size}
-            onRowsPerPageChange={(e) => onPerPageChange(+e.target.value)}
+            onRowsPerPageChange={(e) => onPageSizeChange(+e.target.value)}
             rowsPerPageOptions={[10, 25, 50]}
           />
         )}

@@ -24,7 +24,7 @@ export default function RedirectsPage() {
   const { selectedSiteId } = useSiteContext();
 
   const {
-    page, perPage, formOpen, editing, deleting,
+    page, pageSize, formOpen, editing, deleting,
     openCreate, closeForm, openEdit, closeEdit, openDelete, closeDelete,
     handlePageChange, handleRowsPerPageChange,
   } = useListPageState<Redirect>();
@@ -39,8 +39,8 @@ export default function RedirectsPage() {
   }, [openCreate]);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['redirects', selectedSiteId, page, perPage],
-    queryFn: () => apiService.getRedirects(selectedSiteId, { page, per_page: perPage }),
+    queryKey: ['redirects', selectedSiteId, page, pageSize],
+    queryFn: () => apiService.getRedirects(selectedSiteId, { page, page_size: pageSize }),
     enabled: !!selectedSiteId,
   });
   const redirects = data?.data;
@@ -108,7 +108,7 @@ export default function RedirectsPage() {
               meta={data?.meta}
               page={page}
               onPageChange={handlePageChange}
-              rowsPerPage={perPage}
+              rowsPerPage={pageSize}
               onRowsPerPageChange={handleRowsPerPageChange}
             />
           )}

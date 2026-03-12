@@ -11,6 +11,7 @@ use crate::dto::cv::{
 use crate::errors::codes;
 use crate::errors::ApiError;
 use crate::services::content_service::ContentService;
+use crate::utils::list_params::ListParams;
 
 /// CV entry type enum matching PostgreSQL
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::Type, PartialEq, utoipa::ToSchema)]
@@ -83,6 +84,100 @@ impl Skill {
         .fetch_one(pool)
         .await?;
         Ok(row.0)
+    }
+
+    /// Count skills for a site with optional search
+    pub async fn count_for_site_filtered(
+        pool: &PgPool,
+        site_id: Uuid,
+        search: Option<&str>,
+    ) -> Result<i64, ApiError> {
+        let mut where_clauses = vec![
+            "ss.site_id = $1".to_string(),
+            "s.is_deleted = FALSE".to_string(),
+        ];
+        let mut bind_idx = 2u32; // $1=site_id
+
+        if search.is_some() {
+            where_clauses.push(format!("s.slug ILIKE '%' || ${bind_idx} || '%'"));
+            bind_idx += 1;
+        }
+        let _ = bind_idx;
+
+        let sql = format!(
+            r#"
+            SELECT COUNT(*)
+            FROM skills s
+            INNER JOIN skill_sites ss ON s.id = ss.skill_id
+            WHERE {}
+            "#,
+            where_clauses.join(" AND "),
+        );
+
+        let mut query = sqlx::query_as::<_, (i64,)>(&sql).bind(site_id);
+
+        if let Some(s) = search {
+            query = query.bind(s);
+        }
+
+        let row = query.fetch_one(pool).await?;
+        Ok(row.0)
+    }
+
+    /// Find all skills for a site with optional search and sort
+    pub async fn find_all_for_site_filtered(
+        pool: &PgPool,
+        site_id: Uuid,
+        params: &ListParams,
+    ) -> Result<Vec<Self>, ApiError> {
+        let (limit, offset) = params.limit_offset();
+
+        let mut where_clauses = vec![
+            "ss.site_id = $1".to_string(),
+            "s.is_deleted = FALSE".to_string(),
+        ];
+        let mut bind_idx = 4u32; // $1=site_id, $2=limit, $3=offset
+
+        if params.search_ref().is_some() {
+            where_clauses.push(format!("s.slug ILIKE '%' || ${bind_idx} || '%'"));
+            bind_idx += 1;
+        }
+        let _ = bind_idx;
+
+        let order_col = match params.sort.field_or("slug") {
+            "slug" => "s.slug",
+            "display_order" => "s.proficiency_level",
+            "created_at" => "s.created_at",
+            _ => "s.slug",
+        };
+        let order_dir = params.sort.direction();
+
+        let sql = format!(
+            r#"
+            SELECT s.id, s.name, s.slug, s.category, s.icon, s.proficiency_level,
+                   s.is_global, s.is_deleted, s.created_at, s.updated_at
+            FROM skills s
+            INNER JOIN skill_sites ss ON s.id = ss.skill_id
+            WHERE {}
+            ORDER BY {} {}
+            LIMIT $2 OFFSET $3
+            "#,
+            where_clauses.join(" AND "),
+            order_col,
+            order_dir,
+        );
+
+        let mut query = sqlx::query_as::<_, Self>(&sql)
+            .bind(site_id)
+            .bind(limit)
+            .bind(offset);
+
+        if let Some(s) = params.search_ref() {
+            query = query.bind(s);
+        }
+
+        let skills = query.fetch_all(pool).await?;
+        Ok(skills)
     }
 
     /// Find all skills for a site
@@ -270,6 +365,125 @@ impl CvEntry {
             .await?
         };
         Ok(row.0)
+    }
+
+    /// Count CV entries for a site with optional entry_type and search filters
+    pub async fn count_for_site_filtered(
+        pool: &PgPool,
+        site_id: Uuid,
+        entry_type: Option<CvEntryType>,
+        search: Option<&str>,
+    ) -> Result<i64, ApiError> {
+        let mut where_clauses = vec![
+            "cs.site_id = $1".to_string(),
+            "c.is_deleted = FALSE".to_string(),
+        ];
+        let mut bind_idx = 2u32; // $1=site_id
+
+        if entry_type.is_some() {
+            where_clauses.push(format!("e.entry_type = ${bind_idx}"));
+            bind_idx += 1;
+        }
+
+        if search.is_some() {
+            where_clauses.push(format!(
+                "(e.company ILIKE '%' || ${bind_idx} || '%' OR e.location ILIKE '%' || ${bind_idx} || '%')"
+            ));
+            bind_idx += 1;
+        }
+        let _ = bind_idx;
+
+        let sql = format!(
+            r#"
+            SELECT COUNT(*)
+            FROM cv_entries e
+            INNER JOIN contents c ON e.content_id = c.id
+            INNER JOIN content_sites cs ON c.id = cs.content_id
+            WHERE {}
+            "#,
+            where_clauses.join(" AND "),
+        );
+
+        let mut query = sqlx::query_as::<_, (i64,)>(&sql).bind(site_id);
+
+        if let Some(ref et) = entry_type {
+            query = query.bind(et);
+        }
+        if let Some(s) = search {
+            query = query.bind(s);
+        }
+
+        let row = query.fetch_one(pool).await?;
+        Ok(row.0)
+    }
+
+    /// Find all CV entries for a site with optional entry_type, search, and sort
+    pub async fn find_all_for_site_filtered(
+        pool: &PgPool,
+        site_id: Uuid,
+        entry_type: Option<CvEntryType>,
+        params: &ListParams,
+    ) -> Result<Vec<Self>, ApiError> {
+        let (limit, offset) = params.limit_offset();
+
+        let mut where_clauses = vec![
+            "cs.site_id = $1".to_string(),
+            "c.is_deleted = FALSE".to_string(),
+        ];
+        let mut bind_idx = 4u32; // $1=site_id, $2=limit, $3=offset
+
+        if entry_type.is_some() {
+            where_clauses.push(format!("e.entry_type = ${bind_idx}"));
+            bind_idx += 1;
+        }
+
+        if params.search_ref().is_some() {
+            where_clauses.push(format!(
+                "(e.company ILIKE '%' || ${bind_idx} || '%' OR e.location ILIKE '%' || ${bind_idx} || '%')"
+            ));
+            bind_idx += 1;
+        }
+        let _ = bind_idx;
+
+        let order_col = match params.sort.field_or("display_order") {
+            "display_order" => "e.display_order",
+            "start_date" => "e.start_date",
+            "created_at" => "e.created_at",
+            _ => "e.display_order",
+        };
+        let order_dir = params.sort.direction();
+
+        let sql = format!(
+            r#"
+            SELECT e.id, e.content_id, e.company, e.company_url, e.company_logo_id,
+                   e.location, e.start_date, e.end_date, e.is_current, e.entry_type,
+                   e.display_order, e.created_at, e.updated_at
+            FROM cv_entries e
+            INNER JOIN contents c ON e.content_id = c.id
+            INNER JOIN content_sites cs ON c.id = cs.content_id
+            WHERE {}
+            ORDER BY {} {}
+            LIMIT $2 OFFSET $3
+            "#,
+            where_clauses.join(" AND "),
+            order_col,
+            order_dir,
+        );
+
+        let mut query = sqlx::query_as::<_, Self>(&sql)
+            .bind(site_id)
+            .bind(limit)
+            .bind(offset);
+
+        if let Some(ref et) = entry_type {
+            query = query.bind(et);
+        }
+        if let Some(s) = params.search_ref() {
+            query = query.bind(s);
+        }
+
+        let entries = query.fetch_all(pool).await?;
+        Ok(entries)
     }
 
     /// Find all CV entries for a site

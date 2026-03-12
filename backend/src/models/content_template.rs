@@ -8,6 +8,7 @@ use uuid::Uuid;
 use crate::dto::content_template::{CreateContentTemplateRequest, UpdateContentTemplateRequest};
 use crate::errors::codes;
 use crate::errors::ApiError;
+use crate::utils::list_params::ListParams;
 
 /// Content template model
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
@@ -32,82 +33,88 @@ pub struct ContentTemplate {
 }
 
 impl ContentTemplate {
-    /// Find all content templates for a site (paginated, with optional search)
-    pub async fn find_all_for_site(
+    /// Find all content templates for a site (paginated, searchable, sortable)
+    pub async fn find_all_for_site_filtered(
         pool: &PgPool,
         site_id: Uuid,
-        search: Option<&str>,
-        limit: i64,
-        offset: i64,
+        params: &ListParams,
     ) -> Result<Vec<Self>, ApiError> {
-        let templates = match search {
-            Some(q) if !q.is_empty() => {
-                let pattern = format!("%{}%", q);
-                sqlx::query_as::<_, Self>(
-                    r#"
-                    SELECT id, site_id, name, description, icon, slug_prefix,
-                           is_featured, allow_comments, title, subtitle, excerpt, body,
-                           meta_title, meta_description, is_active, created_at, updated_at
-                    FROM content_templates
-                    WHERE site_id = $1 AND (name ILIKE $4 OR description ILIKE $4)
-                    ORDER BY created_at DESC
-                    LIMIT $2 OFFSET $3
-                    "#,
-                )
-                .bind(site_id)
-                .bind(limit)
-                .bind(offset)
-                .bind(&pattern)
-                .fetch_all(pool)
-                .await?
-            }
-            _ => {
-                sqlx::query_as::<_, Self>(
-                    r#"
-                    SELECT id, site_id, name, description, icon, slug_prefix,
-                           is_featured, allow_comments, title, subtitle, excerpt, body,
-                           meta_title, meta_description, is_active, created_at, updated_at
-                    FROM content_templates
-                    WHERE site_id = $1
-                    ORDER BY created_at DESC
-                    LIMIT $2 OFFSET $3
-                    "#,
-                )
-                .bind(site_id)
-                .bind(limit)
-                .bind(offset)
-                .fetch_all(pool)
-                .await?
-            }
-        };
+        let (limit, offset) = params.limit_offset();
 
+        let mut where_clauses = vec!["ct.site_id = $1".to_string()];
+        let mut bind_idx = 4u32; // $1=site_id, $2=limit, $3=offset
+
+        if params.search_ref().is_some() {
+            where_clauses.push(format!(
+                "(ct.name ILIKE '%' || ${bind_idx} || '%' OR ct.description ILIKE '%' || ${bind_idx} || '%')"
+            ));
+            bind_idx += 1;
+        }
+        let _ = bind_idx;
+
+        let order_col = match params.sort.field_or("name") {
+            "created_at" => "ct.created_at",
+            _ => "ct.name",
+        };
+        let order_dir = params.sort.direction();
+
+        let sql = format!(
+            r#"
+            SELECT ct.id, ct.site_id, ct.name, ct.description, ct.icon, ct.slug_prefix,
+                   ct.is_featured, ct.allow_comments, ct.title, ct.subtitle, ct.excerpt, ct.body,
+                   ct.meta_title, ct.meta_description, ct.is_active, ct.created_at, ct.updated_at
+            FROM content_templates ct
+            WHERE {}
+            ORDER BY {} {}
+            LIMIT $2 OFFSET $3
+            "#,
+            where_clauses.join(" AND "),
+            order_col,
+            order_dir,
+        );
+
+        let mut query = sqlx::query_as::<_, Self>(&sql)
+            .bind(site_id)
+            .bind(limit)
+            .bind(offset);
+
+        if let Some(s) = params.search_ref() {
+            query = query.bind(s);
+        }
+
+        let templates = query.fetch_all(pool).await?;
         Ok(templates)
     }
 
-    /// Count content templates for a site (with optional search)
-    pub async fn count_for_site(
+    /// Count content templates for a site with optional search
+    pub async fn count_for_site_filtered(
         pool: &PgPool,
         site_id: Uuid,
         search: Option<&str>,
     ) -> Result<i64, ApiError> {
-        let row: (i64,) = match search {
-            Some(q) if !q.is_empty() => {
-                let pattern = format!("%{}%", q);
-                sqlx::query_as(
-                    "SELECT COUNT(*) FROM content_templates WHERE site_id = $1 AND (name ILIKE $2 OR description ILIKE $2)",
-                )
-                .bind(site_id)
-                .bind(&pattern)
-                .fetch_one(pool)
-                .await?
-            }
-            _ => {
-                sqlx::query_as("SELECT COUNT(*) FROM content_templates WHERE site_id = $1")
-                    .bind(site_id)
-                    .fetch_one(pool)
-                    .await?
-            }
-        };
+        let mut where_clauses = vec!["ct.site_id = $1".to_string()];
+        let mut bind_idx = 2u32; // $1=site_id
+
+        if search.is_some() {
+            where_clauses.push(format!(
+                "(ct.name ILIKE '%' || ${bind_idx} || '%' OR ct.description ILIKE '%' || ${bind_idx} || '%')"
+            ));
+            bind_idx += 1;
+        }
+        let _ = bind_idx;
+
+        let sql = format!(
+            "SELECT COUNT(*) FROM content_templates ct WHERE {}",
+            where_clauses.join(" AND "),
+        );
+
+        let mut query = sqlx::query_as::<_, (i64,)>(&sql).bind(site_id);
+
+        if let Some(s) = search {
+            query = query.bind(s);
+        }
+
+        let row = query.fetch_one(pool).await?;
         Ok(row.0)
     }
 

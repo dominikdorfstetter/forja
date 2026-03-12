@@ -53,7 +53,7 @@ interface UIState {
   statusFilter: string;
   permissionFilter: string;
   page: number;
-  perPage: number;
+  pageSize: number;
   createOpen: boolean;
   blockingKey: ApiKeyListItem | null;
   revokingKey: ApiKeyListItem | null;
@@ -65,7 +65,7 @@ type UIAction =
   | { type: 'setStatusFilter'; value: string }
   | { type: 'setPermissionFilter'; value: string }
   | { type: 'setPage'; value: number }
-  | { type: 'setPerPage'; value: number }
+  | { type: 'setPageSize'; value: number }
   | { type: 'openCreate' }
   | { type: 'closeCreate' }
   | { type: 'openBlock'; key: ApiKeyListItem }
@@ -81,7 +81,7 @@ const initialUIState: UIState = {
   statusFilter: '',
   permissionFilter: '',
   page: 1,
-  perPage: 25,
+  pageSize: 25,
   createOpen: false,
   blockingKey: null,
   revokingKey: null,
@@ -97,8 +97,8 @@ function uiReducer(state: UIState, action: UIAction): UIState {
       return { ...state, permissionFilter: action.value, page: 1 };
     case 'setPage':
       return { ...state, page: action.value };
-    case 'setPerPage':
-      return { ...state, perPage: action.value, page: 1 };
+    case 'setPageSize':
+      return { ...state, pageSize: action.value, page: 1 };
     case 'openCreate':
       return { ...state, createOpen: true };
     case 'closeCreate':
@@ -148,13 +148,13 @@ export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
   });
 
   const { data: apiKeysData, isLoading, error } = useQuery({
-    queryKey: ['apiKeys', ui.statusFilter, ui.permissionFilter, ui.page, ui.perPage, selectedSiteId],
+    queryKey: ['apiKeys', ui.statusFilter, ui.permissionFilter, ui.page, ui.pageSize, selectedSiteId],
     queryFn: () => apiService.getApiKeys({
       status: ui.statusFilter || undefined,
       permission: ui.permissionFilter || undefined,
       site_id: isMaster ? undefined : selectedSiteId || undefined,
       page: ui.page,
-      per_page: ui.perPage,
+      page_size: ui.pageSize,
     }),
     enabled: isMaster || !!selectedSiteId,
   });
@@ -318,7 +318,7 @@ export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
             page={apiKeysData.meta.page - 1}
             onPageChange={(_, p) => dispatch({ type: 'setPage', value: p + 1 })}
             rowsPerPage={apiKeysData.meta.page_size}
-            onRowsPerPageChange={(e) => dispatch({ type: 'setPerPage', value: +e.target.value })}
+            onRowsPerPageChange={(e) => dispatch({ type: 'setPageSize', value: +e.target.value })}
             rowsPerPageOptions={[10, 25, 50]}
           />
         )}

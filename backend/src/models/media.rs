@@ -115,8 +115,20 @@ impl MediaFile {
         site_id: Uuid,
         limit: i64,
         offset: i64,
+        sort_by: Option<&str>,
+        sort_dir: Option<&str>,
     ) -> Result<Vec<Self>, ApiError> {
-        let media = sqlx::query_as::<_, Self>(
+        let order_col = match sort_by.unwrap_or("created_at") {
+            "file_name" => "m.file_name",
+            "file_size" => "m.file_size",
+            _ => "m.created_at",
+        };
+        let order_dir = match sort_dir.unwrap_or("desc") {
+            "asc" | "ASC" => "ASC",
+            _ => "DESC",
+        };
+
+        let query = format!(
             r#"
             SELECT m.id, m.filename, m.original_filename, m.mime_type, m.file_size,
                    m.storage_provider, m.storage_path, m.public_url, m.checksum,
@@ -125,15 +137,18 @@ impl MediaFile {
             FROM media_files m
             INNER JOIN media_sites ms ON m.id = ms.media_file_id
             WHERE ms.site_id = $1 AND m.is_deleted = FALSE
-            ORDER BY m.created_at DESC
+            ORDER BY {} {}
             LIMIT $2 OFFSET $3
             "#,
-        )
-        .bind(site_id)
-        .bind(limit)
-        .bind(offset)
-        .fetch_all(pool)
-        .await?;
+            order_col, order_dir,
+        );
+
+        let media = sqlx::query_as::<_, Self>(&query)
+            .bind(site_id)
+            .bind(limit)
+            .bind(offset)
+            .fetch_all(pool)
+            .await?;
 
         Ok(media)
     }
@@ -215,6 +230,8 @@ impl MediaFile {
         params: &MediaSearchParams,
         limit: i64,
         offset: i64,
+        sort_by: Option<&str>,
+        sort_dir: Option<&str>,
     ) -> Result<Vec<Self>, ApiError> {
         let mut qb = sqlx::QueryBuilder::<sqlx::Postgres>::new(
             "SELECT DISTINCT m.id, m.filename, m.original_filename, m.mime_type, m.file_size, \
@@ -259,7 +276,17 @@ impl MediaFile {
             qb.push_bind(folder_id);
         }
 
-        qb.push(" ORDER BY m.created_at DESC LIMIT ");
+        let order_col = match sort_by.unwrap_or("created_at") {
+            "file_name" => "m.file_name",
+            "file_size" => "m.file_size",
+            _ => "m.created_at",
+        };
+        let order_dir = match sort_dir.unwrap_or("desc") {
+            "asc" | "ASC" => "ASC",
+            _ => "DESC",
+        };
+
+        qb.push(format!(" ORDER BY {} {} LIMIT ", order_col, order_dir));
         qb.push_bind(limit);
         qb.push(" OFFSET ");
         qb.push_bind(offset);
