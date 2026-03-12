@@ -30,19 +30,19 @@ use crate::AppState;
     operation_id = "list_media",
     description = "List all media files for a site (paginated, with optional search & filters)",
     params(
-        ("site_id" = Uuid, Path, description = "Site UUID"),
-        ("page" = Option<i64>, Query, description = "Page number (default 1)"),
-        ("page_size" = Option<i64>, Query, description = "Items per page (default 10, max 100)"),
-        ("search" = Option<String>, Query, description = "Search text (filename, alt text, caption, title)"),
-        ("sort_by" = Option<String>, Query, description = "Sort field (created_at, file_name, file_size)"),
-        ("sort_dir" = Option<String>, Query, description = "Sort direction (asc, desc)"),
-        ("mime_category" = Option<String>, Query, description = "MIME category filter (image, video, audio, document)"),
-        ("folder_id" = Option<Uuid>, Query, description = "Folder UUID filter")
+        ("site_id" = Uuid, Path, description = "The UUID of the site"),
+        ("page" = Option<i64>, Query, description = "Page number, 1-indexed (default: 1)"),
+        ("page_size" = Option<i64>, Query, description = "Items per page, 1–100 (default: 10)"),
+        ("search" = Option<String>, Query, description = "Search by filename, alt text, caption, or title"),
+        ("sort_by" = Option<String>, Query, description = "Sort column: created_at, file_name, file_size"),
+        ("sort_dir" = Option<String>, Query, description = "Sort direction: asc or desc (default: asc)"),
+        ("mime_category" = Option<String>, Query, description = "Filter by MIME type category (e.g. image, video, audio, document)"),
+        ("folder_id" = Option<Uuid>, Query, description = "Filter by media folder UUID")
     ),
     responses(
         (status = 200, description = "Paginated media list", body = PaginatedMedia),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 403, description = "Forbidden", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 403, description = "Insufficient permissions for this site", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -113,11 +113,11 @@ pub async fn list_media(
     tag = "Media",
     operation_id = "get_media",
     description = "Get a media file by ID with variants",
-    params(("id" = Uuid, Path, description = "Media file UUID")),
+    params(("id" = Uuid, Path, description = "The UUID of the media file")),
     responses(
         (status = 200, description = "Media file with variants", body = MediaResponse),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 404, description = "Media not found", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 404, description = "Media file not found", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]

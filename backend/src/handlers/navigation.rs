@@ -25,11 +25,11 @@ use crate::AppState;
     tag = "Navigation",
     operation_id = "list_navigation",
     description = "List root navigation items for a site (primary menu)",
-    params(("site_id" = Uuid, Path, description = "Site UUID")),
+    params(("site_id" = Uuid, Path, description = "The UUID of the site")),
     responses(
         (status = 200, description = "Root navigation items", body = Vec<NavigationItemResponse>),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 403, description = "Forbidden", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 403, description = "Insufficient permissions for this site", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -92,11 +92,11 @@ pub async fn list_menu_items(
     tag = "Navigation",
     operation_id = "get_navigation_item",
     description = "Get a navigation item by ID",
-    params(("id" = Uuid, Path, description = "Navigation item UUID")),
+    params(("id" = Uuid, Path, description = "The UUID of the navigation item")),
     responses(
         (status = 200, description = "Navigation item details", body = NavigationItemResponse),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 404, description = "Item not found", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 404, description = "Navigation item not found", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -122,10 +122,10 @@ pub async fn get_navigation_item(
     tag = "Navigation",
     operation_id = "get_navigation_children",
     description = "Get children of a navigation item",
-    params(("parent_id" = Uuid, Path, description = "Parent navigation item UUID")),
+    params(("parent_id" = Uuid, Path, description = "The UUID of the parent navigation item")),
     responses(
         (status = 200, description = "Child navigation items", body = Vec<NavigationItemResponse>),
-        (status = 401, description = "Unauthorized", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -404,10 +404,10 @@ pub async fn reorder_menu_items(
     tag = "Navigation",
     operation_id = "get_navigation_item_localizations",
     description = "Get all localizations for a navigation item",
-    params(("id" = Uuid, Path, description = "Navigation item UUID")),
+    params(("id" = Uuid, Path, description = "The UUID of the navigation item")),
     responses(
         (status = 200, description = "Item localizations", body = Vec<NavigationItemLocalizationResponse>),
-        (status = 401, description = "Unauthorized", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]

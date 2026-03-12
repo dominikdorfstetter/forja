@@ -7,13 +7,21 @@ use validator::Validate;
 /// Response for a Clerk user
 #[derive(Debug, Serialize, ToSchema)]
 pub struct ClerkUserResponse {
+    #[schema(example = "user_2abc123def456")]
     pub id: String,
+    #[schema(example = "jane@example.com")]
     pub email: Option<String>,
+    #[schema(example = "Jane Doe")]
     pub name: String,
+    #[schema(example = "https://img.clerk.com/abc123")]
     pub image_url: Option<String>,
+    #[schema(example = "admin")]
     pub role: String,
+    #[schema(example = 1704067200)]
     pub created_at: i64,
+    #[schema(example = 1717200000)]
     pub updated_at: i64,
+    #[schema(example = 1717200000)]
     pub last_sign_in_at: Option<i64>,
 }
 
@@ -21,6 +29,7 @@ pub struct ClerkUserResponse {
 #[derive(Debug, Serialize, ToSchema)]
 pub struct ClerkUserListResponse {
     pub data: Vec<ClerkUserResponse>,
+    #[schema(example = 42)]
     pub total_count: i64,
 }
 
@@ -28,6 +37,7 @@ pub struct ClerkUserListResponse {
 #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
 pub struct UpdateClerkUserRoleRequest {
     #[validate(length(min = 1, max = 20))]
+    #[schema(example = "editor")]
     pub role: String,
 }
 

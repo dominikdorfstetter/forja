@@ -11,19 +11,28 @@ use crate::models::site_membership::SiteRole;
 /// Response for a site membership (enriched with Clerk user data)
 #[derive(Debug, Serialize, ToSchema)]
 pub struct SiteMembershipResponse {
+    #[schema(example = "550e8400-e29b-41d4-a716-446655440000")]
     pub id: Uuid,
+    #[schema(example = "user_2abc123def456")]
     pub clerk_user_id: String,
+    #[schema(example = "660e8400-e29b-41d4-a716-446655440000")]
     pub site_id: Uuid,
     pub role: SiteRole,
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(example = "Jane Doe")]
     pub name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(example = "jane@example.com")]
     pub email: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(example = "https://img.clerk.com/abc123")]
     pub image_url: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(example = "user_owner789")]
     pub invited_by: Option<String>,
+    #[schema(example = "2024-01-15T10:30:00Z")]
     pub created_at: DateTime<Utc>,
+    #[schema(example = "2024-06-01T08:00:00Z")]
     pub updated_at: DateTime<Utc>,
 }
 
@@ -31,13 +40,16 @@ pub struct SiteMembershipResponse {
 #[derive(Debug, Deserialize, Validate, ToSchema)]
 pub struct AddSiteMemberRequest {
     #[validate(length(min = 1, max = 255, message = "clerk_user_id is required"))]
+    #[schema(example = "user_2abc123def456")]
     pub clerk_user_id: String,
+    #[schema(example = "editor")]
     pub role: SiteRole,
 }
 
 /// Request to update a member's role
 #[derive(Debug, Deserialize, ToSchema)]
 pub struct UpdateMemberRoleRequest {
+    #[schema(example = "admin")]
     pub role: SiteRole,
 }
 
@@ -45,14 +57,18 @@ pub struct UpdateMemberRoleRequest {
 #[derive(Debug, Deserialize, Validate, ToSchema)]
 pub struct TransferOwnershipRequest {
     #[validate(length(min = 1, max = 255, message = "new_owner_clerk_user_id is required"))]
+    #[schema(example = "user_new_owner789")]
     pub new_owner_clerk_user_id: String,
 }
 
 /// Summary of a user's membership in a site (for /auth/me, /auth/profile)
 #[derive(Debug, Clone, Serialize, ToSchema)]
 pub struct MembershipSummary {
+    #[schema(example = "660e8400-e29b-41d4-a716-446655440000")]
     pub site_id: Uuid,
+    #[schema(example = "My Portfolio")]
     pub site_name: String,
+    #[schema(example = "my-portfolio")]
     pub site_slug: String,
     pub role: SiteRole,
 }

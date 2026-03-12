@@ -22,11 +22,11 @@ use crate::AppState;
     tag = "Social Links",
     operation_id = "list_social_links",
     description = "List all social links for a site",
-    params(("site_id" = Uuid, Path, description = "Site UUID")),
+    params(("site_id" = Uuid, Path, description = "The UUID of the site")),
     responses(
         (status = 200, description = "List of social links", body = Vec<SocialLinkResponse>),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 403, description = "Forbidden", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 403, description = "Insufficient permissions for this site", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -50,10 +50,10 @@ pub async fn list_social_links(
     tag = "Social Links",
     operation_id = "get_social_link",
     description = "Get a social link by ID",
-    params(("id" = Uuid, Path, description = "Social link UUID")),
+    params(("id" = Uuid, Path, description = "The UUID of the social link")),
     responses(
         (status = 200, description = "Social link details", body = SocialLinkResponse),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
         (status = 404, description = "Social link not found", body = ProblemDetails)
     ),
     security(("api_key" = []))

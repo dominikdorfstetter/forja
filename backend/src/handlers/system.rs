@@ -11,7 +11,7 @@ use crate::AppState;
     operation_id = "index",
     description = "API root endpoint returning version info",
     responses(
-        (status = 200, description = "API version string")
+        (status = 200, description = "API version identifier string (e.g. 'Forja API v1.2.3')", body = String)
     )
 )]
 #[get("/")]
@@ -25,7 +25,7 @@ pub fn index() -> &'static str {
     description = "Health check endpoint verifying database connectivity and returning structured status",
     responses(
         (status = 200, description = "All services healthy", body = HealthResponse),
-        (status = 503, description = "One or more services degraded/unhealthy", body = HealthResponse)
+        (status = 503, description = "One or more services degraded or unhealthy", body = HealthResponse)
     )
 )]
 #[get("/health")]

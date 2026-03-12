@@ -42,11 +42,15 @@ pub struct CreateWebhookRequest {
 #[derive(Debug, Deserialize, Validate, ToSchema)]
 pub struct UpdateWebhookRequest {
     #[validate(url(message = "Must be a valid URL"))]
+    #[schema(example = "https://updated.example.com/webhook")]
     pub url: Option<String>,
     #[validate(length(max = 500, message = "Description cannot exceed 500 characters"))]
+    #[schema(example = "Updated webhook description")]
     pub description: Option<String>,
     #[validate(custom(function = "validate_webhook_events"))]
+    #[schema(example = json!(["page.created", "page.updated"]))]
     pub events: Option<Vec<String>>,
+    #[schema(example = true)]
     pub is_active: Option<bool>,
 }
 
@@ -65,13 +69,21 @@ fn validate_webhook_events(events: &[String]) -> Result<(), validator::Validatio
 /// Webhook response (secret is excluded).
 #[derive(Debug, Serialize, ToSchema)]
 pub struct WebhookResponse {
+    #[schema(example = "550e8400-e29b-41d4-a716-446655440000")]
     pub id: Uuid,
+    #[schema(example = "660e8400-e29b-41d4-a716-446655440000")]
     pub site_id: Uuid,
+    #[schema(example = "https://example.com/webhook")]
     pub url: String,
+    #[schema(example = "Blog event notifications")]
     pub description: Option<String>,
+    #[schema(example = json!(["blog.created", "blog.updated"]))]
     pub events: Vec<String>,
+    #[schema(example = true)]
     pub is_active: bool,
+    #[schema(example = "2024-01-15T10:30:00Z")]
     pub created_at: DateTime<Utc>,
+    #[schema(example = "2024-06-01T08:00:00Z")]
     pub updated_at: DateTime<Utc>,
 }
 
@@ -93,14 +105,23 @@ impl From<Webhook> for WebhookResponse {
 /// Webhook delivery log response.
 #[derive(Debug, Serialize, ToSchema)]
 pub struct WebhookDeliveryResponse {
+    #[schema(example = "550e8400-e29b-41d4-a716-446655440000")]
     pub id: Uuid,
+    #[schema(example = "660e8400-e29b-41d4-a716-446655440000")]
     pub webhook_id: Uuid,
+    #[schema(example = "blog.created")]
     pub event_type: String,
+    #[schema(example = json!({"id": "770e8400-e29b-41d4-a716-446655440000", "slug": "hello-world"}))]
     pub payload: serde_json::Value,
+    #[schema(example = 200)]
     pub status_code: Option<i16>,
+    #[schema(example = "OK")]
     pub response_body: Option<String>,
+    #[schema(example = "Connection refused")]
     pub error_message: Option<String>,
+    #[schema(example = 1)]
     pub attempt_number: i16,
+    #[schema(example = "2024-06-15T10:30:00Z")]
     pub delivered_at: DateTime<Utc>,
 }
 

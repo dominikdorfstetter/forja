@@ -10,6 +10,7 @@ use validator::Validate;
 pub struct OnboardingStepResponse {
     #[schema(example = "edit_first_post")]
     pub step_key: String,
+    #[schema(example = "2024-06-15T10:30:00Z")]
     pub completed_at: DateTime<Utc>,
 }
 
@@ -18,8 +19,11 @@ pub struct OnboardingStepResponse {
 #[schema(description = "Onboarding progress for a user on a site")]
 pub struct OnboardingProgressResponse {
     pub completed_steps: Vec<OnboardingStepResponse>,
+    #[schema(example = 5)]
     pub total_steps: usize,
+    #[schema(example = 3)]
     pub completed_count: usize,
+    #[schema(example = 60)]
     pub progress_percent: u8,
 }
 

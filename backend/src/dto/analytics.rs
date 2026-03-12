@@ -54,6 +54,7 @@ impl From<TopContentRow> for TopContentItem {
 #[schema(description = "Daily view trend data point")]
 pub struct TrendDataPoint {
     /// Date (YYYY-MM-DD)
+    #[schema(example = "2024-06-15")]
     pub date: NaiveDate,
     /// Total views on this day
     #[schema(example = 42)]
@@ -93,6 +94,7 @@ pub struct AnalyticsReportResponse {
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 #[schema(description = "Pageview recorded acknowledgement")]
 pub struct TrackPageviewResponse {
+    #[schema(example = true)]
     pub ok: bool,
 }
 
@@ -100,6 +102,8 @@ pub struct TrackPageviewResponse {
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 #[schema(description = "Result of analytics aggregation/pruning")]
 pub struct AnalyticsMaintenanceResponse {
+    #[schema(example = 1500)]
     pub rows_affected: u64,
+    #[schema(example = "aggregate")]
     pub action: String,
 }

@@ -104,11 +104,11 @@ pub async fn get_site(
     tag = "Sites",
     operation_id = "get_site_by_slug",
     description = "Get a site by its slug",
-    params(("slug" = String, Path, description = "Site slug")),
+    params(("slug" = String, Path, description = "URL-friendly site identifier (lowercase, hyphens only)")),
     responses(
         (status = 200, description = "Site details", body = SiteResponse),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 403, description = "Forbidden", body = ProblemDetails),
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 403, description = "Insufficient permissions for this site", body = ProblemDetails),
         (status = 404, description = "Site not found", body = ProblemDetails)
     ),
     security(("api_key" = []), ("bearer_auth" = []))
@@ -323,11 +323,11 @@ pub async fn delete_site(
     tag = "Sites",
     operation_id = "get_site_context",
     description = "Returns site context for adaptive UI — member count, current user role, feature flags, and suggestions",
-    params(("site_id" = Uuid, Path, description = "Site UUID")),
+    params(("site_id" = Uuid, Path, description = "The UUID of the site")),
     responses(
         (status = 200, description = "Site context", body = SiteContextResponse),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 403, description = "Forbidden", body = ProblemDetails),
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 403, description = "Insufficient permissions for this site", body = ProblemDetails),
         (status = 404, description = "Site not found", body = ProblemDetails)
     ),
     security(("api_key" = []), ("bearer_auth" = []))
