@@ -33,6 +33,8 @@ interface DashboardData {
   // Setup checklist
   siteLocales: Awaited<ReturnType<typeof apiService.getSiteLocales>> | undefined;
   navMenus: Awaited<ReturnType<typeof apiService.getNavigationMenus>> | undefined;
+  hasSampleContent: boolean;
+  hasPublished: boolean;
 
   // Loading states
   sitesLoading: boolean;
@@ -146,6 +148,9 @@ export function useDashboardData(): DashboardData {
     (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime(),
   );
 
+  const hasSampleContent = allBlogs.some((b) => b.is_sample);
+  const hasPublished = publishedBlogs.length > 0;
+
   return {
     totalSites: sitesData?.length ?? 0,
     totalBlogs: blogsData?.meta?.total_items ?? 0,
@@ -164,6 +169,9 @@ export function useDashboardData(): DashboardData {
     draftBlogs,
     draftPages,
     publishedBlogs,
+
+    hasSampleContent,
+    hasPublished,
 
     healthData,
     apiKeysData,

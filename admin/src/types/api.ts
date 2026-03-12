@@ -470,6 +470,7 @@ export interface BlogListItem {
   cover_image_id?: string;
   header_image_id?: string;
   is_featured: boolean;
+  is_sample: boolean;
   status: ContentStatus;
   publish_start?: string;
   publish_end?: string;
@@ -764,6 +765,7 @@ export interface BlogResponse {
   cover_image_id?: string;
   header_image_id?: string;
   is_featured: boolean;
+  is_sample: boolean;
   allow_comments: boolean;
   status: ContentStatus;
   published_at?: string;
@@ -1537,4 +1539,26 @@ export interface UpdateHelpStateRequest {
   tour_completed?: boolean;
   dismiss_hotspot?: string;
   dismiss_field_help?: string;
+}
+
+// Onboarding Progress
+export interface OnboardingStepResponse {
+  step_key: string;
+  completed_at: string;
+}
+
+export interface OnboardingProgressResponse {
+  completed_steps: OnboardingStepResponse[];
+  total_steps: number;
+  completed_count: number;
+  progress_percent: number;
+}
+
+export interface CompleteStepRequest {
+  step_key: string;
+}
+
+// Seed content
+export interface SeedContentResponse {
+  deleted?: number;
 }

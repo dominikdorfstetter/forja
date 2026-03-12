@@ -46,7 +46,7 @@ function mockDashboardAPIs() {
   ]);
   vi.mocked(apiService.getBlogs).mockResolvedValue({
     data: [
-      { id: 'b1', slug: 'post-1', author: 'Author', published_date: '', is_featured: false, status: 'Published', created_at: '2025-06-01T00:00:00Z', updated_at: '2025-06-01T00:00:00Z' },
+      { id: 'b1', slug: 'post-1', author: 'Author', published_date: '', is_featured: false, is_sample: false, status: 'Published', created_at: '2025-06-01T00:00:00Z', updated_at: '2025-06-01T00:00:00Z' },
     ],
     meta: { page: 1, page_size: 200, total_items: 1, total_pages: 1 },
   });

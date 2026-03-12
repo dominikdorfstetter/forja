@@ -142,6 +142,8 @@ import type {
   CompleteOnboardingRequest,
   HelpStateResponse,
   UpdateHelpStateRequest,
+  OnboardingProgressResponse,
+  CompleteStepRequest,
 } from '@/types/api';
 
 const API_BASE_URL = '/api/v1';
@@ -569,6 +571,24 @@ class ApiService {
   async getSimilarBlogs(siteId: string, blogId: string, limit?: number): Promise<BlogListItem[]> {
     const params = limit !== undefined ? `?limit=${limit}` : '';
     return apiRequest<BlogListItem[]>('GET', `/sites/${siteId}/blogs/${blogId}/similar${params}`);
+  }
+
+  // Blog seed content
+  async seedSampleContent(siteId: string): Promise<BlogResponse[]> {
+    return apiRequest<BlogResponse[]>('POST', `/sites/${siteId}/blogs/seed`);
+  }
+
+  async deleteSampleContent(siteId: string): Promise<{ deleted: number }> {
+    return apiRequest<{ deleted: number }>('DELETE', `/sites/${siteId}/blogs/samples`);
+  }
+
+  // Onboarding progress
+  async getOnboardingProgress(siteId: string): Promise<OnboardingProgressResponse> {
+    return apiRequest<OnboardingProgressResponse>('GET', `/sites/${siteId}/onboarding-progress`);
+  }
+
+  async completeOnboardingStep(siteId: string, data: CompleteStepRequest): Promise<OnboardingProgressResponse> {
+    return apiRequest<OnboardingProgressResponse>('PUT', `/sites/${siteId}/onboarding-progress`, data);
   }
 
   // Media (mutations)

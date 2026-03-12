@@ -1134,6 +1134,118 @@ pub async fn bulk_blogs(
     Ok(Json(response))
 }
 
+/// Seed sample content for a site
+#[utoipa::path(
+    tag = "Blogs",
+    operation_id = "seed_sample_content",
+    description = "Create sample blog posts for a new site (creates 3 draft posts marked as samples)",
+    params(("site_id" = Uuid, Path, description = "Site UUID")),
+    responses(
+        (status = 201, description = "Sample content created", body = Vec<BlogResponse>),
+        (status = 400, description = "Sample content already exists", body = ProblemDetails),
+        (status = 401, description = "Unauthorized", body = ProblemDetails),
+        (status = 403, description = "Forbidden", body = ProblemDetails)
+    ),
+    security(("api_key" = []))
+)]
+#[post("/sites/<site_id>/blogs/seed")]
+pub async fn seed_sample_content(
+    state: &State<AppState>,
+    site_id: Uuid,
+    auth: ReadKey,
+    _module: ModuleGuard<BlogModule>,
+) -> Result<(Status, Json<Vec<BlogResponse>>), ApiError> {
+    auth.0
+        .authorize_site_action(&state.db, site_id, &SiteRole::Author)
+        .await?;
+
+    // Check if samples already exist
+    let existing = Blog::count_sample_for_site(&state.db, site_id).await?;
+    if existing > 0 {
+        return Err(ApiError::BadRequest(
+            "Sample content already exists for this site".to_string(),
+        ));
+    }
+
+    // Get default locale for the site
+    let locale_id: Uuid = sqlx::query_scalar(
+        r#"
+        SELECT sl.locale_id
+        FROM site_locales sl
+        WHERE sl.site_id = $1 AND sl.is_default = TRUE
+        LIMIT 1
+        "#,
+    )
+    .bind(site_id)
+    .fetch_optional(&state.db)
+    .await?
+    .ok_or_else(|| {
+        ApiError::BadRequest("No default locale configured for this site".to_string())
+    })?;
+
+    // Determine author name
+    let author = match &auth.0.auth_source {
+        crate::guards::auth_guard::AuthSource::ClerkJwt { .. } => "Site Author".to_string(),
+        crate::guards::auth_guard::AuthSource::ApiKey => "Site Author".to_string(),
+    };
+
+    let blogs = Blog::seed_sample_content(&state.db, site_id, locale_id, &author).await?;
+
+    audit_service::log_action(
+        &state.db,
+        Some(site_id),
+        Some(auth.0.id),
+        AuditAction::Create,
+        "blog",
+        site_id,
+        Some(serde_json::json!({ "action": "seed_sample_content", "count": blogs.len() })),
+    )
+    .await;
+
+    let responses: Vec<BlogResponse> = blogs.into_iter().map(BlogResponse::from).collect();
+    Ok((Status::Created, Json(responses)))
+}
+
+/// Delete all sample content for a site
+#[utoipa::path(
+    tag = "Blogs",
+    operation_id = "delete_sample_content",
+    description = "Delete all sample blog posts for a site",
+    params(("site_id" = Uuid, Path, description = "Site UUID")),
+    responses(
+        (status = 200, description = "Sample content deleted", body = serde_json::Value),
+        (status = 401, description = "Unauthorized", body = ProblemDetails),
+        (status = 403, description = "Forbidden", body = ProblemDetails)
+    ),
+    security(("api_key" = []))
+)]
+#[delete("/sites/<site_id>/blogs/samples")]
+pub async fn delete_sample_content(
+    state: &State<AppState>,
+    site_id: Uuid,
+    auth: ReadKey,
+    _module: ModuleGuard<BlogModule>,
+) -> Result<Json<serde_json::Value>, ApiError> {
+    auth.0
+        .authorize_site_action(&state.db, site_id, &SiteRole::Editor)
+        .await?;
+
+    let deleted = Blog::delete_sample_content(&state.db, site_id).await?;
+
+    audit_service::log_action(
+        &state.db,
+        Some(site_id),
+        Some(auth.0.id),
+        AuditAction::Delete,
+        "blog",
+        site_id,
+        Some(serde_json::json!({ "action": "delete_sample_content", "count": deleted })),
+    )
+    .await;
+
+    Ok(Json(serde_json::json!({ "deleted": deleted })))
+}
+
 /// Collect blog routes
 pub fn routes() -> Vec<Route> {
     routes![
@@ -1155,7 +1267,9 @@ pub fn routes() -> Vec<Route> {
         update_blog_localization,
         delete_blog_localization,
         rss_feed,
-        bulk_blogs
+        bulk_blogs,
+        seed_sample_content,
+        delete_sample_content
     ]
 }
 
@@ -1166,6 +1280,6 @@ mod tests {
     #[test]
     fn test_routes_count() {
         let routes = routes();
-        assert_eq!(routes.len(), 19, "Should have 19 blog routes");
+        assert_eq!(routes.len(), 21, "Should have 21 blog routes");
     }
 }

@@ -156,6 +156,15 @@ export default function BlogsPage() {
     onError: showError,
   });
 
+  const seedMutation = useMutation({
+    mutationFn: () => apiService.seedSampleContent(selectedSiteId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] });
+      showSuccess(t('blogs.messages.sampleSeeded'));
+    },
+    onError: showError,
+  });
+
   const bulkMutation = useMutation({
     mutationFn: (data: BulkContentRequest) => apiService.bulkBlogs(selectedSiteId, data),
     onSuccess: (resp) => {
@@ -217,7 +226,13 @@ export default function BlogsPage() {
       ) : error ? (
         <Alert severity="error">{t('blogs.loadError')}</Alert>
       ) : blogs.length === 0 && !ui.searchQuery && !ui.statusFilter && !isArchived ? (
-        <EmptyState icon={<ArticleIcon sx={{ fontSize: 64 }} />} title={t('blogs.empty.title')} description={t('blogs.empty.description')} action={{ label: t('blogs.createButton'), onClick: openCreate }} />
+        <EmptyState
+          icon={<ArticleIcon sx={{ fontSize: 64 }} />}
+          title={t('blogs.empty.title')}
+          description={t('blogs.empty.description')}
+          action={{ label: t('blogs.createButton'), onClick: openCreate }}
+          secondaryAction={canWrite ? { label: t('blogs.empty.seedSamples'), onClick: () => seedMutation.mutate() } : undefined}
+        />
       ) : (
         <>
           <Tabs value={ui.viewTab} onChange={handleTabChange} sx={{ mb: 2 }}>
