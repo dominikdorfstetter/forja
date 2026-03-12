@@ -1242,6 +1242,10 @@
       "title": "Allgemein",
       "contactEmail": "Kontakt-E-Mail"
     },
+    "advanced": {
+      "title": "Erweiterte Einstellungen",
+      "description": "Konfigurationsoptionen für erfahrene Benutzer und Team-Workflows"
+    },
     "featureToggles": {
       "title": "Funktionsschalter",
       "analytics": "Analyse",

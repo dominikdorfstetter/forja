@@ -1,18 +1,18 @@
 [
   {
-    "slug": "welcome-to-your-new-site",
+    "slug": "welkom-op-je-nieuwe-site",
     "title": "Welkom op je nieuwe site",
     "excerpt": "Je site is klaar — dit kun je ermee doen.",
     "body": "Dit is je eerste bericht. Je kunt het bewerken, verwijderen of helemaal opnieuw beginnen — het is helemaal van jou.\n\nGebruik de werkbalk van de editor om **vetgedrukte tekst**, *cursief*, koppen, afbeeldingen en meer toe te voegen. Als je tevreden bent, klik dan op **Publiceren** om het met de wereld te delen."
   },
   {
-    "slug": "getting-started-with-forja",
+    "slug": "aan-de-slag-met-forja",
     "title": "Aan de slag met Forja",
     "excerpt": "Een kort overzicht van de belangrijkste functies van Forja.",
     "body": "Forja is een modern contentmanagementsysteem ontworpen voor snelheid en flexibiliteit.\n\n## Belangrijkste functies\n\n- **Rijke editor** — Schrijf met een blokgebaseerde editor die koppen, afbeeldingen, codeblokken en meer ondersteunt\n- **Categorieën en tags** — Organiseer je content met een flexibel taxonomiesysteem\n- **Meertalig** — Publiceer content in meerdere talen met ingebouwde lokalisatie\n- **Mediabibliotheek** — Upload en beheer afbeeldingen, documenten en andere bestanden\n\n## Volgende stappen\n\n1. Bewerk dit bericht en maak het je eigen\n2. Maak je eerste eigen bericht\n3. Stel de navigatie van je site in"
   },
   {
-    "slug": "your-first-real-post",
+    "slug": "je-eerste-echte-bericht",
     "title": "Je eerste echte bericht (verwijder mij)",
     "excerpt": "Een leeg canvas klaar voor jouw ideeën.",
     "body": "Vervang deze tekst door je eigen content. Waar ga je over schrijven?\n\nTip: Gebruik de `/`-toets om blokken zoals koppen, afbeeldingen en citaten in te voegen."

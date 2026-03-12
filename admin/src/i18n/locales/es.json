@@ -1242,6 +1242,10 @@
       "title": "General",
       "contactEmail": "Correo electrónico de contacto"
     },
+    "advanced": {
+      "title": "Configuración avanzada",
+      "description": "Opciones de configuración para usuarios avanzados y flujos de trabajo en equipo"
+    },
     "featureToggles": {
       "title": "Funciones activables",
       "analytics": "Analíticas",

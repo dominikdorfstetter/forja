@@ -1242,6 +1242,10 @@
       "title": "Algemeen",
       "contactEmail": "Contact-e-mail"
     },
+    "advanced": {
+      "title": "Geavanceerde instellingen",
+      "description": "Configuratieopties voor ervaren gebruikers en teamworkflows"
+    },
     "featureToggles": {
       "title": "Functieschakelaars",
       "analytics": "Analyses",

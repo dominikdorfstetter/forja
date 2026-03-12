@@ -1,18 +1,18 @@
 [
   {
-    "slug": "welcome-to-your-new-site",
+    "slug": "witaj-na-swojej-nowej-stronie",
     "title": "Witaj na swojej nowej stronie",
     "excerpt": "Twoja strona jest gotowa — oto, co możesz z nią zrobić.",
     "body": "To jest Twój pierwszy wpis. Możesz go edytować, usunąć lub zacząć od nowa — to wszystko należy do Ciebie.\n\nUżyj paska narzędzi edytora, aby dodać **pogrubiony tekst**, *kursywę*, nagłówki, obrazy i inne elementy. Gdy będziesz zadowolony, kliknij **Opublikuj**, aby podzielić się tym ze światem."
   },
   {
-    "slug": "getting-started-with-forja",
+    "slug": "pierwsze-kroki-z-forja",
     "title": "Pierwsze kroki z Forja",
     "excerpt": "Szybki przegląd kluczowych funkcji Forja.",
     "body": "Forja to nowoczesny system zarządzania treścią zaprojektowany z myślą o szybkości i elastyczności.\n\n## Kluczowe funkcje\n\n- **Zaawansowany edytor** — Pisz za pomocą edytora blokowego obsługującego nagłówki, obrazy, bloki kodu i więcej\n- **Kategorie i tagi** — Organizuj treści za pomocą elastycznego systemu taksonomii\n- **Wielojęzyczność** — Publikuj treści w wielu językach z wbudowaną lokalizacją\n- **Biblioteka multimediów** — Przesyłaj i zarządzaj obrazami, dokumentami i innymi plikami\n\n## Następne kroki\n\n1. Edytuj ten wpis i zrób go swoim\n2. Stwórz swój pierwszy oryginalny wpis\n3. Skonfiguruj nawigację swojej strony"
   },
   {
-    "slug": "your-first-real-post",
+    "slug": "twoj-pierwszy-prawdziwy-wpis",
     "title": "Twój pierwszy prawdziwy wpis (usuń mnie)",
     "excerpt": "Czyste płótno gotowe na Twoje pomysły.",
     "body": "Zastąp ten tekst własną treścią. O czym napiszesz?\n\nWskazówka: Użyj klawisza `/`, aby wstawiać bloki, takie jak nagłówki, obrazy i cytaty."
