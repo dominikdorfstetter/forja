@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import {
   Button,
   Dialog,
@@ -24,24 +24,16 @@ export default function FirstPublishCelebration({
   onWriteAnother,
 }: FirstPublishCelebrationProps) {
   const { t } = useTranslation();
-  const [visible, setVisible] = useState(open);
-
-  useEffect(() => {
-    setVisible(open);
-  }, [open]);
 
   // Auto-dismiss after 8 seconds
   useEffect(() => {
-    if (!visible) return;
-    const timer = setTimeout(() => {
-      setVisible(false);
-      onClose();
-    }, 8000);
+    if (!open) return;
+    const timer = setTimeout(onClose, 8000);
     return () => clearTimeout(timer);
-  }, [visible, onClose]);
+  }, [open, onClose]);
 
   return (
-    <Dialog open={visible} onClose={onClose} maxWidth="xs" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
       <DialogTitle sx={{ textAlign: 'center', pt: 4 }}>
         <Typography variant="h4" component="span">
           {t('firstPublish.title')}
