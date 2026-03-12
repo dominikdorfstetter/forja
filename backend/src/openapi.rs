@@ -1,17 +1,222 @@
 //! OpenAPI documentation configuration
 //!
-//! Central OpenApi struct that collects all paths and schemas for
-//! auto-generated API documentation via utoipa + Swagger UI.
+//! Two separate OpenAPI specs: a public Consumer API (read-only endpoints)
+//! and a full Admin API (all CRUD operations). Both share the same schemas
+//! and serve under `/api/v1` — the split is documentation-only, not routing.
 
 use utoipa::openapi::security::{ApiKey, ApiKeyValue, Http, HttpAuthScheme, SecurityScheme};
 use utoipa::{Modify, OpenApi};
 
+// ---------------------------------------------------------------------------
+// Consumer API — read-only endpoints accessible via API key
+// ---------------------------------------------------------------------------
+
 #[derive(OpenApi)]
 #[openapi(
     info(
-        title = "Forja Multi-Site CMS API",
+        title = "Forja Consumer API",
         version = "1.0.5",
-        description = "A high-performance REST API built with Rust for managing multiple websites with shared content and translations.",
+        description = "Public read-only API for building frontends against a Forja-powered site. Authenticate with an API key that has Read permission.",
+        license(name = "AGPL-3.0-or-later", url = "https://www.gnu.org/licenses/agpl-3.0.html"),
+        contact(name = "Forja Team", url = "https://github.com/dominikdorfstetter/forja")
+    ),
+    servers(
+        (url = "/api/v1", description = "API v1")
+    ),
+    tags(
+        (name = "System", description = "Health and system endpoints"),
+        (name = "Blogs", description = "Published blog posts"),
+        (name = "Pages", description = "Public page content"),
+        (name = "CV", description = "CV/Resume entries and skills"),
+        (name = "Legal", description = "Legal documents and consent"),
+        (name = "Media", description = "Media files"),
+        (name = "Navigation", description = "Navigation trees and menus"),
+        (name = "Social Links", description = "Social media links"),
+        (name = "Taxonomy", description = "Tags and categories"),
+        (name = "Sites", description = "Site information"),
+        (name = "Environments", description = "Environment configuration"),
+        (name = "Locales", description = "Locale/language information"),
+        (name = "Analytics", description = "Pageview tracking"),
+        (name = "Redirects", description = "URL redirect lookup")
+    ),
+    paths(
+        // System
+        crate::handlers::system::index,
+        crate::handlers::system::health,
+        // Blogs (published/public)
+        crate::handlers::blog::list_published_blogs,
+        crate::handlers::blog::list_published_blogs_by_category,
+        crate::handlers::blog::list_featured_blogs,
+        crate::handlers::blog::list_similar_blogs,
+        crate::handlers::blog::get_blog_by_slug,
+        crate::handlers::blog::rss_feed,
+        // Pages (public)
+        crate::handlers::page::get_page_by_route,
+        crate::handlers::page::get_page_sections,
+        crate::handlers::page::get_section_localizations,
+        crate::handlers::page::get_page_section_localizations,
+        // CV
+        crate::handlers::cv::list_skills,
+        crate::handlers::cv::get_skill,
+        crate::handlers::cv::get_skill_by_slug,
+        crate::handlers::cv::list_cv_entries,
+        crate::handlers::cv::get_cv_entry,
+        // Legal
+        crate::handlers::legal::list_legal_documents,
+        crate::handlers::legal::get_legal_document,
+        crate::handlers::legal::get_cookie_consent,
+        crate::handlers::legal::get_legal_document_by_slug,
+        crate::handlers::legal::get_legal_groups,
+        crate::handlers::legal::get_legal_items,
+        // Media (read only)
+        crate::handlers::media::list_media,
+        crate::handlers::media::get_media,
+        // Navigation
+        crate::handlers::navigation::list_navigation,
+        crate::handlers::navigation::list_menu_items,
+        crate::handlers::navigation::get_navigation_item,
+        crate::handlers::navigation::get_navigation_children,
+        crate::handlers::navigation::get_navigation_item_localizations,
+        // Navigation Menus
+        crate::handlers::navigation_menu::list_navigation_menus,
+        crate::handlers::navigation_menu::get_navigation_menu,
+        crate::handlers::navigation_menu::get_navigation_menu_by_slug,
+        crate::handlers::navigation_menu::get_navigation_tree,
+        // Social Links
+        crate::handlers::social::list_social_links,
+        crate::handlers::social::get_social_link,
+        // Taxonomy
+        crate::handlers::taxonomy::list_tags,
+        crate::handlers::taxonomy::get_tag,
+        crate::handlers::taxonomy::get_tag_by_slug,
+        crate::handlers::taxonomy::get_content_tags,
+        crate::handlers::taxonomy::list_categories,
+        crate::handlers::taxonomy::get_category,
+        crate::handlers::taxonomy::get_category_children,
+        crate::handlers::taxonomy::get_content_categories,
+        crate::handlers::taxonomy::get_categories_with_blog_counts,
+        // Sites (public info)
+        crate::handlers::site::get_site_by_slug,
+        crate::handlers::site::get_site_context,
+        // Environments
+        crate::handlers::environment::list_environments,
+        crate::handlers::environment::get_environment,
+        crate::handlers::environment::get_default_environment,
+        // Locales
+        crate::handlers::locale::list_locales,
+        crate::handlers::locale::get_locale,
+        crate::handlers::locale::get_locale_by_code,
+        // Analytics
+        crate::handlers::analytics::track_pageview,
+        // Config
+        crate::handlers::config::get_config,
+        // Redirects (lookup only)
+        crate::handlers::redirect::lookup_redirect,
+        // Error Codes
+        crate::handlers::error_codes::list_error_codes,
+    ),
+    components(schemas(
+        // Error types
+        crate::errors::ProblemDetails,
+        crate::errors::FieldError,
+        crate::dto::error_codes::ErrorCodeCatalogResponse,
+        crate::dto::error_codes::ErrorCodeEntry,
+        crate::errors::codes::ErrorCodeDef,
+        // Health
+        crate::dto::health::HealthResponse,
+        crate::dto::health::ServiceHealth,
+        crate::dto::health::StorageHealth,
+        // Pagination
+        crate::utils::pagination::PaginationMeta,
+        // Blog DTOs
+        crate::dto::blog::BlogListItem,
+        crate::dto::blog::BlogResponse,
+        crate::dto::blog::PaginatedBlogs,
+        // Content DTOs
+        crate::dto::content::LocalizationResponse,
+        // Page DTOs
+        crate::dto::page::PageResponse,
+        crate::dto::page::PageSectionResponse,
+        crate::dto::page::SectionLocalizationResponse,
+        // CV DTOs
+        crate::dto::cv::SkillResponse,
+        crate::dto::cv::CvEntryResponse,
+        crate::dto::cv::PaginatedCvEntries,
+        crate::dto::cv::PaginatedSkills,
+        // Legal DTOs
+        crate::dto::legal::LegalDocumentResponse,
+        crate::dto::legal::LegalGroupResponse,
+        crate::dto::legal::LegalItemResponse,
+        crate::dto::legal::LegalDocumentWithGroups,
+        crate::dto::legal::LegalGroupWithItems,
+        crate::dto::legal::LegalDocumentDetailResponse,
+        crate::dto::legal::LegalDocLocalizationResponse,
+        crate::dto::legal::PaginatedLegalDocuments,
+        // Media DTOs
+        crate::dto::media::MediaListItem,
+        crate::dto::media::MediaVariantResponse,
+        crate::dto::media::MediaResponse,
+        crate::dto::media::PaginatedMedia,
+        // Navigation DTOs
+        crate::dto::navigation::NavigationItemResponse,
+        crate::dto::navigation::NavigationTree,
+        crate::dto::navigation::NavigationItemLocalizationResponse,
+        // Navigation Menu DTOs
+        crate::dto::navigation_menu::NavigationMenuResponse,
+        crate::dto::navigation_menu::MenuLocalizationResponse,
+        // Social DTOs
+        crate::dto::social::SocialLinkResponse,
+        // Taxonomy DTOs
+        crate::dto::taxonomy::TagResponse,
+        crate::dto::taxonomy::CategoryResponse,
+        crate::dto::taxonomy::CategoryTree,
+        crate::dto::taxonomy::PaginatedTags,
+        crate::dto::taxonomy::PaginatedCategories,
+        crate::dto::taxonomy::CategoryWithCountResponse,
+        // Site DTOs
+        crate::dto::site::SiteResponse,
+        crate::dto::site::SiteContextResponse,
+        crate::dto::site::SiteContextFeatures,
+        crate::dto::site::SiteContextSuggestions,
+        crate::dto::site::SiteContextModules,
+        // Environment DTOs
+        crate::dto::environment::EnvironmentResponse,
+        // Locale DTOs
+        crate::dto::locale::LocaleResponse,
+        // Analytics DTOs
+        crate::dto::analytics::TrackPageviewRequest,
+        crate::dto::analytics::TrackPageviewResponse,
+        // Config DTOs
+        crate::dto::config::ConfigResponse,
+        // Redirect DTOs
+        crate::dto::redirect::RedirectLookupResponse,
+        // Model enums (used in response types)
+        crate::models::content::ContentStatus,
+        crate::models::content::TranslationStatus,
+        crate::models::cv::CvEntryType,
+        crate::models::cv::SkillCategory,
+        crate::models::media::StorageProvider,
+        crate::models::media::MediaVariantType,
+        crate::models::page::PageType,
+        crate::models::page::SectionType,
+        crate::models::legal::LegalDocType,
+        crate::models::environment::EnvironmentType,
+        crate::models::locale::TextDirection,
+    )),
+    modifiers(&ConsumerSecurityAddon)
+)]
+pub struct ConsumerApiDoc;
+
+// ---------------------------------------------------------------------------
+// Admin API — all endpoints (CRUD, audit, webhooks, AI, etc.)
+// ---------------------------------------------------------------------------
+
+#[derive(OpenApi)]
+#[openapi(
+    info(
+        title = "Forja Admin API",
+        version = "1.0.5",
+        description = "Full administration API for managing Forja-powered sites. Includes all CRUD operations, audit logs, webhooks, AI, and system management. Requires Clerk session with system admin role.",
         license(name = "AGPL-3.0-or-later", url = "https://www.gnu.org/licenses/agpl-3.0.html"),
         contact(name = "Forja Team", url = "https://github.com/dominikdorfstetter/forja")
     ),
@@ -35,7 +240,6 @@ use utoipa::{Modify, OpenApi};
         (name = "Locales", description = "Locale/language management"),
         (name = "Site Locales", description = "Per-site language/locale management"),
         (name = "Site Members", description = "Site membership management"),
-        (name = "Users", description = "User management"),
         (name = "Audit", description = "Audit logs and change history"),
         (name = "Site Settings", description = "Per-site settings management"),
         (name = "Notifications", description = "In-app notification management"),
@@ -529,14 +733,32 @@ use utoipa::{Modify, OpenApi};
         // Config DTOs
         crate::dto::config::ConfigResponse,
     )),
-    modifiers(&SecurityAddon)
+    modifiers(&AdminSecurityAddon)
 )]
-pub struct ApiDoc;
+pub struct AdminApiDoc;
 
-/// Adds X-API-Key and Bearer auth security schemes to the OpenAPI spec
-struct SecurityAddon;
+// ---------------------------------------------------------------------------
+// Security scheme modifiers
+// ---------------------------------------------------------------------------
 
-impl Modify for SecurityAddon {
+/// Consumer API uses only API key auth
+struct ConsumerSecurityAddon;
+
+impl Modify for ConsumerSecurityAddon {
+    fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
+        if let Some(components) = openapi.components.as_mut() {
+            components.add_security_scheme(
+                "api_key",
+                SecurityScheme::ApiKey(ApiKey::Header(ApiKeyValue::new("X-API-Key"))),
+            );
+        }
+    }
+}
+
+/// Admin API uses both API key and Bearer token auth
+struct AdminSecurityAddon;
+
+impl Modify for AdminSecurityAddon {
     fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
         if let Some(components) = openapi.components.as_mut() {
             components.add_security_scheme(

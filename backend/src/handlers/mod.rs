@@ -17,6 +17,9 @@ pub mod config;
 // Dashboard
 pub mod dashboard;
 
+// API documentation (admin docs + redirects)
+pub mod docs;
+
 // System (health, index)
 pub mod system;
 
