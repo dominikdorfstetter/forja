@@ -1,6 +1,16 @@
 //! Data Transfer Objects
 //!
 //! This module contains request/response DTOs for the API.
+//!
+//! # Naming convention
+//!
+//! All struct fields use **snake_case** — Serde serialises them as-is since Rust
+//! identifiers are already snake_case. Explicit `#[serde(rename_all = "snake_case")]`
+//! is not required on structs but **is** required on enums whose variants must
+//! serialise as snake_case (e.g. `AiAction`, `ReviewAction`).
+//!
+//! The only field-level rename is `ProblemDetails::problem_type` → `"type"`
+//! (required by RFC 7807).
 
 pub mod ai;
 pub mod analytics;

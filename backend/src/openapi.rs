@@ -16,7 +16,7 @@ use utoipa::{Modify, OpenApi};
     info(
         title = "Forja Consumer API",
         version = "1.0.5",
-        description = "Public read-only API for building frontends against a Forja-powered site. Authenticate with an API key that has Read permission.",
+        description = "Public read-only API for building frontends against a Forja-powered site. Authenticate with an API key that has Read permission.\n\nNaming conventions: all JSON response fields and query parameters use snake_case. Enum values use PascalCase. The only exception is the RFC 7807 Problem Details `type` field.",
         license(name = "AGPL-3.0-or-later", url = "https://www.gnu.org/licenses/agpl-3.0.html"),
         contact(name = "Forja Team", url = "https://github.com/dominikdorfstetter/forja")
     ),
@@ -216,7 +216,7 @@ pub struct ConsumerApiDoc;
     info(
         title = "Forja Admin API",
         version = "1.0.5",
-        description = "Full administration API for managing Forja-powered sites. Includes all CRUD operations, audit logs, webhooks, AI, and system management. Requires Clerk session with system admin role.",
+        description = "Full administration API for managing Forja-powered sites. Includes all CRUD operations, audit logs, webhooks, AI, and system management. Requires Clerk session with system admin role.\n\nNaming conventions: all JSON response fields and query parameters use snake_case. Enum values use PascalCase. The only exception is the RFC 7807 Problem Details `type` field.",
         license(name = "AGPL-3.0-or-later", url = "https://www.gnu.org/licenses/agpl-3.0.html"),
         contact(name = "Forja Team", url = "https://github.com/dominikdorfstetter/forja")
     ),
