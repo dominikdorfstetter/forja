@@ -145,6 +145,7 @@ export default function BlogDocumentCard({ blogId, documents }: BlogDocumentCard
                         )}
                       </Box>
                     }
+                    primaryTypographyProps={{ component: 'div' }}
                     secondary={
                       doc.has_file ? (
                         <Button

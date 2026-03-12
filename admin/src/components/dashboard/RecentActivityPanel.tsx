@@ -103,7 +103,7 @@ export default function RecentActivityPanel({ blogs, pages, loading }: RecentAct
               <ListItemText
                 primary={item.label}
                 secondary={
-                  <Stack direction="row" spacing={1} alignItems="center" component="span">
+                  <Stack direction="row" spacing={1} alignItems="center">
                     <Chip
                       label={item.status}
                       size="small"
@@ -118,6 +118,7 @@ export default function RecentActivityPanel({ blogs, pages, loading }: RecentAct
                     </Typography>
                   </Stack>
                 }
+                secondaryTypographyProps={{ component: 'div' }}
               />
               <Box sx={{ ml: 1 }}>
                 <Chip
