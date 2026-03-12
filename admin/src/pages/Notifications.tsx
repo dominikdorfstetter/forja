@@ -55,7 +55,7 @@ export default function NotificationsPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ['notifications', selectedSiteId, page, rowsPerPage],
-    queryFn: () => apiService.getNotifications(selectedSiteId!, { page: page + 1, per_page: rowsPerPage }),
+    queryFn: () => apiService.getNotifications(selectedSiteId!, { page: page + 1, page_size: rowsPerPage }),
     enabled: !!selectedSiteId,
   });
 

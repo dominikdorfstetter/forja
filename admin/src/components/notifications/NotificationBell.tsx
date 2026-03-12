@@ -64,7 +64,7 @@ export default function NotificationBell() {
 
   const { data: notificationsData } = useQuery({
     queryKey: ['notifications', selectedSiteId],
-    queryFn: () => apiService.getNotifications(selectedSiteId!, { per_page: 20 }),
+    queryFn: () => apiService.getNotifications(selectedSiteId!, { page_size: 20 }),
     enabled: !!selectedSiteId && !!anchorEl,
   });
 

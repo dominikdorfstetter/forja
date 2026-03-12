@@ -94,7 +94,7 @@ export default function ActivityLogPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ['audit-logs', selectedSiteId, page, rowsPerPage],
-    queryFn: () => apiService.getAuditLogs(selectedSiteId, { page: page + 1, per_page: rowsPerPage }),
+    queryFn: () => apiService.getAuditLogs(selectedSiteId, { page: page + 1, page_size: rowsPerPage }),
     enabled: !!selectedSiteId,
   });
 

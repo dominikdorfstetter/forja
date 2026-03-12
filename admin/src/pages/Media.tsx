@@ -48,7 +48,7 @@ import MediaFilterChips from '@/components/media/MediaFilterChips';
 interface MediaPageState {
   assetsTab: number;
   page: number;
-  perPage: number;
+  pageSize: number;
   uploadOpen: boolean;
   deletingFile: MediaListItem | null;
   deletingFolderId: string | null;
@@ -79,7 +79,7 @@ type MediaPageAction =
 const initialState: MediaPageState = {
   assetsTab: 0,
   page: 1,
-  perPage: 25,
+  pageSize: 25,
   uploadOpen: false,
   deletingFile: null,
   deletingFolderId: null,
@@ -98,7 +98,7 @@ function mediaReducer(state: MediaPageState, action: MediaPageAction): MediaPage
     case 'SET_PAGE':
       return { ...state, page: action.payload };
     case 'SET_PER_PAGE':
-      return { ...state, perPage: action.payload, page: 1 };
+      return { ...state, pageSize: action.payload, page: 1 };
     case 'SET_UPLOAD_OPEN':
       return { ...state, uploadOpen: action.payload };
     case 'SET_DELETING_FILE':
@@ -164,13 +164,13 @@ export default function MediaPage() {
   }
 
   // Build query params for server-side filtering
-  const queryParams: Record<string, string | number> = { page: state.page, per_page: state.perPage };
+  const queryParams: Record<string, string | number> = { page: state.page, page_size: state.pageSize };
   if (state.debouncedSearch) queryParams.search = state.debouncedSearch;
   if (state.mimeCategory) queryParams.mime_category = state.mimeCategory;
   if (state.selectedFolderId) queryParams.folder_id = state.selectedFolderId;
 
   const { data: mediaData, isLoading, error } = useQuery({
-    queryKey: ['media', selectedSiteId, state.debouncedSearch, state.mimeCategory, state.selectedFolderId, state.page, state.perPage],
+    queryKey: ['media', selectedSiteId, state.debouncedSearch, state.mimeCategory, state.selectedFolderId, state.page, state.pageSize],
     queryFn: () => apiService.getMedia(selectedSiteId, queryParams),
     enabled: !!selectedSiteId,
   });

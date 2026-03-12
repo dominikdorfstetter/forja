@@ -27,7 +27,7 @@ export default function ContentTemplatesPage() {
   const { canWrite, isAdmin } = useAuth();
 
   const {
-    page, perPage, formOpen, editing, deleting,
+    page, pageSize, formOpen, editing, deleting,
     openCreate, closeForm, openEdit, closeEdit, openDelete, closeDelete,
     handlePageChange, handleRowsPerPageChange,
   } = useListPageState<ContentTemplate>();
@@ -42,8 +42,8 @@ export default function ContentTemplatesPage() {
   }, [openCreate]);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['content-templates', selectedSiteId, page, perPage],
-    queryFn: () => apiService.getContentTemplates(selectedSiteId, { page, per_page: perPage }),
+    queryKey: ['content-templates', selectedSiteId, page, pageSize],
+    queryFn: () => apiService.getContentTemplates(selectedSiteId, { page, page_size: pageSize }),
     enabled: !!selectedSiteId,
   });
   const templates = data?.data;
@@ -115,7 +115,7 @@ export default function ContentTemplatesPage() {
               meta={data?.meta}
               page={page}
               onPageChange={handlePageChange}
-              rowsPerPage={perPage}
+              rowsPerPage={pageSize}
               onRowsPerPageChange={handleRowsPerPageChange}
             />
           )}

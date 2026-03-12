@@ -3,13 +3,13 @@ import { useUserPreferences } from '@/store/UserPreferencesContext';
 
 interface UseListPageStateOptions {
   initialPage?: number;
-  initialPerPage?: number;
+  initialPageSize?: number;
 }
 
 export function useListPageState<T>(options?: UseListPageStateOptions) {
   const { preferences } = useUserPreferences();
   const [page, setPage] = useState(options?.initialPage ?? 1);
-  const [perPage, setPerPage] = useState(options?.initialPerPage ?? preferences.page_size);
+  const [pageSize, setPageSize] = useState(options?.initialPageSize ?? preferences.page_size);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<T | null>(null);
   const [deleting, setDeleting] = useState<T | null>(null);
@@ -24,7 +24,7 @@ export function useListPageState<T>(options?: UseListPageStateOptions) {
   const handlePageChange = useCallback((_: unknown, p: number) => setPage(p + 1), []);
   const handleRowsPerPageChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setPerPage(+e.target.value);
+      setPageSize(+e.target.value);
       setPage(1);
     },
     [],
@@ -33,8 +33,8 @@ export function useListPageState<T>(options?: UseListPageStateOptions) {
   return {
     page,
     setPage,
-    perPage,
-    setPerPage,
+    pageSize,
+    setPageSize,
     formOpen,
     setFormOpen,
     editing,

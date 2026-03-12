@@ -42,7 +42,7 @@ export default function MediaPickerDialog({
 
   const { data: mediaData, isLoading } = useQuery({
     queryKey: ['media-picker', siteId],
-    queryFn: () => apiService.getMedia(siteId, { mime_category: 'image', per_page: 50 }),
+    queryFn: () => apiService.getMedia(siteId, { mime_category: 'image', page_size: 50 }),
     enabled: open && !!siteId,
   });
 

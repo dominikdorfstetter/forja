@@ -31,11 +31,11 @@ interface WebhookDeliveryLogProps {
 export default function WebhookDeliveryLog({ open, webhookId, onClose }: WebhookDeliveryLogProps) {
   const { t } = useTranslation();
   const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(10);
+  const [pageSize, setPageSize] = useState(10);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['webhook-deliveries', webhookId, page, perPage],
-    queryFn: () => apiService.getWebhookDeliveries(webhookId!, { page, per_page: perPage }),
+    queryKey: ['webhook-deliveries', webhookId, page, pageSize],
+    queryFn: () => apiService.getWebhookDeliveries(webhookId!, { page, page_size: pageSize }),
     enabled: !!webhookId && open,
   });
 
@@ -101,7 +101,7 @@ export default function WebhookDeliveryLog({ open, webhookId, onClose }: Webhook
             page={data.meta.page - 1}
             onPageChange={(_, p) => setPage(() => p + 1)}
             rowsPerPage={data.meta.page_size}
-            onRowsPerPageChange={(e) => { setPerPage(() => +e.target.value); setPage(1); }}
+            onRowsPerPageChange={(e) => { setPageSize(() => +e.target.value); setPage(1); }}
             rowsPerPageOptions={[10, 25, 50]}
           />
         )}

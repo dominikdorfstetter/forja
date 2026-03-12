@@ -48,7 +48,7 @@ export default function BlogsPage() {
   const workflowEnabled = context.features.editorial_workflow;
 
   const {
-    page, setPage, perPage, formOpen, deleting: deletingBlog,
+    page, setPage, pageSize, formOpen, deleting: deletingBlog,
     openCreate, closeForm,
     openDelete: setDeletingBlog, closeDelete,
     handlePageChange, handleRowsPerPageChange,
@@ -93,10 +93,10 @@ export default function BlogsPage() {
   const isArchived = ui.viewTab === 'archived';
 
   const { data: blogData, isLoading, error } = useQuery({
-    queryKey: ['blogs', selectedSiteId, page, perPage, debouncedSearch, ui.statusFilter, ui.sortBy, ui.sortDir, ui.viewTab],
+    queryKey: ['blogs', selectedSiteId, page, pageSize, debouncedSearch, ui.statusFilter, ui.sortBy, ui.sortDir, ui.viewTab],
     queryFn: () => apiService.getBlogs(selectedSiteId, {
       page,
-      per_page: perPage,
+      page_size: pageSize,
       search: debouncedSearch || undefined,
       status: isArchived ? 'Archived' : (ui.statusFilter || undefined),
       sort_by: ui.sortBy,
@@ -115,14 +115,14 @@ export default function BlogsPage() {
 
   const { data: siteTemplatesData, isLoading: siteTemplatesLoading } = useQuery({
     queryKey: ['content-templates', selectedSiteId],
-    queryFn: () => apiService.getContentTemplates(selectedSiteId, { per_page: 100 }),
+    queryFn: () => apiService.getContentTemplates(selectedSiteId, { page_size: 100 }),
     enabled: !!selectedSiteId,
   });
 
   const blogs = blogData?.data ?? [];
   const blogIds = blogs.map((b) => b.id);
 
-  const bulk = useBulkSelection([page, perPage, blogData]);
+  const bulk = useBulkSelection([page, pageSize, blogData]);
 
   const handleSort = useCallback((column: string) => {
     if (ui.sortBy === column) {
@@ -265,7 +265,7 @@ export default function BlogsPage() {
               meta={blogData?.meta}
               page={page}
               onPageChange={handlePageChange}
-              rowsPerPage={perPage}
+              rowsPerPage={pageSize}
               onRowsPerPageChange={handleRowsPerPageChange}
               isRowSelected={(blog) => bulk.isSelected(blog.id)}
               size="medium"

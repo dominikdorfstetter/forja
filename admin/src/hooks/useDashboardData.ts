@@ -75,19 +75,19 @@ export function useDashboardData(): DashboardData {
 
   const { data: blogsData, isLoading: blogsLoading } = useQuery({
     queryKey: ['dashboard-blogs', selectedSiteId],
-    queryFn: () => apiService.getBlogs(selectedSiteId!, { page: 1, per_page: 200, exclude_status: 'Archived' }),
+    queryFn: () => apiService.getBlogs(selectedSiteId!, { page: 1, page_size: 200, exclude_status: 'Archived' }),
     enabled: hasSite,
   });
 
   const { data: pagesData, isLoading: pagesLoading } = useQuery({
     queryKey: ['dashboard-pages', selectedSiteId],
-    queryFn: () => apiService.getPages(selectedSiteId!, { page: 1, per_page: 200, exclude_status: 'Archived' }),
+    queryFn: () => apiService.getPages(selectedSiteId!, { page: 1, page_size: 200, exclude_status: 'Archived' }),
     enabled: hasSite,
   });
 
   const { data: mediaData, isLoading: mediaLoading } = useQuery({
     queryKey: ['media', selectedSiteId],
-    queryFn: () => apiService.getMedia(selectedSiteId!, { page: 1, per_page: 1 }),
+    queryFn: () => apiService.getMedia(selectedSiteId!, { page: 1, page_size: 1 }),
     enabled: hasSite,
   });
 

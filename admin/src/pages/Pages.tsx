@@ -45,7 +45,7 @@ export default function PagesPage() {
   const workflowEnabled = context.features.editorial_workflow;
 
   const {
-    page, setPage, perPage, formOpen, deleting: deletingPage,
+    page, setPage, pageSize, formOpen, deleting: deletingPage,
     openCreate, closeForm,
     openDelete: setDeletingPage, closeDelete,
     handlePageChange, handleRowsPerPageChange,
@@ -93,10 +93,10 @@ export default function PagesPage() {
   const isArchived = ui.viewTab === 'archived';
 
   const { data: pageData, isLoading, error } = useQuery({
-    queryKey: ['pages', selectedSiteId, page, perPage, debouncedSearch, ui.statusFilter, ui.typeFilter, ui.sortBy, ui.sortDir, ui.viewTab],
+    queryKey: ['pages', selectedSiteId, page, pageSize, debouncedSearch, ui.statusFilter, ui.typeFilter, ui.sortBy, ui.sortDir, ui.viewTab],
     queryFn: () => apiService.getPages(selectedSiteId, {
       page,
-      per_page: perPage,
+      page_size: pageSize,
       search: debouncedSearch || undefined,
       status: isArchived ? 'Archived' : (ui.statusFilter || undefined),
       page_type: ui.typeFilter || undefined,
@@ -111,7 +111,7 @@ export default function PagesPage() {
   const pages = pageData?.data ?? [];
   const pageIds = pages.map((p) => p.id);
 
-  const bulk = useBulkSelection([page, perPage, pageData]);
+  const bulk = useBulkSelection([page, pageSize, pageData]);
 
   const handleSort = useCallback((column: string) => {
     if (ui.sortBy === column) {
@@ -251,7 +251,7 @@ export default function PagesPage() {
               meta={pageData?.meta}
               page={page}
               onPageChange={handlePageChange}
-              rowsPerPage={perPage}
+              rowsPerPage={pageSize}
               onRowsPerPageChange={handleRowsPerPageChange}
               isRowSelected={(pg) => bulk.isSelected(pg.id)}
               size="medium"

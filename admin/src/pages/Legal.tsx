@@ -29,7 +29,7 @@ export default function LegalPage({ embedded }: { embedded?: boolean }) {
   const { canWrite, isAdmin } = useAuth();
 
   const {
-    page, perPage, formOpen, editing, deleting,
+    page, pageSize, formOpen, editing, deleting,
     openCreate, closeForm, openEdit, closeEdit, openDelete, closeDelete,
     handlePageChange, handleRowsPerPageChange,
   } = useListPageState<LegalDocumentResponse>();
@@ -44,8 +44,8 @@ export default function LegalPage({ embedded }: { embedded?: boolean }) {
   }, [openCreate]);
 
   const { data: documentsData, isLoading, error } = useQuery({
-    queryKey: ['legal', selectedSiteId, page, perPage],
-    queryFn: () => apiService.getLegalDocuments(selectedSiteId, { page, per_page: perPage }),
+    queryKey: ['legal', selectedSiteId, page, pageSize],
+    queryFn: () => apiService.getLegalDocuments(selectedSiteId, { page, page_size: pageSize }),
     enabled: !!selectedSiteId,
   });
   const documents = documentsData?.data;
@@ -122,7 +122,7 @@ export default function LegalPage({ embedded }: { embedded?: boolean }) {
           meta={documentsData?.meta}
           page={page}
           onPageChange={handlePageChange}
-          rowsPerPage={perPage}
+          rowsPerPage={pageSize}
           onRowsPerPageChange={handleRowsPerPageChange}
         />
       )}

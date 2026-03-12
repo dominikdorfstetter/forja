@@ -62,12 +62,12 @@ function DocumentsPage({ embedded = false, ref }: { embedded?: boolean; ref?: Re
     data: documentsData,
     isLoading: documentsLoading,
   } = useQuery({
-    queryKey: ['documents', selectedSiteId, ui.selectedFolderId, ui.page, ui.perPage],
+    queryKey: ['documents', selectedSiteId, ui.selectedFolderId, ui.page, ui.pageSize],
     queryFn: () =>
       apiService.getDocuments(selectedSiteId, {
         folder_id: ui.selectedFolderId ?? undefined,
         page: ui.page,
-        per_page: ui.perPage,
+        page_size: ui.pageSize,
       }),
     enabled: !!selectedSiteId,
   });
@@ -262,7 +262,7 @@ function DocumentsPage({ embedded = false, ref }: { embedded?: boolean; ref?: Re
               onOpenCreate={handleOpenCreate}
               meta={documentsData?.meta}
               onPageChange={(p) => dispatch({ type: 'setPage', value: p })}
-              onPerPageChange={(pp) => dispatch({ type: 'setPerPage', value: pp })}
+              onPageSizeChange={(pp) => dispatch({ type: 'setPageSize', value: pp })}
               detailError={!!documentDetailQueries.error}
               activeDoc={activeDoc}
               t={t}

@@ -40,13 +40,13 @@ export default function MyDraftsPage() {
 
   const { data: blogsData, isLoading: blogsLoading } = useQuery({
     queryKey: ['blogs', selectedSiteId, 'drafts'],
-    queryFn: () => apiService.getBlogs(selectedSiteId, { page: 1, per_page: 100 }),
+    queryFn: () => apiService.getBlogs(selectedSiteId, { page: 1, page_size: 100 }),
     enabled: !!selectedSiteId,
   });
 
   const { data: pagesData, isLoading: pagesLoading } = useQuery({
     queryKey: ['pages', selectedSiteId, 'drafts'],
-    queryFn: () => apiService.getPages(selectedSiteId, { page: 1, per_page: 100 }),
+    queryFn: () => apiService.getPages(selectedSiteId, { page: 1, page_size: 100 }),
     enabled: !!selectedSiteId,
   });
 

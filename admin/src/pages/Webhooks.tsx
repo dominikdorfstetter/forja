@@ -29,7 +29,7 @@ export default function WebhooksPage() {
   const { showError, showSuccess } = useErrorSnackbar();
 
   const {
-    page, perPage, formOpen, editing, deleting,
+    page, pageSize, formOpen, editing, deleting,
     openCreate, closeForm, openEdit, closeEdit, openDelete, closeDelete,
     handlePageChange, handleRowsPerPageChange,
   } = useListPageState<Webhook>();
@@ -47,8 +47,8 @@ export default function WebhooksPage() {
   }, [openCreate]);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['webhooks', selectedSiteId, page, perPage],
-    queryFn: () => apiService.getWebhooks(selectedSiteId, { page, per_page: perPage }),
+    queryKey: ['webhooks', selectedSiteId, page, pageSize],
+    queryFn: () => apiService.getWebhooks(selectedSiteId, { page, page_size: pageSize }),
     enabled: !!selectedSiteId,
   });
   const webhooks = data?.data;
@@ -138,7 +138,7 @@ export default function WebhooksPage() {
               meta={data?.meta}
               page={page}
               onPageChange={handlePageChange}
-              rowsPerPage={perPage}
+              rowsPerPage={pageSize}
               onRowsPerPageChange={handleRowsPerPageChange}
             />
           )}

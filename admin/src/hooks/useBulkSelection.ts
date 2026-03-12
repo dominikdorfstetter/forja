@@ -13,7 +13,7 @@ interface UseBulkSelectionReturn {
 export function useBulkSelection(deps: unknown[] = []): UseBulkSelectionReturn {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
-  // Clear selection when dependencies change (e.g. page, perPage, data)
+  // Clear selection when dependencies change (e.g. page, pageSize, data)
   useEffect(() => {
     setSelectedIds(new Set());
     // eslint-disable-next-line react-hooks/exhaustive-deps

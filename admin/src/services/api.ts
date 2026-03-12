@@ -310,7 +310,7 @@ class ApiService {
     permission?: string;
     site_id?: string;
     page?: number;
-    per_page?: number;
+    page_size?: number;
   }): Promise<Paginated<ApiKeyListItem>> {
     return apiRequest<Paginated<ApiKeyListItem>>('GET', '/api-keys', undefined, { params });
   }
@@ -376,7 +376,7 @@ class ApiService {
   // Blogs (paginated)
   async getBlogs(siteId: string, params?: {
     page?: number;
-    per_page?: number;
+    page_size?: number;
     search?: string;
     status?: string;
     sort_by?: string;
@@ -389,7 +389,7 @@ class ApiService {
   // Media (paginated, with optional search & filters)
   async getMedia(siteId: string, params?: {
     page?: number;
-    per_page?: number;
+    page_size?: number;
     search?: string;
     mime_category?: string;
     folder_id?: string;
@@ -423,11 +423,11 @@ class ApiService {
   }
 
   // Taxonomy
-  async getTags(siteId: string, params?: { page?: number; per_page?: number }): Promise<Paginated<Tag>> {
+  async getTags(siteId: string, params?: { page?: number; page_size?: number }): Promise<Paginated<Tag>> {
     return apiRequest<Paginated<Tag>>('GET', `/sites/${siteId}/tags`, undefined, { params });
   }
 
-  async getCategories(siteId: string, params?: { page?: number; per_page?: number }): Promise<Paginated<Category>> {
+  async getCategories(siteId: string, params?: { page?: number; page_size?: number }): Promise<Paginated<Category>> {
     return apiRequest<Paginated<Category>>('GET', `/sites/${siteId}/categories`, undefined, { params });
   }
 
@@ -627,7 +627,7 @@ class ApiService {
   // Pages
   async getPages(siteId: string, params?: {
     page?: number;
-    per_page?: number;
+    page_size?: number;
     search?: string;
     status?: string;
     page_type?: string;
@@ -717,7 +717,7 @@ class ApiService {
   }
 
   // Legal
-  async getLegalDocuments(siteId: string, params?: { page?: number; per_page?: number }): Promise<Paginated<LegalDocumentResponse>> {
+  async getLegalDocuments(siteId: string, params?: { page?: number; page_size?: number }): Promise<Paginated<LegalDocumentResponse>> {
     return apiRequest<Paginated<LegalDocumentResponse>>('GET', `/sites/${siteId}/legal`, undefined, { params });
   }
 
@@ -766,7 +766,7 @@ class ApiService {
   }
 
   // Skills
-  async getSkills(siteId: string, params?: { page?: number; per_page?: number }): Promise<Paginated<SkillResponse>> {
+  async getSkills(siteId: string, params?: { page?: number; page_size?: number }): Promise<Paginated<SkillResponse>> {
     return apiRequest<Paginated<SkillResponse>>('GET', `/sites/${siteId}/skills`, undefined, { params });
   }
 
@@ -783,7 +783,7 @@ class ApiService {
   }
 
   // CV Entries
-  async getCvEntries(siteId: string, params?: { entry_type?: string; page?: number; per_page?: number }): Promise<Paginated<CvEntryResponse>> {
+  async getCvEntries(siteId: string, params?: { entry_type?: string; page?: number; page_size?: number }): Promise<Paginated<CvEntryResponse>> {
     return apiRequest<Paginated<CvEntryResponse>>('GET', `/sites/${siteId}/cv`, undefined, { params });
   }
 
@@ -817,7 +817,7 @@ class ApiService {
   }
 
   // Documents
-  async getDocuments(siteId: string, params?: { folder_id?: string; page?: number; per_page?: number }): Promise<Paginated<DocumentListItem>> {
+  async getDocuments(siteId: string, params?: { folder_id?: string; page?: number; page_size?: number }): Promise<Paginated<DocumentListItem>> {
     return apiRequest<Paginated<DocumentListItem>>('GET', `/sites/${siteId}/documents`, undefined, { params });
   }
 
@@ -973,7 +973,7 @@ class ApiService {
   }
 
   // Audit Logs
-  async getAuditLogs(siteId: string, params?: { page?: number; per_page?: number }): Promise<Paginated<AuditLogEntry>> {
+  async getAuditLogs(siteId: string, params?: { page?: number; page_size?: number }): Promise<Paginated<AuditLogEntry>> {
     return apiRequest<Paginated<AuditLogEntry>>('GET', `/sites/${siteId}/audit`, undefined, { params });
   }
 
@@ -991,7 +991,7 @@ class ApiService {
 
   // ===== Webhooks =====
 
-  async getWebhooks(siteId: string, params?: { page?: number; per_page?: number }): Promise<Paginated<Webhook>> {
+  async getWebhooks(siteId: string, params?: { page?: number; page_size?: number }): Promise<Paginated<Webhook>> {
     return apiRequest<Paginated<Webhook>>('GET', `/sites/${siteId}/webhooks`, undefined, { params });
   }
 
@@ -1015,13 +1015,13 @@ class ApiService {
     return apiRequest<WebhookDelivery>('POST', `/webhooks/${id}/test`);
   }
 
-  async getWebhookDeliveries(id: string, params?: { page?: number; per_page?: number }): Promise<Paginated<WebhookDelivery>> {
+  async getWebhookDeliveries(id: string, params?: { page?: number; page_size?: number }): Promise<Paginated<WebhookDelivery>> {
     return apiRequest<Paginated<WebhookDelivery>>('GET', `/webhooks/${id}/deliveries`, undefined, { params });
   }
 
   // ===== Redirects =====
 
-  async getRedirects(siteId: string, params?: { page?: number; per_page?: number }): Promise<Paginated<Redirect>> {
+  async getRedirects(siteId: string, params?: { page?: number; page_size?: number }): Promise<Paginated<Redirect>> {
     return apiRequest<Paginated<Redirect>>('GET', `/sites/${siteId}/redirects`, undefined, { params });
   }
 
@@ -1039,7 +1039,7 @@ class ApiService {
 
   // ===== Content Templates =====
 
-  async getContentTemplates(siteId: string, params?: { page?: number; per_page?: number; search?: string }): Promise<Paginated<ContentTemplate>> {
+  async getContentTemplates(siteId: string, params?: { page?: number; page_size?: number; search?: string }): Promise<Paginated<ContentTemplate>> {
     return apiRequest<Paginated<ContentTemplate>>('GET', `/sites/${siteId}/content-templates`, undefined, { params });
   }
 
@@ -1079,7 +1079,7 @@ class ApiService {
 
   // ===== Notifications =====
 
-  async getNotifications(siteId: string, params?: { page?: number; per_page?: number }): Promise<Paginated<NotificationResponse>> {
+  async getNotifications(siteId: string, params?: { page?: number; page_size?: number }): Promise<Paginated<NotificationResponse>> {
     return apiRequest<Paginated<NotificationResponse>>('GET', `/sites/${siteId}/notifications`, undefined, { params });
   }
 
