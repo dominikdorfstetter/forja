@@ -25,7 +25,9 @@
       "preview": "Pré-visualização",
       "viewDetails": "Ver detalhes",
       "clickToCopy": "Clique para copiar",
-      "copied": "Copiado!"
+      "copied": "Copiado!",
+      "next": "Seguinte",
+      "copyLabel": "Copiar {{value}} para a área de transferência"
     },
     "status": {
       "active": "Ativo",
@@ -120,11 +122,14 @@
       "legal": "Legal",
       "cv": "CV",
       "members": "Membros",
+      "invite": "Convidar",
+      "reviews": "Revisões",
       "apiKeys": "Chaves API",
       "contentTemplates": "Modelos",
       "redirects": "Redirecionamentos",
       "webhooks": "Webhooks",
       "settings": "Definições",
+      "aiSettings": "Definições de IA",
       "sites": "Sites",
       "locales": "Idiomas",
       "apiDocs": "Documentação API",
@@ -136,7 +141,8 @@
       "account": "Conta",
       "profile": "Perfil",
       "theme": "Tema",
-      "language": "Idioma"
+      "language": "Idioma",
+      "siteSelector": "Selecionar site"
     },
     "accountMenu": {
       "system": "Sistema",
@@ -236,7 +242,10 @@
       "status": "Estado",
       "featured": "Destaque",
       "published": "Publicado",
-      "actions": "Ações"
+      "actions": "Ações",
+      "selectAll": "Selecionar todos os blogs",
+      "selectRow": "Selecionar blog {{slug}}",
+      "caption": "Lista de publicações do blog"
     },
     "viewDetail": "Ver Detalhes",
     "empty": {
@@ -433,7 +442,10 @@
       "status": "Estado",
       "inNav": "Na Nav.",
       "created": "Criado",
-      "actions": "Ações"
+      "actions": "Ações",
+      "selectAll": "Selecionar todas as páginas",
+      "selectRow": "Selecionar página {{route}}",
+      "caption": "Lista de páginas"
     },
     "viewDetails": "Ver Detalhes",
     "empty": {
@@ -526,11 +538,13 @@
       "added": "Secção adicionada",
       "loadingSections": "A carregar secções...",
       "deleteTitle": "Eliminar secção",
-      "deleteMessage": "Eliminar esta secção {{type}}? Esta ação não pode ser desfeita."
+      "deleteMessage": "Eliminar esta secção {{type}}? Esta ação não pode ser desfeita.",
+      "untitled": "Sem título"
     },
     "table": {
       "type": "Tipo",
       "order": "Ordem",
+      "content": "Conteúdo",
       "localizations": "Localizações",
       "coverImage": "Imagem de capa",
       "ctaRoute": "Rota CTA",
@@ -910,6 +924,13 @@
       "reviewer": "Revisor",
       "viewer": "Leitor"
     },
+    "roleDescriptions": {
+      "admin": "Acesso completo à gestão do site",
+      "editor": "Pode gerir todo o conteúdo e autores",
+      "author": "Pode escrever e editar o seu próprio conteúdo",
+      "reviewer": "Pode rever conteúdo submetido para aprovação",
+      "viewer": "Pode visualizar conteúdo (apenas leitura)"
+    },
     "empty": {
       "noSite": "Selecione um site na barra de ferramentas para gerir os seus membros",
       "title": "Nenhum membro da equipe",
@@ -1191,6 +1212,38 @@
       "view": "Ver",
       "edit": "Editar",
       "delete": "Eliminar"
+    },
+    "wizard": {
+      "title": "Criar novo site",
+      "steps": {
+        "basics": "Básicos",
+        "modules": "Módulos",
+        "workflow": "Fluxo de trabalho",
+        "languages": "Idiomas"
+      },
+      "modulesDescription": "Escolha quais módulos de conteúdo ativar. Pode alterá-los mais tarde nas Definições.",
+      "modules": {
+        "blog": "Blog",
+        "blogDesc": "Publique artigos, tutoriais e notícias",
+        "pages": "Páginas",
+        "pagesDesc": "Crie páginas estáticas com secções e layouts",
+        "cv": "CV / Currículo",
+        "cvDesc": "Gira experiência profissional, formação e competências",
+        "legal": "Legal",
+        "legalDesc": "Política de privacidade, termos de serviço e documentos legais",
+        "documents": "Documentos",
+        "documentsDesc": "Carregue e gira ficheiros transferíveis",
+        "ai": "Assistente IA",
+        "aiDesc": "Geração SEO, excertos automáticos e sugestões de tradução"
+      },
+      "workflowDescription": "Como vai gerir o conteúdo neste site?",
+      "workflow": {
+        "solo": "Individual",
+        "soloDesc": "É o único autor. O conteúdo é publicado quando clica em Publicar.",
+        "team": "Equipa",
+        "teamDesc": "Vários autores colaboram. Ativa o fluxo de revisão editorial."
+      },
+      "languagesDescription": "Selecione os idiomas que o seu site irá suportar. Pode adicionar mais posteriormente."
     }
   },
   "siteDetail": {
@@ -1229,7 +1282,25 @@
       "systemInfo": "Informações do Sistema",
       "preferences": "Preferências",
       "legal": "Jurídico",
-      "apiKeys": "Chaves API"
+      "apiKeys": "Chaves API",
+      "modules": "Módulos",
+      "ai": "Assistente IA"
+    },
+    "modules": {
+      "title": "Módulos de conteúdo",
+      "description": "Ative ou desative módulos de conteúdo para este site. Os módulos desativados são ocultados da barra lateral e os seus endpoints API devolvem 403.",
+      "blog": "Blog",
+      "blogDesc": "Publique artigos, tutoriais e notícias",
+      "pages": "Páginas",
+      "pagesDesc": "Crie páginas estáticas com secções e layouts",
+      "cv": "CV / Currículo",
+      "cvDesc": "Gira experiência profissional, formação e competências",
+      "legal": "Legal",
+      "legalDesc": "Política de privacidade, termos de serviço e documentos legais",
+      "documents": "Documentos",
+      "documentsDesc": "Carregue e gira ficheiros transferíveis",
+      "ai": "Assistente IA",
+      "aiDesc": "Geração SEO, excertos automáticos e sugestões de tradução"
     },
     "selectSiteAlert": "Selecione um site no cabeçalho para gerir as suas definições.",
     "loadingSiteSettings": "A carregar definições do site...",
@@ -1314,6 +1385,11 @@
         "debounceLabel": "Atraso de salvamento",
         "debounceDescription": "Tempo de espera após a última edição antes de salvar (1–60)",
         "seconds": "segundos"
+      },
+      "tableDisplay": {
+        "title": "Visualização de tabela",
+        "pageSizeLabel": "Linhas por página",
+        "pageSizeDescription": "Número predefinido de linhas nas tabelas de administração"
       }
     }
   },
@@ -1414,6 +1490,11 @@
     "description": "Sua primeira publicação foi publicada.",
     "viewPost": "Ver sua publicação",
     "writeAnother": "Escrever outra"
+  },
+  "teamWorkflowPrompt": {
+    "message": "O seu site tem agora vários colaboradores. Ative a revisão editorial para que o conteúdo seja revisto antes da publicação.",
+    "enableButton": "Ativar nas Definições",
+    "dismissButton": "Ignorar"
   },
   "activity": {
     "title": "Atividade",
@@ -1722,7 +1803,8 @@
       "localizedContent": "Conteúdo localizado",
       "sectionConfiguration": "Configuração da seção",
       "noActiveLocales": "Nenhum idioma ativo configurado",
-      "localeExists": "existe"
+      "localeExists": "existe",
+      "sectionSaved": "Secção guardada"
     },
     "undo": "Desfazer",
     "redo": "Refazer",
@@ -1742,7 +1824,8 @@
     },
     "confirmDialog": {
       "defaultTitle": "Confirmar",
-      "defaultCancel": "Cancelar"
+      "defaultCancel": "Cancelar",
+      "confirmationInput": "Texto de confirmação"
     },
     "loadingState": {
       "defaultLabel": "A carregar..."
@@ -1756,7 +1839,9 @@
       "rename": "Renomear",
       "delete": "Eliminar",
       "createFolder": "Criar pasta",
-      "folderName": "Nome da pasta"
+      "folderName": "Nome da pasta",
+      "collapse": "Recolher {{name}}",
+      "expand": "Expandir {{name}}"
     },
     "pageHeader": {},
     "statusChip": {},
@@ -1920,6 +2005,7 @@
   "notifications": {
     "title": "Notificações",
     "bell": "Notificações",
+    "bellWithCount": "Notificações, {{count}} não lidas",
     "empty": "Nenhuma notificação ainda",
     "markAllRead": "Marcar tudo como lido",
     "viewAll": "Ver todas",
@@ -1942,6 +2028,7 @@
     }
   },
   "bulk": {
+    "toolbar": "Barra de ações em massa",
     "selectedCount": "{{count}} selecionados",
     "publish": "Publicar",
     "unpublish": "Despublicar",
@@ -2074,6 +2161,13 @@
     "placeholder": "Digite / para inserir blocos...",
     "sectionPlaceholder": "Conteúdo da seção...",
     "toolbar": {
+      "label": "Formatação de texto",
+      "linkDialog": {
+        "title": "Inserir ligação",
+        "urlLabel": "URL",
+        "insert": "Inserir",
+        "remove": "Remover ligação"
+      },
       "bold": "Negrito (Ctrl+B)",
       "italic": "Itálico (Ctrl+I)",
       "underline": "Sublinhado (Ctrl+U)",
