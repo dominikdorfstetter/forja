@@ -27,17 +27,17 @@ use crate::AppState;
     operation_id = "list_tags",
     description = "List all tags for a site",
     params(
-        ("site_id" = Uuid, Path, description = "Site UUID"),
-        ("page" = Option<i64>, Query, description = "Page number (default: 1)"),
-        ("page_size" = Option<i64>, Query, description = "Items per page (default: 10)"),
-        ("search" = Option<String>, Query, description = "Search by slug (ILIKE)"),
-        ("sort_by" = Option<String>, Query, description = "Sort field: slug (default), created_at"),
-        ("sort_dir" = Option<String>, Query, description = "Sort direction: asc, desc (default)"),
+        ("site_id" = Uuid, Path, description = "The UUID of the site"),
+        ("page" = Option<i64>, Query, description = "Page number, 1-indexed (default: 1)"),
+        ("page_size" = Option<i64>, Query, description = "Items per page, 1–100 (default: 10)"),
+        ("search" = Option<String>, Query, description = "Filter tags by slug (case-insensitive partial match)"),
+        ("sort_by" = Option<String>, Query, description = "Sort column: slug (default), created_at"),
+        ("sort_dir" = Option<String>, Query, description = "Sort direction: asc or desc (default: asc)"),
     ),
     responses(
         (status = 200, description = "List of tags", body = PaginatedTags),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 403, description = "Forbidden", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 403, description = "Insufficient permissions for this site", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -70,10 +70,10 @@ pub async fn list_tags(
     tag = "Taxonomy",
     operation_id = "get_tag",
     description = "Get a tag by ID",
-    params(("id" = Uuid, Path, description = "Tag UUID")),
+    params(("id" = Uuid, Path, description = "The UUID of the tag")),
     responses(
         (status = 200, description = "Tag details", body = TagResponse),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
         (status = 404, description = "Tag not found", body = ProblemDetails)
     ),
     security(("api_key" = []))
@@ -93,10 +93,10 @@ pub async fn get_tag(
     tag = "Taxonomy",
     operation_id = "get_tag_by_slug",
     description = "Get a tag by slug",
-    params(("slug" = String, Path, description = "Tag slug")),
+    params(("slug" = String, Path, description = "URL-friendly identifier (lowercase, hyphens only)")),
     responses(
         (status = 200, description = "Tag details", body = TagResponse),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
         (status = 404, description = "Tag not found", body = ProblemDetails)
     ),
     security(("api_key" = []))
@@ -116,10 +116,10 @@ pub async fn get_tag_by_slug(
     tag = "Taxonomy",
     operation_id = "get_content_tags",
     description = "Get tags assigned to content",
-    params(("content_id" = Uuid, Path, description = "Content UUID")),
+    params(("content_id" = Uuid, Path, description = "The UUID of the content item")),
     responses(
         (status = 200, description = "Content tags", body = Vec<TagResponse>),
-        (status = 401, description = "Unauthorized", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -140,17 +140,17 @@ pub async fn get_content_tags(
     operation_id = "list_categories",
     description = "List root categories for a site",
     params(
-        ("site_id" = Uuid, Path, description = "Site UUID"),
-        ("page" = Option<i64>, Query, description = "Page number (default: 1)"),
-        ("page_size" = Option<i64>, Query, description = "Items per page (default: 10)"),
-        ("search" = Option<String>, Query, description = "Search by slug (ILIKE)"),
-        ("sort_by" = Option<String>, Query, description = "Sort field: slug (default), created_at"),
-        ("sort_dir" = Option<String>, Query, description = "Sort direction: asc, desc (default)"),
+        ("site_id" = Uuid, Path, description = "The UUID of the site"),
+        ("page" = Option<i64>, Query, description = "Page number, 1-indexed (default: 1)"),
+        ("page_size" = Option<i64>, Query, description = "Items per page, 1–100 (default: 10)"),
+        ("search" = Option<String>, Query, description = "Filter categories by slug (case-insensitive partial match)"),
+        ("sort_by" = Option<String>, Query, description = "Sort column: slug (default), created_at"),
+        ("sort_dir" = Option<String>, Query, description = "Sort direction: asc or desc (default: asc)"),
     ),
     responses(
         (status = 200, description = "Root categories", body = PaginatedCategories),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 403, description = "Forbidden", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 403, description = "Insufficient permissions for this site", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -184,10 +184,10 @@ pub async fn list_categories(
     tag = "Taxonomy",
     operation_id = "get_category",
     description = "Get a category by ID",
-    params(("id" = Uuid, Path, description = "Category UUID")),
+    params(("id" = Uuid, Path, description = "The UUID of the category")),
     responses(
         (status = 200, description = "Category details", body = CategoryResponse),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
         (status = 404, description = "Category not found", body = ProblemDetails)
     ),
     security(("api_key" = []))
@@ -207,10 +207,10 @@ pub async fn get_category(
     tag = "Taxonomy",
     operation_id = "get_category_children",
     description = "Get children of a category",
-    params(("parent_id" = Uuid, Path, description = "Parent category UUID")),
+    params(("parent_id" = Uuid, Path, description = "The UUID of the parent category")),
     responses(
         (status = 200, description = "Child categories", body = Vec<CategoryResponse>),
-        (status = 401, description = "Unauthorized", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -231,10 +231,10 @@ pub async fn get_category_children(
     tag = "Taxonomy",
     operation_id = "get_content_categories",
     description = "Get categories assigned to content",
-    params(("content_id" = Uuid, Path, description = "Content UUID")),
+    params(("content_id" = Uuid, Path, description = "The UUID of the content item")),
     responses(
         (status = 200, description = "Content categories", body = Vec<CategoryResponse>),
-        (status = 401, description = "Unauthorized", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -572,11 +572,11 @@ pub async fn remove_category_from_content(
     tag = "Taxonomy",
     operation_id = "get_categories_with_blog_counts",
     description = "Get categories with blog counts for a site",
-    params(("site_id" = Uuid, Path, description = "Site UUID")),
+    params(("site_id" = Uuid, Path, description = "The UUID of the site")),
     responses(
         (status = 200, description = "Categories with counts", body = Vec<CategoryWithCountResponse>),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 403, description = "Forbidden", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 403, description = "Insufficient permissions for this site", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]

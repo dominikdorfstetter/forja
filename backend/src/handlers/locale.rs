@@ -18,10 +18,11 @@ use crate::AppState;
     operation_id = "list_locales",
     description = "List all locales. Pass include_inactive=true to include inactive locales (admin use).",
     params(
-        ("include_inactive" = Option<bool>, Query, description = "Include inactive locales (default: false)")
+        ("include_inactive" = Option<bool>, Query, description = "Include inactive locales in the response (default: false)")
     ),
     responses(
-        (status = 200, description = "List of locales", body = Vec<LocaleResponse>)
+        (status = 200, description = "List of locales", body = Vec<LocaleResponse>),
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -44,9 +45,10 @@ pub async fn list_locales(
     tag = "Locales",
     operation_id = "get_locale",
     description = "Get a locale by ID",
-    params(("id" = Uuid, Path, description = "Locale UUID")),
+    params(("id" = Uuid, Path, description = "The UUID of the locale")),
     responses(
         (status = 200, description = "Locale details", body = LocaleResponse),
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
         (status = 404, description = "Locale not found", body = ProblemDetails)
     ),
     security(("api_key" = []))
@@ -65,9 +67,10 @@ pub async fn get_locale(
     tag = "Locales",
     operation_id = "get_locale_by_code",
     description = "Get a locale by its language code",
-    params(("code" = String, Path, description = "Locale code (e.g., 'en', 'de')")),
+    params(("code" = String, Path, description = "ISO 639-1 language code (e.g. en, de, fr)")),
     responses(
         (status = 200, description = "Locale details", body = LocaleResponse),
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
         (status = 404, description = "Locale not found", body = ProblemDetails)
     ),
     security(("api_key" = []))

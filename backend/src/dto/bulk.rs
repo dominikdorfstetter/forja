@@ -24,6 +24,7 @@ pub struct BulkContentRequest {
         max = 100,
         message = "ids must contain between 1 and 100 items"
     ))]
+    #[schema(example = json!(["550e8400-e29b-41d4-a716-446655440000", "660e8400-e29b-41d4-a716-446655440000"]))]
     pub ids: Vec<Uuid>,
 
     /// The action to perform
@@ -37,9 +38,12 @@ pub struct BulkContentRequest {
 #[derive(Debug, Clone, Serialize, ToSchema)]
 #[schema(description = "Result for a single item in a bulk operation")]
 pub struct BulkItemResult {
+    #[schema(example = "550e8400-e29b-41d4-a716-446655440000")]
     pub id: Uuid,
+    #[schema(example = true)]
     pub success: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[schema(example = "Content not found")]
     pub error: Option<String>,
 }
 
@@ -47,8 +51,11 @@ pub struct BulkItemResult {
 #[derive(Debug, Clone, Serialize, ToSchema)]
 #[schema(description = "Bulk operation response with per-item results")]
 pub struct BulkContentResponse {
+    #[schema(example = 10)]
     pub total: usize,
+    #[schema(example = 8)]
     pub succeeded: usize,
+    #[schema(example = 2)]
     pub failed: usize,
     pub results: Vec<BulkItemResult>,
 }

@@ -34,8 +34,10 @@ pub struct CreateBlogRequest {
     ))]
     pub author: String,
 
+    #[schema(example = "2024-06-15")]
     pub published_date: NaiveDate,
 
+    #[schema(example = 8)]
     #[validate(range(
         min = 0,
         max = 999,
@@ -43,23 +45,30 @@ pub struct CreateBlogRequest {
     ))]
     pub reading_time_minutes: Option<i16>,
 
+    #[schema(example = "770e8400-e29b-41d4-a716-446655440000")]
     pub cover_image_id: Option<Uuid>,
 
+    #[schema(example = "880e8400-e29b-41d4-a716-446655440000")]
     pub header_image_id: Option<Uuid>,
 
+    #[schema(example = false)]
     #[serde(default)]
     pub is_featured: bool,
 
+    #[schema(example = true)]
     #[serde(default = "default_true")]
     pub allow_comments: bool,
 
     #[serde(default)]
     pub status: ContentStatus,
 
+    #[schema(example = "2024-06-15T08:00:00Z")]
     pub publish_start: Option<DateTime<Utc>>,
+    #[schema(example = "2024-12-31T23:59:59Z")]
     pub publish_end: Option<DateTime<Utc>>,
 
     /// Site IDs to associate this blog with
+    #[schema(example = json!(["660e8400-e29b-41d4-a716-446655440000"]))]
     #[validate(length(min = 1, message = "At least one site ID is required"))]
     pub site_ids: Vec<Uuid>,
 }
@@ -89,8 +98,10 @@ pub struct UpdateBlogRequest {
     ))]
     pub author: Option<String>,
 
+    #[schema(example = "2024-07-01")]
     pub published_date: Option<NaiveDate>,
 
+    #[schema(example = 12)]
     #[validate(range(
         min = 0,
         max = 999,
@@ -98,17 +109,23 @@ pub struct UpdateBlogRequest {
     ))]
     pub reading_time_minutes: Option<i16>,
 
+    #[schema(example = "770e8400-e29b-41d4-a716-446655440000")]
     pub cover_image_id: Option<Uuid>,
 
+    #[schema(example = "880e8400-e29b-41d4-a716-446655440000")]
     pub header_image_id: Option<Uuid>,
 
+    #[schema(example = true)]
     pub is_featured: Option<bool>,
 
+    #[schema(example = true)]
     pub allow_comments: Option<bool>,
 
     pub status: Option<ContentStatus>,
 
+    #[schema(example = "2024-07-01T08:00:00Z")]
     pub publish_start: Option<DateTime<Utc>>,
+    #[schema(example = "2024-12-31T23:59:59Z")]
     pub publish_end: Option<DateTime<Utc>>,
 }
 
@@ -122,16 +139,26 @@ pub struct BlogListItem {
     pub slug: Option<String>,
     #[schema(example = "Jane Doe")]
     pub author: String,
+    #[schema(example = "2024-06-15")]
     pub published_date: NaiveDate,
+    #[schema(example = 8)]
     pub reading_time_minutes: Option<i16>,
+    #[schema(example = "770e8400-e29b-41d4-a716-446655440000")]
     pub cover_image_id: Option<Uuid>,
+    #[schema(example = "880e8400-e29b-41d4-a716-446655440000")]
     pub header_image_id: Option<Uuid>,
+    #[schema(example = false)]
     pub is_featured: bool,
+    #[schema(example = false)]
     pub is_sample: bool,
     pub status: ContentStatus,
+    #[schema(example = "2024-06-15T08:00:00Z")]
     pub publish_start: Option<DateTime<Utc>>,
+    #[schema(example = "2024-12-31T23:59:59Z")]
     pub publish_end: Option<DateTime<Utc>>,
+    #[schema(example = "2024-01-15T10:30:00Z")]
     pub created_at: DateTime<Utc>,
+    #[schema(example = "2024-06-01T08:00:00Z")]
     pub updated_at: DateTime<Utc>,
 }
 
@@ -168,18 +195,30 @@ pub struct BlogResponse {
     pub slug: Option<String>,
     #[schema(example = "Jane Doe")]
     pub author: String,
+    #[schema(example = "2024-06-15")]
     pub published_date: NaiveDate,
+    #[schema(example = 8)]
     pub reading_time_minutes: Option<i16>,
+    #[schema(example = "770e8400-e29b-41d4-a716-446655440000")]
     pub cover_image_id: Option<Uuid>,
+    #[schema(example = "880e8400-e29b-41d4-a716-446655440000")]
     pub header_image_id: Option<Uuid>,
+    #[schema(example = false)]
     pub is_featured: bool,
+    #[schema(example = false)]
     pub is_sample: bool,
+    #[schema(example = true)]
     pub allow_comments: bool,
     pub status: ContentStatus,
+    #[schema(example = "2024-06-15T08:00:00Z")]
     pub published_at: Option<DateTime<Utc>>,
+    #[schema(example = "2024-06-15T08:00:00Z")]
     pub publish_start: Option<DateTime<Utc>>,
+    #[schema(example = "2024-12-31T23:59:59Z")]
     pub publish_end: Option<DateTime<Utc>>,
+    #[schema(example = "2024-01-15T10:30:00Z")]
     pub created_at: DateTime<Utc>,
+    #[schema(example = "2024-06-01T08:00:00Z")]
     pub updated_at: DateTime<Utc>,
 }
 

@@ -30,24 +30,30 @@ pub struct StorageHealth {
     #[schema(example = "up")]
     pub status: String,
     /// Response latency in milliseconds
+    #[schema(example = 2)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub latency_ms: Option<u64>,
     /// Error message if the service is down
+    #[schema(example = "Disk read error")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
     /// Storage provider: "local" or "s3"
     #[schema(example = "local")]
     pub provider: String,
     /// Total bytes on disk (local only)
+    #[schema(example = 107374182400_i64)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub total_bytes: Option<u64>,
     /// Available bytes on disk (local only)
+    #[schema(example = 53687091200_i64)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub available_bytes: Option<u64>,
     /// Percentage of disk used (local only)
+    #[schema(example = 50.0)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub used_percent: Option<f64>,
     /// S3 bucket name (S3 only)
+    #[schema(example = "forja-media")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bucket: Option<String>,
 }
@@ -63,9 +69,11 @@ pub struct ServiceHealth {
     #[schema(example = "up")]
     pub status: String,
     /// Response latency in milliseconds
+    #[schema(example = 1)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub latency_ms: Option<u64>,
     /// Error message if the service is down
+    #[schema(example = "Connection refused")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
 }

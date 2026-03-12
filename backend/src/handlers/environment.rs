@@ -15,7 +15,8 @@ use crate::AppState;
     operation_id = "list_environments",
     description = "List all environments",
     responses(
-        (status = 200, description = "List of environments", body = Vec<EnvironmentResponse>)
+        (status = 200, description = "List of environments", body = Vec<EnvironmentResponse>),
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -36,9 +37,10 @@ pub async fn list_environments(
     tag = "Environments",
     operation_id = "get_environment",
     description = "Get an environment by ID",
-    params(("id" = Uuid, Path, description = "Environment UUID")),
+    params(("id" = Uuid, Path, description = "The UUID of the environment")),
     responses(
         (status = 200, description = "Environment details", body = EnvironmentResponse),
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
         (status = 404, description = "Environment not found", body = ProblemDetails)
     ),
     security(("api_key" = []))
@@ -59,7 +61,8 @@ pub async fn get_environment(
     description = "Get the default environment",
     responses(
         (status = 200, description = "Default environment", body = EnvironmentResponse),
-        (status = 404, description = "No default environment found", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 404, description = "Default environment not found", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]

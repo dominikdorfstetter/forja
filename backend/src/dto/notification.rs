@@ -11,16 +11,27 @@ use crate::utils::pagination::Paginated;
 /// Notification response.
 #[derive(Debug, Serialize, ToSchema)]
 pub struct NotificationResponse {
+    #[schema(example = "550e8400-e29b-41d4-a716-446655440000")]
     pub id: Uuid,
+    #[schema(example = "660e8400-e29b-41d4-a716-446655440000")]
     pub site_id: Uuid,
+    #[schema(example = "user_2abc123def456")]
     pub actor_clerk_id: Option<String>,
+    #[schema(example = "review_submitted")]
     pub notification_type: String,
+    #[schema(example = "blog")]
     pub entity_type: String,
+    #[schema(example = "770e8400-e29b-41d4-a716-446655440000")]
     pub entity_id: Uuid,
+    #[schema(example = "New review on your post")]
     pub title: String,
+    #[schema(example = "Please review the changes")]
     pub message: Option<String>,
+    #[schema(example = false)]
     pub is_read: bool,
+    #[schema(example = "2024-06-15T12:00:00Z")]
     pub read_at: Option<DateTime<Utc>>,
+    #[schema(example = "2024-06-15T10:00:00Z")]
     pub created_at: DateTime<Utc>,
 }
 
@@ -45,12 +56,14 @@ impl From<Notification> for NotificationResponse {
 /// Unread notification count response.
 #[derive(Debug, Serialize, ToSchema)]
 pub struct UnreadCountResponse {
+    #[schema(example = 5)]
     pub unread_count: i64,
 }
 
 /// Response after marking all notifications as read.
 #[derive(Debug, Serialize, ToSchema)]
 pub struct MarkAllReadResponse {
+    #[schema(example = 3)]
     pub updated: i64,
 }
 

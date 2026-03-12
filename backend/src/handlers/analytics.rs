@@ -81,12 +81,13 @@ async fn require_analytics_enabled(pool: &sqlx::PgPool, site_id: Uuid) -> Result
     tag = "Analytics",
     operation_id = "track_pageview",
     params(
-        ("site_id" = Uuid, Path, description = "Site ID"),
+        ("site_id" = Uuid, Path, description = "The UUID of the site"),
     ),
     request_body = TrackPageviewRequest,
     responses(
         (status = 201, description = "Pageview recorded", body = TrackPageviewResponse),
         (status = 400, description = "Invalid request"),
+        (status = 401, description = "Missing or invalid API key"),
         (status = 403, description = "Analytics not enabled or insufficient permissions"),
     ),
     security(("api_key" = []))

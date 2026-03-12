@@ -252,13 +252,14 @@ pub async fn delete_redirect(
     operation_id = "lookup_redirect",
     description = "Lookup an active redirect by source path for a site",
     params(
-        ("site_id" = Uuid, Path, description = "Site UUID"),
-        ("path" = String, Query, description = "Source path to look up")
+        ("site_id" = Uuid, Path, description = "The UUID of the site"),
+        ("path" = String, Query, description = "Source path to look up a redirect for (e.g. /old-page)")
     ),
     responses(
         (status = 200, description = "Redirect found", body = RedirectLookupResponse),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 404, description = "No active redirect for this path", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 403, description = "Insufficient permissions for this site", body = ProblemDetails),
+        (status = 404, description = "Redirect not found for the given path", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]

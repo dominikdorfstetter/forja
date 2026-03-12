@@ -12,7 +12,7 @@ use crate::errors::codes;
     operation_id = "list_error_codes",
     description = "Returns the full catalog of domain-specific error codes with metadata. Use this to programmatically discover all possible error codes the API can return.",
     responses(
-        (status = 200, description = "Error code catalog", body = ErrorCodeCatalogResponse)
+        (status = 200, description = "Full error code catalog with descriptions and metadata", body = ErrorCodeCatalogResponse)
     )
 )]
 #[get("/error-codes")]

@@ -159,14 +159,14 @@ pub async fn get_page(
     operation_id = "get_page_by_route",
     description = "Get a page by its route within a site",
     params(
-        ("site_id" = Uuid, Path, description = "Site UUID"),
-        ("route" = String, Path, description = "Page route")
+        ("site_id" = Uuid, Path, description = "The UUID of the site"),
+        ("route" = String, Path, description = "The page route path (without leading slash, e.g. 'about' or 'blog/hello-world')")
     ),
     responses(
         (status = 200, description = "Page details", body = PageResponse),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 403, description = "Forbidden", body = ProblemDetails),
-        (status = 404, description = "Page not found", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 403, description = "Insufficient permissions for this site", body = ProblemDetails),
+        (status = 404, description = "Page not found for the given route", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -193,10 +193,12 @@ pub async fn get_page_by_route(
     tag = "Pages",
     operation_id = "get_page_sections",
     description = "Get all sections for a page",
-    params(("page_id" = Uuid, Path, description = "Page UUID")),
+    params(("page_id" = Uuid, Path, description = "The UUID of the page to retrieve sections for")),
     responses(
         (status = 200, description = "Page sections", body = Vec<PageSectionResponse>),
-        (status = 401, description = "Unauthorized", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 403, description = "Insufficient permissions for this site", body = ProblemDetails),
+        (status = 404, description = "Page not found", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -681,10 +683,12 @@ pub async fn reorder_page_sections(
     tag = "Pages",
     operation_id = "get_section_localizations",
     description = "Get all localizations for a page section",
-    params(("section_id" = Uuid, Path, description = "Section UUID")),
+    params(("section_id" = Uuid, Path, description = "The UUID of the page section to retrieve localizations for")),
     responses(
         (status = 200, description = "Section localizations", body = Vec<SectionLocalizationResponse>),
-        (status = 401, description = "Unauthorized", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 403, description = "Insufficient permissions for this site", body = ProblemDetails),
+        (status = 404, description = "Section not found", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]

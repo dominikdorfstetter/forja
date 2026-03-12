@@ -69,19 +69,19 @@ impl<'r> Responder<'r, 'static> for RssResponse {
     operation_id = "list_blogs",
     description = "List all blogs for a site (paginated, with optional search/filter/sort)",
     params(
-        ("site_id" = Uuid, Path, description = "Site UUID"),
-        ("page" = Option<i64>, Query, description = "Page number (default 1)"),
-        ("page_size" = Option<i64>, Query, description = "Items per page (default 10, max 100)"),
-        ("search" = Option<String>, Query, description = "Search by ID, slug, or author (ILIKE)"),
-        ("status" = Option<String>, Query, description = "Filter by status"),
+        ("site_id" = Uuid, Path, description = "The UUID of the site. Use GET /sites to list available sites."),
+        ("page" = Option<i64>, Query, description = "Page number, 1-indexed (default: 1)"),
+        ("page_size" = Option<i64>, Query, description = "Items per page, 1–100 (default: 10)"),
+        ("search" = Option<String>, Query, description = "Case-insensitive search across blog ID, slug, and author fields (ILIKE)"),
+        ("status" = Option<String>, Query, description = "Filter by content status: Draft, InReview, Scheduled, Published, Archived"),
         ("sort_by" = Option<String>, Query, description = "Sort column: slug, author, published_date, status, created_at"),
-        ("sort_dir" = Option<String>, Query, description = "Sort direction: asc or desc"),
-        ("exclude_status" = Option<String>, Query, description = "Exclude items with this status (e.g. Archived)")
+        ("sort_dir" = Option<String>, Query, description = "Sort direction: asc or desc (default: asc)"),
+        ("exclude_status" = Option<String>, Query, description = "Exclude items with this status: Draft, InReview, Scheduled, Published, Archived (e.g. Archived)")
     ),
     responses(
         (status = 200, description = "Paginated blog list", body = PaginatedBlogs),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 403, description = "Forbidden", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 403, description = "Insufficient permissions for this site", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -152,14 +152,14 @@ pub async fn list_blogs(
     operation_id = "list_published_blogs",
     description = "List published blogs for a site (public)",
     params(
-        ("site_id" = Uuid, Path, description = "Site UUID"),
-        ("page" = Option<i64>, Query, description = "Page number (default 1)"),
-        ("page_size" = Option<i64>, Query, description = "Items per page (default 10, max 100)")
+        ("site_id" = Uuid, Path, description = "The UUID of the site. Use GET /sites to list available sites."),
+        ("page" = Option<i64>, Query, description = "Page number, 1-indexed (default: 1)"),
+        ("page_size" = Option<i64>, Query, description = "Items per page, 1–100 (default: 10)")
     ),
     responses(
         (status = 200, description = "Paginated published blogs", body = PaginatedBlogs),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 403, description = "Forbidden", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 403, description = "Insufficient permissions for this site", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -193,15 +193,15 @@ pub async fn list_published_blogs(
     operation_id = "list_published_blogs_by_category",
     description = "List published blogs filtered by category slug (public)",
     params(
-        ("site_id" = Uuid, Path, description = "Site UUID"),
-        ("category_slug" = String, Path, description = "Category slug"),
-        ("page" = Option<i64>, Query, description = "Page number (default 1)"),
-        ("page_size" = Option<i64>, Query, description = "Items per page (default 10, max 100)")
+        ("site_id" = Uuid, Path, description = "The UUID of the site. Use GET /sites to list available sites."),
+        ("category_slug" = String, Path, description = "URL-safe category slug (e.g. 'tech', 'announcements')"),
+        ("page" = Option<i64>, Query, description = "Page number, 1-indexed (default: 1)"),
+        ("page_size" = Option<i64>, Query, description = "Items per page, 1–100 (default: 10)")
     ),
     responses(
         (status = 200, description = "Paginated published blogs in category", body = PaginatedBlogs),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 403, description = "Forbidden", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 403, description = "Insufficient permissions for this site", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -239,13 +239,13 @@ pub async fn list_published_blogs_by_category(
     operation_id = "list_featured_blogs",
     description = "Get featured blogs for a site",
     params(
-        ("site_id" = Uuid, Path, description = "Site UUID"),
-        ("limit" = Option<i64>, Query, description = "Max results (default 5, max 20)")
+        ("site_id" = Uuid, Path, description = "The UUID of the site. Use GET /sites to list available sites."),
+        ("limit" = Option<i64>, Query, description = "Max results, 1–20 (default: 5)")
     ),
     responses(
         (status = 200, description = "Featured blogs", body = Vec<BlogListItem>),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 403, description = "Forbidden", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 403, description = "Insufficient permissions for this site", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -274,15 +274,15 @@ pub async fn list_featured_blogs(
     operation_id = "list_similar_blogs",
     description = "Get similar blogs ranked by taxonomy overlap (shared tags, categories) and author",
     params(
-        ("site_id" = Uuid, Path, description = "Site UUID"),
-        ("id" = Uuid, Path, description = "Source blog UUID"),
-        ("limit" = Option<i64>, Query, description = "Max results (default 3, max 10)")
+        ("site_id" = Uuid, Path, description = "The UUID of the site. Use GET /sites to list available sites."),
+        ("id" = Uuid, Path, description = "The UUID of the source blog post to find similar content for"),
+        ("limit" = Option<i64>, Query, description = "Max results, 1–10 (default: 3)")
     ),
     responses(
         (status = 200, description = "Similar blogs", body = Vec<BlogListItem>),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 403, description = "Forbidden", body = ProblemDetails),
-        (status = 404, description = "Source blog not found", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 403, description = "Insufficient permissions for this site", body = ProblemDetails),
+        (status = 404, description = "Blog post not found", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -346,14 +346,14 @@ pub async fn get_blog(
     operation_id = "get_blog_by_slug",
     description = "Get a blog post by slug within a site",
     params(
-        ("site_id" = Uuid, Path, description = "Site UUID"),
-        ("slug" = String, Path, description = "Blog slug")
+        ("site_id" = Uuid, Path, description = "The UUID of the site. Use GET /sites to list available sites."),
+        ("slug" = String, Path, description = "URL-safe blog slug (e.g. 'my-first-post')")
     ),
     responses(
         (status = 200, description = "Blog details", body = BlogResponse),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 403, description = "Forbidden", body = ProblemDetails),
-        (status = 404, description = "Blog not found", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 403, description = "Insufficient permissions for this site", body = ProblemDetails),
+        (status = 404, description = "Blog post not found", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -969,11 +969,11 @@ pub async fn review_blog(
     tag = "Blogs",
     operation_id = "rss_feed",
     description = "Get an RSS 2.0 feed of published blog posts for a site",
-    params(("site_id" = Uuid, Path, description = "Site UUID")),
+    params(("site_id" = Uuid, Path, description = "The UUID of the site. Use GET /sites to list available sites.")),
     responses(
-        (status = 200, description = "RSS 2.0 XML feed", content_type = "application/rss+xml"),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 403, description = "Forbidden", body = ProblemDetails),
+        (status = 200, description = "RSS 2.0 XML feed containing up to 50 most recent published posts", content_type = "application/rss+xml"),
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 403, description = "Insufficient permissions for this site", body = ProblemDetails),
         (status = 404, description = "Site not found", body = ProblemDetails)
     ),
     security(("api_key" = []))

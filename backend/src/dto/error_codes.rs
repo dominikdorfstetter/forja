@@ -9,6 +9,7 @@ use crate::errors::codes::ErrorCodeDef;
 #[derive(Debug, Serialize, ToSchema)]
 pub struct ErrorCodeCatalogResponse {
     /// Total number of registered error codes
+    #[schema(example = 42)]
     pub total: usize,
     /// All registered error codes with metadata
     pub codes: Vec<ErrorCodeEntry>,

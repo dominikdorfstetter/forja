@@ -31,17 +31,17 @@ use crate::AppState;
     operation_id = "list_legal_documents",
     description = "List all legal documents for a site",
     params(
-        ("site_id" = Uuid, Path, description = "Site UUID"),
-        ("page" = Option<i64>, Query, description = "Page number (default 1)"),
-        ("page_size" = Option<i64>, Query, description = "Items per page (default 10, max 100)"),
-        ("search" = Option<String>, Query, description = "Search by cookie name"),
-        ("sort_by" = Option<String>, Query, description = "Sort field (created_at, updated_at, document_type)"),
-        ("sort_dir" = Option<String>, Query, description = "Sort direction (asc, desc)")
+        ("site_id" = Uuid, Path, description = "The UUID of the site"),
+        ("page" = Option<i64>, Query, description = "Page number, 1-indexed (default: 1)"),
+        ("page_size" = Option<i64>, Query, description = "Items per page, 1–100 (default: 10)"),
+        ("search" = Option<String>, Query, description = "Search by cookie name (case-insensitive partial match)"),
+        ("sort_by" = Option<String>, Query, description = "Sort field: created_at, updated_at, document_type (default: created_at)"),
+        ("sort_dir" = Option<String>, Query, description = "Sort direction: asc or desc (default: asc)")
     ),
     responses(
         (status = 200, description = "List of legal documents", body = PaginatedLegalDocuments),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 403, description = "Forbidden", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 403, description = "Insufficient permissions for this site", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -77,11 +77,11 @@ pub async fn list_legal_documents(
     tag = "Legal",
     operation_id = "get_legal_document",
     description = "Get a legal document by ID",
-    params(("id" = Uuid, Path, description = "Legal document UUID")),
+    params(("id" = Uuid, Path, description = "The UUID of the legal document")),
     responses(
         (status = 200, description = "Legal document details", body = LegalDocumentResponse),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 404, description = "Document not found", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 404, description = "Legal document not found", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -100,12 +100,12 @@ pub async fn get_legal_document(
     tag = "Legal",
     operation_id = "get_cookie_consent",
     description = "Get cookie consent document with full structure (groups and items)",
-    params(("site_id" = Uuid, Path, description = "Site UUID")),
+    params(("site_id" = Uuid, Path, description = "The UUID of the site")),
     responses(
         (status = 200, description = "Cookie consent structure", body = LegalDocumentWithGroups),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 403, description = "Forbidden", body = ProblemDetails),
-        (status = 404, description = "No cookie consent document found", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 403, description = "Insufficient permissions for this site", body = ProblemDetails),
+        (status = 404, description = "Cookie consent document not found for this site", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -150,10 +150,11 @@ pub async fn get_cookie_consent(
     tag = "Legal",
     operation_id = "get_legal_groups",
     description = "Get groups for a legal document",
-    params(("document_id" = Uuid, Path, description = "Legal document UUID")),
+    params(("document_id" = Uuid, Path, description = "The UUID of the legal document")),
     responses(
         (status = 200, description = "Legal groups", body = Vec<LegalGroupResponse>),
-        (status = 401, description = "Unauthorized", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 404, description = "Legal document not found", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -174,10 +175,11 @@ pub async fn get_legal_groups(
     tag = "Legal",
     operation_id = "get_legal_items",
     description = "Get items for a legal group",
-    params(("group_id" = Uuid, Path, description = "Legal group UUID")),
+    params(("group_id" = Uuid, Path, description = "The UUID of the legal group")),
     responses(
         (status = 200, description = "Legal items", body = Vec<LegalItemResponse>),
-        (status = 401, description = "Unauthorized", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 404, description = "Legal group not found", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -597,14 +599,14 @@ pub async fn delete_legal_item(
     operation_id = "get_legal_document_by_slug",
     description = "Get a legal document by content slug with localizations",
     params(
-        ("site_id" = Uuid, Path, description = "Site UUID"),
-        ("slug" = String, Path, description = "Content slug (e.g. 'imprint', 'privacy-policy')")
+        ("site_id" = Uuid, Path, description = "The UUID of the site"),
+        ("slug" = String, Path, description = "URL-friendly identifier (lowercase, hyphens only)")
     ),
     responses(
         (status = 200, description = "Legal document with localizations", body = LegalDocumentDetailResponse),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 403, description = "Forbidden", body = ProblemDetails),
-        (status = 404, description = "Document not found", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 403, description = "Insufficient permissions for this site", body = ProblemDetails),
+        (status = 404, description = "Legal document not found", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]

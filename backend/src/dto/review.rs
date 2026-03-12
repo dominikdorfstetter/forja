@@ -26,6 +26,7 @@ pub struct ReviewActionRequest {
 #[derive(Debug, Clone, Serialize, utoipa::ToSchema)]
 pub struct ReviewActionResponse {
     pub status: ContentStatus,
+    #[schema(example = "Content approved and published")]
     pub message: String,
 }
 

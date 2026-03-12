@@ -25,11 +25,11 @@ use crate::AppState;
     tag = "Navigation",
     operation_id = "list_navigation_menus",
     description = "List all navigation menus for a site",
-    params(("site_id" = Uuid, Path, description = "Site UUID")),
+    params(("site_id" = Uuid, Path, description = "The UUID of the site")),
     responses(
         (status = 200, description = "Navigation menus", body = Vec<NavigationMenuResponse>),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 403, description = "Forbidden", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 403, description = "Insufficient permissions for this site", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -144,11 +144,11 @@ pub async fn create_navigation_menu(
     tag = "Navigation",
     operation_id = "get_navigation_menu",
     description = "Get a navigation menu by ID",
-    params(("id" = Uuid, Path, description = "Menu UUID")),
+    params(("id" = Uuid, Path, description = "The UUID of the navigation menu")),
     responses(
         (status = 200, description = "Navigation menu details", body = NavigationMenuResponse),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 404, description = "Menu not found", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 404, description = "Navigation menu not found", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -194,13 +194,13 @@ pub async fn get_navigation_menu(
     operation_id = "get_navigation_menu_by_slug",
     description = "Get a navigation menu by slug for a site",
     params(
-        ("site_id" = Uuid, Path, description = "Site UUID"),
-        ("slug" = String, Path, description = "Menu slug")
+        ("site_id" = Uuid, Path, description = "The UUID of the site"),
+        ("slug" = String, Path, description = "URL-friendly identifier (lowercase, hyphens only)")
     ),
     responses(
         (status = 200, description = "Navigation menu details", body = NavigationMenuResponse),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 404, description = "Menu not found", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 404, description = "Navigation menu not found", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -361,13 +361,13 @@ pub async fn delete_navigation_menu(
     operation_id = "get_navigation_tree",
     description = "Get the full navigation tree for a menu with localized titles",
     params(
-        ("menu_id" = Uuid, Path, description = "Menu UUID"),
-        ("locale" = Option<String>, Query, description = "Locale code for titles (e.g. 'en')")
+        ("menu_id" = Uuid, Path, description = "The UUID of the navigation menu"),
+        ("locale" = Option<String>, Query, description = "Locale code for localized titles (e.g. en, de, fr)")
     ),
     responses(
         (status = 200, description = "Navigation tree", body = Vec<NavigationTree>),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 404, description = "Menu not found", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 404, description = "Navigation menu not found", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]

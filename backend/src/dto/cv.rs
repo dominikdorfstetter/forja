@@ -32,11 +32,14 @@ pub struct CreateSkillRequest {
     #[validate(custom(function = "validate_slug"))]
     pub slug: String,
 
+    #[schema(example = "Programming")]
     pub category: Option<SkillCategory>,
 
+    #[schema(example = "devicon-rust-plain")]
     #[validate(length(max = 200, message = "Icon cannot exceed 200 characters"))]
     pub icon: Option<String>,
 
+    #[schema(example = 85)]
     #[validate(range(
         min = 0,
         max = 100,
@@ -44,10 +47,12 @@ pub struct CreateSkillRequest {
     ))]
     pub proficiency_level: Option<i16>,
 
+    #[schema(example = false)]
     #[serde(default)]
     pub is_global: bool,
 
     /// Site IDs to associate this skill with
+    #[schema(example = json!(["660e8400-e29b-41d4-a716-446655440000"]))]
     #[validate(length(min = 1, message = "At least one site ID is required"))]
     pub site_ids: Vec<Uuid>,
 }
@@ -73,11 +78,14 @@ pub struct UpdateSkillRequest {
     #[validate(custom(function = "validate_slug"))]
     pub slug: Option<String>,
 
+    #[schema(example = "Framework")]
     pub category: Option<SkillCategory>,
 
+    #[schema(example = "devicon-typescript-plain")]
     #[validate(length(max = 200, message = "Icon cannot exceed 200 characters"))]
     pub icon: Option<String>,
 
+    #[schema(example = 90)]
     #[validate(range(
         min = 0,
         max = 100,
@@ -85,6 +93,7 @@ pub struct UpdateSkillRequest {
     ))]
     pub proficiency_level: Option<i16>,
 
+    #[schema(example = true)]
     pub is_global: Option<bool>,
 }
 
@@ -105,8 +114,10 @@ pub struct CreateCvEntryRequest {
     #[validate(custom(function = "validate_url"))]
     pub company_url: Option<String>,
 
+    #[schema(example = "770e8400-e29b-41d4-a716-446655440000")]
     pub company_logo_id: Option<Uuid>,
 
+    #[schema(example = "Vienna, Austria")]
     #[validate(length(
         min = 1,
         max = 200,
@@ -114,15 +125,20 @@ pub struct CreateCvEntryRequest {
     ))]
     pub location: String,
 
+    #[schema(example = "2020-01-15")]
     pub start_date: NaiveDate,
+    #[schema(example = "2023-06-30")]
     pub end_date: Option<NaiveDate>,
 
+    #[schema(example = false)]
     #[serde(default)]
     pub is_current: bool,
 
+    #[schema(example = "Work")]
     #[serde(default)]
     pub entry_type: CvEntryType,
 
+    #[schema(example = 1)]
     #[validate(range(
         min = 0,
         max = 9999,
@@ -130,10 +146,12 @@ pub struct CreateCvEntryRequest {
     ))]
     pub display_order: i16,
 
+    #[schema(example = "Draft")]
     #[serde(default)]
     pub status: ContentStatus,
 
     /// Site IDs to associate this entry with
+    #[schema(example = json!(["660e8400-e29b-41d4-a716-446655440000"]))]
     #[validate(length(min = 1, message = "At least one site ID is required"))]
     pub site_ids: Vec<Uuid>,
 }
@@ -155,8 +173,10 @@ pub struct UpdateCvEntryRequest {
     #[validate(custom(function = "validate_url"))]
     pub company_url: Option<String>,
 
+    #[schema(example = "770e8400-e29b-41d4-a716-446655440000")]
     pub company_logo_id: Option<Uuid>,
 
+    #[schema(example = "Berlin, Germany")]
     #[validate(length(
         min = 1,
         max = 200,
@@ -164,11 +184,16 @@ pub struct UpdateCvEntryRequest {
     ))]
     pub location: Option<String>,
 
+    #[schema(example = "2020-03-01")]
     pub start_date: Option<NaiveDate>,
+    #[schema(example = "2024-01-01")]
     pub end_date: Option<NaiveDate>,
+    #[schema(example = true)]
     pub is_current: Option<bool>,
+    #[schema(example = "Education")]
     pub entry_type: Option<CvEntryType>,
 
+    #[schema(example = 2)]
     #[validate(range(
         min = 0,
         max = 9999,
@@ -176,6 +201,7 @@ pub struct UpdateCvEntryRequest {
     ))]
     pub display_order: Option<i16>,
 
+    #[schema(example = "Published")]
     pub status: Option<ContentStatus>,
 }
 
@@ -190,7 +216,9 @@ pub struct SkillResponse {
     #[schema(example = "rust")]
     pub slug: String,
     pub category: Option<SkillCategory>,
+    #[schema(example = "devicon-rust-plain")]
     pub icon: Option<String>,
+    #[schema(example = 85)]
     pub proficiency_level: Option<i16>,
 }
 
@@ -217,14 +245,22 @@ pub struct CvEntryResponse {
     pub company: String,
     #[schema(example = "https://acme.com")]
     pub company_url: Option<String>,
+    #[schema(example = "770e8400-e29b-41d4-a716-446655440000")]
     pub company_logo_id: Option<Uuid>,
+    #[schema(example = "Vienna, Austria")]
     pub location: String,
+    #[schema(example = "2020-01-15")]
     pub start_date: NaiveDate,
+    #[schema(example = "2023-06-30")]
     pub end_date: Option<NaiveDate>,
+    #[schema(example = true)]
     pub is_current: bool,
     pub entry_type: CvEntryType,
+    #[schema(example = 1)]
     pub display_order: i16,
+    #[schema(example = "2024-01-15T10:30:00Z")]
     pub created_at: DateTime<Utc>,
+    #[schema(example = "2024-06-01T08:00:00Z")]
     pub updated_at: DateTime<Utc>,
 }
 

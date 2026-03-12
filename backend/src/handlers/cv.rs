@@ -26,17 +26,17 @@ use crate::AppState;
     operation_id = "list_skills",
     description = "List all skills for a site",
     params(
-        ("site_id" = Uuid, Path, description = "Site UUID"),
-        ("page" = Option<i64>, Query, description = "Page number (default: 1)"),
-        ("page_size" = Option<i64>, Query, description = "Items per page (default: 10)"),
-        ("search" = Option<String>, Query, description = "Search by slug (ILIKE)"),
-        ("sort_by" = Option<String>, Query, description = "Sort field: slug (default), display_order, created_at"),
-        ("sort_dir" = Option<String>, Query, description = "Sort direction: asc, desc (default)"),
+        ("site_id" = Uuid, Path, description = "The UUID of the site"),
+        ("page" = Option<i64>, Query, description = "Page number, 1-indexed (default: 1)"),
+        ("page_size" = Option<i64>, Query, description = "Items per page, 1–100 (default: 10)"),
+        ("search" = Option<String>, Query, description = "Search by skill slug (case-insensitive partial match)"),
+        ("sort_by" = Option<String>, Query, description = "Sort field: slug, display_order, created_at (default: slug)"),
+        ("sort_dir" = Option<String>, Query, description = "Sort direction: asc or desc (default: asc)"),
     ),
     responses(
         (status = 200, description = "List of skills", body = PaginatedSkills),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 403, description = "Forbidden", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 403, description = "Insufficient permissions for this site", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -70,10 +70,10 @@ pub async fn list_skills(
     tag = "CV",
     operation_id = "get_skill",
     description = "Get a skill by ID",
-    params(("id" = Uuid, Path, description = "Skill UUID")),
+    params(("id" = Uuid, Path, description = "The UUID of the skill")),
     responses(
         (status = 200, description = "Skill details", body = SkillResponse),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
         (status = 404, description = "Skill not found", body = ProblemDetails)
     ),
     security(("api_key" = []))
@@ -93,10 +93,10 @@ pub async fn get_skill(
     tag = "CV",
     operation_id = "get_skill_by_slug",
     description = "Get a skill by slug",
-    params(("slug" = String, Path, description = "Skill slug")),
+    params(("slug" = String, Path, description = "URL-friendly identifier (lowercase, hyphens only)")),
     responses(
         (status = 200, description = "Skill details", body = SkillResponse),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
         (status = 404, description = "Skill not found", body = ProblemDetails)
     ),
     security(("api_key" = []))
@@ -240,18 +240,18 @@ pub async fn delete_skill(
     operation_id = "list_cv_entries",
     description = "List all CV entries for a site, optionally filtered by type",
     params(
-        ("site_id" = Uuid, Path, description = "Site UUID"),
-        ("entry_type" = Option<String>, Query, description = "Filter by type (work, education, volunteer, certification, project)"),
-        ("page" = Option<i64>, Query, description = "Page number (default: 1)"),
-        ("page_size" = Option<i64>, Query, description = "Items per page (default: 10)"),
-        ("search" = Option<String>, Query, description = "Search by company or location (ILIKE)"),
-        ("sort_by" = Option<String>, Query, description = "Sort field: display_order (default), start_date, created_at"),
-        ("sort_dir" = Option<String>, Query, description = "Sort direction: asc, desc (default)"),
+        ("site_id" = Uuid, Path, description = "The UUID of the site"),
+        ("entry_type" = Option<String>, Query, description = "Filter by entry type: Work, Education, Volunteer, Certification, Project"),
+        ("page" = Option<i64>, Query, description = "Page number, 1-indexed (default: 1)"),
+        ("page_size" = Option<i64>, Query, description = "Items per page, 1–100 (default: 10)"),
+        ("search" = Option<String>, Query, description = "Search by company or location (case-insensitive partial match)"),
+        ("sort_by" = Option<String>, Query, description = "Sort field: display_order, start_date, created_at (default: display_order)"),
+        ("sort_dir" = Option<String>, Query, description = "Sort direction: asc or desc (default: asc)"),
     ),
     responses(
         (status = 200, description = "List of CV entries", body = PaginatedCvEntries),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 403, description = "Forbidden", body = ProblemDetails)
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
+        (status = 403, description = "Insufficient permissions for this site", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -297,10 +297,10 @@ pub async fn list_cv_entries(
     tag = "CV",
     operation_id = "get_cv_entry",
     description = "Get a CV entry by ID",
-    params(("id" = Uuid, Path, description = "CV entry UUID")),
+    params(("id" = Uuid, Path, description = "The UUID of the CV entry")),
     responses(
         (status = 200, description = "CV entry details", body = CvEntryResponse),
-        (status = 401, description = "Unauthorized", body = ProblemDetails),
+        (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
         (status = 404, description = "CV entry not found", body = ProblemDetails)
     ),
     security(("api_key" = []))
