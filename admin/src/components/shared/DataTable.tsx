@@ -66,9 +66,9 @@ export default function DataTable<T>({
           )}
           <TableHead>
             <TableRow>
-              {columns.map((col) => (
+              {columns.map((col, colIndex) => (
                 <TableCell
-                  key={String(col.header)}
+                  key={colIndex}
                   align={col.align}
                   padding={col.padding}
                   scope="col"
@@ -81,8 +81,8 @@ export default function DataTable<T>({
           <TableBody>
             {data.map((item) => (
               <TableRow key={getRowKey(item)} selected={isRowSelected?.(item)}>
-                {columns.map((col) => (
-                  <TableCell key={String(col.header)} align={col.align} padding={col.padding}>
+                {columns.map((col, colIndex) => (
+                  <TableCell key={colIndex} align={col.align} padding={col.padding}>
                     {col.render(item)}
                   </TableCell>
                 ))}

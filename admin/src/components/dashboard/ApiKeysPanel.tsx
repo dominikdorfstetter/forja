@@ -55,7 +55,7 @@ export default function ApiKeysPanel({ loading, apiKeys }: ApiKeysPanelProps) {
               <ListItemText
                 primary={key.name}
                 secondary={
-                  <Stack direction="row" spacing={1} alignItems="center" component="span">
+                  <Stack direction="row" spacing={1} alignItems="center">
                     <Chip
                       label={key.permission}
                       size="small"
@@ -67,6 +67,7 @@ export default function ApiKeysPanel({ loading, apiKeys }: ApiKeysPanelProps) {
                     </Typography>
                   </Stack>
                 }
+                secondaryTypographyProps={{ component: 'div' }}
               />
             </ListItem>
           ))}

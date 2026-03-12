@@ -163,6 +163,7 @@ export default function NotificationBell() {
                       </Typography>
                     </Box>
                   }
+                  primaryTypographyProps={{ component: 'div' }}
                   secondary={
                     <Box sx={{ mt: 0.5 }}>
                       <Chip
@@ -178,6 +179,7 @@ export default function NotificationBell() {
                       )}
                     </Box>
                   }
+                  secondaryTypographyProps={{ component: 'div' }}
                 />
               </ListItemButton>
             ))}
