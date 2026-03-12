@@ -1,0 +1,20 @@
+[
+  {
+    "slug": "welcome-to-your-new-site",
+    "title": "Bienvenue sur votre nouveau site",
+    "excerpt": "Votre site est prêt — voici ce que vous pouvez en faire.",
+    "body": "Ceci est votre premier article. N'hésitez pas à le modifier, le supprimer ou repartir de zéro — il est à vous.\n\nUtilisez la barre d'outils de l'éditeur pour ajouter du **texte en gras**, de l'*italique*, des titres, des images et plus encore. Quand vous êtes satisfait, cliquez sur **Publier** pour le partager avec le monde."
+  },
+  {
+    "slug": "getting-started-with-forja",
+    "title": "Premiers pas avec Forja",
+    "excerpt": "Un aperçu rapide des fonctionnalités clés de Forja.",
+    "body": "Forja est un système de gestion de contenu moderne conçu pour la rapidité et la flexibilité.\n\n## Fonctionnalités clés\n\n- **Éditeur riche** — Rédigez avec un éditeur par blocs prenant en charge les titres, images, blocs de code et plus\n- **Catégories et tags** — Organisez votre contenu avec un système de taxonomie flexible\n- **Multilingue** — Publiez du contenu en plusieurs langues avec la localisation intégrée\n- **Médiathèque** — Téléchargez et gérez vos images, documents et autres fichiers\n\n## Prochaines étapes\n\n1. Modifiez cet article pour le personnaliser\n2. Créez votre premier article original\n3. Configurez la navigation de votre site"
+  },
+  {
+    "slug": "your-first-real-post",
+    "title": "Votre premier vrai article (supprimez-moi)",
+    "excerpt": "Une page blanche prête pour vos idées.",
+    "body": "Remplacez ce texte par votre propre contenu. Sur quoi allez-vous écrire ?\n\nAstuce : Utilisez la touche `/` pour insérer des blocs comme des titres, des images et des citations."
+  }
+]

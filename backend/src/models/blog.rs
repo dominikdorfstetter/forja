@@ -71,6 +71,35 @@ fn normalize_content_status(api_value: &str) -> Option<&'static str> {
     }
 }
 
+/// A single seed blog post loaded from a JSON resource file.
+#[derive(serde::Deserialize)]
+struct SeedPost {
+    slug: String,
+    title: String,
+    excerpt: Option<String>,
+    body: Option<String>,
+}
+
+/// Loads localized sample content from JSON resource files embedded at compile time.
+///
+/// Falls back to English for unsupported locale codes.
+fn load_seed_content(locale_code: &str) -> Vec<SeedPost> {
+    let base = locale_code.split('-').next().unwrap_or(locale_code);
+
+    let json = match base {
+        "de" => include_str!("../../resources/seed-content/de.json"),
+        "es" => include_str!("../../resources/seed-content/es.json"),
+        "fr" => include_str!("../../resources/seed-content/fr.json"),
+        "it" => include_str!("../../resources/seed-content/it.json"),
+        "nl" => include_str!("../../resources/seed-content/nl.json"),
+        "pl" => include_str!("../../resources/seed-content/pl.json"),
+        "pt" => include_str!("../../resources/seed-content/pt.json"),
+        _ => include_str!("../../resources/seed-content/en.json"),
+    };
+
+    serde_json::from_str(json).expect("invalid seed content JSON")
+}
+
 impl Blog {
     /// Find all blogs for a site
     pub async fn find_all_for_site(
@@ -791,20 +820,17 @@ impl Blog {
         site_id: Uuid,
         locale_id: Uuid,
         author: &str,
+        locale_code: &str,
     ) -> Result<Vec<BlogWithContent>, ApiError> {
         use crate::models::content::ContentLocalization;
 
-        let samples = vec![
-            ("welcome-to-your-new-site", "Welcome to your new site", Some("Your site is ready — here's what you can do with it."), Some("This is your first post. Feel free to edit it, delete it, or start fresh — it's all yours.\n\nUse the editor toolbar to add **bold text**, *italics*, headings, images, and more. When you're happy with your post, click **Publish** to share it with the world.")),
-            ("getting-started-with-forja", "Getting started with Forja", Some("A quick tour of the key features that make Forja powerful."), Some("Forja is a modern content management system designed for speed and flexibility.\n\n## Key Features\n\n- **Rich Editor** — Write with a block-based editor that supports headings, images, code blocks, and more\n- **Categories & Tags** — Organize your content with a flexible taxonomy system\n- **Multi-language** — Publish content in multiple languages with built-in localization\n- **Media Library** — Upload and manage images, documents, and other files\n\n## Next Steps\n\n1. Edit this post to make it your own\n2. Create your first original post\n3. Set up your site navigation")),
-            ("your-first-real-post", "Your first real post (delete me)", Some("A blank canvas ready for your ideas."), Some("Replace this text with your own content. What will you write about?\n\nTip: Use the `/` key to insert blocks like headings, images, and quotes.")),
-        ];
+        let samples = load_seed_content(locale_code);
 
         let mut created = Vec::new();
 
-        for (slug, title, excerpt, body) in samples {
+        for post in &samples {
             let req = CreateBlogRequest {
-                slug: slug.to_string(),
+                slug: post.slug.clone(),
                 author: author.to_string(),
                 published_date: chrono::Utc::now().date_naive(),
                 reading_time_minutes: Some(2),
@@ -831,10 +857,10 @@ impl Blog {
                 pool,
                 blog.content_id,
                 locale_id,
-                title,
+                &post.title,
                 None,
-                excerpt,
-                body,
+                post.excerpt.as_deref(),
+                post.body.as_deref(),
                 None,
                 None,
             )

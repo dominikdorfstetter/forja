@@ -242,7 +242,8 @@
     "empty": {
       "noSite": "Selecione um site na barra de ferramentas para ver os seus artigos do blogue",
       "title": "Nenhuma postagem de blog",
-      "description": "Postagens de blog são a espinha dorsal do seu conteúdo. Escreva artigos, tutoriais ou notícias — cada um com traduções, categorias e metadados SEO."
+      "description": "Postagens de blog são a espinha dorsal do seu conteúdo. Escreva artigos, tutoriais ou notícias — cada um com traduções, categorias e metadados SEO.",
+      "seedSamples": "Começar com publicações de exemplo"
     },
     "loading": "A carregar blogues...",
     "loadError": "Falha ao carregar blogues",
@@ -250,7 +251,8 @@
       "created": "Blogue criado — a abrir editor",
       "updated": "Blogue atualizado",
       "deleted": "Blogue eliminado",
-      "cloned": "Blog clonado com sucesso"
+      "cloned": "Blog clonado com sucesso",
+      "sampleSeeded": "Publicações de blog de exemplo criadas"
     },
     "deleteDialog": {
       "title": "Eliminar Blogue",
@@ -1367,14 +1369,47 @@
     "completeTitle": "Tudo pronto!",
     "completeDescription": "Você concluiu todas as etapas de configuração. Está pronto para publicar!",
     "progress": "{{completed}} de {{total}} concluídos",
-    "dismiss": "Ocultar",
+    "dismiss": "Ocultar checklist",
+    "deleteSamples": "Excluir todo o conteúdo de exemplo",
     "steps": {
+      "create_site": "Criar seu site",
+      "edit_first_post": "Editar sua primeira publicação",
+      "preview_site": "Pré-visualizar seu site",
+      "publish_first_post": "Publicar sua primeira publicação",
+      "customize_settings": "Personalizar as configurações do site",
+      "invite_team": "Convidar um membro da equipe",
+      "setup_workflow": "Configurar o fluxo editorial",
       "createSite": "Criar seu primeiro site",
       "addLanguage": "Adicionar um idioma",
       "createPage": "Criar uma página",
       "writeBlog": "Escrever uma postagem de blog",
       "setupNav": "Configurar a navegação"
+    },
+    "descriptions": {
+      "create_site": "Seu site foi criado",
+      "edit_first_post": "Abra uma publicação e personalize-a",
+      "preview_site": "Veja como seu conteúdo aparece para os visitantes",
+      "publish_first_post": "Publique com um clique",
+      "customize_settings": "Nome, descrição e aparência",
+      "invite_team": "Adicione colaboradores ao seu site",
+      "setup_workflow": "Ative o processo de revisão e aprovação"
+    },
+    "estimates": {
+      "done": "Feito",
+      "30sec": "~30 seg",
+      "1min": "~1 min",
+      "2min": "~2 min"
     }
+  },
+  "firstRunTip": {
+    "title": "Dica rápida",
+    "description": "Comece editando o título, depois use a tecla / para adicionar cabeçalhos, imagens e mais. Quando estiver pronto, clique em \"Publicar\" na barra de ferramentas."
+  },
+  "firstPublish": {
+    "title": "Você está no ar!",
+    "description": "Sua primeira publicação foi publicada.",
+    "viewPost": "Ver sua publicação",
+    "writeAnother": "Escrever outra"
   },
   "activity": {
     "title": "Atividade",

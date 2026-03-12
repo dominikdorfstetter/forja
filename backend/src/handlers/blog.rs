@@ -1167,11 +1167,12 @@ pub async fn seed_sample_content(
         ));
     }
 
-    // Get default locale for the site
-    let locale_id: Uuid = sqlx::query_scalar(
+    // Get default locale for the site (id + code for localized sample content)
+    let (locale_id, locale_code): (Uuid, String) = sqlx::query_as(
         r#"
-        SELECT sl.locale_id
+        SELECT sl.locale_id, l.code
         FROM site_locales sl
+        INNER JOIN locales l ON l.id = sl.locale_id
         WHERE sl.site_id = $1 AND sl.is_default = TRUE
         LIMIT 1
         "#,
@@ -1189,7 +1190,8 @@ pub async fn seed_sample_content(
         crate::guards::auth_guard::AuthSource::ApiKey => "Site Author".to_string(),
     };
 
-    let blogs = Blog::seed_sample_content(&state.db, site_id, locale_id, &author).await?;
+    let blogs =
+        Blog::seed_sample_content(&state.db, site_id, locale_id, &author, &locale_code).await?;
 
     audit_service::log_action(
         &state.db,

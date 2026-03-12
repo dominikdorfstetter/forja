@@ -242,7 +242,8 @@
     "empty": {
       "noSite": "Wybierz stronę z paska narzędzi, aby zobaczyć jej wpisy na blogu",
       "title": "Brak wpisów na blogu",
-      "description": "Wpisy na blogu to trzon Twoich treści. Pisz artykuły, poradniki lub wiadomości — każdy z tłumaczeniami, kategoriami i metadanymi SEO."
+      "description": "Wpisy na blogu to trzon Twoich treści. Pisz artykuły, poradniki lub wiadomości — każdy z tłumaczeniami, kategoriami i metadanymi SEO.",
+      "seedSamples": "Zacznij z przykładowymi wpisami"
     },
     "loading": "Ładowanie wpisów...",
     "loadError": "Nie udało się załadować wpisów",
@@ -250,7 +251,8 @@
       "created": "Wpis utworzony — otwieranie edytora",
       "updated": "Wpis zaktualizowany",
       "deleted": "Wpis usunięty",
-      "cloned": "Blog sklonowany pomyślnie"
+      "cloned": "Blog sklonowany pomyślnie",
+      "sampleSeeded": "Przykładowe wpisy na blogu utworzone"
     },
     "deleteDialog": {
       "title": "Usuń wpis",
@@ -1367,14 +1369,47 @@
     "completeTitle": "Wszystko gotowe!",
     "completeDescription": "Ukończyłeś wszystkie kroki konfiguracji. Jesteś gotowy do publikacji!",
     "progress": "{{completed}} z {{total}} ukończonych",
-    "dismiss": "Ukryj",
+    "dismiss": "Ukryj listę kontrolną",
+    "deleteSamples": "Usuń całą przykładową zawartość",
     "steps": {
+      "create_site": "Utwórz swoją stronę",
+      "edit_first_post": "Edytuj swój pierwszy wpis",
+      "preview_site": "Podgląd strony",
+      "publish_first_post": "Opublikuj swój pierwszy wpis",
+      "customize_settings": "Dostosuj ustawienia strony",
+      "invite_team": "Zaproś członka zespołu",
+      "setup_workflow": "Skonfiguruj przepływ redakcyjny",
       "createSite": "Utwórz swoją pierwszą stronę",
       "addLanguage": "Dodaj język",
       "createPage": "Utwórz stronę",
       "writeBlog": "Napisz wpis na blogu",
       "setupNav": "Skonfiguruj nawigację"
+    },
+    "descriptions": {
+      "create_site": "Twoja strona została utworzona",
+      "edit_first_post": "Otwórz wpis na blogu i dostosuj go",
+      "preview_site": "Zobacz, jak Twoje treści wyglądają dla odwiedzających",
+      "publish_first_post": "Opublikuj jednym kliknięciem",
+      "customize_settings": "Nazwa, opis i wygląd",
+      "invite_team": "Dodaj współpracowników do swojej strony",
+      "setup_workflow": "Włącz proces recenzji i zatwierdzania"
+    },
+    "estimates": {
+      "done": "Gotowe",
+      "30sec": "~30 sek.",
+      "1min": "~1 min",
+      "2min": "~2 min"
     }
+  },
+  "firstRunTip": {
+    "title": "Szybka wskazówka",
+    "description": "Zacznij od edycji tytułu, a następnie użyj klawisza /, aby dodać nagłówki, obrazy i nie tylko. Gdy będziesz gotowy, kliknij \"Opublikuj\" na pasku narzędzi."
+  },
+  "firstPublish": {
+    "title": "Jesteś online!",
+    "description": "Twój pierwszy wpis został opublikowany.",
+    "viewPost": "Zobacz swój wpis",
+    "writeAnother": "Napisz kolejny"
   },
   "activity": {
     "title": "Aktywność",

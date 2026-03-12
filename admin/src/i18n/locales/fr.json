@@ -242,7 +242,8 @@
     "empty": {
       "noSite": "Sélectionnez un site dans la barre d'outils pour voir ses articles de blog",
       "title": "Aucun article de blog",
-      "description": "Les articles de blog sont l'épine dorsale de votre contenu. Rédigez des articles, tutoriels ou actualités — chacun avec des traductions, catégories et métadonnées SEO."
+      "description": "Les articles de blog sont l'épine dorsale de votre contenu. Rédigez des articles, tutoriels ou actualités — chacun avec des traductions, catégories et métadonnées SEO.",
+      "seedSamples": "Commencer avec des articles d'exemple"
     },
     "loading": "Chargement des articles...",
     "loadError": "Échec du chargement des articles",
@@ -250,7 +251,8 @@
       "created": "Article créé — ouverture de l'éditeur",
       "updated": "Article mis à jour",
       "deleted": "Article supprimé",
-      "cloned": "Article cloné avec succès"
+      "cloned": "Article cloné avec succès",
+      "sampleSeeded": "Articles de blog d'exemple créés"
     },
     "deleteDialog": {
       "title": "Supprimer l'article",
@@ -1367,14 +1369,47 @@
     "completeTitle": "Tout est prêt !",
     "completeDescription": "Vous avez terminé toutes les étapes de configuration. Vous êtes prêt à publier !",
     "progress": "{{completed}} sur {{total}} terminé(s)",
-    "dismiss": "Masquer",
+    "dismiss": "Masquer la checklist",
+    "deleteSamples": "Supprimer tout le contenu d'exemple",
     "steps": {
+      "create_site": "Créer votre site",
+      "edit_first_post": "Modifier votre premier article",
+      "preview_site": "Prévisualiser votre site",
+      "publish_first_post": "Publier votre premier article",
+      "customize_settings": "Personnaliser les paramètres du site",
+      "invite_team": "Inviter un membre de l'équipe",
+      "setup_workflow": "Configurer le flux éditorial",
       "createSite": "Créer votre premier site",
       "addLanguage": "Ajouter une langue",
       "createPage": "Créer une page",
       "writeBlog": "Écrire un article de blog",
       "setupNav": "Configurer la navigation"
+    },
+    "descriptions": {
+      "create_site": "Votre site a été créé",
+      "edit_first_post": "Ouvrez un article et personnalisez-le",
+      "preview_site": "Voyez à quoi ressemble votre contenu pour les visiteurs",
+      "publish_first_post": "Mettez en ligne en un clic",
+      "customize_settings": "Nom, description et apparence",
+      "invite_team": "Ajoutez des collaborateurs à votre site",
+      "setup_workflow": "Activez le processus de révision et d'approbation"
+    },
+    "estimates": {
+      "done": "Terminé",
+      "30sec": "~30 sec",
+      "1min": "~1 min",
+      "2min": "~2 min"
     }
+  },
+  "firstRunTip": {
+    "title": "Astuce rapide",
+    "description": "Commencez par modifier le titre, puis utilisez la touche / pour ajouter des titres, des images et plus encore. Quand vous êtes prêt, cliquez sur « Publier » dans la barre d'outils."
+  },
+  "firstPublish": {
+    "title": "Vous êtes en ligne !",
+    "description": "Votre premier article a été publié.",
+    "viewPost": "Voir votre article",
+    "writeAnother": "En écrire un autre"
   },
   "activity": {
     "title": "Activité",
