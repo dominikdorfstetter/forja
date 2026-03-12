@@ -242,7 +242,8 @@
     "empty": {
       "noSite": "Wählen Sie eine Seite in der Symbolleiste aus, um deren Blogbeiträge anzuzeigen",
       "title": "Noch keine Blogbeiträge",
-      "description": "Blogbeiträge sind das Herzstück Ihrer Inhalte. Schreiben Sie Artikel, Tutorials oder Neuigkeiten — jeweils mit Übersetzungen, Kategorien und SEO-Metadaten."
+      "description": "Blogbeiträge sind das Herzstück Ihrer Inhalte. Schreiben Sie Artikel, Tutorials oder Neuigkeiten — jeweils mit Übersetzungen, Kategorien und SEO-Metadaten.",
+      "seedSamples": "Mit Beispielbeiträgen starten"
     },
     "loading": "Blogs werden geladen...",
     "loadError": "Blogs konnten nicht geladen werden",
@@ -250,7 +251,8 @@
       "created": "Blog erstellt — Editor wird geöffnet",
       "updated": "Blog aktualisiert",
       "deleted": "Blog gelöscht",
-      "cloned": "Blog erfolgreich geklont"
+      "cloned": "Blog erfolgreich geklont",
+      "sampleSeeded": "Beispiel-Blogbeiträge erstellt"
     },
     "deleteDialog": {
       "title": "Blog löschen",
@@ -1367,14 +1369,47 @@
     "completeTitle": "Alles erledigt!",
     "completeDescription": "Sie haben alle Einrichtungsschritte abgeschlossen. Sie können jetzt veröffentlichen!",
     "progress": "{{completed}} von {{total}} erledigt",
-    "dismiss": "Ausblenden",
+    "dismiss": "Checkliste ausblenden",
+    "deleteSamples": "Alle Beispielinhalte löschen",
     "steps": {
+      "create_site": "Website erstellen",
+      "edit_first_post": "Ersten Beitrag bearbeiten",
+      "preview_site": "Website-Vorschau ansehen",
+      "publish_first_post": "Ersten Beitrag veröffentlichen",
+      "customize_settings": "Website-Einstellungen anpassen",
+      "invite_team": "Teammitglied einladen",
+      "setup_workflow": "Redaktionellen Workflow einrichten",
       "createSite": "Erste Website erstellen",
       "addLanguage": "Sprache hinzufügen",
       "createPage": "Seite erstellen",
       "writeBlog": "Blogbeitrag schreiben",
       "setupNav": "Navigation einrichten"
+    },
+    "descriptions": {
+      "create_site": "Ihre Website wurde erstellt",
+      "edit_first_post": "Öffnen Sie einen Blogbeitrag und gestalten Sie ihn nach Ihren Wünschen",
+      "preview_site": "Sehen Sie, wie Ihre Inhalte für Besucher aussehen",
+      "publish_first_post": "Mit einem Klick online gehen",
+      "customize_settings": "Name, Beschreibung und Erscheinungsbild",
+      "invite_team": "Fügen Sie Mitarbeiter zu Ihrer Website hinzu",
+      "setup_workflow": "Freigabe- und Genehmigungsprozess aktivieren"
+    },
+    "estimates": {
+      "done": "Erledigt",
+      "30sec": "~30 Sek.",
+      "1min": "~1 Min.",
+      "2min": "~2 Min."
     }
+  },
+  "firstRunTip": {
+    "title": "Kurzer Tipp",
+    "description": "Bearbeiten Sie zuerst den Titel, dann verwenden Sie die /-Taste, um Überschriften, Bilder und mehr hinzuzufügen. Wenn Sie bereit sind, klicken Sie in der Symbolleiste auf \"Veröffentlichen\"."
+  },
+  "firstPublish": {
+    "title": "Sie sind online!",
+    "description": "Ihr erster Beitrag wurde veröffentlicht.",
+    "viewPost": "Beitrag ansehen",
+    "writeAnother": "Weiteren schreiben"
   },
   "activity": {
     "title": "Aktivität",

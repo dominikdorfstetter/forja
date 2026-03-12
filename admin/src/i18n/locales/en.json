@@ -251,7 +251,8 @@
     "empty": {
       "noSite": "Select a site from the toolbar to view its blog posts",
       "title": "No blog posts yet",
-      "description": "Blog posts are the backbone of your content. Write articles, tutorials, or news — each with translations, categories, and SEO metadata."
+      "description": "Blog posts are the backbone of your content. Write articles, tutorials, or news — each with translations, categories, and SEO metadata.",
+      "seedSamples": "Start with sample posts"
     },
     "loading": "Loading blogs...",
     "loadError": "Failed to load blogs",
@@ -259,7 +260,8 @@
       "created": "Blog created — opening editor",
       "updated": "Blog updated",
       "deleted": "Blog deleted",
-      "cloned": "Blog cloned successfully"
+      "cloned": "Blog cloned successfully",
+      "sampleSeeded": "Sample blog posts created"
     },
     "deleteDialog": {
       "title": "Delete Blog",
@@ -1448,13 +1450,46 @@
     "completeDescription": "You've completed all setup steps. You're ready to publish!",
     "progress": "{{completed}} of {{total}} complete",
     "dismiss": "Dismiss",
+    "deleteSamples": "Delete all sample content",
     "steps": {
-      "createSite": "Create your first site",
+      "create_site": "Create your site",
+      "edit_first_post": "Edit your first post",
+      "preview_site": "Preview your site",
+      "publish_first_post": "Publish your first post",
+      "customize_settings": "Customize your site settings",
+      "invite_team": "Invite a team member",
+      "setup_workflow": "Set up editorial workflow",
+      "createSite": "Create your site",
       "addLanguage": "Add a language",
       "createPage": "Create a page",
       "writeBlog": "Write a blog post",
       "setupNav": "Set up navigation"
+    },
+    "descriptions": {
+      "create_site": "Your site has been created",
+      "edit_first_post": "Open a sample post and make it yours",
+      "preview_site": "See how your content looks to visitors",
+      "publish_first_post": "Go live with one click",
+      "customize_settings": "Name, description, and appearance",
+      "invite_team": "Add collaborators to your site",
+      "setup_workflow": "Configure editorial review process"
+    },
+    "estimates": {
+      "done": "Done!",
+      "30sec": "30 sec",
+      "1min": "1 min",
+      "2min": "2 min"
     }
+  },
+  "firstRunTip": {
+    "title": "Quick tip",
+    "description": "Start by editing the title, then use the / key to add headings, images, and more. When you're ready, click \"Publish\" in the toolbar."
+  },
+  "firstPublish": {
+    "title": "You're live!",
+    "description": "Your first post has been published.",
+    "viewPost": "View your post",
+    "writeAnother": "Write another"
   },
   "teamWorkflowPrompt": {
     "message": "Your site now has multiple contributors. Enable editorial review to have content reviewed before publishing.",

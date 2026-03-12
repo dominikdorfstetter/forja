@@ -1,5 +1,5 @@
-import { useReducer, useCallback, useEffect, useRef, useMemo } from 'react';
-import { useParams } from 'react-router';
+import { useReducer, useCallback, useEffect, useRef, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router';
 import {
   Alert,
   Box,
@@ -29,6 +29,8 @@ import { useUserPreferences } from '@/store/UserPreferencesContext';
 import { usePreviewUrl } from '@/hooks/usePreviewUrl';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
+import FirstRunTip from '@/components/FirstRunTip';
+import FirstPublishCelebration from '@/components/FirstPublishCelebration';
 import {
   blogContentSchema,
   type BlogContentFormData,
@@ -46,6 +48,7 @@ import { createTranslationHandlers } from './blogDetailTranslationHandlers';
 export default function BlogDetailPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { showError, showSuccess } = useErrorSnackbar();
   const { canWrite } = useAuth();
@@ -55,6 +58,12 @@ export default function BlogDetailPage() {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const [ui, dispatch] = useReducer(uiReducer, initialUIState);
+
+  const FIRST_RUN_TIP_KEY = 'forja_editor_tip_dismissed';
+  const firstPublishKey = `forja_first_publish_celebrated_${selectedSiteId}`;
+  const [showFirstRunTip, setShowFirstRunTip] = useState(() => !localStorage.getItem(FIRST_RUN_TIP_KEY));
+  const [showCelebration, setShowCelebration] = useState(false);
+  const justPublishedRef = useRef(false);
 
   const { templates: previewTemplates, openPreview } = usePreviewUrl();
   const { isConfigured: aiConfigured, generate: aiGenerate, isGenerating: aiGenerating } = useAiAssist();
@@ -104,7 +113,15 @@ export default function BlogDetailPage() {
 
   const updateBlogMutation = useMutation({
     mutationFn: ({ blogId, data }: { blogId: string; data: Parameters<typeof apiService.updateBlog>[1] }) => apiService.updateBlog(blogId, data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['blog-detail', id] }); queryClient.invalidateQueries({ queryKey: ['blogs'] }); },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blog-detail', id] });
+      queryClient.invalidateQueries({ queryKey: ['blogs'] });
+      if (justPublishedRef.current && !localStorage.getItem(firstPublishKey)) {
+        localStorage.setItem(firstPublishKey, '1');
+        setShowCelebration(true);
+      }
+      justPublishedRef.current = false;
+    },
     onError: (err) => showError(err),
   });
 
@@ -195,12 +212,18 @@ export default function BlogDetailPage() {
   const currentFormStatus = watch('status') as ContentStatus;
   const workflow = useEditorialWorkflow(currentFormStatus);
 
+  const workflowHandlers = createBlogWorkflowHandlers({ setValue, flush, dispatch, reviewBlogMutation });
   const {
     handleSubmitForReview, handleApproveClick, handleApprovePublishNow,
     handleApproveSchedule, handleRequestChanges, handleReviewCommentSubmit,
-    handlePublish, handleUnpublish, handleArchiveClick, handleArchiveConfirm,
+    handleUnpublish, handleArchiveClick, handleArchiveConfirm,
     handleRestoreClick, handleRestore, handleRestoreAsDraft,
-  } = createBlogWorkflowHandlers({ setValue, flush, dispatch, reviewBlogMutation });
+  } = workflowHandlers;
+
+  const handlePublish = () => {
+    justPublishedRef.current = true;
+    workflowHandlers.handlePublish();
+  };
 
   if (isLoading) return <LoadingState label={t('blogDetail.loading')} />;
   if (error) return <Alert severity="error">{t('blogDetail.messages.saveFailed')}</Alert>;
@@ -215,6 +238,10 @@ export default function BlogDetailPage() {
           { label: blogDetail.slug || t('common.labels.untitled') },
         ]}
       />
+
+      {showFirstRunTip && (
+        <FirstRunTip onDismiss={() => { localStorage.setItem(FIRST_RUN_TIP_KEY, '1'); setShowFirstRunTip(false); }} />
+      )}
 
       <BlogEditorToolbar
         control={control} watch={watch} setValue={setValue}
@@ -292,6 +319,13 @@ export default function BlogDetailPage() {
         onGenerate={handleGenerateTranslation} onRefreshField={handleRefreshField}
         onApply={handleApplyTranslation} isGenerating={aiGenerating}
         refreshingField={ui.refreshingField} hasBody={!!getValues('body')}
+      />
+
+      <FirstPublishCelebration
+        open={showCelebration}
+        onClose={() => setShowCelebration(false)}
+        onViewPost={() => { setShowCelebration(false); openPreview('/blog/' + (blogDetail.slug || ''), previewTemplates[0]?.url); }}
+        onWriteAnother={() => { setShowCelebration(false); navigate('/blogs'); }}
       />
     </Box>
   );

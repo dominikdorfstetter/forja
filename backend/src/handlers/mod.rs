@@ -38,6 +38,7 @@ pub mod media_folder;
 pub mod navigation;
 pub mod navigation_menu;
 pub mod notification;
+pub mod onboarding_progress;
 pub mod page;
 pub mod redirect;
 pub mod site;
@@ -116,6 +117,9 @@ pub fn routes() -> Vec<Route> {
 
     // AI content assist
     routes.extend(ai::routes());
+
+    // Onboarding progress
+    routes.extend(onboarding_progress::routes());
 
     // Public configuration (no auth)
     routes.extend(config::routes());

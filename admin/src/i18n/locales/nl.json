@@ -242,7 +242,8 @@
     "empty": {
       "noSite": "Selecteer een site in de werkbalk om de blogberichten te bekijken",
       "title": "Nog geen blogberichten",
-      "description": "Blogberichten vormen de kern van uw content. Schrijf artikelen, tutorials of nieuws — elk met vertalingen, categorieën en SEO-metadata."
+      "description": "Blogberichten vormen de kern van uw content. Schrijf artikelen, tutorials of nieuws — elk met vertalingen, categorieën en SEO-metadata.",
+      "seedSamples": "Begin met voorbeeldberichten"
     },
     "loading": "Blogs laden...",
     "loadError": "Blogs laden mislukt",
@@ -250,7 +251,8 @@
       "created": "Blog aangemaakt — editor wordt geopend",
       "updated": "Blog bijgewerkt",
       "deleted": "Blog verwijderd",
-      "cloned": "Blog succesvol gekloond"
+      "cloned": "Blog succesvol gekloond",
+      "sampleSeeded": "Voorbeeld-blogberichten aangemaakt"
     },
     "deleteDialog": {
       "title": "Blog verwijderen",
@@ -1367,14 +1369,47 @@
     "completeTitle": "Helemaal klaar!",
     "completeDescription": "U heeft alle instellingsstappen voltooid. U bent klaar om te publiceren!",
     "progress": "{{completed}} van {{total}} voltooid",
-    "dismiss": "Verbergen",
+    "dismiss": "Checklist verbergen",
+    "deleteSamples": "Alle voorbeeldinhoud verwijderen",
     "steps": {
+      "create_site": "Maak uw site aan",
+      "edit_first_post": "Bewerk uw eerste bericht",
+      "preview_site": "Bekijk een voorvertoning van uw site",
+      "publish_first_post": "Publiceer uw eerste bericht",
+      "customize_settings": "Pas uw site-instellingen aan",
+      "invite_team": "Nodig een teamlid uit",
+      "setup_workflow": "Stel een redactionele workflow in",
       "createSite": "Maak uw eerste site aan",
       "addLanguage": "Voeg een taal toe",
       "createPage": "Maak een pagina aan",
       "writeBlog": "Schrijf een blogbericht",
       "setupNav": "Stel de navigatie in"
+    },
+    "descriptions": {
+      "create_site": "Uw site is aangemaakt",
+      "edit_first_post": "Open een blogbericht en maak het uw eigen",
+      "preview_site": "Bekijk hoe uw content eruitziet voor bezoekers",
+      "publish_first_post": "Ga met één klik online",
+      "customize_settings": "Naam, beschrijving en uiterlijk",
+      "invite_team": "Voeg medewerkers toe aan uw site",
+      "setup_workflow": "Schakel het beoordelings- en goedkeuringsproces in"
+    },
+    "estimates": {
+      "done": "Klaar",
+      "30sec": "~30 sec",
+      "1min": "~1 min",
+      "2min": "~2 min"
     }
+  },
+  "firstRunTip": {
+    "title": "Snelle tip",
+    "description": "Begin met het bewerken van de titel en gebruik vervolgens de /-toets om koppen, afbeeldingen en meer toe te voegen. Wanneer u klaar bent, klikt u op \"Publiceren\" in de werkbalk."
+  },
+  "firstPublish": {
+    "title": "U bent online!",
+    "description": "Uw eerste bericht is gepubliceerd.",
+    "viewPost": "Bekijk uw bericht",
+    "writeAnother": "Nog een schrijven"
   },
   "activity": {
     "title": "Activiteit",

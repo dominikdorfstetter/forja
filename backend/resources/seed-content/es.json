@@ -1,0 +1,20 @@
+[
+  {
+    "slug": "welcome-to-your-new-site",
+    "title": "Bienvenido a tu nuevo sitio",
+    "excerpt": "Tu sitio está listo — esto es lo que puedes hacer con él.",
+    "body": "Esta es tu primera publicación. Puedes editarla, eliminarla o empezar de cero — es toda tuya.\n\nUsa la barra de herramientas del editor para añadir **texto en negrita**, *cursiva*, encabezados, imágenes y más. Cuando estés satisfecho, haz clic en **Publicar** para compartirlo con el mundo."
+  },
+  {
+    "slug": "getting-started-with-forja",
+    "title": "Primeros pasos con Forja",
+    "excerpt": "Un recorrido rápido por las funciones clave de Forja.",
+    "body": "Forja es un sistema de gestión de contenidos moderno diseñado para la velocidad y la flexibilidad.\n\n## Funciones principales\n\n- **Editor enriquecido** — Escribe con un editor basado en bloques que admite encabezados, imágenes, bloques de código y más\n- **Categorías y etiquetas** — Organiza tu contenido con un sistema de taxonomía flexible\n- **Multilingüe** — Publica contenido en varios idiomas con localización integrada\n- **Biblioteca multimedia** — Sube y gestiona imágenes, documentos y otros archivos\n\n## Próximos pasos\n\n1. Edita esta publicación y hazla tuya\n2. Crea tu primera publicación original\n3. Configura la navegación de tu sitio"
+  },
+  {
+    "slug": "your-first-real-post",
+    "title": "Tu primera publicación real (bórrame)",
+    "excerpt": "Un lienzo en blanco listo para tus ideas.",
+    "body": "Reemplaza este texto con tu propio contenido. ¿Sobre qué vas a escribir?\n\nConsejo: Usa la tecla `/` para insertar bloques como encabezados, imágenes y citas."
+  }
+]

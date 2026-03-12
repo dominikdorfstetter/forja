@@ -73,6 +73,9 @@ use utoipa::{Modify, OpenApi};
         // Site Settings
         crate::handlers::site_settings::get_site_settings,
         crate::handlers::site_settings::update_site_settings,
+        // Onboarding Progress
+        crate::handlers::onboarding_progress::get_onboarding_progress,
+        crate::handlers::onboarding_progress::complete_onboarding_step,
         // Blogs
         crate::handlers::blog::list_blogs,
         crate::handlers::blog::list_published_blogs,
@@ -93,6 +96,8 @@ use utoipa::{Modify, OpenApi};
         crate::handlers::blog::review_blog,
         crate::handlers::blog::rss_feed,
         crate::handlers::blog::bulk_blogs,
+        crate::handlers::blog::seed_sample_content,
+        crate::handlers::blog::delete_sample_content,
         // Pages
         crate::handlers::page::list_pages,
         crate::handlers::page::get_page,
@@ -511,6 +516,10 @@ use utoipa::{Modify, OpenApi};
         crate::dto::review::ReviewAction,
         crate::dto::review::ReviewActionRequest,
         crate::dto::review::ReviewActionResponse,
+        // Onboarding Progress DTOs
+        crate::dto::onboarding_progress::OnboardingProgressResponse,
+        crate::dto::onboarding_progress::OnboardingStepResponse,
+        crate::dto::onboarding_progress::CompleteStepRequest,
         // Config DTOs
         crate::dto::config::ConfigResponse,
     )),

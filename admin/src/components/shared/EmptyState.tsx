@@ -1,4 +1,4 @@
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Stack, Typography } from '@mui/material';
 import InboxIcon from '@mui/icons-material/Inbox';
 import { ReactNode } from 'react';
 
@@ -10,9 +10,13 @@ interface EmptyStateProps {
     label: string;
     onClick: () => void;
   };
+  secondaryAction?: {
+    label: string;
+    onClick: () => void;
+  };
 }
 
-export default function EmptyState({ icon, title, description, action }: EmptyStateProps) {
+export default function EmptyState({ icon, title, description, action, secondaryAction }: EmptyStateProps) {
   return (
     <Box role="status" aria-live="polite" data-testid="empty-state" sx={{ textAlign: 'center', py: 8 }}>
       <Box sx={{ color: 'text.disabled', mb: 2 }}>
@@ -26,10 +30,19 @@ export default function EmptyState({ icon, title, description, action }: EmptySt
           {description}
         </Typography>
       )}
-      {action && (
-        <Button variant="outlined" onClick={action.onClick}>
-          {action.label}
-        </Button>
+      {(action || secondaryAction) && (
+        <Stack direction="row" spacing={2} justifyContent="center">
+          {action && (
+            <Button variant="outlined" onClick={action.onClick}>
+              {action.label}
+            </Button>
+          )}
+          {secondaryAction && (
+            <Button variant="text" onClick={secondaryAction.onClick}>
+              {secondaryAction.label}
+            </Button>
+          )}
+        </Stack>
       )}
     </Box>
   );

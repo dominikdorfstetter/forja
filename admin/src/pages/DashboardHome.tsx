@@ -17,6 +17,7 @@ import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import { useAuth } from '@/store/AuthContext';
 import { useSiteContext } from '@/store/SiteContext';
 import { useDashboardData } from '@/hooks/useDashboardData';
+import { useSiteContextData } from '@/hooks/useSiteContextData';
 import SetupChecklist from '@/components/SetupChecklist';
 import ContentStatusChart from '@/components/dashboard/ContentStatusChart';
 import AttentionPanel from '@/components/dashboard/AttentionPanel';
@@ -108,6 +109,31 @@ export default function DashboardHome() {
   const hasNoSites = !sitesLoading2 && (!sites || sites.length === 0);
 
   const dashboard = useDashboardData();
+  const { context: siteContext } = useSiteContextData();
+
+  // Onboarding progress (per-site checklist state from backend)
+  const { data: onboardingProgress } = useQuery({
+    queryKey: ['onboardingProgress', selectedSiteId],
+    queryFn: () => apiService.getOnboardingProgress(selectedSiteId),
+    enabled: hasSite,
+  });
+
+  const completeStepMutation = useMutation({
+    mutationFn: (stepKey: string) =>
+      apiService.completeOnboardingStep(selectedSiteId, { step_key: stepKey }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['onboardingProgress', selectedSiteId] });
+    },
+    onError: showError,
+  });
+
+  const deleteSamplesMutation = useMutation({
+    mutationFn: () => apiService.deleteSampleContent(selectedSiteId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dashboard-blogs', selectedSiteId] });
+    },
+    onError: showError,
+  });
 
   // Fetch onboarding state (only when user has no sites)
   const { data: onboarding, isLoading: onboardingLoading } = useQuery({
@@ -241,7 +267,13 @@ export default function DashboardHome() {
           hasPages={dashboard.totalPages > 0}
           hasBlogs={dashboard.totalBlogs > 0}
           hasNavigation={hasNavigation}
+          hasPublished={dashboard.hasPublished}
+          hasSampleContent={dashboard.hasSampleContent}
+          isTeam={siteContext.member_count >= 2}
+          completedSteps={onboardingProgress?.completed_steps?.map((s) => s.step_key) ?? []}
           onDismiss={dismissChecklist}
+          onCompleteStep={(stepKey) => completeStepMutation.mutate(stepKey)}
+          onDeleteSamples={() => deleteSamplesMutation.mutate()}
         />
       )}
 

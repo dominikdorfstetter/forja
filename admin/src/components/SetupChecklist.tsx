@@ -16,10 +16,12 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import WebIcon from '@mui/icons-material/Web';
-import TranslateIcon from '@mui/icons-material/Translate';
-import DescriptionIcon from '@mui/icons-material/Description';
-import ArticleIcon from '@mui/icons-material/Article';
-import MenuIcon from '@mui/icons-material/Menu';
+import EditIcon from '@mui/icons-material/Edit';
+import PreviewIcon from '@mui/icons-material/Preview';
+import PublishIcon from '@mui/icons-material/Publish';
+import SettingsIcon from '@mui/icons-material/Settings';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
+import WorkflowIcon from '@mui/icons-material/AccountTree';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 
@@ -28,7 +30,13 @@ interface SetupChecklistProps {
   hasPages: boolean;
   hasBlogs: boolean;
   hasNavigation: boolean;
+  hasPublished: boolean;
+  hasSampleContent: boolean;
+  isTeam: boolean;
+  completedSteps: string[];
   onDismiss: () => void;
+  onCompleteStep: (stepKey: string) => void;
+  onDeleteSamples?: () => void;
 }
 
 interface ChecklistStep {
@@ -36,33 +44,52 @@ interface ChecklistStep {
   icon: React.ReactNode;
   done: boolean;
   route: string;
+  estimateKey: string;
 }
 
 export default function SetupChecklist({
-  hasLocales,
-  hasPages,
   hasBlogs,
-  hasNavigation,
+  hasPublished,
+  hasSampleContent,
+  isTeam,
+  completedSteps,
   onDismiss,
+  onCompleteStep,
+  onDeleteSamples,
 }: SetupChecklistProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const steps: ChecklistStep[] = useMemo(
-    () => [
-      { key: 'createSite', icon: <WebIcon fontSize="small" />, done: true, route: '/sites' },
-      { key: 'addLanguage', icon: <TranslateIcon fontSize="small" />, done: hasLocales, route: '/locales' },
-      { key: 'createPage', icon: <DescriptionIcon fontSize="small" />, done: hasPages, route: '/pages' },
-      { key: 'writeBlog', icon: <ArticleIcon fontSize="small" />, done: hasBlogs, route: '/blogs' },
-      { key: 'setupNav', icon: <MenuIcon fontSize="small" />, done: hasNavigation, route: '/navigation' },
-    ],
-    [hasLocales, hasPages, hasBlogs, hasNavigation],
-  );
+  const steps: ChecklistStep[] = useMemo(() => {
+    const done = (key: string) => completedSteps.includes(key);
+    const base: ChecklistStep[] = [
+      { key: 'create_site', icon: <WebIcon fontSize="small" />, done: true, route: '/sites', estimateKey: 'done' },
+      { key: 'edit_first_post', icon: <EditIcon fontSize="small" />, done: done('edit_first_post') || hasBlogs, route: '/blogs', estimateKey: '2min' },
+      { key: 'preview_site', icon: <PreviewIcon fontSize="small" />, done: done('preview_site'), route: '/settings', estimateKey: '30sec' },
+      { key: 'publish_first_post', icon: <PublishIcon fontSize="small" />, done: done('publish_first_post') || hasPublished, route: '/blogs', estimateKey: '1min' },
+      { key: 'customize_settings', icon: <SettingsIcon fontSize="small" />, done: done('customize_settings'), route: '/settings', estimateKey: '2min' },
+    ];
+
+    if (isTeam) {
+      base.push(
+        { key: 'invite_team', icon: <GroupAddIcon fontSize="small" />, done: done('invite_team'), route: '/members', estimateKey: '1min' },
+        { key: 'setup_workflow', icon: <WorkflowIcon fontSize="small" />, done: done('setup_workflow'), route: '/settings', estimateKey: '1min' },
+      );
+    }
+
+    return base;
+  }, [completedSteps, hasBlogs, hasPublished, isTeam]);
 
   const completed = steps.filter((s) => s.done).length;
   const total = steps.length;
   const progress = Math.round((completed / total) * 100);
   const allDone = completed === total;
+
+  const handleStepClick = (step: ChecklistStep) => {
+    if (step.done) return;
+    onCompleteStep(step.key);
+    navigate(step.route);
+  };
 
   return (
     <Paper sx={{ p: 3, mb: 3 }}>
@@ -95,7 +122,7 @@ export default function SetupChecklist({
         {steps.map((step) => (
           <ListItem key={step.key} disablePadding>
             <ListItemButton
-              onClick={() => !step.done && navigate(step.route)}
+              onClick={() => handleStepClick(step)}
               disabled={step.done}
               sx={{ borderRadius: 1, py: 0.5 }}
             >
@@ -114,23 +141,35 @@ export default function SetupChecklist({
               </ListItemIcon>
               <ListItemText
                 primary={t(`setupChecklist.steps.${step.key}`)}
+                secondary={step.done ? undefined : t(`setupChecklist.descriptions.${step.key}`)}
                 primaryTypographyProps={{
                   variant: 'body2',
                   sx: step.done ? { textDecoration: 'line-through', color: 'text.disabled' } : undefined,
                 }}
+                secondaryTypographyProps={{ variant: 'caption' }}
               />
+              {!step.done && (
+                <Typography variant="caption" color="text.disabled" sx={{ ml: 1, whiteSpace: 'nowrap' }}>
+                  ~{t(`setupChecklist.estimates.${step.estimateKey}`)}
+                </Typography>
+              )}
             </ListItemButton>
           </ListItem>
         ))}
       </List>
 
-      {allDone && (
-        <Box sx={{ mt: 2, textAlign: 'center' }}>
+      <Stack direction="row" spacing={1} sx={{ mt: 2, justifyContent: 'center' }}>
+        {hasSampleContent && onDeleteSamples && (
+          <Button variant="text" size="small" color="warning" onClick={onDeleteSamples}>
+            {t('setupChecklist.deleteSamples')}
+          </Button>
+        )}
+        {allDone && (
           <Button variant="outlined" size="small" onClick={onDismiss}>
             {t('setupChecklist.dismiss')}
           </Button>
-        </Box>
-      )}
+        )}
+      </Stack>
     </Paper>
   );
 }

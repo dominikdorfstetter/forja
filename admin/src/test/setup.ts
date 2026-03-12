@@ -101,6 +101,8 @@ vi.mock('@/services/api', () => {
     updateBlog: vi.fn(),
     deleteBlog: vi.fn(),
     cloneBlog: vi.fn(),
+    seedSampleContent: vi.fn(),
+    deleteSampleContent: vi.fn(),
     bulkBlogs: vi.fn(),
     createBlogLocalization: vi.fn(),
     // Page methods
@@ -136,6 +138,9 @@ vi.mock('@/services/api', () => {
     // Onboarding
     getOnboarding: vi.fn(),
     completeOnboarding: vi.fn(),
+    // Onboarding progress
+    getOnboardingProgress: vi.fn(),
+    completeOnboardingStep: vi.fn(),
     // Help state
     getHelpState: vi.fn(),
     updateHelpState: vi.fn(),

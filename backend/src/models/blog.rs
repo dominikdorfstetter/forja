@@ -23,6 +23,7 @@ pub struct BlogWithContent {
     pub header_image_id: Option<Uuid>,
     pub is_featured: bool,
     pub allow_comments: bool,
+    pub is_sample: bool,
     // Content fields
     pub slug: Option<String>,
     pub status: ContentStatus,
@@ -45,6 +46,7 @@ pub struct Blog {
     pub header_image_id: Option<Uuid>,
     pub is_featured: bool,
     pub allow_comments: bool,
+    pub is_sample: bool,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
@@ -69,6 +71,35 @@ fn normalize_content_status(api_value: &str) -> Option<&'static str> {
     }
 }
 
+/// A single seed blog post loaded from a JSON resource file.
+#[derive(serde::Deserialize)]
+struct SeedPost {
+    slug: String,
+    title: String,
+    excerpt: Option<String>,
+    body: Option<String>,
+}
+
+/// Loads localized sample content from JSON resource files embedded at compile time.
+///
+/// Falls back to English for unsupported locale codes.
+fn load_seed_content(locale_code: &str) -> Vec<SeedPost> {
+    let base = locale_code.split('-').next().unwrap_or(locale_code);
+
+    let json = match base {
+        "de" => include_str!("../../resources/seed-content/de.json"),
+        "es" => include_str!("../../resources/seed-content/es.json"),
+        "fr" => include_str!("../../resources/seed-content/fr.json"),
+        "it" => include_str!("../../resources/seed-content/it.json"),
+        "nl" => include_str!("../../resources/seed-content/nl.json"),
+        "pl" => include_str!("../../resources/seed-content/pl.json"),
+        "pt" => include_str!("../../resources/seed-content/pt.json"),
+        _ => include_str!("../../resources/seed-content/en.json"),
+    };
+
+    serde_json::from_str(json).expect("invalid seed content JSON")
+}
+
 impl Blog {
     /// Find all blogs for a site
     pub async fn find_all_for_site(
@@ -81,7 +112,7 @@ impl Blog {
             r#"
             SELECT
                 b.id, b.content_id, b.author, b.published_date,
-                b.reading_time_minutes, b.cover_image_id, b.header_image_id, b.is_featured, b.allow_comments,
+                b.reading_time_minutes, b.cover_image_id, b.header_image_id, b.is_featured, b.allow_comments, b.is_sample,
                 c.slug, c.status, c.published_at, c.publish_start, c.publish_end,
                 b.created_at, b.updated_at
             FROM blogs b
@@ -112,7 +143,7 @@ impl Blog {
             r#"
             SELECT
                 b.id, b.content_id, b.author, b.published_date,
-                b.reading_time_minutes, b.cover_image_id, b.header_image_id, b.is_featured, b.allow_comments,
+                b.reading_time_minutes, b.cover_image_id, b.header_image_id, b.is_featured, b.allow_comments, b.is_sample,
                 c.slug, c.status, c.published_at, c.publish_start, c.publish_end,
                 b.created_at, b.updated_at
             FROM blogs b
@@ -142,7 +173,7 @@ impl Blog {
             r#"
             SELECT
                 b.id, b.content_id, b.author, b.published_date,
-                b.reading_time_minutes, b.cover_image_id, b.header_image_id, b.is_featured, b.allow_comments,
+                b.reading_time_minutes, b.cover_image_id, b.header_image_id, b.is_featured, b.allow_comments, b.is_sample,
                 c.slug, c.status, c.published_at, c.publish_start, c.publish_end,
                 b.created_at, b.updated_at
             FROM blogs b
@@ -168,7 +199,7 @@ impl Blog {
             r#"
             SELECT
                 b.id, b.content_id, b.author, b.published_date,
-                b.reading_time_minutes, b.cover_image_id, b.header_image_id, b.is_featured, b.allow_comments,
+                b.reading_time_minutes, b.cover_image_id, b.header_image_id, b.is_featured, b.allow_comments, b.is_sample,
                 c.slug, c.status, c.published_at, c.publish_start, c.publish_end,
                 b.created_at, b.updated_at
             FROM blogs b
@@ -196,7 +227,7 @@ impl Blog {
             r#"
             SELECT
                 b.id, b.content_id, b.author, b.published_date,
-                b.reading_time_minutes, b.cover_image_id, b.header_image_id, b.is_featured, b.allow_comments,
+                b.reading_time_minutes, b.cover_image_id, b.header_image_id, b.is_featured, b.allow_comments, b.is_sample,
                 c.slug, c.status, c.published_at, c.publish_start, c.publish_end,
                 b.created_at, b.updated_at
             FROM blogs b
@@ -249,7 +280,7 @@ impl Blog {
                 SELECT
                     b.id, b.content_id, b.author, b.published_date,
                     b.reading_time_minutes, b.cover_image_id, b.header_image_id,
-                    b.is_featured, b.allow_comments,
+                    b.is_featured, b.allow_comments, b.is_sample,
                     c.slug, c.status, c.published_at, c.publish_start, c.publish_end,
                     b.created_at, b.updated_at
                 FROM blogs b
@@ -293,7 +324,7 @@ impl Blog {
             SELECT
                 id, content_id, author, published_date,
                 reading_time_minutes, cover_image_id, header_image_id,
-                is_featured, allow_comments,
+                is_featured, allow_comments, is_sample,
                 slug, status, published_at, publish_start, publish_end,
                 created_at, updated_at
             FROM scores
@@ -396,7 +427,7 @@ impl Blog {
             r#"
             SELECT
                 b.id, b.content_id, b.author, b.published_date,
-                b.reading_time_minutes, b.cover_image_id, b.header_image_id, b.is_featured, b.allow_comments,
+                b.reading_time_minutes, b.cover_image_id, b.header_image_id, b.is_featured, b.allow_comments, b.is_sample,
                 c.slug, c.status, c.published_at, c.publish_start, c.publish_end,
                 b.created_at, b.updated_at
             FROM blogs b
@@ -513,7 +544,7 @@ impl Blog {
             r#"
             SELECT
                 b.id, b.content_id, b.author, b.published_date,
-                b.reading_time_minutes, b.cover_image_id, b.header_image_id, b.is_featured, b.allow_comments,
+                b.reading_time_minutes, b.cover_image_id, b.header_image_id, b.is_featured, b.allow_comments, b.is_sample,
                 c.slug, c.status, c.published_at, c.publish_start, c.publish_end,
                 b.created_at, b.updated_at
             FROM blogs b
@@ -634,7 +665,7 @@ impl Blog {
             r#"
             SELECT
                 b.id, b.content_id, b.author, b.published_date,
-                b.reading_time_minutes, b.cover_image_id, b.header_image_id, b.is_featured, b.allow_comments,
+                b.reading_time_minutes, b.cover_image_id, b.header_image_id, b.is_featured, b.allow_comments, b.is_sample,
                 c.slug, c.status, c.published_at, c.publish_start, c.publish_end,
                 b.created_at, b.updated_at
             FROM blogs b
@@ -762,7 +793,7 @@ impl Blog {
             r#"
             SELECT
                 b.id, b.content_id, b.author, b.published_date,
-                b.reading_time_minutes, b.cover_image_id, b.header_image_id, b.is_featured, b.allow_comments,
+                b.reading_time_minutes, b.cover_image_id, b.header_image_id, b.is_featured, b.allow_comments, b.is_sample,
                 c.slug, c.status, c.published_at, c.publish_start, c.publish_end,
                 b.created_at, b.updated_at
             FROM blogs b
@@ -782,6 +813,127 @@ impl Blog {
         let blog = Self::find_by_id(pool, id).await?;
         ContentService::soft_delete_content(pool, blog.content_id).await
     }
+
+    /// Seed sample blog posts for a new site
+    pub async fn seed_sample_content(
+        pool: &PgPool,
+        site_id: Uuid,
+        locale_id: Uuid,
+        author: &str,
+        locale_code: &str,
+    ) -> Result<Vec<BlogWithContent>, ApiError> {
+        use crate::models::content::ContentLocalization;
+
+        let samples = load_seed_content(locale_code);
+
+        let mut created = Vec::new();
+
+        for post in &samples {
+            let req = CreateBlogRequest {
+                slug: post.slug.clone(),
+                author: author.to_string(),
+                published_date: chrono::Utc::now().date_naive(),
+                reading_time_minutes: Some(2),
+                cover_image_id: None,
+                header_image_id: None,
+                is_featured: false,
+                allow_comments: true,
+                status: ContentStatus::Draft,
+                publish_start: None,
+                publish_end: None,
+                site_ids: vec![site_id],
+            };
+
+            let blog = Self::create(pool, req).await?;
+
+            // Mark as sample
+            sqlx::query("UPDATE blogs SET is_sample = TRUE WHERE id = $1")
+                .bind(blog.id)
+                .execute(pool)
+                .await?;
+
+            // Create localization with sample content
+            ContentLocalization::create(
+                pool,
+                blog.content_id,
+                locale_id,
+                &post.title,
+                None,
+                post.excerpt.as_deref(),
+                post.body.as_deref(),
+                None,
+                None,
+            )
+            .await?;
+
+            // Re-fetch to get is_sample = true
+            let updated = Self::find_by_id(pool, blog.id).await?;
+            created.push(updated);
+        }
+
+        Ok(created)
+    }
+
+    /// Delete all sample blog posts for a site
+    pub async fn delete_sample_content(pool: &PgPool, site_id: Uuid) -> Result<i64, ApiError> {
+        let sample_ids: Vec<Uuid> = sqlx::query_scalar(
+            r#"
+            SELECT b.id
+            FROM blogs b
+            INNER JOIN contents c ON b.content_id = c.id
+            INNER JOIN content_sites cs ON c.id = cs.content_id
+            WHERE cs.site_id = $1 AND b.is_sample = TRUE AND c.is_deleted = FALSE
+            "#,
+        )
+        .bind(site_id)
+        .fetch_all(pool)
+        .await?;
+
+        let count = sample_ids.len() as i64;
+        for id in sample_ids {
+            Self::soft_delete(pool, id).await?;
+        }
+
+        Ok(count)
+    }
+
+    /// Count sample blogs for a site
+    pub async fn count_sample_for_site(pool: &PgPool, site_id: Uuid) -> Result<i64, ApiError> {
+        let row: (i64,) = sqlx::query_as(
+            r#"
+            SELECT COUNT(*)
+            FROM blogs b
+            INNER JOIN contents c ON b.content_id = c.id
+            INNER JOIN content_sites cs ON c.id = cs.content_id
+            WHERE cs.site_id = $1 AND b.is_sample = TRUE AND c.is_deleted = FALSE
+            "#,
+        )
+        .bind(site_id)
+        .fetch_one(pool)
+        .await?;
+
+        Ok(row.0)
+    }
+
+    /// Check if a site has ever had a published blog post
+    pub async fn has_ever_published(pool: &PgPool, site_id: Uuid) -> Result<bool, ApiError> {
+        let exists: bool = sqlx::query_scalar(
+            r#"
+            SELECT EXISTS(
+                SELECT 1
+                FROM blogs b
+                INNER JOIN contents c ON b.content_id = c.id
+                INNER JOIN content_sites cs ON c.id = cs.content_id
+                WHERE cs.site_id = $1 AND c.status = 'published' AND c.is_deleted = FALSE
+            )
+            "#,
+        )
+        .bind(site_id)
+        .fetch_one(pool)
+        .await?;
+
+        Ok(exists)
+    }
 }
 
 #[cfg(test)]
@@ -800,6 +952,7 @@ mod tests {
             header_image_id: None,
             is_featured: true,
             allow_comments: true,
+            is_sample: false,
             slug: Some("my-blog-post".to_string()),
             status: ContentStatus::Published,
             published_at: Some(Utc::now()),
