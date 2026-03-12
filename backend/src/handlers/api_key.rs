@@ -19,7 +19,7 @@ use crate::models::api_key::{ApiKey, ApiKeyPermission, ApiKeyStatus, ApiKeyUsage
 use crate::models::audit::AuditAction;
 use crate::models::site_membership::SiteRole;
 use crate::services::audit_service;
-use crate::utils::pagination::PaginationParams;
+use crate::utils::list_params::ListParams;
 use crate::AppState;
 
 /// Maximum API key permission a given site role can create
@@ -163,7 +163,10 @@ pub async fn create_api_key(
         ("permission" = Option<String>, Query, description = "Filter by permission"),
         ("site_id" = Option<Uuid>, Query, description = "Filter by site ID"),
         ("page" = Option<i64>, Query, description = "Page number (default 1)"),
-        ("per_page" = Option<i64>, Query, description = "Items per page (default 10, max 100)")
+        ("page_size" = Option<i64>, Query, description = "Items per page (default 10, max 100)"),
+        ("search" = Option<String>, Query, description = "Search by name or key prefix (ILIKE)"),
+        ("sort_by" = Option<String>, Query, description = "Sort column: created_at (default), name"),
+        ("sort_dir" = Option<String>, Query, description = "Sort direction: asc or desc")
     ),
     responses(
         (status = 200, description = "List of API keys", body = PaginatedApiKeys),
@@ -172,7 +175,8 @@ pub async fn create_api_key(
     ),
     security(("api_key" = []), ("bearer_auth" = []))
 )]
-#[get("/api-keys?<status>&<permission>&<site_id>&<page>&<per_page>")]
+#[allow(clippy::too_many_arguments)]
+#[get("/api-keys?<status>&<permission>&<site_id>&<page>&<page_size>&<search>&<sort_by>&<sort_dir>")]
 pub async fn list_api_keys(
     state: &State<AppState>,
     auth: AuthenticatedKey,
@@ -180,7 +184,10 @@ pub async fn list_api_keys(
     permission: Option<String>,
     site_id: Option<Uuid>,
     page: Option<i64>,
-    per_page: Option<i64>,
+    page_size: Option<i64>,
+    search: Option<String>,
+    sort_by: Option<String>,
+    sort_dir: Option<String>,
 ) -> Result<Json<PaginatedApiKeys>, ApiError> {
     let is_sys = auth.is_system_admin(&state.db).await.unwrap_or(false);
 
@@ -223,8 +230,14 @@ pub async fn list_api_keys(
         })
         .transpose()?;
 
-    let params = PaginationParams::new(page, per_page);
-    let (limit, offset) = params.limit_offset();
+    let list_params = ListParams::new(
+        page,
+        page_size,
+        search.clone(),
+        sort_by.clone(),
+        sort_dir.clone(),
+    );
+    let (limit, offset) = list_params.limit_offset();
 
     let keys = ApiKey::list(
         &state.db,
@@ -233,11 +246,21 @@ pub async fn list_api_keys(
         effective_site_id,
         limit,
         offset,
+        list_params.search_ref(),
+        list_params.sort.sort_by.as_deref(),
+        list_params.sort.sort_dir.as_deref(),
     )
     .await?;
-    let total = ApiKey::count(&state.db, status, permission, effective_site_id).await?;
+    let total = ApiKey::count(
+        &state.db,
+        status,
+        permission,
+        effective_site_id,
+        list_params.search_ref(),
+    )
+    .await?;
     let items: Vec<ApiKeyListItem> = keys.into_iter().map(ApiKeyListItem::from).collect();
-    Ok(Json(params.paginate(items, total)))
+    Ok(Json(list_params.paginate(items, total)))
 }
 
 /// Get an API key by ID

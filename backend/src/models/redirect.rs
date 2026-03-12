@@ -8,6 +8,7 @@ use uuid::Uuid;
 use crate::dto::redirect::{CreateRedirectRequest, UpdateRedirectRequest};
 use crate::errors::codes;
 use crate::errors::ApiError;
+use crate::utils::list_params::ListParams;
 
 /// URL redirect model
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
@@ -56,6 +57,85 @@ impl Redirect {
             .bind(site_id)
             .fetch_one(pool)
             .await?;
+        Ok(row.0)
+    }
+
+    /// Find all redirects for a site (filtered, paginated, sortable)
+    pub async fn find_all_for_site_filtered(
+        pool: &PgPool,
+        site_id: Uuid,
+        params: &ListParams,
+    ) -> Result<Vec<Self>, ApiError> {
+        let (limit, offset) = params.limit_offset();
+        let order_col = match params.sort.field_or("created_at") {
+            "source_path" => "r.source_path",
+            _ => "r.created_at",
+        };
+        let order_dir = params.sort.direction();
+
+        let mut where_clauses = vec!["r.site_id = $1".to_string()];
+        let mut bind_idx = 4u32; // $1=site_id, $2=limit, $3=offset
+
+        if params.search.is_some() {
+            where_clauses.push(format!(
+                "(r.source_path ILIKE '%' || ${bind_idx} || '%' OR r.destination_path ILIKE '%' || ${bind_idx} || '%')"
+            ));
+            bind_idx += 1;
+        }
+        let _ = bind_idx;
+
+        let sql = format!(
+            "SELECT r.id, r.site_id, r.source_path, r.destination_path, r.status_code, \
+                    r.is_active, r.description, r.created_at, r.updated_at \
+             FROM redirects r \
+             WHERE {} \
+             ORDER BY {} {} \
+             LIMIT $2 OFFSET $3",
+            where_clauses.join(" AND "),
+            order_col,
+            order_dir
+        );
+
+        let mut query = sqlx::query_as::<_, Self>(&sql)
+            .bind(site_id)
+            .bind(limit)
+            .bind(offset);
+        if let Some(s) = params.search_ref() {
+            query = query.bind(s);
+        }
+
+        let redirects = query.fetch_all(pool).await?;
+        Ok(redirects)
+    }
+
+    /// Count redirects for a site (with optional search filter)
+    pub async fn count_for_site_filtered(
+        pool: &PgPool,
+        site_id: Uuid,
+        search: Option<&str>,
+    ) -> Result<i64, ApiError> {
+        let mut where_clauses = vec!["r.site_id = $1".to_string()];
+        let mut bind_idx = 2u32;
+
+        if search.is_some() {
+            where_clauses.push(format!(
+                "(r.source_path ILIKE '%' || ${bind_idx} || '%' OR r.destination_path ILIKE '%' || ${bind_idx} || '%')"
+            ));
+            bind_idx += 1;
+        }
+        let _ = bind_idx;
+
+        let sql = format!(
+            "SELECT COUNT(*) FROM redirects r WHERE {}",
+            where_clauses.join(" AND "),
+        );
+
+        let mut query = sqlx::query_as::<_, (i64,)>(&sql).bind(site_id);
+        if let Some(s) = search {
+            query = query.bind(s);
+        }
+
+        let row = query.fetch_one(pool).await?;
         Ok(row.0)
     }
 

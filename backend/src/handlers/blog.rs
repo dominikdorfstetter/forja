@@ -71,7 +71,7 @@ impl<'r> Responder<'r, 'static> for RssResponse {
     params(
         ("site_id" = Uuid, Path, description = "Site UUID"),
         ("page" = Option<i64>, Query, description = "Page number (default 1)"),
-        ("per_page" = Option<i64>, Query, description = "Items per page (default 10, max 100)"),
+        ("page_size" = Option<i64>, Query, description = "Items per page (default 10, max 100)"),
         ("search" = Option<String>, Query, description = "Search by ID, slug, or author (ILIKE)"),
         ("status" = Option<String>, Query, description = "Filter by status"),
         ("sort_by" = Option<String>, Query, description = "Sort column: slug, author, published_date, status, created_at"),
@@ -86,12 +86,12 @@ impl<'r> Responder<'r, 'static> for RssResponse {
     security(("api_key" = []))
 )]
 #[allow(clippy::too_many_arguments)]
-#[get("/sites/<site_id>/blogs?<page>&<per_page>&<search>&<status>&<sort_by>&<sort_dir>&<exclude_status>")]
+#[get("/sites/<site_id>/blogs?<page>&<page_size>&<search>&<status>&<sort_by>&<sort_dir>&<exclude_status>")]
 pub async fn list_blogs(
     state: &State<AppState>,
     site_id: Uuid,
     page: Option<i64>,
-    per_page: Option<i64>,
+    page_size: Option<i64>,
     search: Option<String>,
     status: Option<String>,
     sort_by: Option<String>,
@@ -103,7 +103,7 @@ pub async fn list_blogs(
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)
         .await?;
-    let params = PaginationParams::new(page, per_page);
+    let params = PaginationParams::new(page, page_size);
     let (limit, offset) = params.limit_offset();
 
     let has_filters = search.is_some()
@@ -154,7 +154,7 @@ pub async fn list_blogs(
     params(
         ("site_id" = Uuid, Path, description = "Site UUID"),
         ("page" = Option<i64>, Query, description = "Page number (default 1)"),
-        ("per_page" = Option<i64>, Query, description = "Items per page (default 10, max 100)")
+        ("page_size" = Option<i64>, Query, description = "Items per page (default 10, max 100)")
     ),
     responses(
         (status = 200, description = "Paginated published blogs", body = PaginatedBlogs),
@@ -163,19 +163,19 @@ pub async fn list_blogs(
     ),
     security(("api_key" = []))
 )]
-#[get("/sites/<site_id>/blogs/published?<page>&<per_page>")]
+#[get("/sites/<site_id>/blogs/published?<page>&<page_size>")]
 pub async fn list_published_blogs(
     state: &State<AppState>,
     site_id: Uuid,
     page: Option<i64>,
-    per_page: Option<i64>,
+    page_size: Option<i64>,
     auth: ReadKey,
     _module: ModuleGuard<BlogModule>,
 ) -> Result<Json<PaginatedBlogs>, ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)
         .await?;
-    let params = PaginationParams::new(page, per_page);
+    let params = PaginationParams::new(page, page_size);
     let (limit, offset) = params.limit_offset();
 
     let blogs = Blog::find_published_for_site(&state.db, site_id, limit, offset).await?;
@@ -196,7 +196,7 @@ pub async fn list_published_blogs(
         ("site_id" = Uuid, Path, description = "Site UUID"),
         ("category_slug" = String, Path, description = "Category slug"),
         ("page" = Option<i64>, Query, description = "Page number (default 1)"),
-        ("per_page" = Option<i64>, Query, description = "Items per page (default 10, max 100)")
+        ("page_size" = Option<i64>, Query, description = "Items per page (default 10, max 100)")
     ),
     responses(
         (status = 200, description = "Paginated published blogs in category", body = PaginatedBlogs),
@@ -205,20 +205,20 @@ pub async fn list_published_blogs(
     ),
     security(("api_key" = []))
 )]
-#[get("/sites/<site_id>/blogs/published/category/<category_slug>?<page>&<per_page>")]
+#[get("/sites/<site_id>/blogs/published/category/<category_slug>?<page>&<page_size>")]
 pub async fn list_published_blogs_by_category(
     state: &State<AppState>,
     site_id: Uuid,
     category_slug: &str,
     page: Option<i64>,
-    per_page: Option<i64>,
+    page_size: Option<i64>,
     auth: ReadKey,
     _module: ModuleGuard<BlogModule>,
 ) -> Result<Json<PaginatedBlogs>, ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)
         .await?;
-    let params = PaginationParams::new(page, per_page);
+    let params = PaginationParams::new(page, page_size);
     let (limit, offset) = params.limit_offset();
 
     let blogs =

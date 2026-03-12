@@ -9,7 +9,7 @@ use crate::dto::user::{CreateUserRequest, PaginatedUsers, UpdateUserRequest, Use
 use crate::errors::{ApiError, ProblemDetails};
 use crate::guards::auth_guard::AdminKey;
 use crate::models::user::{User, UserSite};
-use crate::utils::pagination::PaginationParams;
+use crate::utils::list_params::ListParams;
 use crate::AppState;
 
 /// Get user by ID
@@ -104,7 +104,10 @@ pub async fn get_user_sites(
     params(
         ("is_active" = Option<bool>, Query, description = "Filter by active status"),
         ("page" = Option<i64>, Query, description = "Page number (default 1)"),
-        ("per_page" = Option<i64>, Query, description = "Items per page (default 10, max 100)")
+        ("page_size" = Option<i64>, Query, description = "Items per page (default 10, max 100)"),
+        ("search" = Option<String>, Query, description = "Search by username or email (ILIKE)"),
+        ("sort_by" = Option<String>, Query, description = "Sort column: created_at (default), username"),
+        ("sort_dir" = Option<String>, Query, description = "Sort direction: asc or desc")
     ),
     responses(
         (status = 200, description = "List of users", body = PaginatedUsers),
@@ -112,28 +115,35 @@ pub async fn get_user_sites(
     ),
     security(("api_key" = []))
 )]
-#[get("/users?<is_active>&<page>&<per_page>", rank = 2)]
+#[allow(clippy::too_many_arguments)]
+#[get("/users?<is_active>&<page>&<page_size>&<search>&<sort_by>&<sort_dir>", rank = 2)]
 pub async fn list_users(
     state: &State<AppState>,
     _auth: AdminKey,
     is_active: Option<bool>,
     page: Option<i64>,
-    per_page: Option<i64>,
+    page_size: Option<i64>,
+    search: Option<String>,
+    sort_by: Option<String>,
+    sort_dir: Option<String>,
 ) -> Result<Json<PaginatedUsers>, ApiError> {
-    let params = PaginationParams::new(page, per_page);
-    let (limit, offset) = params.limit_offset();
+    let list_params = ListParams::new(page, page_size, search.clone(), sort_by.clone(), sort_dir.clone());
+    let (limit, offset) = list_params.limit_offset();
 
     let users = User::list(
         &state.db,
         is_active,
         limit,
         offset,
+        list_params.search_ref(),
+        list_params.sort.sort_by.as_deref(),
+        list_params.sort.sort_dir.as_deref(),
     )
     .await?;
 
-    let total = User::count(&state.db, is_active).await?;
+    let total = User::count(&state.db, is_active, list_params.search_ref()).await?;
     let items: Vec<UserResponse> = users.into_iter().map(UserResponse::from).collect();
-    Ok(Json(params.paginate(items, total)))
+    Ok(Json(list_params.paginate(items, total)))
 }
 
 /// Create a new user (admin)

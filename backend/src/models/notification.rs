@@ -9,6 +9,7 @@ use uuid::Uuid;
 
 use crate::errors::codes;
 use crate::errors::ApiError;
+use crate::utils::list_params::ListParams;
 
 /// A notification for a user.
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
@@ -79,6 +80,39 @@ impl Notification {
         .bind(offset)
         .fetch_all(pool)
         .await?;
+        Ok(rows)
+    }
+
+    /// Find notifications for a user in a site (filtered, paginated, sortable).
+    /// No search support — notifications have no user-searchable text.
+    pub async fn find_for_user_filtered(
+        pool: &PgPool,
+        clerk_id: &str,
+        site_id: Uuid,
+        params: &ListParams,
+    ) -> Result<Vec<Notification>, ApiError> {
+        let (limit, offset) = params.limit_offset();
+        let order_col = "n.created_at";
+        let order_dir = params.sort.direction();
+
+        let sql = format!(
+            "SELECT n.id, n.site_id, n.recipient_clerk_id, n.actor_clerk_id, \
+                    n.notification_type, n.entity_type, n.entity_id, \
+                    n.title, n.message, n.is_read, n.read_at, n.created_at \
+             FROM notifications n \
+             WHERE n.recipient_clerk_id = $1 AND n.site_id = $2 \
+             ORDER BY {} {} \
+             LIMIT $3 OFFSET $4",
+            order_col, order_dir
+        );
+
+        let rows = sqlx::query_as::<_, Notification>(&sql)
+            .bind(clerk_id)
+            .bind(site_id)
+            .bind(limit)
+            .bind(offset)
+            .fetch_all(pool)
+            .await?;
         Ok(rows)
     }
 

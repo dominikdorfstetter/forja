@@ -22,36 +22,41 @@ use crate::models::page::Page;
 use crate::models::site::Site;
 use crate::models::social::SocialLink;
 use crate::services::audit_service;
-use crate::utils::pagination::PaginationParams;
+use crate::utils::list_params::ListParams;
 use crate::AppState;
 
 /// List audit logs for a site (paginated)
 #[utoipa::path(
     tag = "Audit",
     operation_id = "list_audit_logs",
-    description = "List audit logs for a site (paginated)",
+    description = "List audit logs for a site (paginated, with optional search/sort)",
     params(
         ("site_id" = Uuid, Path, description = "Site UUID"),
         ("page" = Option<i64>, Query, description = "Page number (default 1)"),
-        ("per_page" = Option<i64>, Query, description = "Items per page (default 10, max 100)")
+        ("page_size" = Option<i64>, Query, description = "Items per page (default 10, max 100)"),
+        ("search" = Option<String>, Query, description = "Search by entity_type or action (ILIKE)"),
+        ("sort_by" = Option<String>, Query, description = "Sort column: created_at, action"),
+        ("sort_dir" = Option<String>, Query, description = "Sort direction: asc or desc")
     ),
     responses(
         (status = 200, description = "Paginated audit logs", body = PaginatedAuditLogs)
     ),
     security(("api_key" = []))
 )]
-#[get("/sites/<site_id>/audit?<page>&<per_page>")]
+#[get("/sites/<site_id>/audit?<page>&<page_size>&<search>&<sort_by>&<sort_dir>")]
 pub async fn list_audit_logs(
     state: &State<AppState>,
     site_id: Uuid,
     page: Option<i64>,
-    per_page: Option<i64>,
+    page_size: Option<i64>,
+    search: Option<String>,
+    sort_by: Option<String>,
+    sort_dir: Option<String>,
 ) -> Result<Json<PaginatedAuditLogs>, ApiError> {
-    let params = PaginationParams::new(page, per_page);
-    let (limit, offset) = params.limit_offset();
+    let params = ListParams::new(page, page_size, search, sort_by, sort_dir);
 
-    let logs = AuditLog::find_for_site(&state.db, site_id, limit, offset).await?;
-    let total = AuditLog::count_for_site(&state.db, site_id).await?;
+    let logs = AuditLog::find_for_site_filtered(&state.db, site_id, &params).await?;
+    let total = AuditLog::count_for_site_filtered(&state.db, site_id, params.search_ref()).await?;
 
     let items: Vec<AuditLogResponse> = logs.into_iter().map(AuditLogResponse::from).collect();
     let paginated = params.paginate(items, total);

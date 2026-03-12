@@ -6,6 +6,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::errors::ApiError;
+use crate::utils::list_params::ListParams;
 
 /// Audit action enum matching PostgreSQL
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::Type, PartialEq, utoipa::ToSchema)]
@@ -83,6 +84,85 @@ impl AuditLog {
         .await?;
 
         Ok(logs)
+    }
+
+    /// Find audit logs for a site (filtered, paginated, sortable)
+    pub async fn find_for_site_filtered(
+        pool: &PgPool,
+        site_id: Uuid,
+        params: &ListParams,
+    ) -> Result<Vec<Self>, ApiError> {
+        let (limit, offset) = params.limit_offset();
+        let order_col = match params.sort.field_or("created_at") {
+            "action" => "al.action",
+            _ => "al.created_at",
+        };
+        let order_dir = params.sort.direction();
+
+        let mut where_clauses = vec!["al.site_id = $1".to_string()];
+        let mut bind_idx = 4u32; // $1=site_id, $2=limit, $3=offset
+
+        if params.search.is_some() {
+            where_clauses.push(format!(
+                "(al.entity_type ILIKE '%' || ${bind_idx} || '%' OR al.action::text ILIKE '%' || ${bind_idx} || '%')"
+            ));
+            bind_idx += 1;
+        }
+        let _ = bind_idx;
+
+        let sql = format!(
+            "SELECT al.id, al.site_id, al.user_id, al.action, al.entity_type, al.entity_id, \
+                    al.ip_address::TEXT as ip_address, al.user_agent, al.metadata, al.created_at \
+             FROM audit_logs al \
+             WHERE {} \
+             ORDER BY {} {} \
+             LIMIT $2 OFFSET $3",
+            where_clauses.join(" AND "),
+            order_col,
+            order_dir
+        );
+
+        let mut query = sqlx::query_as::<_, Self>(&sql)
+            .bind(site_id)
+            .bind(limit)
+            .bind(offset);
+        if let Some(s) = params.search_ref() {
+            query = query.bind(s);
+        }
+
+        let logs = query.fetch_all(pool).await?;
+        Ok(logs)
+    }
+
+    /// Count audit logs for a site (with optional search filter)
+    pub async fn count_for_site_filtered(
+        pool: &PgPool,
+        site_id: Uuid,
+        search: Option<&str>,
+    ) -> Result<i64, ApiError> {
+        let mut where_clauses = vec!["al.site_id = $1".to_string()];
+        let mut bind_idx = 2u32;
+
+        if search.is_some() {
+            where_clauses.push(format!(
+                "(al.entity_type ILIKE '%' || ${bind_idx} || '%' OR al.action::text ILIKE '%' || ${bind_idx} || '%')"
+            ));
+            bind_idx += 1;
+        }
+        let _ = bind_idx;
+
+        let sql = format!(
+            "SELECT COUNT(*) FROM audit_logs al WHERE {}",
+            where_clauses.join(" AND "),
+        );
+
+        let mut query = sqlx::query_as::<_, (i64,)>(&sql).bind(site_id);
+        if let Some(s) = search {
+            query = query.bind(s);
+        }
+
+        let row = query.fetch_one(pool).await?;
+        Ok(row.0)
     }
 
     /// Find audit logs for an entity

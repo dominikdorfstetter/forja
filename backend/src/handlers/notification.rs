@@ -10,7 +10,7 @@ use crate::dto::notification::{
 use crate::errors::{codes, ApiError, ProblemDetails};
 use crate::guards::auth_guard::ReadKey;
 use crate::models::notification::Notification;
-use crate::utils::pagination::PaginationParams;
+use crate::utils::list_params::ListParams;
 use crate::AppState;
 
 /// Helper: extract clerk_user_id or return 403.
@@ -25,11 +25,13 @@ fn require_clerk_user_id(auth: &ReadKey) -> Result<&str, ApiError> {
 #[utoipa::path(
     tag = "Notifications",
     operation_id = "list_notifications",
-    description = "List notifications for the current user in a site (paginated, newest first)",
+    description = "List notifications for the current user in a site (paginated, with optional sort)",
     params(
         ("site_id" = Uuid, Path, description = "Site UUID"),
         ("page" = Option<i64>, Query, description = "Page number (default 1)"),
-        ("per_page" = Option<i64>, Query, description = "Items per page (default 20, max 100)")
+        ("page_size" = Option<i64>, Query, description = "Items per page (default 20, max 100)"),
+        ("sort_by" = Option<String>, Query, description = "Sort column: created_at"),
+        ("sort_dir" = Option<String>, Query, description = "Sort direction: asc or desc")
     ),
     responses(
         (status = 200, description = "Paginated notification list", body = PaginatedNotifications),
@@ -38,20 +40,21 @@ fn require_clerk_user_id(auth: &ReadKey) -> Result<&str, ApiError> {
     ),
     security(("bearer_auth" = []))
 )]
-#[get("/sites/<site_id>/notifications?<page>&<per_page>")]
+#[get("/sites/<site_id>/notifications?<page>&<page_size>&<sort_by>&<sort_dir>")]
 pub async fn list_notifications(
     state: &State<AppState>,
     site_id: Uuid,
     page: Option<i64>,
-    per_page: Option<i64>,
+    page_size: Option<i64>,
+    sort_by: Option<String>,
+    sort_dir: Option<String>,
     auth: ReadKey,
 ) -> Result<Json<PaginatedNotifications>, ApiError> {
     let clerk_id = require_clerk_user_id(&auth)?;
-    let params = PaginationParams::new(page, per_page.or(Some(20)));
-    let (limit, offset) = params.limit_offset();
+    let params = ListParams::new(page, page_size.or(Some(20)), None, sort_by, sort_dir);
 
     let notifications =
-        Notification::find_for_user(&state.db, clerk_id, site_id, limit, offset).await?;
+        Notification::find_for_user_filtered(&state.db, clerk_id, site_id, &params).await?;
     let total = Notification::count_for_user(&state.db, clerk_id, site_id).await?;
 
     let items: Vec<NotificationResponse> = notifications

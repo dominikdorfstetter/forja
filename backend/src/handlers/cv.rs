@@ -17,7 +17,7 @@ use crate::models::audit::AuditAction;
 use crate::models::cv::{CvEntry, CvEntryType, Skill};
 use crate::models::site_membership::SiteRole;
 use crate::services::audit_service;
-use crate::utils::pagination::PaginationParams;
+use crate::utils::list_params::ListParams;
 use crate::AppState;
 
 /// List all skills for a site
@@ -28,7 +28,10 @@ use crate::AppState;
     params(
         ("site_id" = Uuid, Path, description = "Site UUID"),
         ("page" = Option<i64>, Query, description = "Page number (default: 1)"),
-        ("per_page" = Option<i64>, Query, description = "Items per page (default: 25)"),
+        ("page_size" = Option<i64>, Query, description = "Items per page (default: 10)"),
+        ("search" = Option<String>, Query, description = "Search by slug (ILIKE)"),
+        ("sort_by" = Option<String>, Query, description = "Sort field: slug (default), display_order, created_at"),
+        ("sort_dir" = Option<String>, Query, description = "Sort direction: asc, desc (default)"),
     ),
     responses(
         (status = 200, description = "List of skills", body = PaginatedSkills),
@@ -37,22 +40,25 @@ use crate::AppState;
     ),
     security(("api_key" = []))
 )]
-#[get("/sites/<site_id>/skills?<page>&<per_page>")]
+#[get("/sites/<site_id>/skills?<page>&<page_size>&<search>&<sort_by>&<sort_dir>")]
+#[allow(clippy::too_many_arguments)]
 pub async fn list_skills(
     state: &State<AppState>,
     site_id: Uuid,
     page: Option<i64>,
-    per_page: Option<i64>,
+    page_size: Option<i64>,
+    search: Option<String>,
+    sort_by: Option<String>,
+    sort_dir: Option<String>,
     auth: ReadKey,
     _module: ModuleGuard<CvModule>,
 ) -> Result<Json<PaginatedSkills>, ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)
         .await?;
-    let params = PaginationParams::new(page, per_page);
-    let (limit, offset) = params.limit_offset();
-    let skills = Skill::find_all_for_site(&state.db, site_id, limit, offset).await?;
-    let total = Skill::count_for_site(&state.db, site_id).await?;
+    let params = ListParams::new(page, page_size, search, sort_by, sort_dir);
+    let skills = Skill::find_all_for_site_filtered(&state.db, site_id, &params).await?;
+    let total = Skill::count_for_site_filtered(&state.db, site_id, params.search_ref()).await?;
     Ok(Json(params.paginate(
         skills.into_iter().map(SkillResponse::from).collect(),
         total,
@@ -237,7 +243,10 @@ pub async fn delete_skill(
         ("site_id" = Uuid, Path, description = "Site UUID"),
         ("entry_type" = Option<String>, Query, description = "Filter by type (work, education, volunteer, certification, project)"),
         ("page" = Option<i64>, Query, description = "Page number (default: 1)"),
-        ("per_page" = Option<i64>, Query, description = "Items per page (default: 25)"),
+        ("page_size" = Option<i64>, Query, description = "Items per page (default: 10)"),
+        ("search" = Option<String>, Query, description = "Search by company or location (ILIKE)"),
+        ("sort_by" = Option<String>, Query, description = "Sort field: display_order (default), start_date, created_at"),
+        ("sort_dir" = Option<String>, Query, description = "Sort direction: asc, desc (default)"),
     ),
     responses(
         (status = 200, description = "List of CV entries", body = PaginatedCvEntries),
@@ -246,13 +255,17 @@ pub async fn delete_skill(
     ),
     security(("api_key" = []))
 )]
-#[get("/sites/<site_id>/cv?<entry_type>&<page>&<per_page>")]
+#[get("/sites/<site_id>/cv?<entry_type>&<page>&<page_size>&<search>&<sort_by>&<sort_dir>")]
+#[allow(clippy::too_many_arguments)]
 pub async fn list_cv_entries(
     state: &State<AppState>,
     site_id: Uuid,
     entry_type: Option<String>,
     page: Option<i64>,
-    per_page: Option<i64>,
+    page_size: Option<i64>,
+    search: Option<String>,
+    sort_by: Option<String>,
+    sort_dir: Option<String>,
     auth: ReadKey,
     _module: ModuleGuard<CvModule>,
 ) -> Result<Json<PaginatedCvEntries>, ApiError> {
@@ -268,10 +281,11 @@ pub async fn list_cv_entries(
         _ => None,
     });
 
-    let params = PaginationParams::new(page, per_page);
-    let (limit, offset) = params.limit_offset();
-    let entries = CvEntry::find_all_for_site(&state.db, site_id, et.clone(), limit, offset).await?;
-    let total = CvEntry::count_for_site(&state.db, site_id, et).await?;
+    let params = ListParams::new(page, page_size, search, sort_by, sort_dir);
+    let entries =
+        CvEntry::find_all_for_site_filtered(&state.db, site_id, et.clone(), &params).await?;
+    let total =
+        CvEntry::count_for_site_filtered(&state.db, site_id, et, params.search_ref()).await?;
     Ok(Json(params.paginate(
         entries.into_iter().map(CvEntryResponse::from).collect(),
         total,

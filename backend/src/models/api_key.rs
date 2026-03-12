@@ -228,7 +228,8 @@ impl ApiKey {
         Ok(key)
     }
 
-    /// List all API keys (with optional filters)
+    /// List all API keys (with optional filters, search, and sort)
+    #[allow(clippy::too_many_arguments)]
     pub async fn list(
         pool: &PgPool,
         status: Option<ApiKeyStatus>,
@@ -236,28 +237,44 @@ impl ApiKey {
         site_id: Option<Uuid>,
         limit: i64,
         offset: i64,
+        search: Option<&str>,
+        sort_by: Option<&str>,
+        sort_dir: Option<&str>,
     ) -> Result<Vec<Self>, ApiError> {
-        let keys = sqlx::query_as::<_, Self>(
+        let search_pattern = search.map(|s| format!("%{}%", s));
+        let order_clause = match sort_by {
+            Some("name") => "ak.name",
+            _ => "ak.created_at",
+        };
+        let dir = match sort_dir {
+            Some("asc" | "ASC") => "ASC",
+            _ => "DESC",
+        };
+        let query = format!(
             r#"
-            SELECT id, key_hash, key_prefix, name, description, permission, site_id, user_id, status,
-                   rate_limit_per_second, rate_limit_per_minute, rate_limit_per_hour, rate_limit_per_day,
-                   total_requests, last_used_at, last_used_ip::TEXT as last_used_ip, expires_at, metadata,
-                   created_by, created_at, updated_at, blocked_at, blocked_reason
-            FROM api_keys
-            WHERE ($1::api_key_status IS NULL OR status = $1)
-              AND ($2::api_key_permission IS NULL OR permission = $2)
-              AND ($3::UUID IS NULL OR site_id = $3)
-            ORDER BY created_at DESC
-            LIMIT $4 OFFSET $5
+            SELECT ak.id, ak.key_hash, ak.key_prefix, ak.name, ak.description, ak.permission, ak.site_id, ak.user_id, ak.status,
+                   ak.rate_limit_per_second, ak.rate_limit_per_minute, ak.rate_limit_per_hour, ak.rate_limit_per_day,
+                   ak.total_requests, ak.last_used_at, ak.last_used_ip::TEXT as last_used_ip, ak.expires_at, ak.metadata,
+                   ak.created_by, ak.created_at, ak.updated_at, ak.blocked_at, ak.blocked_reason
+            FROM api_keys ak
+            WHERE ($1::api_key_status IS NULL OR ak.status = $1)
+              AND ($2::api_key_permission IS NULL OR ak.permission = $2)
+              AND ($3::UUID IS NULL OR ak.site_id = $3)
+              AND ($4::TEXT IS NULL OR ak.name ILIKE $4 OR ak.key_prefix ILIKE $4)
+            ORDER BY {} {}
+            LIMIT $5 OFFSET $6
             "#,
-        )
-        .bind(status)
-        .bind(permission)
-        .bind(site_id)
-        .bind(limit)
-        .bind(offset)
-        .fetch_all(pool)
-        .await?;
+            order_clause, dir
+        );
+        let keys = sqlx::query_as::<_, Self>(&query)
+            .bind(status)
+            .bind(permission)
+            .bind(site_id)
+            .bind(&search_pattern)
+            .bind(limit)
+            .bind(offset)
+            .fetch_all(pool)
+            .await?;
 
         Ok(keys)
     }
@@ -268,19 +285,23 @@ impl ApiKey {
         status: Option<ApiKeyStatus>,
         permission: Option<ApiKeyPermission>,
         site_id: Option<Uuid>,
+        search: Option<&str>,
     ) -> Result<i64, ApiError> {
+        let search_pattern = search.map(|s| format!("%{}%", s));
         let row: (i64,) = sqlx::query_as(
             r#"
             SELECT COUNT(*)
-            FROM api_keys
-            WHERE ($1::api_key_status IS NULL OR status = $1)
-              AND ($2::api_key_permission IS NULL OR permission = $2)
-              AND ($3::UUID IS NULL OR site_id = $3)
+            FROM api_keys ak
+            WHERE ($1::api_key_status IS NULL OR ak.status = $1)
+              AND ($2::api_key_permission IS NULL OR ak.permission = $2)
+              AND ($3::UUID IS NULL OR ak.site_id = $3)
+              AND ($4::TEXT IS NULL OR ak.name ILIKE $4 OR ak.key_prefix ILIKE $4)
             "#,
         )
         .bind(status)
         .bind(permission)
         .bind(site_id)
+        .bind(&search_pattern)
         .fetch_one(pool)
         .await?;
 

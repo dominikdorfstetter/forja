@@ -16,18 +16,21 @@ use crate::models::audit::AuditAction;
 use crate::models::redirect::Redirect;
 use crate::models::site_membership::SiteRole;
 use crate::services::audit_service;
-use crate::utils::pagination::PaginationParams;
+use crate::utils::list_params::ListParams;
 use crate::AppState;
 
 /// List redirects for a site (paginated)
 #[utoipa::path(
     tag = "Redirects",
     operation_id = "list_redirects",
-    description = "List all redirects for a site (paginated)",
+    description = "List all redirects for a site (paginated, with optional search/sort)",
     params(
         ("site_id" = Uuid, Path, description = "Site UUID"),
         ("page" = Option<i64>, Query, description = "Page number (default 1)"),
-        ("per_page" = Option<i64>, Query, description = "Items per page (default 10, max 100)")
+        ("page_size" = Option<i64>, Query, description = "Items per page (default 10, max 100)"),
+        ("search" = Option<String>, Query, description = "Search by source_path or destination_path (ILIKE)"),
+        ("sort_by" = Option<String>, Query, description = "Sort column: created_at, source_path"),
+        ("sort_dir" = Option<String>, Query, description = "Sort direction: asc or desc")
     ),
     responses(
         (status = 200, description = "Paginated redirect list", body = PaginatedRedirects),
@@ -36,22 +39,25 @@ use crate::AppState;
     ),
     security(("api_key" = []))
 )]
-#[get("/sites/<site_id>/redirects?<page>&<per_page>")]
+#[get("/sites/<site_id>/redirects?<page>&<page_size>&<search>&<sort_by>&<sort_dir>")]
+#[allow(clippy::too_many_arguments)]
 pub async fn list_redirects(
     state: &State<AppState>,
     site_id: Uuid,
     page: Option<i64>,
-    per_page: Option<i64>,
+    page_size: Option<i64>,
+    search: Option<String>,
+    sort_by: Option<String>,
+    sort_dir: Option<String>,
     auth: ReadKey,
 ) -> Result<Json<PaginatedRedirects>, ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)
         .await?;
-    let params = PaginationParams::new(page, per_page);
-    let (limit, offset) = params.limit_offset();
+    let params = ListParams::new(page, page_size, search, sort_by, sort_dir);
 
-    let redirects = Redirect::find_all_for_site(&state.db, site_id, limit, offset).await?;
-    let total = Redirect::count_for_site(&state.db, site_id).await?;
+    let redirects = Redirect::find_all_for_site_filtered(&state.db, site_id, &params).await?;
+    let total = Redirect::count_for_site_filtered(&state.db, site_id, params.search_ref()).await?;
 
     let items: Vec<RedirectResponse> = redirects.into_iter().map(RedirectResponse::from).collect();
     let paginated = params.paginate(items, total);

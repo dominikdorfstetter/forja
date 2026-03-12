@@ -11,6 +11,7 @@ use crate::dto::document::{
 };
 use crate::errors::codes;
 use crate::errors::ApiError;
+use crate::utils::list_params::ListParams;
 
 /// Document folder model
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
@@ -158,71 +159,102 @@ impl Document {
         Ok(val.as_i64().unwrap_or(10_485_760))
     }
 
-    /// Count documents for a site, optionally filtered by folder
-    pub async fn count_for_site(
+    /// Count documents for a site with optional folder filter and search
+    pub async fn count_for_site_filtered(
         pool: &PgPool,
         site_id: Uuid,
         folder_id: Option<Uuid>,
+        search: Option<&str>,
     ) -> Result<i64, ApiError> {
-        let row: (i64,) = if let Some(fid) = folder_id {
-            sqlx::query_as("SELECT COUNT(*) FROM documents WHERE site_id = $1 AND folder_id = $2")
-                .bind(site_id)
-                .bind(fid)
-                .fetch_one(pool)
-                .await?
-        } else {
-            sqlx::query_as("SELECT COUNT(*) FROM documents WHERE site_id = $1")
-                .bind(site_id)
-                .fetch_one(pool)
-                .await?
-        };
+        let mut where_clauses = vec!["d.site_id = $1".to_string()];
+        let mut bind_idx = 2u32; // $1=site_id
+
+        if search.is_some() {
+            where_clauses.push(format!("d.file_name ILIKE '%' || ${bind_idx} || '%'"));
+            bind_idx += 1;
+        }
+
+        if folder_id.is_some() {
+            where_clauses.push(format!("d.folder_id = ${bind_idx}"));
+            bind_idx += 1;
+        }
+        let _ = bind_idx;
+
+        let sql = format!(
+            "SELECT COUNT(*) FROM documents d WHERE {}",
+            where_clauses.join(" AND "),
+        );
+
+        let mut query = sqlx::query_as::<_, (i64,)>(&sql).bind(site_id);
+
+        if let Some(s) = search {
+            query = query.bind(s);
+        }
+        if let Some(fid) = folder_id {
+            query = query.bind(fid);
+        }
+
+        let row = query.fetch_one(pool).await?;
         Ok(row.0)
     }
 
-    pub async fn find_all_for_site(
+    /// Find all documents for a site (paginated, searchable, sortable, with optional folder filter)
+    pub async fn find_all_for_site_filtered(
         pool: &PgPool,
         site_id: Uuid,
         folder_id: Option<Uuid>,
-        limit: i64,
-        offset: i64,
+        params: &ListParams,
     ) -> Result<Vec<Self>, ApiError> {
-        let documents = if let Some(fid) = folder_id {
-            sqlx::query_as::<_, Self>(
-                r#"
-                SELECT id, site_id, folder_id, url, document_type, display_order,
-                       file_name, file_size, mime_type,
-                       created_at, updated_at
-                FROM documents
-                WHERE site_id = $1 AND folder_id = $2
-                ORDER BY display_order ASC, created_at DESC
-                LIMIT $3 OFFSET $4
-                "#,
-            )
-            .bind(site_id)
-            .bind(fid)
-            .bind(limit)
-            .bind(offset)
-            .fetch_all(pool)
-            .await?
-        } else {
-            sqlx::query_as::<_, Self>(
-                r#"
-                SELECT id, site_id, folder_id, url, document_type, display_order,
-                       file_name, file_size, mime_type,
-                       created_at, updated_at
-                FROM documents
-                WHERE site_id = $1
-                ORDER BY display_order ASC, created_at DESC
-                LIMIT $2 OFFSET $3
-                "#,
-            )
-            .bind(site_id)
-            .bind(limit)
-            .bind(offset)
-            .fetch_all(pool)
-            .await?
-        };
+        let (limit, offset) = params.limit_offset();
 
+        let mut where_clauses = vec!["d.site_id = $1".to_string()];
+        let mut bind_idx = 4u32; // $1=site_id, $2=limit, $3=offset
+
+        if params.search_ref().is_some() {
+            where_clauses.push(format!("d.file_name ILIKE '%' || ${bind_idx} || '%'"));
+            bind_idx += 1;
+        }
+
+        if folder_id.is_some() {
+            where_clauses.push(format!("d.folder_id = ${bind_idx}"));
+            bind_idx += 1;
+        }
+        let _ = bind_idx;
+
+        let order_col = match params.sort.field_or("created_at") {
+            "file_name" => "d.file_name",
+            _ => "d.created_at",
+        };
+        let order_dir = params.sort.direction();
+
+        let sql = format!(
+            r#"
+            SELECT d.id, d.site_id, d.folder_id, d.url, d.document_type, d.display_order,
+                   d.file_name, d.file_size, d.mime_type,
+                   d.created_at, d.updated_at
+            FROM documents d
+            WHERE {}
+            ORDER BY {} {}
+            LIMIT $2 OFFSET $3
+            "#,
+            where_clauses.join(" AND "),
+            order_col,
+            order_dir,
+        );
+
+        let mut query = sqlx::query_as::<_, Self>(&sql)
+            .bind(site_id)
+            .bind(limit)
+            .bind(offset);
+
+        if let Some(s) = params.search_ref() {
+            query = query.bind(s);
+        }
+        if let Some(fid) = folder_id {
+            query = query.bind(fid);
+        }
+
+        let documents = query.fetch_all(pool).await?;
         Ok(documents)
     }
 

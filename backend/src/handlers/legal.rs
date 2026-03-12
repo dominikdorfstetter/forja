@@ -22,7 +22,7 @@ use crate::models::legal::{
 };
 use crate::models::site_membership::SiteRole;
 use crate::services::audit_service;
-use crate::utils::pagination::PaginationParams;
+use crate::utils::list_params::ListParams;
 use crate::AppState;
 
 /// List all legal documents for a site
@@ -33,7 +33,10 @@ use crate::AppState;
     params(
         ("site_id" = Uuid, Path, description = "Site UUID"),
         ("page" = Option<i64>, Query, description = "Page number (default 1)"),
-        ("per_page" = Option<i64>, Query, description = "Items per page (default 10, max 100)")
+        ("page_size" = Option<i64>, Query, description = "Items per page (default 10, max 100)"),
+        ("search" = Option<String>, Query, description = "Search by cookie name"),
+        ("sort_by" = Option<String>, Query, description = "Sort field (created_at, updated_at, document_type)"),
+        ("sort_dir" = Option<String>, Query, description = "Sort direction (asc, desc)")
     ),
     responses(
         (status = 200, description = "List of legal documents", body = PaginatedLegalDocuments),
@@ -42,22 +45,26 @@ use crate::AppState;
     ),
     security(("api_key" = []))
 )]
-#[get("/sites/<site_id>/legal?<page>&<per_page>")]
+#[get("/sites/<site_id>/legal?<page>&<page_size>&<search>&<sort_by>&<sort_dir>")]
+#[allow(clippy::too_many_arguments)]
 pub async fn list_legal_documents(
     state: &State<AppState>,
     site_id: Uuid,
     page: Option<i64>,
-    per_page: Option<i64>,
+    page_size: Option<i64>,
+    search: Option<String>,
+    sort_by: Option<String>,
+    sort_dir: Option<String>,
     auth: ReadKey,
     _module: ModuleGuard<LegalModule>,
 ) -> Result<Json<PaginatedLegalDocuments>, ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)
         .await?;
-    let params = PaginationParams::new(page, per_page);
-    let (limit, offset) = params.limit_offset();
-    let documents = LegalDocument::find_all_for_site(&state.db, site_id, limit, offset).await?;
-    let total = LegalDocument::count_for_site(&state.db, site_id).await?;
+    let params = ListParams::new(page, page_size, search, sort_by, sort_dir);
+    let documents = LegalDocument::find_all_for_site_filtered(&state.db, site_id, &params).await?;
+    let total =
+        LegalDocument::count_for_site_filtered(&state.db, site_id, params.search_ref()).await?;
     let items: Vec<LegalDocumentResponse> = documents
         .into_iter()
         .map(LegalDocumentResponse::from)

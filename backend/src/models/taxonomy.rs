@@ -10,6 +10,7 @@ use crate::dto::taxonomy::{
 };
 use crate::errors::codes;
 use crate::errors::ApiError;
+use crate::utils::list_params::ListParams;
 
 /// Tag model
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
@@ -99,6 +100,98 @@ impl Tag {
         .await?;
 
         Ok(tags)
+    }
+
+    /// Find all tags for a site with optional search and sort
+    pub async fn find_all_for_site_filtered(
+        pool: &PgPool,
+        site_id: Uuid,
+        params: &ListParams,
+    ) -> Result<Vec<Self>, ApiError> {
+        let (limit, offset) = params.limit_offset();
+
+        let mut where_clauses = vec![
+            "ts.site_id = $1".to_string(),
+            "t.is_active = TRUE".to_string(),
+        ];
+        let mut bind_idx = 4u32; // $1=site_id, $2=limit, $3=offset
+
+        if params.search_ref().is_some() {
+            where_clauses.push(format!("t.slug ILIKE '%' || ${bind_idx} || '%'"));
+            bind_idx += 1;
+        }
+        let _ = bind_idx;
+
+        let order_col = match params.sort.field_or("slug") {
+            "slug" => "t.slug",
+            "created_at" => "t.created_at",
+            _ => "t.slug",
+        };
+        let order_dir = params.sort.direction();
+
+        let sql = format!(
+            r#"
+            SELECT t.id, t.slug, t.is_global, t.is_active, t.created_at
+            FROM tags t
+            INNER JOIN tag_sites ts ON t.id = ts.tag_id
+            WHERE {}
+            ORDER BY {} {}
+            LIMIT $2 OFFSET $3
+            "#,
+            where_clauses.join(" AND "),
+            order_col,
+            order_dir,
+        );
+
+        let mut query = sqlx::query_as::<_, Self>(&sql)
+            .bind(site_id)
+            .bind(limit)
+            .bind(offset);
+
+        if let Some(s) = params.search_ref() {
+            query = query.bind(s);
+        }
+
+        let tags = query.fetch_all(pool).await?;
+        Ok(tags)
+    }
+
+    /// Count tags for a site with optional search
+    pub async fn count_for_site_filtered(
+        pool: &PgPool,
+        site_id: Uuid,
+        search: Option<&str>,
+    ) -> Result<i64, ApiError> {
+        let mut where_clauses = vec![
+            "ts.site_id = $1".to_string(),
+            "t.is_active = TRUE".to_string(),
+        ];
+        let mut bind_idx = 2u32; // $1=site_id
+
+        if search.is_some() {
+            where_clauses.push(format!("t.slug ILIKE '%' || ${bind_idx} || '%'"));
+            bind_idx += 1;
+        }
+        let _ = bind_idx;
+
+        let sql = format!(
+            r#"
+            SELECT COUNT(*)
+            FROM tags t
+            INNER JOIN tag_sites ts ON t.id = ts.tag_id
+            WHERE {}
+            "#,
+            where_clauses.join(" AND "),
+        );
+
+        let mut query = sqlx::query_as::<_, (i64,)>(&sql).bind(site_id);
+
+        if let Some(s) = search {
+            query = query.bind(s);
+        }
+
+        let row = query.fetch_one(pool).await?;
+        Ok(row.0)
     }
 
     /// Find tag by ID
@@ -274,6 +367,100 @@ impl Category {
         .await?;
 
         Ok(categories)
+    }
+
+    /// Find root categories for a site with optional search and sort
+    pub async fn find_root_for_site_filtered(
+        pool: &PgPool,
+        site_id: Uuid,
+        params: &ListParams,
+    ) -> Result<Vec<Self>, ApiError> {
+        let (limit, offset) = params.limit_offset();
+
+        let mut where_clauses = vec![
+            "cs.site_id = $1".to_string(),
+            "c.parent_id IS NULL".to_string(),
+            "c.is_active = TRUE".to_string(),
+        ];
+        let mut bind_idx = 4u32; // $1=site_id, $2=limit, $3=offset
+
+        if params.search_ref().is_some() {
+            where_clauses.push(format!("c.slug ILIKE '%' || ${bind_idx} || '%'"));
+            bind_idx += 1;
+        }
+        let _ = bind_idx;
+
+        let order_col = match params.sort.field_or("slug") {
+            "slug" => "c.slug",
+            "created_at" => "c.created_at",
+            _ => "c.slug",
+        };
+        let order_dir = params.sort.direction();
+
+        let sql = format!(
+            r#"
+            SELECT c.id, c.parent_id, c.slug, c.is_global, c.is_active, c.created_at
+            FROM categories c
+            INNER JOIN category_sites cs ON c.id = cs.category_id
+            WHERE {}
+            ORDER BY {} {}
+            LIMIT $2 OFFSET $3
+            "#,
+            where_clauses.join(" AND "),
+            order_col,
+            order_dir,
+        );
+
+        let mut query = sqlx::query_as::<_, Self>(&sql)
+            .bind(site_id)
+            .bind(limit)
+            .bind(offset);
+
+        if let Some(s) = params.search_ref() {
+            query = query.bind(s);
+        }
+
+        let categories = query.fetch_all(pool).await?;
+        Ok(categories)
+    }
+
+    /// Count root categories for a site with optional search
+    pub async fn count_root_for_site_filtered(
+        pool: &PgPool,
+        site_id: Uuid,
+        search: Option<&str>,
+    ) -> Result<i64, ApiError> {
+        let mut where_clauses = vec![
+            "cs.site_id = $1".to_string(),
+            "c.parent_id IS NULL".to_string(),
+            "c.is_active = TRUE".to_string(),
+        ];
+        let mut bind_idx = 2u32; // $1=site_id
+
+        if search.is_some() {
+            where_clauses.push(format!("c.slug ILIKE '%' || ${bind_idx} || '%'"));
+            bind_idx += 1;
+        }
+        let _ = bind_idx;
+
+        let sql = format!(
+            r#"
+            SELECT COUNT(*)
+            FROM categories c
+            INNER JOIN category_sites cs ON c.id = cs.category_id
+            WHERE {}
+            "#,
+            where_clauses.join(" AND "),
+        );
+
+        let mut query = sqlx::query_as::<_, (i64,)>(&sql).bind(site_id);
+
+        if let Some(s) = search {
+            query = query.bind(s);
+        }
+
+        let row = query.fetch_one(pool).await?;
+        Ok(row.0)
     }
 
     /// Find category by ID
