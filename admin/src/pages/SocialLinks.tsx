@@ -76,7 +76,7 @@ export default function SocialLinksPage() {
     enabled: !!selectedSiteId,
   });
 
-  const prevLinksRef = useRef(links);
+  const prevLinksRef = useRef<SocialLink[] | undefined>(undefined);
   if (links && links !== prevLinksRef.current) {
     setOrderedLinks(links);
   }

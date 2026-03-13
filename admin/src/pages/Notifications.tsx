@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -25,7 +25,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import apiService from '@/services/api';
 import { useSiteContext } from '@/store/SiteContext';
-import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { useListPageState } from '@/hooks/useListPageState';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
@@ -53,26 +53,16 @@ export default function NotificationsPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { selectedSiteId } = useSiteContext();
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(25);
-  const [searchInput, setSearchInput] = useState('');
-  const debouncedSearch = useDebouncedValue(searchInput);
-  const [sortBy, setSortBy] = useState('');
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
-
-  const handleSort = useCallback((column: string) => {
-    setSortBy((prev) => {
-      setSortDir((prevDir) => prev === column ? (prevDir === 'asc' ? 'desc' : 'asc') : 'asc');
-      return column;
-    });
-    setPage(0);
-  }, []);
+  const {
+    page, setPage, pageSize, search, setSearch, debouncedSearch,
+    sortBy, sortDir, handleSort, handleRowsPerPageChange,
+  } = useListPageState();
 
   const { data, isLoading } = useQuery({
-    queryKey: ['notifications', selectedSiteId, page, rowsPerPage, debouncedSearch, sortBy, sortDir],
+    queryKey: ['notifications', selectedSiteId, page, pageSize, debouncedSearch, sortBy, sortDir],
     queryFn: () => apiService.getNotifications(selectedSiteId!, {
-      page: page + 1,
-      page_size: rowsPerPage,
+      page,
+      page_size: pageSize,
       search: debouncedSearch || undefined,
       sort_by: sortBy || undefined,
       sort_dir: sortBy ? sortDir : undefined,
@@ -138,8 +128,8 @@ export default function NotificationsPage() {
       ) : (
         <Paper>
           <TableFilterBar
-            searchValue={searchInput}
-            onSearchChange={(v) => { setSearchInput(v); setPage(0); }}
+            searchValue={search}
+            onSearchChange={setSearch}
             searchPlaceholder={t('notifications.searchPlaceholder')}
           />
           <TableContainer>
@@ -222,13 +212,10 @@ export default function NotificationsPage() {
           <TablePagination
             component="div"
             count={data?.meta?.total_items || 0}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            onPageChange={(_, newPage) => setPage(newPage)}
-            onRowsPerPageChange={(e) => {
-              setRowsPerPage(parseInt(e.target.value, 10));
-              setPage(0);
-            }}
+            page={page - 1}
+            rowsPerPage={pageSize}
+            onPageChange={(_, newPage) => setPage(() => newPage + 1)}
+            onRowsPerPageChange={handleRowsPerPageChange}
             rowsPerPageOptions={[10, 25, 50]}
           />
         </Paper>

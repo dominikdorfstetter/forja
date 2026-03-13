@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Box,
   Alert,
@@ -23,7 +23,7 @@ import { Link as RouterLink } from 'react-router';
 import { v5 as uuidv5 } from 'uuid';
 import apiService from '@/services/api';
 import { useSiteContext } from '@/store/SiteContext';
-import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { useListPageState } from '@/hooks/useListPageState';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
@@ -88,28 +88,18 @@ const ACTION_TYPES: AuditAction[] = [
 export default function ActivityLogPage() {
   const { t } = useTranslation();
   const { selectedSiteId } = useSiteContext();
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(25);
-  const [searchInput, setSearchInput] = useState('');
-  const debouncedSearch = useDebouncedValue(searchInput);
+  const {
+    page, setPage, pageSize, search, setSearch, debouncedSearch,
+    sortBy, sortDir, handleSort, handleRowsPerPageChange,
+  } = useListPageState();
   const [actionFilter, setActionFilter] = useState<string>('');
   const [entityFilter, setEntityFilter] = useState<string>('');
-  const [sortBy, setSortBy] = useState('');
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
-
-  const handleSort = useCallback((column: string) => {
-    setSortBy((prev) => {
-      setSortDir((prevDir) => prev === column ? (prevDir === 'asc' ? 'desc' : 'asc') : 'asc');
-      return column;
-    });
-    setPage(0);
-  }, []);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['audit-logs', selectedSiteId, page, rowsPerPage, debouncedSearch, sortBy, sortDir],
+    queryKey: ['audit-logs', selectedSiteId, page, pageSize, debouncedSearch, sortBy, sortDir],
     queryFn: () => apiService.getAuditLogs(selectedSiteId, {
-      page: page + 1,
-      page_size: rowsPerPage,
+      page,
+      page_size: pageSize,
       search: debouncedSearch || undefined,
       sort_by: sortBy || undefined,
       sort_dir: sortBy ? sortDir : undefined,
@@ -164,8 +154,8 @@ export default function ActivityLogPage() {
       ) : (
         <Paper>
           <TableFilterBar
-            searchValue={searchInput}
-            onSearchChange={(v) => { setSearchInput(v); setPage(0); }}
+            searchValue={search}
+            onSearchChange={setSearch}
             searchPlaceholder={t('activity.searchPlaceholder')}
             filters={[
               {
@@ -284,13 +274,10 @@ export default function ActivityLogPage() {
           <TablePagination
             component="div"
             count={data?.meta?.total_items || 0}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            onPageChange={(_, newPage) => setPage(newPage)}
-            onRowsPerPageChange={(e) => {
-              setRowsPerPage(parseInt(e.target.value, 10));
-              setPage(0);
-            }}
+            page={page - 1}
+            rowsPerPage={pageSize}
+            onPageChange={(_, newPage) => setPage(() => newPage + 1)}
+            onRowsPerPageChange={handleRowsPerPageChange}
             rowsPerPageOptions={[10, 25, 50]}
           />
         </Paper>
