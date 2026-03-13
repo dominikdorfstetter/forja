@@ -30,14 +30,14 @@ if (section.cover_image_id) {
 }
 ---
 
-<section class="page-section">
-  {title && <h2 class="page-section__title">{title}</h2>}
+<section class="mb-10">
+  {title && <h2 class="text-2xl font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mb-4">{title}</h2>}
   {coverUrl && (
-    <img src={coverUrl} alt={title ?? ""} loading="lazy" style="border-radius: var(--radius); margin-bottom: var(--space-md);" />
+    <img src={coverUrl} alt={title ?? ""} loading="lazy" class="rounded-xl mb-4 w-full" />
   )}
-  {text.length > 0 && <div class="page-section__text" set:html={text} />}
+  {text.length > 0 && <div class="prose" set:html={text} />}
   {buttonText && section.call_to_action_route && (
-    <a href={section.call_to_action_route} class="page-section__cta">
+    <a href={section.call_to_action_route} class="inline-block mt-4 px-6 py-2 bg-violet-500 hover:bg-violet-600 text-white rounded-lg font-medium no-underline hover:no-underline transition-colors">
       {buttonText}
     </a>
   )}
