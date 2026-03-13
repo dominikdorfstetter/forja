@@ -280,7 +280,7 @@ export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
         {apiKeys && apiKeys.length > 0 ? (
           <>
             <TableContainer>
-              <Table>
+              <Table size="small">
                 <TableHead>
                   <TableRow>
                     <TableCell scope="col">

@@ -339,7 +339,7 @@ export default function PageSectionsTab({
       ) : (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
           <TableContainer>
-            <Table>
+            <Table size="small">
               <TableHead>
                 <TableRow>
                   {canWrite && <TableCell scope="col" sx={{ width: 48, px: 1 }} />}

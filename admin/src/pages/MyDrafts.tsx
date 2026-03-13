@@ -105,7 +105,7 @@ export default function MyDraftsPage() {
         />
       ) : (
         <TableContainer component={Paper}>
-          <Table>
+          <Table size="small">
             <TableHead>
               <TableRow>
                 <TableCell scope="col">{t('myDrafts.table.name')}</TableCell>

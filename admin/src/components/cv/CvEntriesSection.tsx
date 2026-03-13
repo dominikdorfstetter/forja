@@ -199,7 +199,7 @@ export default function CvEntriesSection({
         onPageChange={onPageChange}
         rowsPerPage={rowsPerPage}
         onRowsPerPageChange={onRowsPerPageChange}
-        size="medium"
+        size="small"
       />
     </Paper>
   );

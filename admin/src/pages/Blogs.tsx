@@ -268,7 +268,7 @@ export default function BlogsPage() {
               rowsPerPage={pageSize}
               onRowsPerPageChange={handleRowsPerPageChange}
               isRowSelected={(blog) => bulk.isSelected(blog.id)}
-              size="medium"
+              size="small"
             />
           </Paper>
         </>

@@ -164,7 +164,7 @@ export default function CvSkillsSection({
         onPageChange={onPageChange}
         rowsPerPage={rowsPerPage}
         onRowsPerPageChange={onRowsPerPageChange}
-        size="medium"
+        size="small"
       />
     </Paper>
   );
