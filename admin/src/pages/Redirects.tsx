@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Paper, Chip, IconButton, Tooltip } from '@mui/material';
+import { Box, Paper, Chip, IconButton, Tooltip, TableSortLabel } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -16,6 +16,7 @@ import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
+import TableFilterBar from '@/components/shared/TableFilterBar';
 import DataTable, { type DataTableColumn } from '@/components/shared/DataTable';
 import RedirectFormDialog from '@/components/redirects/RedirectFormDialog';
 
@@ -25,6 +26,8 @@ export default function RedirectsPage() {
 
   const {
     page, pageSize, formOpen, editing, deleting,
+    search, setSearch, debouncedSearch,
+    sortBy, sortDir, handleSort,
     openCreate, closeForm, openEdit, closeEdit, openDelete, closeDelete,
     handlePageChange, handleRowsPerPageChange,
   } = useListPageState<Redirect>();
@@ -39,8 +42,8 @@ export default function RedirectsPage() {
   }, [openCreate]);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['redirects', selectedSiteId, page, pageSize],
-    queryFn: () => apiService.getRedirects(selectedSiteId, { page, page_size: pageSize }),
+    queryKey: ['redirects', selectedSiteId, page, pageSize, debouncedSearch, sortBy, sortDir],
+    queryFn: () => apiService.getRedirects(selectedSiteId, { page, page_size: pageSize, search: debouncedSearch || undefined, sort_by: sortBy || undefined, sort_dir: sortBy ? sortDir : undefined }),
     enabled: !!selectedSiteId,
   });
   const redirects = data?.data;
@@ -67,11 +70,66 @@ export default function RedirectsPage() {
   });
 
   const columns: DataTableColumn<Redirect>[] = [
-    { header: t('redirects.table.sourcePath'), render: (r) => <span style={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>{r.source_path}</span> },
-    { header: t('redirects.table.destination'), render: (r) => <span style={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>{r.destination_path}</span> },
-    { header: t('redirects.table.type'), render: (r) => <Chip label={r.status_code === 301 ? t('redirects.table.permanent') : t('redirects.table.temporary')} size="small" variant="outlined" color={r.status_code === 301 ? 'primary' : 'secondary'} /> },
-    { header: t('redirects.table.status'), render: (r) => <Chip label={r.is_active ? t('common.status.active') : t('common.status.inactive')} size="small" color={r.is_active ? 'success' : 'default'} /> },
-    { header: t('redirects.table.created'), render: (r) => format(new Date(r.created_at), 'PP') },
+    {
+      header: (
+        <TableSortLabel
+          active={sortBy === 'source_path'}
+          direction={sortBy === 'source_path' ? sortDir : 'asc'}
+          onClick={() => handleSort('source_path')}
+        >
+          {t('redirects.table.sourcePath')}
+        </TableSortLabel>
+      ),
+      render: (r) => <span style={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>{r.source_path}</span>,
+    },
+    {
+      header: (
+        <TableSortLabel
+          active={sortBy === 'destination_path'}
+          direction={sortBy === 'destination_path' ? sortDir : 'asc'}
+          onClick={() => handleSort('destination_path')}
+        >
+          {t('redirects.table.destination')}
+        </TableSortLabel>
+      ),
+      render: (r) => <span style={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>{r.destination_path}</span>,
+    },
+    {
+      header: (
+        <TableSortLabel
+          active={sortBy === 'status_code'}
+          direction={sortBy === 'status_code' ? sortDir : 'asc'}
+          onClick={() => handleSort('status_code')}
+        >
+          {t('redirects.table.type')}
+        </TableSortLabel>
+      ),
+      render: (r) => <Chip label={r.status_code === 301 ? t('redirects.table.permanent') : t('redirects.table.temporary')} size="small" variant="outlined" color={r.status_code === 301 ? 'primary' : 'secondary'} />,
+    },
+    {
+      header: (
+        <TableSortLabel
+          active={sortBy === 'is_active'}
+          direction={sortBy === 'is_active' ? sortDir : 'asc'}
+          onClick={() => handleSort('is_active')}
+        >
+          {t('redirects.table.status')}
+        </TableSortLabel>
+      ),
+      render: (r) => <Chip label={r.is_active ? t('common.status.active') : t('common.status.inactive')} size="small" color={r.is_active ? 'success' : 'default'} />,
+    },
+    {
+      header: (
+        <TableSortLabel
+          active={sortBy === 'created_at'}
+          direction={sortBy === 'created_at' ? sortDir : 'asc'}
+          onClick={() => handleSort('created_at')}
+        >
+          {t('redirects.table.created')}
+        </TableSortLabel>
+      ),
+      render: (r) => format(new Date(r.created_at), 'PP'),
+    },
     {
       header: t('redirects.table.actions'),
       align: 'right',
@@ -95,11 +153,16 @@ export default function RedirectsPage() {
       {!selectedSiteId ? (
         <EmptyState icon={<AltRouteIcon sx={{ fontSize: 64 }} />} title={t('common.noSiteSelected')} description={t('redirects.empty.noSite')} />
       ) : (
-        <Paper sx={{ p: 3 }}>
+        <Paper>
+          <TableFilterBar
+            searchValue={search}
+            onSearchChange={setSearch}
+            searchPlaceholder={t('redirects.searchPlaceholder')}
+          />
           {isLoading ? (
-            <LoadingState label={t('redirects.loading')} />
+            <Box sx={{ p: 3 }}><LoadingState label={t('redirects.loading')} /></Box>
           ) : !redirects || redirects.length === 0 ? (
-            <EmptyState icon={<AltRouteIcon sx={{ fontSize: 48 }} />} title={t('redirects.empty.title')} description={t('redirects.empty.description')} action={{ label: t('redirects.addRedirect'), onClick: openCreate }} />
+            <Box sx={{ p: 3 }}><EmptyState icon={<AltRouteIcon sx={{ fontSize: 48 }} />} title={t('redirects.empty.title')} description={t('redirects.empty.description')} action={{ label: t('redirects.addRedirect'), onClick: openCreate }} /></Box>
           ) : (
             <DataTable
               data={redirects}

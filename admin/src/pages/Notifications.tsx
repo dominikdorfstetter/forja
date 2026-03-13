@@ -14,6 +14,7 @@ import {
   TableRow,
   TablePagination,
   Chip,
+  TableSortLabel,
   Typography,
   Tooltip,
 } from '@mui/material';
@@ -24,9 +25,11 @@ import EditIcon from '@mui/icons-material/Edit';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import apiService from '@/services/api';
 import { useSiteContext } from '@/store/SiteContext';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
+import TableFilterBar from '@/components/shared/TableFilterBar';
 import type { NotificationResponse, NotificationType } from '@/types/api';
 
 function typeIcon(type: NotificationType) {
@@ -52,10 +55,28 @@ export default function NotificationsPage() {
   const { selectedSiteId } = useSiteContext();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [searchInput, setSearchInput] = useState('');
+  const debouncedSearch = useDebouncedValue(searchInput);
+  const [sortBy, setSortBy] = useState('');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+
+  const handleSort = useCallback((column: string) => {
+    setSortBy((prev) => {
+      setSortDir((prevDir) => prev === column ? (prevDir === 'asc' ? 'desc' : 'asc') : 'asc');
+      return column;
+    });
+    setPage(0);
+  }, []);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['notifications', selectedSiteId, page, rowsPerPage],
-    queryFn: () => apiService.getNotifications(selectedSiteId!, { page: page + 1, page_size: rowsPerPage }),
+    queryKey: ['notifications', selectedSiteId, page, rowsPerPage, debouncedSearch, sortBy, sortDir],
+    queryFn: () => apiService.getNotifications(selectedSiteId!, {
+      page: page + 1,
+      page_size: rowsPerPage,
+      search: debouncedSearch || undefined,
+      sort_by: sortBy || undefined,
+      sort_dir: sortBy ? sortDir : undefined,
+    }),
     enabled: !!selectedSiteId,
   });
 
@@ -116,14 +137,27 @@ export default function NotificationsPage() {
         <EmptyState title={t('notifications.empty')} />
       ) : (
         <Paper>
+          <TableFilterBar
+            searchValue={searchInput}
+            onSearchChange={(v) => { setSearchInput(v); setPage(0); }}
+            searchPlaceholder={t('notifications.searchPlaceholder')}
+          />
           <TableContainer>
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell>{t('notifications.columns.type')}</TableCell>
+                  <TableCell>
+                    <TableSortLabel active={sortBy === 'notification_type'} direction={sortBy === 'notification_type' ? sortDir : 'asc'} onClick={() => handleSort('notification_type')}>
+                      {t('notifications.columns.type')}
+                    </TableSortLabel>
+                  </TableCell>
                   <TableCell>{t('notifications.columns.title')}</TableCell>
                   <TableCell>{t('notifications.columns.message')}</TableCell>
-                  <TableCell>{t('notifications.columns.time')}</TableCell>
+                  <TableCell>
+                    <TableSortLabel active={sortBy === 'created_at'} direction={sortBy === 'created_at' ? sortDir : 'asc'} onClick={() => handleSort('created_at')}>
+                      {t('notifications.columns.time')}
+                    </TableSortLabel>
+                  </TableCell>
                   <TableCell>{t('notifications.columns.status')}</TableCell>
                 </TableRow>
               </TableHead>

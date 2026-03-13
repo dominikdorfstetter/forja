@@ -5,6 +5,7 @@ import {
   Divider,
   IconButton,
   Paper,
+  TableSortLabel,
   Tooltip,
   Typography,
 } from '@mui/material';
@@ -18,6 +19,7 @@ import type { Tag } from '@/types/api';
 import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
 import DataTable, { type DataTableColumn } from '@/components/shared/DataTable';
+import TableFilterBar from '@/components/shared/TableFilterBar';
 
 interface PaginationMeta {
   total_items: number;
@@ -38,6 +40,11 @@ interface TagsSectionProps {
   onOpenCreate: () => void;
   onEdit: (tag: Tag) => void;
   onDelete: (tag: Tag) => void;
+  searchValue: string;
+  onSearchChange: (value: string) => void;
+  sortBy: string;
+  sortDir: 'asc' | 'desc';
+  onSort: (column: string) => void;
 }
 
 export default function TagsSection({
@@ -53,25 +60,35 @@ export default function TagsSection({
   onOpenCreate,
   onEdit,
   onDelete,
+  searchValue,
+  onSearchChange,
+  sortBy,
+  sortDir,
+  onSort,
 }: TagsSectionProps) {
   const { t } = useTranslation();
 
   const tagColumns: DataTableColumn<Tag>[] = [
     {
-      header: t('taxonomy.tags.table.slug'),
-      scope: 'col',
+      header: (
+        <TableSortLabel active={sortBy === 'slug'} direction={sortBy === 'slug' ? sortDir : 'asc'} onClick={() => onSort('slug')}>
+          {t('taxonomy.tags.table.slug')}
+        </TableSortLabel>
+      ),
       render: (tag) => <Typography variant="body2" fontFamily="monospace">{tag.slug}</Typography>,
     },
     {
       header: t('taxonomy.tags.table.scope'),
-      scope: 'col',
       render: (tag) => tag.is_global
         ? <Chip label={t('common.labels.global')} size="small" color="info" variant="outlined" />
         : <Chip label={t('common.labels.site')} size="small" variant="outlined" />,
     },
     {
-      header: t('taxonomy.tags.table.created'),
-      scope: 'col',
+      header: (
+        <TableSortLabel active={sortBy === 'created_at'} direction={sortBy === 'created_at' ? sortDir : 'asc'} onClick={() => onSort('created_at')}>
+          {t('taxonomy.tags.table.created')}
+        </TableSortLabel>
+      ),
       render: (tag) => format(new Date(tag.created_at), 'PP'),
     },
     {
@@ -101,7 +118,13 @@ export default function TagsSection({
           {t('taxonomy.tags.addTag')}
         </Button>}
       </Box>
-      <Divider sx={{ mb: 2 }} />
+      <Divider />
+      <TableFilterBar
+        searchValue={searchValue}
+        onSearchChange={onSearchChange}
+        searchPlaceholder={t('taxonomy.tags.searchPlaceholder')}
+        testIdPrefix="taxonomy.tags"
+      />
 
       {loading ? (
         <LoadingState label={t('taxonomy.tags.loading')} />

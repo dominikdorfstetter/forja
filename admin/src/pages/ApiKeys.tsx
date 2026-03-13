@@ -1,9 +1,10 @@
-import { useReducer, useEffect } from 'react';
+import { useReducer, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
   Alert,
   Button,
+  InputAdornment,
   Table,
   TableBody,
   TableCell,
@@ -15,14 +16,17 @@ import {
   Typography,
   Stack,
   MenuItem,
+  TableSortLabel,
   TextField,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import KeyIcon from '@mui/icons-material/Key';
+import SearchIcon from '@mui/icons-material/Search';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import apiService from '@/services/api';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import type { ApiKeyListItem, CreateApiKeyRequest, ApiKeyPermission, ApiKeyStatus, SiteRole } from '@/types/api';
 import { useAuth } from '@/store/AuthContext';
 import { useSiteContext } from '@/store/SiteContext';
@@ -52,6 +56,9 @@ function maxPermissionForRole(role: SiteRole | null, isSysAdmin: boolean): ApiKe
 interface UIState {
   statusFilter: string;
   permissionFilter: string;
+  searchInput: string;
+  sortBy: string;
+  sortDir: 'asc' | 'desc';
   page: number;
   pageSize: number;
   createOpen: boolean;
@@ -64,8 +71,10 @@ interface UIState {
 type UIAction =
   | { type: 'setStatusFilter'; value: string }
   | { type: 'setPermissionFilter'; value: string }
+  | { type: 'setSearchInput'; value: string }
   | { type: 'setPage'; value: number }
   | { type: 'setPageSize'; value: number }
+  | { type: 'setSort'; sortBy: string; sortDir: 'asc' | 'desc' }
   | { type: 'openCreate' }
   | { type: 'closeCreate' }
   | { type: 'openBlock'; key: ApiKeyListItem }
@@ -80,6 +89,9 @@ type UIAction =
 const initialUIState: UIState = {
   statusFilter: '',
   permissionFilter: '',
+  searchInput: '',
+  sortBy: '',
+  sortDir: 'asc',
   page: 1,
   pageSize: 25,
   createOpen: false,
@@ -95,10 +107,14 @@ function uiReducer(state: UIState, action: UIAction): UIState {
       return { ...state, statusFilter: action.value, page: 1 };
     case 'setPermissionFilter':
       return { ...state, permissionFilter: action.value, page: 1 };
+    case 'setSearchInput':
+      return { ...state, searchInput: action.value, page: 1 };
     case 'setPage':
       return { ...state, page: action.value };
     case 'setPageSize':
       return { ...state, pageSize: action.value, page: 1 };
+    case 'setSort':
+      return { ...state, sortBy: action.sortBy, sortDir: action.sortDir, page: 1 };
     case 'openCreate':
       return { ...state, createOpen: true };
     case 'closeCreate':
@@ -132,6 +148,12 @@ export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
   const { isMaster, isAdmin, currentSiteRole } = useAuth();
   const { selectedSiteId } = useSiteContext();
   const [ui, dispatch] = useReducer(uiReducer, initialUIState);
+  const debouncedSearch = useDebouncedValue(ui.searchInput);
+
+  const handleSort = useCallback((column: string) => {
+    const newDir = ui.sortBy === column ? (ui.sortDir === 'asc' ? 'desc' : 'asc') : 'asc';
+    dispatch({ type: 'setSort', sortBy: column, sortDir: newDir });
+  }, [ui.sortBy, ui.sortDir]);
 
   // Command palette action listener
   useEffect(() => {
@@ -148,13 +170,16 @@ export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
   });
 
   const { data: apiKeysData, isLoading, error } = useQuery({
-    queryKey: ['apiKeys', ui.statusFilter, ui.permissionFilter, ui.page, ui.pageSize, selectedSiteId],
+    queryKey: ['apiKeys', ui.statusFilter, ui.permissionFilter, debouncedSearch, ui.page, ui.pageSize, selectedSiteId, ui.sortBy, ui.sortDir],
     queryFn: () => apiService.getApiKeys({
       status: ui.statusFilter || undefined,
       permission: ui.permissionFilter || undefined,
+      search: debouncedSearch || undefined,
       site_id: isMaster ? undefined : selectedSiteId || undefined,
       page: ui.page,
       page_size: ui.pageSize,
+      sort_by: ui.sortBy || undefined,
+      sort_dir: ui.sortBy ? ui.sortDir : undefined,
     }),
     enabled: isMaster || !!selectedSiteId,
   });
@@ -229,7 +254,23 @@ export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
       )}
 
       {/* Filters */}
-      <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
+      <Stack direction="row" spacing={2} sx={{ mb: 3, flexWrap: 'wrap' }}>
+        <TextField
+          size="small"
+          placeholder={t('apiKeys.searchPlaceholder')}
+          value={ui.searchInput}
+          onChange={(e) => dispatch({ type: 'setSearchInput', value: e.target.value })}
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" color="action" />
+                </InputAdornment>
+              ),
+            },
+          }}
+          sx={{ minWidth: 220, flex: 1, maxWidth: 320 }}
+        />
         <TextField
           select
           label={t('common.filters.status')}
@@ -264,13 +305,33 @@ export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell scope="col">{t('apiKeys.table.name')}</TableCell>
+                <TableCell scope="col">
+                  <TableSortLabel active={ui.sortBy === 'name'} direction={ui.sortBy === 'name' ? ui.sortDir : 'asc'} onClick={() => handleSort('name')}>
+                    {t('apiKeys.table.name')}
+                  </TableSortLabel>
+                </TableCell>
                 <TableCell scope="col">{t('apiKeys.table.keyPrefix')}</TableCell>
                 <TableCell scope="col">{t('apiKeys.table.site')}</TableCell>
-                <TableCell scope="col">{t('apiKeys.table.permission')}</TableCell>
-                <TableCell scope="col">{t('apiKeys.table.status')}</TableCell>
-                <TableCell scope="col" align="right">{t('apiKeys.table.requests')}</TableCell>
-                <TableCell scope="col">{t('apiKeys.table.lastUsed')}</TableCell>
+                <TableCell scope="col">
+                  <TableSortLabel active={ui.sortBy === 'permission'} direction={ui.sortBy === 'permission' ? ui.sortDir : 'asc'} onClick={() => handleSort('permission')}>
+                    {t('apiKeys.table.permission')}
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell scope="col">
+                  <TableSortLabel active={ui.sortBy === 'status'} direction={ui.sortBy === 'status' ? ui.sortDir : 'asc'} onClick={() => handleSort('status')}>
+                    {t('apiKeys.table.status')}
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell scope="col" align="right">
+                  <TableSortLabel active={ui.sortBy === 'total_requests'} direction={ui.sortBy === 'total_requests' ? ui.sortDir : 'asc'} onClick={() => handleSort('total_requests')}>
+                    {t('apiKeys.table.requests')}
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell scope="col">
+                  <TableSortLabel active={ui.sortBy === 'last_used_at'} direction={ui.sortBy === 'last_used_at' ? ui.sortDir : 'asc'} onClick={() => handleSort('last_used_at')}>
+                    {t('apiKeys.table.lastUsed')}
+                  </TableSortLabel>
+                </TableCell>
                 <TableCell scope="col" align="right">{t('apiKeys.table.actions')}</TableCell>
               </TableRow>
             </TableHead>
@@ -327,8 +388,8 @@ export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
         <EmptyState
           icon={<KeyIcon sx={{ fontSize: 64 }} />}
           title={t('apiKeys.empty.title')}
-          description={ui.statusFilter || ui.permissionFilter ? t('apiKeys.empty.filterHint') : t('apiKeys.empty.description')}
-          action={!ui.statusFilter && !ui.permissionFilter ? { label: t('apiKeys.createButton'), onClick: () => dispatch({ type: 'openCreate' }) } : undefined}
+          description={ui.statusFilter || ui.permissionFilter || debouncedSearch ? t('apiKeys.empty.filterHint') : t('apiKeys.empty.description')}
+          action={!ui.statusFilter && !ui.permissionFilter && !debouncedSearch ? { label: t('apiKeys.createButton'), onClick: () => dispatch({ type: 'openCreate' }) } : undefined}
         />
       )}
 

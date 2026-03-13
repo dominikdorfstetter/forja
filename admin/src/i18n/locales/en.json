@@ -760,6 +760,7 @@
         "description": "Tags are flat labels for cross-cutting topics — like hashtags. Assign multiple tags per post (e.g. \"rust\", \"tutorial\") so visitors can filter and discover content."
       },
       "loading": "Loading tags...",
+      "searchPlaceholder": "Search tags by slug...",
       "messages": {
         "created": "Tag created",
         "updated": "Tag updated",
@@ -785,6 +786,7 @@
         "description": "Categories create a tree-like hierarchy for your content. Group related posts under branches like \"Technology > Web Development\" for structured navigation."
       },
       "loading": "Loading categories...",
+      "searchPlaceholder": "Search categories by slug...",
       "messages": {
         "created": "Category created",
         "updated": "Category updated",

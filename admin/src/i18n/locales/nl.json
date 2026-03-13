@@ -760,6 +760,7 @@
         "description": "Tags zijn platte labels voor overkoepelende onderwerpen — zoals hashtags. Wijs meerdere tags per artikel toe (bijv. \"rust\", \"tutorial\") zodat bezoekers content kunnen filteren en ontdekken."
       },
       "loading": "Tags laden...",
+      "searchPlaceholder": "Tags zoeken op slug...",
       "messages": {
         "created": "Tag aangemaakt",
         "updated": "Tag bijgewerkt",
@@ -785,6 +786,7 @@
         "description": "Categorieën creëren een boomachtige hiërarchie voor je content. Groepeer gerelateerde artikelen onder takken zoals \"Technologie > Webontwikkeling\" voor gestructureerde navigatie."
       },
       "loading": "Categorieën laden...",
+      "searchPlaceholder": "Categorieën zoeken op slug...",
       "messages": {
         "created": "Categorie aangemaakt",
         "updated": "Categorie bijgewerkt",

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
-import { Box, Alert, Button, IconButton, Tooltip } from '@mui/material';
+import { Box, Alert, Button, IconButton, Tooltip, Paper, TableSortLabel } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -20,6 +20,7 @@ import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import DataTable, { type DataTableColumn } from '@/components/shared/DataTable';
+import TableFilterBar from '@/components/shared/TableFilterBar';
 import LegalDocumentFormDialog from '@/components/legal/LegalDocumentFormDialog';
 
 export default function LegalPage({ embedded }: { embedded?: boolean }) {
@@ -30,6 +31,8 @@ export default function LegalPage({ embedded }: { embedded?: boolean }) {
 
   const {
     page, pageSize, formOpen, editing, deleting,
+    search, setSearch, debouncedSearch,
+    sortBy, sortDir, handleSort,
     openCreate, closeForm, openEdit, closeEdit, openDelete, closeDelete,
     handlePageChange, handleRowsPerPageChange,
   } = useListPageState<LegalDocumentResponse>();
@@ -44,8 +47,8 @@ export default function LegalPage({ embedded }: { embedded?: boolean }) {
   }, [openCreate]);
 
   const { data: documentsData, isLoading, error } = useQuery({
-    queryKey: ['legal', selectedSiteId, page, pageSize],
-    queryFn: () => apiService.getLegalDocuments(selectedSiteId, { page, page_size: pageSize }),
+    queryKey: ['legal', selectedSiteId, page, pageSize, debouncedSearch, sortBy, sortDir],
+    queryFn: () => apiService.getLegalDocuments(selectedSiteId, { page, page_size: pageSize, search: debouncedSearch || undefined, sort_by: sortBy || undefined, sort_dir: sortBy ? sortDir : undefined }),
     enabled: !!selectedSiteId,
   });
   const documents = documentsData?.data;
@@ -72,9 +75,33 @@ export default function LegalPage({ embedded }: { embedded?: boolean }) {
   });
 
   const columns: DataTableColumn<LegalDocumentResponse>[] = [
-    { header: t('legal.table.cookieName'), scope: 'col', render: (doc) => <span style={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>{doc.cookie_name}</span> },
-    { header: t('legal.table.type'), scope: 'col', render: (doc) => doc.document_type },
-    { header: t('legal.table.created'), scope: 'col', render: (doc) => format(new Date(doc.created_at), 'PP') },
+    { header: (
+      <TableSortLabel
+        active={sortBy === 'cookie_name'}
+        direction={sortBy === 'cookie_name' ? sortDir : 'asc'}
+        onClick={() => handleSort('cookie_name')}
+      >
+        {t('legal.table.cookieName')}
+      </TableSortLabel>
+    ), scope: 'col', render: (doc) => <span style={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>{doc.cookie_name}</span> },
+    { header: (
+      <TableSortLabel
+        active={sortBy === 'document_type'}
+        direction={sortBy === 'document_type' ? sortDir : 'asc'}
+        onClick={() => handleSort('document_type')}
+      >
+        {t('legal.table.type')}
+      </TableSortLabel>
+    ), scope: 'col', render: (doc) => doc.document_type },
+    { header: (
+      <TableSortLabel
+        active={sortBy === 'created_at'}
+        direction={sortBy === 'created_at' ? sortDir : 'asc'}
+        onClick={() => handleSort('created_at')}
+      >
+        {t('legal.table.created')}
+      </TableSortLabel>
+    ), scope: 'col', render: (doc) => format(new Date(doc.created_at), 'PP') },
     {
       header: t('legal.table.actions'),
       scope: 'col',
@@ -112,19 +139,22 @@ export default function LegalPage({ embedded }: { embedded?: boolean }) {
         <LoadingState label={t('legal.loading')} />
       ) : error ? (
         <Alert severity="error">{t('legal.loadError')}</Alert>
-      ) : !documents || documents.length === 0 ? (
+      ) : !documents || (documents.length === 0 && !debouncedSearch) ? (
         <EmptyState icon={<GavelIcon sx={{ fontSize: 64 }} />} title={t('legal.empty.title')} description={t('legal.empty.description')} action={{ label: t('legal.addDocument'), onClick: openCreate }} />
       ) : (
-        <DataTable
-          data={documents}
-          columns={columns}
-          getRowKey={(doc) => doc.id}
-          meta={documentsData?.meta}
-          page={page}
-          onPageChange={handlePageChange}
-          rowsPerPage={pageSize}
-          onRowsPerPageChange={handleRowsPerPageChange}
-        />
+        <Paper>
+          <TableFilterBar searchValue={search} onSearchChange={setSearch} searchPlaceholder={t('legal.searchPlaceholder')} />
+          <DataTable
+            data={documents}
+            columns={columns}
+            getRowKey={(doc) => doc.id}
+            meta={documentsData?.meta}
+            page={page}
+            onPageChange={handlePageChange}
+            rowsPerPage={pageSize}
+            onRowsPerPageChange={handleRowsPerPageChange}
+          />
+        </Paper>
       )}
 
       <LegalDocumentFormDialog open={formOpen} siteId={selectedSiteId} onSubmit={(data) => createMutation.mutate(data)} onClose={closeForm} loading={createMutation.isPending} />

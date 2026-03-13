@@ -760,6 +760,7 @@
         "description": "Las etiquetas son marcas planas para temas transversales — como hashtags. Asigna múltiples etiquetas por artículo (ej. \"rust\", \"tutorial\") para que los visitantes puedan filtrar y descubrir contenido."
       },
       "loading": "Cargando etiquetas...",
+      "searchPlaceholder": "Buscar etiquetas por slug...",
       "messages": {
         "created": "Etiqueta creada",
         "updated": "Etiqueta actualizada",
@@ -785,6 +786,7 @@
         "description": "Las categorías crean una jerarquía en árbol para tu contenido. Agrupa artículos relacionados bajo ramas como \"Tecnología > Desarrollo Web\" para una navegación estructurada."
       },
       "loading": "Cargando categorías...",
+      "searchPlaceholder": "Buscar categorías por slug...",
       "messages": {
         "created": "Categoría creada",
         "updated": "Categoría actualizada",

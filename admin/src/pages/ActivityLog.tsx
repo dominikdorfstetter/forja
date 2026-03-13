@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   Box,
   Alert,
+  InputAdornment,
   Paper,
   Table,
   TableBody,
@@ -14,9 +15,11 @@ import {
   TextField,
   MenuItem,
   Typography,
+  TableSortLabel,
   Tooltip,
   Link as MuiLink,
 } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { format, formatDistanceToNow } from 'date-fns';
@@ -24,6 +27,7 @@ import { Link as RouterLink } from 'react-router';
 import { v5 as uuidv5 } from 'uuid';
 import apiService from '@/services/api';
 import { useSiteContext } from '@/store/SiteContext';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
@@ -89,12 +93,30 @@ export default function ActivityLogPage() {
   const { selectedSiteId } = useSiteContext();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(25);
+  const [searchInput, setSearchInput] = useState('');
+  const debouncedSearch = useDebouncedValue(searchInput);
   const [actionFilter, setActionFilter] = useState<string>('');
   const [entityFilter, setEntityFilter] = useState<string>('');
+  const [sortBy, setSortBy] = useState('');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+
+  const handleSort = useCallback((column: string) => {
+    setSortBy((prev) => {
+      setSortDir((prevDir) => prev === column ? (prevDir === 'asc' ? 'desc' : 'asc') : 'asc');
+      return column;
+    });
+    setPage(0);
+  }, []);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['audit-logs', selectedSiteId, page, rowsPerPage],
-    queryFn: () => apiService.getAuditLogs(selectedSiteId, { page: page + 1, page_size: rowsPerPage }),
+    queryKey: ['audit-logs', selectedSiteId, page, rowsPerPage, debouncedSearch, sortBy, sortDir],
+    queryFn: () => apiService.getAuditLogs(selectedSiteId, {
+      page: page + 1,
+      page_size: rowsPerPage,
+      search: debouncedSearch || undefined,
+      sort_by: sortBy || undefined,
+      sort_dir: sortBy ? sortDir : undefined,
+    }),
     enabled: !!selectedSiteId,
   });
 
@@ -138,7 +160,23 @@ export default function ActivityLogPage() {
         breadcrumbs={[{ label: t('activity.title') }]}
       />
 
-      <Paper sx={{ mb: 2, p: 2, display: 'flex', gap: 2 }}>
+      <Paper sx={{ mb: 2, p: 2, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+        <TextField
+          size="small"
+          placeholder={t('activity.searchPlaceholder')}
+          value={searchInput}
+          onChange={(e) => { setSearchInput(e.target.value); setPage(0); }}
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" color="action" />
+                </InputAdornment>
+              ),
+            },
+          }}
+          sx={{ minWidth: 220, flex: 1, maxWidth: 320 }}
+        />
         <TextField
           select
           size="small"
@@ -177,10 +215,22 @@ export default function ActivityLogPage() {
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell>{t('activity.columns.timestamp')}</TableCell>
+                  <TableCell>
+                    <TableSortLabel active={sortBy === 'created_at'} direction={sortBy === 'created_at' ? sortDir : 'asc'} onClick={() => handleSort('created_at')}>
+                      {t('activity.columns.timestamp')}
+                    </TableSortLabel>
+                  </TableCell>
                   <TableCell>{t('activity.columns.userId')}</TableCell>
-                  <TableCell>{t('activity.columns.action')}</TableCell>
-                  <TableCell>{t('activity.columns.entityType')}</TableCell>
+                  <TableCell>
+                    <TableSortLabel active={sortBy === 'action'} direction={sortBy === 'action' ? sortDir : 'asc'} onClick={() => handleSort('action')}>
+                      {t('activity.columns.action')}
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell>
+                    <TableSortLabel active={sortBy === 'entity_type'} direction={sortBy === 'entity_type' ? sortDir : 'asc'} onClick={() => handleSort('entity_type')}>
+                      {t('activity.columns.entityType')}
+                    </TableSortLabel>
+                  </TableCell>
                   <TableCell>{t('activity.columns.entityId')}</TableCell>
                 </TableRow>
               </TableHead>

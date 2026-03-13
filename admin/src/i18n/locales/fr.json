@@ -760,6 +760,7 @@
         "description": "Les tags sont des étiquettes plates pour les sujets transversaux — comme des hashtags. Attribuez plusieurs tags par article (ex. \"rust\", \"tutoriel\") pour que les visiteurs puissent filtrer et découvrir le contenu."
       },
       "loading": "Chargement des tags...",
+      "searchPlaceholder": "Rechercher des tags par slug...",
       "messages": {
         "created": "Tag créé",
         "updated": "Tag mis à jour",
@@ -785,6 +786,7 @@
         "description": "Les catégories créent une hiérarchie arborescente pour votre contenu. Groupez les articles connexes sous des branches comme \"Technologie > Développement Web\" pour une navigation structurée."
       },
       "loading": "Chargement des catégories...",
+      "searchPlaceholder": "Rechercher des catégories par slug...",
       "messages": {
         "created": "Catégorie créée",
         "updated": "Catégorie mise à jour",

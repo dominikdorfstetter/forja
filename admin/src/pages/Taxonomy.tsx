@@ -45,6 +45,8 @@ export default function TaxonomyPage() {
     openEdit: setEditingTag, closeEdit: closeTagEdit,
     openDelete: setDeletingTag, closeDelete: closeTagDelete,
     handlePageChange: handleTagPageChange, handleRowsPerPageChange: handleTagRowsPerPageChange,
+    search: tagSearch, setSearch: setTagSearch, debouncedSearch: tagDebouncedSearch,
+    sortBy: tagSortBy, sortDir: tagSortDir, handleSort: handleTagSort,
   } = useListPageState<Tag>();
 
   // Category list state
@@ -55,6 +57,8 @@ export default function TaxonomyPage() {
     openEdit: setEditingCat, closeEdit: closeCatEdit,
     openDelete: setDeletingCat, closeDelete: closeCatDelete,
     handlePageChange: handleCatPageChange, handleRowsPerPageChange: handleCatRowsPerPageChange,
+    search: catSearch, setSearch: setCatSearch, debouncedSearch: catDebouncedSearch,
+    sortBy: catSortBy, sortDir: catSortDir, handleSort: handleCatSort,
   } = useListPageState<Category>();
 
   // Command palette action listener
@@ -69,15 +73,27 @@ export default function TaxonomyPage() {
   }, [openTagCreate, openCatCreate]);
 
   const { data: tagsData, isLoading: tagsLoading } = useQuery({
-    queryKey: ['tags', selectedSiteId, tagPage, tagPageSize],
-    queryFn: () => apiService.getTags(selectedSiteId, { page: tagPage, page_size: tagPageSize }),
+    queryKey: ['tags', selectedSiteId, tagPage, tagPageSize, tagDebouncedSearch, tagSortBy, tagSortDir],
+    queryFn: () => apiService.getTags(selectedSiteId, {
+      page: tagPage,
+      page_size: tagPageSize,
+      search: tagDebouncedSearch || undefined,
+      sort_by: tagSortBy || undefined,
+      sort_dir: tagSortBy ? tagSortDir : undefined,
+    }),
     enabled: !!selectedSiteId,
   });
   const tags = tagsData?.data;
 
   const { data: categoriesData, isLoading: catsLoading } = useQuery({
-    queryKey: ['categories', selectedSiteId, catPage, catPageSize],
-    queryFn: () => apiService.getCategories(selectedSiteId, { page: catPage, page_size: catPageSize }),
+    queryKey: ['categories', selectedSiteId, catPage, catPageSize, catDebouncedSearch, catSortBy, catSortDir],
+    queryFn: () => apiService.getCategories(selectedSiteId, {
+      page: catPage,
+      page_size: catPageSize,
+      search: catDebouncedSearch || undefined,
+      sort_by: catSortBy || undefined,
+      sort_dir: catSortBy ? catSortDir : undefined,
+    }),
     enabled: !!selectedSiteId,
   });
   const categories = categoriesData?.data;
@@ -154,6 +170,11 @@ export default function TaxonomyPage() {
               onOpenCreate={openTagCreate}
               onEdit={setEditingTag}
               onDelete={setDeletingTag}
+              searchValue={tagSearch}
+              onSearchChange={setTagSearch}
+              sortBy={tagSortBy}
+              sortDir={tagSortDir}
+              onSort={handleTagSort}
             />
           </Grid>
 
@@ -171,6 +192,11 @@ export default function TaxonomyPage() {
               onOpenCreate={openCatCreate}
               onEdit={setEditingCat}
               onDelete={setDeletingCat}
+              searchValue={catSearch}
+              onSearchChange={setCatSearch}
+              sortBy={catSortBy}
+              sortDir={catSortDir}
+              onSort={handleCatSort}
             />
           </Grid>
         </Grid>

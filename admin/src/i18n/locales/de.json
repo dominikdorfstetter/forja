@@ -760,6 +760,7 @@
         "description": "Tags sind flache Bezeichnungen für übergreifende Themen — wie Hashtags. Weisen Sie mehrere Tags pro Beitrag zu (z.B. \"rust\", \"tutorial\"), damit Besucher Inhalte filtern und entdecken können."
       },
       "loading": "Tags werden geladen...",
+      "searchPlaceholder": "Tags nach Slug suchen...",
       "messages": {
         "created": "Tag erstellt",
         "updated": "Tag aktualisiert",
@@ -785,6 +786,7 @@
         "description": "Kategorien schaffen eine baumartige Hierarchie für Ihre Inhalte. Gruppieren Sie verwandte Beiträge unter Zweigen wie \"Technologie > Webentwicklung\" für strukturierte Navigation."
       },
       "loading": "Kategorien werden geladen...",
+      "searchPlaceholder": "Kategorien nach Slug suchen...",
       "messages": {
         "created": "Kategorie erstellt",
         "updated": "Kategorie aktualisiert",

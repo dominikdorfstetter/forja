@@ -760,6 +760,7 @@
         "description": "Tags são rótulos simples para temas transversais — como hashtags. Atribua múltiplas tags por artigo (ex. \"rust\", \"tutorial\") para que visitantes possam filtrar e descobrir conteúdo."
       },
       "loading": "A carregar etiquetas...",
+      "searchPlaceholder": "Pesquisar etiquetas por slug...",
       "messages": {
         "created": "Etiqueta criada",
         "updated": "Etiqueta atualizada",
@@ -785,6 +786,7 @@
         "description": "Categorias criam uma hierarquia em árvore para seu conteúdo. Agrupe artigos relacionados sob ramos como \"Tecnologia > Desenvolvimento Web\" para navegação estruturada."
       },
       "loading": "A carregar categorias...",
+      "searchPlaceholder": "Pesquisar categorias por slug...",
       "messages": {
         "created": "Categoria criada",
         "updated": "Categoria atualizada",

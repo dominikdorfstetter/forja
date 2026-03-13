@@ -5,12 +5,11 @@ import {
   Alert,
   Paper,
   IconButton,
-  MenuItem,
-  TextField,
   Tooltip,
   Chip,
   Tab,
   Tabs,
+  TableSortLabel,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -38,6 +37,7 @@ import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import SkillFormDialog from '@/components/cv/SkillFormDialog';
 import CvEntryFormDialog from '@/components/cv/CvEntryFormDialog';
 import DataTable, { type DataTableColumn } from '@/components/shared/DataTable';
+import TableFilterBar from '@/components/shared/TableFilterBar';
 import { useListPageState } from '@/hooks/useListPageState';
 import { useCrudMutations } from '@/hooks/useCrudMutations';
 
@@ -53,6 +53,8 @@ export default function CVPage() {
   // Entry list state
   const {
     page: entryPage, pageSize: entryPageSize,
+    search: entrySearch, setSearch: setEntrySearch, debouncedSearch: entryDebouncedSearch,
+    sortBy: entrySortBy, sortDir: entrySortDir, handleSort: handleEntrySort,
     formOpen: entryFormOpen, editing: editingEntry, deleting: deletingEntry,
     openCreate: openEntryCreate, closeForm: closeEntryForm,
     openEdit: setEditingEntry, closeEdit: closeEntryEdit,
@@ -64,6 +66,8 @@ export default function CVPage() {
   // Skill list state
   const {
     page: skillPage, pageSize: skillPageSize,
+    search: skillSearch, setSearch: setSkillSearch, debouncedSearch: skillDebouncedSearch,
+    sortBy: skillSortBy, sortDir: skillSortDir, handleSort: handleSkillSort,
     formOpen: skillFormOpen, editing: editingSkill, deleting: deletingSkill,
     openCreate: openSkillCreate, closeForm: closeSkillForm,
     openEdit: setEditingSkill, closeEdit: closeSkillEdit,
@@ -84,19 +88,22 @@ export default function CVPage() {
 
   // Queries
   const { data: entriesData, isLoading: entriesLoading, error: entriesError } = useQuery({
-    queryKey: ['cv-entries', selectedSiteId, entryTypeFilter, entryPage, entryPageSize],
+    queryKey: ['cv-entries', selectedSiteId, entryTypeFilter, entryDebouncedSearch, entryPage, entryPageSize, entrySortBy, entrySortDir],
     queryFn: () => apiService.getCvEntries(selectedSiteId, {
       entry_type: entryTypeFilter ? entryTypeFilter.toLowerCase() : undefined,
+      search: entryDebouncedSearch || undefined,
       page: entryPage,
       page_size: entryPageSize,
+      sort_by: entrySortBy || undefined,
+      sort_dir: entrySortBy ? entrySortDir : undefined,
     }),
     enabled: !!selectedSiteId,
   });
   const entries = entriesData?.data;
 
   const { data: skillsData, isLoading: skillsLoading, error: skillsError } = useQuery({
-    queryKey: ['skills', selectedSiteId, skillPage, skillPageSize],
-    queryFn: () => apiService.getSkills(selectedSiteId, { page: skillPage, page_size: skillPageSize }),
+    queryKey: ['skills', selectedSiteId, skillDebouncedSearch, skillPage, skillPageSize, skillSortBy, skillSortDir],
+    queryFn: () => apiService.getSkills(selectedSiteId, { search: skillDebouncedSearch || undefined, page: skillPage, page_size: skillPageSize, sort_by: skillSortBy || undefined, sort_dir: skillSortBy ? skillSortDir : undefined }),
     enabled: !!selectedSiteId,
   });
   const skills = skillsData?.data;
@@ -149,7 +156,15 @@ export default function CVPage() {
 
   const entryColumns: DataTableColumn<CvEntryResponse>[] = [
     {
-      header: t('cv.entries.table.company'),
+      header: (
+        <TableSortLabel
+          active={entrySortBy === 'company'}
+          direction={entrySortBy === 'company' ? entrySortDir : 'asc'}
+          onClick={() => handleEntrySort('company')}
+        >
+          {t('cv.entries.table.company')}
+        </TableSortLabel>
+      ),
       scope: 'col',
       render: (entry) => entry.company,
     },
@@ -159,12 +174,28 @@ export default function CVPage() {
       render: (entry) => entry.location,
     },
     {
-      header: t('cv.entries.table.type'),
+      header: (
+        <TableSortLabel
+          active={entrySortBy === 'entry_type'}
+          direction={entrySortBy === 'entry_type' ? entrySortDir : 'asc'}
+          onClick={() => handleEntrySort('entry_type')}
+        >
+          {t('cv.entries.table.type')}
+        </TableSortLabel>
+      ),
       scope: 'col',
       render: (entry) => <Chip label={entry.entry_type} size="small" variant="outlined" />,
     },
     {
-      header: t('cv.entries.table.dates'),
+      header: (
+        <TableSortLabel
+          active={entrySortBy === 'start_date'}
+          direction={entrySortBy === 'start_date' ? entrySortDir : 'asc'}
+          onClick={() => handleEntrySort('start_date')}
+        >
+          {t('cv.entries.table.dates')}
+        </TableSortLabel>
+      ),
       scope: 'col',
       render: (entry) => (
         <>
@@ -180,7 +211,15 @@ export default function CVPage() {
       render: (entry) => entry.is_current ? t('common.labels.yes') : t('common.labels.no'),
     },
     {
-      header: t('cv.entries.table.order'),
+      header: (
+        <TableSortLabel
+          active={entrySortBy === 'display_order'}
+          direction={entrySortBy === 'display_order' ? entrySortDir : 'asc'}
+          onClick={() => handleEntrySort('display_order')}
+        >
+          {t('cv.entries.table.order')}
+        </TableSortLabel>
+      ),
       scope: 'col',
       render: (entry) => entry.display_order,
     },
@@ -199,7 +238,15 @@ export default function CVPage() {
 
   const skillColumns: DataTableColumn<SkillResponse>[] = [
     {
-      header: t('cv.skills.table.name'),
+      header: (
+        <TableSortLabel
+          active={skillSortBy === 'name'}
+          direction={skillSortBy === 'name' ? skillSortDir : 'asc'}
+          onClick={() => handleSkillSort('name')}
+        >
+          {t('cv.skills.table.name')}
+        </TableSortLabel>
+      ),
       scope: 'col',
       render: (skill) => skill.name,
     },
@@ -209,12 +256,28 @@ export default function CVPage() {
       render: (skill) => <Box component="span" sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>{skill.slug}</Box>,
     },
     {
-      header: t('cv.skills.table.category'),
+      header: (
+        <TableSortLabel
+          active={skillSortBy === 'category'}
+          direction={skillSortBy === 'category' ? skillSortDir : 'asc'}
+          onClick={() => handleSkillSort('category')}
+        >
+          {t('cv.skills.table.category')}
+        </TableSortLabel>
+      ),
       scope: 'col',
       render: (skill) => skill.category ? <Chip label={skill.category} size="small" variant="outlined" /> : '\u2014',
     },
     {
-      header: t('cv.skills.table.proficiency'),
+      header: (
+        <TableSortLabel
+          active={skillSortBy === 'proficiency_level'}
+          direction={skillSortBy === 'proficiency_level' ? skillSortDir : 'asc'}
+          onClick={() => handleSkillSort('proficiency_level')}
+        >
+          {t('cv.skills.table.proficiency')}
+        </TableSortLabel>
+      ),
       scope: 'col',
       render: (skill) => skill.proficiency_level != null ? `${skill.proficiency_level}%` : '\u2014',
     },
@@ -256,11 +319,6 @@ export default function CVPage() {
           {/* Entries Tab */}
           {tabIndex === 0 && (
             <>
-              <TextField select label={t('common.filters.filterByType')} size="small" value={entryTypeFilter} onChange={(e) => { setEntryTypeFilter(e.target.value); setEntryPage(1); }} sx={{ minWidth: 200, mb: 2 }}>
-                <MenuItem value="">{t('common.filters.all')}</MenuItem>
-                {ENTRY_TYPES.map((type) => <MenuItem key={type} value={type}>{type}</MenuItem>)}
-              </TextField>
-
               {entriesLoading ? (
                 <LoadingState label={t('cv.entries.loading')} />
               ) : entriesError ? (
@@ -269,6 +327,21 @@ export default function CVPage() {
                 <EmptyState icon={<WorkIcon sx={{ fontSize: 64 }} />} title={t('cv.entries.empty.title')} description={t('cv.entries.empty.description')} action={{ label: t('cv.entries.addEntry'), onClick: openEntryCreate }} />
               ) : (
                 <Paper>
+                  <TableFilterBar
+                    searchValue={entrySearch}
+                    onSearchChange={setEntrySearch}
+                    searchPlaceholder={t('cv.entries.searchPlaceholder')}
+                    filters={[{
+                      key: 'entryType',
+                      label: t('common.filters.filterByType'),
+                      value: entryTypeFilter,
+                      onChange: (value) => { setEntryTypeFilter(value); setEntryPage(1); },
+                      options: [
+                        { value: '', label: t('common.filters.all') },
+                        ...ENTRY_TYPES.map((type) => ({ value: type, label: type })),
+                      ],
+                    }]}
+                  />
                   <DataTable<CvEntryResponse>
                     data={entries}
                     columns={entryColumns}
@@ -296,6 +369,11 @@ export default function CVPage() {
                 <EmptyState icon={<SchoolIcon sx={{ fontSize: 64 }} />} title={t('cv.skills.empty.title')} description={t('cv.skills.empty.description')} action={{ label: t('cv.skills.addSkill'), onClick: openSkillCreate }} />
               ) : (
                 <Paper>
+                  <TableFilterBar
+                    searchValue={skillSearch}
+                    onSearchChange={setSkillSearch}
+                    searchPlaceholder={t('cv.skills.searchPlaceholder')}
+                  />
                   <DataTable<SkillResponse>
                     data={skills}
                     columns={skillColumns}

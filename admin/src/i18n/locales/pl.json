@@ -760,6 +760,7 @@
         "description": "Tagi to płaskie etykiety dla tematów przekrojowych — jak hashtagi. Przypisuj wiele tagów do wpisu (np. \"rust\", \"tutorial\"), aby odwiedzający mogli filtrować i odkrywać treści."
       },
       "loading": "Ładowanie tagów...",
+      "searchPlaceholder": "Szukaj tagów po slug...",
       "messages": {
         "created": "Tag utworzony",
         "updated": "Tag zaktualizowany",
@@ -785,6 +786,7 @@
         "description": "Kategorie tworzą hierarchię drzewiastą dla Twoich treści. Grupuj powiązane wpisy pod gałęziami jak \"Technologia > Tworzenie stron\" dla uporządkowanej nawigacji."
       },
       "loading": "Ładowanie kategorii...",
+      "searchPlaceholder": "Szukaj kategorii po slug...",
       "messages": {
         "created": "Kategoria utworzona",
         "updated": "Kategoria zaktualizowana",

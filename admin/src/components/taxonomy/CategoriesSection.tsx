@@ -5,6 +5,7 @@ import {
   Divider,
   IconButton,
   Paper,
+  TableSortLabel,
   Tooltip,
   Typography,
 } from '@mui/material';
@@ -18,6 +19,7 @@ import type { Category } from '@/types/api';
 import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
 import DataTable, { type DataTableColumn } from '@/components/shared/DataTable';
+import TableFilterBar from '@/components/shared/TableFilterBar';
 
 interface PaginationMeta {
   total_items: number;
@@ -38,6 +40,11 @@ interface CategoriesSectionProps {
   onOpenCreate: () => void;
   onEdit: (cat: Category) => void;
   onDelete: (cat: Category) => void;
+  searchValue: string;
+  onSearchChange: (value: string) => void;
+  sortBy: string;
+  sortDir: 'asc' | 'desc';
+  onSort: (column: string) => void;
 }
 
 export default function CategoriesSection({
@@ -53,32 +60,41 @@ export default function CategoriesSection({
   onOpenCreate,
   onEdit,
   onDelete,
+  searchValue,
+  onSearchChange,
+  sortBy,
+  sortDir,
+  onSort,
 }: CategoriesSectionProps) {
   const { t } = useTranslation();
 
   const catColumns: DataTableColumn<Category>[] = [
     {
-      header: t('taxonomy.categories.table.slug'),
-      scope: 'col',
+      header: (
+        <TableSortLabel active={sortBy === 'slug'} direction={sortBy === 'slug' ? sortDir : 'asc'} onClick={() => onSort('slug')}>
+          {t('taxonomy.categories.table.slug')}
+        </TableSortLabel>
+      ),
       render: (cat) => <Typography variant="body2" fontFamily="monospace">{cat.slug}</Typography>,
     },
     {
       header: t('taxonomy.categories.table.parent'),
-      scope: 'col',
       render: (cat) => cat.parent_id
         ? <Chip label={t('common.labels.child')} size="small" variant="outlined" />
         : '\u2014',
     },
     {
       header: t('taxonomy.categories.table.scope'),
-      scope: 'col',
       render: (cat) => cat.is_global
         ? <Chip label={t('common.labels.global')} size="small" color="info" variant="outlined" />
         : <Chip label={t('common.labels.site')} size="small" variant="outlined" />,
     },
     {
-      header: t('taxonomy.categories.table.created'),
-      scope: 'col',
+      header: (
+        <TableSortLabel active={sortBy === 'created_at'} direction={sortBy === 'created_at' ? sortDir : 'asc'} onClick={() => onSort('created_at')}>
+          {t('taxonomy.categories.table.created')}
+        </TableSortLabel>
+      ),
       render: (cat) => format(new Date(cat.created_at), 'PP'),
     },
     {
@@ -108,7 +124,13 @@ export default function CategoriesSection({
           {t('taxonomy.categories.addCategory')}
         </Button>}
       </Box>
-      <Divider sx={{ mb: 2 }} />
+      <Divider />
+      <TableFilterBar
+        searchValue={searchValue}
+        onSearchChange={onSearchChange}
+        searchPlaceholder={t('taxonomy.categories.searchPlaceholder')}
+        testIdPrefix="taxonomy.categories"
+      />
 
       {loading ? (
         <LoadingState label={t('taxonomy.categories.loading')} />
