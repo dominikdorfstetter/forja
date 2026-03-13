@@ -44,15 +44,28 @@ Astro.response.headers.set("Cache-Control", "public, max-age=300, s-maxage=600")
 
 <Base title="Home" description={siteDescription}>
   <SeoHead seo={seo} slot="head" />
-  <section class="hero">
-    <h1>Welcome to {siteName}</h1>
-    <p>{siteDescription}</p>
+
+  {/* Hero */}
+  <section class="pt-12 pb-10">
+    <span class="inline-block text-xs font-semibold uppercase tracking-widest bg-gradient-to-r from-violet-600 to-violet-400 bg-clip-text text-transparent mb-3">
+      Welcome
+    </span>
+    <h1 class="text-4xl sm:text-5xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mb-3">
+      {siteName}
+    </h1>
+    <p class="text-base text-zinc-500 dark:text-zinc-400 max-w-lg leading-relaxed">
+      {siteDescription}
+    </p>
   </section>
 
+  {/* Featured posts */}
   {featured.length > 0 && (
     <section>
-      <h2 class="section-heading">Featured Posts</h2>
-      <div class="blog-grid">
+      <div class="flex items-center gap-3 mb-6">
+        <span class="text-xs font-semibold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">Featured</span>
+        <div class="flex-1 h-px bg-zinc-200 dark:bg-zinc-800"></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {featured.map((blog) => (
           <BlogCard
             blog={blog}
@@ -60,8 +73,10 @@ Astro.response.headers.set("Cache-Control", "public, max-age=300, s-maxage=600")
           />
         ))}
       </div>
-      <p class="text-center mt-lg">
-        <a href="/blog">View all posts &rarr;</a>
+      <p class="mt-8">
+        <a href="/blog" class="text-sm font-medium text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 no-underline hover:no-underline">
+          View all posts &rarr;
+        </a>
       </p>
     </section>
   )}
