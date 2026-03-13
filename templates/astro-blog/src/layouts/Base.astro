@@ -60,18 +60,16 @@ const pageDesc = metaDescription ?? description ?? "";
     </main>
     <Footer siteName={siteName} />
     <script>
-      // Mobile nav toggle
       document.addEventListener("DOMContentLoaded", () => {
-        const toggle = document.querySelector(".site-nav__toggle");
-        const links = document.querySelector(".site-nav__links");
+        // Mobile nav toggle
+        const toggle = document.querySelector("[data-nav-toggle]");
+        const links = document.querySelector("[data-nav-links-mobile]");
         toggle?.addEventListener("click", () => {
-          links?.classList.toggle("open");
+          links?.classList.toggle("hidden");
         });
-      });
 
-      // Theme toggle
-      document.addEventListener("DOMContentLoaded", () => {
-        const btn = document.querySelector(".theme-toggle");
+        // Theme toggle
+        const btn = document.querySelector("[data-theme-toggle]");
         btn?.addEventListener("click", () => {
           const isDark = document.documentElement.getAttribute("data-theme") === "dark";
           const next = isDark ? "light" : "dark";

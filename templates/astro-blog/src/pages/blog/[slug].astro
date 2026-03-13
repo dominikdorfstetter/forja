@@ -87,40 +87,73 @@ Astro.response.headers.set("Cache-Control", "public, max-age=300, s-maxage=900")
 
 <Base title={title} metaTitle={metaTitle} metaDescription={metaDescription}>
   <SeoHead seo={seo} slot="head" />
-  <article class="blog-detail">
-    <header class="blog-detail__header">
-      <h1 class="blog-detail__title">{title}</h1>
-      <div class="blog-detail__meta">
-        <span>{date}</span>
-        {blog.author && <span>{blog.author}</span>}
-        {blog.reading_time_minutes && <span>{blog.reading_time_minutes} min read</span>}
-      </div>
-      {blog.categories.length > 0 && (
-        <div class="blog-detail__categories">
-          {blog.categories.map((cat) => (
-            <a href={`/blog/category/${cat.slug}`} class="blog-detail__tag">{cat.slug}</a>
-          ))}
-        </div>
-      )}
-    </header>
 
-    {coverMedia && (
-      <ResponsiveImage
-        media={coverMedia}
-        alt={title}
-        class="blog-detail__cover"
-        sizes="(max-width: 768px) 100vw, 740px"
-        loading="eager"
-      />
+  <article class="max-w-prose mx-auto">
+    {/* Breadcrumb */}
+    <div class="flex items-center gap-1.5 text-xs text-zinc-400 dark:text-zinc-500 mb-6">
+      <a href="/blog" class="text-zinc-500 dark:text-zinc-400 no-underline hover:text-violet-600 dark:hover:text-violet-400 hover:no-underline">Blog</a>
+      <span>/</span>
+      <span class="text-zinc-500 dark:text-zinc-400 truncate">{title}</span>
+    </div>
+
+    {/* Category pills */}
+    {blog.categories.length > 0 && (
+      <div class="flex gap-1.5 mb-4 flex-wrap">
+        {blog.categories.map((cat, i) => (
+          <a
+            href={`/blog/category/${cat.slug}`}
+            class={`text-[11px] font-medium px-2.5 py-0.5 rounded-full no-underline hover:no-underline transition-colors ${
+              i === 0
+                ? "bg-gradient-to-r from-violet-600 to-violet-400 text-white"
+                : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400"
+            }`}
+          >
+            {cat.slug}
+          </a>
+        ))}
+      </div>
     )}
 
-    <div class="blog-detail__body" set:html={body} />
+    {/* Title */}
+    <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mb-4">
+      {title}
+    </h1>
+
+    {/* Meta row */}
+    <div class="flex items-center gap-4 text-sm text-zinc-500 dark:text-zinc-400 pb-6 border-b border-zinc-200 dark:border-zinc-800">
+      {blog.author && <span>{blog.author}</span>}
+      <span class="text-zinc-300 dark:text-zinc-700">&middot;</span>
+      <span>{date}</span>
+      {blog.reading_time_minutes && (
+        <>
+          <span class="text-zinc-300 dark:text-zinc-700">&middot;</span>
+          <span>{blog.reading_time_minutes} min read</span>
+        </>
+      )}
+    </div>
+
+    {/* Cover image */}
+    {coverMedia && (
+      <div class="my-6">
+        <ResponsiveImage
+          media={coverMedia}
+          alt={title}
+          class="w-full rounded-xl"
+          sizes="(max-width: 768px) 100vw, 740px"
+          loading="eager"
+        />
+      </div>
+    )}
+
+    {/* Article body */}
+    <div class="prose" set:html={body} />
   </article>
 
+  {/* Similar posts */}
   {similarBlogs.length > 0 && (
-    <section class="similar-blogs">
-      <h2 class="similar-blogs__title">Continue Reading</h2>
-      <div class="similar-blogs__grid">
+    <section class="max-w-5xl mx-auto mt-16 pt-10 border-t border-zinc-200 dark:border-zinc-800">
+      <h2 class="text-xl font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mb-6">Continue Reading</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {similarBlogs.map((sb) => (
           <BlogCard
             blog={sb}

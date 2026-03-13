@@ -10,7 +10,7 @@ function escapeXml(str: string): string {
     .replace(/'/g, "&apos;");
 }
 
-export const GET: APIRoute = async ({ response }) => {
+export const GET: APIRoute = async () => {
   const siteUrl = getSiteUrl();
   const urls: { loc: string; lastmod?: string; changefreq?: string; priority?: string }[] = [];
 
@@ -24,7 +24,6 @@ export const GET: APIRoute = async ({ response }) => {
   // Blog posts
   try {
     const blogs = await fetchAllPublishedBlogs();
-    const categorySet = new Set<string>();
 
     for (const blog of blogs) {
       const slug = blog.slug ?? blog.id;

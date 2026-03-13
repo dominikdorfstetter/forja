@@ -32,24 +32,26 @@ function pageNumbers(): (number | "...")[] {
 }
 ---
 
-<nav class="pagination" aria-label="Page navigation">
+<nav class="flex items-center justify-center gap-1.5 mt-10 flex-wrap" aria-label="Page navigation">
   {currentPage > 1 && (
-    <a href={pageUrl(currentPage - 1)} class="pagination__link pagination__prev" aria-label="Previous page">&larr; Prev</a>
+    <a href={pageUrl(currentPage - 1)} class="inline-flex items-center px-3 py-1.5 text-sm text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg no-underline hover:no-underline transition-colors" aria-label="Previous page">
+      &larr; Prev
+    </a>
   )}
 
-  <span class="pagination__pages">
-    {pageNumbers().map((p) =>
-      p === "..." ? (
-        <span class="pagination__ellipsis">&hellip;</span>
-      ) : p === currentPage ? (
-        <span class="pagination__link pagination__current" aria-current="page">{p}</span>
-      ) : (
-        <a href={pageUrl(p)} class="pagination__link">{p}</a>
-      )
-    )}
-  </span>
+  {pageNumbers().map((p) =>
+    p === "..." ? (
+      <span class="px-2 text-sm text-zinc-400 dark:text-zinc-500">&hellip;</span>
+    ) : p === currentPage ? (
+      <span class="inline-flex items-center justify-center min-w-[2rem] h-8 px-2 text-sm font-semibold bg-violet-500 text-white rounded-lg" aria-current="page">{p}</span>
+    ) : (
+      <a href={pageUrl(p)} class="inline-flex items-center justify-center min-w-[2rem] h-8 px-2 text-sm text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg no-underline hover:no-underline transition-colors">{p}</a>
+    )
+  )}
 
   {currentPage < totalPages && (
-    <a href={pageUrl(currentPage + 1)} class="pagination__link pagination__next" aria-label="Next page">Next &rarr;</a>
+    <a href={pageUrl(currentPage + 1)} class="inline-flex items-center px-3 py-1.5 text-sm text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg no-underline hover:no-underline transition-colors" aria-label="Next page">
+      Next &rarr;
+    </a>
   )}
 </nav>

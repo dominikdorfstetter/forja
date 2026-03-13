@@ -40,10 +40,10 @@ Astro.response.headers.set("Cache-Control", "public, max-age=3600, s-maxage=8640
 
 <Base title={title}>
   <SeoHead seo={seo} slot="head" />
-  <article class="legal-page">
-    <h1>{title}</h1>
-    {intro.length > 0 && <div class="legal-page__intro" set:html={intro} />}
-    <p class="legal-page__meta">
+  <article class="max-w-prose mx-auto">
+    <h1 class="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mb-6">{title}</h1>
+    {intro.length > 0 && <div class="prose" set:html={intro} />}
+    <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-8">
       Last updated: {new Date(doc.updated_at).toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
