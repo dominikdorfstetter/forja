@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Paper, Chip, IconButton, Tooltip } from '@mui/material';
+import { Box, Paper, Chip, IconButton, Tooltip, TableSortLabel } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -16,6 +16,7 @@ import { useListPageState } from '@/hooks/useListPageState';
 import { useCrudMutations } from '@/hooks/useCrudMutations';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import PageHeader from '@/components/shared/PageHeader';
+import TableFilterBar from '@/components/shared/TableFilterBar';
 import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
@@ -30,6 +31,8 @@ export default function WebhooksPage() {
 
   const {
     page, pageSize, formOpen, editing, deleting,
+    search, setSearch, debouncedSearch,
+    sortBy, sortDir, handleSort,
     openCreate, closeForm, openEdit, closeEdit, openDelete, closeDelete,
     handlePageChange, handleRowsPerPageChange,
   } = useListPageState<Webhook>();
@@ -47,8 +50,8 @@ export default function WebhooksPage() {
   }, [openCreate]);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['webhooks', selectedSiteId, page, pageSize],
-    queryFn: () => apiService.getWebhooks(selectedSiteId, { page, page_size: pageSize }),
+    queryKey: ['webhooks', selectedSiteId, page, pageSize, debouncedSearch, sortBy, sortDir],
+    queryFn: () => apiService.getWebhooks(selectedSiteId, { page, page_size: pageSize, search: debouncedSearch || undefined, sort_by: sortBy || undefined, sort_dir: sortBy ? sortDir : undefined }),
     enabled: !!selectedSiteId,
   });
   const webhooks = data?.data;
@@ -86,7 +89,15 @@ export default function WebhooksPage() {
   });
 
   const columns: DataTableColumn<Webhook>[] = [
-    { header: t('webhooks.table.url'), render: (wh) => <span style={{ maxWidth: 250, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block' }}>{wh.url}</span> },
+    { header: (
+      <TableSortLabel
+        active={sortBy === 'url'}
+        direction={sortBy === 'url' ? sortDir : 'asc'}
+        onClick={() => handleSort('url')}
+      >
+        {t('webhooks.table.url')}
+      </TableSortLabel>
+    ), render: (wh) => <span style={{ maxWidth: 250, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block' }}>{wh.url}</span> },
     {
       header: t('webhooks.table.events'),
       render: (wh) => wh.events.length === 0
@@ -98,8 +109,24 @@ export default function WebhooksPage() {
           </Box>
         ),
     },
-    { header: t('webhooks.table.status'), render: (wh) => <Chip label={wh.is_active ? t('common.status.active') : t('common.status.inactive')} size="small" color={wh.is_active ? 'success' : 'default'} /> },
-    { header: t('webhooks.table.created'), render: (wh) => format(new Date(wh.created_at), 'PP') },
+    { header: (
+      <TableSortLabel
+        active={sortBy === 'is_active'}
+        direction={sortBy === 'is_active' ? sortDir : 'asc'}
+        onClick={() => handleSort('is_active')}
+      >
+        {t('webhooks.table.status')}
+      </TableSortLabel>
+    ), render: (wh) => <Chip label={wh.is_active ? t('common.status.active') : t('common.status.inactive')} size="small" color={wh.is_active ? 'success' : 'default'} /> },
+    { header: (
+      <TableSortLabel
+        active={sortBy === 'created_at'}
+        direction={sortBy === 'created_at' ? sortDir : 'asc'}
+        onClick={() => handleSort('created_at')}
+      >
+        {t('webhooks.table.created')}
+      </TableSortLabel>
+    ), render: (wh) => format(new Date(wh.created_at), 'PP') },
     {
       header: t('webhooks.table.actions'),
       align: 'right',
@@ -125,11 +152,16 @@ export default function WebhooksPage() {
       {!selectedSiteId ? (
         <EmptyState icon={<WebhookIcon sx={{ fontSize: 64 }} />} title={t('common.noSiteSelected')} description={t('webhooks.empty.noSite')} />
       ) : (
-        <Paper sx={{ p: 3 }}>
+        <Paper>
+          <TableFilterBar
+            searchValue={search}
+            onSearchChange={setSearch}
+            searchPlaceholder={t('webhooks.searchPlaceholder')}
+          />
           {isLoading ? (
-            <LoadingState label={t('webhooks.loading')} />
+            <Box sx={{ p: 3 }}><LoadingState label={t('webhooks.loading')} /></Box>
           ) : !webhooks || webhooks.length === 0 ? (
-            <EmptyState icon={<WebhookIcon sx={{ fontSize: 48 }} />} title={t('webhooks.empty.title')} description={t('webhooks.empty.description')} action={{ label: t('webhooks.addWebhook'), onClick: openCreate }} />
+            <Box sx={{ p: 3 }}><EmptyState icon={<WebhookIcon sx={{ fontSize: 48 }} />} title={t('webhooks.empty.title')} description={t('webhooks.empty.description')} action={{ label: t('webhooks.addWebhook'), onClick: openCreate }} /></Box>
           ) : (
             <DataTable
               data={webhooks}

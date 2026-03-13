@@ -760,6 +760,7 @@
         "description": "Tags sind flache Bezeichnungen für übergreifende Themen — wie Hashtags. Weisen Sie mehrere Tags pro Beitrag zu (z.B. \"rust\", \"tutorial\"), damit Besucher Inhalte filtern und entdecken können."
       },
       "loading": "Tags werden geladen...",
+      "searchPlaceholder": "Tags nach Slug suchen...",
       "messages": {
         "created": "Tag erstellt",
         "updated": "Tag aktualisiert",
@@ -785,6 +786,7 @@
         "description": "Kategorien schaffen eine baumartige Hierarchie für Ihre Inhalte. Gruppieren Sie verwandte Beiträge unter Zweigen wie \"Technologie > Webentwicklung\" für strukturierte Navigation."
       },
       "loading": "Kategorien werden geladen...",
+      "searchPlaceholder": "Kategorien nach Slug suchen...",
       "messages": {
         "created": "Kategorie erstellt",
         "updated": "Kategorie aktualisiert",
@@ -803,6 +805,7 @@
     "title": "Webhooks",
     "subtitle": "Externe Dienste bei Inhaltsänderungen benachrichtigen",
     "addWebhook": "Webhook hinzufügen",
+    "searchPlaceholder": "Nach URL suchen...",
     "allEvents": "Alle Ereignisse",
     "viewDeliveries": "Zustellungen anzeigen",
     "sendTest": "Test senden",
@@ -848,6 +851,7 @@
     "title": "Weiterleitungen",
     "subtitle": "URL-Weiterleitungen für Ihre Seiten verwalten",
     "addRedirect": "Weiterleitung hinzufügen",
+    "searchPlaceholder": "Nach Pfad suchen...",
     "table": {
       "sourcePath": "Quell-Pfad",
       "destination": "Ziel-URL",
@@ -964,6 +968,7 @@
     "title": "API Keys",
     "subtitle": "API Keys für den Backend-Zugriff verwalten",
     "createButton": "API Key erstellen",
+    "searchPlaceholder": "Nach Name oder Schlüsselpräfix suchen...",
     "filters": {
       "allStatuses": "Alle Status",
       "allPermissions": "Alle Berechtigungen"
@@ -1051,6 +1056,7 @@
     },
     "entries": {
       "addEntry": "Eintrag hinzufügen",
+      "searchPlaceholder": "Nach Firma oder Standort suchen...",
       "table": {
         "company": "Unternehmen",
         "location": "Standort",
@@ -1078,6 +1084,7 @@
     },
     "skills": {
       "addSkill": "Fähigkeit hinzufügen",
+      "searchPlaceholder": "Nach Fähigkeit suchen...",
       "table": {
         "name": "Name",
         "slug": "Slug",
@@ -1110,6 +1117,7 @@
     "title": "Rechtliche Dokumente",
     "subtitle": "Rechtliche Dokumente Ihrer Seiten verwalten",
     "addDocument": "Dokument hinzufügen",
+    "searchPlaceholder": "Nach Cookie-Name suchen...",
     "table": {
       "cookieName": "Cookie-Name",
       "type": "Typ",
@@ -1502,6 +1510,8 @@
     "loading": "Aktivität wird geladen...",
     "empty": "Noch keine Aktivität",
     "emptyDescription": "Aktionen wie Erstellen, Aktualisieren und Löschen von Inhalten werden hier angezeigt.",
+    "noFilterResults": "Keine passende Aktivität",
+    "noFilterResultsDescription": "Keine Aktivität entspricht den ausgewählten Filtern. Versuchen Sie, die Filter zu ändern oder zurückzusetzen.",
     "columns": {
       "timestamp": "Zeitstempel",
       "action": "Aktion",
@@ -2011,6 +2021,7 @@
     "viewAll": "Alle anzeigen",
     "pageTitle": "Benachrichtigungen",
     "pageSubtitle": "Benachrichtigungen anzeigen und verwalten",
+    "searchPlaceholder": "Benachrichtigungen durchsuchen...",
     "columns": {
       "type": "Typ",
       "title": "Titel",

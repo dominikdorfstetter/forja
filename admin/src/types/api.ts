@@ -201,6 +201,15 @@ export interface PaginationMeta {
   total_items: number;
 }
 
+/** Standard query parameters shared by all paginated list endpoints. */
+export interface ListQueryParams {
+  page?: number;
+  page_size?: number;
+  search?: string;
+  sort_by?: string;
+  sort_dir?: 'asc' | 'desc';
+}
+
 export interface Paginated<T> {
   data: T[];
   meta: PaginationMeta;

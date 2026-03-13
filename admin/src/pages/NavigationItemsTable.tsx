@@ -61,7 +61,7 @@ export default function NavigationItemsTable({
       onDragEnd={onDragEnd}
     >
       <TableContainer component={Paper}>
-        <Table>
+        <Table size="small">
           <TableHead>
             <TableRow>
               {canWrite && <TableCell scope="col" sx={{ width: 48, px: 1 }} />}

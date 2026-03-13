@@ -254,7 +254,7 @@ export default function PagesPage() {
               rowsPerPage={pageSize}
               onRowsPerPageChange={handleRowsPerPageChange}
               isRowSelected={(pg) => bulk.isSelected(pg.id)}
-              size="medium"
+              size="small"
             />
           </Paper>
         </>

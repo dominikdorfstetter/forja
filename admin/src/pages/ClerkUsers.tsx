@@ -85,7 +85,7 @@ export default function ClerkUsersPage() {
       ) : (
         <Paper sx={{ width: '100%', overflow: 'hidden' }}>
           <TableContainer>
-            <Table>
+            <Table size="small">
               <TableHead>
                 <TableRow>
                   <TableCell>User</TableCell>

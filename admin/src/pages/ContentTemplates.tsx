@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Paper, Chip, IconButton, Tooltip, Typography } from '@mui/material';
+import { Box, Paper, Chip, IconButton, Tooltip, Typography, TableSortLabel } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -18,6 +18,7 @@ import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import DataTable, { type DataTableColumn } from '@/components/shared/DataTable';
+import TableFilterBar from '@/components/shared/TableFilterBar';
 import ContentTemplateFormDialog from '@/components/content-templates/ContentTemplateFormDialog';
 import CreateTemplateWizard from '@/components/content-templates/CreateTemplateWizard';
 
@@ -28,6 +29,8 @@ export default function ContentTemplatesPage() {
 
   const {
     page, pageSize, formOpen, editing, deleting,
+    search, setSearch, debouncedSearch,
+    sortBy, sortDir, handleSort,
     openCreate, closeForm, openEdit, closeEdit, openDelete, closeDelete,
     handlePageChange, handleRowsPerPageChange,
   } = useListPageState<ContentTemplate>();
@@ -42,8 +45,8 @@ export default function ContentTemplatesPage() {
   }, [openCreate]);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['content-templates', selectedSiteId, page, pageSize],
-    queryFn: () => apiService.getContentTemplates(selectedSiteId, { page, page_size: pageSize }),
+    queryKey: ['content-templates', selectedSiteId, page, pageSize, debouncedSearch, sortBy, sortDir],
+    queryFn: () => apiService.getContentTemplates(selectedSiteId, { page, page_size: pageSize, search: debouncedSearch || undefined, sort_by: sortBy || undefined, sort_dir: sortBy ? sortDir : undefined }),
     enabled: !!selectedSiteId,
   });
   const templates = data?.data;
@@ -70,11 +73,35 @@ export default function ContentTemplatesPage() {
   });
 
   const columns: DataTableColumn<ContentTemplate>[] = [
-    { header: t('contentTemplates.table.name'), render: (tpl) => <Typography variant="body2" fontWeight={500}>{tpl.name}</Typography> },
+    { header: (
+        <TableSortLabel
+          active={sortBy === 'name'}
+          direction={sortBy === 'name' ? sortDir : 'asc'}
+          onClick={() => handleSort('name')}
+        >
+          {t('contentTemplates.table.name')}
+        </TableSortLabel>
+      ), render: (tpl) => <Typography variant="body2" fontWeight={500}>{tpl.name}</Typography> },
     { header: t('contentTemplates.table.description'), render: (tpl) => <span style={{ maxWidth: 250, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block' }}>{tpl.description || '—'}</span> },
     { header: t('contentTemplates.table.icon'), render: (tpl) => <Chip label={tpl.icon} size="small" variant="outlined" /> },
-    { header: t('contentTemplates.table.active'), render: (tpl) => <Chip label={tpl.is_active ? t('common.status.active') : t('common.status.inactive')} size="small" color={tpl.is_active ? 'success' : 'default'} /> },
-    { header: t('contentTemplates.table.created'), render: (tpl) => format(new Date(tpl.created_at), 'PP') },
+    { header: (
+        <TableSortLabel
+          active={sortBy === 'is_active'}
+          direction={sortBy === 'is_active' ? sortDir : 'asc'}
+          onClick={() => handleSort('is_active')}
+        >
+          {t('contentTemplates.table.active')}
+        </TableSortLabel>
+      ), render: (tpl) => <Chip label={tpl.is_active ? t('common.status.active') : t('common.status.inactive')} size="small" color={tpl.is_active ? 'success' : 'default'} /> },
+    { header: (
+        <TableSortLabel
+          active={sortBy === 'created_at'}
+          direction={sortBy === 'created_at' ? sortDir : 'asc'}
+          onClick={() => handleSort('created_at')}
+        >
+          {t('contentTemplates.table.created')}
+        </TableSortLabel>
+      ), render: (tpl) => format(new Date(tpl.created_at), 'PP') },
     {
       header: t('contentTemplates.table.actions'),
       align: 'right',
@@ -102,11 +129,12 @@ export default function ContentTemplatesPage() {
       {!selectedSiteId ? (
         <EmptyState icon={<ViewQuiltIcon sx={{ fontSize: 64 }} />} title={t('common.noSiteSelected')} description={t('contentTemplates.empty.noSite')} />
       ) : (
-        <Paper sx={{ p: 3 }}>
+        <Paper>
+          <TableFilterBar searchValue={search} onSearchChange={setSearch} searchPlaceholder={t('contentTemplates.searchPlaceholder')} />
           {isLoading ? (
-            <LoadingState label={t('contentTemplates.loading')} />
+            <Box sx={{ p: 3 }}><LoadingState label={t('contentTemplates.loading')} /></Box>
           ) : !templates || templates.length === 0 ? (
-            <EmptyState icon={<ViewQuiltIcon sx={{ fontSize: 48 }} />} title={t('contentTemplates.empty.title')} description={t('contentTemplates.empty.description')} action={canWrite ? { label: t('contentTemplates.addTemplate'), onClick: openCreate } : undefined} />
+            <Box sx={{ p: 3 }}><EmptyState icon={<ViewQuiltIcon sx={{ fontSize: 48 }} />} title={t('contentTemplates.empty.title')} description={t('contentTemplates.empty.description')} action={canWrite ? { label: t('contentTemplates.addTemplate'), onClick: openCreate } : undefined} /></Box>
           ) : (
             <DataTable
               data={templates}

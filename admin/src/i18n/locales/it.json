@@ -760,6 +760,7 @@
         "description": "I tag sono etichette piatte per argomenti trasversali — come hashtag. Assegna più tag per articolo (es. \"rust\", \"tutorial\") così i visitatori possono filtrare e scoprire i contenuti."
       },
       "loading": "Caricamento tag...",
+      "searchPlaceholder": "Cerca tag per slug...",
       "messages": {
         "created": "Tag creato",
         "updated": "Tag aggiornato",
@@ -785,6 +786,7 @@
         "description": "Le categorie creano una gerarchia ad albero per i tuoi contenuti. Raggruppa gli articoli correlati sotto rami come \"Tecnologia > Sviluppo Web\" per una navigazione strutturata."
       },
       "loading": "Caricamento categorie...",
+      "searchPlaceholder": "Cerca categorie per slug...",
       "messages": {
         "created": "Categoria creata",
         "updated": "Categoria aggiornata",
@@ -803,6 +805,7 @@
     "title": "Webhooks",
     "subtitle": "Notifica servizi esterni quando i contenuti cambiano",
     "addWebhook": "Aggiungi webhook",
+    "searchPlaceholder": "Cerca per URL...",
     "allEvents": "Tutti gli eventi",
     "viewDeliveries": "Visualizza consegne",
     "sendTest": "Invia test",
@@ -848,6 +851,7 @@
     "title": "Reindirizzamenti",
     "subtitle": "Gestire i reindirizzamenti URL per i tuoi siti",
     "addRedirect": "Aggiungi reindirizzamento",
+    "searchPlaceholder": "Cerca per percorso...",
     "table": {
       "sourcePath": "Percorso di origine",
       "destination": "URL di destinazione",
@@ -964,6 +968,7 @@
     "title": "API Keys",
     "subtitle": "Gestisci le API key per accedere al backend",
     "createButton": "Crea API Key",
+    "searchPlaceholder": "Cerca per nome o prefisso chiave...",
     "filters": {
       "allStatuses": "Tutti gli stati",
       "allPermissions": "Tutti i permessi"
@@ -1051,6 +1056,7 @@
     },
     "entries": {
       "addEntry": "Aggiungi voce",
+      "searchPlaceholder": "Cerca per azienda o sede...",
       "table": {
         "company": "Azienda",
         "location": "Luogo",
@@ -1078,6 +1084,7 @@
     },
     "skills": {
       "addSkill": "Aggiungi competenza",
+      "searchPlaceholder": "Cerca per nome competenza...",
       "table": {
         "name": "Nome",
         "slug": "Slug",
@@ -1110,6 +1117,7 @@
     "title": "Documenti legali",
     "subtitle": "Gestisci i documenti legali dei tuoi siti",
     "addDocument": "Aggiungi documento",
+    "searchPlaceholder": "Cerca per nome cookie...",
     "table": {
       "cookieName": "Nome cookie",
       "type": "Tipo",
@@ -1502,6 +1510,8 @@
     "loading": "Caricamento attività...",
     "empty": "Nessuna attività",
     "emptyDescription": "Le azioni come creazione, aggiornamento ed eliminazione di contenuti appariranno qui.",
+    "noFilterResults": "Nessuna attività corrispondente",
+    "noFilterResultsDescription": "Nessuna attività corrisponde ai filtri selezionati. Prova a modificare o cancellare i filtri.",
     "columns": {
       "timestamp": "Timestamp",
       "action": "Azione",
@@ -2011,6 +2021,7 @@
     "viewAll": "Vedi tutte",
     "pageTitle": "Notifiche",
     "pageSubtitle": "Rivedi e gestisci le tue notifiche",
+    "searchPlaceholder": "Cerca notifiche...",
     "columns": {
       "type": "Tipo",
       "title": "Titolo",

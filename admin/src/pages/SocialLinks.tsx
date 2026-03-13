@@ -76,7 +76,7 @@ export default function SocialLinksPage() {
     enabled: !!selectedSiteId,
   });
 
-  const prevLinksRef = useRef(links);
+  const prevLinksRef = useRef<SocialLink[] | undefined>(undefined);
   if (links && links !== prevLinksRef.current) {
     setOrderedLinks(links);
   }
@@ -158,7 +158,7 @@ export default function SocialLinksPage() {
       ) : (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
           <TableContainer component={Paper}>
-            <Table>
+            <Table size="small">
               <TableHead>
                 <TableRow>
                   {canWrite && <TableCell scope="col" sx={{ width: 48, px: 1 }} />}

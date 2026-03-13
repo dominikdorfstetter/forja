@@ -130,6 +130,16 @@ export function createAppTheme(flavor: Flavor, locale?: ThemeOptions): Theme {
           },
         },
       },
+      MuiTableCell: {
+        styleOverrides: {
+          root: {
+            padding: '10px 16px',
+          },
+          sizeSmall: {
+            padding: '10px 16px',
+          },
+        },
+      },
       MuiChip: {
         styleOverrides: {
           root: {

@@ -1,9 +1,12 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useUserPreferences } from '@/store/UserPreferencesContext';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 
 interface UseListPageStateOptions {
   initialPage?: number;
   initialPageSize?: number;
+  initialSortBy?: string;
+  initialSortDir?: 'asc' | 'desc';
 }
 
 export function useListPageState<T>(options?: UseListPageStateOptions) {
@@ -13,6 +16,23 @@ export function useListPageState<T>(options?: UseListPageStateOptions) {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<T | null>(null);
   const [deleting, setDeleting] = useState<T | null>(null);
+
+  // Search state
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebouncedValue(search);
+
+  // Sort state
+  const [sortBy, setSortBy] = useState(options?.initialSortBy ?? '');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>(options?.initialSortDir ?? 'asc');
+
+  // Reset to page 1 when debounced search changes (skip initial mount)
+  const prevDebouncedSearch = useRef(debouncedSearch);
+  useEffect(() => {
+    if (prevDebouncedSearch.current !== debouncedSearch) {
+      prevDebouncedSearch.current = debouncedSearch;
+      setPage(1);
+    }
+  }, [debouncedSearch]);
 
   const openCreate = useCallback(() => setFormOpen(true), []);
   const closeForm = useCallback(() => setFormOpen(false), []);
@@ -29,6 +49,16 @@ export function useListPageState<T>(options?: UseListPageStateOptions) {
     },
     [],
   );
+
+  const handleSort = useCallback((column: string) => {
+    setSortBy((prevSortBy) => {
+      setSortDir((prevSortDir) =>
+        prevSortBy === column ? (prevSortDir === 'asc' ? 'desc' : 'asc') : 'asc'
+      );
+      return column;
+    });
+    setPage(1);
+  }, []);
 
   return {
     page,
@@ -49,5 +79,13 @@ export function useListPageState<T>(options?: UseListPageStateOptions) {
     closeDelete,
     handlePageChange,
     handleRowsPerPageChange,
+    // Search
+    search,
+    setSearch,
+    debouncedSearch,
+    // Sort
+    sortBy,
+    sortDir,
+    handleSort,
   };
 }

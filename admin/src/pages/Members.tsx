@@ -215,7 +215,7 @@ export default function MembersPage() {
         <EmptyState title={t('members.empty.title')} description={t('members.empty.description')} />
       ) : (
         <TableContainer component={Paper} variant="outlined">
-          <Table>
+          <Table size="small">
             <TableHead>
               <TableRow>
                 <TableCell>{t('members.table.name')}</TableCell>

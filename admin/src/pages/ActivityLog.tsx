@@ -11,9 +11,8 @@ import {
   TableRow,
   TablePagination,
   Chip,
-  TextField,
-  MenuItem,
   Typography,
+  TableSortLabel,
   Tooltip,
   Link as MuiLink,
 } from '@mui/material';
@@ -24,9 +23,11 @@ import { Link as RouterLink } from 'react-router';
 import { v5 as uuidv5 } from 'uuid';
 import apiService from '@/services/api';
 import { useSiteContext } from '@/store/SiteContext';
+import { useListPageState } from '@/hooks/useListPageState';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
+import TableFilterBar from '@/components/shared/TableFilterBar';
 import type { AuditAction } from '@/types/api';
 
 /**
@@ -87,14 +88,21 @@ const ACTION_TYPES: AuditAction[] = [
 export default function ActivityLogPage() {
   const { t } = useTranslation();
   const { selectedSiteId } = useSiteContext();
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(25);
+  const {
+    page, setPage, pageSize,
+    sortBy, sortDir, handleSort, handleRowsPerPageChange,
+  } = useListPageState();
   const [actionFilter, setActionFilter] = useState<string>('');
   const [entityFilter, setEntityFilter] = useState<string>('');
 
   const { data, isLoading } = useQuery({
-    queryKey: ['audit-logs', selectedSiteId, page, rowsPerPage],
-    queryFn: () => apiService.getAuditLogs(selectedSiteId, { page: page + 1, page_size: rowsPerPage }),
+    queryKey: ['audit-logs', selectedSiteId, page, pageSize, sortBy, sortDir],
+    queryFn: () => apiService.getAuditLogs(selectedSiteId, {
+      page,
+      page_size: pageSize,
+      sort_by: sortBy || undefined,
+      sort_dir: sortBy ? sortDir : undefined,
+    }),
     enabled: !!selectedSiteId,
   });
 
@@ -138,132 +146,138 @@ export default function ActivityLogPage() {
         breadcrumbs={[{ label: t('activity.title') }]}
       />
 
-      <Paper sx={{ mb: 2, p: 2, display: 'flex', gap: 2 }}>
-        <TextField
-          select
-          size="small"
-          label={t('activity.filters.action')}
-          value={actionFilter}
-          onChange={(e) => setActionFilter(e.target.value)}
-          sx={{ minWidth: 150 }}
-        >
-          <MenuItem value="">{t('common.filters.all')}</MenuItem>
-          {ACTION_TYPES.map((a) => (
-            <MenuItem key={a} value={a}>{a}</MenuItem>
-          ))}
-        </TextField>
-        <TextField
-          select
-          size="small"
-          label={t('activity.filters.entityType')}
-          value={entityFilter}
-          onChange={(e) => setEntityFilter(e.target.value)}
-          sx={{ minWidth: 180 }}
-        >
-          <MenuItem value="">{t('common.filters.all')}</MenuItem>
-          {ENTITY_TYPES.map((et) => (
-            <MenuItem key={et} value={et}>{ENTITY_TYPE_LABELS[et] || et}</MenuItem>
-          ))}
-        </TextField>
-      </Paper>
-
       {isLoading ? (
         <LoadingState label={t('activity.loading')} />
-      ) : filteredData.length === 0 ? (
+      ) : !data?.data || data.data.length === 0 ? (
         <EmptyState title={t('activity.empty')} description={t('activity.emptyDescription')} />
       ) : (
         <Paper>
-          <TableContainer>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>{t('activity.columns.timestamp')}</TableCell>
-                  <TableCell>{t('activity.columns.userId')}</TableCell>
-                  <TableCell>{t('activity.columns.action')}</TableCell>
-                  <TableCell>{t('activity.columns.entityType')}</TableCell>
-                  <TableCell>{t('activity.columns.entityId')}</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {filteredData.map((log) => {
-                  const detailRoute = ENTITY_DETAIL_ROUTES[log.entity_type];
-                  const fullDate = format(new Date(log.created_at), 'PPpp');
-                  const relativeDate = formatDistanceToNow(new Date(log.created_at), { addSuffix: true });
-                  const userName = log.user_id ? userNameMap.get(log.user_id) : null;
-
-                  return (
-                    <TableRow key={log.id} hover>
-                      {/* Timestamp — relative with full date on hover */}
-                      <TableCell>
-                        <Tooltip title={fullDate} arrow>
-                          <Typography variant="body2" color="text.secondary">
-                            {relativeDate}
-                          </Typography>
-                        </Tooltip>
-                      </TableCell>
-
-                      {/* User — resolved name */}
-                      <TableCell>
-                        <Typography variant="body2">
-                          {userName || '—'}
-                        </Typography>
-                      </TableCell>
-
-                      {/* Action */}
-                      <TableCell>
-                        <Chip
-                          label={log.action}
-                          size="small"
-                          color={ACTION_COLORS[log.action] || 'default'}
-                          variant="outlined"
-                        />
-                      </TableCell>
-
-                      {/* Entity Type — human-readable */}
-                      <TableCell>
-                        <Typography variant="body2">
-                          {ENTITY_TYPE_LABELS[log.entity_type] || log.entity_type}
-                        </Typography>
-                      </TableCell>
-
-                      {/* Entity ID — truncated, linked to detail page when available */}
-                      <TableCell>
-                        <Tooltip title={log.entity_id} arrow>
-                          {detailRoute && log.action !== 'Delete' ? (
-                            <MuiLink
-                              component={RouterLink}
-                              to={`${detailRoute}/${log.entity_id}`}
-                              variant="body2"
-                              fontFamily="monospace"
-                              fontSize="0.75rem"
-                            >
-                              {log.entity_id.slice(0, 8)}
-                            </MuiLink>
-                          ) : (
-                            <Typography variant="body2" fontFamily="monospace" fontSize="0.75rem">
-                              {log.entity_id.slice(0, 8)}
-                            </Typography>
-                          )}
-                        </Tooltip>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <TablePagination
-            component="div"
-            count={data?.meta?.total_items || 0}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            onPageChange={(_, newPage) => setPage(newPage)}
-            onRowsPerPageChange={(e) => {
-              setRowsPerPage(parseInt(e.target.value, 10));
-              setPage(0);
-            }}
-            rowsPerPageOptions={[10, 25, 50]}
+          <TableFilterBar
+            searchValue=""
+            onSearchChange={() => {}}
+            hideSearch
+            filters={[
+              {
+                key: 'action',
+                label: t('activity.filters.action'),
+                value: actionFilter,
+                onChange: (v) => setActionFilter(v),
+                options: [
+                  { value: '', label: t('common.filters.all') },
+                  ...ACTION_TYPES.map((a) => ({ value: a, label: a })),
+                ],
+              },
+              {
+                key: 'entityType',
+                label: t('activity.filters.entityType'),
+                value: entityFilter,
+                onChange: (v) => setEntityFilter(v),
+                options: [
+                  { value: '', label: t('common.filters.all') },
+                  ...ENTITY_TYPES.map((et) => ({ value: et, label: ENTITY_TYPE_LABELS[et] || et })),
+                ],
+              },
+            ]}
           />
+          {filteredData.length === 0 ? (
+            <Box sx={{ p: 3 }}>
+              <EmptyState title={t('activity.noFilterResults')} description={t('activity.noFilterResultsDescription')} />
+            </Box>
+          ) : (
+            <>
+              <TableContainer>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>
+                        <TableSortLabel active={sortBy === 'created_at'} direction={sortBy === 'created_at' ? sortDir : 'asc'} onClick={() => handleSort('created_at')}>
+                          {t('activity.columns.timestamp')}
+                        </TableSortLabel>
+                      </TableCell>
+                      <TableCell>{t('activity.columns.userId')}</TableCell>
+                      <TableCell>
+                        <TableSortLabel active={sortBy === 'action'} direction={sortBy === 'action' ? sortDir : 'asc'} onClick={() => handleSort('action')}>
+                          {t('activity.columns.action')}
+                        </TableSortLabel>
+                      </TableCell>
+                      <TableCell>
+                        <TableSortLabel active={sortBy === 'entity_type'} direction={sortBy === 'entity_type' ? sortDir : 'asc'} onClick={() => handleSort('entity_type')}>
+                          {t('activity.columns.entityType')}
+                        </TableSortLabel>
+                      </TableCell>
+                      <TableCell>{t('activity.columns.entityId')}</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {filteredData.map((log) => {
+                      const detailRoute = ENTITY_DETAIL_ROUTES[log.entity_type];
+                      const fullDate = format(new Date(log.created_at), 'PPpp');
+                      const relativeDate = formatDistanceToNow(new Date(log.created_at), { addSuffix: true });
+                      const userName = log.user_id ? userNameMap.get(log.user_id) : null;
+
+                      return (
+                        <TableRow key={log.id} hover>
+                          <TableCell>
+                            <Tooltip title={fullDate} arrow>
+                              <Typography variant="body2" color="text.secondary">
+                                {relativeDate}
+                              </Typography>
+                            </Tooltip>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2">
+                              {userName || '—'}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Chip
+                              label={log.action}
+                              size="small"
+                              color={ACTION_COLORS[log.action] || 'default'}
+                              variant="outlined"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="body2">
+                              {ENTITY_TYPE_LABELS[log.entity_type] || log.entity_type}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Tooltip title={log.entity_id} arrow>
+                              {detailRoute && log.action !== 'Delete' ? (
+                                <MuiLink
+                                  component={RouterLink}
+                                  to={`${detailRoute}/${log.entity_id}`}
+                                  variant="body2"
+                                  fontFamily="monospace"
+                                  fontSize="0.75rem"
+                                >
+                                  {log.entity_id.slice(0, 8)}
+                                </MuiLink>
+                              ) : (
+                                <Typography variant="body2" fontFamily="monospace" fontSize="0.75rem">
+                                  {log.entity_id.slice(0, 8)}
+                                </Typography>
+                              )}
+                            </Tooltip>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <TablePagination
+                component="div"
+                count={data?.meta?.total_items || 0}
+                page={page - 1}
+                rowsPerPage={pageSize}
+                onPageChange={(_, newPage) => setPage(() => newPage + 1)}
+                onRowsPerPageChange={handleRowsPerPageChange}
+                rowsPerPageOptions={[10, 25, 50]}
+              />
+            </>
+          )}
         </Paper>
       )}
     </Box>

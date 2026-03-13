@@ -760,6 +760,7 @@
         "description": "Tags zijn platte labels voor overkoepelende onderwerpen — zoals hashtags. Wijs meerdere tags per artikel toe (bijv. \"rust\", \"tutorial\") zodat bezoekers content kunnen filteren en ontdekken."
       },
       "loading": "Tags laden...",
+      "searchPlaceholder": "Tags zoeken op slug...",
       "messages": {
         "created": "Tag aangemaakt",
         "updated": "Tag bijgewerkt",
@@ -785,6 +786,7 @@
         "description": "Categorieën creëren een boomachtige hiërarchie voor je content. Groepeer gerelateerde artikelen onder takken zoals \"Technologie > Webontwikkeling\" voor gestructureerde navigatie."
       },
       "loading": "Categorieën laden...",
+      "searchPlaceholder": "Categorieën zoeken op slug...",
       "messages": {
         "created": "Categorie aangemaakt",
         "updated": "Categorie bijgewerkt",
@@ -803,6 +805,7 @@
     "title": "Webhooks",
     "subtitle": "Externe diensten melden wanneer inhoud wijzigt",
     "addWebhook": "Webhook toevoegen",
+    "searchPlaceholder": "Zoeken op URL...",
     "allEvents": "Alle gebeurtenissen",
     "viewDeliveries": "Afleveringen bekijken",
     "sendTest": "Test verzenden",
@@ -848,6 +851,7 @@
     "title": "Omleidingen",
     "subtitle": "URL-omleidingen voor uw sites beheren",
     "addRedirect": "Omleiding toevoegen",
+    "searchPlaceholder": "Zoeken op pad...",
     "table": {
       "sourcePath": "Bronpad",
       "destination": "Doel-URL",
@@ -964,6 +968,7 @@
     "title": "API-sleutels",
     "subtitle": "Beheer API-sleutels voor toegang tot de backend",
     "createButton": "API-sleutel aanmaken",
+    "searchPlaceholder": "Zoeken op naam of sleutelprefix...",
     "filters": {
       "allStatuses": "Alle statussen",
       "allPermissions": "Alle machtigingen"
@@ -1051,6 +1056,7 @@
     },
     "entries": {
       "addEntry": "Vermelding toevoegen",
+      "searchPlaceholder": "Zoeken op bedrijf of locatie...",
       "table": {
         "company": "Bedrijf",
         "location": "Locatie",
@@ -1078,6 +1084,7 @@
     },
     "skills": {
       "addSkill": "Vaardigheid toevoegen",
+      "searchPlaceholder": "Zoeken op vaardigheidsnaam...",
       "table": {
         "name": "Naam",
         "slug": "Slug",
@@ -1110,6 +1117,7 @@
     "title": "Juridische documenten",
     "subtitle": "Beheer juridische documenten voor uw sites",
     "addDocument": "Document toevoegen",
+    "searchPlaceholder": "Zoeken op cookienaam...",
     "table": {
       "cookieName": "Cookienaam",
       "type": "Type",
@@ -1502,6 +1510,8 @@
     "loading": "Activiteit laden...",
     "empty": "Nog geen activiteit",
     "emptyDescription": "Acties zoals het aanmaken, bijwerken en verwijderen van content verschijnen hier.",
+    "noFilterResults": "Geen overeenkomende activiteit",
+    "noFilterResultsDescription": "Geen activiteit komt overeen met de geselecteerde filters. Probeer de filters te wijzigen of te wissen.",
     "columns": {
       "timestamp": "Tijdstempel",
       "action": "Actie",
@@ -2011,6 +2021,7 @@
     "viewAll": "Alles bekijken",
     "pageTitle": "Meldingen",
     "pageSubtitle": "Bekijk en beheer uw meldingen",
+    "searchPlaceholder": "Meldingen doorzoeken...",
     "columns": {
       "type": "Type",
       "title": "Titel",

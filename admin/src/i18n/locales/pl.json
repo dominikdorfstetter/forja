@@ -760,6 +760,7 @@
         "description": "Tagi to płaskie etykiety dla tematów przekrojowych — jak hashtagi. Przypisuj wiele tagów do wpisu (np. \"rust\", \"tutorial\"), aby odwiedzający mogli filtrować i odkrywać treści."
       },
       "loading": "Ładowanie tagów...",
+      "searchPlaceholder": "Szukaj tagów po slug...",
       "messages": {
         "created": "Tag utworzony",
         "updated": "Tag zaktualizowany",
@@ -785,6 +786,7 @@
         "description": "Kategorie tworzą hierarchię drzewiastą dla Twoich treści. Grupuj powiązane wpisy pod gałęziami jak \"Technologia > Tworzenie stron\" dla uporządkowanej nawigacji."
       },
       "loading": "Ładowanie kategorii...",
+      "searchPlaceholder": "Szukaj kategorii po slug...",
       "messages": {
         "created": "Kategoria utworzona",
         "updated": "Kategoria zaktualizowana",
@@ -803,6 +805,7 @@
     "title": "Webhooks",
     "subtitle": "Powiadamiaj zewnętrzne serwisy o zmianach w treści",
     "addWebhook": "Dodaj webhook",
+    "searchPlaceholder": "Szukaj po URL...",
     "allEvents": "Wszystkie zdarzenia",
     "viewDeliveries": "Zobacz dostarczenia",
     "sendTest": "Wyślij test",
@@ -848,6 +851,7 @@
     "title": "Przekierowania",
     "subtitle": "Zarządzaj przekierowaniami URL dla swoich stron",
     "addRedirect": "Dodaj przekierowanie",
+    "searchPlaceholder": "Szukaj po ścieżce...",
     "table": {
       "sourcePath": "Ścieżka źródłowa",
       "destination": "Docelowy URL",
@@ -964,6 +968,7 @@
     "title": "Klucze API",
     "subtitle": "Zarządzaj kluczami API do dostępu do backendu",
     "createButton": "Utwórz klucz API",
+    "searchPlaceholder": "Szukaj po nazwie lub prefiksie klucza...",
     "filters": {
       "allStatuses": "Wszystkie statusy",
       "allPermissions": "Wszystkie uprawnienia"
@@ -1051,6 +1056,7 @@
     },
     "entries": {
       "addEntry": "Dodaj wpis",
+      "searchPlaceholder": "Szukaj po firmie lub lokalizacji...",
       "table": {
         "company": "Firma",
         "location": "Lokalizacja",
@@ -1078,6 +1084,7 @@
     },
     "skills": {
       "addSkill": "Dodaj umiejętność",
+      "searchPlaceholder": "Szukaj po nazwie umiejętności...",
       "table": {
         "name": "Nazwa",
         "slug": "Slug",
@@ -1110,6 +1117,7 @@
     "title": "Dokumenty prawne",
     "subtitle": "Zarządzaj dokumentami prawnymi dla swoich stron",
     "addDocument": "Dodaj dokument",
+    "searchPlaceholder": "Szukaj po nazwie ciasteczka...",
     "table": {
       "cookieName": "Nazwa ciasteczka",
       "type": "Typ",
@@ -1502,6 +1510,8 @@
     "loading": "Ładowanie aktywności...",
     "empty": "Brak aktywności",
     "emptyDescription": "Akcje takie jak tworzenie, aktualizowanie i usuwanie treści pojawią się tutaj.",
+    "noFilterResults": "Brak pasującej aktywności",
+    "noFilterResultsDescription": "Żadna aktywność nie odpowiada wybranym filtrom. Spróbuj zmienić lub wyczyścić filtry.",
     "columns": {
       "timestamp": "Znacznik czasu",
       "action": "Akcja",
@@ -2011,6 +2021,7 @@
     "viewAll": "Zobacz wszystkie",
     "pageTitle": "Powiadomienia",
     "pageSubtitle": "Przeglądaj i zarządzaj powiadomieniami",
+    "searchPlaceholder": "Szukaj powiadomień...",
     "columns": {
       "type": "Typ",
       "title": "Tytuł",

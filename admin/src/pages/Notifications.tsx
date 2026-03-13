@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +14,7 @@ import {
   TableRow,
   TablePagination,
   Chip,
+  TableSortLabel,
   Typography,
   Tooltip,
 } from '@mui/material';
@@ -24,9 +25,11 @@ import EditIcon from '@mui/icons-material/Edit';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import apiService from '@/services/api';
 import { useSiteContext } from '@/store/SiteContext';
+import { useListPageState } from '@/hooks/useListPageState';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
+import TableFilterBar from '@/components/shared/TableFilterBar';
 import type { NotificationResponse, NotificationType } from '@/types/api';
 
 function typeIcon(type: NotificationType) {
@@ -50,12 +53,20 @@ export default function NotificationsPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { selectedSiteId } = useSiteContext();
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(25);
+  const {
+    page, setPage, pageSize, search, setSearch, debouncedSearch,
+    sortBy, sortDir, handleSort, handleRowsPerPageChange,
+  } = useListPageState();
 
   const { data, isLoading } = useQuery({
-    queryKey: ['notifications', selectedSiteId, page, rowsPerPage],
-    queryFn: () => apiService.getNotifications(selectedSiteId!, { page: page + 1, page_size: rowsPerPage }),
+    queryKey: ['notifications', selectedSiteId, page, pageSize, debouncedSearch, sortBy, sortDir],
+    queryFn: () => apiService.getNotifications(selectedSiteId!, {
+      page,
+      page_size: pageSize,
+      search: debouncedSearch || undefined,
+      sort_by: sortBy || undefined,
+      sort_dir: sortBy ? sortDir : undefined,
+    }),
     enabled: !!selectedSiteId,
   });
 
@@ -116,14 +127,27 @@ export default function NotificationsPage() {
         <EmptyState title={t('notifications.empty')} />
       ) : (
         <Paper>
+          <TableFilterBar
+            searchValue={search}
+            onSearchChange={setSearch}
+            searchPlaceholder={t('notifications.searchPlaceholder')}
+          />
           <TableContainer>
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell>{t('notifications.columns.type')}</TableCell>
+                  <TableCell>
+                    <TableSortLabel active={sortBy === 'notification_type'} direction={sortBy === 'notification_type' ? sortDir : 'asc'} onClick={() => handleSort('notification_type')}>
+                      {t('notifications.columns.type')}
+                    </TableSortLabel>
+                  </TableCell>
                   <TableCell>{t('notifications.columns.title')}</TableCell>
                   <TableCell>{t('notifications.columns.message')}</TableCell>
-                  <TableCell>{t('notifications.columns.time')}</TableCell>
+                  <TableCell>
+                    <TableSortLabel active={sortBy === 'created_at'} direction={sortBy === 'created_at' ? sortDir : 'asc'} onClick={() => handleSort('created_at')}>
+                      {t('notifications.columns.time')}
+                    </TableSortLabel>
+                  </TableCell>
                   <TableCell>{t('notifications.columns.status')}</TableCell>
                 </TableRow>
               </TableHead>
@@ -188,13 +212,10 @@ export default function NotificationsPage() {
           <TablePagination
             component="div"
             count={data?.meta?.total_items || 0}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            onPageChange={(_, newPage) => setPage(newPage)}
-            onRowsPerPageChange={(e) => {
-              setRowsPerPage(parseInt(e.target.value, 10));
-              setPage(0);
-            }}
+            page={page - 1}
+            rowsPerPage={pageSize}
+            onPageChange={(_, newPage) => setPage(() => newPage + 1)}
+            onRowsPerPageChange={handleRowsPerPageChange}
             rowsPerPageOptions={[10, 25, 50]}
           />
         </Paper>
