@@ -12,7 +12,10 @@
   "dependencies": {
     "@astrojs/check": "^0.9.7",
     "@astrojs/node": "^10.0.1",
+    "@fontsource/inter": "^5.2.8",
+    "@fontsource/jetbrains-mono": "^5.2.8",
     "@forja/analytics": "file:../../libs/analytics",
+    "@tailwindcss/vite": "^4.2.1",
     "astro": "^6.0.4",
     "marked": "^17.0.4",
     "typescript": "^5.9.3"
