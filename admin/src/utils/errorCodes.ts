@@ -1,58 +1,46 @@
+import i18n from '@/i18n';
+
 export interface ErrorCodeInfo {
   message: string;
   action?: string;
 }
 
+/** i18n key pair for lazy translation resolution */
+interface ErrorCodeKeys {
+  messageKey: string;
+  actionKey: string;
+}
+
 /**
  * Specific error code overrides — keyed by the exact `{DOMAIN}_{ACTION}_{REASON}` code
- * from ProblemDetails.code. Add entries here when the backend message isn't
- * user-friendly enough or when an action hint is needed.
+ * from ProblemDetails.code. Values are i18n key paths under `errorCodes.*`.
  */
-const ERROR_CODE_MAP: Record<string, ErrorCodeInfo> = {
-  // Auth
-  AUTH_MISSING_CREDENTIALS: { message: 'Authentication required', action: 'Please sign in to continue.' },
-  AUTH_TOKEN_INVALID: { message: 'Session expired', action: 'Please sign in again.' },
-  AUTH_INSUFFICIENT_ROLE: { message: 'Insufficient permissions', action: 'Contact an admin for elevated access.' },
-  AUTH_SITE_ACCESS_DENIED: { message: 'Site access denied', action: 'Contact the site owner for access.' },
-  AUTH_API_KEY_INVALID: { message: 'Invalid API key', action: 'Check your API key configuration.' },
-  AUTH_ACCOUNT_SOLE_OWNER: { message: 'Cannot delete account', action: 'Transfer site ownership first.' },
-
-  // Slug conflicts
-  BLOG_SLUG_TAKEN: { message: 'Blog slug already in use', action: 'Choose a different slug.' },
-  PAGE_SLUG_TAKEN: { message: 'Page slug already in use', action: 'Choose a different slug.' },
-  SITE_SLUG_TAKEN: { message: 'Site slug already in use', action: 'Choose a different slug.' },
-  TAG_SLUG_TAKEN: { message: 'Tag slug already in use', action: 'Choose a different slug.' },
-  CATEGORY_SLUG_TAKEN: { message: 'Category slug already in use', action: 'Choose a different slug.' },
-  LOCALE_CODE_TAKEN: { message: 'Locale code already exists', action: 'Use a different locale code.' },
-
-  // Rate limiting
-  RATE_LIMIT_EXCEEDED: { message: 'Too many requests', action: 'Please wait a moment and try again.' },
-
-  // Membership
-  MEMBER_ALREADY_EXISTS: { message: 'Member already exists', action: 'This user is already a member of the site.' },
-  MEMBER_CANNOT_REMOVE_OWNER: { message: 'Cannot remove owner', action: 'Transfer ownership before removing this member.' },
-
-  // Media uploads
-  MEDIA_UPLOAD_TOO_LARGE: { message: 'File too large', action: 'Reduce the file size or adjust site settings.' },
-  MEDIA_UPLOAD_INVALID_TYPE: { message: 'Unsupported file type', action: 'Check the allowed file types.' },
-
-  // AI
-  AI_NOT_CONFIGURED: { message: 'AI not configured', action: 'Set up an AI provider in site settings.' },
-  AI_PROVIDER_UNAVAILABLE: { message: 'AI provider unavailable', action: 'Check your AI configuration or try again later.' },
-
-  // Workflow
-  WORKFLOW_REVIEW_REQUIRED: { message: 'Review required', action: 'Submit content for review before publishing.' },
-  WORKFLOW_NO_PERMISSION: { message: 'Workflow permission denied', action: "You don't have permission for this workflow action." },
-
-  // Modules
-  MODULE_NOT_ENABLED: { message: 'Module not enabled', action: 'Enable this module in site settings.' },
-
-  // Locale
-  LOCALE_DELETE_IN_USE: { message: 'Locale in use', action: 'Remove all content using this locale first.' },
-  SITE_LOCALE_LAST_LANGUAGE: { message: 'Cannot remove last locale', action: 'Sites must have at least one locale.' },
-
-  // Redirect
-  REDIRECT_SAME_PATH: { message: 'Redirect loop detected', action: 'Source and destination paths must be different.' },
+const ERROR_CODE_MAP: Record<string, ErrorCodeKeys> = {
+  AUTH_MISSING_CREDENTIALS: { messageKey: 'errorCodes.AUTH_MISSING_CREDENTIALS.message', actionKey: 'errorCodes.AUTH_MISSING_CREDENTIALS.action' },
+  AUTH_TOKEN_INVALID: { messageKey: 'errorCodes.AUTH_TOKEN_INVALID.message', actionKey: 'errorCodes.AUTH_TOKEN_INVALID.action' },
+  AUTH_INSUFFICIENT_ROLE: { messageKey: 'errorCodes.AUTH_INSUFFICIENT_ROLE.message', actionKey: 'errorCodes.AUTH_INSUFFICIENT_ROLE.action' },
+  AUTH_SITE_ACCESS_DENIED: { messageKey: 'errorCodes.AUTH_SITE_ACCESS_DENIED.message', actionKey: 'errorCodes.AUTH_SITE_ACCESS_DENIED.action' },
+  AUTH_API_KEY_INVALID: { messageKey: 'errorCodes.AUTH_API_KEY_INVALID.message', actionKey: 'errorCodes.AUTH_API_KEY_INVALID.action' },
+  AUTH_ACCOUNT_SOLE_OWNER: { messageKey: 'errorCodes.AUTH_ACCOUNT_SOLE_OWNER.message', actionKey: 'errorCodes.AUTH_ACCOUNT_SOLE_OWNER.action' },
+  BLOG_SLUG_TAKEN: { messageKey: 'errorCodes.BLOG_SLUG_TAKEN.message', actionKey: 'errorCodes.BLOG_SLUG_TAKEN.action' },
+  PAGE_SLUG_TAKEN: { messageKey: 'errorCodes.PAGE_SLUG_TAKEN.message', actionKey: 'errorCodes.PAGE_SLUG_TAKEN.action' },
+  SITE_SLUG_TAKEN: { messageKey: 'errorCodes.SITE_SLUG_TAKEN.message', actionKey: 'errorCodes.SITE_SLUG_TAKEN.action' },
+  TAG_SLUG_TAKEN: { messageKey: 'errorCodes.TAG_SLUG_TAKEN.message', actionKey: 'errorCodes.TAG_SLUG_TAKEN.action' },
+  CATEGORY_SLUG_TAKEN: { messageKey: 'errorCodes.CATEGORY_SLUG_TAKEN.message', actionKey: 'errorCodes.CATEGORY_SLUG_TAKEN.action' },
+  LOCALE_CODE_TAKEN: { messageKey: 'errorCodes.LOCALE_CODE_TAKEN.message', actionKey: 'errorCodes.LOCALE_CODE_TAKEN.action' },
+  RATE_LIMIT_EXCEEDED: { messageKey: 'errorCodes.RATE_LIMIT_EXCEEDED.message', actionKey: 'errorCodes.RATE_LIMIT_EXCEEDED.action' },
+  MEMBER_ALREADY_EXISTS: { messageKey: 'errorCodes.MEMBER_ALREADY_EXISTS.message', actionKey: 'errorCodes.MEMBER_ALREADY_EXISTS.action' },
+  MEMBER_CANNOT_REMOVE_OWNER: { messageKey: 'errorCodes.MEMBER_CANNOT_REMOVE_OWNER.message', actionKey: 'errorCodes.MEMBER_CANNOT_REMOVE_OWNER.action' },
+  MEDIA_UPLOAD_TOO_LARGE: { messageKey: 'errorCodes.MEDIA_UPLOAD_TOO_LARGE.message', actionKey: 'errorCodes.MEDIA_UPLOAD_TOO_LARGE.action' },
+  MEDIA_UPLOAD_INVALID_TYPE: { messageKey: 'errorCodes.MEDIA_UPLOAD_INVALID_TYPE.message', actionKey: 'errorCodes.MEDIA_UPLOAD_INVALID_TYPE.action' },
+  AI_NOT_CONFIGURED: { messageKey: 'errorCodes.AI_NOT_CONFIGURED.message', actionKey: 'errorCodes.AI_NOT_CONFIGURED.action' },
+  AI_PROVIDER_UNAVAILABLE: { messageKey: 'errorCodes.AI_PROVIDER_UNAVAILABLE.message', actionKey: 'errorCodes.AI_PROVIDER_UNAVAILABLE.action' },
+  WORKFLOW_REVIEW_REQUIRED: { messageKey: 'errorCodes.WORKFLOW_REVIEW_REQUIRED.message', actionKey: 'errorCodes.WORKFLOW_REVIEW_REQUIRED.action' },
+  WORKFLOW_NO_PERMISSION: { messageKey: 'errorCodes.WORKFLOW_NO_PERMISSION.message', actionKey: 'errorCodes.WORKFLOW_NO_PERMISSION.action' },
+  MODULE_NOT_ENABLED: { messageKey: 'errorCodes.MODULE_NOT_ENABLED.message', actionKey: 'errorCodes.MODULE_NOT_ENABLED.action' },
+  LOCALE_DELETE_IN_USE: { messageKey: 'errorCodes.LOCALE_DELETE_IN_USE.message', actionKey: 'errorCodes.LOCALE_DELETE_IN_USE.action' },
+  SITE_LOCALE_LAST_LANGUAGE: { messageKey: 'errorCodes.SITE_LOCALE_LAST_LANGUAGE.message', actionKey: 'errorCodes.SITE_LOCALE_LAST_LANGUAGE.action' },
+  REDIRECT_SAME_PATH: { messageKey: 'errorCodes.REDIRECT_SAME_PATH.message', actionKey: 'errorCodes.REDIRECT_SAME_PATH.action' },
 };
 
 /**
@@ -60,22 +48,29 @@ const ERROR_CODE_MAP: Record<string, ErrorCodeInfo> = {
  * These handle the `{DOMAIN}_{ACTION}_{REASON}` convention so new backend
  * codes automatically get reasonable messages without frontend changes.
  */
-const PATTERN_FALLBACKS: Array<{ pattern: RegExp; info: ErrorCodeInfo }> = [
-  { pattern: /_NOT_FOUND$/, info: { message: 'Resource not found', action: 'It may have been deleted or moved.' } },
-  { pattern: /_SLUG_TAKEN$/, info: { message: 'Slug already in use', action: 'Choose a different slug.' } },
-  { pattern: /_ACCESS_DENIED$/, info: { message: 'Access denied', action: "You don't have permission for this action." } },
-  { pattern: /^AUTH_/, info: { message: 'Authentication error', action: 'Try signing in again.' } },
-  { pattern: /^VALIDATION_/, info: { message: 'Validation error', action: 'Check the form fields and try again.' } },
-  { pattern: /^MEDIA_UPLOAD_/, info: { message: 'Upload failed', action: 'Check the file and try again.' } },
+const PATTERN_FALLBACKS: Array<{ pattern: RegExp; keys: ErrorCodeKeys }> = [
+  { pattern: /_NOT_FOUND$/, keys: { messageKey: 'errorCodes.patterns.notFound.message', actionKey: 'errorCodes.patterns.notFound.action' } },
+  { pattern: /_SLUG_TAKEN$/, keys: { messageKey: 'errorCodes.patterns.slugTaken.message', actionKey: 'errorCodes.patterns.slugTaken.action' } },
+  { pattern: /_ACCESS_DENIED$/, keys: { messageKey: 'errorCodes.patterns.accessDenied.message', actionKey: 'errorCodes.patterns.accessDenied.action' } },
+  { pattern: /^AUTH_/, keys: { messageKey: 'errorCodes.patterns.auth.message', actionKey: 'errorCodes.patterns.auth.action' } },
+  { pattern: /^VALIDATION_/, keys: { messageKey: 'errorCodes.patterns.validation.message', actionKey: 'errorCodes.patterns.validation.action' } },
+  { pattern: /^MEDIA_UPLOAD_/, keys: { messageKey: 'errorCodes.patterns.mediaUpload.message', actionKey: 'errorCodes.patterns.mediaUpload.action' } },
 ];
 
-/** Resolve a ProblemDetails error code to a user-friendly message and optional action hint. */
+function translate(keys: ErrorCodeKeys): ErrorCodeInfo {
+  return {
+    message: i18n.t(keys.messageKey),
+    action: i18n.t(keys.actionKey),
+  };
+}
+
+/** Resolve a ProblemDetails error code to a translated, user-friendly message and action hint. */
 export function resolveErrorCode(code: string): ErrorCodeInfo | null {
   const exact = ERROR_CODE_MAP[code];
-  if (exact) return exact;
+  if (exact) return translate(exact);
 
-  for (const { pattern, info } of PATTERN_FALLBACKS) {
-    if (pattern.test(code)) return info;
+  for (const { pattern, keys } of PATTERN_FALLBACKS) {
+    if (pattern.test(code)) return translate(keys);
   }
 
   return null;

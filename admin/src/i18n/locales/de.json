@@ -2305,5 +2305,40 @@
       "italic": "Kursiv",
       "underline": "Unterstrichen"
     }
+  },
+  "errorCodes": {
+    "AUTH_MISSING_CREDENTIALS": { "message": "Authentifizierung erforderlich", "action": "Bitte melden Sie sich an, um fortzufahren." },
+    "AUTH_TOKEN_INVALID": { "message": "Sitzung abgelaufen", "action": "Bitte melden Sie sich erneut an." },
+    "AUTH_INSUFFICIENT_ROLE": { "message": "Unzureichende Berechtigungen", "action": "Kontaktieren Sie einen Administrator für erweiterten Zugang." },
+    "AUTH_SITE_ACCESS_DENIED": { "message": "Seitenzugriff verweigert", "action": "Kontaktieren Sie den Seiteninhaber für Zugang." },
+    "AUTH_API_KEY_INVALID": { "message": "Ungültiger API-Schlüssel", "action": "Überprüfen Sie Ihre API-Schlüssel-Konfiguration." },
+    "AUTH_ACCOUNT_SOLE_OWNER": { "message": "Konto kann nicht gelöscht werden", "action": "Übertragen Sie zuerst die Eigentümerschaft." },
+    "BLOG_SLUG_TAKEN": { "message": "Blog-Slug bereits vergeben", "action": "Wählen Sie einen anderen Slug." },
+    "PAGE_SLUG_TAKEN": { "message": "Seiten-Slug bereits vergeben", "action": "Wählen Sie einen anderen Slug." },
+    "SITE_SLUG_TAKEN": { "message": "Site-Slug bereits vergeben", "action": "Wählen Sie einen anderen Slug." },
+    "TAG_SLUG_TAKEN": { "message": "Tag-Slug bereits vergeben", "action": "Wählen Sie einen anderen Slug." },
+    "CATEGORY_SLUG_TAKEN": { "message": "Kategorie-Slug bereits vergeben", "action": "Wählen Sie einen anderen Slug." },
+    "LOCALE_CODE_TAKEN": { "message": "Sprachcode existiert bereits", "action": "Verwenden Sie einen anderen Sprachcode." },
+    "RATE_LIMIT_EXCEEDED": { "message": "Zu viele Anfragen", "action": "Bitte warten Sie einen Moment und versuchen Sie es erneut." },
+    "MEMBER_ALREADY_EXISTS": { "message": "Mitglied existiert bereits", "action": "Dieser Benutzer ist bereits Mitglied der Site." },
+    "MEMBER_CANNOT_REMOVE_OWNER": { "message": "Eigentümer kann nicht entfernt werden", "action": "Übertragen Sie die Eigentümerschaft, bevor Sie dieses Mitglied entfernen." },
+    "MEDIA_UPLOAD_TOO_LARGE": { "message": "Datei zu groß", "action": "Reduzieren Sie die Dateigröße oder passen Sie die Site-Einstellungen an." },
+    "MEDIA_UPLOAD_INVALID_TYPE": { "message": "Nicht unterstützter Dateityp", "action": "Überprüfen Sie die erlaubten Dateitypen." },
+    "AI_NOT_CONFIGURED": { "message": "KI nicht konfiguriert", "action": "Richten Sie einen KI-Anbieter in den Site-Einstellungen ein." },
+    "AI_PROVIDER_UNAVAILABLE": { "message": "KI-Anbieter nicht verfügbar", "action": "Überprüfen Sie Ihre KI-Konfiguration oder versuchen Sie es später erneut." },
+    "WORKFLOW_REVIEW_REQUIRED": { "message": "Überprüfung erforderlich", "action": "Reichen Sie den Inhalt zur Überprüfung ein, bevor Sie veröffentlichen." },
+    "WORKFLOW_NO_PERMISSION": { "message": "Workflow-Berechtigung verweigert", "action": "Sie haben keine Berechtigung für diese Workflow-Aktion." },
+    "MODULE_NOT_ENABLED": { "message": "Modul nicht aktiviert", "action": "Aktivieren Sie dieses Modul in den Site-Einstellungen." },
+    "LOCALE_DELETE_IN_USE": { "message": "Sprache in Verwendung", "action": "Entfernen Sie zuerst alle Inhalte, die diese Sprache verwenden." },
+    "SITE_LOCALE_LAST_LANGUAGE": { "message": "Letzte Sprache kann nicht entfernt werden", "action": "Sites müssen mindestens eine Sprache haben." },
+    "REDIRECT_SAME_PATH": { "message": "Weiterleitungsschleife erkannt", "action": "Quell- und Zielpfad müssen unterschiedlich sein." },
+    "patterns": {
+      "notFound": { "message": "Ressource nicht gefunden", "action": "Sie wurde möglicherweise gelöscht oder verschoben." },
+      "slugTaken": { "message": "Slug bereits vergeben", "action": "Wählen Sie einen anderen Slug." },
+      "accessDenied": { "message": "Zugriff verweigert", "action": "Sie haben keine Berechtigung für diese Aktion." },
+      "auth": { "message": "Authentifizierungsfehler", "action": "Versuchen Sie, sich erneut anzumelden." },
+      "validation": { "message": "Validierungsfehler", "action": "Überprüfen Sie die Formularfelder und versuchen Sie es erneut." },
+      "mediaUpload": { "message": "Upload fehlgeschlagen", "action": "Überprüfen Sie die Datei und versuchen Sie es erneut." }
+    }
   }
 }

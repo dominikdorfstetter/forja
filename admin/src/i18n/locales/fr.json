@@ -2305,5 +2305,40 @@
       "italic": "Italique",
       "underline": "Souligné"
     }
+  },
+  "errorCodes": {
+    "AUTH_MISSING_CREDENTIALS": { "message": "Authentification requise", "action": "Veuillez vous connecter pour continuer." },
+    "AUTH_TOKEN_INVALID": { "message": "Session expirée", "action": "Veuillez vous reconnecter." },
+    "AUTH_INSUFFICIENT_ROLE": { "message": "Permissions insuffisantes", "action": "Contactez un administrateur pour un accès élevé." },
+    "AUTH_SITE_ACCESS_DENIED": { "message": "Accès au site refusé", "action": "Contactez le propriétaire du site pour obtenir l'accès." },
+    "AUTH_API_KEY_INVALID": { "message": "Clé API invalide", "action": "Vérifiez la configuration de votre clé API." },
+    "AUTH_ACCOUNT_SOLE_OWNER": { "message": "Impossible de supprimer le compte", "action": "Transférez d'abord la propriété du site." },
+    "BLOG_SLUG_TAKEN": { "message": "Slug de blog déjà utilisé", "action": "Choisissez un slug différent." },
+    "PAGE_SLUG_TAKEN": { "message": "Slug de page déjà utilisé", "action": "Choisissez un slug différent." },
+    "SITE_SLUG_TAKEN": { "message": "Slug de site déjà utilisé", "action": "Choisissez un slug différent." },
+    "TAG_SLUG_TAKEN": { "message": "Slug de tag déjà utilisé", "action": "Choisissez un slug différent." },
+    "CATEGORY_SLUG_TAKEN": { "message": "Slug de catégorie déjà utilisé", "action": "Choisissez un slug différent." },
+    "LOCALE_CODE_TAKEN": { "message": "Code de langue déjà existant", "action": "Utilisez un code de langue différent." },
+    "RATE_LIMIT_EXCEEDED": { "message": "Trop de requêtes", "action": "Veuillez patienter un moment et réessayer." },
+    "MEMBER_ALREADY_EXISTS": { "message": "Membre déjà existant", "action": "Cet utilisateur est déjà membre du site." },
+    "MEMBER_CANNOT_REMOVE_OWNER": { "message": "Impossible de retirer le propriétaire", "action": "Transférez la propriété avant de retirer ce membre." },
+    "MEDIA_UPLOAD_TOO_LARGE": { "message": "Fichier trop volumineux", "action": "Réduisez la taille du fichier ou ajustez les paramètres du site." },
+    "MEDIA_UPLOAD_INVALID_TYPE": { "message": "Type de fichier non supporté", "action": "Vérifiez les types de fichiers autorisés." },
+    "AI_NOT_CONFIGURED": { "message": "IA non configurée", "action": "Configurez un fournisseur d'IA dans les paramètres du site." },
+    "AI_PROVIDER_UNAVAILABLE": { "message": "Fournisseur d'IA indisponible", "action": "Vérifiez votre configuration IA ou réessayez plus tard." },
+    "WORKFLOW_REVIEW_REQUIRED": { "message": "Révision requise", "action": "Soumettez le contenu pour révision avant de publier." },
+    "WORKFLOW_NO_PERMISSION": { "message": "Permission de workflow refusée", "action": "Vous n'avez pas la permission pour cette action de workflow." },
+    "MODULE_NOT_ENABLED": { "message": "Module non activé", "action": "Activez ce module dans les paramètres du site." },
+    "LOCALE_DELETE_IN_USE": { "message": "Langue en cours d'utilisation", "action": "Supprimez d'abord tout le contenu utilisant cette langue." },
+    "SITE_LOCALE_LAST_LANGUAGE": { "message": "Impossible de supprimer la dernière langue", "action": "Les sites doivent avoir au moins une langue." },
+    "REDIRECT_SAME_PATH": { "message": "Boucle de redirection détectée", "action": "Les chemins source et destination doivent être différents." },
+    "patterns": {
+      "notFound": { "message": "Ressource introuvable", "action": "Elle a peut-être été supprimée ou déplacée." },
+      "slugTaken": { "message": "Slug déjà utilisé", "action": "Choisissez un slug différent." },
+      "accessDenied": { "message": "Accès refusé", "action": "Vous n'avez pas la permission pour cette action." },
+      "auth": { "message": "Erreur d'authentification", "action": "Essayez de vous reconnecter." },
+      "validation": { "message": "Erreur de validation", "action": "Vérifiez les champs du formulaire et réessayez." },
+      "mediaUpload": { "message": "Échec du téléversement", "action": "Vérifiez le fichier et réessayez." }
+    }
   }
 }
