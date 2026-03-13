@@ -53,9 +53,9 @@ Astro.response.headers.set("Cache-Control", "public, max-age=300, s-maxage=600")
 
 <Base title={categoryTitle} description={`Posts in ${categoryTitle}.`}>
   <SeoHead seo={seo} slot="head" />
-  <h1 class="section-heading">Category: {categoryTitle}</h1>
+  <h1 class="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mb-6">{categoryTitle}</h1>
   {blogs.length > 0 ? (
-    <div class="blog-grid">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {blogs.map((blog) => (
         <BlogCard
           blog={blog}
@@ -64,7 +64,7 @@ Astro.response.headers.set("Cache-Control", "public, max-age=300, s-maxage=600")
       ))}
     </div>
   ) : (
-    <p>No posts in this category yet.</p>
+    <p class="text-zinc-500 dark:text-zinc-400">No blog posts yet. Check back soon!</p>
   )}
   <Pagination currentPage={1} totalPages={totalPages} baseUrl={`/blog/category/${slug}`} />
 </Base>
