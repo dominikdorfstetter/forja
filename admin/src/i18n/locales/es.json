@@ -805,6 +805,7 @@
     "title": "Webhooks",
     "subtitle": "Notificar servicios externos cuando cambia el contenido",
     "addWebhook": "Agregar webhook",
+    "searchPlaceholder": "Buscar por URL...",
     "allEvents": "Todos los eventos",
     "viewDeliveries": "Ver entregas",
     "sendTest": "Enviar prueba",
@@ -850,6 +851,7 @@
     "title": "Redirecciones",
     "subtitle": "Gestionar redirecciones de URL para sus sitios",
     "addRedirect": "Añadir redirección",
+    "searchPlaceholder": "Buscar por ruta...",
     "table": {
       "sourcePath": "Ruta de origen",
       "destination": "URL de destino",
@@ -966,6 +968,7 @@
     "title": "API Keys",
     "subtitle": "Gestionar API keys para acceder al backend",
     "createButton": "Crear API Key",
+    "searchPlaceholder": "Buscar por nombre o prefijo de clave...",
     "filters": {
       "allStatuses": "Todos los estados",
       "allPermissions": "Todos los permisos"
@@ -1053,6 +1056,7 @@
     },
     "entries": {
       "addEntry": "Agregar entrada",
+      "searchPlaceholder": "Buscar por empresa o ubicación...",
       "table": {
         "company": "Empresa",
         "location": "Ubicación",
@@ -1080,6 +1084,7 @@
     },
     "skills": {
       "addSkill": "Agregar habilidad",
+      "searchPlaceholder": "Buscar por nombre de habilidad...",
       "table": {
         "name": "Nombre",
         "slug": "Slug",
@@ -1112,6 +1117,7 @@
     "title": "Documentos legales",
     "subtitle": "Gestionar documentos legales para sus sitios",
     "addDocument": "Agregar documento",
+    "searchPlaceholder": "Buscar por nombre de cookie...",
     "table": {
       "cookieName": "Nombre de cookie",
       "type": "Tipo",
@@ -1501,6 +1507,7 @@
   "activity": {
     "title": "Actividad",
     "subtitle": "Registro de todos los cambios en este sitio",
+    "searchPlaceholder": "Buscar actividad...",
     "loading": "Cargando actividad...",
     "empty": "Sin actividad aún",
     "emptyDescription": "Las acciones como crear, actualizar y eliminar contenido aparecerán aquí.",
@@ -2013,6 +2020,7 @@
     "viewAll": "Ver todas",
     "pageTitle": "Notificaciones",
     "pageSubtitle": "Revisa y gestiona tus notificaciones",
+    "searchPlaceholder": "Buscar notificaciones...",
     "columns": {
       "type": "Tipo",
       "title": "Título",

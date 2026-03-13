@@ -805,6 +805,7 @@
     "title": "Webhooks",
     "subtitle": "Externe Dienste bei Inhaltsänderungen benachrichtigen",
     "addWebhook": "Webhook hinzufügen",
+    "searchPlaceholder": "Nach URL suchen...",
     "allEvents": "Alle Ereignisse",
     "viewDeliveries": "Zustellungen anzeigen",
     "sendTest": "Test senden",
@@ -850,6 +851,7 @@
     "title": "Weiterleitungen",
     "subtitle": "URL-Weiterleitungen für Ihre Seiten verwalten",
     "addRedirect": "Weiterleitung hinzufügen",
+    "searchPlaceholder": "Nach Pfad suchen...",
     "table": {
       "sourcePath": "Quell-Pfad",
       "destination": "Ziel-URL",
@@ -966,6 +968,7 @@
     "title": "API Keys",
     "subtitle": "API Keys für den Backend-Zugriff verwalten",
     "createButton": "API Key erstellen",
+    "searchPlaceholder": "Nach Name oder Schlüsselpräfix suchen...",
     "filters": {
       "allStatuses": "Alle Status",
       "allPermissions": "Alle Berechtigungen"
@@ -1053,6 +1056,7 @@
     },
     "entries": {
       "addEntry": "Eintrag hinzufügen",
+      "searchPlaceholder": "Nach Firma oder Standort suchen...",
       "table": {
         "company": "Unternehmen",
         "location": "Standort",
@@ -1080,6 +1084,7 @@
     },
     "skills": {
       "addSkill": "Fähigkeit hinzufügen",
+      "searchPlaceholder": "Nach Fähigkeit suchen...",
       "table": {
         "name": "Name",
         "slug": "Slug",
@@ -1112,6 +1117,7 @@
     "title": "Rechtliche Dokumente",
     "subtitle": "Rechtliche Dokumente Ihrer Seiten verwalten",
     "addDocument": "Dokument hinzufügen",
+    "searchPlaceholder": "Nach Cookie-Name suchen...",
     "table": {
       "cookieName": "Cookie-Name",
       "type": "Typ",
@@ -1501,6 +1507,7 @@
   "activity": {
     "title": "Aktivität",
     "subtitle": "Protokoll aller Änderungen auf dieser Website",
+    "searchPlaceholder": "Aktivität durchsuchen...",
     "loading": "Aktivität wird geladen...",
     "empty": "Noch keine Aktivität",
     "emptyDescription": "Aktionen wie Erstellen, Aktualisieren und Löschen von Inhalten werden hier angezeigt.",
@@ -2013,6 +2020,7 @@
     "viewAll": "Alle anzeigen",
     "pageTitle": "Benachrichtigungen",
     "pageSubtitle": "Benachrichtigungen anzeigen und verwalten",
+    "searchPlaceholder": "Benachrichtigungen durchsuchen...",
     "columns": {
       "type": "Typ",
       "title": "Titel",

@@ -805,6 +805,7 @@
     "title": "Webhooks",
     "subtitle": "Externe diensten melden wanneer inhoud wijzigt",
     "addWebhook": "Webhook toevoegen",
+    "searchPlaceholder": "Zoeken op URL...",
     "allEvents": "Alle gebeurtenissen",
     "viewDeliveries": "Afleveringen bekijken",
     "sendTest": "Test verzenden",
@@ -850,6 +851,7 @@
     "title": "Omleidingen",
     "subtitle": "URL-omleidingen voor uw sites beheren",
     "addRedirect": "Omleiding toevoegen",
+    "searchPlaceholder": "Zoeken op pad...",
     "table": {
       "sourcePath": "Bronpad",
       "destination": "Doel-URL",
@@ -966,6 +968,7 @@
     "title": "API-sleutels",
     "subtitle": "Beheer API-sleutels voor toegang tot de backend",
     "createButton": "API-sleutel aanmaken",
+    "searchPlaceholder": "Zoeken op naam of sleutelprefix...",
     "filters": {
       "allStatuses": "Alle statussen",
       "allPermissions": "Alle machtigingen"
@@ -1053,6 +1056,7 @@
     },
     "entries": {
       "addEntry": "Vermelding toevoegen",
+      "searchPlaceholder": "Zoeken op bedrijf of locatie...",
       "table": {
         "company": "Bedrijf",
         "location": "Locatie",
@@ -1080,6 +1084,7 @@
     },
     "skills": {
       "addSkill": "Vaardigheid toevoegen",
+      "searchPlaceholder": "Zoeken op vaardigheidsnaam...",
       "table": {
         "name": "Naam",
         "slug": "Slug",
@@ -1112,6 +1117,7 @@
     "title": "Juridische documenten",
     "subtitle": "Beheer juridische documenten voor uw sites",
     "addDocument": "Document toevoegen",
+    "searchPlaceholder": "Zoeken op cookienaam...",
     "table": {
       "cookieName": "Cookienaam",
       "type": "Type",
@@ -1501,6 +1507,7 @@
   "activity": {
     "title": "Activiteit",
     "subtitle": "Logboek van alle wijzigingen op deze site",
+    "searchPlaceholder": "Activiteit doorzoeken...",
     "loading": "Activiteit laden...",
     "empty": "Nog geen activiteit",
     "emptyDescription": "Acties zoals het aanmaken, bijwerken en verwijderen van content verschijnen hier.",
@@ -2013,6 +2020,7 @@
     "viewAll": "Alles bekijken",
     "pageTitle": "Meldingen",
     "pageSubtitle": "Bekijk en beheer uw meldingen",
+    "searchPlaceholder": "Meldingen doorzoeken...",
     "columns": {
       "type": "Type",
       "title": "Titel",

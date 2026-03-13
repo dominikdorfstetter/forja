@@ -805,6 +805,7 @@
     "title": "Webhooks",
     "subtitle": "Notify external services when content changes",
     "addWebhook": "Add Webhook",
+    "searchPlaceholder": "Search by URL...",
     "allEvents": "All events",
     "viewDeliveries": "View deliveries",
     "sendTest": "Send test",
@@ -850,6 +851,7 @@
     "title": "Redirects",
     "subtitle": "Manage URL redirects for your sites",
     "addRedirect": "Add Redirect",
+    "searchPlaceholder": "Search by path...",
     "table": {
       "sourcePath": "Source Path",
       "destination": "Destination",
@@ -966,6 +968,7 @@
     "title": "API Keys",
     "subtitle": "Manage API keys for accessing the backend",
     "createButton": "Create API Key",
+    "searchPlaceholder": "Search by name or key prefix...",
     "filters": {
       "allStatuses": "All statuses",
       "allPermissions": "All permissions"
@@ -1053,6 +1056,7 @@
     },
     "entries": {
       "addEntry": "Add Entry",
+      "searchPlaceholder": "Search by company or location...",
       "table": {
         "company": "Company",
         "location": "Location",
@@ -1080,6 +1084,7 @@
     },
     "skills": {
       "addSkill": "Add Skill",
+      "searchPlaceholder": "Search by skill name...",
       "table": {
         "name": "Name",
         "slug": "Slug",
@@ -1112,6 +1117,7 @@
     "title": "Legal Documents",
     "subtitle": "Manage legal documents for your sites",
     "addDocument": "Add Document",
+    "searchPlaceholder": "Search by cookie name...",
     "table": {
       "cookieName": "Cookie Name",
       "type": "Type",
@@ -1501,6 +1507,7 @@
   "activity": {
     "title": "Activity",
     "subtitle": "Audit log of all changes on this site",
+    "searchPlaceholder": "Search activity...",
     "loading": "Loading activity...",
     "empty": "No activity yet",
     "emptyDescription": "Actions like creating, updating, and deleting content will appear here.",
@@ -2014,6 +2021,7 @@
     "viewAll": "View all",
     "pageTitle": "Notifications",
     "pageSubtitle": "Review and manage your notifications",
+    "searchPlaceholder": "Search notifications...",
     "columns": {
       "type": "Type",
       "title": "Title",
