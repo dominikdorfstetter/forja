@@ -91,9 +91,12 @@
   @apply mb-4;
 }
 
-.prose ul,
+.prose ul {
+  @apply mb-4 pl-6 list-disc;
+}
+
 .prose ol {
-  @apply mb-4 pl-6;
+  @apply mb-4 pl-6 list-decimal;
 }
 
 .prose li {
