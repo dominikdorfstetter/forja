@@ -32,53 +32,92 @@ function href(item: NavigationTree): string {
 }
 ---
 
-<nav class="site-nav" aria-label="Main navigation">
-  <div class="site-nav__inner">
-    <a href="/" class="site-nav__brand">{siteName}</a>
-    <ul class="site-nav__links">
+<nav class="sticky top-0 z-50 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-950/80 backdrop-blur-lg">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14">
+    <a href="/" class="font-mono text-sm font-semibold text-zinc-900 dark:text-zinc-100 no-underline hover:text-violet-600 dark:hover:text-violet-400 hover:no-underline tracking-tight">
+      {siteName}
+    </a>
+
+    {/* Desktop links */}
+    <div class="hidden md:flex items-center gap-1">
       {navItems.map((item) =>
         item.children.length > 0 ? (
-          <li class="site-nav__dropdown">
+          <div class="relative group">
             <a
               href={href(item)}
               target={item.open_in_new_tab ? "_blank" : undefined}
               rel={item.open_in_new_tab ? "noopener noreferrer" : undefined}
+              class="text-sm font-medium text-zinc-500 dark:text-zinc-400 px-3 py-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 no-underline hover:no-underline transition-colors duration-200"
             >
               {item.title ?? "Untitled"}
             </a>
-            <ul class="site-nav__dropdown-items">
-              {item.children.map((child) => (
-                <li>
+            <div class="hidden group-hover:block absolute top-full left-0 pt-1 z-10">
+              <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-lg py-1 min-w-[180px]">
+                {item.children.map((child) => (
                   <a
                     href={href(child)}
                     target={child.open_in_new_tab ? "_blank" : undefined}
                     rel={child.open_in_new_tab ? "noopener noreferrer" : undefined}
+                    class="block px-4 py-2 text-sm text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 no-underline hover:no-underline transition-colors"
                   >
                     {child.title ?? "Untitled"}
                   </a>
-                </li>
-              ))}
-            </ul>
-          </li>
+                ))}
+              </div>
+            </div>
+          </div>
         ) : (
-          <li>
-            <a
-              href={href(item)}
-              target={item.open_in_new_tab ? "_blank" : undefined}
-              rel={item.open_in_new_tab ? "noopener noreferrer" : undefined}
-            >
-              {item.title ?? "Untitled"}
-            </a>
-          </li>
+          <a
+            href={href(item)}
+            target={item.open_in_new_tab ? "_blank" : undefined}
+            rel={item.open_in_new_tab ? "noopener noreferrer" : undefined}
+            class="text-sm font-medium text-zinc-500 dark:text-zinc-400 px-3 py-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 no-underline hover:no-underline transition-colors duration-200"
+          >
+            {item.title ?? "Untitled"}
+          </a>
         )
       )}
-      <li>
-        <button class="theme-toggle" type="button" aria-label="Toggle dark mode">
-          <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/></svg>
-          <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-        </button>
-      </li>
-    </ul>
-    <button class="site-nav__toggle" aria-label="Toggle navigation">&#9776;</button>
+      <button
+        type="button"
+        aria-label="Toggle dark mode"
+        data-theme-toggle
+        class="ml-2 w-8 h-8 flex items-center justify-center rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-violet-600 dark:hover:text-violet-400 hover:border-violet-300 dark:hover:border-violet-700 transition-colors duration-200 cursor-pointer"
+      >
+        <svg class="dark:hidden" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/></svg>
+        <svg class="hidden dark:block" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+    </div>
+
+    {/* Mobile hamburger */}
+    <button
+      class="md:hidden w-8 h-8 flex items-center justify-center text-zinc-600 dark:text-zinc-300 cursor-pointer"
+      aria-label="Toggle navigation"
+      data-nav-toggle
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+
+  {/* Mobile menu */}
+  <div class="hidden md:hidden border-t border-zinc-200 dark:border-zinc-800 px-4 pb-4 pt-2" data-nav-links-mobile>
+    {navItems.map((item) => (
+      <a
+        href={href(item)}
+        target={item.open_in_new_tab ? "_blank" : undefined}
+        rel={item.open_in_new_tab ? "noopener noreferrer" : undefined}
+        class="block py-2 text-sm text-zinc-600 dark:text-zinc-300 hover:text-violet-600 dark:hover:text-violet-400 no-underline hover:no-underline"
+      >
+        {item.title ?? "Untitled"}
+      </a>
+    ))}
+    <button
+      type="button"
+      aria-label="Toggle dark mode"
+      data-theme-toggle
+      class="mt-2 w-8 h-8 flex items-center justify-center rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 cursor-pointer"
+    >
+      <svg class="dark:hidden" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/></svg>
+      <svg class="hidden dark:block" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/></svg>
+    </button>
   </div>
 </nav>
