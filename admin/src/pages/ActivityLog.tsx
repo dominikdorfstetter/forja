@@ -2,7 +2,6 @@ import { useCallback, useMemo, useState } from 'react';
 import {
   Box,
   Alert,
-  InputAdornment,
   Paper,
   Table,
   TableBody,
@@ -12,14 +11,11 @@ import {
   TableRow,
   TablePagination,
   Chip,
-  TextField,
-  MenuItem,
   Typography,
   TableSortLabel,
   Tooltip,
   Link as MuiLink,
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { format, formatDistanceToNow } from 'date-fns';
@@ -31,6 +27,7 @@ import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
+import TableFilterBar from '@/components/shared/TableFilterBar';
 import type { AuditAction } from '@/types/api';
 
 /**
@@ -160,57 +157,39 @@ export default function ActivityLogPage() {
         breadcrumbs={[{ label: t('activity.title') }]}
       />
 
-      <Paper sx={{ mb: 2, p: 2, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-        <TextField
-          size="small"
-          placeholder={t('activity.searchPlaceholder')}
-          value={searchInput}
-          onChange={(e) => { setSearchInput(e.target.value); setPage(0); }}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon fontSize="small" color="action" />
-                </InputAdornment>
-              ),
-            },
-          }}
-          sx={{ minWidth: 220, flex: 1, maxWidth: 320 }}
-        />
-        <TextField
-          select
-          size="small"
-          label={t('activity.filters.action')}
-          value={actionFilter}
-          onChange={(e) => setActionFilter(e.target.value)}
-          sx={{ minWidth: 150 }}
-        >
-          <MenuItem value="">{t('common.filters.all')}</MenuItem>
-          {ACTION_TYPES.map((a) => (
-            <MenuItem key={a} value={a}>{a}</MenuItem>
-          ))}
-        </TextField>
-        <TextField
-          select
-          size="small"
-          label={t('activity.filters.entityType')}
-          value={entityFilter}
-          onChange={(e) => setEntityFilter(e.target.value)}
-          sx={{ minWidth: 180 }}
-        >
-          <MenuItem value="">{t('common.filters.all')}</MenuItem>
-          {ENTITY_TYPES.map((et) => (
-            <MenuItem key={et} value={et}>{ENTITY_TYPE_LABELS[et] || et}</MenuItem>
-          ))}
-        </TextField>
-      </Paper>
-
       {isLoading ? (
         <LoadingState label={t('activity.loading')} />
       ) : filteredData.length === 0 ? (
         <EmptyState title={t('activity.empty')} description={t('activity.emptyDescription')} />
       ) : (
         <Paper>
+          <TableFilterBar
+            searchValue={searchInput}
+            onSearchChange={(v) => { setSearchInput(v); setPage(0); }}
+            searchPlaceholder={t('activity.searchPlaceholder')}
+            filters={[
+              {
+                key: 'action',
+                label: t('activity.filters.action'),
+                value: actionFilter,
+                onChange: (v) => setActionFilter(v),
+                options: [
+                  { value: '', label: t('common.filters.all') },
+                  ...ACTION_TYPES.map((a) => ({ value: a, label: a })),
+                ],
+              },
+              {
+                key: 'entityType',
+                label: t('activity.filters.entityType'),
+                value: entityFilter,
+                onChange: (v) => setEntityFilter(v),
+                options: [
+                  { value: '', label: t('common.filters.all') },
+                  ...ENTITY_TYPES.map((et) => ({ value: et, label: ENTITY_TYPE_LABELS[et] || et })),
+                ],
+              },
+            ]}
+          />
           <TableContainer>
             <Table size="small">
               <TableHead>

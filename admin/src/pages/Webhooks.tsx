@@ -152,16 +152,16 @@ export default function WebhooksPage() {
       {!selectedSiteId ? (
         <EmptyState icon={<WebhookIcon sx={{ fontSize: 64 }} />} title={t('common.noSiteSelected')} description={t('webhooks.empty.noSite')} />
       ) : (
-        <Paper sx={{ p: 3 }}>
+        <Paper>
           <TableFilterBar
             searchValue={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('webhooks.searchPlaceholder')}
           />
           {isLoading ? (
-            <LoadingState label={t('webhooks.loading')} />
+            <Box sx={{ p: 3 }}><LoadingState label={t('webhooks.loading')} /></Box>
           ) : !webhooks || webhooks.length === 0 ? (
-            <EmptyState icon={<WebhookIcon sx={{ fontSize: 48 }} />} title={t('webhooks.empty.title')} description={t('webhooks.empty.description')} action={{ label: t('webhooks.addWebhook'), onClick: openCreate }} />
+            <Box sx={{ p: 3 }}><EmptyState icon={<WebhookIcon sx={{ fontSize: 48 }} />} title={t('webhooks.empty.title')} description={t('webhooks.empty.description')} action={{ label: t('webhooks.addWebhook'), onClick: openCreate }} /></Box>
           ) : (
             <DataTable
               data={webhooks}

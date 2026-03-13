@@ -4,7 +4,6 @@ import {
   Box,
   Alert,
   Button,
-  InputAdornment,
   Table,
   TableBody,
   TableCell,
@@ -14,14 +13,10 @@ import {
   TablePagination,
   Paper,
   Typography,
-  Stack,
-  MenuItem,
   TableSortLabel,
-  TextField,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import KeyIcon from '@mui/icons-material/Key';
-import SearchIcon from '@mui/icons-material/Search';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import apiService from '@/services/api';
@@ -33,6 +28,7 @@ import { useSiteContext } from '@/store/SiteContext';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
+import TableFilterBar from '@/components/shared/TableFilterBar';
 import StatusChip from '@/components/shared/StatusChip';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import CreateApiKeyDialog from '@/components/api-keys/CreateApiKeyDialog';
@@ -253,145 +249,130 @@ export default function ApiKeysPage({ embedded }: { embedded?: boolean }) {
         </Box>
       )}
 
-      {/* Filters */}
-      <Stack direction="row" spacing={2} sx={{ mb: 3, flexWrap: 'wrap' }}>
-        <TextField
-          size="small"
-          placeholder={t('apiKeys.searchPlaceholder')}
-          value={ui.searchInput}
-          onChange={(e) => dispatch({ type: 'setSearchInput', value: e.target.value })}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon fontSize="small" color="action" />
-                </InputAdornment>
-              ),
+      <Paper>
+        <TableFilterBar
+          searchValue={ui.searchInput}
+          onSearchChange={(v) => dispatch({ type: 'setSearchInput', value: v })}
+          searchPlaceholder={t('apiKeys.searchPlaceholder')}
+          filters={[
+            {
+              key: 'status',
+              label: t('common.filters.status'),
+              value: ui.statusFilter,
+              onChange: (v) => dispatch({ type: 'setStatusFilter', value: v }),
+              options: [
+                { value: '', label: t('apiKeys.filters.allStatuses') },
+                ...STATUS_OPTIONS.filter(Boolean).map((s) => ({ value: s, label: s })),
+              ],
             },
-          }}
-          sx={{ minWidth: 220, flex: 1, maxWidth: 320 }}
+            {
+              key: 'permission',
+              label: t('common.filters.permission'),
+              value: ui.permissionFilter,
+              onChange: (v) => dispatch({ type: 'setPermissionFilter', value: v }),
+              options: [
+                { value: '', label: t('apiKeys.filters.allPermissions') },
+                ...PERMISSION_OPTIONS.filter(Boolean).map((s) => ({ value: s, label: s })),
+              ],
+            },
+          ]}
         />
-        <TextField
-          select
-          label={t('common.filters.status')}
-          size="small"
-          value={ui.statusFilter}
-          onChange={(e) => dispatch({ type: 'setStatusFilter', value: e.target.value })}
-          sx={{ minWidth: 140 }}
-        >
-          <MenuItem value="">{t('apiKeys.filters.allStatuses')}</MenuItem>
-          {STATUS_OPTIONS.filter(Boolean).map((s) => (
-            <MenuItem key={s} value={s}>{s}</MenuItem>
-          ))}
-        </TextField>
-        <TextField
-          select
-          label={t('common.filters.permission')}
-          size="small"
-          value={ui.permissionFilter}
-          onChange={(e) => dispatch({ type: 'setPermissionFilter', value: e.target.value })}
-          sx={{ minWidth: 140 }}
-        >
-          <MenuItem value="">{t('apiKeys.filters.allPermissions')}</MenuItem>
-          {PERMISSION_OPTIONS.filter(Boolean).map((p) => (
-            <MenuItem key={p} value={p}>{p}</MenuItem>
-          ))}
-        </TextField>
-      </Stack>
-
-      {apiKeys && apiKeys.length > 0 ? (
-        <>
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell scope="col">
-                  <TableSortLabel active={ui.sortBy === 'name'} direction={ui.sortBy === 'name' ? ui.sortDir : 'asc'} onClick={() => handleSort('name')}>
-                    {t('apiKeys.table.name')}
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell scope="col">{t('apiKeys.table.keyPrefix')}</TableCell>
-                <TableCell scope="col">{t('apiKeys.table.site')}</TableCell>
-                <TableCell scope="col">
-                  <TableSortLabel active={ui.sortBy === 'permission'} direction={ui.sortBy === 'permission' ? ui.sortDir : 'asc'} onClick={() => handleSort('permission')}>
-                    {t('apiKeys.table.permission')}
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell scope="col">
-                  <TableSortLabel active={ui.sortBy === 'status'} direction={ui.sortBy === 'status' ? ui.sortDir : 'asc'} onClick={() => handleSort('status')}>
-                    {t('apiKeys.table.status')}
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell scope="col" align="right">
-                  <TableSortLabel active={ui.sortBy === 'total_requests'} direction={ui.sortBy === 'total_requests' ? ui.sortDir : 'asc'} onClick={() => handleSort('total_requests')}>
-                    {t('apiKeys.table.requests')}
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell scope="col">
-                  <TableSortLabel active={ui.sortBy === 'last_used_at'} direction={ui.sortBy === 'last_used_at' ? ui.sortDir : 'asc'} onClick={() => handleSort('last_used_at')}>
-                    {t('apiKeys.table.lastUsed')}
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell scope="col" align="right">{t('apiKeys.table.actions')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {apiKeys.map((key) => (
-                <TableRow key={key.id}>
-                  <TableCell>
-                    <Typography variant="body2" fontWeight="medium">{key.name}</Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" fontFamily="monospace">{key.key_prefix}...</Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" color="text.secondary">
-                      {siteMap.get(key.site_id) || key.site_id.slice(0, 8) + '...'}
-                    </Typography>
-                  </TableCell>
-                  <TableCell><StatusChip value={key.permission} /></TableCell>
-                  <TableCell><StatusChip value={key.status} /></TableCell>
-                  <TableCell align="right">{key.total_requests.toLocaleString()}</TableCell>
-                  <TableCell>
-                    <Typography variant="body2" color="text.secondary">
-                      {key.last_used_at ? format(new Date(key.last_used_at), 'PP') : t('common.labels.never')}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="right">
-                    <ApiKeyActionsMenu
-                      apiKey={key}
-                      onBlock={(k) => dispatch({ type: 'openBlock', key: k })}
-                      onUnblock={(k) => unblockMutation.mutate(k.id)}
-                      onRevoke={(k) => dispatch({ type: 'openRevoke', key: k })}
-                      onDelete={(k) => dispatch({ type: 'openDelete', key: k })}
-                      onViewUsage={(k) => dispatch({ type: 'openUsage', key: k })}
-                    />
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        {apiKeysData?.meta && (
-          <TablePagination
-            component="div"
-            count={apiKeysData.meta.total_items}
-            page={apiKeysData.meta.page - 1}
-            onPageChange={(_, p) => dispatch({ type: 'setPage', value: p + 1 })}
-            rowsPerPage={apiKeysData.meta.page_size}
-            onRowsPerPageChange={(e) => dispatch({ type: 'setPageSize', value: +e.target.value })}
-            rowsPerPageOptions={[10, 25, 50]}
-          />
+        {apiKeys && apiKeys.length > 0 ? (
+          <>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell scope="col">
+                      <TableSortLabel active={ui.sortBy === 'name'} direction={ui.sortBy === 'name' ? ui.sortDir : 'asc'} onClick={() => handleSort('name')}>
+                        {t('apiKeys.table.name')}
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell scope="col">{t('apiKeys.table.keyPrefix')}</TableCell>
+                    <TableCell scope="col">{t('apiKeys.table.site')}</TableCell>
+                    <TableCell scope="col">
+                      <TableSortLabel active={ui.sortBy === 'permission'} direction={ui.sortBy === 'permission' ? ui.sortDir : 'asc'} onClick={() => handleSort('permission')}>
+                        {t('apiKeys.table.permission')}
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell scope="col">
+                      <TableSortLabel active={ui.sortBy === 'status'} direction={ui.sortBy === 'status' ? ui.sortDir : 'asc'} onClick={() => handleSort('status')}>
+                        {t('apiKeys.table.status')}
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell scope="col" align="right">
+                      <TableSortLabel active={ui.sortBy === 'total_requests'} direction={ui.sortBy === 'total_requests' ? ui.sortDir : 'asc'} onClick={() => handleSort('total_requests')}>
+                        {t('apiKeys.table.requests')}
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell scope="col">
+                      <TableSortLabel active={ui.sortBy === 'last_used_at'} direction={ui.sortBy === 'last_used_at' ? ui.sortDir : 'asc'} onClick={() => handleSort('last_used_at')}>
+                        {t('apiKeys.table.lastUsed')}
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell scope="col" align="right">{t('apiKeys.table.actions')}</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {apiKeys.map((key) => (
+                    <TableRow key={key.id}>
+                      <TableCell>
+                        <Typography variant="body2" fontWeight="medium">{key.name}</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" fontFamily="monospace">{key.key_prefix}...</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" color="text.secondary">
+                          {siteMap.get(key.site_id) || key.site_id.slice(0, 8) + '...'}
+                        </Typography>
+                      </TableCell>
+                      <TableCell><StatusChip value={key.permission} /></TableCell>
+                      <TableCell><StatusChip value={key.status} /></TableCell>
+                      <TableCell align="right">{key.total_requests.toLocaleString()}</TableCell>
+                      <TableCell>
+                        <Typography variant="body2" color="text.secondary">
+                          {key.last_used_at ? format(new Date(key.last_used_at), 'PP') : t('common.labels.never')}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="right">
+                        <ApiKeyActionsMenu
+                          apiKey={key}
+                          onBlock={(k) => dispatch({ type: 'openBlock', key: k })}
+                          onUnblock={(k) => unblockMutation.mutate(k.id)}
+                          onRevoke={(k) => dispatch({ type: 'openRevoke', key: k })}
+                          onDelete={(k) => dispatch({ type: 'openDelete', key: k })}
+                          onViewUsage={(k) => dispatch({ type: 'openUsage', key: k })}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            {apiKeysData?.meta && (
+              <TablePagination
+                component="div"
+                count={apiKeysData.meta.total_items}
+                page={apiKeysData.meta.page - 1}
+                onPageChange={(_, p) => dispatch({ type: 'setPage', value: p + 1 })}
+                rowsPerPage={apiKeysData.meta.page_size}
+                onRowsPerPageChange={(e) => dispatch({ type: 'setPageSize', value: +e.target.value })}
+                rowsPerPageOptions={[10, 25, 50]}
+              />
+            )}
+          </>
+        ) : (
+          <Box sx={{ p: 3 }}>
+            <EmptyState
+              icon={<KeyIcon sx={{ fontSize: 64 }} />}
+              title={t('apiKeys.empty.title')}
+              description={ui.statusFilter || ui.permissionFilter || debouncedSearch ? t('apiKeys.empty.filterHint') : t('apiKeys.empty.description')}
+              action={!ui.statusFilter && !ui.permissionFilter && !debouncedSearch ? { label: t('apiKeys.createButton'), onClick: () => dispatch({ type: 'openCreate' }) } : undefined}
+            />
+          </Box>
         )}
-        </>
-      ) : (
-        <EmptyState
-          icon={<KeyIcon sx={{ fontSize: 64 }} />}
-          title={t('apiKeys.empty.title')}
-          description={ui.statusFilter || ui.permissionFilter || debouncedSearch ? t('apiKeys.empty.filterHint') : t('apiKeys.empty.description')}
-          action={!ui.statusFilter && !ui.permissionFilter && !debouncedSearch ? { label: t('apiKeys.createButton'), onClick: () => dispatch({ type: 'openCreate' }) } : undefined}
-        />
-      )}
+      </Paper>
 
       <CreateApiKeyDialog
         open={ui.createOpen}
