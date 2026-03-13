@@ -7,8 +7,10 @@ export function useErrorSnackbar() {
 
   const showError = useCallback(
     (error: unknown) => {
-      const { detail, title } = resolveError(error);
-      enqueueSnackbar(detail || title, { variant: 'error' });
+      const { detail, title, action } = resolveError(error);
+      const base = detail || title;
+      const message = action ? `${base} ${action}` : base;
+      enqueueSnackbar(message, { variant: 'error' });
     },
     [enqueueSnackbar],
   );

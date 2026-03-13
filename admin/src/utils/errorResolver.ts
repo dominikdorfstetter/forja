@@ -1,8 +1,11 @@
 import { ProblemDetails, FieldError } from '@/types/api';
+import { resolveErrorCode } from './errorCodes';
 
-interface ResolvedError {
+export interface ResolvedError {
   title: string;
   detail: string;
+  code?: string;
+  action?: string;
   fieldErrors?: FieldError[];
 }
 
@@ -19,7 +22,9 @@ function isProblemDetails(error: unknown): error is ProblemDetails {
 
 export function resolveError(error: unknown): ResolvedError {
   if (isProblemDetails(error)) {
-    let detail = error.detail || error.title;
+    const codeInfo = resolveErrorCode(error.code);
+    const title = codeInfo?.message ?? error.title;
+    let detail = error.detail || title;
 
     if (error.errors && error.errors.length > 0) {
       const fieldMessages = error.errors.map((e) => `${e.field}: ${e.message}`);
@@ -27,8 +32,10 @@ export function resolveError(error: unknown): ResolvedError {
     }
 
     return {
-      title: error.title,
+      title,
       detail,
+      code: error.code,
+      action: codeInfo?.action,
       fieldErrors: error.errors,
     };
   }

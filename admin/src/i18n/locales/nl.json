@@ -2305,5 +2305,40 @@
       "italic": "Cursief",
       "underline": "Onderstreept"
     }
+  },
+  "errorCodes": {
+    "AUTH_MISSING_CREDENTIALS": { "message": "Authenticatie vereist", "action": "Log in om door te gaan." },
+    "AUTH_TOKEN_INVALID": { "message": "Sessie verlopen", "action": "Log opnieuw in." },
+    "AUTH_INSUFFICIENT_ROLE": { "message": "Onvoldoende rechten", "action": "Neem contact op met een beheerder voor uitgebreide toegang." },
+    "AUTH_SITE_ACCESS_DENIED": { "message": "Sitetoegang geweigerd", "action": "Neem contact op met de site-eigenaar voor toegang." },
+    "AUTH_API_KEY_INVALID": { "message": "Ongeldige API-sleutel", "action": "Controleer uw API-sleutelconfiguratie." },
+    "AUTH_ACCOUNT_SOLE_OWNER": { "message": "Account kan niet worden verwijderd", "action": "Draag eerst het eigendom over." },
+    "BLOG_SLUG_TAKEN": { "message": "Blog-slug al in gebruik", "action": "Kies een andere slug." },
+    "PAGE_SLUG_TAKEN": { "message": "Pagina-slug al in gebruik", "action": "Kies een andere slug." },
+    "SITE_SLUG_TAKEN": { "message": "Site-slug al in gebruik", "action": "Kies een andere slug." },
+    "TAG_SLUG_TAKEN": { "message": "Tag-slug al in gebruik", "action": "Kies een andere slug." },
+    "CATEGORY_SLUG_TAKEN": { "message": "Categorie-slug al in gebruik", "action": "Kies een andere slug." },
+    "LOCALE_CODE_TAKEN": { "message": "Taalcode bestaat al", "action": "Gebruik een andere taalcode." },
+    "RATE_LIMIT_EXCEEDED": { "message": "Te veel verzoeken", "action": "Wacht even en probeer het opnieuw." },
+    "MEMBER_ALREADY_EXISTS": { "message": "Lid bestaat al", "action": "Deze gebruiker is al lid van de site." },
+    "MEMBER_CANNOT_REMOVE_OWNER": { "message": "Eigenaar kan niet worden verwijderd", "action": "Draag het eigendom over voordat u dit lid verwijdert." },
+    "MEDIA_UPLOAD_TOO_LARGE": { "message": "Bestand te groot", "action": "Verklein het bestand of pas de site-instellingen aan." },
+    "MEDIA_UPLOAD_INVALID_TYPE": { "message": "Niet-ondersteund bestandstype", "action": "Controleer de toegestane bestandstypen." },
+    "AI_NOT_CONFIGURED": { "message": "AI niet geconfigureerd", "action": "Stel een AI-provider in bij de site-instellingen." },
+    "AI_PROVIDER_UNAVAILABLE": { "message": "AI-provider niet beschikbaar", "action": "Controleer uw AI-configuratie of probeer het later opnieuw." },
+    "WORKFLOW_REVIEW_REQUIRED": { "message": "Beoordeling vereist", "action": "Dien de inhoud ter beoordeling in voordat u publiceert." },
+    "WORKFLOW_NO_PERMISSION": { "message": "Workflow-toestemming geweigerd", "action": "U hebt geen toestemming voor deze workflowactie." },
+    "MODULE_NOT_ENABLED": { "message": "Module niet ingeschakeld", "action": "Schakel deze module in bij de site-instellingen." },
+    "LOCALE_DELETE_IN_USE": { "message": "Taal in gebruik", "action": "Verwijder eerst alle inhoud die deze taal gebruikt." },
+    "SITE_LOCALE_LAST_LANGUAGE": { "message": "Laatste taal kan niet worden verwijderd", "action": "Sites moeten minstens één taal hebben." },
+    "REDIRECT_SAME_PATH": { "message": "Omleidingslus gedetecteerd", "action": "Bron- en bestemmingspaden moeten verschillend zijn." },
+    "patterns": {
+      "notFound": { "message": "Bron niet gevonden", "action": "Het is mogelijk verwijderd of verplaatst." },
+      "slugTaken": { "message": "Slug al in gebruik", "action": "Kies een andere slug." },
+      "accessDenied": { "message": "Toegang geweigerd", "action": "U hebt geen toestemming voor deze actie." },
+      "auth": { "message": "Authenticatiefout", "action": "Probeer opnieuw in te loggen." },
+      "validation": { "message": "Validatiefout", "action": "Controleer de formuliervelden en probeer het opnieuw." },
+      "mediaUpload": { "message": "Upload mislukt", "action": "Controleer het bestand en probeer het opnieuw." }
+    }
   }
 }
