@@ -42,11 +42,11 @@ function getIcon(slug: string): string {
 }
 ---
 
-<div class="social-links" role="list" aria-label="Social links">
+<div class="flex gap-2" role="list" aria-label="Social links">
   {links.map((link) => (
     <a
       href={link.url}
-      class="social-links__item"
+      class="w-8 h-8 flex items-center justify-center rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-violet-600 dark:hover:text-violet-400 hover:border-violet-300 dark:hover:border-violet-700 no-underline hover:no-underline transition-colors duration-200"
       target="_blank"
       rel="noopener noreferrer"
       title={link.alt_text ?? link.title}
@@ -55,8 +55,8 @@ function getIcon(slug: string): string {
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
-        width="20"
-        height="20"
+        width="16"
+        height="16"
         fill="currentColor"
         aria-hidden="true"
         set:html={getIcon(link.icon)}
@@ -65,17 +65,3 @@ function getIcon(slug: string): string {
     </a>
   ))}
 </div>
-
-<style>
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border-width: 0;
-  }
-</style>
