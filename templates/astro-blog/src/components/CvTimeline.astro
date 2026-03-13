@@ -22,22 +22,39 @@ function dateRange(entry: CvEntryResponse): string {
 }
 ---
 
-<div class="cv-timeline">
+<div class="relative pl-7">
+  {/* Vertical timeline line */}
+  <div class="absolute left-[7px] top-1.5 bottom-0 w-px bg-zinc-200 dark:bg-zinc-800"></div>
+
   {entries.map((entry) => (
-    <div class={`cv-entry${entry.is_current ? " cv-entry--current" : ""}`}>
-      <div class="cv-entry__company">
-        {entry.company_url ? (
-          <a href={entry.company_url} target="_blank" rel="noopener noreferrer">
-            {entry.company}
-          </a>
-        ) : (
-          entry.company
+    <div class="relative mb-7">
+      {/* Dot */}
+      <div class={`absolute -left-7 top-1.5 w-2.5 h-2.5 rounded-full ${
+        entry.is_current
+          ? "bg-violet-500 shadow-[0_0_8px_rgba(139,92,246,0.4)]"
+          : "bg-zinc-400 dark:bg-zinc-600 ring-2 ring-zinc-50 dark:ring-zinc-950"
+      }`}></div>
+
+      <div class="flex items-baseline gap-2 flex-wrap">
+        <span class="text-[15px] font-semibold text-zinc-900 dark:text-zinc-100">
+          {entry.company_url ? (
+            <a href={entry.company_url} target="_blank" rel="noopener noreferrer" class="text-zinc-900 dark:text-zinc-100 hover:text-violet-600 dark:hover:text-violet-400 no-underline hover:no-underline">
+              {entry.company}
+            </a>
+          ) : (
+            entry.company
+          )}
+        </span>
+        {entry.is_current && (
+          <span class="text-[11px] font-medium bg-gradient-to-r from-violet-600 to-violet-400 text-white px-2 py-0.5 rounded-full">Current</span>
         )}
       </div>
-      <div class="cv-entry__details">
+      <div class="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
         {entry.location} &middot; {dateRange(entry)}
       </div>
-      <span class="cv-entry__badge">{entry.entry_type}</span>
+      <span class="inline-block text-xs text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded mt-1 capitalize">
+        {entry.entry_type}
+      </span>
     </div>
   ))}
 </div>
