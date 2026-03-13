@@ -31,34 +31,47 @@ const date = new Date(blog.published_date).toLocaleDateString("en-US", {
 });
 ---
 
-<article class="blog-card">
+<article class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden transition-all duration-200 hover:ring-1 hover:ring-violet-500/20 hover:shadow-lg">
   {resolvedMedia && (
     <ResponsiveImage
       media={resolvedMedia}
       alt={title}
-      class="blog-card__img"
+      class="w-full aspect-video object-cover"
       sizes="(max-width: 768px) 100vw, 360px"
       loading="lazy"
     />
   )}
-  <div class="blog-card__body">
-    <p class="blog-card__meta">
-      {date}
-      {blog.author && <> &middot; {blog.author}</>}
-      {blog.reading_time_minutes && <> &middot; {blog.reading_time_minutes} min read</>}
-    </p>
-    <h3 class="blog-card__title">
-      <a href={`/blog/${slug}`}>{title}</a>
-    </h3>
-    {excerpt && <p class="blog-card__excerpt">{excerpt}</p>}
+  <div class="p-4">
     {blog.categories.length > 0 && (
-      <div class="blog-card__categories">
-        {blog.categories.map((cat) => (
-          <a href={`/blog/category/${cat.slug}`} class="blog-card__category">
+      <div class="flex gap-1.5 mb-2 flex-wrap">
+        {blog.categories.map((cat, i) => (
+          <a
+            href={`/blog/category/${cat.slug}`}
+            class={`text-[11px] font-medium px-2.5 py-0.5 rounded-full no-underline hover:no-underline transition-colors ${
+              i === 0
+                ? "bg-gradient-to-r from-violet-600 to-violet-400 text-white"
+                : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-violet-600 dark:hover:text-violet-400"
+            }`}
+          >
             {cat.slug}
           </a>
         ))}
       </div>
     )}
+    <h3 class="text-sm font-semibold leading-snug mb-1">
+      <a href={`/blog/${slug}`} class="text-zinc-900 dark:text-zinc-100 no-underline hover:text-violet-600 dark:hover:text-violet-400 hover:no-underline">
+        {title}
+      </a>
+    </h3>
+    {excerpt && (
+      <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed line-clamp-2">
+        {excerpt}
+      </p>
+    )}
+    <div class="flex items-center gap-2 mt-3 text-[11px] text-zinc-400 dark:text-zinc-500">
+      <span>{date}</span>
+      {blog.author && <><span class="text-zinc-300 dark:text-zinc-700">&middot;</span><span>{blog.author}</span></>}
+      {blog.reading_time_minutes && <><span class="text-zinc-300 dark:text-zinc-700">&middot;</span><span>{blog.reading_time_minutes} min read</span></>}
+    </div>
   </div>
 </article>
