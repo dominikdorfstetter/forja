@@ -14,7 +14,7 @@ const { media, alt, class: className, sizes, loading = "lazy" } = Astro.props;
 const img = buildResponsiveImage(media, sizes);
 ---
 
-<picture class={className}>
+<picture class:list={["block", className]}>
   {img.avifSrcset && (
     <source type="image/avif" srcset={img.avifSrcset} sizes={img.sizes} />
   )}
@@ -30,5 +30,6 @@ const img = buildResponsiveImage(media, sizes);
     height={img.height}
     loading={loading}
     decoding="async"
+    class="w-full h-auto rounded-xl"
   />
 </picture>
