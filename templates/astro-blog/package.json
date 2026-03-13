@@ -10,10 +10,10 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/check": "^0.9.6",
-    "@astrojs/node": "^9.5.4",
+    "@astrojs/check": "^0.9.7",
+    "@astrojs/node": "^10.0.1",
     "@forja/analytics": "file:../../libs/analytics",
-    "astro": "^5.18.0",
+    "astro": "^6.0.4",
     "marked": "^17.0.4",
     "typescript": "^5.9.3"
   },

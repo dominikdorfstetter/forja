@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Forja API Client — build-time data fetching for Astro SSG
+// Forja API Client — build-time data fetching for Astro
 // ---------------------------------------------------------------------------
 
 const API_URL = import.meta.env.CMS_API_URL as string;
@@ -12,23 +12,106 @@ export function getSiteUrl(): string {
   return SITE_URL.replace(/\/+$/, "");
 }
 
+// ---- Error types ----------------------------------------------------------
+
+/** A single field-level validation error returned by the API. */
+export interface FieldError {
+  field: string;
+  message: string;
+  code?: string;
+}
+
+/** RFC 7807 problem details returned by the Forja API on errors. */
+export interface ProblemDetails {
+  type: string;
+  title: string;
+  status: number;
+  detail?: string;
+  instance?: string;
+  /** Machine-readable code following `{DOMAIN}_{ACTION}_{REASON}` pattern. */
+  code: string;
+  errors?: FieldError[];
+}
+
+/** Structured error thrown when an API request fails. */
+export class ForjaApiError extends Error {
+  constructor(public readonly problem: ProblemDetails) {
+    super(problem.detail || problem.title);
+    this.name = "ForjaApiError";
+  }
+}
+
 // ---- Generic helpers ------------------------------------------------------
 
+const MAX_RETRIES = 3;
+const INITIAL_BACKOFF_MS = 1000;
+
+/**
+ * Parse a `Retry-After` header value into milliseconds.
+ * Supports both delta-seconds (`120`) and HTTP-date formats.
+ */
+function parseRetryAfter(header: string | null): number {
+  if (!header) return INITIAL_BACKOFF_MS;
+  const seconds = Number(header);
+  if (!Number.isNaN(seconds)) return seconds * 1000;
+  const date = Date.parse(header);
+  if (!Number.isNaN(date)) return Math.max(0, date - Date.now());
+  return INITIAL_BACKOFF_MS;
+}
+
+/**
+ * Core fetch wrapper with structured error parsing and 429 retry logic.
+ *
+ * On non-2xx responses the body is parsed as {@link ProblemDetails} and
+ * thrown as a {@link ForjaApiError}. Rate-limited (429) responses are
+ * retried with exponential backoff, honouring the `Retry-After` header.
+ */
 async function api<T>(path: string): Promise<T> {
   const url = path.startsWith("http") ? path : `${API_URL}${path}`;
-  const res = await fetch(url, {
-    headers: { "X-API-Key": API_KEY },
-  });
-  if (!res.ok) {
-    const msg = `API ${res.status}: ${res.statusText} — ${url}`;
-    console.error(`[CMS] ${msg}`);
-    throw new Error(msg);
+
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    const res = await fetch(url, {
+      headers: { "X-API-Key": API_KEY },
+    });
+
+    if (res.ok) return res.json() as Promise<T>;
+
+    // Rate limited — retry with backoff
+    if (res.status === 429 && attempt < MAX_RETRIES) {
+      const retryMs = parseRetryAfter(res.headers.get("Retry-After"));
+      const backoff = Math.min(retryMs, INITIAL_BACKOFF_MS * 2 ** attempt);
+      console.warn(
+        `[CMS] 429 rate limited on ${url}, retrying in ${backoff}ms (attempt ${attempt + 1}/${MAX_RETRIES})`,
+      );
+      await new Promise((r) => setTimeout(r, backoff));
+      continue;
+    }
+
+    // Parse structured error body
+    let problem: ProblemDetails;
+    try {
+      problem = (await res.json()) as ProblemDetails;
+    } catch {
+      problem = {
+        type: "about:blank",
+        title: res.statusText,
+        status: res.status,
+        detail: `${res.status} ${res.statusText} — ${url}`,
+        code: "UNKNOWN_ERROR",
+      };
+    }
+
+    console.error(`[CMS] ${problem.code}: ${problem.detail || problem.title} — ${url}`);
+    throw new ForjaApiError(problem);
   }
-  return res.json() as Promise<T>;
+
+  // Unreachable in practice, but satisfies the type checker
+  throw new Error(`[CMS] Exhausted retries for ${url}`);
 }
 
 // ---- Site -----------------------------------------------------------------
 
+/** Site-level configuration returned by the CMS. */
 export interface SiteInfo {
   id: string;
   name: string;
@@ -51,6 +134,7 @@ export async function fetchSite(): Promise<SiteInfo> {
 
 // ---- Shared types ---------------------------------------------------------
 
+/** Pagination metadata returned alongside paginated collections. */
 export interface PaginationMeta {
   page: number;
   page_size: number;
@@ -58,6 +142,7 @@ export interface PaginationMeta {
   total_items: number;
 }
 
+/** A paginated collection with data items and pagination metadata. */
 export interface Paginated<T> {
   data: T[];
   meta: PaginationMeta;
@@ -65,6 +150,7 @@ export interface Paginated<T> {
 
 // ---- Blog -----------------------------------------------------------------
 
+/** Summary representation of a blog post in list views. */
 export interface BlogListItem {
   id: string;
   slug: string | null;
@@ -74,6 +160,7 @@ export interface BlogListItem {
   cover_image_id: string | null;
   header_image_id: string | null;
   is_featured: boolean;
+  is_sample: boolean;
   status: string;
   publish_start: string | null;
   publish_end: string | null;
@@ -81,6 +168,7 @@ export interface BlogListItem {
   updated_at: string;
 }
 
+/** A content localization (translation) for a blog post or page. */
 export interface LocalizationResponse {
   id: string;
   content_id: string;
@@ -96,6 +184,7 @@ export interface LocalizationResponse {
   updated_at: string;
 }
 
+/** A category assigned to a blog post. */
 export interface CategoryResponse {
   id: string;
   parent_id: string | null;
@@ -104,6 +193,7 @@ export interface CategoryResponse {
   created_at: string;
 }
 
+/** A document (media attachment) linked to a blog post. */
 export interface BlogDocumentResponse {
   id: string;
   blog_id: string;
@@ -111,6 +201,7 @@ export interface BlogDocumentResponse {
   display_order: number;
 }
 
+/** Full blog post detail including localizations, categories, and documents. */
 export interface BlogDetailResponse {
   id: string;
   content_id: string;
@@ -121,6 +212,7 @@ export interface BlogDetailResponse {
   cover_image_id: string | null;
   header_image_id: string | null;
   is_featured: boolean;
+  is_sample: boolean;
   allow_comments: boolean;
   status: string;
   published_at: string | null;
@@ -133,13 +225,29 @@ export interface BlogDetailResponse {
   documents: BlogDocumentResponse[];
 }
 
+/**
+ * Fetch a page of published blog posts.
+ *
+ * @param page - 1-indexed page number (default: 1)
+ * @param pageSize - items per page, max 100 (default: 10)
+ * @param sortBy - field to sort by (default: "published_at")
+ * @param sortDir - sort direction, "asc" or "desc" (default: "desc")
+ */
 export async function fetchPublishedBlogs(
   page = 1,
-  perPage = 10,
+  pageSize = 10,
+  sortBy = "published_at",
+  sortDir: "asc" | "desc" = "desc",
 ): Promise<Paginated<BlogListItem>> {
-  return api(`/sites/${SITE_ID}/blogs/published?page=${page}&per_page=${perPage}`);
+  return api(
+    `/sites/${SITE_ID}/blogs/published?page=${page}&page_size=${pageSize}&sort_by=${sortBy}&sort_dir=${sortDir}`,
+  );
 }
 
+/**
+ * Fetch every published blog post across all pages.
+ * Iterates through paginated results automatically.
+ */
 export async function fetchAllPublishedBlogs(): Promise<BlogListItem[]> {
   const first = await fetchPublishedBlogs(1, 100);
   const items = [...first.data];
@@ -150,14 +258,29 @@ export async function fetchAllPublishedBlogs(): Promise<BlogListItem[]> {
   return items;
 }
 
+/**
+ * Fetch featured blog posts.
+ *
+ * @param limit - maximum number of featured posts to return (default: 3)
+ */
 export async function fetchFeaturedBlogs(limit = 3): Promise<BlogListItem[]> {
   return api(`/sites/${SITE_ID}/blogs/featured?limit=${limit}`);
 }
 
+/**
+ * Fetch blog posts similar to the given blog.
+ *
+ * @param blogId - the blog post ID to find similar content for
+ * @param limit - maximum number of similar posts to return (default: 3)
+ */
 export async function fetchSimilarBlogs(blogId: string, limit = 3): Promise<BlogListItem[]> {
   return api(`/sites/${SITE_ID}/blogs/${blogId}/similar?limit=${limit}`);
 }
 
+/**
+ * Fetch a blog post's full detail by its URL slug.
+ * Resolves the slug to an ID first, then fetches the detail view.
+ */
 export async function fetchBlogBySlug(slug: string): Promise<BlogDetailResponse> {
   const brief = await api<{
     id: string;
@@ -167,11 +290,17 @@ export async function fetchBlogBySlug(slug: string): Promise<BlogDetailResponse>
   return api(`/blogs/${brief.id}/detail`);
 }
 
+/** Fetch a single blog post's full detail by ID. */
 export async function fetchBlogDetail(id: string): Promise<BlogDetailResponse> {
   return api(`/blogs/${id}/detail`);
 }
 
-/** Fetch blog details for multiple IDs, batched to avoid rate limits. */
+/**
+ * Fetch blog details for multiple IDs, batched to avoid rate limits.
+ *
+ * @param ids - array of blog post IDs
+ * @param batchSize - how many to fetch in parallel per batch (default: 5)
+ */
 export async function fetchBlogDetails(
   ids: string[],
   batchSize = 5,
@@ -187,6 +316,7 @@ export async function fetchBlogDetails(
 
 // ---- Navigation -----------------------------------------------------------
 
+/** A node in the navigation tree (recursive structure). */
 export interface NavigationTree {
   id: string;
   parent_id: string | null;
@@ -200,6 +330,7 @@ export interface NavigationTree {
   children: NavigationTree[];
 }
 
+/** Metadata about a navigation menu. */
 export interface NavigationMenuResponse {
   id: string;
   site_id: string;
@@ -212,6 +343,10 @@ export interface NavigationMenuResponse {
   updated_at: string;
 }
 
+/**
+ * Fetch a navigation menu's tree by its slug.
+ * Returns an empty array if the menu does not exist.
+ */
 export async function fetchNavTree(
   menuSlug: string,
 ): Promise<NavigationTree[]> {
@@ -228,6 +363,7 @@ export async function fetchNavTree(
 
 // ---- Pages & Sections -----------------------------------------------------
 
+/** Summary representation of a CMS page in list views. */
 export interface PageListItem {
   id: string;
   route: string;
@@ -240,6 +376,7 @@ export interface PageListItem {
   created_at: string;
 }
 
+/** Full page detail returned by the CMS. */
 export interface PageResponse {
   id: string;
   content_id: string;
@@ -258,6 +395,7 @@ export interface PageResponse {
   updated_at: string;
 }
 
+/** A section within a page (hero, text, gallery, etc.). */
 export interface PageSectionResponse {
   id: string;
   page_id: string;
@@ -268,6 +406,7 @@ export interface PageSectionResponse {
   settings: Record<string, unknown> | null;
 }
 
+/** Localized content for a page section. */
 export interface SectionLocalizationResponse {
   id: string;
   page_section_id: string;
@@ -277,25 +416,37 @@ export interface SectionLocalizationResponse {
   button_text: string | null;
 }
 
+/**
+ * Fetch a paginated list of CMS pages.
+ *
+ * @param page - 1-indexed page number (default: 1)
+ * @param pageSize - items per page, max 100 (default: 100)
+ */
 export async function fetchPages(
   page = 1,
-  perPage = 100,
+  pageSize = 100,
 ): Promise<Paginated<PageListItem>> {
-  return api(`/sites/${SITE_ID}/pages?page=${page}&per_page=${perPage}`);
+  return api(`/sites/${SITE_ID}/pages?page=${page}&page_size=${pageSize}`);
 }
 
+/**
+ * Fetch a page by its route path.
+ *
+ * @param route - the page route (leading slashes are stripped automatically)
+ */
 export async function fetchPageByRoute(route: string): Promise<PageResponse> {
-  // Strip leading slash — the API path segment already provides one
   const cleanRoute = route.replace(/^\/+/, "");
   return api(`/sites/${SITE_ID}/pages/by-route/${cleanRoute}`);
 }
 
+/** Fetch all sections for a page by its ID. */
 export async function fetchPageSections(
   pageId: string,
 ): Promise<PageSectionResponse[]> {
   return api(`/pages/${pageId}/sections`);
 }
 
+/** Fetch all section localizations for a page by its ID. */
 export async function fetchPageSectionLocalizations(
   pageId: string,
 ): Promise<SectionLocalizationResponse[]> {
@@ -304,6 +455,7 @@ export async function fetchPageSectionLocalizations(
 
 // ---- Legal ----------------------------------------------------------------
 
+/** Localized metadata for a legal document. */
 export interface LegalDocLocalizationResponse {
   id: string;
   locale_id: string;
@@ -311,6 +463,7 @@ export interface LegalDocLocalizationResponse {
   intro: string | null;
 }
 
+/** Full legal document with all localizations. */
 export interface LegalDocumentDetailResponse {
   id: string;
   cookie_name: string;
@@ -320,6 +473,11 @@ export interface LegalDocumentDetailResponse {
   updated_at: string;
 }
 
+/**
+ * Fetch a legal document by its URL slug.
+ *
+ * @param slug - the legal document slug (e.g. "privacy-policy", "terms")
+ */
 export async function fetchLegalDocBySlug(
   slug: string,
 ): Promise<LegalDocumentDetailResponse> {
@@ -328,6 +486,7 @@ export async function fetchLegalDocBySlug(
 
 // ---- CV -------------------------------------------------------------------
 
+/** A CV / resume entry (work experience, education, etc.). */
 export interface CvEntryResponse {
   id: string;
   company: string;
@@ -343,18 +502,24 @@ export interface CvEntryResponse {
   updated_at: string;
 }
 
+/**
+ * Fetch all CV entries, optionally filtered by type.
+ *
+ * @param entryType - filter to a specific type (e.g. "work", "education")
+ */
 export async function fetchCvEntries(
   entryType?: string,
 ): Promise<CvEntryResponse[]> {
   const typeParam = entryType ? `&entry_type=${entryType}` : "";
   const first = await api<Paginated<CvEntryResponse>>(
-    `/sites/${SITE_ID}/cv?page=1&per_page=100${typeParam}`,
+    `/sites/${SITE_ID}/cv?page=1&page_size=100${typeParam}`,
   );
   return first.data;
 }
 
 // ---- Skills ---------------------------------------------------------------
 
+/** A skill or technology with optional proficiency level. */
 export interface SkillResponse {
   id: string;
   name: string;
@@ -364,15 +529,17 @@ export interface SkillResponse {
   proficiency_level: number | null;
 }
 
+/** Fetch all skills for the site. */
 export async function fetchSkills(): Promise<SkillResponse[]> {
   const first = await api<Paginated<SkillResponse>>(
-    `/sites/${SITE_ID}/skills?page=1&per_page=100`,
+    `/sites/${SITE_ID}/skills?page=1&page_size=100`,
   );
   return first.data;
 }
 
 // ---- Media ----------------------------------------------------------------
 
+/** A resized variant of a media asset. */
 export interface MediaVariantResponse {
   id: string;
   variant_name: string;
@@ -382,23 +549,36 @@ export interface MediaVariantResponse {
   public_url: string | null;
 }
 
+/** A media asset (image, video, document) stored in the CMS. */
 export interface MediaResponse {
   id: string;
   filename: string;
   original_filename: string;
   mime_type: string;
   file_size: number;
+  storage_provider: string;
   public_url: string | null;
   width: number | null;
   height: number | null;
+  duration: number | null;
+  is_global: boolean;
+  created_at: string;
+  updated_at: string;
   variants: MediaVariantResponse[];
 }
 
+/** Fetch a single media asset by ID. */
 export async function fetchMedia(id: string): Promise<MediaResponse> {
   return api(`/media/${id}`);
 }
 
-/** Fetch multiple media items in parallel batches. Returns a Map keyed by media ID. */
+/**
+ * Fetch multiple media items in parallel batches.
+ * Returns a Map keyed by media ID. Failed fetches are silently skipped.
+ *
+ * @param ids - media asset IDs to fetch
+ * @param batchSize - how many to fetch in parallel per batch (default: 5)
+ */
 export async function fetchMediaBatch(
   ids: string[],
   batchSize = 5,
@@ -421,6 +601,7 @@ export async function fetchMediaBatch(
 
 // ---- Social Links -----------------------------------------------------------
 
+/** A social media link displayed in the site footer/header. */
 export interface SocialLinkResponse {
   id: string;
   title: string;
@@ -447,12 +628,23 @@ export async function fetchSocialLinks(): Promise<SocialLinkResponse[]> {
 
 // ---- Blog category filter ---------------------------------------------------
 
+/**
+ * Fetch published blog posts filtered by category.
+ *
+ * @param categorySlug - the category slug to filter by
+ * @param page - 1-indexed page number (default: 1)
+ * @param pageSize - items per page, max 100 (default: 12)
+ * @param sortBy - field to sort by (default: "published_at")
+ * @param sortDir - sort direction, "asc" or "desc" (default: "desc")
+ */
 export async function fetchPublishedBlogsByCategory(
   categorySlug: string,
   page = 1,
-  perPage = 12,
+  pageSize = 12,
+  sortBy = "published_at",
+  sortDir: "asc" | "desc" = "desc",
 ): Promise<Paginated<BlogListItem>> {
   return api(
-    `/sites/${SITE_ID}/blogs/published/category/${categorySlug}?page=${page}&per_page=${perPage}`,
+    `/sites/${SITE_ID}/blogs/published/category/${categorySlug}?page=${page}&page_size=${pageSize}&sort_by=${sortBy}&sort_dir=${sortDir}`,
   );
 }
