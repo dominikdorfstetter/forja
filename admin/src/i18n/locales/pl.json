@@ -1507,10 +1507,11 @@
   "activity": {
     "title": "Aktywność",
     "subtitle": "Dziennik wszystkich zmian na tej stronie",
-    "searchPlaceholder": "Szukaj aktywności...",
     "loading": "Ładowanie aktywności...",
     "empty": "Brak aktywności",
     "emptyDescription": "Akcje takie jak tworzenie, aktualizowanie i usuwanie treści pojawią się tutaj.",
+    "noFilterResults": "Brak pasującej aktywności",
+    "noFilterResultsDescription": "Żadna aktywność nie odpowiada wybranym filtrom. Spróbuj zmienić lub wyczyścić filtry.",
     "columns": {
       "timestamp": "Znacznik czasu",
       "action": "Akcja",

@@ -1507,10 +1507,11 @@
   "activity": {
     "title": "Activité",
     "subtitle": "Journal de toutes les modifications sur ce site",
-    "searchPlaceholder": "Rechercher l'activité...",
     "loading": "Chargement de l'activité...",
     "empty": "Aucune activité",
     "emptyDescription": "Les actions telles que la création, la mise à jour et la suppression de contenu apparaîtront ici.",
+    "noFilterResults": "Aucune activité correspondante",
+    "noFilterResultsDescription": "Aucune activité ne correspond aux filtres sélectionnés. Essayez de modifier ou de réinitialiser les filtres.",
     "columns": {
       "timestamp": "Horodatage",
       "action": "Action",

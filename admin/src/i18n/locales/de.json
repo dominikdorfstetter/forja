@@ -1507,10 +1507,11 @@
   "activity": {
     "title": "Aktivität",
     "subtitle": "Protokoll aller Änderungen auf dieser Website",
-    "searchPlaceholder": "Aktivität durchsuchen...",
     "loading": "Aktivität wird geladen...",
     "empty": "Noch keine Aktivität",
     "emptyDescription": "Aktionen wie Erstellen, Aktualisieren und Löschen von Inhalten werden hier angezeigt.",
+    "noFilterResults": "Keine passende Aktivität",
+    "noFilterResultsDescription": "Keine Aktivität entspricht den ausgewählten Filtern. Versuchen Sie, die Filter zu ändern oder zurückzusetzen.",
     "columns": {
       "timestamp": "Zeitstempel",
       "action": "Aktion",

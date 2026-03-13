@@ -1507,10 +1507,11 @@
   "activity": {
     "title": "Atividade",
     "subtitle": "Registro de todas as alterações neste site",
-    "searchPlaceholder": "Pesquisar atividade...",
     "loading": "Carregando atividade...",
     "empty": "Nenhuma atividade",
     "emptyDescription": "Ações como criar, atualizar e excluir conteúdo aparecerão aqui.",
+    "noFilterResults": "Nenhuma atividade correspondente",
+    "noFilterResultsDescription": "Nenhuma atividade corresponde aos filtros selecionados. Tente alterar ou limpar os filtros.",
     "columns": {
       "timestamp": "Data/Hora",
       "action": "Ação",

@@ -22,6 +22,7 @@ interface TableFilterBarProps {
   searchPlaceholder?: string;
   filters?: FilterConfig[];
   testIdPrefix?: string;
+  hideSearch?: boolean;
 }
 
 export default function TableFilterBar({
@@ -30,46 +31,49 @@ export default function TableFilterBar({
   searchPlaceholder,
   filters,
   testIdPrefix,
+  hideSearch,
 }: TableFilterBarProps) {
   const { t } = useTranslation();
 
   return (
     <Box sx={{ px: 2, py: 1.5, borderBottom: 1, borderColor: 'divider' }}>
       <Stack direction="row" spacing={2} alignItems="center">
-        <TextField
-          size="small"
-          variant="outlined"
-          placeholder={searchPlaceholder ?? t('common.actions.search')}
-          value={searchValue}
-          onChange={(e) => onSearchChange(e.target.value)}
-          inputProps={{
-            'aria-label': searchPlaceholder ?? t('common.actions.search'),
-          }}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon fontSize="small" color="action" />
-                </InputAdornment>
-              ),
-              endAdornment: searchValue ? (
-                <InputAdornment position="end">
-                  <IconButton
-                    size="small"
-                    onClick={() => onSearchChange('')}
-                    aria-label={t('common.actions.clear')}
-                    {...(testIdPrefix ? { 'data-testid': `${testIdPrefix}.search.clear` } : {})}
-                  >
-                    <ClearIcon fontSize="small" />
-                  </IconButton>
-                </InputAdornment>
-              ) : null,
-            },
-          }}
-          sx={{ minWidth: 280, flex: 1, maxWidth: 400 }}
-          {...(testIdPrefix ? { 'data-testid': `${testIdPrefix}.search.input` } : {})}
-        />
-        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ ml: 'auto' }}>
+        {!hideSearch && (
+          <TextField
+            size="small"
+            variant="outlined"
+            placeholder={searchPlaceholder ?? t('common.actions.search')}
+            value={searchValue}
+            onChange={(e) => onSearchChange(e.target.value)}
+            inputProps={{
+              'aria-label': searchPlaceholder ?? t('common.actions.search'),
+            }}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon fontSize="small" color="action" />
+                  </InputAdornment>
+                ),
+                endAdornment: searchValue ? (
+                  <InputAdornment position="end">
+                    <IconButton
+                      size="small"
+                      onClick={() => onSearchChange('')}
+                      aria-label={t('common.actions.clear')}
+                      {...(testIdPrefix ? { 'data-testid': `${testIdPrefix}.search.clear` } : {})}
+                    >
+                      <ClearIcon fontSize="small" />
+                    </IconButton>
+                  </InputAdornment>
+                ) : null,
+              },
+            }}
+            sx={{ minWidth: 280, flex: 1, maxWidth: 400 }}
+            {...(testIdPrefix ? { 'data-testid': `${testIdPrefix}.search.input` } : {})}
+          />
+        )}
+        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ ml: hideSearch ? 0 : 'auto' }}>
           {filters?.map((filter) => (
             <TextField
               key={filter.key}

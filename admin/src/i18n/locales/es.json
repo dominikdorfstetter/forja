@@ -1507,10 +1507,11 @@
   "activity": {
     "title": "Actividad",
     "subtitle": "Registro de todos los cambios en este sitio",
-    "searchPlaceholder": "Buscar actividad...",
     "loading": "Cargando actividad...",
     "empty": "Sin actividad aún",
     "emptyDescription": "Las acciones como crear, actualizar y eliminar contenido aparecerán aquí.",
+    "noFilterResults": "Sin actividad coincidente",
+    "noFilterResultsDescription": "Ninguna actividad coincide con los filtros seleccionados. Intente cambiar o borrar los filtros.",
     "columns": {
       "timestamp": "Marca de tiempo",
       "action": "Acción",

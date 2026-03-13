@@ -1507,10 +1507,11 @@
   "activity": {
     "title": "Activiteit",
     "subtitle": "Logboek van alle wijzigingen op deze site",
-    "searchPlaceholder": "Activiteit doorzoeken...",
     "loading": "Activiteit laden...",
     "empty": "Nog geen activiteit",
     "emptyDescription": "Acties zoals het aanmaken, bijwerken en verwijderen van content verschijnen hier.",
+    "noFilterResults": "Geen overeenkomende activiteit",
+    "noFilterResultsDescription": "Geen activiteit komt overeen met de geselecteerde filters. Probeer de filters te wijzigen of te wissen.",
     "columns": {
       "timestamp": "Tijdstempel",
       "action": "Actie",

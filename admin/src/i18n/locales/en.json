@@ -1507,10 +1507,11 @@
   "activity": {
     "title": "Activity",
     "subtitle": "Audit log of all changes on this site",
-    "searchPlaceholder": "Search activity...",
     "loading": "Loading activity...",
     "empty": "No activity yet",
     "emptyDescription": "Actions like creating, updating, and deleting content will appear here.",
+    "noFilterResults": "No matching activity",
+    "noFilterResultsDescription": "No activity matches the selected filters. Try changing or clearing the filters.",
     "columns": {
       "timestamp": "Timestamp",
       "action": "Action",
