@@ -425,7 +425,7 @@ async fn fetch_blog_post_data(pool: &PgPool, content_id: Uuid) -> Result<BlogPos
                 cl.body,
                 cl.excerpt,
                 c.published_at
-            FROM content c
+            FROM contents c
             JOIN blogs b ON b.content_id = c.id
             LEFT JOIN content_localizations cl ON cl.content_id = c.id
             WHERE c.id = $1

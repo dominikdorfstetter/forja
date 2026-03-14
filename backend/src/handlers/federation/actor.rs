@@ -96,7 +96,7 @@ pub async fn actor_outbox(
         r#"
         SELECT COUNT(*)
         FROM blogs b
-        JOIN content c ON b.content_id = c.id
+        JOIN contents c ON b.content_id = c.id
         JOIN content_sites cs ON c.id = cs.content_id
         WHERE cs.site_id = $1
           AND c.status = 'published'
