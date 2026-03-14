@@ -29,6 +29,9 @@ yarn-error.log*
 .claude/
 WORKING_WITH_CLAUDE.md
 
+# worktrees
+.worktrees/
+
 # astro
 **/.astro/
 
