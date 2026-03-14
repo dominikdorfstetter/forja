@@ -63,6 +63,10 @@ function ImportBlocklistDialog({ open, onClose, onImport, isPending }: ImportBlo
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    // Security: limit file size to 1 MB
+    if (file.size > 1_048_576) {
+      return;
+    }
     const reader = new FileReader();
     reader.onload = (ev) => {
       const content = ev.target?.result;

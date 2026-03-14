@@ -205,12 +205,20 @@ pub async fn import_blocklist(
     req.validate()
         .map_err(|e| ApiError::bad_request(format!("Validation error: {e}")))?;
 
-    // Filter: non-empty, reasonable length (max 253 chars for a domain)
+    // Security: cap at 10,000 domains per import to prevent DB abuse
+    if req.domains.len() > 10_000 {
+        return Err(ApiError::bad_request(
+            "Maximum 10,000 domains per import. Split into multiple requests.",
+        ));
+    }
+
+    // Filter and validate: non-empty, max 253 chars, valid domain format (alphanumeric + hyphens + dots)
+    let domain_regex = regex::Regex::new(r"^[a-z0-9]([a-z0-9\-\.]*[a-z0-9])?$").unwrap();
     let valid_domains: Vec<String> = req
         .domains
         .into_iter()
         .map(|d| d.trim().to_lowercase())
-        .filter(|d| !d.is_empty() && d.len() <= 253)
+        .filter(|d| !d.is_empty() && d.len() <= 253 && domain_regex.is_match(d))
         .collect();
 
     let total_requested = valid_domains.len();

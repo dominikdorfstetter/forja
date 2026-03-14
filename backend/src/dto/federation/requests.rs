@@ -117,7 +117,11 @@ pub struct PinPostRequest {
 pub struct ImportBlocklistRequest {
     /// A list of domains to block.
     #[schema(example = json!(["spam.example.com", "bad-actor.net"]))]
-    #[validate(length(min = 1, message = "At least one domain is required"))]
+    #[validate(length(
+        min = 1,
+        max = 10000,
+        message = "Between 1 and 10,000 domains required"
+    ))]
     pub domains: Vec<String>,
 }
 
