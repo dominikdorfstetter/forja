@@ -3,6 +3,7 @@
 use rocket::http::Status;
 use rocket::serde::json::Json;
 use rocket::{Route, State};
+use sqlx;
 use uuid::Uuid;
 
 use crate::dto::federation::responses::ActivityResponse;
@@ -221,9 +222,63 @@ pub async fn get_engagement(
     Ok(Json(counts))
 }
 
+/// Get federation stats for a site
+#[get("/sites/<site_id>/federation/stats")]
+pub async fn get_stats(
+    state: &State<AppState>,
+    site_id: Uuid,
+    auth: ReadKey,
+    _module: ModuleGuard<FederationModule>,
+) -> Result<Json<serde_json::Value>, ApiError> {
+    let role = auth
+        .0
+        .require_site_role(&state.db, site_id, &SiteRole::Reviewer)
+        .await?;
+    if !can_view_federation(&role) {
+        return Err(ApiError::forbidden("Insufficient role"));
+    }
+
+    let activity_stats = ApActivity::stats_for_site(&state.db, site_id).await?;
+
+    // Get actor for follower/block counts
+    let actor =
+        crate::models::federation::actor::ApActor::find_by_site_id(&state.db, site_id).await?;
+    let (follower_count, blocked_instances, blocked_actors) = if let Some(actor) = actor {
+        let followers =
+            crate::models::federation::follower::ApFollower::count_by_actor(&state.db, actor.id)
+                .await
+                .unwrap_or(0);
+        let instances: (i64,) =
+            sqlx::query_as("SELECT COUNT(*) FROM ap_blocked_instances WHERE actor_id = $1")
+                .bind(actor.id)
+                .fetch_one(&state.db)
+                .await
+                .unwrap_or((0,));
+        let actors: (i64,) =
+            sqlx::query_as("SELECT COUNT(*) FROM ap_blocked_actors WHERE actor_id = $1")
+                .bind(actor.id)
+                .fetch_one(&state.db)
+                .await
+                .unwrap_or((0,));
+        (followers, instances.0, actors.0)
+    } else {
+        (0, 0, 0)
+    };
+
+    Ok(Json(serde_json::json!({
+        "outbound_activities": activity_stats.outbound_count,
+        "inbound_activities": activity_stats.inbound_count,
+        "failed_activities": activity_stats.failed_count,
+        "pending_comments": activity_stats.pending_comments,
+        "follower_count": follower_count,
+        "blocked_instances": blocked_instances,
+        "blocked_actors": blocked_actors,
+    })))
+}
+
 /// Collect admin activity routes
 pub fn routes() -> Vec<Route> {
-    routes![list_activities, retry_activity, get_engagement]
+    routes![list_activities, retry_activity, get_engagement, get_stats]
 }
 
 #[cfg(test)]
