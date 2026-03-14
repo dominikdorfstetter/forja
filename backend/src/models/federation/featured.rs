@@ -51,9 +51,12 @@ impl ApFeaturedPost {
             FROM ap_featured_posts fp
             LEFT JOIN contents c ON fp.content_id = c.id
             LEFT JOIN blogs b ON b.content_id = c.id
-            LEFT JOIN content_localizations cl
-                ON cl.content_id = c.id
-                AND cl.is_primary = TRUE
+            LEFT JOIN LATERAL (
+                SELECT title FROM content_localizations
+                WHERE content_id = c.id
+                ORDER BY created_at ASC
+                LIMIT 1
+            ) cl ON TRUE
             WHERE fp.actor_id = $1
             ORDER BY fp.position ASC
             "#,
