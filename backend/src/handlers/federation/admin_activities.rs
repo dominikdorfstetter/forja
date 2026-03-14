@@ -21,12 +21,21 @@ use crate::AppState;
 
 /// Convert an ApActivity model to an ActivityResponse DTO.
 fn activity_to_response(a: ApActivity) -> ActivityResponse {
+    // Expose the payload unless it's JSON null (empty payloads are stored as null in the DB).
+    let payload = if a.payload.is_null() {
+        None
+    } else {
+        Some(a.payload)
+    };
+
     ActivityResponse {
         id: a.id,
         activity_type: a.activity_type,
         activity_uri: a.activity_uri,
         actor_uri: a.actor_uri,
         object_uri: a.object_uri,
+        object_type: a.object_type,
+        payload,
         direction: format!("{:?}", a.direction).to_lowercase(),
         status: format!("{:?}", a.status).to_lowercase(),
         error_message: a.error_message,

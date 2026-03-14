@@ -2660,14 +2660,18 @@
     },
     "timeline": {
       "empty": "A sua cronologia está vazia. Publique algo ou aguarde interações do Fediverso!",
+      "outCreateArticle": "publicado",
       "outCreate": "publicou um novo artigo",
       "outUpdate": "atualizou um artigo",
       "outDelete": "eliminou um artigo",
       "outDefault": "enviou atividade {{type}}",
       "inFollow": "começou a segui-lo",
       "inLike": "gostou da sua publicação",
+      "inLikePost": "gostou de",
       "inBoost": "impulsionou a sua publicação",
+      "inBoostPost": "impulsionou",
       "inComment": "respondeu à sua publicação",
+      "inCommentPost": "respondeu a",
       "inDefault": "enviou {{type}}"
     },
     "health": {

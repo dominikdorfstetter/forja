@@ -2660,14 +2660,18 @@
     },
     "timeline": {
       "empty": "Twoja oś czasu jest pusta. Opublikuj coś lub poczekaj na interakcje z Fediverse!",
+      "outCreateArticle": "opublikowano",
       "outCreate": "opublikował(a) nowy wpis",
       "outUpdate": "zaktualizował(a) wpis",
       "outDelete": "usunął/usunęła wpis",
       "outDefault": "wysłał(a) aktywność {{type}}",
       "inFollow": "zaczął/zaczęła Cię obserwować",
       "inLike": "polubił(a) Twój wpis",
+      "inLikePost": "polubił(a)",
       "inBoost": "podbił(a) Twój wpis",
+      "inBoostPost": "podbił(a)",
       "inComment": "odpowiedział(a) na Twój wpis",
+      "inCommentPost": "odpowiedział(a) na",
       "inDefault": "wysłał(a) {{type}}"
     },
     "health": {

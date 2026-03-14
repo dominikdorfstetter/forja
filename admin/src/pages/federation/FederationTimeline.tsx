@@ -8,6 +8,7 @@ import {
   CircularProgress,
   Divider,
   IconButton,
+  Link,
   Stack,
   TextField,
   Tooltip,
@@ -22,6 +23,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import HubIcon from '@mui/icons-material/Hub';
+import ArticleIcon from '@mui/icons-material/Article';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow } from 'date-fns';
@@ -44,6 +46,13 @@ interface TimelineItem {
   activity?: FederationActivity;
 }
 
+interface ExtractedContent {
+  title: string | null;
+  summary: string | null;
+  url: string | null;
+  content: string | null;
+}
+
 function extractUsername(actorUri: string): string {
   try {
     const url = new URL(actorUri);
@@ -55,9 +64,38 @@ function extractUsername(actorUri: string): string {
   }
 }
 
+/** Strip HTML tags for safe plain-text preview. */
+function stripHtml(html: string): string {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  return doc.body.textContent ?? '';
+}
+
+/** Truncate text to a maximum length, adding ellipsis if needed. */
+function truncate(text: string, maxLength: number): string {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength).trimEnd() + '...';
+}
+
+/** Extract structured content from an ActivityPub payload. */
+function extractContentFromPayload(payload?: Record<string, unknown>): ExtractedContent {
+  if (!payload) return { title: null, summary: null, url: null, content: null };
+
+  // For Create/Update, the actual content lives in payload.object
+  // For inbound Likes, object may be a plain URI string — handle gracefully
+  const rawObject = payload.object ?? payload;
+  const object = (typeof rawObject === 'object' && rawObject !== null ? rawObject : {}) as Record<string, unknown>;
+
+  return {
+    title: (typeof object.name === 'string' ? object.name : null),
+    summary: (typeof object.summary === 'string' ? object.summary : null),
+    url: (typeof object.url === 'string' ? object.url : null),
+    content: (typeof object.content === 'string' ? object.content : null),
+  };
+}
+
 function activityIcon(type: string, direction: string) {
   if (direction === 'out') {
-    if (type === 'Create') return <SendIcon sx={{ fontSize: 18 }} />;
+    if (type === 'Create') return <ArticleIcon sx={{ fontSize: 18 }} />;
     if (type === 'Update') return <EditIcon sx={{ fontSize: 18 }} />;
     if (type === 'Delete') return <DeleteIcon sx={{ fontSize: 18 }} />;
     return <SendIcon sx={{ fontSize: 18 }} />;
@@ -87,43 +125,210 @@ function ActivityItem({ activity }: { activity: FederationActivity }) {
   const username = extractUsername(activity.actor_uri);
   const isOutbound = activity.direction === 'out';
   const timeAgo = formatDistanceToNow(new Date(activity.created_at), { addSuffix: true });
+  const { title, summary, url, content } = extractContentFromPayload(activity.payload);
 
-  const getMessage = () => {
-    if (isOutbound) {
-      switch (activity.activity_type) {
-        case 'Create': return t('federation.timeline.outCreate');
-        case 'Update': return t('federation.timeline.outUpdate');
-        case 'Delete': return t('federation.timeline.outDelete');
-        default: return t('federation.timeline.outDefault', { type: activity.activity_type });
-      }
-    }
-    switch (activity.activity_type) {
-      case 'Follow': return t('federation.timeline.inFollow');
-      case 'Like': return t('federation.timeline.inLike');
-      case 'Announce': return t('federation.timeline.inBoost');
-      case 'Create': return t('federation.timeline.inComment');
-      default: return t('federation.timeline.inDefault', { type: activity.activity_type });
-    }
-  };
+  // Build a plain-text preview from summary or content (stripping HTML)
+  const previewText = summary
+    ? truncate(stripHtml(summary), 150)
+    : content
+      ? truncate(stripHtml(content), 150)
+      : null;
 
-  return (
-    <Box sx={{ display: 'flex', gap: 1.5, px: 2, py: 1.5 }}>
-      <Avatar sx={{ bgcolor: activityColor(activity.activity_type, activity.direction), width: 36, height: 36 }}>
-        {activityIcon(activity.activity_type, activity.direction)}
-      </Avatar>
-      <Box sx={{ flex: 1, minWidth: 0 }}>
-        <Typography variant="body2">
-          {!isOutbound && (
-            <Typography component="span" variant="body2" fontWeight={600} fontFamily="monospace" sx={{ fontSize: '0.8rem' }}>
-              {username}{' '}
+  if (isOutbound) {
+    // Outbound Create/Update — show blog post card with title + excerpt
+    const label =
+      activity.activity_type === 'Create'
+        ? t('federation.timeline.outCreateArticle')
+        : activity.activity_type === 'Update'
+          ? t('federation.timeline.outUpdate')
+          : activity.activity_type === 'Delete'
+            ? t('federation.timeline.outDelete')
+            : t('federation.timeline.outDefault', { type: activity.activity_type });
+
+    return (
+      <Box sx={{ display: 'flex', gap: 1.5, px: 2, py: 1.5 }}>
+        <Avatar sx={{ bgcolor: activityColor(activity.activity_type, activity.direction), width: 36, height: 36 }}>
+          {activityIcon(activity.activity_type, activity.direction)}
+        </Avatar>
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Typography variant="body2" color="text.secondary">
+            {label}
+          </Typography>
+          {title && (
+            <Typography variant="body2" fontWeight={700} sx={{ mt: 0.25 }}>
+              {title}
             </Typography>
           )}
-          {getMessage()}
-        </Typography>
-        <Typography variant="caption" color="text.disabled">{timeAgo}</Typography>
+          {previewText && (
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{
+                mt: 0.25,
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+              }}
+            >
+              {previewText}
+            </Typography>
+          )}
+          {url && (
+            <Link
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="caption"
+              sx={{ display: 'block', mt: 0.25, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+            >
+              {url}
+            </Link>
+          )}
+          <Typography variant="caption" color="text.disabled" sx={{ mt: 0.25, display: 'block' }}>
+            {timeAgo}
+          </Typography>
+        </Box>
       </Box>
-    </Box>
-  );
+    );
+  }
+
+  // Inbound interactions
+  switch (activity.activity_type) {
+    case 'Follow':
+      return (
+        <Box sx={{ display: 'flex', gap: 1.5, px: 2, py: 1.5 }}>
+          <Avatar sx={{ bgcolor: activityColor('Follow', 'in'), width: 36, height: 36 }}>
+            <PersonAddIcon sx={{ fontSize: 18 }} />
+          </Avatar>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Typography variant="body2">
+              <Typography component="span" variant="body2" fontWeight={600} fontFamily="monospace" sx={{ fontSize: '0.8rem' }}>
+                {username}
+              </Typography>{' '}
+              {t('federation.timeline.inFollow')}
+            </Typography>
+            <Typography variant="caption" color="text.disabled">{timeAgo}</Typography>
+          </Box>
+        </Box>
+      );
+
+    case 'Like':
+      return (
+        <Box sx={{ display: 'flex', gap: 1.5, px: 2, py: 1.5 }}>
+          <Avatar sx={{ bgcolor: 'error.main', width: 36, height: 36 }}>
+            <FavoriteIcon sx={{ fontSize: 18 }} />
+          </Avatar>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Typography variant="body2">
+              <Typography component="span" variant="body2" fontWeight={600} fontFamily="monospace" sx={{ fontSize: '0.8rem' }}>
+                {username}
+              </Typography>{' '}
+              {t('federation.timeline.inLikePost')}
+              {title && (
+                <>
+                  {' "'}
+                  <Typography component="span" variant="body2" fontWeight={600}>
+                    {title}
+                  </Typography>
+                  {'"'}
+                </>
+              )}
+            </Typography>
+            <Typography variant="caption" color="text.disabled">{timeAgo}</Typography>
+          </Box>
+        </Box>
+      );
+
+    case 'Announce':
+      return (
+        <Box sx={{ display: 'flex', gap: 1.5, px: 2, py: 1.5 }}>
+          <Avatar sx={{ bgcolor: 'success.main', width: 36, height: 36 }}>
+            <RepeatIcon sx={{ fontSize: 18 }} />
+          </Avatar>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Typography variant="body2">
+              <Typography component="span" variant="body2" fontWeight={600} fontFamily="monospace" sx={{ fontSize: '0.8rem' }}>
+                {username}
+              </Typography>{' '}
+              {t('federation.timeline.inBoostPost')}
+              {title && (
+                <>
+                  {' "'}
+                  <Typography component="span" variant="body2" fontWeight={600}>
+                    {title}
+                  </Typography>
+                  {'"'}
+                </>
+              )}
+            </Typography>
+            <Typography variant="caption" color="text.disabled">{timeAgo}</Typography>
+          </Box>
+        </Box>
+      );
+
+    case 'Create': {
+      // Inbound comment/reply
+      return (
+        <Box sx={{ display: 'flex', gap: 1.5, px: 2, py: 1.5 }}>
+          <Avatar sx={{ bgcolor: 'info.main', width: 36, height: 36 }}>
+            <CommentIcon sx={{ fontSize: 18 }} />
+          </Avatar>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Typography variant="body2">
+              <Typography component="span" variant="body2" fontWeight={600} fontFamily="monospace" sx={{ fontSize: '0.8rem' }}>
+                {username}
+              </Typography>{' '}
+              {t('federation.timeline.inCommentPost')}
+              {title && (
+                <>
+                  {' "'}
+                  <Typography component="span" variant="body2" fontWeight={600}>
+                    {title}
+                  </Typography>
+                  {'"'}
+                </>
+              )}
+            </Typography>
+            {previewText && (
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{
+                  mt: 0.25,
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                }}
+              >
+                {previewText}
+              </Typography>
+            )}
+            <Typography variant="caption" color="text.disabled">{timeAgo}</Typography>
+          </Box>
+        </Box>
+      );
+    }
+
+    default:
+      return (
+        <Box sx={{ display: 'flex', gap: 1.5, px: 2, py: 1.5 }}>
+          <Avatar sx={{ bgcolor: 'text.secondary', width: 36, height: 36 }}>
+            <HubIcon sx={{ fontSize: 18 }} />
+          </Avatar>
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Typography variant="body2">
+              <Typography component="span" variant="body2" fontWeight={600} fontFamily="monospace" sx={{ fontSize: '0.8rem' }}>
+                {username}
+              </Typography>{' '}
+              {t('federation.timeline.inDefault', { type: activity.activity_type })}
+            </Typography>
+            <Typography variant="caption" color="text.disabled">{timeAgo}</Typography>
+          </Box>
+        </Box>
+      );
+  }
 }
 
 interface NoteItemProps {
@@ -280,10 +485,13 @@ export default function FederationTimeline({ siteId, handle, avatarUrl, onDelete
   }
 
   for (const activity of (activitiesData?.data ?? [])) {
-    // Skip outbound Create/Update/Delete if we already show the note
-    // (avoid duplicating note posts in the timeline)
+    // Skip internal protocol events
     if (activity.direction === 'out' && ['Undo', 'Accept', 'Reject'].includes(activity.activity_type)) {
-      continue; // Skip internal protocol events
+      continue;
+    }
+    // Skip outbound Note activities — they are already shown via NoteItem
+    if (activity.direction === 'out' && activity.object_type === 'Note') {
+      continue;
     }
     timeline.push({ id: `activity-${activity.id}`, type: 'activity', timestamp: activity.created_at, activity });
   }

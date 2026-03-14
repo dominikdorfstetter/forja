@@ -2660,14 +2660,18 @@
     },
     "timeline": {
       "empty": "Je tijdlijn is leeg. Plaats iets of wacht op interacties vanuit het Fediverse!",
+      "outCreateArticle": "gepubliceerd",
       "outCreate": "heeft een nieuw bericht gepubliceerd",
       "outUpdate": "heeft een bericht bijgewerkt",
       "outDelete": "heeft een bericht verwijderd",
       "outDefault": "heeft {{type}}-activiteit verzonden",
       "inFollow": "is je gaan volgen",
       "inLike": "vond je bericht leuk",
+      "inLikePost": "vond leuk",
       "inBoost": "heeft je bericht geboost",
+      "inBoostPost": "heeft geboost",
       "inComment": "heeft op je bericht gereageerd",
+      "inCommentPost": "heeft gereageerd op",
       "inDefault": "heeft {{type}} verzonden"
     },
     "health": {

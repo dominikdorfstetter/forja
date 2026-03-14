@@ -2660,14 +2660,18 @@
     },
     "timeline": {
       "empty": "Votre fil est vide. Publiez quelque chose ou attendez des interactions du Fédivers !",
+      "outCreateArticle": "publié",
       "outCreate": "a publié un nouvel article",
       "outUpdate": "a mis à jour un article",
       "outDelete": "a supprimé un article",
       "outDefault": "a envoyé une activité {{type}}",
       "inFollow": "a commencé à vous suivre",
       "inLike": "a aimé votre publication",
+      "inLikePost": "a aimé",
       "inBoost": "a boosté votre publication",
+      "inBoostPost": "a boosté",
       "inComment": "a répondu à votre publication",
+      "inCommentPost": "a répondu à",
       "inDefault": "a envoyé {{type}}"
     },
     "health": {

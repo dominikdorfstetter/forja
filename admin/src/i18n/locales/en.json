@@ -2621,14 +2621,18 @@
     },
     "timeline": {
       "empty": "Your timeline is empty. Post something or wait for interactions from the Fediverse!",
+      "outCreateArticle": "published",
       "outCreate": "published a new post",
       "outUpdate": "updated a post",
       "outDelete": "deleted a post",
       "outDefault": "sent {{type}} activity",
       "inFollow": "started following you",
       "inLike": "liked your post",
+      "inLikePost": "liked",
       "inBoost": "boosted your post",
+      "inBoostPost": "boosted",
       "inComment": "replied to your post",
+      "inCommentPost": "replied to",
       "inDefault": "sent {{type}}"
     },
     "settings": {

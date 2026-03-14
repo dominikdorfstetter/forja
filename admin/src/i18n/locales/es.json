@@ -2660,14 +2660,18 @@
     },
     "timeline": {
       "empty": "Tu línea de tiempo está vacía. ¡Publica algo o espera interacciones del Fediverso!",
+      "outCreateArticle": "publicado",
       "outCreate": "publicó una nueva entrada",
       "outUpdate": "actualizó una entrada",
       "outDelete": "eliminó una entrada",
       "outDefault": "envió actividad {{type}}",
       "inFollow": "comenzó a seguirte",
       "inLike": "le gustó tu publicación",
+      "inLikePost": "le gustó",
       "inBoost": "impulsó tu publicación",
+      "inBoostPost": "impulsó",
       "inComment": "respondió a tu publicación",
+      "inCommentPost": "respondió a",
       "inDefault": "envió {{type}}"
     },
     "health": {

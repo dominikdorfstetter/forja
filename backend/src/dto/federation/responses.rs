@@ -128,6 +128,13 @@ pub struct ActivityResponse {
     #[schema(example = "done")]
     pub status: String,
 
+    #[schema(example = "Article")]
+    pub object_type: Option<String>,
+
+    /// The full ActivityPub payload (contains title, content, URLs)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub payload: Option<serde_json::Value>,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error_message: Option<String>,
 

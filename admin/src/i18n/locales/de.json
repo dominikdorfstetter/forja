@@ -2660,14 +2660,18 @@
     },
     "timeline": {
       "empty": "Deine Timeline ist leer. Poste etwas oder warte auf Interaktionen aus dem Fediverse!",
+      "outCreateArticle": "veröffentlicht",
       "outCreate": "hat einen neuen Beitrag veröffentlicht",
       "outUpdate": "hat einen Beitrag aktualisiert",
       "outDelete": "hat einen Beitrag gelöscht",
       "outDefault": "hat {{type}}-Aktivität gesendet",
       "inFollow": "folgt dir jetzt",
       "inLike": "hat deinen Beitrag geliked",
+      "inLikePost": "geliked",
       "inBoost": "hat deinen Beitrag geboostet",
+      "inBoostPost": "geboostet",
       "inComment": "hat auf deinen Beitrag geantwortet",
+      "inCommentPost": "hat geantwortet auf",
       "inDefault": "hat {{type}} gesendet"
     },
     "health": {

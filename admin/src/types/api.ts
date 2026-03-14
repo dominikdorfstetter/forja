@@ -1606,6 +1606,8 @@ export interface FederationActivity {
   activity_uri: string;
   actor_uri: string;
   object_uri: string | null;
+  object_type: string | null;
+  payload?: Record<string, unknown>;
   direction: string;
   status: string;
   error_message: string | null;
