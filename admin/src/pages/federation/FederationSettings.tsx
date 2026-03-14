@@ -10,11 +10,13 @@ import {
   MenuItem,
   Paper,
   Select,
+  Stack,
   Switch,
   Typography,
 } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
+import HubIcon from '@mui/icons-material/Hub';
 import { useSiteContext } from '@/store/SiteContext';
 import { useFederationSettings } from '@/hooks/useFederationData';
 import { useFederationMutations } from '@/hooks/useFederationMutations';
@@ -24,12 +26,14 @@ import EmptyState from '@/components/shared/EmptyState';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import { useState } from 'react';
 
-export default function FederationSettingsPage() {
+interface FederationSettingsProps {
+  embedded?: boolean;
+}
+
+export default function FederationSettingsPage({ embedded }: FederationSettingsProps = {}) {
   const { selectedSiteId } = useSiteContext();
   const { data: settings, isLoading } = useFederationSettings(selectedSiteId);
   const {
-    enableFederation,
-    disableFederation,
     updateSettings,
     rotateKeysMutation,
   } = useFederationMutations(selectedSiteId);
@@ -39,7 +43,7 @@ export default function FederationSettingsPage() {
   if (!selectedSiteId) {
     return (
       <Box data-testid="federation-settings.page">
-        <PageHeader title="Federation Settings" subtitle="Configure ActivityPub federation" />
+        {!embedded && <PageHeader title="Federation Settings" subtitle="Configure ActivityPub federation" />}
         <EmptyState icon={<SettingsIcon sx={{ fontSize: 64 }} />} title="No site selected" description="Select a site to manage settings." />
       </Box>
     );
@@ -48,110 +52,96 @@ export default function FederationSettingsPage() {
   if (isLoading) {
     return (
       <Box data-testid="federation-settings.page">
-        <PageHeader title="Federation Settings" subtitle="Configure ActivityPub federation" />
+        {!embedded && <PageHeader title="Federation Settings" subtitle="Configure ActivityPub federation" />}
         <LoadingState label="Loading settings..." />
       </Box>
     );
   }
 
-  const handleToggle = () => {
-    if (settings?.enabled) {
-      disableFederation.mutate();
-    } else {
-      enableFederation.mutate();
-    }
-  };
-
   return (
-    <Box data-testid="federation-settings.page">
-      <PageHeader title="Federation Settings" subtitle="Configure ActivityPub federation" />
+    <Box data-testid="federation-settings.page" sx={{ maxWidth: 800, mx: embedded ? undefined : 'auto', p: embedded ? 0 : 3 }}>
+      {!embedded && (
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
+          <HubIcon />
+          <Typography variant="h5">Federation Settings</Typography>
+        </Stack>
+      )}
 
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, maxWidth: 700 }}>
-        <Paper sx={{ p: 3 }}>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={settings?.enabled ?? false}
-                onChange={handleToggle}
-                disabled={enableFederation.isPending || disableFederation.isPending}
-              />
-            }
-            label="Enable Federation"
-          />
+      <Paper sx={{ p: 3 }} elevation={embedded ? 0 : 1}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           {settings?.actorHandle && (
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1, fontFamily: 'monospace' }}>
-              {settings.actorHandle}
-            </Typography>
+            <Box>
+              <Typography variant="subtitle2" color="text.secondary">Fediverse Handle</Typography>
+              <Typography variant="body1" sx={{ fontFamily: 'monospace' }}>
+                {settings.actorHandle}
+              </Typography>
+            </Box>
           )}
-        </Paper>
 
-        {settings?.enabled && (
-          <>
-            <Card>
-              <CardHeader title="Signature Algorithm" />
-              <CardContent>
-                <FormControl fullWidth size="small">
-                  <InputLabel>Algorithm</InputLabel>
-                  <Select
-                    value={settings.signatureAlgorithm}
-                    label="Algorithm"
-                    onChange={(e) => updateSettings.mutate({ signatureAlgorithm: e.target.value })}
-                  >
-                    <MenuItem value="rsa-sha256">RSA-SHA256</MenuItem>
-                    <MenuItem value="ed25519">Ed25519</MenuItem>
-                  </Select>
-                </FormControl>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader title="Moderation" />
-              <CardContent>
-                <FormControl fullWidth size="small">
-                  <InputLabel>Mode</InputLabel>
-                  <Select
-                    value={settings.moderationMode}
-                    label="Mode"
-                    onChange={(e) => updateSettings.mutate({ moderationMode: e.target.value })}
-                  >
-                    <MenuItem value="queue_all">Queue All (manual review)</MenuItem>
-                    <MenuItem value="auto_approve">Auto Approve</MenuItem>
-                    <MenuItem value="followers_only">Followers Only</MenuItem>
-                  </Select>
-                </FormControl>
-                <FormControlLabel
-                  sx={{ mt: 2 }}
-                  control={
-                    <Switch
-                      checked={settings.autoPublish}
-                      onChange={(e) => updateSettings.mutate({ autoPublish: e.target.checked })}
-                    />
-                  }
-                  label="Auto-publish new posts to federation"
-                />
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader title="Key Management" />
-              <CardContent>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  Rotating keys will invalidate existing HTTP signatures. Remote servers will need to re-fetch your public key.
-                </Typography>
-                <Button
-                  variant="outlined"
-                  color="warning"
-                  startIcon={<VpnKeyIcon />}
-                  onClick={() => setRotateConfirmOpen(true)}
-                  disabled={rotateKeysMutation.isPending}
+          <Card variant="outlined">
+            <CardHeader title="Signature Algorithm" />
+            <CardContent>
+              <FormControl fullWidth size="small">
+                <InputLabel>Algorithm</InputLabel>
+                <Select
+                  value={settings?.signatureAlgorithm ?? 'rsa-sha256'}
+                  label="Algorithm"
+                  onChange={(e) => updateSettings.mutate({ signatureAlgorithm: e.target.value })}
                 >
-                  Rotate Keys
-                </Button>
-              </CardContent>
-            </Card>
-          </>
-        )}
-      </Box>
+                  <MenuItem value="rsa-sha256">RSA-SHA256</MenuItem>
+                  <MenuItem value="ed25519">Ed25519</MenuItem>
+                </Select>
+              </FormControl>
+            </CardContent>
+          </Card>
+
+          <Card variant="outlined">
+            <CardHeader title="Moderation" />
+            <CardContent>
+              <FormControl fullWidth size="small">
+                <InputLabel>Mode</InputLabel>
+                <Select
+                  value={settings?.moderationMode ?? 'queue_all'}
+                  label="Mode"
+                  onChange={(e) => updateSettings.mutate({ moderationMode: e.target.value })}
+                >
+                  <MenuItem value="queue_all">Queue All (manual review)</MenuItem>
+                  <MenuItem value="auto_approve">Auto Approve</MenuItem>
+                  <MenuItem value="followers_only">Followers Only</MenuItem>
+                </Select>
+              </FormControl>
+              <FormControlLabel
+                sx={{ mt: 2 }}
+                control={
+                  <Switch
+                    checked={settings?.autoPublish ?? true}
+                    onChange={(e) => updateSettings.mutate({ autoPublish: e.target.checked })}
+                  />
+                }
+                label="Auto-publish new posts to federation"
+              />
+            </CardContent>
+          </Card>
+
+          <Card variant="outlined">
+            <CardHeader title="Key Management" />
+            <CardContent>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                Rotating keys will invalidate existing HTTP signatures. Remote servers will need to re-fetch your public key.
+              </Typography>
+              <Button
+                variant="outlined"
+                color="warning"
+                startIcon={<VpnKeyIcon />}
+                onClick={() => setRotateConfirmOpen(true)}
+                disabled={rotateKeysMutation.isPending}
+              >
+                Rotate Keys
+              </Button>
+            </CardContent>
+          </Card>
+        </Box>
+      </Paper>
 
       <ConfirmDialog
         open={rotateConfirmOpen}

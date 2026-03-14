@@ -52,14 +52,10 @@ describe('FederationSettings', () => {
     expect(await screen.findByText('@myblog@example.com')).toBeInTheDocument();
   });
 
-  it('shows the enable/disable toggle', async () => {
+  it('shows the auto-publish toggle (enable/disable is in ModulesTab)', async () => {
     vi.mocked(apiService.getFederationSettings).mockResolvedValue(mockSettings);
     renderWithProviders(<FederationSettingsPage />);
-    await waitFor(() => {
-      const switches = screen.getAllByRole('switch');
-      expect(switches.length).toBeGreaterThan(0);
-    });
-    expect(screen.getByText('Enable Federation')).toBeInTheDocument();
+    expect(await screen.findByText('Auto-publish new posts to federation')).toBeInTheDocument();
   });
 
   it('shows loading state', () => {

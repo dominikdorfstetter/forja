@@ -12,6 +12,7 @@ import LanguageIcon from '@mui/icons-material/Language';
 import GavelIcon from '@mui/icons-material/Gavel';
 import KeyIcon from '@mui/icons-material/Key';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import HubIcon from '@mui/icons-material/Hub';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 import PageHeader from '@/components/shared/PageHeader';
@@ -21,6 +22,7 @@ import { useSiteContextData } from '@/hooks/useSiteContextData';
 import LegalPage from '@/pages/Legal';
 import ApiKeysPage from '@/pages/ApiKeys';
 import AiSettingsPage from '@/pages/ai-settings/AiSettingsPage';
+import FederationSettingsPage from '@/pages/federation/FederationSettings';
 import SiteSettingsTab from './settings/SiteSettingsTab';
 import ModulesTab from './settings/ModulesTab';
 import SystemInfoTab from './settings/SystemInfoTab';
@@ -83,7 +85,17 @@ export default function SettingsPage() {
     });
   }
 
-  // 5. System Info — master only
+  // 5. Federation Settings — admin + site selected + federation module enabled
+  if (isAdmin && selectedSiteId && modules.federation) {
+    tabs.push({
+      key: 'federation',
+      icon: <HubIcon />,
+      label: 'Federation',
+      content: <FederationSettingsPage embedded />,
+    });
+  }
+
+  // 6. System Info — master only
   if (isMaster) {
     tabs.push({
       key: 'systemInfo',
