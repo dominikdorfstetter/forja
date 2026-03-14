@@ -1,12 +1,13 @@
 //! Federation background worker fairing.
 //!
-//! Spawns a Tokio task on liftoff that periodically polls the delivery queue
-//! and dispatches outbound activities. A second timer purges dead-letter jobs
-//! once per hour.
+//! Spawns a Tokio task on liftoff that periodically:
+//! 1. Processes pending **inbound** activities via `inbox_processor`
+//! 2. Dispatches **outbound** delivery jobs (signing + HTTP POST — skeleton for now)
+//! 3. Purges dead-letter jobs once per hour
 //!
 //! Concurrency is bounded by two semaphores:
 //! - **outbound** (10 permits) — limits concurrent outbound HTTP deliveries
-//! - **inbound** (5 permits) — reserved for future inbound processing
+//! - **inbound** (5 permits) — limits concurrent inbound processing
 //!
 //! The worker checks whether *any* site has federation enabled before doing
 //! real work each cycle, so it is safe to attach unconditionally.
@@ -17,14 +18,17 @@ use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 use tokio::sync::Semaphore;
 
+use crate::models::federation::activity::ApActivity;
 use crate::models::federation::delivery::ApDeliveryJob;
+use crate::models::federation::types::ApActivityStatus;
+use crate::services::federation::inbox_processor;
 use crate::services::federation::queue::{CompositeQueue, DeliveryQueue};
 use crate::AppState;
 
 /// Maximum concurrent outbound delivery tasks.
 const MAX_OUTBOUND_CONCURRENCY: usize = 10;
 
-/// Maximum concurrent inbound processing tasks (reserved for future use).
+/// Maximum concurrent inbound processing tasks.
 const MAX_INBOUND_CONCURRENCY: usize = 5;
 
 /// How often the worker polls the queue (seconds).
@@ -113,22 +117,22 @@ impl Fairing for FederationWorker {
                             continue;
                         }
 
-                        // Dequeue and process jobs
+                        // ── Phase 1: Process pending inbound activities ──
+                        process_inbound_activities(&pool).await;
+
+                        // ── Phase 2: Process outbound delivery jobs ──
                         match queue.dequeue(BATCH_SIZE).await {
                             Ok(jobs) if jobs.is_empty() => {
                                 // Nothing to do
                             }
                             Ok(jobs) => {
-                                tracing::debug!("Federation worker: dequeued {} jobs", jobs.len());
+                                tracing::debug!("Federation worker: dequeued {} outbound jobs", jobs.len());
                                 for job in jobs {
-                                    // TODO: Acquire outbound semaphore permit and spawn
-                                    // delivery task. The actual HTTP delivery logic
-                                    // (signing, sending) comes in Chunk 5.
-                                    process_job(&queue, &job).await;
+                                    process_outbound_job(&queue, &job, &pool).await;
                                 }
                             }
                             Err(e) => {
-                                tracing::error!("Federation worker: dequeue failed: {e}");
+                                tracing::error!("Federation worker: outbound dequeue failed: {e}");
                             }
                         }
                     }
@@ -174,31 +178,133 @@ async fn check_federation_enabled(pool: &sqlx::PgPool) -> Result<bool, sqlx::Err
     Ok(exists)
 }
 
-/// Process a single delivery job.
-///
-/// This is a skeleton — the actual HTTP signing and delivery logic will be
-/// implemented in the delivery service (Chunk 5). For now it just marks
-/// the job as done to prevent infinite re-processing during development.
-async fn process_job(queue: &Arc<dyn DeliveryQueue>, job: &ApDeliveryJob) {
+/// Dequeue and process pending inbound activities through the inbox processor.
+async fn process_inbound_activities(pool: &sqlx::PgPool) {
+    let pending: Result<Vec<ApActivity>, _> = sqlx::query_as(
+        r#"
+        SELECT * FROM ap_activities
+        WHERE direction = 'in'
+          AND status = 'pending'
+        ORDER BY created_at ASC
+        LIMIT $1
+        "#,
+    )
+    .bind(BATCH_SIZE as i64)
+    .fetch_all(pool)
+    .await;
+
+    let pending = match pending {
+        Ok(activities) => activities,
+        Err(e) => {
+            tracing::error!("Federation worker: failed to fetch pending inbound activities: {e}");
+            return;
+        }
+    };
+
+    if pending.is_empty() {
+        return;
+    }
+
     tracing::debug!(
-        "Federation worker: processing job {} -> {}",
+        "Federation worker: processing {} pending inbound activities",
+        pending.len()
+    );
+
+    for activity in &pending {
+        // Look up the moderation mode for this site
+        let moderation_mode = match get_moderation_mode(pool, activity.site_id).await {
+            Ok(mode) => mode,
+            Err(e) => {
+                tracing::warn!(
+                    activity_id = %activity.id,
+                    "Federation worker: failed to get moderation mode: {e}"
+                );
+                "queue_all".to_string()
+            }
+        };
+
+        match inbox_processor::process_activity(pool, activity, &moderation_mode).await {
+            Ok(()) => {
+                if let Err(e) =
+                    ApActivity::update_status(pool, activity.id, ApActivityStatus::Done, None).await
+                {
+                    tracing::error!(
+                        activity_id = %activity.id,
+                        "Federation worker: failed to mark activity as done: {e}"
+                    );
+                }
+            }
+            Err(e) => {
+                tracing::error!(
+                    activity_id = %activity.id,
+                    activity_type = activity.activity_type,
+                    "Federation worker: inbox processing failed: {e}"
+                );
+
+                let error_msg = format!("{e}");
+                if let Err(e2) = ApActivity::update_status(
+                    pool,
+                    activity.id,
+                    ApActivityStatus::Failed,
+                    Some(&error_msg),
+                )
+                .await
+                {
+                    tracing::error!(
+                        activity_id = %activity.id,
+                        "Federation worker: failed to mark activity as failed: {e2}"
+                    );
+                }
+            }
+        }
+    }
+}
+
+/// Get the moderation mode setting for a site.
+async fn get_moderation_mode(
+    pool: &sqlx::PgPool,
+    site_id: uuid::Uuid,
+) -> Result<String, sqlx::Error> {
+    let value: Option<serde_json::Value> = sqlx::query_scalar(
+        "SELECT value FROM site_settings WHERE site_id = $1 AND key = 'federation_moderation_mode'",
+    )
+    .bind(site_id)
+    .fetch_optional(pool)
+    .await?;
+
+    Ok(value
+        .and_then(|v| v.as_str().map(|s| s.to_string()))
+        .unwrap_or_else(|| "queue_all".to_string()))
+}
+
+/// Process a single outbound delivery job.
+///
+/// The actual HTTP signing and delivery logic will be implemented in a future
+/// chunk. For now, it logs and skips to prevent infinite re-processing.
+async fn process_outbound_job(
+    queue: &Arc<dyn DeliveryQueue>,
+    job: &ApDeliveryJob,
+    _pool: &sqlx::PgPool,
+) {
+    tracing::debug!(
+        "Federation worker: processing outbound job {} -> {}",
         job.id,
         job.target_inbox_uri
     );
 
-    // TODO: Implement actual delivery:
-    // 1. Look up the activity payload from ap_activities
+    // TODO: Implement actual outbound delivery:
+    // 1. Look up the activity payload from ap_activities using job.activity_id
     // 2. Look up the actor's signing key
     // 3. Sign the request with HTTP signatures
-    // 4. POST to the target inbox
-    // 5. Handle response (mark_done on success, schedule_retry on failure)
+    // 4. POST to job.target_inbox_uri
+    // 5. Handle response:
+    //    - 2xx → queue.mark_done(job.id)
+    //    - 4xx (permanent) → queue.mark_failed(job.id, error)
+    //    - 5xx (transient) → ApDeliveryJob::schedule_retry(pool, job.id)
 
-    // For now, log and skip — don't mark done/failed so jobs stay in the queue
-    // until the delivery service is implemented.
     tracing::debug!(
-        "Federation worker: job {} skipped (delivery service not yet implemented)",
+        "Federation worker: outbound job {} skipped (HTTP delivery not yet implemented)",
         job.id
     );
     let _ = queue;
-    let _ = job;
 }
