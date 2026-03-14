@@ -84,6 +84,15 @@ pub struct CreateNoteRequest {
     pub body: String,
 }
 
+/// Request to pin a blog post in the featured collection.
+#[derive(Debug, Clone, Deserialize, Validate, utoipa::ToSchema)]
+#[schema(description = "Pin a blog post to the ActivityPub featured collection")]
+pub struct PinPostRequest {
+    /// The content UUID of the blog post to pin.
+    #[schema(example = "550e8400-e29b-41d4-a716-446655440000")]
+    pub content_id: uuid::Uuid,
+}
+
 /// Request to moderate a federated comment.
 #[derive(Debug, Clone, Deserialize, Validate, utoipa::ToSchema)]
 #[schema(description = "Moderate a federated comment")]

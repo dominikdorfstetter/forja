@@ -187,6 +187,30 @@ pub struct NoteResponse {
     pub activity_uri: Option<String>,
 }
 
+// ── Featured/Pinned Posts ────────────────────────────────────────────────
+
+/// A featured/pinned post as returned by the admin API.
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+#[schema(description = "A pinned post in the ActivityPub featured collection")]
+pub struct FeaturedPostResponse {
+    #[schema(example = "550e8400-e29b-41d4-a716-446655440000")]
+    pub id: Uuid,
+
+    #[schema(example = "550e8400-e29b-41d4-a716-446655440001")]
+    pub content_id: Uuid,
+
+    #[schema(example = 0)]
+    pub position: i32,
+
+    #[schema(example = "Hello World")]
+    pub title: Option<String>,
+
+    #[schema(example = "hello-world")]
+    pub slug: Option<String>,
+
+    pub created_at: DateTime<Utc>,
+}
+
 // ── Blocks ──────────────────────────────────────────────────────────────
 
 /// A blocked instance domain as returned by the admin API.
@@ -225,6 +249,7 @@ pub struct BlockedActorResponse {
 
 use crate::models::federation::block::{ApBlockedActor, ApBlockedInstance};
 use crate::models::federation::comment::ApComment;
+use crate::models::federation::featured::ApFeaturedPostWithMeta;
 use crate::models::federation::follower::ApFollower;
 use crate::models::federation::note::ApNote;
 
@@ -267,6 +292,19 @@ impl From<ApNote> for NoteResponse {
             body_html: n.body_html,
             published_at: n.published_at,
             activity_uri: n.activity_uri,
+        }
+    }
+}
+
+impl From<ApFeaturedPostWithMeta> for FeaturedPostResponse {
+    fn from(fp: ApFeaturedPostWithMeta) -> Self {
+        Self {
+            id: fp.id,
+            content_id: fp.content_id,
+            position: fp.position,
+            title: fp.title,
+            slug: fp.slug,
+            created_at: fp.created_at,
         }
     }
 }

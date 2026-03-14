@@ -2633,6 +2633,21 @@
     "status": {
       "enabled": "Enabled",
       "disabled": "Disabled"
+    },
+    "featured": {
+      "title": "Pinned Posts",
+      "description": "Pinned posts appear on your Fediverse profile",
+      "pin": "Pin Post",
+      "unpin": "Unpin",
+      "maxReached": "Maximum 3 pinned posts",
+      "empty": "No pinned posts",
+      "selectPost": "Select a blog post to pin"
+    },
+    "preview": {
+      "title": "Federation Preview",
+      "description": "How this post will appear on the Fediverse",
+      "via": "Published via Forja",
+      "notEnabled": "Enable federation to preview"
     }
   }
 }

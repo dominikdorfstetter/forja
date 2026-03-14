@@ -11,6 +11,7 @@ export function useFederationMutations(siteId: string) {
   const invalidateComments = () => queryClient.invalidateQueries({ queryKey: ['federation-comments'] });
   const invalidateBlockedInstances = () => queryClient.invalidateQueries({ queryKey: ['federation-blocked-instances'] });
   const invalidateBlockedActors = () => queryClient.invalidateQueries({ queryKey: ['federation-blocked-actors'] });
+  const invalidateFeatured = () => queryClient.invalidateQueries({ queryKey: ['federation-featured'] });
   const invalidateSettings = () => queryClient.invalidateQueries({ queryKey: ['federation-settings'] });
   const invalidateStats = () => queryClient.invalidateQueries({ queryKey: ['federation-stats'] });
 
@@ -86,6 +87,18 @@ export function useFederationMutations(siteId: string) {
     onError: showError,
   });
 
+  const pinPostMutation = useMutation({
+    mutationFn: (contentId: string) => apiService.pinPost(siteId, contentId),
+    onSuccess: () => { showSuccess('Post pinned'); invalidateFeatured(); },
+    onError: showError,
+  });
+
+  const unpinPostMutation = useMutation({
+    mutationFn: (contentId: string) => apiService.unpinPost(siteId, contentId),
+    onSuccess: () => { showSuccess('Post unpinned'); invalidateFeatured(); },
+    onError: showError,
+  });
+
   const rotateKeysMutation = useMutation({
     mutationFn: () => apiService.rotateKeys(siteId),
     onSuccess: () => { showSuccess('Keys rotated successfully'); },
@@ -105,6 +118,8 @@ export function useFederationMutations(siteId: string) {
     enableFederation,
     disableFederation,
     updateSettings,
+    pinPostMutation,
+    unpinPostMutation,
     rotateKeysMutation,
   };
 }

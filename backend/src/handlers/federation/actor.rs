@@ -5,9 +5,11 @@ use rocket::{Route, State};
 
 use crate::dto::federation::activitypub::{
     ap_context, as_context, ActivityPubActor, ActorEndpoints, ActorPublicKey, OrderedCollection,
+    OrderedCollectionPage,
 };
 use crate::errors::ApiError;
 use crate::models::federation::actor::ApActor;
+use crate::models::federation::featured::ApFeaturedPost;
 use crate::models::federation::follower::ApFollower;
 use crate::models::site::Site;
 use crate::models::site_settings::SiteSetting;
@@ -67,6 +69,10 @@ pub async fn actor_profile(
         inbox: format!("{}/inbox", base),
         outbox: format!("{}/outbox", base),
         followers: format!("{}/followers", base),
+        featured: Some(format!(
+            "https://{}/ap/actor/{}/featured",
+            domain, site.slug
+        )),
         url: Some(format!("https://{}", domain)),
         public_key: ActorPublicKey {
             id: format!("{}#main-key", actor_uri),
@@ -151,9 +157,54 @@ pub async fn actor_followers(
     Ok(Json(collection))
 }
 
+/// Actor featured collection (pinned posts as Article objects)
+#[get("/ap/actor/<site_slug>/featured")]
+pub async fn actor_featured(
+    state: &State<AppState>,
+    site_slug: &str,
+) -> Result<Json<OrderedCollectionPage>, ApiError> {
+    let (site, actor, domain) = resolve_actor(state.inner(), site_slug).await?;
+
+    let featured = ApFeaturedPost::list_by_actor(&state.db, actor.id).await?;
+    let actor_uri = actor.actor_uri(&domain, &site.slug);
+
+    let mut items = Vec::new();
+    for fp in &featured {
+        // Build a minimal Article object for each pinned post
+        let post_url = format!(
+            "https://{}/blog/{}",
+            domain,
+            fp.slug.as_deref().unwrap_or("")
+        );
+        let article = serde_json::json!({
+            "type": "Article",
+            "id": post_url,
+            "attributedTo": actor_uri,
+            "name": fp.title.as_deref().unwrap_or("Untitled"),
+            "url": post_url
+        });
+        items.push(article);
+    }
+
+    let featured_uri = format!("https://{}/ap/actor/{}/featured", domain, site.slug);
+
+    let page = OrderedCollectionPage {
+        context: as_context(),
+        id: featured_uri.clone(),
+        page_type: "OrderedCollection".to_string(),
+        part_of: featured_uri,
+        total_items: Some(items.len() as u64),
+        ordered_items: items,
+        next: None,
+        prev: None,
+    };
+
+    Ok(Json(page))
+}
+
 /// Collect actor routes (mounted at root `/`)
 pub fn routes() -> Vec<Route> {
-    routes![actor_profile, actor_outbox, actor_followers]
+    routes![actor_profile, actor_outbox, actor_followers, actor_featured]
 }
 
 #[cfg(test)]
@@ -161,6 +212,6 @@ mod tests {
     #[test]
     fn test_routes_count() {
         let routes = super::routes();
-        assert_eq!(routes.len(), 3, "Should have 3 actor routes");
+        assert_eq!(routes.len(), 4, "Should have 4 actor routes");
     }
 }

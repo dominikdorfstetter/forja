@@ -58,8 +58,8 @@ describe('FederationOverview', () => {
   it('renders profile card with stats', async () => {
     vi.mocked(apiService.getFederationStats).mockResolvedValue(mockStats);
     vi.mocked(apiService.getFederationSettings).mockResolvedValue(mockSettings);
-    vi.mocked(apiService.getFederationNotes).mockResolvedValue({ data: [], meta: { total: 0, page: 1, page_size: 5, total_pages: 0 } });
-    vi.mocked(apiService.getFederationActivities).mockResolvedValue({ data: [], meta: { total: 0, page: 1, page_size: 20, total_pages: 0 } });
+    vi.mocked(apiService.getFederationNotes).mockResolvedValue({ data: [], meta: { total_items: 0, page: 1, page_size: 5, total_pages: 0 } });
+    vi.mocked(apiService.getFederationActivities).mockResolvedValue({ data: [], meta: { total_items: 0, page: 1, page_size: 20, total_pages: 0 } });
 
     renderWithProviders(<FederationOverview />);
     // Profile card shows stats — multiple elements may have the same count (profile + quick link badge)

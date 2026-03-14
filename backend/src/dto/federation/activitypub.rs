@@ -41,6 +41,9 @@ pub struct ActivityPubActor {
     pub followers: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub featured: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<String>,
 
     #[serde(rename = "publicKey")]
@@ -354,6 +357,7 @@ mod tests {
             inbox: "https://example.com/ap/blog/inbox".to_string(),
             outbox: "https://example.com/ap/blog/outbox".to_string(),
             followers: "https://example.com/ap/blog/followers".to_string(),
+            featured: Some("https://example.com/ap/actor/blog/featured".to_string()),
             url: Some("https://example.com".to_string()),
             public_key: ActorPublicKey {
                 id: "https://example.com/ap/blog/actor#main-key".to_string(),

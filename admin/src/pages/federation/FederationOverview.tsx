@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Avatar, Box, Button, Card, CardActionArea, CardContent, Chip, Divider, FormControl, FormControlLabel, Grid, IconButton, InputLabel, MenuItem, Paper, Select, Stack, Switch, TextField, Tooltip, Typography } from '@mui/material';
+import { Avatar, Box, Button, Card, CardActionArea, CardContent, Chip, Dialog, DialogActions, DialogContent, DialogTitle, Divider, FormControl, FormControlLabel, Grid, IconButton, InputLabel, List, ListItemButton, ListItemText, MenuItem, Paper, Select, Stack, Switch, TextField, Tooltip, Typography } from '@mui/material';
 import PeopleIcon from '@mui/icons-material/People';
 import CommentIcon from '@mui/icons-material/Comment';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
@@ -10,11 +10,15 @@ import HubIcon from '@mui/icons-material/Hub';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import EditIcon from '@mui/icons-material/Edit';
 import ImageIcon from '@mui/icons-material/Image';
+import PushPinIcon from '@mui/icons-material/PushPin';
+import CloseIcon from '@mui/icons-material/Close';
+import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import { useSiteContext } from '@/store/SiteContext';
-import { useFederationStats, useFederationSettings } from '@/hooks/useFederationData';
+import { useFederationStats, useFederationSettings, useFeaturedPosts } from '@/hooks/useFederationData';
 import { useFederationMutations } from '@/hooks/useFederationMutations';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
@@ -58,6 +62,102 @@ function QuickLink({ icon, label, value, path }: QuickLinkProps) {
   );
 }
 
+interface PinnedPostsCardProps {
+  siteId: string;
+  featuredPosts: import('@/types/api').FederationFeaturedPost[];
+  onPin: () => void;
+  onUnpin: (contentId: string) => void;
+}
+
+function PinnedPostsCard({ featuredPosts, onPin, onUnpin }: PinnedPostsCardProps) {
+  const { t } = useTranslation();
+  const maxReached = featuredPosts.length >= 3;
+
+  return (
+    <Card sx={{ mb: 3 }}>
+      <CardContent>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <PushPinIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+            <Typography variant="subtitle2" color="text.secondary">
+              {t('federation.featured.title')}
+            </Typography>
+          </Stack>
+          <Tooltip title={maxReached ? t('federation.featured.maxReached') : t('federation.featured.pin')}>
+            <span>
+              <IconButton size="small" onClick={onPin} disabled={maxReached}>
+                <AddIcon fontSize="small" />
+              </IconButton>
+            </span>
+          </Tooltip>
+        </Stack>
+        <Typography variant="caption" color="text.disabled" sx={{ display: 'block', mb: 1.5 }}>
+          {t('federation.featured.description')}
+        </Typography>
+        {featuredPosts.length === 0 && (
+          <Typography variant="body2" color="text.disabled" fontStyle="italic">
+            {t('federation.featured.empty')}
+          </Typography>
+        )}
+        {featuredPosts.map((post) => (
+          <Stack key={post.id} direction="row" alignItems="center" justifyContent="space-between" sx={{ py: 0.5 }}>
+            <Typography variant="body2" sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+              {post.title ?? post.slug ?? post.content_id}
+            </Typography>
+            <Tooltip title={t('federation.featured.unpin')}>
+              <IconButton size="small" onClick={() => onUnpin(post.content_id)}>
+                <CloseIcon sx={{ fontSize: 16 }} />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
+
+interface PinPostDialogProps {
+  open: boolean;
+  onClose: () => void;
+  siteId: string;
+  alreadyPinned: Set<string>;
+  onSelect: (contentId: string) => void;
+}
+
+function PinPostDialog({ open, onClose, siteId, alreadyPinned, onSelect }: PinPostDialogProps) {
+  const { t } = useTranslation();
+
+  const { data: blogsData, isLoading } = useQuery({
+    queryKey: ['blogs-for-pin', siteId],
+    queryFn: () => apiService.getBlogs(siteId, { page: 1, page_size: 100, status: 'Published' }),
+    enabled: open && !!siteId,
+  });
+
+  const blogs = (blogsData?.data ?? []).filter((b) => !alreadyPinned.has(b.content_id));
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle>{t('federation.featured.selectPost')}</DialogTitle>
+      <DialogContent dividers>
+        {isLoading && <Typography variant="body2" color="text.secondary">Loading...</Typography>}
+        {!isLoading && blogs.length === 0 && (
+          <Typography variant="body2" color="text.secondary">{t('federation.featured.empty')}</Typography>
+        )}
+        <List disablePadding>
+          {blogs.map((blog) => (
+            <ListItemButton key={blog.id} onClick={() => onSelect(blog.content_id)}>
+              <ListItemText primary={blog.slug ?? blog.id} secondary={blog.author} />
+            </ListItemButton>
+          ))}
+        </List>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>{t('common.cancel')}</Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
 export default function FederationOverview() {
   const { t } = useTranslation();
   const { selectedSiteId } = useSiteContext();
@@ -65,9 +165,11 @@ export default function FederationOverview() {
   const { data: settings, isLoading: settingsLoading } = useFederationSettings(selectedSiteId);
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
-  const { updateSettings } = useFederationMutations(selectedSiteId);
+  const { updateSettings, pinPostMutation, unpinPostMutation } = useFederationMutations(selectedSiteId);
+  const { data: featuredPosts } = useFeaturedPosts(selectedSiteId);
 
   const [editingProfile, setEditingProfile] = useState(false);
+  const [pinDialogOpen, setPinDialogOpen] = useState(false);
   const [bio, setBio] = useState<string | undefined>(undefined);
   const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -312,6 +414,16 @@ export default function FederationOverview() {
             </Card>
           )}
 
+          {/* Pinned Posts */}
+          {settings?.enabled && (
+            <PinnedPostsCard
+              siteId={selectedSiteId}
+              featuredPosts={featuredPosts ?? []}
+              onPin={() => setPinDialogOpen(true)}
+              onUnpin={(contentId) => unpinPostMutation.mutate(contentId)}
+            />
+          )}
+
           {/* Attention items */}
           {((stats?.pending_comments ?? 0) > 0 || (stats?.failed_activities ?? 0) > 0) && (
             <Card sx={{ mb: 3 }}>
@@ -380,6 +492,17 @@ export default function FederationOverview() {
         onClose={() => setPickerOpen(false)}
         siteId={selectedSiteId}
         onSelect={handleMediaSelected}
+      />
+
+      <PinPostDialog
+        open={pinDialogOpen}
+        onClose={() => setPinDialogOpen(false)}
+        siteId={selectedSiteId}
+        alreadyPinned={new Set((featuredPosts ?? []).map((p) => p.content_id))}
+        onSelect={(contentId) => {
+          pinPostMutation.mutate(contentId);
+          setPinDialogOpen(false);
+        }}
       />
     </Box>
   );

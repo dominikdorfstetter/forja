@@ -17,6 +17,14 @@ export function useFederationSettings(siteId: string) {
   });
 }
 
+export function useFeaturedPosts(siteId: string) {
+  return useQuery({
+    queryKey: ['federation-featured', siteId],
+    queryFn: () => apiService.getFeaturedPosts(siteId),
+    enabled: !!siteId,
+  });
+}
+
 export function useFederationEngagement(siteId: string, contentId: string) {
   return useQuery({
     queryKey: ['federation-engagement', siteId, contentId],

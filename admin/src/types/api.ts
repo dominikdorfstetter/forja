@@ -473,6 +473,7 @@ export interface UpdateLocalizationRequest {
 // Blog
 export interface BlogListItem {
   id: string;
+  content_id: string;
   slug?: string;
   author: string;
   published_date: string;
@@ -1669,4 +1670,13 @@ export interface FederationStats {
 export interface FederationEngagement {
   likes: number;
   boosts: number;
+}
+
+export interface FederationFeaturedPost {
+  id: string;
+  content_id: string;
+  position: number;
+  title: string | null;
+  slug: string | null;
+  created_at: string;
 }
