@@ -171,7 +171,7 @@ export default function Layout() {
         { text: t('layout.sidebar.taxonomy'), icon: <LocalOfferIcon />, path: '/taxonomy' },
       ],
     },
-    {
+    ...(modules.federation ? [{
       label: 'Federation',
       items: [
         { text: 'Overview', icon: <HubIcon />, path: '/federation' },
@@ -181,7 +181,7 @@ export default function Layout() {
         { text: 'Blocklist', icon: <BlockIcon />, path: '/federation/blocks' },
         { text: 'Settings', icon: <SettingsIcon />, path: '/federation/settings' },
       ],
-    },
+    }] : []),
     {
       label: t('layout.sidebar.site'),
       items: [

@@ -1308,7 +1308,9 @@
       "documents": "Documents",
       "documentsDesc": "Upload and manage downloadable files",
       "ai": "AI Assist",
-      "aiDesc": "SEO generation, auto-excerpts, and translation suggestions"
+      "aiDesc": "SEO generation, auto-excerpts, and translation suggestions",
+      "federation": "Federation",
+      "federationDesc": "Syndicate blog posts to the Fediverse via ActivityPub"
     },
     "selectSiteAlert": "Select a site from the header to manage its settings.",
     "loadingSiteSettings": "Loading site settings...",

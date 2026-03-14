@@ -19,7 +19,8 @@ use crate::models::site_locale::SiteLocale;
 use crate::models::site_membership::{SiteMembership, SiteRole};
 use crate::models::site_settings::{
     SiteSetting, KEY_MODULE_AI_ENABLED, KEY_MODULE_BLOG_ENABLED, KEY_MODULE_CV_ENABLED,
-    KEY_MODULE_DOCUMENTS_ENABLED, KEY_MODULE_LEGAL_ENABLED, KEY_MODULE_PAGES_ENABLED,
+    KEY_MODULE_DOCUMENTS_ENABLED, KEY_MODULE_FEDERATION_ENABLED, KEY_MODULE_LEGAL_ENABLED,
+    KEY_MODULE_PAGES_ENABLED,
 };
 use crate::services::audit_service;
 use crate::AppState;
@@ -398,6 +399,10 @@ pub async fn get_site_context(
         .get(KEY_MODULE_AI_ENABLED)
         .and_then(|v| v.as_bool())
         .unwrap_or(false);
+    let module_federation = settings
+        .get(KEY_MODULE_FEDERATION_ENABLED)
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false);
 
     Ok(Json(SiteContextResponse {
         member_count,
@@ -422,6 +427,7 @@ pub async fn get_site_context(
             legal: module_legal,
             documents: module_documents,
             ai: module_ai,
+            federation: module_federation,
         },
     }))
 }

@@ -299,6 +299,7 @@ interface SiteContextModules {
   legal: boolean;
   documents: boolean;
   ai: boolean;
+  federation: boolean;
 }
 
 interface SiteContextSuggestions {
@@ -1213,6 +1214,7 @@ export interface SiteSettingsResponse {
   module_legal_enabled: boolean;
   module_documents_enabled: boolean;
   module_ai_enabled: boolean;
+  module_federation_enabled: boolean;
 }
 
 export interface UpdateSiteSettingsRequest {
@@ -1230,6 +1232,7 @@ export interface UpdateSiteSettingsRequest {
   module_legal_enabled?: boolean;
   module_documents_enabled?: boolean;
   module_ai_enabled?: boolean;
+  module_federation_enabled?: boolean;
 }
 
 // User Preferences
