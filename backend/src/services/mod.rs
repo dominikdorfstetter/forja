@@ -8,6 +8,7 @@ pub mod bulk_content_service;
 pub mod clerk_service;
 pub mod content_service;
 pub mod encryption;
+pub mod federation;
 pub mod image_service;
 pub mod notification_service;
 pub mod review_service;
