@@ -179,7 +179,6 @@ export default function Layout() {
         { text: 'Comments', icon: <RateReviewIcon />, path: '/federation/comments' },
         { text: 'Activity', icon: <HistoryIcon />, path: '/federation/activity' },
         { text: 'Blocklist', icon: <BlockIcon />, path: '/federation/blocks' },
-        { text: 'Settings', icon: <SettingsIcon />, path: '/federation/settings' },
       ],
     }] : []),
     {

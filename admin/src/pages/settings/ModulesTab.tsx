@@ -88,7 +88,22 @@ export default function ModulesTab() {
     setDirty(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    // If federation toggle changed, call enable/disable to manage keypairs
+    const federationChanged = settings && modules.module_federation_enabled !== settings.module_federation_enabled;
+    if (federationChanged) {
+      try {
+        if (modules.module_federation_enabled) {
+          await apiService.enableFederation(selectedSiteId);
+        } else {
+          await apiService.disableFederation(selectedSiteId);
+        }
+      } catch {
+        enqueueSnackbar(t('settings.messages.saveFailed'), { variant: 'error' });
+        return;
+      }
+    }
+    // Save all module settings (including federation flag)
     mutation.mutate(modules);
   };
 
