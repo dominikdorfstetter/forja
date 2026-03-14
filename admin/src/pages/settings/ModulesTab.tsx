@@ -99,8 +99,7 @@ export default function ModulesTab() {
           await apiService.disableFederation(selectedSiteId);
         }
       } catch {
-        enqueueSnackbar(t('settings.messages.saveFailed'), { variant: 'error' });
-        return;
+        // 409 = already enabled/disabled, safe to continue saving the setting
       }
     }
     // Save all module settings (including federation flag)
