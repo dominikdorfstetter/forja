@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Avatar, Box, Button, Card, CardActionArea, CardContent, Chip, Divider, Grid, IconButton, Paper, Stack, TextField, Tooltip, Typography } from '@mui/material';
+import { Avatar, Box, Button, Card, CardActionArea, CardContent, Chip, Divider, FormControl, FormControlLabel, Grid, IconButton, InputLabel, MenuItem, Paper, Select, Stack, Switch, TextField, Tooltip, Typography } from '@mui/material';
 import PeopleIcon from '@mui/icons-material/People';
 import CommentIcon from '@mui/icons-material/Comment';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
@@ -278,6 +278,36 @@ export default function FederationOverview() {
                     </Stack>
                   </Box>
                 )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Moderation settings — accessible to site owners */}
+          {settings?.enabled && (
+            <Card sx={{ mb: 3 }}>
+              <CardContent>
+                <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1.5 }}>{t('federation.settings.moderation')}</Typography>
+                <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+                  <InputLabel>{t('federation.settings.mode')}</InputLabel>
+                  <Select
+                    value={settings.moderation_mode ?? 'queue_all'}
+                    label={t('federation.settings.mode')}
+                    onChange={(e) => updateSettings.mutate({ moderation_mode: e.target.value })}
+                  >
+                    <MenuItem value="queue_all">{t('federation.settings.modeQueueAll')}</MenuItem>
+                    <MenuItem value="auto_approve">{t('federation.settings.modeAutoApprove')}</MenuItem>
+                    <MenuItem value="followers_only">{t('federation.settings.modeFollowersOnly')}</MenuItem>
+                  </Select>
+                </FormControl>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={settings.auto_publish ?? true}
+                      onChange={(e) => updateSettings.mutate({ auto_publish: e.target.checked })}
+                    />
+                  }
+                  label={t('federation.settings.autoPublish')}
+                />
               </CardContent>
             </Card>
           )}

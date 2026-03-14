@@ -5,13 +5,11 @@ import {
   CardContent,
   CardHeader,
   FormControl,
-  FormControlLabel,
   InputLabel,
   MenuItem,
   Paper,
   Select,
   Stack,
-  Switch,
   Typography,
 } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -82,34 +80,6 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
                   <MenuItem value="ed25519">Ed25519</MenuItem>
                 </Select>
               </FormControl>
-            </CardContent>
-          </Card>
-
-          <Card variant="outlined">
-            <CardHeader title={t('federation.settings.moderation')} />
-            <CardContent>
-              <FormControl fullWidth size="small">
-                <InputLabel>{t('federation.settings.mode')}</InputLabel>
-                <Select
-                  value={settings?.moderation_mode ?? 'queue_all'}
-                  label={t('federation.settings.mode')}
-                  onChange={(e) => updateSettings.mutate({ moderation_mode: e.target.value })}
-                >
-                  <MenuItem value="queue_all">{t('federation.settings.modeQueueAll')}</MenuItem>
-                  <MenuItem value="auto_approve">{t('federation.settings.modeAutoApprove')}</MenuItem>
-                  <MenuItem value="followers_only">{t('federation.settings.modeFollowersOnly')}</MenuItem>
-                </Select>
-              </FormControl>
-              <FormControlLabel
-                sx={{ mt: 2 }}
-                control={
-                  <Switch
-                    checked={settings?.auto_publish ?? true}
-                    onChange={(e) => updateSettings.mutate({ auto_publish: e.target.checked })}
-                  />
-                }
-                label={t('federation.settings.autoPublish')}
-              />
             </CardContent>
           </Card>
 

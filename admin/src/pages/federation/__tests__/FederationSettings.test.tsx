@@ -52,10 +52,11 @@ describe('FederationSettings', () => {
     expect(await screen.findByText('RSA-SHA256')).toBeInTheDocument();
   });
 
-  it('shows the auto-publish toggle (enable/disable is in ModulesTab)', async () => {
+  it('shows key management section (sysadmin only)', async () => {
     vi.mocked(apiService.getFederationSettings).mockResolvedValue(mockSettings);
     renderWithProviders(<FederationSettingsPage />);
-    expect(await screen.findByText('Auto-publish new posts to federation')).toBeInTheDocument();
+    // Settings tab only has algorithm + key management (moderation moved to dashboard)
+    expect(await screen.findByRole('button', { name: /rotate/i })).toBeInTheDocument();
   });
 
   it('shows loading state', () => {
