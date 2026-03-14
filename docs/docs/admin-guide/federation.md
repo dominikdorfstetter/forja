@@ -20,7 +20,7 @@ The dashboard is split into two columns:
 
 ### Social Feed (left)
 - **Quick Post Composer** -- Post short notes (up to 500 characters) directly to the Fediverse, similar to Mastodon or Bluesky. Posts can be scheduled for future publication.
-- **Timeline** -- A merged feed of your posts, incoming follows, likes, boosts, and comments. Edit or delete published posts inline.
+- **Timeline** -- A merged feed of your posts, incoming follows, likes, boosts, and comments. Post entries show the actual title, excerpt, and any comment previews -- not just a generic "published a post" notice. Edit or delete published posts inline. Cancel scheduled posts from the timeline before they go out.
 
 ### Profile & Settings (right)
 - **Profile Card** -- Your Fediverse handle (with copy button), follower count, and activity stats.
@@ -50,9 +50,29 @@ Access these from the Federation dashboard via the quick links:
 - **Activity Log** -- View all inbound and outbound federation events. Retry failed deliveries.
 - **Blocklist** -- Block entire instances or individual actors.
 
+### Blocklist Import
+
+On the Blocklist page, click **Import** to bulk-block domains in one step:
+
+1. Paste domains one per line, or upload a `.csv` or `.txt` file
+2. Duplicates are detected and skipped automatically
+3. All imported domains are blocked immediately
+
+A common use case is importing community-curated lists such as [#FediBlock](https://fediblock.org/) to quickly protect your instance from known bad actors.
+
+### Instance Health
+
+The Federation dashboard shows delivery health per remote instance so you can spot problem servers at a glance:
+
+- View success and failure rates for every instance you deliver to
+- See the timestamp of the last delivery attempt per instance
+- Instances with a consistently high failure rate surface a **suggested block** so you can clean up your delivery queue proactively
+
 ## Scheduled Posts
 
 Quick posts can be scheduled for future publication using the Schedule button in the composer. The publish scheduler checks every 60 seconds and automatically publishes and federates due posts.
+
+After a quick post is published, you can still edit its body from the timeline. Saving the edit sends an **Update** activity to all followers so remote servers reflect the correction. Deleting a published post sends a **Delete** activity, removing it from followers' timelines on supported platforms.
 
 Blog posts with a future `publish_start` date are also auto-federated when they become published.
 

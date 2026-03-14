@@ -58,10 +58,17 @@ Federation is a **site module**. All endpoints below (except `enable` and `disab
 |--------|------|------------|-------------|
 | GET | `/sites/{site_id}/federation/blocks/instances` | Admin | List blocked instances |
 | POST | `/sites/{site_id}/federation/blocks/instances` | Admin | Block an instance domain |
+| POST | `/sites/{site_id}/federation/blocks/instances/import` | Admin | Bulk-import blocked domains |
 | DELETE | `/sites/{site_id}/federation/blocks/instances/{domain}` | Admin | Unblock an instance |
 | GET | `/sites/{site_id}/federation/blocks/actors` | Admin | List blocked actors |
 | POST | `/sites/{site_id}/federation/blocks/actors` | Admin | Block a remote actor |
 | DELETE | `/sites/{site_id}/federation/blocks/actors/{actor_uri}` | Admin | Unblock a remote actor |
+
+### Health
+
+| Method | Path | Permission | Description |
+|--------|------|------------|-------------|
+| GET | `/sites/{site_id}/federation/health` | Admin | Get delivery health per remote instance |
 
 ### Notes (Quick Posts)
 
@@ -198,6 +205,27 @@ curl -X POST https://your-site.com/api/v1/sites/{site_id}/federation/notes \
 
 **Response** -- `201 Created`
 
+## Update a Note
+
+Updates the body of a published note and sends an Update activity to all followers so remote servers reflect the change.
+
+```bash
+curl -X PUT https://your-site.com/api/v1/sites/{site_id}/federation/notes/{note_id} \
+  -H "X-API-Key: your_api_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "body": "Updated text"
+  }'
+```
+
+**Request Body**
+
+| Field | Type | Required | Constraints | Description |
+|-------|------|----------|-------------|-------------|
+| `body` | string | Yes | 1 -- 500 chars | Updated plain-text note body |
+
+**Response** -- `200 OK` with the updated note.
+
 ## Moderate Comments
 
 Approve or reject inbound federated comments.
@@ -229,6 +257,53 @@ curl -X POST https://your-site.com/api/v1/sites/{site_id}/federation/blocks/inst
 ```
 
 **Response** -- `200 OK` with the blocked instance record.
+
+## Import Blocklist
+
+Bulk-import blocked domains in a single request. Existing entries are detected and skipped so the operation is safe to re-run with overlapping lists.
+
+```bash
+curl -X POST https://your-site.com/api/v1/sites/{site_id}/federation/blocks/instances/import \
+  -H "X-API-Key: your_api_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "domains": ["spam.example.com", "abuse.example.org"]
+  }'
+```
+
+**Request Body**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `domains` | string[] | Yes | List of domain names to block |
+
+**Response** -- `200 OK`
+
+```json
+{ "imported": 5, "skipped": 2 }
+```
+
+## Instance Health
+
+Returns delivery statistics grouped by remote instance. Use this to identify consistently failing servers.
+
+```bash
+curl "https://your-site.com/api/v1/sites/{site_id}/federation/health" \
+  -H "X-API-Key: your_api_key"
+```
+
+**Response** -- `200 OK`
+
+Array of objects, one per remote instance:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `instance_domain` | string | Remote instance hostname |
+| `total` | integer | Total delivery attempts |
+| `successful` | integer | Successful deliveries |
+| `failed` | integer | Failed deliveries (non-terminal) |
+| `dead` | integer | Dead-lettered deliveries (all retries exhausted) |
+| `last_attempt` | string | ISO 8601 timestamp of the most recent attempt |
 
 ## Pin a Blog Post
 
