@@ -6,6 +6,46 @@ sidebar_position: 100
 
 This page tracks the release history of Forja. For the most up-to-date changelog, see the [CHANGELOG.md](https://github.com/dominikdorfstetter/forja/blob/main/CHANGELOG.md) file in the repository.
 
+## v1.0.6
+
+### Added
+
+- **ActivityPub Federation** -- full Fediverse integration for blog syndication (#45)
+  - WebFinger discovery, Actor profile, Inbox/Outbox protocol endpoints
+  - HTTP Signature creation and verification (RSA-SHA256 + Ed25519)
+  - 6-layer security pipeline on inbound activities (rate limiting, block checks, signature verification, payload validation, content sanitization)
+  - SSRF protection on all outbound HTTP requests
+  - Background delivery worker with PostgreSQL queue (Redis-ready with circuit breaker failover)
+  - Blog posts syndicated as ActivityPub Article objects with auto-hashtags from tags
+  - Direct posting (Notes) with scheduling support
+  - Outbound Create, Update, Delete activity flows
+  - Publish scheduler (60s interval) auto-federates scheduled content and blog posts
+  - Follow/Unfollow handling with auto-accept
+  - Inbound likes, boosts, and comments with configurable moderation (queue all / auto-approve / followers only)
+  - Federation events pushed to notification system
+  - Engagement counters (likes/boosts) on blog detail page
+  - Social feed dashboard with Twitter/X-style timeline showing rich post content
+  - Quick Post composer with inline edit/delete and scheduling
+  - Profile editing (bio, avatar via media picker)
+  - Featured/pinned posts (ActivityPub featured collection, max 3)
+  - Mastodon-style post preview on blog detail page
+  - Followers, comments, activity log management pages
+  - Actor blocklist (site-wide) and instance blocklist (sysadmin-only) with CSV import
+  - Instance health dashboard with delivery stats per remote server
+  - Federation module toggle in Settings > Modules
+  - Custom RBAC (federation publish permission separate from content editing)
+  - Full i18n support (EN, DE, ES, FR, IT, NL, PL, PT)
+  - Encrypted keypairs at rest (AES-256-GCM)
+  - Complete documentation: admin guide, API endpoint reference (26 endpoints), OpenAPI spec
+
+### Changed
+
+- `ENCRYPTION_KEY` env var now accepted alongside legacy `AI_ENCRYPTION_KEY` (backward-compatible)
+- Site context API now includes `federation` module flag
+- Site settings DTO includes `module_federation_enabled`
+
+---
+
 ## v1.1.0
 
 ### Backend
