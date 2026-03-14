@@ -2479,7 +2479,9 @@
       "activityLog": "Journal d'activité",
       "activityLogDesc": "Voir les événements de fédération envoyés et reçus",
       "blocklist": "Liste de blocage",
-      "blocklistDesc": "Bloquer des instances ou des acteurs individuels"
+      "blocklistDesc": "Bloquer des instances ou des acteurs individuels",
+      "blockedActors": "Acteurs bloqués",
+      "blockedActorsDesc": "Bloquer des acteurs Fediverse individuels"
     },
     "followers": {
       "title": "Abonnés",

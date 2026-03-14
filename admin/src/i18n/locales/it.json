@@ -2479,7 +2479,9 @@
       "activityLog": "Registro attività",
       "activityLogDesc": "Visualizza gli eventi di federazione inviati e ricevuti",
       "blocklist": "Lista blocco",
-      "blocklistDesc": "Blocca istanze o singoli attori"
+      "blocklistDesc": "Blocca istanze o singoli attori",
+      "blockedActors": "Attori bloccati",
+      "blockedActorsDesc": "Blocca singoli attori Fediverse"
     },
     "followers": {
       "title": "Follower",

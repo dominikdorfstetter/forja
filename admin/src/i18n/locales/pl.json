@@ -2479,7 +2479,9 @@
       "activityLog": "Dziennik aktywności",
       "activityLogDesc": "Wyświetl wysłane i odebrane zdarzenia federacji",
       "blocklist": "Lista blokad",
-      "blocklistDesc": "Blokuj instancje lub poszczególnych aktorów"
+      "blocklistDesc": "Blokuj instancje lub poszczególnych aktorów",
+      "blockedActors": "Zablokowani aktorzy",
+      "blockedActorsDesc": "Blokuj poszczególnych aktorów Fediverse"
     },
     "followers": {
       "title": "Obserwujący",

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderWithProviders, screen, waitFor } from '@/test/test-utils';
 import apiService from '@/services/api';
-import type { Paginated, FederationBlockedInstance, FederationBlockedActor } from '@/types/api';
+import type { Paginated, FederationBlockedActor } from '@/types/api';
 
 vi.mock('@/store/SiteContext', () => ({
   useSiteContext: () => ({
@@ -27,18 +27,6 @@ vi.mock('@/store/AuthContext', () => ({
   notifySelectedSiteChanged: vi.fn(),
 }));
 
-const mockBlockedInstances: Paginated<FederationBlockedInstance> = {
-  data: [
-    {
-      id: 'bi-1',
-      domain: 'spam.example.com',
-      reason: 'Spam',
-      blocked_at: '2025-06-01T00:00:00Z',
-    },
-  ],
-  meta: { page: 1, page_size: 25, total_items: 1, total_pages: 1 },
-};
-
 const mockBlockedActors: Paginated<FederationBlockedActor> = {
   data: [
     {
@@ -60,17 +48,15 @@ beforeEach(async () => {
 });
 
 describe('FederationBlocklist', () => {
-  it('renders blocked instances tab by default', async () => {
-    vi.mocked(apiService.getBlockedInstances).mockResolvedValue(mockBlockedInstances);
+  it('renders blocked actors', async () => {
     vi.mocked(apiService.getBlockedActors).mockResolvedValue(mockBlockedActors);
     renderWithProviders(<FederationBlocklist />);
     await waitFor(() => {
-      expect(screen.getByText('spam.example.com')).toBeInTheDocument();
+      expect(screen.getByText('https://spam.example.com/users/spammer')).toBeInTheDocument();
     });
   });
 
   it('shows loading state initially', () => {
-    vi.mocked(apiService.getBlockedInstances).mockReturnValue(new Promise(() => {}));
     vi.mocked(apiService.getBlockedActors).mockReturnValue(new Promise(() => {}));
     renderWithProviders(<FederationBlocklist />);
     expect(screen.getByRole('progressbar')).toBeInTheDocument();

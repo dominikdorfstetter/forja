@@ -533,7 +533,7 @@ export default function FederationOverview() {
             <Divider />
             <QuickLink
               icon={<BlockIcon fontSize="small" />}
-              label={t('federation.nav.blocklist')}
+              label={t('federation.nav.blockedActors')}
               path="/federation/blocks"
             />
           </Card>

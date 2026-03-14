@@ -2479,7 +2479,9 @@
       "activityLog": "Aktivitätsprotokoll",
       "activityLogDesc": "Gesendete und empfangene Federationsereignisse anzeigen",
       "blocklist": "Sperrliste",
-      "blocklistDesc": "Instanzen oder einzelne Akteure blockieren"
+      "blocklistDesc": "Instanzen oder einzelne Akteure blockieren",
+      "blockedActors": "Blockierte Akteure",
+      "blockedActorsDesc": "Einzelne Fediverse-Akteure blockieren"
     },
     "followers": {
       "title": "Follower",

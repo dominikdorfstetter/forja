@@ -48,15 +48,15 @@ Access these from the Federation dashboard via the quick links:
 - **Followers** -- View and manage Fediverse followers. Remove followers if needed.
 - **Comments** -- Moderate inbound replies. Approve, reject, or delete.
 - **Activity Log** -- View all inbound and outbound federation events. Retry failed deliveries.
-- **Blocklist** -- Block entire instances or individual actors.
+- **Blocked Actors** -- Block individual Fediverse actors. Accessible from the dashboard via the quick link.
 
-### Blocklist Import
+### Instance Blocklist (Sysadmin Only)
 
-On the Blocklist page, click **Import** to bulk-block domains in one step:
+Instance blocking is managed under **Settings > Federation**, which is restricted to sysadmins (`isMaster`). From there you can:
 
-1. Paste domains one per line, or upload a `.csv` or `.txt` file
-2. Duplicates are detected and skipped automatically
-3. All imported domains are blocked immediately
+- View and unblock currently blocked instances
+- Import a blocklist in bulk: paste domains one per line, or upload a `.csv` or `.txt` file
+- Duplicates are detected and skipped automatically
 
 A common use case is importing community-curated lists such as [#FediBlock](https://fediblock.org/) to quickly protect your instance from known bad actors.
 
@@ -80,6 +80,7 @@ Blog posts with a future `publish_start` date are also auto-federated when they 
 
 Sysadmins (`isMaster`) can access additional settings under **Settings > Federation**:
 
+- **Instance Blocklist** -- View, import, and manage blocked instances (see above).
 - **Signature Algorithm** -- Choose between RSA-SHA256 (default, universal compatibility) and Ed25519 (modern, opt-in).
 - **Key Rotation** -- Rotate signing keys. Old keys remain valid for 48 hours to allow remote servers to re-fetch.
 

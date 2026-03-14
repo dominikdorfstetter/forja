@@ -2479,7 +2479,9 @@
       "activityLog": "Activiteitenlog",
       "activityLogDesc": "Bekijk verzonden en ontvangen federatie-events",
       "blocklist": "Blokkeerlijst",
-      "blocklistDesc": "Blokkeer instanties of individuele actoren"
+      "blocklistDesc": "Blokkeer instanties of individuele actoren",
+      "blockedActors": "Geblokkeerde actoren",
+      "blockedActorsDesc": "Blokkeer individuele Fediverse-actoren"
     },
     "followers": {
       "title": "Volgers",

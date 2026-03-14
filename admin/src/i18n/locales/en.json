@@ -2481,7 +2481,9 @@
       "activityLog": "Activity Log",
       "activityLogDesc": "View sent and received federation events",
       "blocklist": "Blocklist",
-      "blocklistDesc": "Block instances or individual actors"
+      "blocklistDesc": "Block instances or individual actors",
+      "blockedActors": "Blocked Actors",
+      "blockedActorsDesc": "Block individual Fediverse actors"
     },
     "followers": {
       "title": "Followers",
