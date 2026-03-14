@@ -16,6 +16,7 @@ import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
 import QuickPostComposer from '@/pages/federation/QuickPostComposer';
+import FederationTimeline from '@/pages/federation/FederationTimeline';
 
 interface QuickLinkProps {
   icon: React.ReactNode;
@@ -93,10 +94,16 @@ export default function FederationOverview() {
       <Grid container spacing={3}>
         {/* Left column — social feed */}
         <Grid size={{ xs: 12, md: 7 }}>
-          {/* Composer */}
-          {settings?.enabled && <QuickPostComposer siteId={selectedSiteId} />}
+          {settings?.enabled && (
+            <>
+              {/* Composer */}
+              <QuickPostComposer siteId={selectedSiteId} handle={settings.webfinger_address} />
 
-          {/* Empty state when no posts and federation is off */}
+              {/* Timeline */}
+              <FederationTimeline siteId={selectedSiteId} handle={settings.webfinger_address} />
+            </>
+          )}
+
           {!settings?.enabled && (
             <Paper sx={{ p: 3, textAlign: 'center' }}>
               <HubIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }} />

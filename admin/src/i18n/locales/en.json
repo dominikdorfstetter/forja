@@ -2581,6 +2581,18 @@
       "noPosts": "No posts yet. Share your first thought!",
       "charCount": "{{count}}/500"
     },
+    "timeline": {
+      "empty": "Your timeline is empty. Post something or wait for interactions from the Fediverse!",
+      "outCreate": "published a new post",
+      "outUpdate": "updated a post",
+      "outDelete": "deleted a post",
+      "outDefault": "sent {{type}} activity",
+      "inFollow": "started following you",
+      "inLike": "liked your post",
+      "inBoost": "boosted your post",
+      "inComment": "replied to your post",
+      "inDefault": "sent {{type}}"
+    },
     "settings": {
       "title": "Federation Settings",
       "subtitle": "Configure ActivityPub federation",

@@ -59,6 +59,7 @@ describe('FederationOverview', () => {
     vi.mocked(apiService.getFederationStats).mockResolvedValue(mockStats);
     vi.mocked(apiService.getFederationSettings).mockResolvedValue(mockSettings);
     vi.mocked(apiService.getFederationNotes).mockResolvedValue({ data: [], meta: { total: 0, page: 1, page_size: 5, total_pages: 0 } });
+    vi.mocked(apiService.getFederationActivities).mockResolvedValue({ data: [], meta: { total: 0, page: 1, page_size: 20, total_pages: 0 } });
 
     renderWithProviders(<FederationOverview />);
     // Profile card shows stats — multiple elements may have the same count (profile + quick link badge)
@@ -73,7 +74,8 @@ describe('FederationOverview', () => {
     vi.mocked(apiService.getFederationSettings).mockResolvedValue(mockSettings);
 
     renderWithProviders(<FederationOverview />);
-    expect(await screen.findByText('@myblog@example.com')).toBeInTheDocument();
+    const handles = await screen.findAllByText('@myblog@example.com');
+    expect(handles.length).toBeGreaterThan(0);
     expect(screen.getByLabelText('Copy handle')).toBeInTheDocument();
   });
 
