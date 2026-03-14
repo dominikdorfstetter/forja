@@ -1651,3 +1651,8 @@ export interface FederationStats {
   pendingComments: number;
   failedDeliveries: number;
 }
+
+export interface FederationEngagement {
+  likes: number;
+  boosts: number;
+}

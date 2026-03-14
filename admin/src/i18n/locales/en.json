@@ -2589,6 +2589,10 @@
       "bio": "Bio",
       "bioHelper": "A short description of your blog for Fediverse profiles (max 500 characters)"
     },
+    "engagement": {
+      "likes": "Fediverse Likes",
+      "boosts": "Fediverse Boosts"
+    },
     "breadcrumbs": {
       "federation": "Federation"
     },

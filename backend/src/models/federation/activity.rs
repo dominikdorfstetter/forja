@@ -27,6 +27,14 @@ pub struct ApActivity {
     pub created_at: DateTime<Utc>,
 }
 
+/// Engagement counts (likes and boosts) for a content item.
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+#[schema(description = "Federation engagement counts for a content item")]
+pub struct EngagementCounts {
+    pub likes: i64,
+    pub boosts: i64,
+}
+
 /// Aggregate stats for a site's federation activity.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ApActivityStats {
@@ -169,6 +177,31 @@ impl ApActivity {
             inbound_count: row.1,
             failed_count: row.2,
             pending_comments: row.3,
+        })
+    }
+
+    /// Get engagement counts (likes and boosts) for a content item.
+    pub async fn engagement_for_content(
+        pool: &PgPool,
+        content_id: Uuid,
+    ) -> Result<EngagementCounts, ApiError> {
+        let row: (i64, i64) = sqlx::query_as(
+            r#"
+            SELECT
+                COALESCE(SUM(CASE WHEN activity_type = 'Like' THEN 1 ELSE 0 END), 0),
+                COALESCE(SUM(CASE WHEN activity_type = 'Announce' THEN 1 ELSE 0 END), 0)
+            FROM ap_activities
+            WHERE content_id = $1
+              AND direction = 'in'
+            "#,
+        )
+        .bind(content_id)
+        .fetch_one(pool)
+        .await?;
+
+        Ok(EngagementCounts {
+            likes: row.0,
+            boosts: row.1,
         })
     }
 

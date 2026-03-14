@@ -1,20 +1,26 @@
 import {
   Box,
+  Chip,
   Divider,
   FormControlLabel,
   Grid,
   IconButton,
   InputAdornment,
+  Stack,
   Switch,
   TextField,
   Tooltip,
   Typography,
 } from '@mui/material';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import RepeatIcon from '@mui/icons-material/Repeat';
 import { Controller, type Control, type UseFormWatch, type UseFormSetValue } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import CopyableId from '@/components/shared/CopyableId';
+import { useSiteContext } from '@/store/SiteContext';
+import { useFederationEngagement } from '@/hooks/useFederationData';
 import type { BlogContentFormData } from './blogDetailSchema';
 import { calculateReadingTime } from './blogDetailSchema';
 
@@ -42,6 +48,8 @@ export default function BlogSettingsTab({
   updatedAt,
 }: BlogSettingsTabProps) {
   const { t } = useTranslation();
+  const { selectedSiteId } = useSiteContext();
+  const { data: engagement } = useFederationEngagement(selectedSiteId, contentId);
   const body = watch('body');
   const readingTimeOverride = watch('reading_time_override');
   const readingTimeMinutes = watch('reading_time_minutes');
@@ -186,6 +194,29 @@ export default function BlogSettingsTab({
           <Typography variant="body2">{format(new Date(updatedAt), 'PPpp')}</Typography>
         </Grid>
       </Grid>
+
+      {engagement && (engagement.likes > 0 || engagement.boosts > 0) && (
+        <>
+          <Divider sx={{ my: 3 }} />
+          <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+            {t('federation.title')}
+          </Typography>
+          <Stack direction="row" spacing={1}>
+            <Chip
+              icon={<FavoriteIcon />}
+              label={`${engagement.likes} ${t('federation.engagement.likes')}`}
+              size="small"
+              variant="outlined"
+            />
+            <Chip
+              icon={<RepeatIcon />}
+              label={`${engagement.boosts} ${t('federation.engagement.boosts')}`}
+              size="small"
+              variant="outlined"
+            />
+          </Stack>
+        </>
+      )}
     </Box>
   );
 }

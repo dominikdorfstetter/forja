@@ -11,6 +11,7 @@ use crate::guards::auth_guard::ReadKey;
 use crate::guards::federation_guard::{can_manage_federation, can_view_federation};
 use crate::guards::module_guard::{FederationModule, ModuleGuard};
 use crate::models::federation::activity::ApActivity;
+use crate::models::federation::activity::EngagementCounts;
 use crate::models::federation::types::{ApActivityDirection, ApActivityStatus};
 use crate::models::site::Site;
 use crate::models::site_membership::SiteRole;
@@ -179,9 +180,50 @@ pub async fn retry_activity(
     Ok(Status::Accepted)
 }
 
+/// Get federation engagement counts (likes, boosts) for a content item
+#[utoipa::path(
+    tag = "Federation",
+    operation_id = "get_federation_engagement",
+    description = "Get federation engagement counts (likes and boosts) for a content item",
+    params(
+        ("site_id" = Uuid, Path, description = "Site UUID"),
+        ("content_id" = Uuid, Path, description = "Content UUID")
+    ),
+    responses(
+        (status = 200, description = "Engagement counts", body = EngagementCounts),
+        (status = 401, description = "Unauthorized", body = ProblemDetails),
+        (status = 403, description = "Forbidden", body = ProblemDetails),
+        (status = 404, description = "Site not found", body = ProblemDetails)
+    ),
+    security(("api_key" = []))
+)]
+#[get("/sites/<site_id>/federation/engagement/<content_id>")]
+pub async fn get_engagement(
+    state: &State<AppState>,
+    site_id: Uuid,
+    content_id: Uuid,
+    auth: ReadKey,
+    _module: ModuleGuard<FederationModule>,
+) -> Result<Json<EngagementCounts>, ApiError> {
+    let role = auth
+        .0
+        .require_site_role(&state.db, site_id, &SiteRole::Reviewer)
+        .await?;
+    if !can_view_federation(&role) {
+        return Err(ApiError::forbidden(
+            "Insufficient role to view engagement data",
+        ));
+    }
+
+    Site::find_by_id(&state.db, site_id).await?;
+
+    let counts = ApActivity::engagement_for_content(&state.db, content_id).await?;
+    Ok(Json(counts))
+}
+
 /// Collect admin activity routes
 pub fn routes() -> Vec<Route> {
-    routes![list_activities, retry_activity]
+    routes![list_activities, retry_activity, get_engagement]
 }
 
 #[cfg(test)]
@@ -206,6 +248,6 @@ mod tests {
     #[test]
     fn test_routes_count() {
         let routes = routes();
-        assert_eq!(routes.len(), 2);
+        assert_eq!(routes.len(), 3);
     }
 }

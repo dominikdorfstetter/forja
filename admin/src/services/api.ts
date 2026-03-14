@@ -147,6 +147,7 @@ import type {
   CompleteStepRequest,
   FederationSettings,
   FederationStats,
+  FederationEngagement,
   FederationFollower,
   FederationActivity,
   FederationComment,
@@ -1162,6 +1163,11 @@ class ApiService {
   // Stats
   async getFederationStats(siteId: string): Promise<FederationStats> {
     return apiRequest<FederationStats>('GET', `/sites/${siteId}/federation/stats`);
+  }
+
+  // Engagement
+  async getFederationEngagement(siteId: string, contentId: string): Promise<FederationEngagement> {
+    return apiRequest<FederationEngagement>('GET', `/sites/${siteId}/federation/engagement/${contentId}`);
   }
 
   // Followers

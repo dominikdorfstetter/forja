@@ -16,3 +16,11 @@ export function useFederationSettings(siteId: string) {
     enabled: !!siteId,
   });
 }
+
+export function useFederationEngagement(siteId: string, contentId: string) {
+  return useQuery({
+    queryKey: ['federation-engagement', siteId, contentId],
+    queryFn: () => apiService.getFederationEngagement(siteId, contentId),
+    enabled: !!siteId && !!contentId,
+  });
+}
