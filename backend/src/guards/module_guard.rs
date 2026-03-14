@@ -67,6 +67,13 @@ impl ModuleMarker for AiModule {
     const DEFAULT_ENABLED: bool = false;
 }
 
+pub struct FederationModule;
+impl ModuleMarker for FederationModule {
+    const SETTING_KEY: &'static str = "module_federation_enabled";
+    const MODULE_NAME: &'static str = "federation";
+    const DEFAULT_ENABLED: bool = false;
+}
+
 // ── Guard struct ────────────────────────────────────────────────────
 
 /// Request guard that rejects requests when the content module is disabled.
@@ -205,5 +212,9 @@ mod tests {
         assert_eq!(AiModule::SETTING_KEY, "module_ai_enabled");
         assert_eq!(AiModule::MODULE_NAME, "ai");
         assert!(!AiModule::DEFAULT_ENABLED);
+
+        assert_eq!(FederationModule::SETTING_KEY, "module_federation_enabled");
+        assert_eq!(FederationModule::MODULE_NAME, "federation");
+        assert!(!FederationModule::DEFAULT_ENABLED);
     }
 }
