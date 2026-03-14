@@ -30,6 +30,8 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import WebhookIcon from '@mui/icons-material/Webhook';
 import AltRouteIcon from '@mui/icons-material/AltRoute';
 import EditNoteIcon from '@mui/icons-material/EditNote';
+import HubIcon from '@mui/icons-material/Hub';
+import BlockIcon from '@mui/icons-material/Block';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { Tooltip, Fade } from '@mui/material';
 import { useTranslation } from 'react-i18next';
@@ -167,6 +169,17 @@ export default function Layout() {
       items: [
         { text: t('layout.sidebar.navigation'), icon: <MenuBookIcon />, path: '/navigation' },
         { text: t('layout.sidebar.taxonomy'), icon: <LocalOfferIcon />, path: '/taxonomy' },
+      ],
+    },
+    {
+      label: 'Federation',
+      items: [
+        { text: 'Overview', icon: <HubIcon />, path: '/federation' },
+        { text: 'Followers', icon: <PeopleIcon />, path: '/federation/followers' },
+        { text: 'Comments', icon: <RateReviewIcon />, path: '/federation/comments' },
+        { text: 'Activity', icon: <HistoryIcon />, path: '/federation/activity' },
+        { text: 'Blocklist', icon: <BlockIcon />, path: '/federation/blocks' },
+        { text: 'Settings', icon: <SettingsIcon />, path: '/federation/settings' },
       ],
     },
     {
