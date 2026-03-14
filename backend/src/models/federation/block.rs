@@ -90,6 +90,32 @@ impl ApBlockedInstance {
         Ok(())
     }
 
+    /// Bulk-block a list of instance domains. Skips duplicates via ON CONFLICT DO NOTHING.
+    /// Returns the count of actually inserted rows.
+    pub async fn bulk_block_instances(
+        pool: &PgPool,
+        actor_id: Uuid,
+        domains: &[String],
+    ) -> Result<usize, ApiError> {
+        if domains.is_empty() {
+            return Ok(0);
+        }
+
+        let result = sqlx::query(
+            r#"
+            INSERT INTO ap_blocked_instances (actor_id, instance_domain)
+            SELECT $1, unnest($2::text[])
+            ON CONFLICT (actor_id, instance_domain) DO NOTHING
+            "#,
+        )
+        .bind(actor_id)
+        .bind(domains)
+        .execute(pool)
+        .await?;
+
+        Ok(result.rows_affected() as usize)
+    }
+
     /// Check whether a given domain is blocked for an actor.
     pub async fn is_instance_blocked(
         pool: &PgPool,

@@ -6,8 +6,12 @@ use rocket::{Route, State};
 use uuid::Uuid;
 use validator::Validate;
 
-use crate::dto::federation::requests::{BlockActorRequest, BlockInstanceRequest};
-use crate::dto::federation::responses::{BlockedActorResponse, BlockedInstanceResponse};
+use crate::dto::federation::requests::{
+    BlockActorRequest, BlockInstanceRequest, ImportBlocklistRequest,
+};
+use crate::dto::federation::responses::{
+    BlockedActorResponse, BlockedInstanceResponse, BlocklistImportResponse,
+};
 use crate::errors::{ApiError, ProblemDetails};
 use crate::guards::auth_guard::ReadKey;
 use crate::guards::federation_guard::can_manage_federation;
@@ -162,6 +166,68 @@ pub async fn unblock_instance(
     Ok(Status::NoContent)
 }
 
+/// Bulk-import blocked instance domains from a shared blocklist (CSV/text)
+#[utoipa::path(
+    tag = "Federation",
+    operation_id = "import_blocklist",
+    description = "Bulk-import blocked instance domains from a shared blocklist",
+    params(("site_id" = Uuid, Path, description = "Site UUID")),
+    request_body(content = ImportBlocklistRequest, description = "Domains to block"),
+    responses(
+        (status = 200, description = "Import result", body = BlocklistImportResponse),
+        (status = 400, description = "Validation error", body = ProblemDetails),
+        (status = 401, description = "Unauthorized", body = ProblemDetails),
+        (status = 403, description = "Forbidden", body = ProblemDetails),
+        (status = 404, description = "Site not found", body = ProblemDetails)
+    ),
+    security(("api_key" = []))
+)]
+#[post("/sites/<site_id>/federation/blocks/instances/import", data = "<body>")]
+pub async fn import_blocklist(
+    state: &State<AppState>,
+    site_id: Uuid,
+    body: Json<ImportBlocklistRequest>,
+    auth: ReadKey,
+    _module: ModuleGuard<FederationModule>,
+) -> Result<Json<BlocklistImportResponse>, ApiError> {
+    let role = auth
+        .0
+        .require_site_role(&state.db, site_id, &SiteRole::Admin)
+        .await?;
+    if !can_manage_federation(&role) {
+        return Err(ApiError::forbidden("Insufficient role to manage blocklist"));
+    }
+
+    Site::find_by_id(&state.db, site_id).await?;
+    let actor = require_actor(state.inner(), site_id).await?;
+
+    let req = body.into_inner();
+    req.validate()
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {e}")))?;
+
+    // Filter: non-empty, reasonable length (max 253 chars for a domain)
+    let valid_domains: Vec<String> = req
+        .domains
+        .into_iter()
+        .map(|d| d.trim().to_lowercase())
+        .filter(|d| !d.is_empty() && d.len() <= 253)
+        .collect();
+
+    let total_requested = valid_domains.len();
+    let imported =
+        ApBlockedInstance::bulk_block_instances(&state.db, actor.id, &valid_domains).await?;
+    let skipped = total_requested - imported;
+
+    tracing::info!(
+        site_id = %site_id,
+        imported = imported,
+        skipped = skipped,
+        "Bulk-imported blocklist"
+    );
+
+    Ok(Json(BlocklistImportResponse { imported, skipped }))
+}
+
 // ── Actor Blocks ────────────────────────────────────────────────────────
 
 /// List blocked actors for a site
@@ -309,6 +375,7 @@ pub fn routes() -> Vec<Route> {
     routes![
         list_blocked_instances,
         block_instance,
+        import_blocklist,
         unblock_instance,
         list_blocked_actors,
         block_actor,
@@ -323,6 +390,6 @@ mod tests {
     #[test]
     fn test_routes_count() {
         let routes = routes();
-        assert_eq!(routes.len(), 6, "Should have 6 block admin routes");
+        assert_eq!(routes.len(), 7, "Should have 7 block admin routes");
     }
 }

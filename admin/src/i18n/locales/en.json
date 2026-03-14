@@ -2569,7 +2569,26 @@
         "reason": "Reason",
         "blocked": "Blocked",
         "actions": "Actions"
-      }
+      },
+      "import": "Import",
+      "importTitle": "Import Blocklist",
+      "importDescription": "Paste domains (one per line) or upload a CSV/TXT file",
+      "importButton": "Import Domains",
+      "importSuccess": "Imported {{imported}} domains ({{skipped}} already blocked)",
+      "importPaste": "Paste domains here (one per line)...",
+      "importFile": "Or upload a file"
+    },
+    "health": {
+      "title": "Instance Health",
+      "description": "Delivery status by remote instance",
+      "domain": "Instance",
+      "total": "Total",
+      "successful": "OK",
+      "failed": "Failed",
+      "dead": "Dead",
+      "lastAttempt": "Last Attempt",
+      "healthy": "All instances healthy",
+      "blockSuggestion": "Consider blocking"
     },
     "quickPost": {
       "title": "Quick Post",

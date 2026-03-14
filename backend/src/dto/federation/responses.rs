@@ -251,6 +251,51 @@ pub struct BlockedActorResponse {
     pub blocked_at: DateTime<Utc>,
 }
 
+// ── Blocklist Import ────────────────────────────────────────────────────
+
+/// Result of a bulk blocklist import.
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+#[schema(description = "Result of a bulk blocklist import")]
+pub struct BlocklistImportResponse {
+    /// Number of domains actually inserted.
+    #[schema(example = 5)]
+    pub imported: usize,
+
+    /// Number of domains skipped (already blocked or invalid).
+    #[schema(example = 2)]
+    pub skipped: usize,
+}
+
+// ── Instance Health ─────────────────────────────────────────────────────
+
+/// Per-instance delivery health statistics.
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema, sqlx::FromRow)]
+#[schema(description = "Delivery health statistics for a remote instance")]
+pub struct InstanceHealthResponse {
+    /// The remote instance domain.
+    #[schema(example = "mastodon.social")]
+    pub instance_domain: String,
+
+    /// Total number of delivery jobs for this instance.
+    #[schema(example = 100)]
+    pub total: i64,
+
+    /// Number of successful deliveries.
+    #[schema(example = 95)]
+    pub successful: i64,
+
+    /// Number of failed deliveries.
+    #[schema(example = 3)]
+    pub failed: i64,
+
+    /// Number of dead (permanently failed) deliveries.
+    #[schema(example = 2)]
+    pub dead: i64,
+
+    /// Timestamp of the most recent delivery attempt.
+    pub last_attempt: Option<DateTime<Utc>>,
+}
+
 // ── Conversions from models ─────────────────────────────────────────────
 
 use crate::models::federation::block::{ApBlockedActor, ApBlockedInstance};

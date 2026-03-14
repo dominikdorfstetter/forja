@@ -45,6 +45,12 @@ export function useFederationMutations(siteId: string) {
     onError: showError,
   });
 
+  const importBlocklistMutation = useMutation({
+    mutationFn: (domains: string[]) => apiService.importBlocklist(siteId, domains),
+    onSuccess: () => { invalidateBlockedInstances(); },
+    onError: showError,
+  });
+
   const blockInstanceMutation = useMutation({
     mutationFn: (data: { domain: string; reason?: string }) => apiService.blockInstance(siteId, data),
     onSuccess: () => { showSuccess('Instance blocked'); invalidateBlockedInstances(); },
@@ -111,6 +117,7 @@ export function useFederationMutations(siteId: string) {
     approveComment,
     rejectComment,
     deleteComment,
+    importBlocklistMutation,
     blockInstanceMutation,
     unblockInstanceMutation,
     blockActorMutation,

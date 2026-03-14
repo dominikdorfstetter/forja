@@ -1674,6 +1674,20 @@ export interface FederationEngagement {
   boosts: number;
 }
 
+export interface BlocklistImportResult {
+  imported: number;
+  skipped: number;
+}
+
+export interface FederationInstanceHealth {
+  instance_domain: string;
+  total: number;
+  successful: number;
+  failed: number;
+  dead: number;
+  last_attempt: string | null;
+}
+
 export interface FederationFeaturedPost {
   id: string;
   content_id: string;

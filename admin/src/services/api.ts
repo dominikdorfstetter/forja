@@ -155,6 +155,8 @@ import type {
   FederationBlockedActor,
   FederationNote,
   FederationFeaturedPost,
+  BlocklistImportResult,
+  FederationInstanceHealth,
 } from '@/types/api';
 
 const API_BASE_URL = '/api/v1';
@@ -1167,6 +1169,10 @@ class ApiService {
     return apiRequest<FederationStats>('GET', `/sites/${siteId}/federation/stats`);
   }
 
+  async getFederationHealth(siteId: string): Promise<FederationInstanceHealth[]> {
+    return apiRequest<FederationInstanceHealth[]>('GET', `/sites/${siteId}/federation/health`);
+  }
+
   // Engagement
   async getFederationEngagement(siteId: string, contentId: string): Promise<FederationEngagement> {
     return apiRequest<FederationEngagement>('GET', `/sites/${siteId}/federation/engagement/${contentId}`);
@@ -1218,6 +1224,10 @@ class ApiService {
 
   async unblockInstance(siteId: string, blockId: string): Promise<void> {
     return apiRequest<void>('DELETE', `/sites/${siteId}/federation/blocks/instances/${blockId}`);
+  }
+
+  async importBlocklist(siteId: string, domains: string[]): Promise<BlocklistImportResult> {
+    return apiRequest<BlocklistImportResult>('POST', `/sites/${siteId}/federation/blocks/instances/import`, { domains });
   }
 
   // Blocks - Actors

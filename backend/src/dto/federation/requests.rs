@@ -111,6 +111,16 @@ pub struct PinPostRequest {
     pub content_id: uuid::Uuid,
 }
 
+/// Request to bulk-import blocked instance domains.
+#[derive(Debug, Clone, Deserialize, Validate, utoipa::ToSchema)]
+#[schema(description = "Bulk-import blocked instance domains from a shared blocklist")]
+pub struct ImportBlocklistRequest {
+    /// A list of domains to block.
+    #[schema(example = json!(["spam.example.com", "bad-actor.net"]))]
+    #[validate(length(min = 1, message = "At least one domain is required"))]
+    pub domains: Vec<String>,
+}
+
 /// Request to moderate a federated comment.
 #[derive(Debug, Clone, Deserialize, Validate, utoipa::ToSchema)]
 #[schema(description = "Moderate a federated comment")]

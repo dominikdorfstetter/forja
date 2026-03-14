@@ -6,7 +6,7 @@ use rocket::{Route, State};
 use sqlx;
 use uuid::Uuid;
 
-use crate::dto::federation::responses::ActivityResponse;
+use crate::dto::federation::responses::{ActivityResponse, InstanceHealthResponse};
 use crate::errors::{ApiError, ProblemDetails};
 use crate::guards::auth_guard::ReadKey;
 use crate::guards::federation_guard::{can_manage_federation, can_view_federation};
@@ -276,9 +276,69 @@ pub async fn get_stats(
     })))
 }
 
+/// Get instance health / delivery statistics grouped by remote instance
+#[utoipa::path(
+    tag = "Federation",
+    operation_id = "get_federation_health",
+    description = "Get delivery health statistics grouped by remote instance",
+    params(("site_id" = Uuid, Path, description = "Site UUID")),
+    responses(
+        (status = 200, description = "Instance health stats", body = Vec<InstanceHealthResponse>),
+        (status = 401, description = "Unauthorized", body = ProblemDetails),
+        (status = 403, description = "Forbidden", body = ProblemDetails),
+        (status = 404, description = "Site not found", body = ProblemDetails)
+    ),
+    security(("api_key" = []))
+)]
+#[get("/sites/<site_id>/federation/health")]
+pub async fn get_health(
+    state: &State<AppState>,
+    site_id: Uuid,
+    auth: ReadKey,
+    _module: ModuleGuard<FederationModule>,
+) -> Result<Json<Vec<InstanceHealthResponse>>, ApiError> {
+    let role = auth
+        .0
+        .require_site_role(&state.db, site_id, &SiteRole::Reviewer)
+        .await?;
+    if !can_view_federation(&role) {
+        return Err(ApiError::forbidden("Insufficient role to view health data"));
+    }
+
+    Site::find_by_id(&state.db, site_id).await?;
+
+    let rows = sqlx::query_as::<_, InstanceHealthResponse>(
+        r#"
+        SELECT
+            split_part(split_part(dq.target_inbox_uri, '://', 2), '/', 1) as instance_domain,
+            COUNT(*)::bigint as total,
+            COUNT(*) FILTER (WHERE dq.status = 'done')::bigint as successful,
+            COUNT(*) FILTER (WHERE dq.status = 'failed')::bigint as failed,
+            COUNT(*) FILTER (WHERE dq.status = 'dead')::bigint as dead,
+            MAX(dq.last_attempt_at) as last_attempt
+        FROM ap_delivery_queue dq
+        JOIN ap_activities a ON dq.activity_id = a.id
+        WHERE a.site_id = $1
+        GROUP BY 1
+        ORDER BY failed DESC, dead DESC
+        "#,
+    )
+    .bind(site_id)
+    .fetch_all(&state.db)
+    .await?;
+
+    Ok(Json(rows))
+}
+
 /// Collect admin activity routes
 pub fn routes() -> Vec<Route> {
-    routes![list_activities, retry_activity, get_engagement, get_stats]
+    routes![
+        list_activities,
+        retry_activity,
+        get_engagement,
+        get_stats,
+        get_health
+    ]
 }
 
 #[cfg(test)]
@@ -303,6 +363,6 @@ mod tests {
     #[test]
     fn test_routes_count() {
         let routes = routes();
-        assert_eq!(routes.len(), 3);
+        assert_eq!(routes.len(), 5);
     }
 }
