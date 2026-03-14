@@ -113,6 +113,17 @@ pub struct Activity {
     pub published: Option<String>,
 }
 
+// ── Tag ──────────────────────────────────────────────────────────────────
+
+/// An ActivityPub tag (Hashtag, Mention, etc.).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ActivityPubTag {
+    #[serde(rename = "type")]
+    pub tag_type: String, // "Hashtag"
+    pub href: String, // URL to tag page
+    pub name: String, // "#tagname"
+}
+
 // ── Article ─────────────────────────────────────────────────────────────
 
 /// An ActivityPub Article object (used as the `object` of a Create activity).
@@ -148,6 +159,9 @@ pub struct Article {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cc: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tag: Option<Vec<ActivityPubTag>>,
 }
 
 // ── WebFinger ───────────────────────────────────────────────────────────
@@ -384,6 +398,7 @@ mod tests {
                 "https://www.w3.org/ns/activitystreams#Public".to_string()
             ]),
             cc: None,
+            tag: None,
         };
 
         let json = serde_json::to_value(&article).unwrap();
@@ -444,6 +459,57 @@ mod tests {
     fn test_as_context_helper() {
         let ctx = as_context();
         assert_eq!(ctx, ACTIVITY_STREAMS_CONTEXT);
+    }
+
+    #[test]
+    fn test_activitypub_tag_serialization() {
+        let tag = ActivityPubTag {
+            tag_type: "Hashtag".to_string(),
+            href: "https://example.com/tags/rust".to_string(),
+            name: "#rust".to_string(),
+        };
+
+        let json = serde_json::to_value(&tag).unwrap();
+        assert_eq!(json["type"], "Hashtag");
+        assert_eq!(json["href"], "https://example.com/tags/rust");
+        assert_eq!(json["name"], "#rust");
+    }
+
+    #[test]
+    fn test_article_with_tags() {
+        let article = Article {
+            context: Some(as_context()),
+            id: "https://example.com/posts/tagged".to_string(),
+            object_type: "Article".to_string(),
+            attributed_to: "https://example.com/ap/blog/actor".to_string(),
+            name: "Tagged Post".to_string(),
+            content: "<p>A post with tags.</p>".to_string(),
+            summary: None,
+            url: "https://example.com/blog/tagged".to_string(),
+            published: "2026-03-14T12:00:00Z".to_string(),
+            updated: None,
+            to: None,
+            cc: None,
+            tag: Some(vec![
+                ActivityPubTag {
+                    tag_type: "Hashtag".to_string(),
+                    href: "https://example.com/tags/rust".to_string(),
+                    name: "#rust".to_string(),
+                },
+                ActivityPubTag {
+                    tag_type: "Hashtag".to_string(),
+                    href: "https://example.com/tags/webdev".to_string(),
+                    name: "#webdev".to_string(),
+                },
+            ]),
+        };
+
+        let json = serde_json::to_value(&article).unwrap();
+        let tags = json["tag"].as_array().unwrap();
+        assert_eq!(tags.len(), 2);
+        assert_eq!(tags[0]["type"], "Hashtag");
+        assert_eq!(tags[0]["name"], "#rust");
+        assert_eq!(tags[1]["name"], "#webdev");
     }
 
     #[test]

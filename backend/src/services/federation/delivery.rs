@@ -6,7 +6,9 @@
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::dto::federation::activitypub::{ap_context, as_context, Activity, Article};
+use crate::dto::federation::activitypub::{
+    ap_context, as_context, Activity, ActivityPubTag, Article,
+};
 use crate::errors::ApiError;
 use crate::guards::federation_guard::can_publish_to_fediverse;
 use crate::models::federation::activity::ApActivity;
@@ -64,6 +66,7 @@ pub async fn handle_post_published(
     let article_uri = format!("https://{}/blog/{}", domain, post.slug);
 
     // 6. Build Article
+    let hashtags = build_hashtags(&post.tags, domain);
     let article = Article {
         context: Some(as_context()),
         id: article_uri.clone(),
@@ -82,6 +85,7 @@ pub async fn handle_post_published(
             "https://{}/ap/actor/{}/followers",
             domain, site_slug
         )]),
+        tag: hashtags,
     };
 
     // 7. Wrap in Create activity
@@ -194,6 +198,7 @@ pub async fn handle_post_updated(
     let article_uri = format!("https://{}/blog/{}", domain, post.slug);
 
     // Build updated Article
+    let hashtags = build_hashtags(&post.tags, domain);
     let article = Article {
         context: Some(as_context()),
         id: article_uri.clone(),
@@ -212,6 +217,7 @@ pub async fn handle_post_updated(
             "https://{}/ap/actor/{}/followers",
             domain, site_slug
         )]),
+        tag: hashtags,
     };
 
     let activity_uri = format!("https://{}/ap/activities/{}", domain, Uuid::new_v4());
@@ -374,6 +380,28 @@ struct BlogPostData {
     body_html: String,
     excerpt: Option<String>,
     published_at: String,
+    tags: Vec<TagSlug>,
+}
+
+/// A tag slug for hashtag generation.
+struct TagSlug {
+    slug: String,
+}
+
+/// Convert blog tags into ActivityPub Hashtag objects.
+fn build_hashtags(tags: &[TagSlug], domain: &str) -> Option<Vec<ActivityPubTag>> {
+    if tags.is_empty() {
+        return None;
+    }
+    Some(
+        tags.iter()
+            .map(|t| ActivityPubTag {
+                tag_type: "Hashtag".to_string(),
+                href: format!("https://{}/tags/{}", domain, t.slug),
+                name: format!("#{}", t.slug),
+            })
+            .collect(),
+    )
 }
 
 /// Raw row shape returned by the blog post query.
@@ -411,6 +439,25 @@ async fn fetch_blog_post_data(pool: &PgPool, content_id: Uuid) -> Result<BlogPos
 
     let row = row.ok_or_else(|| ApiError::not_found(format!("Content {content_id} not found")))?;
 
+    // Fetch tags for this content
+    let tag_rows: Vec<(String,)> = sqlx::query_as(
+        r#"
+        SELECT t.slug
+        FROM tags t
+        INNER JOIN content_tags ct ON t.id = ct.tag_id
+        WHERE ct.content_id = $1 AND t.is_active = TRUE
+        ORDER BY t.slug ASC
+        "#,
+    )
+    .bind(content_id)
+    .fetch_all(pool)
+    .await?;
+
+    let tags = tag_rows
+        .into_iter()
+        .map(|(slug,)| TagSlug { slug })
+        .collect();
+
     Ok(BlogPostData {
         slug: row.slug,
         title: row.title,
@@ -420,6 +467,7 @@ async fn fetch_blog_post_data(pool: &PgPool, content_id: Uuid) -> Result<BlogPos
             .published_at
             .map(|dt| dt.to_rfc3339())
             .unwrap_or_else(|| chrono::Utc::now().to_rfc3339()),
+        tags,
     })
 }
 
@@ -434,8 +482,33 @@ mod tests {
             body_html: "<p>Hello</p>".to_string(),
             excerpt: None,
             published_at: "2026-03-14T12:00:00Z".to_string(),
+            tags: vec![],
         };
         assert_eq!(data.slug, "test");
         assert!(data.excerpt.is_none());
+        assert!(data.tags.is_empty());
+    }
+
+    #[test]
+    fn test_build_hashtags_empty() {
+        assert!(super::build_hashtags(&[], "example.com").is_none());
+    }
+
+    #[test]
+    fn test_build_hashtags_with_tags() {
+        let tags = vec![
+            super::TagSlug {
+                slug: "rust".to_string(),
+            },
+            super::TagSlug {
+                slug: "webdev".to_string(),
+            },
+        ];
+        let result = super::build_hashtags(&tags, "example.com").unwrap();
+        assert_eq!(result.len(), 2);
+        assert_eq!(result[0].tag_type, "Hashtag");
+        assert_eq!(result[0].href, "https://example.com/tags/rust");
+        assert_eq!(result[0].name, "#rust");
+        assert_eq!(result[1].name, "#webdev");
     }
 }
