@@ -46,7 +46,7 @@ export default function QuickPostComposer({ siteId, handle }: QuickPostComposerP
   };
 
   return (
-    <Card sx={{ mb: 0 }}>
+    <Card sx={{ mb: 2 }}>
       <CardContent sx={{ pb: '12px !important' }}>
         <Box sx={{ display: 'flex', gap: 1.5 }}>
           <Avatar sx={{ bgcolor: 'primary.main', width: 40, height: 40, mt: 0.5 }}>
