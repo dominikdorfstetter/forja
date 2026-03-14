@@ -20,6 +20,7 @@ Multi-site CMS REST API built with Rust and Rocket.
 - Internationalization (i18n) support
 - Media library with variants (local and S3 storage)
 - AI content generation (configurable LLM providers)
+- ActivityPub federation (Fediverse syndication, followers, comments, blocklists)
 - Privacy-first analytics
 - Audit logging
 - Webhooks with HMAC-SHA256 signing and retry logic

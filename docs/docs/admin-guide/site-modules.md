@@ -16,6 +16,7 @@ Forja uses a module system to control which features are available for each site
 | **Legal** | Legal documents with structured groups and items (privacy policy, ToS) | Disabled |
 | **Documents** | General-purpose document library | Disabled |
 | **AI** | AI-powered content generation, SEO, excerpts, and translations. See [AI Content Assist](./ai-content-assist). | Disabled |
+| **Federation** | ActivityPub federation -- syndicate posts to the Fediverse, receive interactions. See [Federation](./federation). | Disabled |
 
 ## Choosing Modules During Site Creation
 
