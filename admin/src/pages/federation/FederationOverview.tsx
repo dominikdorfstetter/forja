@@ -152,7 +152,7 @@ function PinPostDialog({ open, onClose, siteId, alreadyPinned, onSelect }: PinPo
         </List>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>{t('common.cancel')}</Button>
+        <Button onClick={onClose}>{t('common.actions.cancel')}</Button>
       </DialogActions>
     </Dialog>
   );
@@ -372,10 +372,10 @@ export default function FederationOverview() {
                     />
                     <Stack direction="row" spacing={1} justifyContent="flex-end">
                       <Button size="small" onClick={() => { setEditingProfile(false); setBio(undefined); setAvatarUrl(undefined); }}>
-                        {t('common.cancel')}
+                        {t('common.actions.cancel')}
                       </Button>
                       <Button variant="contained" size="small" onClick={handleSaveProfile}>
-                        {t('common.save')}
+                        {t('common.actions.save')}
                       </Button>
                     </Stack>
                   </Box>
