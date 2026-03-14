@@ -1,20 +1,32 @@
 import {
+  Avatar,
   Box,
+  Card,
+  CardContent,
+  Chip,
   Divider,
   FormControlLabel,
   Grid,
   IconButton,
   InputAdornment,
+  Stack,
   Switch,
   TextField,
   Tooltip,
   Typography,
 } from '@mui/material';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import RepeatIcon from '@mui/icons-material/Repeat';
+import HubIcon from '@mui/icons-material/Hub';
+import PublicIcon from '@mui/icons-material/Public';
 import { Controller, type Control, type UseFormWatch, type UseFormSetValue } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import CopyableId from '@/components/shared/CopyableId';
+import { useSiteContext } from '@/store/SiteContext';
+import { useSiteContextData } from '@/hooks/useSiteContextData';
+import { useFederationEngagement, useFederationSettings } from '@/hooks/useFederationData';
 import type { BlogContentFormData } from './blogDetailSchema';
 import { calculateReadingTime } from './blogDetailSchema';
 
@@ -42,7 +54,13 @@ export default function BlogSettingsTab({
   updatedAt,
 }: BlogSettingsTabProps) {
   const { t } = useTranslation();
+  const { selectedSiteId } = useSiteContext();
+  const { modules } = useSiteContextData();
+  const { data: engagement } = useFederationEngagement(selectedSiteId, contentId);
+  const { data: fedSettings } = useFederationSettings(selectedSiteId);
   const body = watch('body');
+  const title = watch('title');
+  const excerpt = watch('excerpt');
   const readingTimeOverride = watch('reading_time_override');
   const readingTimeMinutes = watch('reading_time_minutes');
   const autoReadingTime = calculateReadingTime(body);
@@ -186,6 +204,75 @@ export default function BlogSettingsTab({
           <Typography variant="body2">{format(new Date(updatedAt), 'PPpp')}</Typography>
         </Grid>
       </Grid>
+
+      {engagement && (engagement.likes > 0 || engagement.boosts > 0) && (
+        <>
+          <Divider sx={{ my: 3 }} />
+          <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+            {t('federation.title')}
+          </Typography>
+          <Stack direction="row" spacing={1}>
+            <Chip
+              icon={<FavoriteIcon />}
+              label={`${engagement.likes} ${t('federation.engagement.likes')}`}
+              size="small"
+              variant="outlined"
+            />
+            <Chip
+              icon={<RepeatIcon />}
+              label={`${engagement.boosts} ${t('federation.engagement.boosts')}`}
+              size="small"
+              variant="outlined"
+            />
+          </Stack>
+        </>
+      )}
+
+      {/* Federation Preview */}
+      {modules.federation && fedSettings?.enabled && (
+        <>
+          <Divider sx={{ my: 3 }} />
+          <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+            {t('federation.preview.title')}
+          </Typography>
+          <Typography variant="caption" color="text.disabled" sx={{ display: 'block', mb: 1.5 }}>
+            {t('federation.preview.description')}
+          </Typography>
+          <Card variant="outlined" sx={{ bgcolor: 'background.default' }}>
+            <CardContent sx={{ pb: '12px !important' }}>
+              <Stack direction="row" spacing={1.5} alignItems="flex-start">
+                <Avatar
+                  src={fedSettings.avatar_url || undefined}
+                  sx={{ bgcolor: 'primary.main', width: 40, height: 40 }}
+                >
+                  <HubIcon fontSize="small" />
+                </Avatar>
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                  {fedSettings.webfinger_address && (
+                    <Typography variant="caption" fontWeight={600} fontFamily="monospace" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
+                      @{fedSettings.webfinger_address}
+                    </Typography>
+                  )}
+                  <Typography variant="subtitle2" fontWeight={700} sx={{ mt: 0.25 }}>
+                    {title || 'Untitled'}
+                  </Typography>
+                  {excerpt && (
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      {excerpt}
+                    </Typography>
+                  )}
+                  <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mt: 1 }}>
+                    <PublicIcon sx={{ fontSize: 12, color: 'text.disabled' }} />
+                    <Typography variant="caption" color="text.disabled">
+                      {t('federation.preview.via')}
+                    </Typography>
+                  </Stack>
+                </Box>
+              </Stack>
+            </CardContent>
+          </Card>
+        </>
+      )}
     </Box>
   );
 }

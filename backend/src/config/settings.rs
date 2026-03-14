@@ -149,10 +149,12 @@ impl Settings {
             )?
             // TLS_KEY_PATH override
             .set_override_option("security.tls_key_path", std::env::var("TLS_KEY_PATH").ok())?
-            // AI_ENCRYPTION_KEY override
+            // ENCRYPTION_KEY override (with AI_ENCRYPTION_KEY fallback)
             .set_override_option(
                 "security.ai_encryption_key",
-                std::env::var("AI_ENCRYPTION_KEY").ok(),
+                std::env::var("ENCRYPTION_KEY")
+                    .or_else(|_| std::env::var("AI_ENCRYPTION_KEY"))
+                    .ok(),
             )?
             // Storage overrides
             .set_override_option("storage.provider", std::env::var("STORAGE_PROVIDER").ok())?

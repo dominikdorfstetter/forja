@@ -299,6 +299,7 @@ interface SiteContextModules {
   legal: boolean;
   documents: boolean;
   ai: boolean;
+  federation: boolean;
 }
 
 interface SiteContextSuggestions {
@@ -472,6 +473,7 @@ export interface UpdateLocalizationRequest {
 // Blog
 export interface BlogListItem {
   id: string;
+  content_id: string;
   slug?: string;
   author: string;
   published_date: string;
@@ -1213,6 +1215,7 @@ export interface SiteSettingsResponse {
   module_legal_enabled: boolean;
   module_documents_enabled: boolean;
   module_ai_enabled: boolean;
+  module_federation_enabled: boolean;
 }
 
 export interface UpdateSiteSettingsRequest {
@@ -1230,6 +1233,7 @@ export interface UpdateSiteSettingsRequest {
   module_legal_enabled?: boolean;
   module_documents_enabled?: boolean;
   module_ai_enabled?: boolean;
+  module_federation_enabled?: boolean;
 }
 
 // User Preferences
@@ -1570,4 +1574,127 @@ export interface CompleteStepRequest {
 // Seed content
 export interface SeedContentResponse {
   deleted?: number;
+}
+
+// ── Federation (ActivityPub) ──────────────────────────────────────
+
+export interface FederationActor {
+  id: string;
+  site_id: string;
+  preferred_username: string;
+  display_name: string;
+  summary: string | null;
+  avatar_url: string | null;
+  signature_algorithm: string;
+  created_at: string;
+}
+
+export interface FederationFollower {
+  id: string;
+  actor_uri: string;
+  inbox_uri: string;
+  display_name: string | null;
+  username: string | null;
+  avatar_url: string | null;
+  status: string;
+  followed_at: string;
+}
+
+export interface FederationActivity {
+  id: string;
+  activity_type: string;
+  activity_uri: string;
+  actor_uri: string;
+  object_uri: string | null;
+  object_type: string | null;
+  payload?: Record<string, unknown>;
+  direction: string;
+  status: string;
+  error_message: string | null;
+  created_at: string;
+}
+
+export interface FederationComment {
+  id: string;
+  content_id: string;
+  author_actor_uri: string;
+  author_name: string | null;
+  author_avatar_url: string | null;
+  body_html: string;
+  status: string;
+  created_at: string;
+  moderated_at: string | null;
+}
+
+export interface FederationBlockedInstance {
+  id: string;
+  domain: string;
+  reason: string | null;
+  blocked_at: string;
+}
+
+export interface FederationBlockedActor {
+  id: string;
+  actor_uri: string;
+  reason: string | null;
+  blocked_at: string;
+}
+
+export interface FederationNote {
+  id: string;
+  body: string;
+  body_html: string;
+  published_at: string;
+  activity_uri: string | null;
+  status: string;
+  scheduled_at?: string | null;
+}
+
+export interface FederationSettings {
+  enabled: boolean;
+  signature_algorithm: string;
+  moderation_mode: string;
+  auto_publish: boolean;
+  actor_uri?: string;
+  webfinger_address?: string;
+  summary?: string;
+  avatar_url?: string;
+}
+
+export interface FederationStats {
+  outbound_activities: number;
+  inbound_activities: number;
+  failed_activities: number;
+  pending_comments: number;
+  follower_count: number;
+  blocked_instances: number;
+  blocked_actors: number;
+}
+
+export interface FederationEngagement {
+  likes: number;
+  boosts: number;
+}
+
+export interface BlocklistImportResult {
+  imported: number;
+  skipped: number;
+}
+
+export interface FederationInstanceHealth {
+  instance_domain: string;
+  total: number;
+  successful: number;
+  failed: number;
+  dead: number;
+  last_attempt: string | null;
+}
+
+export interface FederationFeaturedPost {
+  id: string;
+  content_id: string;
+  position: number;
+  title: string | null;
+  slug: string | null;
+  created_at: string;
 }

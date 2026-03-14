@@ -23,6 +23,7 @@ React-based admin interface for managing Forja CMS content.
 - Media library with image variants and upload
 - Navigation menu builder with drag-and-drop
 - AI Content Assist (drafts, SEO metadata, excerpts, translations)
+- Federation dashboard (Fediverse quick posts, followers, comments, blocklist, activity log)
 - Privacy-first analytics dashboard
 - Webhook management with delivery logs
 - API key management with usage tracking

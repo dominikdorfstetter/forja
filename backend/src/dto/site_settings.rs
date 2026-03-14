@@ -8,8 +8,8 @@ use crate::models::site_settings::{
     KEY_ANALYTICS_ENABLED, KEY_CONTACT_EMAIL, KEY_EDITORIAL_WORKFLOW_ENABLED, KEY_MAINTENANCE_MODE,
     KEY_MAX_DOCUMENT_FILE_SIZE, KEY_MAX_MEDIA_FILE_SIZE, KEY_MODULE_AI_ENABLED,
     KEY_MODULE_BLOG_ENABLED, KEY_MODULE_CV_ENABLED, KEY_MODULE_DOCUMENTS_ENABLED,
-    KEY_MODULE_LEGAL_ENABLED, KEY_MODULE_PAGES_ENABLED, KEY_PREVIEW_TEMPLATES,
-    KEY_TEAM_FEATURES_PROMPT_DISMISSED,
+    KEY_MODULE_FEDERATION_ENABLED, KEY_MODULE_LEGAL_ENABLED, KEY_MODULE_PAGES_ENABLED,
+    KEY_PREVIEW_TEMPLATES, KEY_TEAM_FEATURES_PROMPT_DISMISSED,
 };
 use crate::utils::validation::validate_email;
 
@@ -52,6 +52,8 @@ pub struct SiteSettingsResponse {
     pub module_documents_enabled: bool,
     #[schema(example = false)]
     pub module_ai_enabled: bool,
+    #[schema(example = false)]
+    pub module_federation_enabled: bool,
 }
 
 impl SiteSettingsResponse {
@@ -111,6 +113,10 @@ impl SiteSettingsResponse {
                 .get(KEY_MODULE_AI_ENABLED)
                 .and_then(|v| v.as_bool())
                 .unwrap_or(false),
+            module_federation_enabled: map
+                .get(KEY_MODULE_FEDERATION_ENABLED)
+                .and_then(|v| v.as_bool())
+                .unwrap_or(false),
         }
     }
 }
@@ -156,6 +162,7 @@ pub struct UpdateSiteSettingsRequest {
     pub module_legal_enabled: Option<bool>,
     pub module_documents_enabled: Option<bool>,
     pub module_ai_enabled: Option<bool>,
+    pub module_federation_enabled: Option<bool>,
 }
 
 impl UpdateSiteSettingsRequest {
@@ -208,6 +215,9 @@ impl UpdateSiteSettingsRequest {
         }
         if let Some(v) = self.module_ai_enabled {
             out.push((KEY_MODULE_AI_ENABLED, serde_json::json!(v), false));
+        }
+        if let Some(v) = self.module_federation_enabled {
+            out.push((KEY_MODULE_FEDERATION_ENABLED, serde_json::json!(v), false));
         }
 
         out
@@ -266,6 +276,7 @@ mod tests {
             module_legal_enabled: None,
             module_documents_enabled: None,
             module_ai_enabled: None,
+            module_federation_enabled: None,
         };
         assert!(req.validate().is_ok());
     }
@@ -288,6 +299,7 @@ mod tests {
             module_legal_enabled: None,
             module_documents_enabled: None,
             module_ai_enabled: None,
+            module_federation_enabled: None,
         };
         assert!(req.validate().is_err());
     }
@@ -310,6 +322,7 @@ mod tests {
             module_legal_enabled: None,
             module_documents_enabled: None,
             module_ai_enabled: None,
+            module_federation_enabled: None,
         };
         assert!(req.validate().is_err());
     }
@@ -332,6 +345,7 @@ mod tests {
             module_legal_enabled: None,
             module_documents_enabled: None,
             module_ai_enabled: None,
+            module_federation_enabled: None,
         };
         assert!(req.validate().is_err());
     }
@@ -354,6 +368,7 @@ mod tests {
             module_legal_enabled: None,
             module_documents_enabled: None,
             module_ai_enabled: None,
+            module_federation_enabled: None,
         };
         assert!(req.validate().is_ok());
     }
@@ -376,6 +391,7 @@ mod tests {
             module_legal_enabled: None,
             module_documents_enabled: None,
             module_ai_enabled: None,
+            module_federation_enabled: None,
         };
         assert!(req.validate().is_err());
     }
@@ -398,6 +414,7 @@ mod tests {
             module_legal_enabled: None,
             module_documents_enabled: None,
             module_ai_enabled: None,
+            module_federation_enabled: None,
         };
         assert!(req.validate().is_ok());
     }
@@ -421,6 +438,7 @@ mod tests {
             module_legal_enabled: None,
             module_documents_enabled: None,
             module_ai_enabled: None,
+            module_federation_enabled: None,
         };
         assert!(req.validate().is_ok());
     }
@@ -442,6 +460,7 @@ mod tests {
             module_legal_enabled: None,
             module_documents_enabled: None,
             module_ai_enabled: None,
+            module_federation_enabled: None,
         };
         let vec = req.to_settings_vec();
         assert_eq!(vec.len(), 3);
@@ -466,6 +485,7 @@ mod tests {
             module_legal_enabled: false,
             module_documents_enabled: false,
             module_ai_enabled: false,
+            module_federation_enabled: false,
         };
         let json = serde_json::to_string(&resp).unwrap();
         assert!(json.contains("\"max_document_file_size\":10485760"));

@@ -25,6 +25,7 @@ into something useful, Forja lets you shape, manage, and deliver content across 
 - Blog posts, pages, CV entries, legal documents, navigation, media library
 - Rich block editor (Tiptap) with slash commands, tables, code highlighting, and image picker
 - AI Content Assist — generate blog drafts, SEO metadata, excerpts, and translations via configurable LLM providers
+- ActivityPub federation — syndicate posts to the Fediverse, receive follows, comments, and interactions from Mastodon and other platforms
 - Privacy-first analytics — pageview tracking without cookies or PII (GDPR-friendly by design)
 - Role-based access control (Master > Admin > Write > Read)
 - Dual authentication: API keys and Clerk JWT

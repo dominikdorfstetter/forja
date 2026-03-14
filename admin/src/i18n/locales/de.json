@@ -134,7 +134,8 @@
       "logout": "Abmelden",
       "invite": "Einladen",
       "reviews": "Überprüfungen",
-      "aiSettings": "KI-Einstellungen"
+      "aiSettings": "KI-Einstellungen",
+      "federation": "Federation"
     },
     "toolbar": {
       "toggleDrawer": "Seitenleiste umschalten",
@@ -1292,7 +1293,8 @@
       "legal": "Rechtliches",
       "apiKeys": "API-Schlüssel",
       "modules": "Module",
-      "ai": "KI-Assistent"
+      "ai": "KI-Assistent",
+      "federation": "Federation"
     },
     "selectSiteAlert": "Wählen Sie eine Seite in der Kopfzeile aus, um deren Einstellungen zu verwalten.",
     "loadingSiteSettings": "Seiteneinstellungen werden geladen...",
@@ -2318,38 +2320,373 @@
     }
   },
   "errorCodes": {
-    "AUTH_MISSING_CREDENTIALS": { "message": "Authentifizierung erforderlich", "action": "Bitte melden Sie sich an, um fortzufahren." },
-    "AUTH_TOKEN_INVALID": { "message": "Sitzung abgelaufen", "action": "Bitte melden Sie sich erneut an." },
-    "AUTH_INSUFFICIENT_ROLE": { "message": "Unzureichende Berechtigungen", "action": "Kontaktieren Sie einen Administrator für erweiterten Zugang." },
-    "AUTH_SITE_ACCESS_DENIED": { "message": "Seitenzugriff verweigert", "action": "Kontaktieren Sie den Seiteninhaber für Zugang." },
-    "AUTH_API_KEY_INVALID": { "message": "Ungültiger API-Schlüssel", "action": "Überprüfen Sie Ihre API-Schlüssel-Konfiguration." },
-    "AUTH_ACCOUNT_SOLE_OWNER": { "message": "Konto kann nicht gelöscht werden", "action": "Übertragen Sie zuerst die Eigentümerschaft." },
-    "BLOG_SLUG_TAKEN": { "message": "Blog-Slug bereits vergeben", "action": "Wählen Sie einen anderen Slug." },
-    "PAGE_SLUG_TAKEN": { "message": "Seiten-Slug bereits vergeben", "action": "Wählen Sie einen anderen Slug." },
-    "SITE_SLUG_TAKEN": { "message": "Site-Slug bereits vergeben", "action": "Wählen Sie einen anderen Slug." },
-    "TAG_SLUG_TAKEN": { "message": "Tag-Slug bereits vergeben", "action": "Wählen Sie einen anderen Slug." },
-    "CATEGORY_SLUG_TAKEN": { "message": "Kategorie-Slug bereits vergeben", "action": "Wählen Sie einen anderen Slug." },
-    "LOCALE_CODE_TAKEN": { "message": "Sprachcode existiert bereits", "action": "Verwenden Sie einen anderen Sprachcode." },
-    "RATE_LIMIT_EXCEEDED": { "message": "Zu viele Anfragen", "action": "Bitte warten Sie einen Moment und versuchen Sie es erneut." },
-    "MEMBER_ALREADY_EXISTS": { "message": "Mitglied existiert bereits", "action": "Dieser Benutzer ist bereits Mitglied der Site." },
-    "MEMBER_CANNOT_REMOVE_OWNER": { "message": "Eigentümer kann nicht entfernt werden", "action": "Übertragen Sie die Eigentümerschaft, bevor Sie dieses Mitglied entfernen." },
-    "MEDIA_UPLOAD_TOO_LARGE": { "message": "Datei zu groß", "action": "Reduzieren Sie die Dateigröße oder passen Sie die Site-Einstellungen an." },
-    "MEDIA_UPLOAD_INVALID_TYPE": { "message": "Nicht unterstützter Dateityp", "action": "Überprüfen Sie die erlaubten Dateitypen." },
-    "AI_NOT_CONFIGURED": { "message": "KI nicht konfiguriert", "action": "Richten Sie einen KI-Anbieter in den Site-Einstellungen ein." },
-    "AI_PROVIDER_UNAVAILABLE": { "message": "KI-Anbieter nicht verfügbar", "action": "Überprüfen Sie Ihre KI-Konfiguration oder versuchen Sie es später erneut." },
-    "WORKFLOW_REVIEW_REQUIRED": { "message": "Überprüfung erforderlich", "action": "Reichen Sie den Inhalt zur Überprüfung ein, bevor Sie veröffentlichen." },
-    "WORKFLOW_NO_PERMISSION": { "message": "Workflow-Berechtigung verweigert", "action": "Sie haben keine Berechtigung für diese Workflow-Aktion." },
-    "MODULE_NOT_ENABLED": { "message": "Modul nicht aktiviert", "action": "Aktivieren Sie dieses Modul in den Site-Einstellungen." },
-    "LOCALE_DELETE_IN_USE": { "message": "Sprache in Verwendung", "action": "Entfernen Sie zuerst alle Inhalte, die diese Sprache verwenden." },
-    "SITE_LOCALE_LAST_LANGUAGE": { "message": "Letzte Sprache kann nicht entfernt werden", "action": "Sites müssen mindestens eine Sprache haben." },
-    "REDIRECT_SAME_PATH": { "message": "Weiterleitungsschleife erkannt", "action": "Quell- und Zielpfad müssen unterschiedlich sein." },
+    "AUTH_MISSING_CREDENTIALS": {
+      "message": "Authentifizierung erforderlich",
+      "action": "Bitte melden Sie sich an, um fortzufahren."
+    },
+    "AUTH_TOKEN_INVALID": {
+      "message": "Sitzung abgelaufen",
+      "action": "Bitte melden Sie sich erneut an."
+    },
+    "AUTH_INSUFFICIENT_ROLE": {
+      "message": "Unzureichende Berechtigungen",
+      "action": "Kontaktieren Sie einen Administrator für erweiterten Zugang."
+    },
+    "AUTH_SITE_ACCESS_DENIED": {
+      "message": "Seitenzugriff verweigert",
+      "action": "Kontaktieren Sie den Seiteninhaber für Zugang."
+    },
+    "AUTH_API_KEY_INVALID": {
+      "message": "Ungültiger API-Schlüssel",
+      "action": "Überprüfen Sie Ihre API-Schlüssel-Konfiguration."
+    },
+    "AUTH_ACCOUNT_SOLE_OWNER": {
+      "message": "Konto kann nicht gelöscht werden",
+      "action": "Übertragen Sie zuerst die Eigentümerschaft."
+    },
+    "BLOG_SLUG_TAKEN": {
+      "message": "Blog-Slug bereits vergeben",
+      "action": "Wählen Sie einen anderen Slug."
+    },
+    "PAGE_SLUG_TAKEN": {
+      "message": "Seiten-Slug bereits vergeben",
+      "action": "Wählen Sie einen anderen Slug."
+    },
+    "SITE_SLUG_TAKEN": {
+      "message": "Site-Slug bereits vergeben",
+      "action": "Wählen Sie einen anderen Slug."
+    },
+    "TAG_SLUG_TAKEN": {
+      "message": "Tag-Slug bereits vergeben",
+      "action": "Wählen Sie einen anderen Slug."
+    },
+    "CATEGORY_SLUG_TAKEN": {
+      "message": "Kategorie-Slug bereits vergeben",
+      "action": "Wählen Sie einen anderen Slug."
+    },
+    "LOCALE_CODE_TAKEN": {
+      "message": "Sprachcode existiert bereits",
+      "action": "Verwenden Sie einen anderen Sprachcode."
+    },
+    "RATE_LIMIT_EXCEEDED": {
+      "message": "Zu viele Anfragen",
+      "action": "Bitte warten Sie einen Moment und versuchen Sie es erneut."
+    },
+    "MEMBER_ALREADY_EXISTS": {
+      "message": "Mitglied existiert bereits",
+      "action": "Dieser Benutzer ist bereits Mitglied der Site."
+    },
+    "MEMBER_CANNOT_REMOVE_OWNER": {
+      "message": "Eigentümer kann nicht entfernt werden",
+      "action": "Übertragen Sie die Eigentümerschaft, bevor Sie dieses Mitglied entfernen."
+    },
+    "MEDIA_UPLOAD_TOO_LARGE": {
+      "message": "Datei zu groß",
+      "action": "Reduzieren Sie die Dateigröße oder passen Sie die Site-Einstellungen an."
+    },
+    "MEDIA_UPLOAD_INVALID_TYPE": {
+      "message": "Nicht unterstützter Dateityp",
+      "action": "Überprüfen Sie die erlaubten Dateitypen."
+    },
+    "AI_NOT_CONFIGURED": {
+      "message": "KI nicht konfiguriert",
+      "action": "Richten Sie einen KI-Anbieter in den Site-Einstellungen ein."
+    },
+    "AI_PROVIDER_UNAVAILABLE": {
+      "message": "KI-Anbieter nicht verfügbar",
+      "action": "Überprüfen Sie Ihre KI-Konfiguration oder versuchen Sie es später erneut."
+    },
+    "WORKFLOW_REVIEW_REQUIRED": {
+      "message": "Überprüfung erforderlich",
+      "action": "Reichen Sie den Inhalt zur Überprüfung ein, bevor Sie veröffentlichen."
+    },
+    "WORKFLOW_NO_PERMISSION": {
+      "message": "Workflow-Berechtigung verweigert",
+      "action": "Sie haben keine Berechtigung für diese Workflow-Aktion."
+    },
+    "MODULE_NOT_ENABLED": {
+      "message": "Modul nicht aktiviert",
+      "action": "Aktivieren Sie dieses Modul in den Site-Einstellungen."
+    },
+    "LOCALE_DELETE_IN_USE": {
+      "message": "Sprache in Verwendung",
+      "action": "Entfernen Sie zuerst alle Inhalte, die diese Sprache verwenden."
+    },
+    "SITE_LOCALE_LAST_LANGUAGE": {
+      "message": "Letzte Sprache kann nicht entfernt werden",
+      "action": "Sites müssen mindestens eine Sprache haben."
+    },
+    "REDIRECT_SAME_PATH": {
+      "message": "Weiterleitungsschleife erkannt",
+      "action": "Quell- und Zielpfad müssen unterschiedlich sein."
+    },
     "patterns": {
-      "notFound": { "message": "Ressource nicht gefunden", "action": "Sie wurde möglicherweise gelöscht oder verschoben." },
-      "slugTaken": { "message": "Slug bereits vergeben", "action": "Wählen Sie einen anderen Slug." },
-      "accessDenied": { "message": "Zugriff verweigert", "action": "Sie haben keine Berechtigung für diese Aktion." },
-      "auth": { "message": "Authentifizierungsfehler", "action": "Versuchen Sie, sich erneut anzumelden." },
-      "validation": { "message": "Validierungsfehler", "action": "Überprüfen Sie die Formularfelder und versuchen Sie es erneut." },
-      "mediaUpload": { "message": "Upload fehlgeschlagen", "action": "Überprüfen Sie die Datei und versuchen Sie es erneut." }
+      "notFound": {
+        "message": "Ressource nicht gefunden",
+        "action": "Sie wurde möglicherweise gelöscht oder verschoben."
+      },
+      "slugTaken": {
+        "message": "Slug bereits vergeben",
+        "action": "Wählen Sie einen anderen Slug."
+      },
+      "accessDenied": {
+        "message": "Zugriff verweigert",
+        "action": "Sie haben keine Berechtigung für diese Aktion."
+      },
+      "auth": {
+        "message": "Authentifizierungsfehler",
+        "action": "Versuchen Sie, sich erneut anzumelden."
+      },
+      "validation": {
+        "message": "Validierungsfehler",
+        "action": "Überprüfen Sie die Formularfelder und versuchen Sie es erneut."
+      },
+      "mediaUpload": {
+        "message": "Upload fehlgeschlagen",
+        "action": "Überprüfen Sie die Datei und versuchen Sie es erneut."
+      }
+    }
+  },
+  "federation": {
+    "title": "Federation",
+    "subtitle": "ActivityPub-Federationsübersicht",
+    "handle": {
+      "title": "Dein Fediverse-Handle",
+      "description": "Teile dieses Handle, damit Nutzer auf Mastodon, Pleroma oder Misskey deinem Blog folgen können.",
+      "copied": "Handle in die Zwischenablage kopiert",
+      "copy": "Handle kopieren"
+    },
+    "stats": {
+      "followers": "Follower",
+      "postsSyndicated": "Syndizierte Beiträge",
+      "pendingComments": "Ausstehende Kommentare",
+      "inbound": "Eingehend",
+      "failedDeliveries": "Fehlgeschlagene Zustellungen"
+    },
+    "manage": "Verwalten",
+    "profile": {
+      "edit": "Profil bearbeiten",
+      "noBio": "Keine Biografie vorhanden — klicke auf Bearbeiten, um eine hinzuzufügen"
+    },
+    "noSiteSelected": "Keine Seite ausgewählt",
+    "noSiteDescription": "Wähle eine Seite aus, um den Federationsstatus anzuzeigen.",
+    "loadingData": "Federationsdaten werden geladen...",
+    "nav": {
+      "followers": "Follower",
+      "followersDesc": "Fediverse-Follower anzeigen und verwalten",
+      "comments": "Kommentare",
+      "commentsDesc": "Eingehende Antworten aus dem Fediverse moderieren",
+      "activityLog": "Aktivitätsprotokoll",
+      "activityLogDesc": "Gesendete und empfangene Federationsereignisse anzeigen",
+      "blocklist": "Sperrliste",
+      "blocklistDesc": "Instanzen oder einzelne Akteure blockieren",
+      "blockedActors": "Blockierte Akteure",
+      "blockedActorsDesc": "Einzelne Fediverse-Akteure blockieren"
+    },
+    "followers": {
+      "title": "Follower",
+      "subtitle": "Fediverse-Follower dieser Seite",
+      "searchPlaceholder": "Follower suchen...",
+      "noSite": "Wähle eine Seite, um Follower anzuzeigen.",
+      "empty": "Noch keine Follower",
+      "emptyDescription": "Wenn andere Fediverse-Nutzer deiner Seite folgen, erscheinen sie hier.",
+      "loading": "Follower werden geladen...",
+      "removeTitle": "Follower entfernen",
+      "removeMessage": "{{name}} entfernen? Die Person muss deiner Seite erneut folgen.",
+      "removeConfirm": "Entfernen",
+      "removeTooltip": "Follower entfernen",
+      "columns": {
+        "name": "Name",
+        "actorUri": "Akteur-URI",
+        "status": "Status",
+        "followed": "Gefolgt seit",
+        "actions": "Aktionen"
+      }
+    },
+    "comments": {
+      "title": "Kommentare",
+      "subtitle": "Föderierte Kommentare moderieren",
+      "searchPlaceholder": "Kommentare suchen...",
+      "noSite": "Wähle eine Seite, um Kommentare zu moderieren.",
+      "empty": "Keine Kommentare",
+      "emptyDescription": "Föderierte Kommentare erscheinen hier, wenn sie eingehen.",
+      "loading": "Kommentare werden geladen...",
+      "deleteTitle": "Kommentar löschen",
+      "deleteMessage": "Kommentar von {{name}} löschen? Dies kann nicht rückgängig gemacht werden.",
+      "deleteConfirm": "Löschen",
+      "approveTooltip": "Genehmigen",
+      "rejectTooltip": "Ablehnen",
+      "deleteTooltip": "Löschen",
+      "columns": {
+        "author": "Autor",
+        "comment": "Kommentar",
+        "status": "Status",
+        "date": "Datum",
+        "actions": "Aktionen"
+      }
+    },
+    "activityLog": {
+      "title": "Aktivitätsprotokoll",
+      "subtitle": "Federations-Aktivitätsverlauf",
+      "searchPlaceholder": "Aktivitäten suchen...",
+      "noSite": "Wähle eine Seite, um Aktivitäten anzuzeigen.",
+      "empty": "Noch keine Aktivitäten",
+      "emptyDescription": "Federationsaktivitäten erscheinen hier, wenn sie auftreten.",
+      "loading": "Aktivitäten werden geladen...",
+      "retryTooltip": "Zustellung wiederholen",
+      "inbound": "Eingehend",
+      "outbound": "Ausgehend",
+      "columns": {
+        "type": "Typ",
+        "actor": "Akteur",
+        "direction": "Richtung",
+        "status": "Status",
+        "date": "Datum",
+        "actions": "Aktionen"
+      }
+    },
+    "blocklist": {
+      "title": "Sperrliste",
+      "subtitle": "Gesperrte Instanzen und Akteure",
+      "noSite": "Wähle eine Seite, um Sperren zu verwalten.",
+      "instances": "Instanzen",
+      "actors": "Akteure",
+      "loading": "Sperrliste wird geladen...",
+      "noBlockedInstances": "Keine gesperrten Instanzen",
+      "noBlockedInstancesDesc": "Gesperrte Instanzen erscheinen hier.",
+      "noBlockedActors": "Keine gesperrten Akteure",
+      "noBlockedActorsDesc": "Gesperrte Akteure erscheinen hier.",
+      "unblockInstanceTitle": "Instanz entsperren",
+      "unblockInstanceMessage": "{{domain}} entsperren?",
+      "unblockActorTitle": "Akteur entsperren",
+      "unblockActorMessage": "{{actor}} entsperren?",
+      "unblockConfirm": "Entsperren",
+      "unblockInstanceTooltip": "Instanz entsperren",
+      "unblockActorTooltip": "Akteur entsperren",
+      "columns": {
+        "domain": "Domain",
+        "actorUri": "Akteur-URI",
+        "reason": "Grund",
+        "blocked": "Gesperrt",
+        "actions": "Aktionen"
+      },
+      "import": "Importieren",
+      "importTitle": "Sperrliste importieren",
+      "importDescription": "Domains einfügen (eine pro Zeile) oder eine CSV-/TXT-Datei hochladen",
+      "importButton": "Domains importieren",
+      "importSuccess": "{{imported}} Domains importiert ({{skipped}} bereits gesperrt)",
+      "importPaste": "Domains hier einfügen (eine pro Zeile)...",
+      "importFile": "Oder Datei hochladen"
+    },
+    "quickPost": {
+      "title": "Schnellbeitrag",
+      "placeholder": "Was beschäftigt dich? Poste direkt ins Fediverse...",
+      "post": "Posten",
+      "posting": "Wird gepostet...",
+      "posted": "Im Fediverse veröffentlicht!",
+      "deleteTitle": "Beitrag löschen",
+      "deleteMessage": "Dadurch wird auch eine Lösch-Aktivität an das Fediverse gesendet. Der Beitrag kann auf einigen Servern noch zwischengespeichert sein.",
+      "deleteConfirm": "Löschen",
+      "deleted": "Beitrag gelöscht",
+      "recentPosts": "Letzte Beiträge",
+      "noPosts": "Noch keine Beiträge. Teile deinen ersten Gedanken!",
+      "charCount": "{{count}}/500",
+      "schedule": "Planen",
+      "scheduledFor": "Geplant für {{date}}",
+      "schedulePost": "Beitrag planen",
+      "scheduledSuccess": "Beitrag geplant!",
+      "cancelScheduled": "Geplanten Beitrag abbrechen",
+      "cancelledSuccess": "Geplanter Beitrag abgebrochen",
+      "editPost": "Bearbeiten",
+      "deletePost": "Beitrag löschen",
+      "deletePostConfirm": "Diesen Beitrag löschen? Eine Lösch-Aktivität wird an das Fediverse gesendet.",
+      "deleteConfirm": "Löschen",
+      "editSave": "Speichern",
+      "editCancel": "Abbrechen",
+      "edited": "Beitrag aktualisiert",
+      "deletedPost": "Beitrag gelöscht",
+      "scheduledCount": "{{count}} geplante Beiträge",
+      "scheduledCountBanner": "{{count}} Beitrag/Beiträge geplant"
+    },
+    "settings": {
+      "title": "Federationseinstellungen",
+      "subtitle": "ActivityPub-Federation konfigurieren",
+      "handle": "Fediverse-Handle",
+      "signatureAlgorithm": "Signaturalgorithmus",
+      "algorithm": "Algorithmus",
+      "moderation": "Moderation",
+      "mode": "Modus",
+      "modeQueueAll": "Alle einreihen (manuelle Überprüfung)",
+      "modeAutoApprove": "Automatisch genehmigen",
+      "modeFollowersOnly": "Nur Follower",
+      "autoPublish": "Neue Beiträge automatisch in die Federation veröffentlichen",
+      "keyManagement": "Schlüsselverwaltung",
+      "keyRotateWarning": "Das Rotieren der Schlüssel macht bestehende HTTP-Signaturen ungültig. Entfernte Server müssen deinen öffentlichen Schlüssel erneut abrufen.",
+      "rotateKeys": "Schlüssel rotieren",
+      "rotateKeysConfirm": "Signaturschlüssel rotieren",
+      "rotateKeysMessage": "Es werden neue Signaturschlüssel generiert. Entfernte Server müssen deinen öffentlichen Schlüssel erneut abrufen, was die Federation vorübergehend stören kann. Fortfahren?",
+      "noSite": "Wähle eine Seite, um Einstellungen zu verwalten.",
+      "loading": "Einstellungen werden geladen...",
+      "profile": "Profil",
+      "avatarUrl": "Avatar-URL",
+      "avatarUrlHelper": "URL zu deinem Profilbild — füge einen Link ein oder wähle aus Medien",
+      "chooseFromMedia": "Aus Medien wählen",
+      "bio": "Biografie",
+      "bioHelper": "Eine kurze Beschreibung deines Blogs für Fediverse-Profile (max. 500 Zeichen)"
+    },
+    "engagement": {
+      "likes": "Fediverse-Likes",
+      "boosts": "Fediverse-Boosts"
+    },
+    "breadcrumbs": {
+      "federation": "Federation"
+    },
+    "status": {
+      "enabled": "Aktiviert",
+      "disabled": "Deaktiviert"
+    },
+    "featured": {
+      "title": "Angepinnte Beiträge",
+      "description": "Angepinnte Beiträge erscheinen auf deinem Fediverse-Profil",
+      "pin": "Beitrag anpinnen",
+      "unpin": "Lösen",
+      "maxReached": "Maximal 3 angepinnte Beiträge",
+      "empty": "Keine angepinnten Beiträge",
+      "selectPost": "Wähle einen Blogbeitrag zum Anpinnen"
+    },
+    "preview": {
+      "title": "Federations-Vorschau",
+      "description": "So wird dieser Beitrag im Fediverse angezeigt",
+      "via": "Veröffentlicht über Forja",
+      "notEnabled": "Aktiviere die Federation für eine Vorschau"
+    },
+    "timeline": {
+      "empty": "Deine Timeline ist leer. Poste etwas oder warte auf Interaktionen aus dem Fediverse!",
+      "outCreateArticle": "veröffentlicht",
+      "outCreate": "hat einen neuen Beitrag veröffentlicht",
+      "outUpdate": "hat einen Beitrag aktualisiert",
+      "outDelete": "hat einen Beitrag gelöscht",
+      "outDefault": "hat {{type}}-Aktivität gesendet",
+      "inFollow": "folgt dir jetzt",
+      "inLike": "hat deinen Beitrag geliked",
+      "inLikePost": "geliked",
+      "inBoost": "hat deinen Beitrag geboostet",
+      "inBoostPost": "geboostet",
+      "inComment": "hat auf deinen Beitrag geantwortet",
+      "inCommentPost": "hat geantwortet auf",
+      "inDefault": "hat {{type}} gesendet"
+    },
+    "health": {
+      "title": "Instanz-Zustand",
+      "description": "Zustellungsstatus nach entfernter Instanz",
+      "domain": "Instanz",
+      "total": "Gesamt",
+      "successful": "OK",
+      "failed": "Fehlgeschlagen",
+      "dead": "Inaktiv",
+      "lastAttempt": "Letzter Versuch",
+      "healthy": "Alle Instanzen gesund",
+      "blockSuggestion": "Blockierung erwägen"
     }
   }
 }

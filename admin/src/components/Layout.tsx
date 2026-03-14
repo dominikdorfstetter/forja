@@ -30,6 +30,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import WebhookIcon from '@mui/icons-material/Webhook';
 import AltRouteIcon from '@mui/icons-material/AltRoute';
 import EditNoteIcon from '@mui/icons-material/EditNote';
+import HubIcon from '@mui/icons-material/Hub';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { Tooltip, Fade } from '@mui/material';
 import { useTranslation } from 'react-i18next';
@@ -169,6 +170,12 @@ export default function Layout() {
         { text: t('layout.sidebar.taxonomy'), icon: <LocalOfferIcon />, path: '/taxonomy' },
       ],
     },
+    ...(modules.federation ? [{
+      label: t('layout.sidebar.federation'),
+      items: [
+        { text: t('layout.sidebar.federation'), icon: <HubIcon />, path: '/federation' },
+      ],
+    }] : []),
     {
       label: t('layout.sidebar.site'),
       items: [

@@ -46,6 +46,7 @@ vi.mock('@/store/AuthContext', () => ({
 
 const mockBlog: BlogListItem = {
   id: 'blog-1',
+  content_id: 'content-1',
   slug: 'hello-world',
   author: 'Test Author',
   published_date: '2025-06-15',
@@ -58,6 +59,7 @@ const mockBlog: BlogListItem = {
 
 const mockBlog2: BlogListItem = {
   id: 'blog-2',
+  content_id: 'content-2',
   slug: 'second-post',
   author: 'Another Author',
   published_date: '2025-07-01',

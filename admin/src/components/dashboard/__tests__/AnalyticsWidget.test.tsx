@@ -14,7 +14,7 @@ const baseContext: SiteContextResponse = {
     analytics: false,
   },
   suggestions: { show_team_workflow_prompt: false },
-  modules: { blog: true, pages: true, cv: false, legal: false, documents: false, ai: false },
+  modules: { blog: true, pages: true, cv: false, legal: false, documents: false, ai: false, federation: false },
 };
 
 vi.mock('@/store/SiteContext', () => ({

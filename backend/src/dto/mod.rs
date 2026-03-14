@@ -27,6 +27,7 @@ pub mod cv;
 pub mod document;
 pub mod environment;
 pub mod error_codes;
+pub mod federation;
 pub mod health;
 pub mod help_state;
 pub mod legal;

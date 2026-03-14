@@ -28,6 +28,12 @@ pub const KEY_MODULE_CV_ENABLED: &str = "module_cv_enabled";
 pub const KEY_MODULE_LEGAL_ENABLED: &str = "module_legal_enabled";
 pub const KEY_MODULE_DOCUMENTS_ENABLED: &str = "module_documents_enabled";
 pub const KEY_MODULE_AI_ENABLED: &str = "module_ai_enabled";
+pub const KEY_MODULE_FEDERATION_ENABLED: &str = "module_federation_enabled";
+
+// Federation settings
+pub const KEY_FEDERATION_SIGNATURE_ALGO: &str = "federation_signature_algorithm";
+pub const KEY_FEDERATION_MODERATION_MODE: &str = "federation_moderation_mode";
+pub const KEY_FEDERATION_AUTO_PUBLISH: &str = "federation_auto_publish";
 
 /// Returns the known defaults as a HashMap.
 pub fn defaults() -> HashMap<String, serde_json::Value> {
@@ -64,6 +70,19 @@ pub fn defaults() -> HashMap<String, serde_json::Value> {
         serde_json::json!(false),
     );
     m.insert(KEY_MODULE_AI_ENABLED.into(), serde_json::json!(false));
+    m.insert(
+        KEY_MODULE_FEDERATION_ENABLED.into(),
+        serde_json::json!(false),
+    );
+    m.insert(
+        KEY_FEDERATION_SIGNATURE_ALGO.into(),
+        serde_json::json!("rsa-sha256"),
+    );
+    m.insert(
+        KEY_FEDERATION_MODERATION_MODE.into(),
+        serde_json::json!("queue_all"),
+    );
+    m.insert(KEY_FEDERATION_AUTO_PUBLISH.into(), serde_json::json!(true));
     m
 }
 
@@ -173,7 +192,7 @@ mod tests {
     #[test]
     fn test_defaults_contains_all_keys() {
         let d = defaults();
-        assert_eq!(d.len(), 17);
+        assert_eq!(d.len(), 21);
         assert!(d.contains_key(KEY_MAX_DOCUMENT_FILE_SIZE));
         assert!(d.contains_key(KEY_MAX_MEDIA_FILE_SIZE));
         assert!(d.contains_key(KEY_ANALYTICS_ENABLED));
@@ -191,6 +210,10 @@ mod tests {
         assert!(d.contains_key(KEY_MODULE_LEGAL_ENABLED));
         assert!(d.contains_key(KEY_MODULE_DOCUMENTS_ENABLED));
         assert!(d.contains_key(KEY_MODULE_AI_ENABLED));
+        assert!(d.contains_key(KEY_MODULE_FEDERATION_ENABLED));
+        assert!(d.contains_key(KEY_FEDERATION_SIGNATURE_ALGO));
+        assert!(d.contains_key(KEY_FEDERATION_MODERATION_MODE));
+        assert!(d.contains_key(KEY_FEDERATION_AUTO_PUBLISH));
     }
 
     #[test]
@@ -216,6 +239,16 @@ mod tests {
         assert_eq!(d[KEY_MODULE_LEGAL_ENABLED], serde_json::json!(false));
         assert_eq!(d[KEY_MODULE_DOCUMENTS_ENABLED], serde_json::json!(false));
         assert_eq!(d[KEY_MODULE_AI_ENABLED], serde_json::json!(false));
+        assert_eq!(d[KEY_MODULE_FEDERATION_ENABLED], serde_json::json!(false));
+        assert_eq!(
+            d[KEY_FEDERATION_SIGNATURE_ALGO],
+            serde_json::json!("rsa-sha256")
+        );
+        assert_eq!(
+            d[KEY_FEDERATION_MODERATION_MODE],
+            serde_json::json!("queue_all")
+        );
+        assert_eq!(d[KEY_FEDERATION_AUTO_PUBLISH], serde_json::json!(true));
     }
 
     #[test]

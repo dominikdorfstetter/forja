@@ -201,6 +201,70 @@ async fn notify_review_result_inner(
     Ok(())
 }
 
+/// Notify site admins/editors about a federation event (fire-and-forget).
+///
+/// Sends a notification to all site members with at least Reviewer role.
+pub fn notify_federation_event(
+    pool: PgPool,
+    site_id: Uuid,
+    notification_type: &str,
+    entity_type: &str,
+    entity_id: Uuid,
+    title: &str,
+    message: Option<&str>,
+) {
+    let notification_type = notification_type.to_string();
+    let entity_type = entity_type.to_string();
+    let title = title.to_string();
+    let message = message.map(|m| m.to_string());
+    tokio::spawn(async move {
+        let result = notify_federation_inner(
+            &pool,
+            site_id,
+            &notification_type,
+            &entity_type,
+            entity_id,
+            &title,
+            message.as_deref(),
+        )
+        .await;
+        if let Err(e) = result {
+            tracing::warn!("Notification dispatch (federation) failed: {e}");
+        }
+    });
+}
+
+async fn notify_federation_inner(
+    pool: &PgPool,
+    site_id: Uuid,
+    notification_type: &str,
+    entity_type: &str,
+    entity_id: Uuid,
+    title: &str,
+    message: Option<&str>,
+) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    let members = SiteMembership::find_all_for_site(pool, site_id).await?;
+
+    for member in &members {
+        if !member.role.can_review() {
+            continue;
+        }
+        let _ = Notification::create(
+            pool,
+            site_id,
+            &member.clerk_user_id,
+            None, // No actor — the event comes from the fediverse
+            notification_type,
+            entity_type,
+            entity_id,
+            title,
+            message,
+        )
+        .await;
+    }
+    Ok(())
+}
+
 fn capitalize(s: &str) -> String {
     let mut c = s.chars();
     match c.next() {

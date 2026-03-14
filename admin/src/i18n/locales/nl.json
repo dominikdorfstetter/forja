@@ -134,7 +134,8 @@
       "logout": "Uitloggen",
       "invite": "Uitnodigen",
       "reviews": "Beoordelingen",
-      "aiSettings": "AI-instellingen"
+      "aiSettings": "AI-instellingen",
+      "federation": "Federatie"
     },
     "toolbar": {
       "toggleDrawer": "Zijbalk in-/uitschakelen",
@@ -1292,7 +1293,8 @@
       "legal": "Juridisch",
       "apiKeys": "API-sleutels",
       "modules": "Modules",
-      "ai": "AI-assistent"
+      "ai": "AI-assistent",
+      "federation": "Federatie"
     },
     "modules": {
       "title": "Inhoudsmodules",
@@ -2318,38 +2320,373 @@
     }
   },
   "errorCodes": {
-    "AUTH_MISSING_CREDENTIALS": { "message": "Authenticatie vereist", "action": "Log in om door te gaan." },
-    "AUTH_TOKEN_INVALID": { "message": "Sessie verlopen", "action": "Log opnieuw in." },
-    "AUTH_INSUFFICIENT_ROLE": { "message": "Onvoldoende rechten", "action": "Neem contact op met een beheerder voor uitgebreide toegang." },
-    "AUTH_SITE_ACCESS_DENIED": { "message": "Sitetoegang geweigerd", "action": "Neem contact op met de site-eigenaar voor toegang." },
-    "AUTH_API_KEY_INVALID": { "message": "Ongeldige API-sleutel", "action": "Controleer uw API-sleutelconfiguratie." },
-    "AUTH_ACCOUNT_SOLE_OWNER": { "message": "Account kan niet worden verwijderd", "action": "Draag eerst het eigendom over." },
-    "BLOG_SLUG_TAKEN": { "message": "Blog-slug al in gebruik", "action": "Kies een andere slug." },
-    "PAGE_SLUG_TAKEN": { "message": "Pagina-slug al in gebruik", "action": "Kies een andere slug." },
-    "SITE_SLUG_TAKEN": { "message": "Site-slug al in gebruik", "action": "Kies een andere slug." },
-    "TAG_SLUG_TAKEN": { "message": "Tag-slug al in gebruik", "action": "Kies een andere slug." },
-    "CATEGORY_SLUG_TAKEN": { "message": "Categorie-slug al in gebruik", "action": "Kies een andere slug." },
-    "LOCALE_CODE_TAKEN": { "message": "Taalcode bestaat al", "action": "Gebruik een andere taalcode." },
-    "RATE_LIMIT_EXCEEDED": { "message": "Te veel verzoeken", "action": "Wacht even en probeer het opnieuw." },
-    "MEMBER_ALREADY_EXISTS": { "message": "Lid bestaat al", "action": "Deze gebruiker is al lid van de site." },
-    "MEMBER_CANNOT_REMOVE_OWNER": { "message": "Eigenaar kan niet worden verwijderd", "action": "Draag het eigendom over voordat u dit lid verwijdert." },
-    "MEDIA_UPLOAD_TOO_LARGE": { "message": "Bestand te groot", "action": "Verklein het bestand of pas de site-instellingen aan." },
-    "MEDIA_UPLOAD_INVALID_TYPE": { "message": "Niet-ondersteund bestandstype", "action": "Controleer de toegestane bestandstypen." },
-    "AI_NOT_CONFIGURED": { "message": "AI niet geconfigureerd", "action": "Stel een AI-provider in bij de site-instellingen." },
-    "AI_PROVIDER_UNAVAILABLE": { "message": "AI-provider niet beschikbaar", "action": "Controleer uw AI-configuratie of probeer het later opnieuw." },
-    "WORKFLOW_REVIEW_REQUIRED": { "message": "Beoordeling vereist", "action": "Dien de inhoud ter beoordeling in voordat u publiceert." },
-    "WORKFLOW_NO_PERMISSION": { "message": "Workflow-toestemming geweigerd", "action": "U hebt geen toestemming voor deze workflowactie." },
-    "MODULE_NOT_ENABLED": { "message": "Module niet ingeschakeld", "action": "Schakel deze module in bij de site-instellingen." },
-    "LOCALE_DELETE_IN_USE": { "message": "Taal in gebruik", "action": "Verwijder eerst alle inhoud die deze taal gebruikt." },
-    "SITE_LOCALE_LAST_LANGUAGE": { "message": "Laatste taal kan niet worden verwijderd", "action": "Sites moeten minstens één taal hebben." },
-    "REDIRECT_SAME_PATH": { "message": "Omleidingslus gedetecteerd", "action": "Bron- en bestemmingspaden moeten verschillend zijn." },
+    "AUTH_MISSING_CREDENTIALS": {
+      "message": "Authenticatie vereist",
+      "action": "Log in om door te gaan."
+    },
+    "AUTH_TOKEN_INVALID": {
+      "message": "Sessie verlopen",
+      "action": "Log opnieuw in."
+    },
+    "AUTH_INSUFFICIENT_ROLE": {
+      "message": "Onvoldoende rechten",
+      "action": "Neem contact op met een beheerder voor uitgebreide toegang."
+    },
+    "AUTH_SITE_ACCESS_DENIED": {
+      "message": "Sitetoegang geweigerd",
+      "action": "Neem contact op met de site-eigenaar voor toegang."
+    },
+    "AUTH_API_KEY_INVALID": {
+      "message": "Ongeldige API-sleutel",
+      "action": "Controleer uw API-sleutelconfiguratie."
+    },
+    "AUTH_ACCOUNT_SOLE_OWNER": {
+      "message": "Account kan niet worden verwijderd",
+      "action": "Draag eerst het eigendom over."
+    },
+    "BLOG_SLUG_TAKEN": {
+      "message": "Blog-slug al in gebruik",
+      "action": "Kies een andere slug."
+    },
+    "PAGE_SLUG_TAKEN": {
+      "message": "Pagina-slug al in gebruik",
+      "action": "Kies een andere slug."
+    },
+    "SITE_SLUG_TAKEN": {
+      "message": "Site-slug al in gebruik",
+      "action": "Kies een andere slug."
+    },
+    "TAG_SLUG_TAKEN": {
+      "message": "Tag-slug al in gebruik",
+      "action": "Kies een andere slug."
+    },
+    "CATEGORY_SLUG_TAKEN": {
+      "message": "Categorie-slug al in gebruik",
+      "action": "Kies een andere slug."
+    },
+    "LOCALE_CODE_TAKEN": {
+      "message": "Taalcode bestaat al",
+      "action": "Gebruik een andere taalcode."
+    },
+    "RATE_LIMIT_EXCEEDED": {
+      "message": "Te veel verzoeken",
+      "action": "Wacht even en probeer het opnieuw."
+    },
+    "MEMBER_ALREADY_EXISTS": {
+      "message": "Lid bestaat al",
+      "action": "Deze gebruiker is al lid van de site."
+    },
+    "MEMBER_CANNOT_REMOVE_OWNER": {
+      "message": "Eigenaar kan niet worden verwijderd",
+      "action": "Draag het eigendom over voordat u dit lid verwijdert."
+    },
+    "MEDIA_UPLOAD_TOO_LARGE": {
+      "message": "Bestand te groot",
+      "action": "Verklein het bestand of pas de site-instellingen aan."
+    },
+    "MEDIA_UPLOAD_INVALID_TYPE": {
+      "message": "Niet-ondersteund bestandstype",
+      "action": "Controleer de toegestane bestandstypen."
+    },
+    "AI_NOT_CONFIGURED": {
+      "message": "AI niet geconfigureerd",
+      "action": "Stel een AI-provider in bij de site-instellingen."
+    },
+    "AI_PROVIDER_UNAVAILABLE": {
+      "message": "AI-provider niet beschikbaar",
+      "action": "Controleer uw AI-configuratie of probeer het later opnieuw."
+    },
+    "WORKFLOW_REVIEW_REQUIRED": {
+      "message": "Beoordeling vereist",
+      "action": "Dien de inhoud ter beoordeling in voordat u publiceert."
+    },
+    "WORKFLOW_NO_PERMISSION": {
+      "message": "Workflow-toestemming geweigerd",
+      "action": "U hebt geen toestemming voor deze workflowactie."
+    },
+    "MODULE_NOT_ENABLED": {
+      "message": "Module niet ingeschakeld",
+      "action": "Schakel deze module in bij de site-instellingen."
+    },
+    "LOCALE_DELETE_IN_USE": {
+      "message": "Taal in gebruik",
+      "action": "Verwijder eerst alle inhoud die deze taal gebruikt."
+    },
+    "SITE_LOCALE_LAST_LANGUAGE": {
+      "message": "Laatste taal kan niet worden verwijderd",
+      "action": "Sites moeten minstens één taal hebben."
+    },
+    "REDIRECT_SAME_PATH": {
+      "message": "Omleidingslus gedetecteerd",
+      "action": "Bron- en bestemmingspaden moeten verschillend zijn."
+    },
     "patterns": {
-      "notFound": { "message": "Bron niet gevonden", "action": "Het is mogelijk verwijderd of verplaatst." },
-      "slugTaken": { "message": "Slug al in gebruik", "action": "Kies een andere slug." },
-      "accessDenied": { "message": "Toegang geweigerd", "action": "U hebt geen toestemming voor deze actie." },
-      "auth": { "message": "Authenticatiefout", "action": "Probeer opnieuw in te loggen." },
-      "validation": { "message": "Validatiefout", "action": "Controleer de formuliervelden en probeer het opnieuw." },
-      "mediaUpload": { "message": "Upload mislukt", "action": "Controleer het bestand en probeer het opnieuw." }
+      "notFound": {
+        "message": "Bron niet gevonden",
+        "action": "Het is mogelijk verwijderd of verplaatst."
+      },
+      "slugTaken": {
+        "message": "Slug al in gebruik",
+        "action": "Kies een andere slug."
+      },
+      "accessDenied": {
+        "message": "Toegang geweigerd",
+        "action": "U hebt geen toestemming voor deze actie."
+      },
+      "auth": {
+        "message": "Authenticatiefout",
+        "action": "Probeer opnieuw in te loggen."
+      },
+      "validation": {
+        "message": "Validatiefout",
+        "action": "Controleer de formuliervelden en probeer het opnieuw."
+      },
+      "mediaUpload": {
+        "message": "Upload mislukt",
+        "action": "Controleer het bestand en probeer het opnieuw."
+      }
+    }
+  },
+  "federation": {
+    "title": "Federatie",
+    "subtitle": "ActivityPub-federatieoverzicht",
+    "handle": {
+      "title": "Je Fediverse-handle",
+      "description": "Deel deze handle zodat mensen op Mastodon, Pleroma of Misskey je blog kunnen volgen.",
+      "copied": "Handle gekopieerd naar klembord",
+      "copy": "Handle kopiëren"
+    },
+    "stats": {
+      "followers": "Volgers",
+      "postsSyndicated": "Gesyndikeerde berichten",
+      "pendingComments": "Reacties in afwachting",
+      "inbound": "Inkomend",
+      "failedDeliveries": "Mislukte afleveringen"
+    },
+    "manage": "Beheren",
+    "profile": {
+      "edit": "Profiel bewerken",
+      "noBio": "Geen bio ingesteld — klik op bewerken om er een toe te voegen"
+    },
+    "noSiteSelected": "Geen site geselecteerd",
+    "noSiteDescription": "Selecteer een site om de federatiestatus te bekijken.",
+    "loadingData": "Federatiegegevens laden...",
+    "nav": {
+      "followers": "Volgers",
+      "followersDesc": "Bekijk en beheer je Fediverse-volgers",
+      "comments": "Reacties",
+      "commentsDesc": "Modereer inkomende reacties uit het Fediverse",
+      "activityLog": "Activiteitenlog",
+      "activityLogDesc": "Bekijk verzonden en ontvangen federatie-events",
+      "blocklist": "Blokkeerlijst",
+      "blocklistDesc": "Blokkeer instanties of individuele actoren",
+      "blockedActors": "Geblokkeerde actoren",
+      "blockedActorsDesc": "Blokkeer individuele Fediverse-actoren"
+    },
+    "followers": {
+      "title": "Volgers",
+      "subtitle": "Fediverse-volgers van deze site",
+      "searchPlaceholder": "Volgers zoeken...",
+      "noSite": "Selecteer een site om volgers te bekijken.",
+      "empty": "Nog geen volgers",
+      "emptyDescription": "Wanneer andere Fediverse-gebruikers je site volgen, verschijnen ze hier.",
+      "loading": "Volgers laden...",
+      "removeTitle": "Volger verwijderen",
+      "removeMessage": "{{name}} verwijderen? Deze persoon moet je site opnieuw volgen.",
+      "removeConfirm": "Verwijderen",
+      "removeTooltip": "Volger verwijderen",
+      "columns": {
+        "name": "Naam",
+        "actorUri": "Actor-URI",
+        "status": "Status",
+        "followed": "Volgt sinds",
+        "actions": "Acties"
+      }
+    },
+    "comments": {
+      "title": "Reacties",
+      "subtitle": "Gefedereerde reacties modereren",
+      "searchPlaceholder": "Reacties zoeken...",
+      "noSite": "Selecteer een site om reacties te modereren.",
+      "empty": "Geen reacties",
+      "emptyDescription": "Gefedereerde reacties verschijnen hier wanneer ze ontvangen worden.",
+      "loading": "Reacties laden...",
+      "deleteTitle": "Reactie verwijderen",
+      "deleteMessage": "Reactie van {{name}} verwijderen? Dit kan niet ongedaan worden gemaakt.",
+      "deleteConfirm": "Verwijderen",
+      "approveTooltip": "Goedkeuren",
+      "rejectTooltip": "Afwijzen",
+      "deleteTooltip": "Verwijderen",
+      "columns": {
+        "author": "Auteur",
+        "comment": "Reactie",
+        "status": "Status",
+        "date": "Datum",
+        "actions": "Acties"
+      }
+    },
+    "activityLog": {
+      "title": "Activiteitenlog",
+      "subtitle": "Federatie-activiteitengeschiedenis",
+      "searchPlaceholder": "Activiteiten zoeken...",
+      "noSite": "Selecteer een site om activiteiten te bekijken.",
+      "empty": "Nog geen activiteit",
+      "emptyDescription": "Federatie-activiteiten verschijnen hier wanneer ze plaatsvinden.",
+      "loading": "Activiteiten laden...",
+      "retryTooltip": "Aflevering opnieuw proberen",
+      "inbound": "Inkomend",
+      "outbound": "Uitgaand",
+      "columns": {
+        "type": "Type",
+        "actor": "Actor",
+        "direction": "Richting",
+        "status": "Status",
+        "date": "Datum",
+        "actions": "Acties"
+      }
+    },
+    "blocklist": {
+      "title": "Blokkeerlijst",
+      "subtitle": "Geblokkeerde instanties en actoren",
+      "noSite": "Selecteer een site om blokkeringen te beheren.",
+      "instances": "Instanties",
+      "actors": "Actoren",
+      "loading": "Blokkeerlijst laden...",
+      "noBlockedInstances": "Geen geblokkeerde instanties",
+      "noBlockedInstancesDesc": "Geblokkeerde instanties verschijnen hier.",
+      "noBlockedActors": "Geen geblokkeerde actoren",
+      "noBlockedActorsDesc": "Geblokkeerde actoren verschijnen hier.",
+      "unblockInstanceTitle": "Instantie deblokkeren",
+      "unblockInstanceMessage": "{{domain}} deblokkeren?",
+      "unblockActorTitle": "Actor deblokkeren",
+      "unblockActorMessage": "{{actor}} deblokkeren?",
+      "unblockConfirm": "Deblokkeren",
+      "unblockInstanceTooltip": "Instantie deblokkeren",
+      "unblockActorTooltip": "Actor deblokkeren",
+      "columns": {
+        "domain": "Domein",
+        "actorUri": "Actor-URI",
+        "reason": "Reden",
+        "blocked": "Geblokkeerd",
+        "actions": "Acties"
+      },
+      "import": "Importeren",
+      "importTitle": "Blokkeerlijst importeren",
+      "importDescription": "Plak domeinen (één per regel) of upload een CSV/TXT-bestand",
+      "importButton": "Domeinen importeren",
+      "importSuccess": "{{imported}} domeinen geïmporteerd ({{skipped}} al geblokkeerd)",
+      "importPaste": "Plak domeinen hier (één per regel)...",
+      "importFile": "Of upload een bestand"
+    },
+    "quickPost": {
+      "title": "Snelbericht",
+      "placeholder": "Waar denk je aan? Post direct naar het Fediverse...",
+      "post": "Plaatsen",
+      "posting": "Wordt geplaatst...",
+      "posted": "Geplaatst op het Fediverse!",
+      "deleteTitle": "Bericht verwijderen",
+      "deleteMessage": "Dit stuurt ook een verwijderactiviteit naar het Fediverse. Het bericht kan nog in de cache staan op sommige servers.",
+      "deleteConfirm": "Verwijderen",
+      "deleted": "Bericht verwijderd",
+      "recentPosts": "Recente berichten",
+      "noPosts": "Nog geen berichten. Deel je eerste gedachte!",
+      "charCount": "{{count}}/500",
+      "schedule": "Plannen",
+      "scheduledFor": "Gepland voor {{date}}",
+      "schedulePost": "Bericht plannen",
+      "scheduledSuccess": "Bericht gepland!",
+      "cancelScheduled": "Gepland bericht annuleren",
+      "cancelledSuccess": "Gepland bericht geannuleerd",
+      "editPost": "Bewerken",
+      "deletePost": "Bericht verwijderen",
+      "deletePostConfirm": "Dit bericht verwijderen? Er wordt een verwijderactiviteit naar het Fediverse gestuurd.",
+      "deleteConfirm": "Verwijderen",
+      "editSave": "Opslaan",
+      "editCancel": "Annuleren",
+      "edited": "Bericht bijgewerkt",
+      "deletedPost": "Bericht verwijderd",
+      "scheduledCount": "{{count}} geplande berichten",
+      "scheduledCountBanner": "{{count}} bericht(en) gepland"
+    },
+    "settings": {
+      "title": "Federatie-instellingen",
+      "subtitle": "ActivityPub-federatie configureren",
+      "handle": "Fediverse-handle",
+      "signatureAlgorithm": "Handtekeningalgoritme",
+      "algorithm": "Algoritme",
+      "moderation": "Moderatie",
+      "mode": "Modus",
+      "modeQueueAll": "Alles in wachtrij (handmatige beoordeling)",
+      "modeAutoApprove": "Automatisch goedkeuren",
+      "modeFollowersOnly": "Alleen volgers",
+      "autoPublish": "Nieuwe berichten automatisch publiceren naar de federatie",
+      "keyManagement": "Sleutelbeheer",
+      "keyRotateWarning": "Het roteren van sleutels maakt bestaande HTTP-handtekeningen ongeldig. Externe servers moeten je publieke sleutel opnieuw ophalen.",
+      "rotateKeys": "Sleutels roteren",
+      "rotateKeysConfirm": "Ondertekeningssleutels roteren",
+      "rotateKeysMessage": "Er worden nieuwe ondertekeningssleutels gegenereerd. Externe servers moeten je publieke sleutel opnieuw ophalen, wat de federatie tijdelijk kan verstoren. Doorgaan?",
+      "noSite": "Selecteer een site om instellingen te beheren.",
+      "loading": "Instellingen laden...",
+      "profile": "Profiel",
+      "avatarUrl": "Avatar-URL",
+      "avatarUrlHelper": "URL naar je profielfoto — plak een link of kies uit media",
+      "chooseFromMedia": "Kies uit media",
+      "bio": "Bio",
+      "bioHelper": "Een korte beschrijving van je blog voor Fediverse-profielen (max. 500 tekens)"
+    },
+    "engagement": {
+      "likes": "Fediverse-likes",
+      "boosts": "Fediverse-boosts"
+    },
+    "breadcrumbs": {
+      "federation": "Federatie"
+    },
+    "status": {
+      "enabled": "Ingeschakeld",
+      "disabled": "Uitgeschakeld"
+    },
+    "featured": {
+      "title": "Vastgepinde berichten",
+      "description": "Vastgepinde berichten verschijnen op je Fediverse-profiel",
+      "pin": "Bericht vastpinnen",
+      "unpin": "Losmaken",
+      "maxReached": "Maximaal 3 vastgepinde berichten",
+      "empty": "Geen vastgepinde berichten",
+      "selectPost": "Selecteer een blogbericht om vast te pinnen"
+    },
+    "preview": {
+      "title": "Federatie-voorbeeld",
+      "description": "Hoe dit bericht eruitziet op het Fediverse",
+      "via": "Gepubliceerd via Forja",
+      "notEnabled": "Schakel federatie in om een voorbeeld te zien"
+    },
+    "timeline": {
+      "empty": "Je tijdlijn is leeg. Plaats iets of wacht op interacties vanuit het Fediverse!",
+      "outCreateArticle": "gepubliceerd",
+      "outCreate": "heeft een nieuw bericht gepubliceerd",
+      "outUpdate": "heeft een bericht bijgewerkt",
+      "outDelete": "heeft een bericht verwijderd",
+      "outDefault": "heeft {{type}}-activiteit verzonden",
+      "inFollow": "is je gaan volgen",
+      "inLike": "vond je bericht leuk",
+      "inLikePost": "vond leuk",
+      "inBoost": "heeft je bericht geboost",
+      "inBoostPost": "heeft geboost",
+      "inComment": "heeft op je bericht gereageerd",
+      "inCommentPost": "heeft gereageerd op",
+      "inDefault": "heeft {{type}} verzonden"
+    },
+    "health": {
+      "title": "Instantiestatus",
+      "description": "Afleveringsstatus per externe instantie",
+      "domain": "Instantie",
+      "total": "Totaal",
+      "successful": "OK",
+      "failed": "Mislukt",
+      "dead": "Inactief",
+      "lastAttempt": "Laatste poging",
+      "healthy": "Alle instanties gezond",
+      "blockSuggestion": "Overweeg te blokkeren"
     }
   }
 }

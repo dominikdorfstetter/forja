@@ -40,6 +40,15 @@ import ActivityLogPage from '@/pages/ActivityLog';
 import NotificationsPage from '@/pages/Notifications';
 import NotFoundPage from '@/pages/NotFound';
 
+// Federation pages
+import FederationOverviewPage from '@/pages/federation/FederationOverview';
+import FederationFollowersPage from '@/pages/federation/FederationFollowers';
+import FederationActivityLogPage from '@/pages/federation/FederationActivityLog';
+import FederationCommentsPage from '@/pages/federation/FederationComments';
+import FederationBlocklistPage from '@/pages/federation/FederationBlocklist';
+import FederationSettingsPage from '@/pages/federation/FederationSettings';
+import InstanceHealthPage from '@/pages/federation/InstanceHealthView';
+
 // Components
 import Layout from '@/components/Layout';
 import RequireAuth from '@/components/auth/RequireAuth';
@@ -157,6 +166,13 @@ function App() {
                   <Route path="redirects" element={<RedirectsPage />} />
                   <Route path="locales" element={<LocalesPage />} />
                   <Route path="profile" element={<ProfilePage />} />
+                  <Route path="federation" element={<FederationOverviewPage />} />
+                  <Route path="federation/followers" element={<FederationFollowersPage />} />
+                  <Route path="federation/activity" element={<FederationActivityLogPage />} />
+                  <Route path="federation/comments" element={<FederationCommentsPage />} />
+                  <Route path="federation/blocks" element={<FederationBlocklistPage />} />
+                  <Route path="federation/health" element={<InstanceHealthPage />} />
+                  <Route path="federation/settings" element={<FederationSettingsPage />} />
                   <Route path="settings" element={<SettingsPage />} />
                   <Route path="api-docs" element={<ApiDocsPage />} />
                   <Route path="*" element={<NotFoundPage />} />

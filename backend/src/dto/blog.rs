@@ -135,6 +135,8 @@ pub struct UpdateBlogRequest {
 pub struct BlogListItem {
     #[schema(example = "550e8400-e29b-41d4-a716-446655440000")]
     pub id: Uuid,
+    #[schema(example = "660e8400-e29b-41d4-a716-446655440000")]
+    pub content_id: Uuid,
     #[schema(example = "my-awesome-post")]
     pub slug: Option<String>,
     #[schema(example = "Jane Doe")]
@@ -166,6 +168,7 @@ impl From<BlogWithContent> for BlogListItem {
     fn from(blog: BlogWithContent) -> Self {
         Self {
             id: blog.id,
+            content_id: blog.content_id,
             slug: blog.slug,
             author: blog.author,
             published_date: blog.published_date,
@@ -408,6 +411,7 @@ mod tests {
     fn test_blog_list_item_serialization() {
         let item = BlogListItem {
             id: Uuid::new_v4(),
+            content_id: Uuid::new_v4(),
             slug: Some("my-post".to_string()),
             author: "Jane Doe".to_string(),
             published_date: NaiveDate::from_ymd_opt(2024, 6, 15).unwrap(),

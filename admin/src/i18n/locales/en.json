@@ -134,7 +134,8 @@
       "locales": "Languages",
       "apiDocs": "API Docs",
       "myDrafts": "My Drafts",
-      "logout": "Logout"
+      "logout": "Logout",
+      "federation": "Federation"
     },
     "toolbar": {
       "toggleDrawer": "Toggle drawer",
@@ -1292,7 +1293,8 @@
       "legal": "Legal",
       "apiKeys": "API Keys",
       "modules": "Modules",
-      "ai": "AI Assist"
+      "ai": "AI Assist",
+      "federation": "Federation"
     },
     "modules": {
       "title": "Content Modules",
@@ -1308,7 +1310,9 @@
       "documents": "Documents",
       "documentsDesc": "Upload and manage downloadable files",
       "ai": "AI Assist",
-      "aiDesc": "SEO generation, auto-excerpts, and translation suggestions"
+      "aiDesc": "SEO generation, auto-excerpts, and translation suggestions",
+      "federation": "Federation",
+      "federationDesc": "Syndicate blog posts to the Fediverse via ActivityPub"
     },
     "selectSiteAlert": "Select a site from the header to manage its settings.",
     "loadingSiteSettings": "Loading site settings...",
@@ -1431,7 +1435,7 @@
         "solo": "Solo creator",
         "soloDesc": "I'm building for myself",
         "team": "Small team",
-        "teamDesc": "2\u201310 people collaborating",
+        "teamDesc": "2–10 people collaborating",
         "agency": "Agency / Studio",
         "agencyDesc": "Managing multiple client sites"
       },
@@ -2031,7 +2035,6 @@
       "status": "Status"
     },
     "read": "Read",
-    "unread": "Unread",
     "noSite": "Select a site to view notifications",
     "types": {
       "submitted": "Submitted for Review",
@@ -2319,38 +2322,372 @@
     }
   },
   "errorCodes": {
-    "AUTH_MISSING_CREDENTIALS": { "message": "Authentication required", "action": "Please sign in to continue." },
-    "AUTH_TOKEN_INVALID": { "message": "Session expired", "action": "Please sign in again." },
-    "AUTH_INSUFFICIENT_ROLE": { "message": "Insufficient permissions", "action": "Contact an admin for elevated access." },
-    "AUTH_SITE_ACCESS_DENIED": { "message": "Site access denied", "action": "Contact the site owner for access." },
-    "AUTH_API_KEY_INVALID": { "message": "Invalid API key", "action": "Check your API key configuration." },
-    "AUTH_ACCOUNT_SOLE_OWNER": { "message": "Cannot delete account", "action": "Transfer site ownership first." },
-    "BLOG_SLUG_TAKEN": { "message": "Blog slug already in use", "action": "Choose a different slug." },
-    "PAGE_SLUG_TAKEN": { "message": "Page slug already in use", "action": "Choose a different slug." },
-    "SITE_SLUG_TAKEN": { "message": "Site slug already in use", "action": "Choose a different slug." },
-    "TAG_SLUG_TAKEN": { "message": "Tag slug already in use", "action": "Choose a different slug." },
-    "CATEGORY_SLUG_TAKEN": { "message": "Category slug already in use", "action": "Choose a different slug." },
-    "LOCALE_CODE_TAKEN": { "message": "Locale code already exists", "action": "Use a different locale code." },
-    "RATE_LIMIT_EXCEEDED": { "message": "Too many requests", "action": "Please wait a moment and try again." },
-    "MEMBER_ALREADY_EXISTS": { "message": "Member already exists", "action": "This user is already a member of the site." },
-    "MEMBER_CANNOT_REMOVE_OWNER": { "message": "Cannot remove owner", "action": "Transfer ownership before removing this member." },
-    "MEDIA_UPLOAD_TOO_LARGE": { "message": "File too large", "action": "Reduce the file size or adjust site settings." },
-    "MEDIA_UPLOAD_INVALID_TYPE": { "message": "Unsupported file type", "action": "Check the allowed file types." },
-    "AI_NOT_CONFIGURED": { "message": "AI not configured", "action": "Set up an AI provider in site settings." },
-    "AI_PROVIDER_UNAVAILABLE": { "message": "AI provider unavailable", "action": "Check your AI configuration or try again later." },
-    "WORKFLOW_REVIEW_REQUIRED": { "message": "Review required", "action": "Submit content for review before publishing." },
-    "WORKFLOW_NO_PERMISSION": { "message": "Workflow permission denied", "action": "You don't have permission for this workflow action." },
-    "MODULE_NOT_ENABLED": { "message": "Module not enabled", "action": "Enable this module in site settings." },
-    "LOCALE_DELETE_IN_USE": { "message": "Locale in use", "action": "Remove all content using this locale first." },
-    "SITE_LOCALE_LAST_LANGUAGE": { "message": "Cannot remove last locale", "action": "Sites must have at least one locale." },
-    "REDIRECT_SAME_PATH": { "message": "Redirect loop detected", "action": "Source and destination paths must be different." },
+    "AUTH_MISSING_CREDENTIALS": {
+      "message": "Authentication required",
+      "action": "Please sign in to continue."
+    },
+    "AUTH_TOKEN_INVALID": {
+      "message": "Session expired",
+      "action": "Please sign in again."
+    },
+    "AUTH_INSUFFICIENT_ROLE": {
+      "message": "Insufficient permissions",
+      "action": "Contact an admin for elevated access."
+    },
+    "AUTH_SITE_ACCESS_DENIED": {
+      "message": "Site access denied",
+      "action": "Contact the site owner for access."
+    },
+    "AUTH_API_KEY_INVALID": {
+      "message": "Invalid API key",
+      "action": "Check your API key configuration."
+    },
+    "AUTH_ACCOUNT_SOLE_OWNER": {
+      "message": "Cannot delete account",
+      "action": "Transfer site ownership first."
+    },
+    "BLOG_SLUG_TAKEN": {
+      "message": "Blog slug already in use",
+      "action": "Choose a different slug."
+    },
+    "PAGE_SLUG_TAKEN": {
+      "message": "Page slug already in use",
+      "action": "Choose a different slug."
+    },
+    "SITE_SLUG_TAKEN": {
+      "message": "Site slug already in use",
+      "action": "Choose a different slug."
+    },
+    "TAG_SLUG_TAKEN": {
+      "message": "Tag slug already in use",
+      "action": "Choose a different slug."
+    },
+    "CATEGORY_SLUG_TAKEN": {
+      "message": "Category slug already in use",
+      "action": "Choose a different slug."
+    },
+    "LOCALE_CODE_TAKEN": {
+      "message": "Locale code already exists",
+      "action": "Use a different locale code."
+    },
+    "RATE_LIMIT_EXCEEDED": {
+      "message": "Too many requests",
+      "action": "Please wait a moment and try again."
+    },
+    "MEMBER_ALREADY_EXISTS": {
+      "message": "Member already exists",
+      "action": "This user is already a member of the site."
+    },
+    "MEMBER_CANNOT_REMOVE_OWNER": {
+      "message": "Cannot remove owner",
+      "action": "Transfer ownership before removing this member."
+    },
+    "MEDIA_UPLOAD_TOO_LARGE": {
+      "message": "File too large",
+      "action": "Reduce the file size or adjust site settings."
+    },
+    "MEDIA_UPLOAD_INVALID_TYPE": {
+      "message": "Unsupported file type",
+      "action": "Check the allowed file types."
+    },
+    "AI_NOT_CONFIGURED": {
+      "message": "AI not configured",
+      "action": "Set up an AI provider in site settings."
+    },
+    "AI_PROVIDER_UNAVAILABLE": {
+      "message": "AI provider unavailable",
+      "action": "Check your AI configuration or try again later."
+    },
+    "WORKFLOW_REVIEW_REQUIRED": {
+      "message": "Review required",
+      "action": "Submit content for review before publishing."
+    },
+    "WORKFLOW_NO_PERMISSION": {
+      "message": "Workflow permission denied",
+      "action": "You don't have permission for this workflow action."
+    },
+    "MODULE_NOT_ENABLED": {
+      "message": "Module not enabled",
+      "action": "Enable this module in site settings."
+    },
+    "LOCALE_DELETE_IN_USE": {
+      "message": "Locale in use",
+      "action": "Remove all content using this locale first."
+    },
+    "SITE_LOCALE_LAST_LANGUAGE": {
+      "message": "Cannot remove last locale",
+      "action": "Sites must have at least one locale."
+    },
+    "REDIRECT_SAME_PATH": {
+      "message": "Redirect loop detected",
+      "action": "Source and destination paths must be different."
+    },
     "patterns": {
-      "notFound": { "message": "Resource not found", "action": "It may have been deleted or moved." },
-      "slugTaken": { "message": "Slug already in use", "action": "Choose a different slug." },
-      "accessDenied": { "message": "Access denied", "action": "You don't have permission for this action." },
-      "auth": { "message": "Authentication error", "action": "Try signing in again." },
-      "validation": { "message": "Validation error", "action": "Check the form fields and try again." },
-      "mediaUpload": { "message": "Upload failed", "action": "Check the file and try again." }
+      "notFound": {
+        "message": "Resource not found",
+        "action": "It may have been deleted or moved."
+      },
+      "slugTaken": {
+        "message": "Slug already in use",
+        "action": "Choose a different slug."
+      },
+      "accessDenied": {
+        "message": "Access denied",
+        "action": "You don't have permission for this action."
+      },
+      "auth": {
+        "message": "Authentication error",
+        "action": "Try signing in again."
+      },
+      "validation": {
+        "message": "Validation error",
+        "action": "Check the form fields and try again."
+      },
+      "mediaUpload": {
+        "message": "Upload failed",
+        "action": "Check the file and try again."
+      }
+    }
+  },
+  "federation": {
+    "title": "Federation",
+    "subtitle": "ActivityPub federation overview",
+    "handle": {
+      "title": "Your Fediverse Handle",
+      "description": "Share this handle so people on Mastodon, Pleroma, or Misskey can follow your blog.",
+      "copied": "Handle copied to clipboard",
+      "copy": "Copy handle"
+    },
+    "stats": {
+      "followers": "Followers",
+      "postsSyndicated": "Posts",
+      "inbound": "Inbound",
+      "pendingComments": "Pending Comments",
+      "failedDeliveries": "Failed Deliveries"
+    },
+    "manage": "Manage",
+    "profile": {
+      "edit": "Edit profile",
+      "noBio": "No bio set — click edit to add one"
+    },
+    "noSiteSelected": "No site selected",
+    "noSiteDescription": "Select a site to view federation status.",
+    "loadingData": "Loading federation data...",
+    "nav": {
+      "followers": "Followers",
+      "followersDesc": "View and manage your Fediverse followers",
+      "comments": "Comments",
+      "commentsDesc": "Moderate inbound replies from the Fediverse",
+      "activityLog": "Activity Log",
+      "activityLogDesc": "View sent and received federation events",
+      "blocklist": "Blocklist",
+      "blocklistDesc": "Block instances or individual actors",
+      "blockedActors": "Blocked Actors",
+      "blockedActorsDesc": "Block individual Fediverse actors"
+    },
+    "followers": {
+      "title": "Followers",
+      "subtitle": "Fediverse followers for this site",
+      "searchPlaceholder": "Search followers...",
+      "noSite": "Select a site to view followers.",
+      "empty": "No followers yet",
+      "emptyDescription": "When other fediverse users follow your site, they will appear here.",
+      "loading": "Loading followers...",
+      "removeTitle": "Remove Follower",
+      "removeMessage": "Remove {{name}}? They will need to re-follow your site.",
+      "removeConfirm": "Remove",
+      "removeTooltip": "Remove follower",
+      "columns": {
+        "name": "Name",
+        "actorUri": "Actor URI",
+        "status": "Status",
+        "followed": "Followed",
+        "actions": "Actions"
+      }
+    },
+    "comments": {
+      "title": "Comments",
+      "subtitle": "Moderate federated comments",
+      "searchPlaceholder": "Search comments...",
+      "noSite": "Select a site to moderate comments.",
+      "empty": "No comments",
+      "emptyDescription": "Federated comments will appear here when received.",
+      "loading": "Loading comments...",
+      "deleteTitle": "Delete Comment",
+      "deleteMessage": "Delete comment by {{name}}? This cannot be undone.",
+      "deleteConfirm": "Delete",
+      "approveTooltip": "Approve",
+      "rejectTooltip": "Reject",
+      "deleteTooltip": "Delete",
+      "columns": {
+        "author": "Author",
+        "comment": "Comment",
+        "status": "Status",
+        "date": "Date",
+        "actions": "Actions"
+      }
+    },
+    "activityLog": {
+      "title": "Activity Log",
+      "subtitle": "Federation activity history",
+      "searchPlaceholder": "Search activities...",
+      "noSite": "Select a site to view activity.",
+      "empty": "No activity yet",
+      "emptyDescription": "Federation activities will appear here when they occur.",
+      "loading": "Loading activities...",
+      "retryTooltip": "Retry delivery",
+      "inbound": "Inbound",
+      "outbound": "Outbound",
+      "columns": {
+        "type": "Type",
+        "actor": "Actor",
+        "direction": "Direction",
+        "status": "Status",
+        "date": "Date",
+        "actions": "Actions"
+      }
+    },
+    "blocklist": {
+      "title": "Blocklist",
+      "subtitle": "Blocked instances and actors",
+      "noSite": "Select a site to manage blocks.",
+      "instances": "Instances",
+      "actors": "Actors",
+      "loading": "Loading blocklist...",
+      "noBlockedInstances": "No blocked instances",
+      "noBlockedInstancesDesc": "Blocked instances will appear here.",
+      "noBlockedActors": "No blocked actors",
+      "noBlockedActorsDesc": "Blocked actors will appear here.",
+      "unblockInstanceTitle": "Unblock Instance",
+      "unblockInstanceMessage": "Unblock {{domain}}?",
+      "unblockActorTitle": "Unblock Actor",
+      "unblockActorMessage": "Unblock {{actor}}?",
+      "unblockConfirm": "Unblock",
+      "unblockInstanceTooltip": "Unblock instance",
+      "unblockActorTooltip": "Unblock actor",
+      "columns": {
+        "domain": "Domain",
+        "actorUri": "Actor URI",
+        "reason": "Reason",
+        "blocked": "Blocked",
+        "actions": "Actions"
+      },
+      "import": "Import",
+      "importTitle": "Import Blocklist",
+      "importDescription": "Paste domains (one per line) or upload a CSV/TXT file",
+      "importButton": "Import Domains",
+      "importSuccess": "Imported {{imported}} domains ({{skipped}} already blocked)",
+      "importPaste": "Paste domains here (one per line)...",
+      "importFile": "Or upload a file"
+    },
+    "health": {
+      "title": "Instance Health",
+      "description": "Delivery status by remote instance",
+      "domain": "Instance",
+      "total": "Total",
+      "successful": "OK",
+      "failed": "Failed",
+      "dead": "Dead",
+      "lastAttempt": "Last Attempt",
+      "healthy": "All instances healthy",
+      "blockSuggestion": "Consider blocking"
+    },
+    "quickPost": {
+      "title": "Quick Post",
+      "placeholder": "What's on your mind? Post directly to the Fediverse...",
+      "post": "Post",
+      "posting": "Posting...",
+      "posted": "Posted to the Fediverse!",
+      "deleteTitle": "Delete Post",
+      "deleteMessage": "This will also send a Delete activity to the Fediverse. The post may still be cached on some servers.",
+      "deleteConfirm": "Delete",
+      "deleted": "Post deleted",
+      "recentPosts": "Recent Posts",
+      "noPosts": "No posts yet. Share your first thought!",
+      "charCount": "{{count}}/500",
+      "schedule": "Schedule",
+      "scheduledFor": "Scheduled for {{date}}",
+      "schedulePost": "Schedule Post",
+      "scheduledSuccess": "Post scheduled!",
+      "cancelScheduled": "Cancel scheduled post",
+      "cancelledSuccess": "Scheduled post cancelled",
+      "editPost": "Edit",
+      "deletePost": "Delete post",
+      "deletePostConfirm": "Delete this post? A Delete activity will be sent to the Fediverse.",
+      "editSave": "Save",
+      "editCancel": "Cancel",
+      "edited": "Post updated",
+      "deletedPost": "Post deleted",
+      "scheduledCount": "{{count}} post(s) scheduled",
+      "scheduledCountBanner": "{{count}} scheduled"
+    },
+    "timeline": {
+      "empty": "Your timeline is empty. Post something or wait for interactions from the Fediverse!",
+      "outCreateArticle": "published",
+      "outCreate": "published a new post",
+      "outUpdate": "updated a post",
+      "outDelete": "deleted a post",
+      "outDefault": "sent {{type}} activity",
+      "inFollow": "started following you",
+      "inLike": "liked your post",
+      "inLikePost": "liked",
+      "inBoost": "boosted your post",
+      "inBoostPost": "boosted",
+      "inComment": "replied to your post",
+      "inCommentPost": "replied to",
+      "inDefault": "sent {{type}}"
+    },
+    "settings": {
+      "title": "Federation Settings",
+      "subtitle": "Configure ActivityPub federation",
+      "handle": "Fediverse Handle",
+      "signatureAlgorithm": "Signature Algorithm",
+      "algorithm": "Algorithm",
+      "moderation": "Moderation",
+      "mode": "Mode",
+      "modeQueueAll": "Queue All (manual review)",
+      "modeAutoApprove": "Auto Approve",
+      "modeFollowersOnly": "Followers Only",
+      "autoPublish": "Auto-publish new posts to federation",
+      "keyManagement": "Key Management",
+      "keyRotateWarning": "Rotating keys will invalidate existing HTTP signatures. Remote servers will need to re-fetch your public key.",
+      "rotateKeys": "Rotate Keys",
+      "rotateKeysConfirm": "Rotate Signing Keys",
+      "rotateKeysMessage": "This will generate new signing keys. Remote servers will need to re-fetch your public key, which may temporarily disrupt federation. Continue?",
+      "noSite": "Select a site to manage settings.",
+      "loading": "Loading settings...",
+      "profile": "Profile",
+      "avatarUrl": "Avatar URL",
+      "avatarUrlHelper": "URL to your profile picture — paste a link or choose from media",
+      "chooseFromMedia": "Choose from Media",
+      "bio": "Bio",
+      "bioHelper": "A short description of your blog for Fediverse profiles (max 500 characters)"
+    },
+    "engagement": {
+      "likes": "Fediverse Likes",
+      "boosts": "Fediverse Boosts"
+    },
+    "breadcrumbs": {
+      "federation": "Federation"
+    },
+    "status": {
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    },
+    "featured": {
+      "title": "Pinned Posts",
+      "description": "Pinned posts appear on your Fediverse profile",
+      "pin": "Pin Post",
+      "unpin": "Unpin",
+      "maxReached": "Maximum 3 pinned posts",
+      "empty": "No pinned posts",
+      "selectPost": "Select a blog post to pin"
+    },
+    "preview": {
+      "title": "Federation Preview",
+      "description": "How this post will appear on the Fediverse",
+      "via": "Published via Forja",
+      "notEnabled": "Enable federation to preview"
     }
   }
 }

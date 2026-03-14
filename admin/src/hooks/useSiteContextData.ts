@@ -10,6 +10,7 @@ const DEFAULT_MODULES = {
   legal: false,
   documents: false,
   ai: false,
+  federation: false,
 };
 
 const DEFAULT_CONTEXT: SiteContextResponse = {

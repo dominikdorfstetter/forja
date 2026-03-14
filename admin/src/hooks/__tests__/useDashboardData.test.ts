@@ -80,8 +80,8 @@ describe('useDashboardData', () => {
     ]);
     vi.mocked(apiService.getBlogs).mockResolvedValue({
       data: [
-        { id: 'b1', slug: 'b1', author: 'A', published_date: '', is_featured: false, is_sample: false, status: 'Draft', created_at: '', updated_at: '' },
-        { id: 'b2', slug: 'b2', author: 'A', published_date: '', is_featured: false, is_sample: false, status: 'Published', created_at: '', updated_at: '' },
+        { id: 'b1', content_id: 'c1', slug: 'b1', author: 'A', published_date: '', is_featured: false, is_sample: false, status: 'Draft', created_at: '', updated_at: '' },
+        { id: 'b2', content_id: 'c2', slug: 'b2', author: 'A', published_date: '', is_featured: false, is_sample: false, status: 'Published', created_at: '', updated_at: '' },
       ],
       meta: { page: 1, page_size: 200, total_items: 2, total_pages: 1 },
     });

@@ -134,7 +134,8 @@
       "locales": "Langues",
       "apiDocs": "Documentation API",
       "myDrafts": "Mes brouillons",
-      "logout": "Déconnexion"
+      "logout": "Déconnexion",
+      "federation": "Fédération"
     },
     "toolbar": {
       "toggleDrawer": "Basculer le tiroir",
@@ -1292,7 +1293,8 @@
       "legal": "Juridique",
       "apiKeys": "Clés API",
       "modules": "Modules",
-      "ai": "Assistant IA"
+      "ai": "Assistant IA",
+      "federation": "Fédération"
     },
     "modules": {
       "title": "Modules de contenu",
@@ -2318,38 +2320,373 @@
     }
   },
   "errorCodes": {
-    "AUTH_MISSING_CREDENTIALS": { "message": "Authentification requise", "action": "Veuillez vous connecter pour continuer." },
-    "AUTH_TOKEN_INVALID": { "message": "Session expirée", "action": "Veuillez vous reconnecter." },
-    "AUTH_INSUFFICIENT_ROLE": { "message": "Permissions insuffisantes", "action": "Contactez un administrateur pour un accès élevé." },
-    "AUTH_SITE_ACCESS_DENIED": { "message": "Accès au site refusé", "action": "Contactez le propriétaire du site pour obtenir l'accès." },
-    "AUTH_API_KEY_INVALID": { "message": "Clé API invalide", "action": "Vérifiez la configuration de votre clé API." },
-    "AUTH_ACCOUNT_SOLE_OWNER": { "message": "Impossible de supprimer le compte", "action": "Transférez d'abord la propriété du site." },
-    "BLOG_SLUG_TAKEN": { "message": "Slug de blog déjà utilisé", "action": "Choisissez un slug différent." },
-    "PAGE_SLUG_TAKEN": { "message": "Slug de page déjà utilisé", "action": "Choisissez un slug différent." },
-    "SITE_SLUG_TAKEN": { "message": "Slug de site déjà utilisé", "action": "Choisissez un slug différent." },
-    "TAG_SLUG_TAKEN": { "message": "Slug de tag déjà utilisé", "action": "Choisissez un slug différent." },
-    "CATEGORY_SLUG_TAKEN": { "message": "Slug de catégorie déjà utilisé", "action": "Choisissez un slug différent." },
-    "LOCALE_CODE_TAKEN": { "message": "Code de langue déjà existant", "action": "Utilisez un code de langue différent." },
-    "RATE_LIMIT_EXCEEDED": { "message": "Trop de requêtes", "action": "Veuillez patienter un moment et réessayer." },
-    "MEMBER_ALREADY_EXISTS": { "message": "Membre déjà existant", "action": "Cet utilisateur est déjà membre du site." },
-    "MEMBER_CANNOT_REMOVE_OWNER": { "message": "Impossible de retirer le propriétaire", "action": "Transférez la propriété avant de retirer ce membre." },
-    "MEDIA_UPLOAD_TOO_LARGE": { "message": "Fichier trop volumineux", "action": "Réduisez la taille du fichier ou ajustez les paramètres du site." },
-    "MEDIA_UPLOAD_INVALID_TYPE": { "message": "Type de fichier non supporté", "action": "Vérifiez les types de fichiers autorisés." },
-    "AI_NOT_CONFIGURED": { "message": "IA non configurée", "action": "Configurez un fournisseur d'IA dans les paramètres du site." },
-    "AI_PROVIDER_UNAVAILABLE": { "message": "Fournisseur d'IA indisponible", "action": "Vérifiez votre configuration IA ou réessayez plus tard." },
-    "WORKFLOW_REVIEW_REQUIRED": { "message": "Révision requise", "action": "Soumettez le contenu pour révision avant de publier." },
-    "WORKFLOW_NO_PERMISSION": { "message": "Permission de workflow refusée", "action": "Vous n'avez pas la permission pour cette action de workflow." },
-    "MODULE_NOT_ENABLED": { "message": "Module non activé", "action": "Activez ce module dans les paramètres du site." },
-    "LOCALE_DELETE_IN_USE": { "message": "Langue en cours d'utilisation", "action": "Supprimez d'abord tout le contenu utilisant cette langue." },
-    "SITE_LOCALE_LAST_LANGUAGE": { "message": "Impossible de supprimer la dernière langue", "action": "Les sites doivent avoir au moins une langue." },
-    "REDIRECT_SAME_PATH": { "message": "Boucle de redirection détectée", "action": "Les chemins source et destination doivent être différents." },
+    "AUTH_MISSING_CREDENTIALS": {
+      "message": "Authentification requise",
+      "action": "Veuillez vous connecter pour continuer."
+    },
+    "AUTH_TOKEN_INVALID": {
+      "message": "Session expirée",
+      "action": "Veuillez vous reconnecter."
+    },
+    "AUTH_INSUFFICIENT_ROLE": {
+      "message": "Permissions insuffisantes",
+      "action": "Contactez un administrateur pour un accès élevé."
+    },
+    "AUTH_SITE_ACCESS_DENIED": {
+      "message": "Accès au site refusé",
+      "action": "Contactez le propriétaire du site pour obtenir l'accès."
+    },
+    "AUTH_API_KEY_INVALID": {
+      "message": "Clé API invalide",
+      "action": "Vérifiez la configuration de votre clé API."
+    },
+    "AUTH_ACCOUNT_SOLE_OWNER": {
+      "message": "Impossible de supprimer le compte",
+      "action": "Transférez d'abord la propriété du site."
+    },
+    "BLOG_SLUG_TAKEN": {
+      "message": "Slug de blog déjà utilisé",
+      "action": "Choisissez un slug différent."
+    },
+    "PAGE_SLUG_TAKEN": {
+      "message": "Slug de page déjà utilisé",
+      "action": "Choisissez un slug différent."
+    },
+    "SITE_SLUG_TAKEN": {
+      "message": "Slug de site déjà utilisé",
+      "action": "Choisissez un slug différent."
+    },
+    "TAG_SLUG_TAKEN": {
+      "message": "Slug de tag déjà utilisé",
+      "action": "Choisissez un slug différent."
+    },
+    "CATEGORY_SLUG_TAKEN": {
+      "message": "Slug de catégorie déjà utilisé",
+      "action": "Choisissez un slug différent."
+    },
+    "LOCALE_CODE_TAKEN": {
+      "message": "Code de langue déjà existant",
+      "action": "Utilisez un code de langue différent."
+    },
+    "RATE_LIMIT_EXCEEDED": {
+      "message": "Trop de requêtes",
+      "action": "Veuillez patienter un moment et réessayer."
+    },
+    "MEMBER_ALREADY_EXISTS": {
+      "message": "Membre déjà existant",
+      "action": "Cet utilisateur est déjà membre du site."
+    },
+    "MEMBER_CANNOT_REMOVE_OWNER": {
+      "message": "Impossible de retirer le propriétaire",
+      "action": "Transférez la propriété avant de retirer ce membre."
+    },
+    "MEDIA_UPLOAD_TOO_LARGE": {
+      "message": "Fichier trop volumineux",
+      "action": "Réduisez la taille du fichier ou ajustez les paramètres du site."
+    },
+    "MEDIA_UPLOAD_INVALID_TYPE": {
+      "message": "Type de fichier non supporté",
+      "action": "Vérifiez les types de fichiers autorisés."
+    },
+    "AI_NOT_CONFIGURED": {
+      "message": "IA non configurée",
+      "action": "Configurez un fournisseur d'IA dans les paramètres du site."
+    },
+    "AI_PROVIDER_UNAVAILABLE": {
+      "message": "Fournisseur d'IA indisponible",
+      "action": "Vérifiez votre configuration IA ou réessayez plus tard."
+    },
+    "WORKFLOW_REVIEW_REQUIRED": {
+      "message": "Révision requise",
+      "action": "Soumettez le contenu pour révision avant de publier."
+    },
+    "WORKFLOW_NO_PERMISSION": {
+      "message": "Permission de workflow refusée",
+      "action": "Vous n'avez pas la permission pour cette action de workflow."
+    },
+    "MODULE_NOT_ENABLED": {
+      "message": "Module non activé",
+      "action": "Activez ce module dans les paramètres du site."
+    },
+    "LOCALE_DELETE_IN_USE": {
+      "message": "Langue en cours d'utilisation",
+      "action": "Supprimez d'abord tout le contenu utilisant cette langue."
+    },
+    "SITE_LOCALE_LAST_LANGUAGE": {
+      "message": "Impossible de supprimer la dernière langue",
+      "action": "Les sites doivent avoir au moins une langue."
+    },
+    "REDIRECT_SAME_PATH": {
+      "message": "Boucle de redirection détectée",
+      "action": "Les chemins source et destination doivent être différents."
+    },
     "patterns": {
-      "notFound": { "message": "Ressource introuvable", "action": "Elle a peut-être été supprimée ou déplacée." },
-      "slugTaken": { "message": "Slug déjà utilisé", "action": "Choisissez un slug différent." },
-      "accessDenied": { "message": "Accès refusé", "action": "Vous n'avez pas la permission pour cette action." },
-      "auth": { "message": "Erreur d'authentification", "action": "Essayez de vous reconnecter." },
-      "validation": { "message": "Erreur de validation", "action": "Vérifiez les champs du formulaire et réessayez." },
-      "mediaUpload": { "message": "Échec du téléversement", "action": "Vérifiez le fichier et réessayez." }
+      "notFound": {
+        "message": "Ressource introuvable",
+        "action": "Elle a peut-être été supprimée ou déplacée."
+      },
+      "slugTaken": {
+        "message": "Slug déjà utilisé",
+        "action": "Choisissez un slug différent."
+      },
+      "accessDenied": {
+        "message": "Accès refusé",
+        "action": "Vous n'avez pas la permission pour cette action."
+      },
+      "auth": {
+        "message": "Erreur d'authentification",
+        "action": "Essayez de vous reconnecter."
+      },
+      "validation": {
+        "message": "Erreur de validation",
+        "action": "Vérifiez les champs du formulaire et réessayez."
+      },
+      "mediaUpload": {
+        "message": "Échec du téléversement",
+        "action": "Vérifiez le fichier et réessayez."
+      }
+    }
+  },
+  "federation": {
+    "title": "Fédération",
+    "subtitle": "Aperçu de la fédération ActivityPub",
+    "handle": {
+      "title": "Votre identifiant Fediverse",
+      "description": "Partagez cet identifiant pour que les utilisateurs de Mastodon, Pleroma ou Misskey puissent suivre votre blog.",
+      "copied": "Identifiant copié dans le presse-papiers",
+      "copy": "Copier l'identifiant"
+    },
+    "stats": {
+      "followers": "Abonnés",
+      "postsSyndicated": "Articles syndiqués",
+      "pendingComments": "Commentaires en attente",
+      "inbound": "Entrant",
+      "failedDeliveries": "Livraisons échouées"
+    },
+    "manage": "Gérer",
+    "profile": {
+      "edit": "Modifier le profil",
+      "noBio": "Pas de biographie — cliquez sur modifier pour en ajouter une"
+    },
+    "noSiteSelected": "Aucun site sélectionné",
+    "noSiteDescription": "Sélectionnez un site pour voir le statut de fédération.",
+    "loadingData": "Chargement des données de fédération...",
+    "nav": {
+      "followers": "Abonnés",
+      "followersDesc": "Voir et gérer vos abonnés Fediverse",
+      "comments": "Commentaires",
+      "commentsDesc": "Modérer les réponses entrantes du Fediverse",
+      "activityLog": "Journal d'activité",
+      "activityLogDesc": "Voir les événements de fédération envoyés et reçus",
+      "blocklist": "Liste de blocage",
+      "blocklistDesc": "Bloquer des instances ou des acteurs individuels",
+      "blockedActors": "Acteurs bloqués",
+      "blockedActorsDesc": "Bloquer des acteurs Fediverse individuels"
+    },
+    "followers": {
+      "title": "Abonnés",
+      "subtitle": "Abonnés Fediverse de ce site",
+      "searchPlaceholder": "Rechercher des abonnés...",
+      "noSite": "Sélectionnez un site pour voir les abonnés.",
+      "empty": "Pas encore d'abonnés",
+      "emptyDescription": "Les abonnés Fediverse apparaîtront ici lorsqu'ils suivront votre site.",
+      "loading": "Chargement des abonnés...",
+      "removeTitle": "Supprimer l'abonné",
+      "removeMessage": "Supprimer {{name}} ? Cette personne devra se réabonner à votre site.",
+      "removeConfirm": "Supprimer",
+      "removeTooltip": "Supprimer l'abonné",
+      "columns": {
+        "name": "Nom",
+        "actorUri": "URI de l'acteur",
+        "status": "Statut",
+        "followed": "Abonné depuis",
+        "actions": "Actions"
+      }
+    },
+    "comments": {
+      "title": "Commentaires",
+      "subtitle": "Modérer les commentaires fédérés",
+      "searchPlaceholder": "Rechercher des commentaires...",
+      "noSite": "Sélectionnez un site pour modérer les commentaires.",
+      "empty": "Aucun commentaire",
+      "emptyDescription": "Les commentaires fédérés apparaîtront ici lorsqu'ils seront reçus.",
+      "loading": "Chargement des commentaires...",
+      "deleteTitle": "Supprimer le commentaire",
+      "deleteMessage": "Supprimer le commentaire de {{name}} ? Cette action est irréversible.",
+      "deleteConfirm": "Supprimer",
+      "approveTooltip": "Approuver",
+      "rejectTooltip": "Rejeter",
+      "deleteTooltip": "Supprimer",
+      "columns": {
+        "author": "Auteur",
+        "comment": "Commentaire",
+        "status": "Statut",
+        "date": "Date",
+        "actions": "Actions"
+      }
+    },
+    "activityLog": {
+      "title": "Journal d'activité",
+      "subtitle": "Historique d'activité de fédération",
+      "searchPlaceholder": "Rechercher des activités...",
+      "noSite": "Sélectionnez un site pour voir l'activité.",
+      "empty": "Aucune activité pour l'instant",
+      "emptyDescription": "Les activités de fédération apparaîtront ici lorsqu'elles se produiront.",
+      "loading": "Chargement des activités...",
+      "retryTooltip": "Réessayer la livraison",
+      "inbound": "Entrant",
+      "outbound": "Sortant",
+      "columns": {
+        "type": "Type",
+        "actor": "Acteur",
+        "direction": "Direction",
+        "status": "Statut",
+        "date": "Date",
+        "actions": "Actions"
+      }
+    },
+    "blocklist": {
+      "title": "Liste de blocage",
+      "subtitle": "Instances et acteurs bloqués",
+      "noSite": "Sélectionnez un site pour gérer les blocages.",
+      "instances": "Instances",
+      "actors": "Acteurs",
+      "loading": "Chargement de la liste de blocage...",
+      "noBlockedInstances": "Aucune instance bloquée",
+      "noBlockedInstancesDesc": "Les instances bloquées apparaîtront ici.",
+      "noBlockedActors": "Aucun acteur bloqué",
+      "noBlockedActorsDesc": "Les acteurs bloqués apparaîtront ici.",
+      "unblockInstanceTitle": "Débloquer l'instance",
+      "unblockInstanceMessage": "Débloquer {{domain}} ?",
+      "unblockActorTitle": "Débloquer l'acteur",
+      "unblockActorMessage": "Débloquer {{actor}} ?",
+      "unblockConfirm": "Débloquer",
+      "unblockInstanceTooltip": "Débloquer l'instance",
+      "unblockActorTooltip": "Débloquer l'acteur",
+      "columns": {
+        "domain": "Domaine",
+        "actorUri": "URI de l'acteur",
+        "reason": "Raison",
+        "blocked": "Bloqué",
+        "actions": "Actions"
+      },
+      "import": "Importer",
+      "importTitle": "Importer une liste de blocage",
+      "importDescription": "Collez des domaines (un par ligne) ou importez un fichier CSV/TXT",
+      "importButton": "Importer les domaines",
+      "importSuccess": "{{imported}} domaines importés ({{skipped}} déjà bloqués)",
+      "importPaste": "Collez les domaines ici (un par ligne)...",
+      "importFile": "Ou importer un fichier"
+    },
+    "quickPost": {
+      "title": "Publication rapide",
+      "placeholder": "Quoi de neuf ? Publiez directement sur le Fédivers...",
+      "post": "Publier",
+      "posting": "Publication en cours...",
+      "posted": "Publié sur le Fédivers !",
+      "deleteTitle": "Supprimer la publication",
+      "deleteMessage": "Cela enverra également une activité de suppression au Fédivers. La publication peut encore être en cache sur certains serveurs.",
+      "deleteConfirm": "Supprimer",
+      "deleted": "Publication supprimée",
+      "recentPosts": "Publications récentes",
+      "noPosts": "Pas encore de publications. Partagez votre première pensée !",
+      "charCount": "{{count}}/500",
+      "schedule": "Planifier",
+      "scheduledFor": "Planifié pour le {{date}}",
+      "schedulePost": "Planifier la publication",
+      "scheduledSuccess": "Publication planifiée !",
+      "cancelScheduled": "Annuler la publication planifiée",
+      "cancelledSuccess": "Publication planifiée annulée",
+      "editPost": "Modifier",
+      "deletePost": "Supprimer la publication",
+      "deletePostConfirm": "Supprimer cette publication ? Une activité de suppression sera envoyée au Fédivers.",
+      "deleteConfirm": "Supprimer",
+      "editSave": "Enregistrer",
+      "editCancel": "Annuler",
+      "edited": "Publication mise à jour",
+      "deletedPost": "Publication supprimée",
+      "scheduledCount": "{{count}} publications planifiées",
+      "scheduledCountBanner": "{{count}} publication(s) planifiée(s)"
+    },
+    "settings": {
+      "title": "Paramètres de fédération",
+      "subtitle": "Configurer la fédération ActivityPub",
+      "handle": "Identifiant Fediverse",
+      "signatureAlgorithm": "Algorithme de signature",
+      "algorithm": "Algorithme",
+      "moderation": "Modération",
+      "mode": "Mode",
+      "modeQueueAll": "Tout mettre en file d'attente (révision manuelle)",
+      "modeAutoApprove": "Approbation automatique",
+      "modeFollowersOnly": "Abonnés uniquement",
+      "autoPublish": "Publier automatiquement les nouveaux articles vers la fédération",
+      "keyManagement": "Gestion des clés",
+      "keyRotateWarning": "La rotation des clés invalidera les signatures HTTP existantes. Les serveurs distants devront récupérer votre clé publique.",
+      "rotateKeys": "Rotation des clés",
+      "rotateKeysConfirm": "Rotation des clés de signature",
+      "rotateKeysMessage": "De nouvelles clés de signature seront générées. Les serveurs distants devront récupérer votre clé publique, ce qui peut temporairement perturber la fédération. Continuer ?",
+      "noSite": "Sélectionnez un site pour gérer les paramètres.",
+      "loading": "Chargement des paramètres...",
+      "profile": "Profil",
+      "avatarUrl": "URL de l'avatar",
+      "avatarUrlHelper": "URL de votre photo de profil — collez un lien ou choisissez depuis les médias",
+      "chooseFromMedia": "Choisir depuis les médias",
+      "bio": "Biographie",
+      "bioHelper": "Une courte description de votre blog pour les profils Fediverse (500 caractères max.)"
+    },
+    "engagement": {
+      "likes": "Likes Fediverse",
+      "boosts": "Boosts Fediverse"
+    },
+    "breadcrumbs": {
+      "federation": "Fédération"
+    },
+    "status": {
+      "enabled": "Activé",
+      "disabled": "Désactivé"
+    },
+    "featured": {
+      "title": "Publications épinglées",
+      "description": "Les publications épinglées apparaissent sur votre profil Fediverse",
+      "pin": "Épingler la publication",
+      "unpin": "Désépingler",
+      "maxReached": "Maximum 3 publications épinglées",
+      "empty": "Aucune publication épinglée",
+      "selectPost": "Sélectionnez un article de blog à épingler"
+    },
+    "preview": {
+      "title": "Aperçu de la fédération",
+      "description": "Comment cette publication apparaîtra sur le Fédivers",
+      "via": "Publié via Forja",
+      "notEnabled": "Activez la fédération pour prévisualiser"
+    },
+    "timeline": {
+      "empty": "Votre fil est vide. Publiez quelque chose ou attendez des interactions du Fédivers !",
+      "outCreateArticle": "publié",
+      "outCreate": "a publié un nouvel article",
+      "outUpdate": "a mis à jour un article",
+      "outDelete": "a supprimé un article",
+      "outDefault": "a envoyé une activité {{type}}",
+      "inFollow": "a commencé à vous suivre",
+      "inLike": "a aimé votre publication",
+      "inLikePost": "a aimé",
+      "inBoost": "a boosté votre publication",
+      "inBoostPost": "a boosté",
+      "inComment": "a répondu à votre publication",
+      "inCommentPost": "a répondu à",
+      "inDefault": "a envoyé {{type}}"
+    },
+    "health": {
+      "title": "Santé des instances",
+      "description": "Statut de livraison par instance distante",
+      "domain": "Instance",
+      "total": "Total",
+      "successful": "OK",
+      "failed": "Échoué",
+      "dead": "Inactive",
+      "lastAttempt": "Dernière tentative",
+      "healthy": "Toutes les instances en bonne santé",
+      "blockSuggestion": "Envisager de bloquer"
     }
   }
 }

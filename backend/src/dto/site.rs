@@ -188,6 +188,8 @@ pub struct SiteContextModules {
     pub documents: bool,
     #[schema(example = false)]
     pub ai: bool,
+    #[schema(example = false)]
+    pub federation: bool,
 }
 
 /// Site context response for progressive disclosure
@@ -533,6 +535,7 @@ mod tests {
                 legal: false,
                 documents: false,
                 ai: false,
+                federation: false,
             },
         };
 

@@ -26,6 +26,7 @@ const MODULE_DEFS = [
   { key: 'module_legal_enabled' as const, labelKey: 'settings.modules.legal', descKey: 'settings.modules.legalDesc' },
   { key: 'module_documents_enabled' as const, labelKey: 'settings.modules.documents', descKey: 'settings.modules.documentsDesc' },
   { key: 'module_ai_enabled' as const, labelKey: 'settings.modules.ai', descKey: 'settings.modules.aiDesc' },
+  { key: 'module_federation_enabled' as const, labelKey: 'settings.modules.federation', descKey: 'settings.modules.federationDesc' },
 ] as const;
 
 type ModuleKey = typeof MODULE_DEFS[number]['key'];
@@ -49,6 +50,7 @@ export default function ModulesTab() {
     module_legal_enabled: false,
     module_documents_enabled: false,
     module_ai_enabled: false,
+    module_federation_enabled: false,
   });
   const [dirty, setDirty] = useState(false);
 
@@ -62,6 +64,7 @@ export default function ModulesTab() {
       module_legal_enabled: settings.module_legal_enabled,
       module_documents_enabled: settings.module_documents_enabled,
       module_ai_enabled: settings.module_ai_enabled,
+      module_federation_enabled: settings.module_federation_enabled,
     });
     setDirty(false);
   }
@@ -85,7 +88,21 @@ export default function ModulesTab() {
     setDirty(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    // If federation toggle changed, call enable/disable to manage keypairs
+    const federationChanged = settings && modules.module_federation_enabled !== settings.module_federation_enabled;
+    if (federationChanged) {
+      try {
+        if (modules.module_federation_enabled) {
+          await apiService.enableFederation(selectedSiteId);
+        } else {
+          await apiService.disableFederation(selectedSiteId);
+        }
+      } catch {
+        // 409 = already enabled/disabled, safe to continue saving the setting
+      }
+    }
+    // Save all module settings (including federation flag)
     mutation.mutate(modules);
   };
 

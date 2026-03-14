@@ -194,6 +194,25 @@ pub const WORKFLOW_REVIEW_REQUIRED: &str = "WORKFLOW_REVIEW_REQUIRED";
 pub const WORKFLOW_INVALID_STATUS: &str = "WORKFLOW_INVALID_STATUS";
 pub const WORKFLOW_NO_PERMISSION: &str = "WORKFLOW_NO_PERMISSION";
 
+// ── Federation ──────────────────────────────────────────────────────────
+
+pub const FEDERATION_MODULE_DISABLED: &str = "FEDERATION_MODULE_DISABLED";
+pub const FEDERATION_ENABLE_DUPLICATE: &str = "FEDERATION_ENABLE_DUPLICATE";
+pub const FEDERATION_SIGNATURE_INVALID: &str = "FEDERATION_SIGNATURE_INVALID";
+pub const FEDERATION_SIGNATURE_EXPIRED: &str = "FEDERATION_SIGNATURE_EXPIRED";
+pub const FEDERATION_ACTOR_BLOCKED: &str = "FEDERATION_ACTOR_BLOCKED";
+pub const FEDERATION_INSTANCE_BLOCKED: &str = "FEDERATION_INSTANCE_BLOCKED";
+pub const FEDERATION_ACTOR_DOMAIN_MISMATCH: &str = "FEDERATION_ACTOR_DOMAIN_MISMATCH";
+pub const FEDERATION_PAYLOAD_OVERSIZED: &str = "FEDERATION_PAYLOAD_OVERSIZED";
+pub const FEDERATION_ACTIVITY_UNSUPPORTED: &str = "FEDERATION_ACTIVITY_UNSUPPORTED";
+pub const FEDERATION_CONTEXT_MISSING: &str = "FEDERATION_CONTEXT_MISSING";
+pub const FEDERATION_DELIVERY_FAILED: &str = "FEDERATION_DELIVERY_FAILED";
+pub const FEDERATION_KEY_FETCH_FAILED: &str = "FEDERATION_KEY_FETCH_FAILED";
+pub const FEDERATION_COMMENT_NOT_FOUND: &str = "FEDERATION_COMMENT_NOT_FOUND";
+pub const FEDERATION_FOLLOWER_NOT_FOUND: &str = "FEDERATION_FOLLOWER_NOT_FOUND";
+pub const FEDERATION_PUBLISH_UNAUTHORIZED: &str = "FEDERATION_PUBLISH_UNAUTHORIZED";
+pub const FEDERATION_ROTATION_IN_PROGRESS: &str = "FEDERATION_ROTATION_IN_PROGRESS";
+
 // ── Module ──────────────────────────────────────────────────────────────
 
 pub const MODULE_NOT_ENABLED: &str = "MODULE_NOT_ENABLED";
@@ -820,6 +839,103 @@ pub const ALL: &[ErrorCodeDef] = &[
         http_status: 403,
         description: "You do not have permission to change content status",
     },
+    // Federation
+    ErrorCodeDef {
+        code: FEDERATION_MODULE_DISABLED,
+        domain: "federation",
+        http_status: 404,
+        description: "The federation module is not enabled for this site",
+    },
+    ErrorCodeDef {
+        code: FEDERATION_ENABLE_DUPLICATE,
+        domain: "federation",
+        http_status: 409,
+        description: "Federation is already enabled for this site",
+    },
+    ErrorCodeDef {
+        code: FEDERATION_SIGNATURE_INVALID,
+        domain: "federation",
+        http_status: 401,
+        description: "The HTTP signature on the incoming request is invalid",
+    },
+    ErrorCodeDef {
+        code: FEDERATION_SIGNATURE_EXPIRED,
+        domain: "federation",
+        http_status: 401,
+        description: "The HTTP signature on the incoming request has expired",
+    },
+    ErrorCodeDef {
+        code: FEDERATION_ACTOR_BLOCKED,
+        domain: "federation",
+        http_status: 403,
+        description: "The remote actor is blocked on this instance",
+    },
+    ErrorCodeDef {
+        code: FEDERATION_INSTANCE_BLOCKED,
+        domain: "federation",
+        http_status: 403,
+        description: "The remote instance is blocked on this instance",
+    },
+    ErrorCodeDef {
+        code: FEDERATION_ACTOR_DOMAIN_MISMATCH,
+        domain: "federation",
+        http_status: 403,
+        description: "The actor ID domain does not match the request origin",
+    },
+    ErrorCodeDef {
+        code: FEDERATION_PAYLOAD_OVERSIZED,
+        domain: "federation",
+        http_status: 413,
+        description: "The incoming ActivityPub payload exceeds the size limit",
+    },
+    ErrorCodeDef {
+        code: FEDERATION_ACTIVITY_UNSUPPORTED,
+        domain: "federation",
+        http_status: 400,
+        description: "The incoming activity type is not supported",
+    },
+    ErrorCodeDef {
+        code: FEDERATION_CONTEXT_MISSING,
+        domain: "federation",
+        http_status: 400,
+        description: "The required @context field is missing from the activity",
+    },
+    ErrorCodeDef {
+        code: FEDERATION_DELIVERY_FAILED,
+        domain: "federation",
+        http_status: 502,
+        description: "Failed to deliver an activity to a remote inbox",
+    },
+    ErrorCodeDef {
+        code: FEDERATION_KEY_FETCH_FAILED,
+        domain: "federation",
+        http_status: 502,
+        description: "Failed to fetch the public key of a remote actor",
+    },
+    ErrorCodeDef {
+        code: FEDERATION_COMMENT_NOT_FOUND,
+        domain: "federation",
+        http_status: 404,
+        description: "The requested federated comment does not exist",
+    },
+    ErrorCodeDef {
+        code: FEDERATION_FOLLOWER_NOT_FOUND,
+        domain: "federation",
+        http_status: 404,
+        description: "The requested federated follower does not exist",
+    },
+    ErrorCodeDef {
+        code: FEDERATION_PUBLISH_UNAUTHORIZED,
+        domain: "federation",
+        http_status: 403,
+        description: "You do not have permission to publish to the fediverse",
+    },
+    ErrorCodeDef {
+        code: FEDERATION_ROTATION_IN_PROGRESS,
+        domain: "federation",
+        http_status: 409,
+        description: "A key rotation is already in progress for this actor",
+    },
     // Module
     ErrorCodeDef {
         code: MODULE_NOT_ENABLED,
@@ -921,3 +1037,186 @@ pub const ALL: &[ErrorCodeDef] = &[
         description: "The request conflicts with existing data (generic)",
     },
 ];
+
+/// Helper: look up an error code definition by code string.
+pub fn find_by_code(code: &str) -> Option<&'static ErrorCodeDef> {
+    ALL.iter().find(|def| def.code == code)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Every constant must appear in the ALL catalog exactly once.
+    #[test]
+    fn test_all_federation_codes_registered() {
+        let federation_codes: &[&str] = &[
+            FEDERATION_MODULE_DISABLED,
+            FEDERATION_ENABLE_DUPLICATE,
+            FEDERATION_SIGNATURE_INVALID,
+            FEDERATION_SIGNATURE_EXPIRED,
+            FEDERATION_ACTOR_BLOCKED,
+            FEDERATION_INSTANCE_BLOCKED,
+            FEDERATION_ACTOR_DOMAIN_MISMATCH,
+            FEDERATION_PAYLOAD_OVERSIZED,
+            FEDERATION_ACTIVITY_UNSUPPORTED,
+            FEDERATION_CONTEXT_MISSING,
+            FEDERATION_DELIVERY_FAILED,
+            FEDERATION_KEY_FETCH_FAILED,
+            FEDERATION_COMMENT_NOT_FOUND,
+            FEDERATION_FOLLOWER_NOT_FOUND,
+            FEDERATION_PUBLISH_UNAUTHORIZED,
+            FEDERATION_ROTATION_IN_PROGRESS,
+        ];
+
+        for code in federation_codes {
+            assert!(
+                find_by_code(code).is_some(),
+                "Federation code {} is not registered in ALL",
+                code
+            );
+        }
+    }
+
+    #[test]
+    fn test_federation_codes_domain() {
+        let federation_codes: &[&str] = &[
+            FEDERATION_MODULE_DISABLED,
+            FEDERATION_ENABLE_DUPLICATE,
+            FEDERATION_SIGNATURE_INVALID,
+            FEDERATION_SIGNATURE_EXPIRED,
+            FEDERATION_ACTOR_BLOCKED,
+            FEDERATION_INSTANCE_BLOCKED,
+            FEDERATION_ACTOR_DOMAIN_MISMATCH,
+            FEDERATION_PAYLOAD_OVERSIZED,
+            FEDERATION_ACTIVITY_UNSUPPORTED,
+            FEDERATION_CONTEXT_MISSING,
+            FEDERATION_DELIVERY_FAILED,
+            FEDERATION_KEY_FETCH_FAILED,
+            FEDERATION_COMMENT_NOT_FOUND,
+            FEDERATION_FOLLOWER_NOT_FOUND,
+            FEDERATION_PUBLISH_UNAUTHORIZED,
+            FEDERATION_ROTATION_IN_PROGRESS,
+        ];
+
+        for code in federation_codes {
+            let def = find_by_code(code).unwrap();
+            assert_eq!(
+                def.domain, "federation",
+                "Code {} should be in federation domain",
+                code
+            );
+        }
+    }
+
+    #[test]
+    fn test_federation_codes_http_statuses() {
+        // 404 codes
+        assert_eq!(
+            find_by_code(FEDERATION_MODULE_DISABLED)
+                .unwrap()
+                .http_status,
+            404
+        );
+        assert_eq!(
+            find_by_code(FEDERATION_COMMENT_NOT_FOUND)
+                .unwrap()
+                .http_status,
+            404
+        );
+        assert_eq!(
+            find_by_code(FEDERATION_FOLLOWER_NOT_FOUND)
+                .unwrap()
+                .http_status,
+            404
+        );
+
+        // 401 codes
+        assert_eq!(
+            find_by_code(FEDERATION_SIGNATURE_INVALID)
+                .unwrap()
+                .http_status,
+            401
+        );
+        assert_eq!(
+            find_by_code(FEDERATION_SIGNATURE_EXPIRED)
+                .unwrap()
+                .http_status,
+            401
+        );
+
+        // 403 codes
+        assert_eq!(
+            find_by_code(FEDERATION_ACTOR_BLOCKED).unwrap().http_status,
+            403
+        );
+        assert_eq!(
+            find_by_code(FEDERATION_INSTANCE_BLOCKED)
+                .unwrap()
+                .http_status,
+            403
+        );
+        assert_eq!(
+            find_by_code(FEDERATION_ACTOR_DOMAIN_MISMATCH)
+                .unwrap()
+                .http_status,
+            403
+        );
+        assert_eq!(
+            find_by_code(FEDERATION_PUBLISH_UNAUTHORIZED)
+                .unwrap()
+                .http_status,
+            403
+        );
+
+        // 413 codes
+        assert_eq!(
+            find_by_code(FEDERATION_PAYLOAD_OVERSIZED)
+                .unwrap()
+                .http_status,
+            413
+        );
+
+        // 400 codes
+        assert_eq!(
+            find_by_code(FEDERATION_ACTIVITY_UNSUPPORTED)
+                .unwrap()
+                .http_status,
+            400
+        );
+        assert_eq!(
+            find_by_code(FEDERATION_CONTEXT_MISSING)
+                .unwrap()
+                .http_status,
+            400
+        );
+
+        // 409 codes
+        assert_eq!(
+            find_by_code(FEDERATION_ENABLE_DUPLICATE)
+                .unwrap()
+                .http_status,
+            409
+        );
+        assert_eq!(
+            find_by_code(FEDERATION_ROTATION_IN_PROGRESS)
+                .unwrap()
+                .http_status,
+            409
+        );
+
+        // 502 codes
+        assert_eq!(
+            find_by_code(FEDERATION_DELIVERY_FAILED)
+                .unwrap()
+                .http_status,
+            502
+        );
+        assert_eq!(
+            find_by_code(FEDERATION_KEY_FETCH_FAILED)
+                .unwrap()
+                .http_status,
+            502
+        );
+    }
+}
