@@ -15,7 +15,7 @@ use crate::services::publish_hooks;
 use crate::AppState;
 
 /// How often the scheduler polls for due content (seconds).
-const POLL_INTERVAL_SECS: u64 = 30;
+const POLL_INTERVAL_SECS: u64 = 60;
 
 /// Row shape returned by the scheduled content query.
 #[derive(sqlx::FromRow)]
