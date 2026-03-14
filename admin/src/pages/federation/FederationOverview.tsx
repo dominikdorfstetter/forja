@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { useSiteContext } from '@/store/SiteContext';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useFederationStats, useFederationSettings, useFeaturedPosts } from '@/hooks/useFederationData';
+import { useFederationStats, useFederationSettings, useFeaturedPosts, useFederationHealth } from '@/hooks/useFederationData';
 import { useFederationMutations } from '@/hooks/useFederationMutations';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
@@ -29,6 +29,7 @@ import MediaPickerDialog from '@/components/media/MediaPickerDialog';
 import apiService from '@/services/api';
 import QuickPostComposer from '@/pages/federation/QuickPostComposer';
 import FederationTimeline from '@/pages/federation/FederationTimeline';
+import InstanceHealthCard from '@/pages/federation/InstanceHealthCard';
 
 interface QuickLinkProps {
   icon: React.ReactNode;
@@ -167,7 +168,8 @@ export default function FederationOverview() {
   const { data: settings, isLoading: settingsLoading } = useFederationSettings(selectedSiteId);
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
-  const { updateSettings, pinPostMutation, unpinPostMutation } = useFederationMutations(selectedSiteId);
+  const { updateSettings, pinPostMutation, unpinPostMutation, blockInstanceMutation } = useFederationMutations(selectedSiteId);
+  const { data: healthData } = useFederationHealth(selectedSiteId);
   const { data: featuredPosts } = useFeaturedPosts(selectedSiteId);
 
   const queryClient = useQueryClient();
@@ -535,6 +537,16 @@ export default function FederationOverview() {
               path="/federation/blocks"
             />
           </Card>
+
+          {/* Instance Health */}
+          {settings?.enabled && healthData && (
+            <Box sx={{ mt: 3 }}>
+              <InstanceHealthCard
+                healthData={healthData}
+                onBlockInstance={(domain) => blockInstanceMutation.mutate({ domain })}
+              />
+            </Box>
+          )}
         </Grid>
       </Grid>
 

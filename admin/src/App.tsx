@@ -47,6 +47,7 @@ import FederationActivityLogPage from '@/pages/federation/FederationActivityLog'
 import FederationCommentsPage from '@/pages/federation/FederationComments';
 import FederationBlocklistPage from '@/pages/federation/FederationBlocklist';
 import FederationSettingsPage from '@/pages/federation/FederationSettings';
+import InstanceHealthPage from '@/pages/federation/InstanceHealthView';
 
 // Components
 import Layout from '@/components/Layout';
@@ -170,6 +171,7 @@ function App() {
                   <Route path="federation/activity" element={<FederationActivityLogPage />} />
                   <Route path="federation/comments" element={<FederationCommentsPage />} />
                   <Route path="federation/blocks" element={<FederationBlocklistPage />} />
+                  <Route path="federation/health" element={<InstanceHealthPage />} />
                   <Route path="federation/settings" element={<FederationSettingsPage />} />
                   <Route path="settings" element={<SettingsPage />} />
                   <Route path="api-docs" element={<ApiDocsPage />} />

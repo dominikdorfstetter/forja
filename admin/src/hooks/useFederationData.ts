@@ -25,6 +25,14 @@ export function useFeaturedPosts(siteId: string) {
   });
 }
 
+export function useFederationHealth(siteId: string) {
+  return useQuery({
+    queryKey: ['federation-health', siteId],
+    queryFn: () => apiService.getFederationHealth(siteId),
+    enabled: !!siteId,
+  });
+}
+
 export function useFederationEngagement(siteId: string, contentId: string) {
   return useQuery({
     queryKey: ['federation-engagement', siteId, contentId],
