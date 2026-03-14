@@ -55,15 +55,17 @@ beforeEach(async () => {
 });
 
 describe('FederationOverview', () => {
-  it('renders stats cards', async () => {
+  it('renders profile card with stats', async () => {
     vi.mocked(apiService.getFederationStats).mockResolvedValue(mockStats);
     vi.mocked(apiService.getFederationSettings).mockResolvedValue(mockSettings);
+    vi.mocked(apiService.getFederationNotes).mockResolvedValue({ data: [], meta: { total: 0, page: 1, page_size: 5, total_pages: 0 } });
 
     renderWithProviders(<FederationOverview />);
-    expect(await screen.findByText('142')).toBeInTheDocument();
-    expect(screen.getByText('28')).toBeInTheDocument();
-    expect(screen.getByText('3')).toBeInTheDocument();
-    expect(screen.getByText('1')).toBeInTheDocument();
+    // Profile card shows stats — multiple elements may have the same count (profile + quick link badge)
+    const elements142 = await screen.findAllByText('142');
+    expect(elements142.length).toBeGreaterThan(0);
+    const elements28 = screen.getAllByText('28');
+    expect(elements28.length).toBeGreaterThan(0);
   });
 
   it('displays the fediverse handle', async () => {

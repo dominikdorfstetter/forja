@@ -2460,7 +2460,8 @@
     },
     "stats": {
       "followers": "Followers",
-      "postsSyndicated": "Posts Syndicated",
+      "postsSyndicated": "Posts",
+      "inbound": "Inbound",
       "pendingComments": "Pending Comments",
       "failedDeliveries": "Failed Deliveries"
     },
