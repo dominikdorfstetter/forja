@@ -61,7 +61,7 @@ export default function FederationComments() {
   const columns: DataTableColumn<FederationComment>[] = [
     {
       header: t('federation.comments.columns.author'),
-      render: (c) => c.authorName ?? c.authorActorUri,
+      render: (c) => c.author_name ?? c.author_actor_uri,
     },
     {
       header: t('federation.comments.columns.comment'),
@@ -70,7 +70,7 @@ export default function FederationComments() {
           variant="body2"
           sx={{ maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
         >
-          {stripHtml(c.bodyHtml)}
+          {stripHtml(c.body_html)}
         </Typography>
       ),
     },
@@ -82,7 +82,7 @@ export default function FederationComments() {
     },
     {
       header: t('federation.comments.columns.date'),
-      render: (c) => format(new Date(c.createdAt), 'PP'),
+      render: (c) => format(new Date(c.created_at), 'PP'),
     },
     {
       header: t('federation.comments.columns.actions'),
@@ -159,7 +159,7 @@ export default function FederationComments() {
       <ConfirmDialog
         open={!!deleting}
         title={t('federation.comments.deleteTitle')}
-        message={t('federation.comments.deleteMessage', { name: deleting?.authorName ?? deleting?.authorActorUri })}
+        message={t('federation.comments.deleteMessage', { name: deleting?.author_name ?? deleting?.author_actor_uri })}
         confirmLabel={t('federation.comments.deleteConfirm')}
         onConfirm={() => deleting && deleteComment.mutate(deleting.id)}
         onCancel={closeDelete}

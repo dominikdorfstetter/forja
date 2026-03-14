@@ -1579,68 +1579,70 @@ export interface SeedContentResponse {
 
 export interface FederationActor {
   id: string;
-  siteId: string;
-  preferredUsername: string;
-  displayName: string;
+  site_id: string;
+  preferred_username: string;
+  display_name: string;
   summary: string | null;
-  avatarUrl: string | null;
-  signatureAlgorithm: string;
-  createdAt: string;
+  avatar_url: string | null;
+  signature_algorithm: string;
+  created_at: string;
 }
 
 export interface FederationFollower {
   id: string;
-  followerActorUri: string;
-  displayName: string | null;
+  actor_uri: string;
+  inbox_uri: string;
+  display_name: string | null;
   username: string | null;
-  avatarUrl: string | null;
+  avatar_url: string | null;
   status: string;
-  followedAt: string;
+  followed_at: string;
 }
 
 export interface FederationActivity {
   id: string;
-  activityType: string;
-  actorUri: string;
-  objectUri: string | null;
-  direction: 'in' | 'out';
+  activity_type: string;
+  activity_uri: string;
+  actor_uri: string;
+  object_uri: string | null;
+  direction: string;
   status: string;
-  errorMessage: string | null;
-  createdAt: string;
+  error_message: string | null;
+  created_at: string;
 }
 
 export interface FederationComment {
   id: string;
-  contentId: string;
-  authorActorUri: string;
-  authorName: string | null;
-  authorAvatarUrl: string | null;
-  bodyHtml: string;
-  status: 'pending' | 'approved' | 'rejected' | 'spam';
-  createdAt: string;
-  moderatedAt: string | null;
+  content_id: string;
+  author_actor_uri: string;
+  author_name: string | null;
+  author_avatar_url: string | null;
+  body_html: string;
+  status: string;
+  created_at: string;
+  moderated_at: string | null;
 }
 
 export interface FederationBlockedInstance {
   id: string;
-  instanceDomain: string;
+  domain: string;
   reason: string | null;
-  blockedAt: string;
+  blocked_at: string;
 }
 
 export interface FederationBlockedActor {
   id: string;
-  blockedActorUri: string;
+  actor_uri: string;
   reason: string | null;
-  blockedAt: string;
+  blocked_at: string;
 }
 
 export interface FederationNote {
   id: string;
   body: string;
-  bodyHtml: string;
-  publishedAt: string;
-  activityUri: string | null;
+  body_html: string;
+  published_at: string;
+  activity_uri: string | null;
 }
 
 export interface FederationSettings {
@@ -1654,10 +1656,13 @@ export interface FederationSettings {
 }
 
 export interface FederationStats {
-  followersCount: number;
-  postsSyndicated: number;
-  pendingComments: number;
-  failedDeliveries: number;
+  outbound_activities: number;
+  inbound_activities: number;
+  failed_activities: number;
+  pending_comments: number;
+  follower_count: number;
+  blocked_instances: number;
+  blocked_actors: number;
 }
 
 export interface FederationEngagement {

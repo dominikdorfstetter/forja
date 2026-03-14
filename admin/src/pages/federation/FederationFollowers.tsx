@@ -43,13 +43,13 @@ export default function FederationFollowers() {
   const columns: DataTableColumn<FederationFollower>[] = [
     {
       header: t('federation.followers.columns.name'),
-      render: (f) => f.displayName ?? f.username ?? 'Unknown',
+      render: (f) => f.display_name ?? f.username ?? 'Unknown',
     },
     {
       header: t('federation.followers.columns.actorUri'),
       render: (f) => (
         <Box component="span" sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>
-          {f.followerActorUri}
+          {f.actor_uri}
         </Box>
       ),
     },
@@ -65,7 +65,7 @@ export default function FederationFollowers() {
     },
     {
       header: t('federation.followers.columns.followed'),
-      render: (f) => format(new Date(f.followedAt), 'PP'),
+      render: (f) => format(new Date(f.followed_at), 'PP'),
     },
     {
       header: t('federation.followers.columns.actions'),
@@ -126,7 +126,7 @@ export default function FederationFollowers() {
       <ConfirmDialog
         open={!!deleting}
         title={t('federation.followers.removeTitle')}
-        message={t('federation.followers.removeMessage', { name: deleting?.displayName ?? deleting?.followerActorUri })}
+        message={t('federation.followers.removeMessage', { name: deleting?.display_name ?? deleting?.actor_uri })}
         confirmLabel={t('federation.followers.removeConfirm')}
         onConfirm={() => deleting && removeFollower.mutate(deleting.id)}
         onCancel={closeDelete}

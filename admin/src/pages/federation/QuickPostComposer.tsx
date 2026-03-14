@@ -137,7 +137,7 @@ export default function QuickPostComposer({ siteId }: QuickPostComposerProps) {
                   <Box sx={{ flex: 1, mr: 1 }}>
                     <Typography variant="body2">{note.body}</Typography>
                     <Typography variant="caption" color="text.secondary">
-                      {formatDate(note.publishedAt)}
+                      {formatDate(note.published_at)}
                     </Typography>
                   </Box>
                   <Tooltip title={t('federation.quickPost.deleteConfirm')}>

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderWithProviders, screen, waitFor } from '@/test/test-utils';
+import { renderWithProviders, screen } from '@/test/test-utils';
 import apiService from '@/services/api';
 import type { FederationSettings } from '@/types/api';
 

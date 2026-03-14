@@ -45,7 +45,7 @@ export function useFederationMutations(siteId: string) {
   });
 
   const blockInstanceMutation = useMutation({
-    mutationFn: (data: { instanceDomain: string; reason?: string }) => apiService.blockInstance(siteId, data),
+    mutationFn: (data: { domain: string; reason?: string }) => apiService.blockInstance(siteId, data),
     onSuccess: () => { showSuccess('Instance blocked'); invalidateBlockedInstances(); },
     onError: showError,
   });
@@ -57,7 +57,7 @@ export function useFederationMutations(siteId: string) {
   });
 
   const blockActorMutation = useMutation({
-    mutationFn: (data: { actorUri: string; reason?: string }) => apiService.blockActor(siteId, data),
+    mutationFn: (data: { actor_uri: string; reason?: string }) => apiService.blockActor(siteId, data),
     onSuccess: () => { showSuccess('Actor blocked'); invalidateBlockedActors(); },
     onError: showError,
   });

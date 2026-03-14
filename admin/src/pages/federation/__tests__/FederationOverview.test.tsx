@@ -28,10 +28,13 @@ vi.mock('@/store/AuthContext', () => ({
 }));
 
 const mockStats: FederationStats = {
-  followersCount: 142,
-  postsSyndicated: 28,
-  pendingComments: 3,
-  failedDeliveries: 1,
+  follower_count: 142,
+  outbound_activities: 28,
+  inbound_activities: 10,
+  failed_activities: 1,
+  pending_comments: 3,
+  blocked_instances: 0,
+  blocked_actors: 0,
 };
 
 const mockSettings: FederationSettings = {
@@ -74,10 +77,13 @@ describe('FederationOverview', () => {
 
   it('shows disabled state when federation is off', async () => {
     vi.mocked(apiService.getFederationStats).mockResolvedValue({
-      followersCount: 0,
-      postsSyndicated: 0,
-      pendingComments: 0,
-      failedDeliveries: 0,
+      follower_count: 0,
+      outbound_activities: 0,
+      inbound_activities: 0,
+      failed_activities: 0,
+      pending_comments: 0,
+      blocked_instances: 0,
+      blocked_actors: 0,
     });
     vi.mocked(apiService.getFederationSettings).mockResolvedValue({
       ...mockSettings,

@@ -132,16 +132,16 @@ export default function FederationOverview() {
       {/* Stats */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <StatCard label={t('federation.stats.followers')} value={stats?.followersCount ?? 0} icon={<PeopleIcon fontSize="large" />} />
+          <StatCard label={t('federation.stats.followers')} value={stats?.follower_count ?? 0} icon={<PeopleIcon fontSize="large" />} />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <StatCard label={t('federation.stats.postsSyndicated')} value={stats?.postsSyndicated ?? 0} icon={<SendIcon fontSize="large" />} color="success.main" />
+          <StatCard label={t('federation.stats.postsSyndicated')} value={stats?.outbound_activities ?? 0} icon={<SendIcon fontSize="large" />} color="success.main" />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <StatCard label={t('federation.stats.pendingComments')} value={stats?.pendingComments ?? 0} icon={<CommentIcon fontSize="large" />} color="warning.main" />
+          <StatCard label={t('federation.stats.pendingComments')} value={stats?.pending_comments ?? 0} icon={<CommentIcon fontSize="large" />} color="warning.main" />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <StatCard label={t('federation.stats.failedDeliveries')} value={stats?.failedDeliveries ?? 0} icon={<ErrorOutlineIcon fontSize="large" />} color="error.main" />
+          <StatCard label={t('federation.stats.failedDeliveries')} value={stats?.failed_activities ?? 0} icon={<ErrorOutlineIcon fontSize="large" />} color="error.main" />
         </Grid>
       </Grid>
 

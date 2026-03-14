@@ -31,9 +31,9 @@ const mockBlockedInstances: Paginated<FederationBlockedInstance> = {
   data: [
     {
       id: 'bi-1',
-      instanceDomain: 'spam.example.com',
+      domain: 'spam.example.com',
       reason: 'Spam',
-      blockedAt: '2025-06-01T00:00:00Z',
+      blocked_at: '2025-06-01T00:00:00Z',
     },
   ],
   meta: { page: 1, page_size: 25, total_items: 1, total_pages: 1 },
@@ -43,9 +43,9 @@ const mockBlockedActors: Paginated<FederationBlockedActor> = {
   data: [
     {
       id: 'ba-1',
-      blockedActorUri: 'https://spam.example.com/users/spammer',
+      actor_uri: 'https://spam.example.com/users/spammer',
       reason: 'Abusive',
-      blockedAt: '2025-06-01T00:00:00Z',
+      blocked_at: '2025-06-01T00:00:00Z',
     },
   ],
   meta: { page: 1, page_size: 25, total_items: 1, total_pages: 1 },

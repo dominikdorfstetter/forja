@@ -56,13 +56,13 @@ export default function FederationActivityLog() {
   const columns: DataTableColumn<FederationActivity>[] = [
     {
       header: t('federation.activityLog.columns.type'),
-      render: (a) => a.activityType,
+      render: (a) => a.activity_type,
     },
     {
       header: t('federation.activityLog.columns.actor'),
       render: (a) => (
         <Box component="span" sx={{ fontFamily: 'monospace', fontSize: '0.85rem', maxWidth: 250, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block' }}>
-          {a.actorUri}
+          {a.actor_uri}
         </Box>
       ),
     },
@@ -85,7 +85,7 @@ export default function FederationActivityLog() {
     },
     {
       header: t('federation.activityLog.columns.date'),
-      render: (a) => format(new Date(a.createdAt), 'PPp'),
+      render: (a) => format(new Date(a.created_at), 'PPp'),
     },
     {
       header: t('federation.activityLog.columns.actions'),

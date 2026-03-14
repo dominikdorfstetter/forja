@@ -1211,7 +1211,7 @@ class ApiService {
     return apiRequest<Paginated<FederationBlockedInstance>>('GET', `/sites/${siteId}/federation/blocks/instances`, undefined, { params });
   }
 
-  async blockInstance(siteId: string, data: { instanceDomain: string; reason?: string }): Promise<FederationBlockedInstance> {
+  async blockInstance(siteId: string, data: { domain: string; reason?: string }): Promise<FederationBlockedInstance> {
     return apiRequest<FederationBlockedInstance>('POST', `/sites/${siteId}/federation/blocks/instances`, data);
   }
 
@@ -1224,7 +1224,7 @@ class ApiService {
     return apiRequest<Paginated<FederationBlockedActor>>('GET', `/sites/${siteId}/federation/blocks/actors`, undefined, { params });
   }
 
-  async blockActor(siteId: string, data: { actorUri: string; reason?: string }): Promise<FederationBlockedActor> {
+  async blockActor(siteId: string, data: { actor_uri: string; reason?: string }): Promise<FederationBlockedActor> {
     return apiRequest<FederationBlockedActor>('POST', `/sites/${siteId}/federation/blocks/actors`, data);
   }
 

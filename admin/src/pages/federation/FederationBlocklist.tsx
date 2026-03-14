@@ -47,7 +47,7 @@ export default function FederationBlocklist() {
   const instanceColumns: DataTableColumn<FederationBlockedInstance>[] = [
     {
       header: t('federation.blocklist.columns.domain'),
-      render: (b) => b.instanceDomain,
+      render: (b) => b.domain,
     },
     {
       header: t('federation.blocklist.columns.reason'),
@@ -55,7 +55,7 @@ export default function FederationBlocklist() {
     },
     {
       header: t('federation.blocklist.columns.blocked'),
-      render: (b) => format(new Date(b.blockedAt), 'PP'),
+      render: (b) => format(new Date(b.blocked_at), 'PP'),
     },
     {
       header: t('federation.blocklist.columns.actions'),
@@ -75,7 +75,7 @@ export default function FederationBlocklist() {
       header: t('federation.blocklist.columns.actorUri'),
       render: (b) => (
         <Box component="span" sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>
-          {b.blockedActorUri}
+          {b.actor_uri}
         </Box>
       ),
     },
@@ -85,7 +85,7 @@ export default function FederationBlocklist() {
     },
     {
       header: t('federation.blocklist.columns.blocked'),
-      render: (b) => format(new Date(b.blockedAt), 'PP'),
+      render: (b) => format(new Date(b.blocked_at), 'PP'),
     },
     {
       header: t('federation.blocklist.columns.actions'),
@@ -171,7 +171,7 @@ export default function FederationBlocklist() {
       <ConfirmDialog
         open={!!instanceState.deleting}
         title={t('federation.blocklist.unblockInstanceTitle')}
-        message={t('federation.blocklist.unblockInstanceMessage', { domain: instanceState.deleting?.instanceDomain })}
+        message={t('federation.blocklist.unblockInstanceMessage', { domain: instanceState.deleting?.domain })}
         confirmLabel={t('federation.blocklist.unblockConfirm')}
         onConfirm={() => instanceState.deleting && unblockInstanceMutation.mutate(instanceState.deleting.id)}
         onCancel={instanceState.closeDelete}
@@ -181,7 +181,7 @@ export default function FederationBlocklist() {
       <ConfirmDialog
         open={!!actorState.deleting}
         title={t('federation.blocklist.unblockActorTitle')}
-        message={t('federation.blocklist.unblockActorMessage', { actor: actorState.deleting?.blockedActorUri })}
+        message={t('federation.blocklist.unblockActorMessage', { actor: actorState.deleting?.actor_uri })}
         confirmLabel={t('federation.blocklist.unblockConfirm')}
         onConfirm={() => actorState.deleting && unblockActorMutation.mutate(actorState.deleting.id)}
         onCancel={actorState.closeDelete}
