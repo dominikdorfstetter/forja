@@ -2460,9 +2460,14 @@
       "followers": "Volgers",
       "postsSyndicated": "Gesyndikeerde berichten",
       "pendingComments": "Reacties in afwachting",
+      "inbound": "Inkomend",
       "failedDeliveries": "Mislukte afleveringen"
     },
     "manage": "Beheren",
+    "profile": {
+      "edit": "Profiel bewerken",
+      "noBio": "Geen bio ingesteld — klik op bewerken om er een toe te voegen"
+    },
     "noSiteSelected": "Geen site geselecteerd",
     "noSiteDescription": "Selecteer een site om de federatiestatus te bekijken.",
     "loadingData": "Federatiegegevens laden...",
@@ -2562,7 +2567,14 @@
         "reason": "Reden",
         "blocked": "Geblokkeerd",
         "actions": "Acties"
-      }
+      },
+      "import": "Importeren",
+      "importTitle": "Blokkeerlijst importeren",
+      "importDescription": "Plak domeinen (één per regel) of upload een CSV/TXT-bestand",
+      "importButton": "Domeinen importeren",
+      "importSuccess": "{{imported}} domeinen geïmporteerd ({{skipped}} al geblokkeerd)",
+      "importPaste": "Plak domeinen hier (één per regel)...",
+      "importFile": "Of upload een bestand"
     },
     "quickPost": {
       "title": "Snelbericht",
@@ -2576,7 +2588,23 @@
       "deleted": "Bericht verwijderd",
       "recentPosts": "Recente berichten",
       "noPosts": "Nog geen berichten. Deel je eerste gedachte!",
-      "charCount": "{{count}}/500"
+      "charCount": "{{count}}/500",
+      "schedule": "Plannen",
+      "scheduledFor": "Gepland voor {{date}}",
+      "schedulePost": "Bericht plannen",
+      "scheduledSuccess": "Bericht gepland!",
+      "cancelScheduled": "Gepland bericht annuleren",
+      "cancelledSuccess": "Gepland bericht geannuleerd",
+      "editPost": "Bewerken",
+      "deletePost": "Bericht verwijderen",
+      "deletePostConfirm": "Dit bericht verwijderen? Er wordt een verwijderactiviteit naar het Fediverse gestuurd.",
+      "deleteConfirm": "Verwijderen",
+      "editSave": "Opslaan",
+      "editCancel": "Annuleren",
+      "edited": "Bericht bijgewerkt",
+      "deletedPost": "Bericht verwijderd",
+      "scheduledCount": "{{count}} geplande berichten",
+      "scheduledCountBanner": "{{count}} bericht(en) gepland"
     },
     "settings": {
       "title": "Federatie-instellingen",
@@ -2596,7 +2624,17 @@
       "rotateKeysConfirm": "Ondertekeningssleutels roteren",
       "rotateKeysMessage": "Er worden nieuwe ondertekeningssleutels gegenereerd. Externe servers moeten je publieke sleutel opnieuw ophalen, wat de federatie tijdelijk kan verstoren. Doorgaan?",
       "noSite": "Selecteer een site om instellingen te beheren.",
-      "loading": "Instellingen laden..."
+      "loading": "Instellingen laden...",
+      "profile": "Profiel",
+      "avatarUrl": "Avatar-URL",
+      "avatarUrlHelper": "URL naar je profielfoto — plak een link of kies uit media",
+      "chooseFromMedia": "Kies uit media",
+      "bio": "Bio",
+      "bioHelper": "Een korte beschrijving van je blog voor Fediverse-profielen (max. 500 tekens)"
+    },
+    "engagement": {
+      "likes": "Fediverse-likes",
+      "boosts": "Fediverse-boosts"
     },
     "breadcrumbs": {
       "federation": "Federatie"
@@ -2604,6 +2642,45 @@
     "status": {
       "enabled": "Ingeschakeld",
       "disabled": "Uitgeschakeld"
+    },
+    "featured": {
+      "title": "Vastgepinde berichten",
+      "description": "Vastgepinde berichten verschijnen op je Fediverse-profiel",
+      "pin": "Bericht vastpinnen",
+      "unpin": "Losmaken",
+      "maxReached": "Maximaal 3 vastgepinde berichten",
+      "empty": "Geen vastgepinde berichten",
+      "selectPost": "Selecteer een blogbericht om vast te pinnen"
+    },
+    "preview": {
+      "title": "Federatie-voorbeeld",
+      "description": "Hoe dit bericht eruitziet op het Fediverse",
+      "via": "Gepubliceerd via Forja",
+      "notEnabled": "Schakel federatie in om een voorbeeld te zien"
+    },
+    "timeline": {
+      "empty": "Je tijdlijn is leeg. Plaats iets of wacht op interacties vanuit het Fediverse!",
+      "outCreate": "heeft een nieuw bericht gepubliceerd",
+      "outUpdate": "heeft een bericht bijgewerkt",
+      "outDelete": "heeft een bericht verwijderd",
+      "outDefault": "heeft {{type}}-activiteit verzonden",
+      "inFollow": "is je gaan volgen",
+      "inLike": "vond je bericht leuk",
+      "inBoost": "heeft je bericht geboost",
+      "inComment": "heeft op je bericht gereageerd",
+      "inDefault": "heeft {{type}} verzonden"
+    },
+    "health": {
+      "title": "Instantiestatus",
+      "description": "Afleveringsstatus per externe instantie",
+      "domain": "Instantie",
+      "total": "Totaal",
+      "successful": "OK",
+      "failed": "Mislukt",
+      "dead": "Inactief",
+      "lastAttempt": "Laatste poging",
+      "healthy": "Alle instanties gezond",
+      "blockSuggestion": "Overweeg te blokkeren"
     }
   }
 }

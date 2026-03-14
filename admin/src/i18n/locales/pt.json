@@ -2460,9 +2460,14 @@
       "followers": "Seguidores",
       "postsSyndicated": "Publicações sindicadas",
       "pendingComments": "Comentários pendentes",
+      "inbound": "Entrada",
       "failedDeliveries": "Entregas falhadas"
     },
     "manage": "Gerir",
+    "profile": {
+      "edit": "Editar perfil",
+      "noBio": "Sem biografia — clique em editar para adicionar uma"
+    },
     "noSiteSelected": "Nenhum site selecionado",
     "noSiteDescription": "Selecione um site para ver o estado da federação.",
     "loadingData": "A carregar dados de federação...",
@@ -2562,7 +2567,14 @@
         "reason": "Motivo",
         "blocked": "Bloqueado",
         "actions": "Ações"
-      }
+      },
+      "import": "Importar",
+      "importTitle": "Importar lista de bloqueio",
+      "importDescription": "Cole domínios (um por linha) ou carregue um ficheiro CSV/TXT",
+      "importButton": "Importar domínios",
+      "importSuccess": "{{imported}} domínios importados ({{skipped}} já bloqueados)",
+      "importPaste": "Cole os domínios aqui (um por linha)...",
+      "importFile": "Ou carregue um ficheiro"
     },
     "quickPost": {
       "title": "Publicação rápida",
@@ -2576,7 +2588,23 @@
       "deleted": "Publicação eliminada",
       "recentPosts": "Publicações recentes",
       "noPosts": "Ainda sem publicações. Partilhe o seu primeiro pensamento!",
-      "charCount": "{{count}}/500"
+      "charCount": "{{count}}/500",
+      "schedule": "Agendar",
+      "scheduledFor": "Agendado para {{date}}",
+      "schedulePost": "Agendar publicação",
+      "scheduledSuccess": "Publicação agendada!",
+      "cancelScheduled": "Cancelar publicação agendada",
+      "cancelledSuccess": "Publicação agendada cancelada",
+      "editPost": "Editar",
+      "deletePost": "Eliminar publicação",
+      "deletePostConfirm": "Eliminar esta publicação? Uma atividade de eliminação será enviada ao Fediverso.",
+      "deleteConfirm": "Eliminar",
+      "editSave": "Guardar",
+      "editCancel": "Cancelar",
+      "edited": "Publicação atualizada",
+      "deletedPost": "Publicação eliminada",
+      "scheduledCount": "{{count}} publicações agendadas",
+      "scheduledCountBanner": "{{count}} publicação/publicações agendada(s)"
     },
     "settings": {
       "title": "Definições de federação",
@@ -2596,7 +2624,17 @@
       "rotateKeysConfirm": "Rodar chaves de assinatura",
       "rotateKeysMessage": "Serão geradas novas chaves de assinatura. Os servidores remotos terão de obter novamente a sua chave pública, o que pode interromper temporariamente a federação. Continuar?",
       "noSite": "Selecione um site para gerir as definições.",
-      "loading": "A carregar definições..."
+      "loading": "A carregar definições...",
+      "profile": "Perfil",
+      "avatarUrl": "URL do avatar",
+      "avatarUrlHelper": "URL da sua foto de perfil — cole um link ou escolha dos media",
+      "chooseFromMedia": "Escolher dos media",
+      "bio": "Biografia",
+      "bioHelper": "Uma breve descrição do seu blog para perfis Fediverse (máx. 500 caracteres)"
+    },
+    "engagement": {
+      "likes": "Gostos Fediverse",
+      "boosts": "Impulsos Fediverse"
     },
     "breadcrumbs": {
       "federation": "Federação"
@@ -2604,6 +2642,45 @@
     "status": {
       "enabled": "Ativado",
       "disabled": "Desativado"
+    },
+    "featured": {
+      "title": "Publicações fixadas",
+      "description": "As publicações fixadas aparecem no seu perfil Fediverse",
+      "pin": "Fixar publicação",
+      "unpin": "Desafixar",
+      "maxReached": "Máximo de 3 publicações fixadas",
+      "empty": "Sem publicações fixadas",
+      "selectPost": "Selecione um artigo do blog para fixar"
+    },
+    "preview": {
+      "title": "Pré-visualização da federação",
+      "description": "Como esta publicação aparecerá no Fediverso",
+      "via": "Publicado via Forja",
+      "notEnabled": "Ative a federação para pré-visualizar"
+    },
+    "timeline": {
+      "empty": "A sua cronologia está vazia. Publique algo ou aguarde interações do Fediverso!",
+      "outCreate": "publicou um novo artigo",
+      "outUpdate": "atualizou um artigo",
+      "outDelete": "eliminou um artigo",
+      "outDefault": "enviou atividade {{type}}",
+      "inFollow": "começou a segui-lo",
+      "inLike": "gostou da sua publicação",
+      "inBoost": "impulsionou a sua publicação",
+      "inComment": "respondeu à sua publicação",
+      "inDefault": "enviou {{type}}"
+    },
+    "health": {
+      "title": "Estado das instâncias",
+      "description": "Estado de entrega por instância remota",
+      "domain": "Instância",
+      "total": "Total",
+      "successful": "OK",
+      "failed": "Falhado",
+      "dead": "Inativa",
+      "lastAttempt": "Última tentativa",
+      "healthy": "Todas as instâncias saudáveis",
+      "blockSuggestion": "Considere bloquear"
     }
   }
 }

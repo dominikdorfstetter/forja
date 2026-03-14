@@ -2460,9 +2460,14 @@
       "followers": "Follower",
       "postsSyndicated": "Articoli sindacati",
       "pendingComments": "Commenti in attesa",
+      "inbound": "In entrata",
       "failedDeliveries": "Consegne fallite"
     },
     "manage": "Gestisci",
+    "profile": {
+      "edit": "Modifica profilo",
+      "noBio": "Nessuna biografia — clicca su modifica per aggiungerne una"
+    },
     "noSiteSelected": "Nessun sito selezionato",
     "noSiteDescription": "Seleziona un sito per vedere lo stato della federazione.",
     "loadingData": "Caricamento dati federazione...",
@@ -2562,7 +2567,14 @@
         "reason": "Motivo",
         "blocked": "Bloccato",
         "actions": "Azioni"
-      }
+      },
+      "import": "Importa",
+      "importTitle": "Importa lista blocco",
+      "importDescription": "Incolla i domini (uno per riga) o carica un file CSV/TXT",
+      "importButton": "Importa domini",
+      "importSuccess": "{{imported}} domini importati ({{skipped}} già bloccati)",
+      "importPaste": "Incolla i domini qui (uno per riga)...",
+      "importFile": "Oppure carica un file"
     },
     "quickPost": {
       "title": "Post rapido",
@@ -2576,7 +2588,23 @@
       "deleted": "Post eliminato",
       "recentPosts": "Post recenti",
       "noPosts": "Nessun post ancora. Condividi il tuo primo pensiero!",
-      "charCount": "{{count}}/500"
+      "charCount": "{{count}}/500",
+      "schedule": "Programma",
+      "scheduledFor": "Programmato per {{date}}",
+      "schedulePost": "Programma post",
+      "scheduledSuccess": "Post programmato!",
+      "cancelScheduled": "Annulla post programmato",
+      "cancelledSuccess": "Post programmato annullato",
+      "editPost": "Modifica",
+      "deletePost": "Elimina post",
+      "deletePostConfirm": "Eliminare questo post? Verrà inviata un'attività di eliminazione al Fediverso.",
+      "deleteConfirm": "Elimina",
+      "editSave": "Salva",
+      "editCancel": "Annulla",
+      "edited": "Post aggiornato",
+      "deletedPost": "Post eliminato",
+      "scheduledCount": "{{count}} post programmati",
+      "scheduledCountBanner": "{{count}} post programmato/i"
     },
     "settings": {
       "title": "Impostazioni federazione",
@@ -2596,7 +2624,17 @@
       "rotateKeysConfirm": "Ruota chiavi di firma",
       "rotateKeysMessage": "Verranno generate nuove chiavi di firma. I server remoti dovranno recuperare la tua chiave pubblica, il che potrebbe temporaneamente interrompere la federazione. Continuare?",
       "noSite": "Seleziona un sito per gestire le impostazioni.",
-      "loading": "Caricamento impostazioni..."
+      "loading": "Caricamento impostazioni...",
+      "profile": "Profilo",
+      "avatarUrl": "URL avatar",
+      "avatarUrlHelper": "URL della tua foto profilo — incolla un link o scegli dai media",
+      "chooseFromMedia": "Scegli dai media",
+      "bio": "Biografia",
+      "bioHelper": "Una breve descrizione del tuo blog per i profili Fediverse (max 500 caratteri)"
+    },
+    "engagement": {
+      "likes": "Like Fediverse",
+      "boosts": "Boost Fediverse"
     },
     "breadcrumbs": {
       "federation": "Federazione"
@@ -2604,6 +2642,45 @@
     "status": {
       "enabled": "Abilitato",
       "disabled": "Disabilitato"
+    },
+    "featured": {
+      "title": "Post in evidenza",
+      "description": "I post in evidenza appaiono sul tuo profilo Fediverse",
+      "pin": "Metti in evidenza",
+      "unpin": "Rimuovi evidenza",
+      "maxReached": "Massimo 3 post in evidenza",
+      "empty": "Nessun post in evidenza",
+      "selectPost": "Seleziona un articolo del blog da mettere in evidenza"
+    },
+    "preview": {
+      "title": "Anteprima federazione",
+      "description": "Come apparirà questo post nel Fediverso",
+      "via": "Pubblicato tramite Forja",
+      "notEnabled": "Abilita la federazione per l'anteprima"
+    },
+    "timeline": {
+      "empty": "La tua timeline è vuota. Pubblica qualcosa o attendi interazioni dal Fediverso!",
+      "outCreate": "ha pubblicato un nuovo articolo",
+      "outUpdate": "ha aggiornato un articolo",
+      "outDelete": "ha eliminato un articolo",
+      "outDefault": "ha inviato attività {{type}}",
+      "inFollow": "ha iniziato a seguirti",
+      "inLike": "ha messo like al tuo post",
+      "inBoost": "ha boostato il tuo post",
+      "inComment": "ha risposto al tuo post",
+      "inDefault": "ha inviato {{type}}"
+    },
+    "health": {
+      "title": "Stato delle istanze",
+      "description": "Stato di consegna per istanza remota",
+      "domain": "Istanza",
+      "total": "Totale",
+      "successful": "OK",
+      "failed": "Fallito",
+      "dead": "Inattiva",
+      "lastAttempt": "Ultimo tentativo",
+      "healthy": "Tutte le istanze in salute",
+      "blockSuggestion": "Valuta il blocco"
     }
   }
 }

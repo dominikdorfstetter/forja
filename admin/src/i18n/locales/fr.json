@@ -2460,9 +2460,14 @@
       "followers": "Abonnés",
       "postsSyndicated": "Articles syndiqués",
       "pendingComments": "Commentaires en attente",
+      "inbound": "Entrant",
       "failedDeliveries": "Livraisons échouées"
     },
     "manage": "Gérer",
+    "profile": {
+      "edit": "Modifier le profil",
+      "noBio": "Pas de biographie — cliquez sur modifier pour en ajouter une"
+    },
     "noSiteSelected": "Aucun site sélectionné",
     "noSiteDescription": "Sélectionnez un site pour voir le statut de fédération.",
     "loadingData": "Chargement des données de fédération...",
@@ -2562,7 +2567,14 @@
         "reason": "Raison",
         "blocked": "Bloqué",
         "actions": "Actions"
-      }
+      },
+      "import": "Importer",
+      "importTitle": "Importer une liste de blocage",
+      "importDescription": "Collez des domaines (un par ligne) ou importez un fichier CSV/TXT",
+      "importButton": "Importer les domaines",
+      "importSuccess": "{{imported}} domaines importés ({{skipped}} déjà bloqués)",
+      "importPaste": "Collez les domaines ici (un par ligne)...",
+      "importFile": "Ou importer un fichier"
     },
     "quickPost": {
       "title": "Publication rapide",
@@ -2576,7 +2588,23 @@
       "deleted": "Publication supprimée",
       "recentPosts": "Publications récentes",
       "noPosts": "Pas encore de publications. Partagez votre première pensée !",
-      "charCount": "{{count}}/500"
+      "charCount": "{{count}}/500",
+      "schedule": "Planifier",
+      "scheduledFor": "Planifié pour le {{date}}",
+      "schedulePost": "Planifier la publication",
+      "scheduledSuccess": "Publication planifiée !",
+      "cancelScheduled": "Annuler la publication planifiée",
+      "cancelledSuccess": "Publication planifiée annulée",
+      "editPost": "Modifier",
+      "deletePost": "Supprimer la publication",
+      "deletePostConfirm": "Supprimer cette publication ? Une activité de suppression sera envoyée au Fédivers.",
+      "deleteConfirm": "Supprimer",
+      "editSave": "Enregistrer",
+      "editCancel": "Annuler",
+      "edited": "Publication mise à jour",
+      "deletedPost": "Publication supprimée",
+      "scheduledCount": "{{count}} publications planifiées",
+      "scheduledCountBanner": "{{count}} publication(s) planifiée(s)"
     },
     "settings": {
       "title": "Paramètres de fédération",
@@ -2596,7 +2624,17 @@
       "rotateKeysConfirm": "Rotation des clés de signature",
       "rotateKeysMessage": "De nouvelles clés de signature seront générées. Les serveurs distants devront récupérer votre clé publique, ce qui peut temporairement perturber la fédération. Continuer ?",
       "noSite": "Sélectionnez un site pour gérer les paramètres.",
-      "loading": "Chargement des paramètres..."
+      "loading": "Chargement des paramètres...",
+      "profile": "Profil",
+      "avatarUrl": "URL de l'avatar",
+      "avatarUrlHelper": "URL de votre photo de profil — collez un lien ou choisissez depuis les médias",
+      "chooseFromMedia": "Choisir depuis les médias",
+      "bio": "Biographie",
+      "bioHelper": "Une courte description de votre blog pour les profils Fediverse (500 caractères max.)"
+    },
+    "engagement": {
+      "likes": "Likes Fediverse",
+      "boosts": "Boosts Fediverse"
     },
     "breadcrumbs": {
       "federation": "Fédération"
@@ -2604,6 +2642,45 @@
     "status": {
       "enabled": "Activé",
       "disabled": "Désactivé"
+    },
+    "featured": {
+      "title": "Publications épinglées",
+      "description": "Les publications épinglées apparaissent sur votre profil Fediverse",
+      "pin": "Épingler la publication",
+      "unpin": "Désépingler",
+      "maxReached": "Maximum 3 publications épinglées",
+      "empty": "Aucune publication épinglée",
+      "selectPost": "Sélectionnez un article de blog à épingler"
+    },
+    "preview": {
+      "title": "Aperçu de la fédération",
+      "description": "Comment cette publication apparaîtra sur le Fédivers",
+      "via": "Publié via Forja",
+      "notEnabled": "Activez la fédération pour prévisualiser"
+    },
+    "timeline": {
+      "empty": "Votre fil est vide. Publiez quelque chose ou attendez des interactions du Fédivers !",
+      "outCreate": "a publié un nouvel article",
+      "outUpdate": "a mis à jour un article",
+      "outDelete": "a supprimé un article",
+      "outDefault": "a envoyé une activité {{type}}",
+      "inFollow": "a commencé à vous suivre",
+      "inLike": "a aimé votre publication",
+      "inBoost": "a boosté votre publication",
+      "inComment": "a répondu à votre publication",
+      "inDefault": "a envoyé {{type}}"
+    },
+    "health": {
+      "title": "Santé des instances",
+      "description": "Statut de livraison par instance distante",
+      "domain": "Instance",
+      "total": "Total",
+      "successful": "OK",
+      "failed": "Échoué",
+      "dead": "Inactive",
+      "lastAttempt": "Dernière tentative",
+      "healthy": "Toutes les instances en bonne santé",
+      "blockSuggestion": "Envisager de bloquer"
     }
   }
 }

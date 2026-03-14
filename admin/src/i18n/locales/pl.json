@@ -2460,9 +2460,14 @@
       "followers": "Obserwujący",
       "postsSyndicated": "Zsyndykowane wpisy",
       "pendingComments": "Oczekujące komentarze",
+      "inbound": "Przychodzące",
       "failedDeliveries": "Nieudane dostarczenia"
     },
     "manage": "Zarządzaj",
+    "profile": {
+      "edit": "Edytuj profil",
+      "noBio": "Brak biografii — kliknij edytuj, aby dodać"
+    },
     "noSiteSelected": "Nie wybrano witryny",
     "noSiteDescription": "Wybierz witrynę, aby zobaczyć status federacji.",
     "loadingData": "Ładowanie danych federacji...",
@@ -2562,7 +2567,14 @@
         "reason": "Powód",
         "blocked": "Zablokowano",
         "actions": "Akcje"
-      }
+      },
+      "import": "Importuj",
+      "importTitle": "Importuj listę blokad",
+      "importDescription": "Wklej domeny (jedna na wiersz) lub prześlij plik CSV/TXT",
+      "importButton": "Importuj domeny",
+      "importSuccess": "Zaimportowano {{imported}} domen ({{skipped}} już zablokowanych)",
+      "importPaste": "Wklej domeny tutaj (jedna na wiersz)...",
+      "importFile": "Lub prześlij plik"
     },
     "quickPost": {
       "title": "Szybki wpis",
@@ -2576,7 +2588,23 @@
       "deleted": "Wpis usunięty",
       "recentPosts": "Ostatnie wpisy",
       "noPosts": "Brak wpisów. Podziel się swoją pierwszą myślą!",
-      "charCount": "{{count}}/500"
+      "charCount": "{{count}}/500",
+      "schedule": "Zaplanuj",
+      "scheduledFor": "Zaplanowano na {{date}}",
+      "schedulePost": "Zaplanuj wpis",
+      "scheduledSuccess": "Wpis zaplanowany!",
+      "cancelScheduled": "Anuluj zaplanowany wpis",
+      "cancelledSuccess": "Zaplanowany wpis anulowany",
+      "editPost": "Edytuj",
+      "deletePost": "Usuń wpis",
+      "deletePostConfirm": "Usunąć ten wpis? Aktywność usunięcia zostanie wysłana do Fediverse.",
+      "deleteConfirm": "Usuń",
+      "editSave": "Zapisz",
+      "editCancel": "Anuluj",
+      "edited": "Wpis zaktualizowany",
+      "deletedPost": "Wpis usunięty",
+      "scheduledCount": "{{count}} zaplanowanych wpisów",
+      "scheduledCountBanner": "{{count}} zaplanowany(-ch) wpis(-ów)"
     },
     "settings": {
       "title": "Ustawienia federacji",
@@ -2596,7 +2624,17 @@
       "rotateKeysConfirm": "Rotuj klucze podpisu",
       "rotateKeysMessage": "Zostaną wygenerowane nowe klucze podpisu. Zdalne serwery będą musiały ponownie pobrać Twój klucz publiczny, co może tymczasowo zakłócić federację. Kontynuować?",
       "noSite": "Wybierz witrynę, aby zarządzać ustawieniami.",
-      "loading": "Ładowanie ustawień..."
+      "loading": "Ładowanie ustawień...",
+      "profile": "Profil",
+      "avatarUrl": "URL awatara",
+      "avatarUrlHelper": "URL do zdjęcia profilowego — wklej link lub wybierz z mediów",
+      "chooseFromMedia": "Wybierz z mediów",
+      "bio": "Biografia",
+      "bioHelper": "Krótki opis Twojego bloga dla profili Fediverse (maks. 500 znaków)"
+    },
+    "engagement": {
+      "likes": "Polubienia Fediverse",
+      "boosts": "Podbicia Fediverse"
     },
     "breadcrumbs": {
       "federation": "Federacja"
@@ -2604,6 +2642,45 @@
     "status": {
       "enabled": "Włączona",
       "disabled": "Wyłączona"
+    },
+    "featured": {
+      "title": "Przypięte wpisy",
+      "description": "Przypięte wpisy pojawiają się na Twoim profilu Fediverse",
+      "pin": "Przypnij wpis",
+      "unpin": "Odepnij",
+      "maxReached": "Maksymalnie 3 przypięte wpisy",
+      "empty": "Brak przypiętych wpisów",
+      "selectPost": "Wybierz wpis na blogu do przypięcia"
+    },
+    "preview": {
+      "title": "Podgląd federacji",
+      "description": "Jak ten wpis będzie wyglądał w Fediverse",
+      "via": "Opublikowano przez Forja",
+      "notEnabled": "Włącz federację, aby zobaczyć podgląd"
+    },
+    "timeline": {
+      "empty": "Twoja oś czasu jest pusta. Opublikuj coś lub poczekaj na interakcje z Fediverse!",
+      "outCreate": "opublikował(a) nowy wpis",
+      "outUpdate": "zaktualizował(a) wpis",
+      "outDelete": "usunął/usunęła wpis",
+      "outDefault": "wysłał(a) aktywność {{type}}",
+      "inFollow": "zaczął/zaczęła Cię obserwować",
+      "inLike": "polubił(a) Twój wpis",
+      "inBoost": "podbił(a) Twój wpis",
+      "inComment": "odpowiedział(a) na Twój wpis",
+      "inDefault": "wysłał(a) {{type}}"
+    },
+    "health": {
+      "title": "Stan instancji",
+      "description": "Status dostarczania wg zdalnej instancji",
+      "domain": "Instancja",
+      "total": "Łącznie",
+      "successful": "OK",
+      "failed": "Nieudane",
+      "dead": "Martwa",
+      "lastAttempt": "Ostatnia próba",
+      "healthy": "Wszystkie instancje zdrowe",
+      "blockSuggestion": "Rozważ zablokowanie"
     }
   }
 }

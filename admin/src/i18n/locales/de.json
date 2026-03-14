@@ -2460,9 +2460,14 @@
       "followers": "Follower",
       "postsSyndicated": "Syndizierte Beiträge",
       "pendingComments": "Ausstehende Kommentare",
+      "inbound": "Eingehend",
       "failedDeliveries": "Fehlgeschlagene Zustellungen"
     },
     "manage": "Verwalten",
+    "profile": {
+      "edit": "Profil bearbeiten",
+      "noBio": "Keine Biografie vorhanden — klicke auf Bearbeiten, um eine hinzuzufügen"
+    },
     "noSiteSelected": "Keine Seite ausgewählt",
     "noSiteDescription": "Wähle eine Seite aus, um den Federationsstatus anzuzeigen.",
     "loadingData": "Federationsdaten werden geladen...",
@@ -2562,7 +2567,14 @@
         "reason": "Grund",
         "blocked": "Gesperrt",
         "actions": "Aktionen"
-      }
+      },
+      "import": "Importieren",
+      "importTitle": "Sperrliste importieren",
+      "importDescription": "Domains einfügen (eine pro Zeile) oder eine CSV-/TXT-Datei hochladen",
+      "importButton": "Domains importieren",
+      "importSuccess": "{{imported}} Domains importiert ({{skipped}} bereits gesperrt)",
+      "importPaste": "Domains hier einfügen (eine pro Zeile)...",
+      "importFile": "Oder Datei hochladen"
     },
     "quickPost": {
       "title": "Schnellbeitrag",
@@ -2576,7 +2588,23 @@
       "deleted": "Beitrag gelöscht",
       "recentPosts": "Letzte Beiträge",
       "noPosts": "Noch keine Beiträge. Teile deinen ersten Gedanken!",
-      "charCount": "{{count}}/500"
+      "charCount": "{{count}}/500",
+      "schedule": "Planen",
+      "scheduledFor": "Geplant für {{date}}",
+      "schedulePost": "Beitrag planen",
+      "scheduledSuccess": "Beitrag geplant!",
+      "cancelScheduled": "Geplanten Beitrag abbrechen",
+      "cancelledSuccess": "Geplanter Beitrag abgebrochen",
+      "editPost": "Bearbeiten",
+      "deletePost": "Beitrag löschen",
+      "deletePostConfirm": "Diesen Beitrag löschen? Eine Lösch-Aktivität wird an das Fediverse gesendet.",
+      "deleteConfirm": "Löschen",
+      "editSave": "Speichern",
+      "editCancel": "Abbrechen",
+      "edited": "Beitrag aktualisiert",
+      "deletedPost": "Beitrag gelöscht",
+      "scheduledCount": "{{count}} geplante Beiträge",
+      "scheduledCountBanner": "{{count}} Beitrag/Beiträge geplant"
     },
     "settings": {
       "title": "Federationseinstellungen",
@@ -2596,7 +2624,17 @@
       "rotateKeysConfirm": "Signaturschlüssel rotieren",
       "rotateKeysMessage": "Es werden neue Signaturschlüssel generiert. Entfernte Server müssen deinen öffentlichen Schlüssel erneut abrufen, was die Federation vorübergehend stören kann. Fortfahren?",
       "noSite": "Wähle eine Seite, um Einstellungen zu verwalten.",
-      "loading": "Einstellungen werden geladen..."
+      "loading": "Einstellungen werden geladen...",
+      "profile": "Profil",
+      "avatarUrl": "Avatar-URL",
+      "avatarUrlHelper": "URL zu deinem Profilbild — füge einen Link ein oder wähle aus Medien",
+      "chooseFromMedia": "Aus Medien wählen",
+      "bio": "Biografie",
+      "bioHelper": "Eine kurze Beschreibung deines Blogs für Fediverse-Profile (max. 500 Zeichen)"
+    },
+    "engagement": {
+      "likes": "Fediverse-Likes",
+      "boosts": "Fediverse-Boosts"
     },
     "breadcrumbs": {
       "federation": "Federation"
@@ -2604,6 +2642,45 @@
     "status": {
       "enabled": "Aktiviert",
       "disabled": "Deaktiviert"
+    },
+    "featured": {
+      "title": "Angepinnte Beiträge",
+      "description": "Angepinnte Beiträge erscheinen auf deinem Fediverse-Profil",
+      "pin": "Beitrag anpinnen",
+      "unpin": "Lösen",
+      "maxReached": "Maximal 3 angepinnte Beiträge",
+      "empty": "Keine angepinnten Beiträge",
+      "selectPost": "Wähle einen Blogbeitrag zum Anpinnen"
+    },
+    "preview": {
+      "title": "Federations-Vorschau",
+      "description": "So wird dieser Beitrag im Fediverse angezeigt",
+      "via": "Veröffentlicht über Forja",
+      "notEnabled": "Aktiviere die Federation für eine Vorschau"
+    },
+    "timeline": {
+      "empty": "Deine Timeline ist leer. Poste etwas oder warte auf Interaktionen aus dem Fediverse!",
+      "outCreate": "hat einen neuen Beitrag veröffentlicht",
+      "outUpdate": "hat einen Beitrag aktualisiert",
+      "outDelete": "hat einen Beitrag gelöscht",
+      "outDefault": "hat {{type}}-Aktivität gesendet",
+      "inFollow": "folgt dir jetzt",
+      "inLike": "hat deinen Beitrag geliked",
+      "inBoost": "hat deinen Beitrag geboostet",
+      "inComment": "hat auf deinen Beitrag geantwortet",
+      "inDefault": "hat {{type}} gesendet"
+    },
+    "health": {
+      "title": "Instanz-Zustand",
+      "description": "Zustellungsstatus nach entfernter Instanz",
+      "domain": "Instanz",
+      "total": "Gesamt",
+      "successful": "OK",
+      "failed": "Fehlgeschlagen",
+      "dead": "Inaktiv",
+      "lastAttempt": "Letzter Versuch",
+      "healthy": "Alle Instanzen gesund",
+      "blockSuggestion": "Blockierung erwägen"
     }
   }
 }
