@@ -6,4 +6,5 @@ pub mod block;
 pub mod comment;
 pub mod delivery;
 pub mod follower;
+pub mod note;
 pub mod types;

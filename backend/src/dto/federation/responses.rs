@@ -161,6 +161,27 @@ pub struct CommentResponse {
     pub moderated_at: Option<DateTime<Utc>>,
 }
 
+// ── Notes ───────────────────────────────────────────────────────────────
+
+/// A quick-post Note as returned by the admin API.
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+#[schema(description = "A short-form Fediverse note (Quick Post)")]
+pub struct NoteResponse {
+    #[schema(example = "550e8400-e29b-41d4-a716-446655440000")]
+    pub id: Uuid,
+
+    #[schema(example = "Hello from Forja!")]
+    pub body: String,
+
+    #[schema(example = "<p>Hello from Forja!</p>")]
+    pub body_html: String,
+
+    pub published_at: DateTime<Utc>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub activity_uri: Option<String>,
+}
+
 // ── Blocks ──────────────────────────────────────────────────────────────
 
 /// A blocked instance domain as returned by the admin API.
@@ -200,6 +221,7 @@ pub struct BlockedActorResponse {
 use crate::models::federation::block::{ApBlockedActor, ApBlockedInstance};
 use crate::models::federation::comment::ApComment;
 use crate::models::federation::follower::ApFollower;
+use crate::models::federation::note::ApNote;
 
 impl From<ApFollower> for FollowerResponse {
     fn from(f: ApFollower) -> Self {
@@ -228,6 +250,18 @@ impl From<ApComment> for CommentResponse {
             status: format!("{:?}", c.status).to_lowercase(),
             created_at: c.created_at,
             moderated_at: c.moderated_at,
+        }
+    }
+}
+
+impl From<ApNote> for NoteResponse {
+    fn from(n: ApNote) -> Self {
+        Self {
+            id: n.id,
+            body: n.body,
+            body_html: n.body_html,
+            published_at: n.published_at,
+            activity_uri: n.activity_uri,
         }
     }
 }

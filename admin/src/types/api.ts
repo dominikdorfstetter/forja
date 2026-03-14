@@ -1635,6 +1635,14 @@ export interface FederationBlockedActor {
   blockedAt: string;
 }
 
+export interface FederationNote {
+  id: string;
+  body: string;
+  bodyHtml: string;
+  publishedAt: string;
+  activityUri: string | null;
+}
+
 export interface FederationSettings {
   enabled: boolean;
   signature_algorithm: string;

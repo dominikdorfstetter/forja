@@ -65,6 +65,20 @@ pub struct BlockActorRequest {
     pub reason: Option<String>,
 }
 
+/// Request to create a quick-post Note on the Fediverse.
+#[derive(Debug, Clone, Deserialize, Validate, utoipa::ToSchema)]
+#[schema(description = "Create a short-form Note to post to the Fediverse")]
+pub struct CreateNoteRequest {
+    /// The plain-text body of the note (1–500 characters).
+    #[schema(example = "Hello from Forja!")]
+    #[validate(length(
+        min = 1,
+        max = 500,
+        message = "Body must be between 1 and 500 characters"
+    ))]
+    pub body: String,
+}
+
 /// Request to moderate a federated comment.
 #[derive(Debug, Clone, Deserialize, Validate, utoipa::ToSchema)]
 #[schema(description = "Moderate a federated comment")]

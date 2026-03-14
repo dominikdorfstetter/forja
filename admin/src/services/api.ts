@@ -153,6 +153,7 @@ import type {
   FederationComment,
   FederationBlockedInstance,
   FederationBlockedActor,
+  FederationNote,
 } from '@/types/api';
 
 const API_BASE_URL = '/api/v1';
@@ -1229,6 +1230,19 @@ class ApiService {
 
   async unblockActor(siteId: string, blockId: string): Promise<void> {
     return apiRequest<void>('DELETE', `/sites/${siteId}/federation/blocks/actors/${blockId}`);
+  }
+
+  // Notes (Quick Post)
+  async createFederationNote(siteId: string, data: { body: string }): Promise<FederationNote> {
+    return apiRequest<FederationNote>('POST', `/sites/${siteId}/federation/notes`, data);
+  }
+
+  async getFederationNotes(siteId: string, params?: ListQueryParams): Promise<Paginated<FederationNote>> {
+    return apiRequest<Paginated<FederationNote>>('GET', `/sites/${siteId}/federation/notes`, undefined, { params });
+  }
+
+  async deleteFederationNote(siteId: string, noteId: string): Promise<void> {
+    return apiRequest<void>('DELETE', `/sites/${siteId}/federation/notes/${noteId}`);
   }
 }
 

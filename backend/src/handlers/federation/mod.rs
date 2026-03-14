@@ -9,6 +9,7 @@ pub mod admin_activities;
 pub mod admin_blocks;
 pub mod admin_comments;
 pub mod admin_followers;
+pub mod admin_notes;
 pub mod admin_settings;
 pub mod inbox;
 pub mod webfinger;
@@ -32,5 +33,6 @@ pub fn admin_routes() -> Vec<Route> {
     routes.extend(admin_activities::routes());
     routes.extend(admin_blocks::routes());
     routes.extend(admin_comments::routes());
+    routes.extend(admin_notes::routes());
     routes
 }
