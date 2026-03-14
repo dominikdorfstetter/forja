@@ -1,4 +1,5 @@
-import { Avatar, Box, Card, CardActionArea, CardContent, Chip, Divider, Grid, IconButton, Paper, Stack, Tooltip, Typography } from '@mui/material';
+import { useState } from 'react';
+import { Avatar, Box, Button, Card, CardActionArea, CardContent, Chip, Divider, Grid, IconButton, Paper, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import PeopleIcon from '@mui/icons-material/People';
 import CommentIcon from '@mui/icons-material/Comment';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
@@ -7,14 +8,19 @@ import BlockIcon from '@mui/icons-material/Block';
 import HistoryIcon from '@mui/icons-material/History';
 import HubIcon from '@mui/icons-material/Hub';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import EditIcon from '@mui/icons-material/Edit';
+import ImageIcon from '@mui/icons-material/Image';
 import { useNavigate } from 'react-router';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
 import { useSiteContext } from '@/store/SiteContext';
 import { useFederationStats, useFederationSettings } from '@/hooks/useFederationData';
+import { useFederationMutations } from '@/hooks/useFederationMutations';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
+import MediaPickerDialog from '@/components/media/MediaPickerDialog';
+import apiService from '@/services/api';
 import QuickPostComposer from '@/pages/federation/QuickPostComposer';
 import FederationTimeline from '@/pages/federation/FederationTimeline';
 
@@ -59,6 +65,30 @@ export default function FederationOverview() {
   const { data: settings, isLoading: settingsLoading } = useFederationSettings(selectedSiteId);
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
+  const { updateSettings } = useFederationMutations(selectedSiteId);
+
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [bio, setBio] = useState<string | undefined>(undefined);
+  const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined);
+  const [pickerOpen, setPickerOpen] = useState(false);
+
+  const bioValue = bio ?? settings?.summary ?? '';
+  const avatarUrlValue = avatarUrl ?? settings?.avatar_url ?? '';
+
+  const handleSaveProfile = () => {
+    updateSettings.mutate({ summary: bioValue, avatar_url: avatarUrlValue });
+    setEditingProfile(false);
+  };
+
+  const handleMediaSelected = async (mediaId: string | null) => {
+    if (!mediaId) return;
+    try {
+      const media = await apiService.getMediaById(mediaId);
+      if (media.public_url) {
+        setAvatarUrl(media.public_url);
+      }
+    } catch { /* ignore */ }
+  };
 
   const isLoading = statsLoading || settingsLoading;
 
@@ -173,6 +203,85 @@ export default function FederationOverview() {
             </Card>
           )}
 
+          {/* Edit profile */}
+          {settings?.enabled && (
+            <Card sx={{ mb: 3 }}>
+              <CardContent>
+                {!editingProfile ? (
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Box>
+                      {settings.summary && (
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                          {settings.summary}
+                        </Typography>
+                      )}
+                      {!settings.summary && (
+                        <Typography variant="body2" color="text.disabled" fontStyle="italic">
+                          {t('federation.profile.noBio')}
+                        </Typography>
+                      )}
+                    </Box>
+                    <Tooltip title={t('federation.profile.edit')}>
+                      <IconButton size="small" onClick={() => setEditingProfile(true)}>
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                ) : (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Stack direction="row" alignItems="center" spacing={2}>
+                      <Avatar
+                        src={avatarUrlValue || undefined}
+                        sx={{ width: 56, height: 56, cursor: 'pointer' }}
+                        onClick={() => setPickerOpen(true)}
+                      >
+                        <HubIcon />
+                      </Avatar>
+                      <Box sx={{ flex: 1 }}>
+                        <TextField
+                          fullWidth
+                          size="small"
+                          label={t('federation.settings.avatarUrl')}
+                          value={avatarUrlValue}
+                          onChange={(e) => setAvatarUrl(e.target.value)}
+                          inputProps={{ maxLength: 500 }}
+                        />
+                        <Button
+                          variant="text"
+                          size="small"
+                          startIcon={<ImageIcon />}
+                          onClick={() => setPickerOpen(true)}
+                          sx={{ mt: 0.5 }}
+                        >
+                          {t('federation.settings.chooseFromMedia')}
+                        </Button>
+                      </Box>
+                    </Stack>
+                    <TextField
+                      fullWidth
+                      multiline
+                      minRows={2}
+                      maxRows={4}
+                      label={t('federation.settings.bio')}
+                      helperText={t('federation.settings.bioHelper')}
+                      value={bioValue}
+                      onChange={(e) => setBio(e.target.value)}
+                      inputProps={{ maxLength: 500 }}
+                    />
+                    <Stack direction="row" spacing={1} justifyContent="flex-end">
+                      <Button size="small" onClick={() => { setEditingProfile(false); setBio(undefined); setAvatarUrl(undefined); }}>
+                        {t('common.cancel')}
+                      </Button>
+                      <Button variant="contained" size="small" onClick={handleSaveProfile}>
+                        {t('common.save')}
+                      </Button>
+                    </Stack>
+                  </Box>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
           {/* Attention items */}
           {((stats?.pending_comments ?? 0) > 0 || (stats?.failed_activities ?? 0) > 0) && (
             <Card sx={{ mb: 3 }}>
@@ -235,6 +344,13 @@ export default function FederationOverview() {
           </Card>
         </Grid>
       </Grid>
+
+      <MediaPickerDialog
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        siteId={selectedSiteId}
+        onSelect={handleMediaSelected}
+      />
     </Box>
   );
 }

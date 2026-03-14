@@ -2466,6 +2466,10 @@
       "failedDeliveries": "Failed Deliveries"
     },
     "manage": "Manage",
+    "profile": {
+      "edit": "Edit profile",
+      "noBio": "No bio set — click edit to add one"
+    },
     "noSiteSelected": "No site selected",
     "noSiteDescription": "Select a site to view federation status.",
     "loadingData": "Loading federation data...",

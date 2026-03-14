@@ -85,8 +85,8 @@ export default function SettingsPage() {
     });
   }
 
-  // 5. Federation Settings — admin + site selected + federation module enabled
-  if (isAdmin && selectedSiteId && modules.federation) {
+  // 5. Federation Settings — sysadmin only (signature algo, key management, moderation mode)
+  if (isMaster && selectedSiteId && modules.federation) {
     tabs.push({
       key: 'federation',
       icon: <HubIcon />,

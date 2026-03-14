@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Box,
   Button,
   Card,
@@ -13,24 +12,18 @@ import {
   Select,
   Stack,
   Switch,
-  TextField,
   Typography,
 } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
-import PersonIcon from '@mui/icons-material/Person';
 import HubIcon from '@mui/icons-material/Hub';
-import ImageIcon from '@mui/icons-material/Image';
 import { useTranslation } from 'react-i18next';
 import { useSiteContext } from '@/store/SiteContext';
 import { useFederationSettings } from '@/hooks/useFederationData';
 import { useFederationMutations } from '@/hooks/useFederationMutations';
-import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
-import MediaPickerDialog from '@/components/media/MediaPickerDialog';
-import apiService from '@/services/api';
 import { useState } from 'react';
 
 interface FederationSettingsProps {
@@ -47,31 +40,10 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
   } = useFederationMutations(selectedSiteId);
 
   const [rotateConfirmOpen, setRotateConfirmOpen] = useState(false);
-  const [pickerOpen, setPickerOpen] = useState(false);
-
-  const handleMediaSelected = async (mediaId: string | null) => {
-    if (!mediaId) return;
-    try {
-      const media = await apiService.getMediaById(mediaId);
-      if (media.public_url) {
-        setAvatarUrl(media.public_url);
-        updateSettings.mutate({ avatar_url: media.public_url });
-      }
-    } catch {
-      // ignore — picker closed without valid selection
-    }
-  };
-  const [bio, setBio] = useState<string | undefined>(undefined);
-  const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined);
-
-  // Sync local state with settings when data loads
-  const bioValue = bio ?? settings?.summary ?? '';
-  const avatarUrlValue = avatarUrl ?? settings?.avatar_url ?? '';
 
   if (!selectedSiteId) {
     return (
       <Box data-testid="federation-settings.page">
-        {!embedded && <PageHeader title={t('federation.settings.title')} subtitle={t('federation.settings.subtitle')} />}
         <EmptyState icon={<SettingsIcon sx={{ fontSize: 64 }} />} title={t('federation.noSiteSelected')} description={t('federation.settings.noSite')} />
       </Box>
     );
@@ -80,7 +52,6 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
   if (isLoading) {
     return (
       <Box data-testid="federation-settings.page">
-        {!embedded && <PageHeader title={t('federation.settings.title')} subtitle={t('federation.settings.subtitle')} />}
         <LoadingState label={t('federation.settings.loading')} />
       </Box>
     );
@@ -97,62 +68,6 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
 
       <Paper sx={{ p: 3 }} elevation={embedded ? 0 : 1}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-          {settings?.webfinger_address && (
-            <Box>
-              <Typography variant="subtitle2" color="text.secondary">{t('federation.settings.handle')}</Typography>
-              <Typography variant="body1" sx={{ fontFamily: 'monospace' }}>
-                @{settings.webfinger_address}
-              </Typography>
-            </Box>
-          )}
-
-          <Card variant="outlined">
-            <CardHeader avatar={<PersonIcon />} title={t('federation.settings.profile')} />
-            <CardContent>
-              <Stack direction="row" alignItems="flex-start" spacing={2} sx={{ mb: 2 }}>
-                <Avatar
-                  src={avatarUrlValue || undefined}
-                  sx={{ width: 56, height: 56, mt: 0.5 }}
-                >
-                  <PersonIcon />
-                </Avatar>
-                <Box sx={{ flex: 1 }}>
-                  <TextField
-                    fullWidth
-                    label={t('federation.settings.avatarUrl')}
-                    helperText={t('federation.settings.avatarUrlHelper')}
-                    value={avatarUrlValue}
-                    onChange={(e) => setAvatarUrl(e.target.value)}
-                    onBlur={() => updateSettings.mutate({ avatar_url: avatarUrlValue })}
-                    inputProps={{ maxLength: 500 }}
-                    size="small"
-                  />
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    startIcon={<ImageIcon />}
-                    onClick={() => setPickerOpen(true)}
-                    sx={{ mt: 1 }}
-                  >
-                    {t('federation.settings.chooseFromMedia')}
-                  </Button>
-                </Box>
-              </Stack>
-              <TextField
-                fullWidth
-                multiline
-                minRows={2}
-                maxRows={4}
-                label={t('federation.settings.bio')}
-                helperText={t('federation.settings.bioHelper')}
-                value={bioValue}
-                onChange={(e) => setBio(e.target.value)}
-                onBlur={() => updateSettings.mutate({ summary: bioValue })}
-                inputProps={{ maxLength: 500 }}
-              />
-            </CardContent>
-          </Card>
-
           <Card variant="outlined">
             <CardHeader title={t('federation.settings.signatureAlgorithm')} />
             <CardContent>
@@ -230,13 +145,6 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
         }}
         onCancel={() => setRotateConfirmOpen(false)}
         loading={rotateKeysMutation.isPending}
-      />
-
-      <MediaPickerDialog
-        open={pickerOpen}
-        onClose={() => setPickerOpen(false)}
-        siteId={selectedSiteId}
-        onSelect={handleMediaSelected}
       />
     </Box>
   );

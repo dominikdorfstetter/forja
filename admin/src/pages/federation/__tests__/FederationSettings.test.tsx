@@ -48,7 +48,8 @@ describe('FederationSettings', () => {
   it('renders settings form with current values', async () => {
     vi.mocked(apiService.getFederationSettings).mockResolvedValue(mockSettings);
     renderWithProviders(<FederationSettingsPage />);
-    expect(await screen.findByText('@myblog@example.com')).toBeInTheDocument();
+    // Settings tab now only shows sysadmin controls (algorithm, moderation, key management)
+    expect(await screen.findByText('RSA-SHA256')).toBeInTheDocument();
   });
 
   it('shows the auto-publish toggle (enable/disable is in ModulesTab)', async () => {
