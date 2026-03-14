@@ -20,6 +20,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import PersonIcon from '@mui/icons-material/Person';
 import HubIcon from '@mui/icons-material/Hub';
+import ImageIcon from '@mui/icons-material/Image';
 import { useTranslation } from 'react-i18next';
 import { useSiteContext } from '@/store/SiteContext';
 import { useFederationSettings } from '@/hooks/useFederationData';
@@ -28,6 +29,8 @@ import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
+import MediaPickerDialog from '@/components/media/MediaPickerDialog';
+import apiService from '@/services/api';
 import { useState } from 'react';
 
 interface FederationSettingsProps {
@@ -44,6 +47,20 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
   } = useFederationMutations(selectedSiteId);
 
   const [rotateConfirmOpen, setRotateConfirmOpen] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
+
+  const handleMediaSelected = async (mediaId: string | null) => {
+    if (!mediaId) return;
+    try {
+      const media = await apiService.getMediaById(mediaId);
+      if (media.public_url) {
+        setAvatarUrl(media.public_url);
+        updateSettings.mutate({ avatar_url: media.public_url });
+      }
+    } catch {
+      // ignore — picker closed without valid selection
+    }
+  };
   const [bio, setBio] = useState<string | undefined>(undefined);
   const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined);
 
@@ -99,15 +116,27 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
                 >
                   <PersonIcon />
                 </Avatar>
-                <TextField
-                  fullWidth
-                  label={t('federation.settings.avatarUrl')}
-                  helperText={t('federation.settings.avatarUrlHelper')}
-                  value={avatarUrlValue}
-                  onChange={(e) => setAvatarUrl(e.target.value)}
-                  onBlur={() => updateSettings.mutate({ avatar_url: avatarUrlValue })}
-                  inputProps={{ maxLength: 500 }}
-                />
+                <Box sx={{ flex: 1 }}>
+                  <TextField
+                    fullWidth
+                    label={t('federation.settings.avatarUrl')}
+                    helperText={t('federation.settings.avatarUrlHelper')}
+                    value={avatarUrlValue}
+                    onChange={(e) => setAvatarUrl(e.target.value)}
+                    onBlur={() => updateSettings.mutate({ avatar_url: avatarUrlValue })}
+                    inputProps={{ maxLength: 500 }}
+                    size="small"
+                  />
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    startIcon={<ImageIcon />}
+                    onClick={() => setPickerOpen(true)}
+                    sx={{ mt: 1 }}
+                  >
+                    {t('federation.settings.chooseFromMedia')}
+                  </Button>
+                </Box>
               </Stack>
               <TextField
                 fullWidth
@@ -201,6 +230,13 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
         }}
         onCancel={() => setRotateConfirmOpen(false)}
         loading={rotateKeysMutation.isPending}
+      />
+
+      <MediaPickerDialog
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        siteId={selectedSiteId}
+        onSelect={handleMediaSelected}
       />
     </Box>
   );
