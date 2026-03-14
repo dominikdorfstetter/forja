@@ -11,6 +11,8 @@ pub mod encryption;
 pub mod federation;
 pub mod image_service;
 pub mod notification_service;
+pub mod publish_hooks;
+pub mod publish_scheduler;
 pub mod review_service;
 pub mod storage;
 pub mod webhook_service;

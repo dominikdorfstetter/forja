@@ -21,6 +21,7 @@ use rocket::fs::FileServer;
 use forja::guards::auth_guard::ClerkJwksState;
 use forja::middleware::rate_limit::RateLimitHeaderInfo;
 use forja::services::federation::worker::FederationWorker;
+use forja::services::publish_scheduler::PublishScheduler;
 use forja::services::storage;
 use forja::{handlers, openapi::ConsumerApiDoc, AppState, Settings};
 
@@ -329,6 +330,7 @@ async fn rocket() -> _ {
             })
         }))
         .attach(FederationWorker)
+        .attach(PublishScheduler)
         .mount("/", handlers::system::routes())
         .mount("/", handlers::federation::protocol_routes())
         .mount("/api/v1", handlers::routes())
