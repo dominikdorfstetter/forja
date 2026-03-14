@@ -1642,6 +1642,7 @@ export interface FederationSettings {
   auto_publish: boolean;
   actor_uri?: string;
   webfinger_address?: string;
+  summary?: string;
 }
 
 export interface FederationStats {

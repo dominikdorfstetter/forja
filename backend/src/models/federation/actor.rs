@@ -103,6 +103,20 @@ impl ApActor {
         Ok(actor)
     }
 
+    /// Update the actor's summary (bio).
+    pub async fn update_summary(
+        pool: &PgPool,
+        site_id: Uuid,
+        summary: Option<&str>,
+    ) -> Result<(), ApiError> {
+        sqlx::query("UPDATE ap_actors SET summary = $2, updated_at = NOW() WHERE site_id = $1")
+            .bind(site_id)
+            .bind(summary)
+            .execute(pool)
+            .await?;
+        Ok(())
+    }
+
     /// Delete the actor for a given site.
     pub async fn delete_by_site_id(pool: &PgPool, site_id: Uuid) -> Result<(), ApiError> {
         sqlx::query("DELETE FROM ap_actors WHERE site_id = $1")

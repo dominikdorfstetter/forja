@@ -2584,7 +2584,10 @@
       "rotateKeysConfirm": "Rotate Signing Keys",
       "rotateKeysMessage": "This will generate new signing keys. Remote servers will need to re-fetch your public key, which may temporarily disrupt federation. Continue?",
       "noSite": "Select a site to manage settings.",
-      "loading": "Loading settings..."
+      "loading": "Loading settings...",
+      "profile": "Profile",
+      "bio": "Bio",
+      "bioHelper": "A short description of your blog for Fediverse profiles (max 500 characters)"
     },
     "breadcrumbs": {
       "federation": "Federation"

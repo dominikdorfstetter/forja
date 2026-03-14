@@ -24,6 +24,11 @@ pub struct UpdateFederationSettingsRequest {
     /// Automatically publish new posts to the fediverse.
     #[schema(example = false)]
     pub auto_publish: Option<bool>,
+
+    /// Actor bio/summary for Fediverse profiles (max 500 characters).
+    #[schema(example = "A blog about web development and Rust")]
+    #[validate(length(max = 500, message = "Summary cannot exceed 500 characters"))]
+    pub summary: Option<String>,
 }
 
 /// Request to block a remote instance domain.
@@ -119,6 +124,7 @@ mod tests {
             signature_algorithm: Some("rsa-sha256".to_string()),
             moderation_mode: Some("manual".to_string()),
             auto_publish: Some(false),
+            summary: Some("A test blog".to_string()),
         };
         assert!(req.validate().is_ok());
     }
@@ -130,6 +136,7 @@ mod tests {
             signature_algorithm: None,
             moderation_mode: None,
             auto_publish: None,
+            summary: None,
         };
         assert!(req.validate().is_ok());
     }
@@ -141,6 +148,7 @@ mod tests {
             signature_algorithm: Some("hmac-sha512".to_string()),
             moderation_mode: None,
             auto_publish: None,
+            summary: None,
         };
         assert!(req.validate().is_err());
     }
@@ -152,6 +160,19 @@ mod tests {
             signature_algorithm: None,
             moderation_mode: Some("yolo".to_string()),
             auto_publish: None,
+            summary: None,
+        };
+        assert!(req.validate().is_err());
+    }
+
+    #[test]
+    fn test_update_federation_settings_summary_too_long() {
+        let req = UpdateFederationSettingsRequest {
+            enabled: None,
+            signature_algorithm: None,
+            moderation_mode: None,
+            auto_publish: None,
+            summary: Some("x".repeat(501)),
         };
         assert!(req.validate().is_err());
     }

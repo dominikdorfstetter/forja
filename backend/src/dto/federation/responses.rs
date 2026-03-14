@@ -31,6 +31,11 @@ pub struct FederationSettingsResponse {
     #[schema(example = "blog@example.com")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub webfinger_address: Option<String>,
+
+    /// The actor's bio/summary for Fediverse profiles.
+    #[schema(example = "A blog about web development")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub summary: Option<String>,
 }
 
 // ── Stats ───────────────────────────────────────────────────────────────
@@ -264,12 +269,14 @@ mod tests {
             auto_publish: false,
             actor_uri: Some("https://example.com/ap/blog/actor".to_string()),
             webfinger_address: Some("blog@example.com".to_string()),
+            summary: Some("A test blog".to_string()),
         };
 
         let json = serde_json::to_value(&settings).unwrap();
         assert_eq!(json["enabled"], true);
         assert_eq!(json["signature_algorithm"], "rsa-sha256");
         assert_eq!(json["actor_uri"], "https://example.com/ap/blog/actor");
+        assert_eq!(json["summary"], "A test blog");
     }
 
     #[test]
@@ -281,11 +288,13 @@ mod tests {
             auto_publish: false,
             actor_uri: None,
             webfinger_address: None,
+            summary: None,
         };
 
         let json = serde_json::to_string(&settings).unwrap();
         assert!(!json.contains("actor_uri"));
         assert!(!json.contains("webfinger_address"));
+        assert!(!json.contains("summary"));
     }
 
     #[test]

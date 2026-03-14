@@ -12,10 +12,12 @@ import {
   Select,
   Stack,
   Switch,
+  TextField,
   Typography,
 } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
+import PersonIcon from '@mui/icons-material/Person';
 import HubIcon from '@mui/icons-material/Hub';
 import { useTranslation } from 'react-i18next';
 import { useSiteContext } from '@/store/SiteContext';
@@ -41,6 +43,10 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
   } = useFederationMutations(selectedSiteId);
 
   const [rotateConfirmOpen, setRotateConfirmOpen] = useState(false);
+  const [bio, setBio] = useState<string | undefined>(undefined);
+
+  // Sync local bio state with settings when data loads
+  const bioValue = bio ?? settings?.summary ?? '';
 
   if (!selectedSiteId) {
     return (
@@ -79,6 +85,24 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
               </Typography>
             </Box>
           )}
+
+          <Card variant="outlined">
+            <CardHeader avatar={<PersonIcon />} title={t('federation.settings.profile')} />
+            <CardContent>
+              <TextField
+                fullWidth
+                multiline
+                minRows={2}
+                maxRows={4}
+                label={t('federation.settings.bio')}
+                helperText={t('federation.settings.bioHelper')}
+                value={bioValue}
+                onChange={(e) => setBio(e.target.value)}
+                onBlur={() => updateSettings.mutate({ summary: bioValue })}
+                inputProps={{ maxLength: 500 }}
+              />
+            </CardContent>
+          </Card>
 
           <Card variant="outlined">
             <CardHeader title={t('federation.settings.signatureAlgorithm')} />

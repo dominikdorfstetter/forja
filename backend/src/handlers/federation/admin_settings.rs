@@ -64,7 +64,7 @@ async fn build_settings_response(
     .as_bool()
     .unwrap_or(false);
 
-    let (actor_uri, webfinger_address) = if enabled {
+    let (actor_uri, webfinger_address, summary) = if enabled {
         let actor = ApActor::find_by_site_id(&state.db, site_id).await?;
         if let Some(actor) = actor {
             let site = Site::find_by_id(&state.db, site_id).await?;
@@ -78,12 +78,13 @@ async fn build_settings_response(
 
             let uri = actor.actor_uri(&domain, &site.slug);
             let wf = format!("{}@{}", site.slug, domain);
-            (Some(uri), Some(wf))
+            let sum = actor.summary.clone();
+            (Some(uri), Some(wf), sum)
         } else {
-            (None, None)
+            (None, None, None)
         }
     } else {
-        (None, None)
+        (None, None, None)
     };
 
     Ok(FederationSettingsResponse {
@@ -93,6 +94,7 @@ async fn build_settings_response(
         auto_publish: auto_pub,
         actor_uri,
         webfinger_address,
+        summary,
     })
 }
 
@@ -202,6 +204,14 @@ pub async fn update_settings(
             false,
         )
         .await?;
+    }
+    if let Some(ref summary) = req.summary {
+        let summary_val = if summary.is_empty() {
+            None
+        } else {
+            Some(summary.as_str())
+        };
+        ApActor::update_summary(&state.db, site_id, summary_val).await?;
     }
 
     let response = build_settings_response(state.inner(), site_id).await?;
