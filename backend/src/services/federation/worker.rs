@@ -167,8 +167,8 @@ async fn check_federation_enabled(pool: &sqlx::PgPool) -> Result<bool, sqlx::Err
         r#"
         SELECT EXISTS(
             SELECT 1 FROM site_settings
-            WHERE key = 'module_federation_enabled'
-              AND value = '"true"'
+            WHERE setting_key = 'module_federation_enabled'
+              AND setting_value = '"true"'
         )
         "#,
     )
@@ -266,7 +266,7 @@ async fn get_moderation_mode(
     site_id: uuid::Uuid,
 ) -> Result<String, sqlx::Error> {
     let value: Option<serde_json::Value> = sqlx::query_scalar(
-        "SELECT value FROM site_settings WHERE site_id = $1 AND key = 'federation_moderation_mode'",
+        "SELECT setting_value FROM site_settings WHERE site_id = $1 AND setting_key = 'federation_moderation_mode'",
     )
     .bind(site_id)
     .fetch_optional(pool)
