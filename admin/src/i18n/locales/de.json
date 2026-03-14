@@ -2564,6 +2564,20 @@
         "actions": "Aktionen"
       }
     },
+    "quickPost": {
+      "title": "Schnellbeitrag",
+      "placeholder": "Was beschäftigt dich? Poste direkt ins Fediverse...",
+      "post": "Posten",
+      "posting": "Wird gepostet...",
+      "posted": "Im Fediverse veröffentlicht!",
+      "deleteTitle": "Beitrag löschen",
+      "deleteMessage": "Dadurch wird auch eine Lösch-Aktivität an das Fediverse gesendet. Der Beitrag kann auf einigen Servern noch zwischengespeichert sein.",
+      "deleteConfirm": "Löschen",
+      "deleted": "Beitrag gelöscht",
+      "recentPosts": "Letzte Beiträge",
+      "noPosts": "Noch keine Beiträge. Teile deinen ersten Gedanken!",
+      "charCount": "{{count}}/500"
+    },
     "settings": {
       "title": "Federationseinstellungen",
       "subtitle": "ActivityPub-Federation konfigurieren",

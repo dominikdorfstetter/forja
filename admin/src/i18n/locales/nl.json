@@ -2564,6 +2564,20 @@
         "actions": "Acties"
       }
     },
+    "quickPost": {
+      "title": "Snelbericht",
+      "placeholder": "Waar denk je aan? Post direct naar het Fediverse...",
+      "post": "Plaatsen",
+      "posting": "Wordt geplaatst...",
+      "posted": "Geplaatst op het Fediverse!",
+      "deleteTitle": "Bericht verwijderen",
+      "deleteMessage": "Dit stuurt ook een verwijderactiviteit naar het Fediverse. Het bericht kan nog in de cache staan op sommige servers.",
+      "deleteConfirm": "Verwijderen",
+      "deleted": "Bericht verwijderd",
+      "recentPosts": "Recente berichten",
+      "noPosts": "Nog geen berichten. Deel je eerste gedachte!",
+      "charCount": "{{count}}/500"
+    },
     "settings": {
       "title": "Federatie-instellingen",
       "subtitle": "ActivityPub-federatie configureren",

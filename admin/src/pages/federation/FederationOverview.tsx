@@ -15,6 +15,7 @@ import { useFederationStats, useFederationSettings } from '@/hooks/useFederation
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
+import QuickPostComposer from '@/pages/federation/QuickPostComposer';
 
 interface StatCardProps {
   label: string;
@@ -117,6 +118,8 @@ export default function FederationOverview() {
           </CardContent>
         </Card>
       )}
+
+      {settings?.enabled && <QuickPostComposer siteId={selectedSiteId} />}
 
       <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
         <Chip

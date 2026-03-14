@@ -2564,6 +2564,20 @@
         "actions": "Akcje"
       }
     },
+    "quickPost": {
+      "title": "Szybki wpis",
+      "placeholder": "Co masz na myśli? Opublikuj bezpośrednio w Fediverse...",
+      "post": "Opublikuj",
+      "posting": "Publikowanie...",
+      "posted": "Opublikowano w Fediverse!",
+      "deleteTitle": "Usuń wpis",
+      "deleteMessage": "Spowoduje to również wysłanie aktywności usunięcia do Fediverse. Wpis może nadal być w pamięci podręcznej na niektórych serwerach.",
+      "deleteConfirm": "Usuń",
+      "deleted": "Wpis usunięty",
+      "recentPosts": "Ostatnie wpisy",
+      "noPosts": "Brak wpisów. Podziel się swoją pierwszą myślą!",
+      "charCount": "{{count}}/500"
+    },
     "settings": {
       "title": "Ustawienia federacji",
       "subtitle": "Konfiguruj federację ActivityPub",

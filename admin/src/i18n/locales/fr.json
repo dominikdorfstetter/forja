@@ -2564,6 +2564,20 @@
         "actions": "Actions"
       }
     },
+    "quickPost": {
+      "title": "Publication rapide",
+      "placeholder": "Quoi de neuf ? Publiez directement sur le Fédivers...",
+      "post": "Publier",
+      "posting": "Publication en cours...",
+      "posted": "Publié sur le Fédivers !",
+      "deleteTitle": "Supprimer la publication",
+      "deleteMessage": "Cela enverra également une activité de suppression au Fédivers. La publication peut encore être en cache sur certains serveurs.",
+      "deleteConfirm": "Supprimer",
+      "deleted": "Publication supprimée",
+      "recentPosts": "Publications récentes",
+      "noPosts": "Pas encore de publications. Partagez votre première pensée !",
+      "charCount": "{{count}}/500"
+    },
     "settings": {
       "title": "Paramètres de fédération",
       "subtitle": "Configurer la fédération ActivityPub",

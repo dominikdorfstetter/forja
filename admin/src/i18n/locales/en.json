@@ -2566,6 +2566,20 @@
         "actions": "Actions"
       }
     },
+    "quickPost": {
+      "title": "Quick Post",
+      "placeholder": "What's on your mind? Post directly to the Fediverse...",
+      "post": "Post",
+      "posting": "Posting...",
+      "posted": "Posted to the Fediverse!",
+      "deleteTitle": "Delete Post",
+      "deleteMessage": "This will also send a Delete activity to the Fediverse. The post may still be cached on some servers.",
+      "deleteConfirm": "Delete",
+      "deleted": "Post deleted",
+      "recentPosts": "Recent Posts",
+      "noPosts": "No posts yet. Share your first thought!",
+      "charCount": "{{count}}/500"
+    },
     "settings": {
       "title": "Federation Settings",
       "subtitle": "Configure ActivityPub federation",

@@ -2564,6 +2564,20 @@
         "actions": "Azioni"
       }
     },
+    "quickPost": {
+      "title": "Post rapido",
+      "placeholder": "A cosa stai pensando? Pubblica direttamente nel Fediverso...",
+      "post": "Pubblica",
+      "posting": "Pubblicazione in corso...",
+      "posted": "Pubblicato nel Fediverso!",
+      "deleteTitle": "Elimina post",
+      "deleteMessage": "Verrà inviata anche un'attività di eliminazione al Fediverso. Il post potrebbe essere ancora nella cache di alcuni server.",
+      "deleteConfirm": "Elimina",
+      "deleted": "Post eliminato",
+      "recentPosts": "Post recenti",
+      "noPosts": "Nessun post ancora. Condividi il tuo primo pensiero!",
+      "charCount": "{{count}}/500"
+    },
     "settings": {
       "title": "Impostazioni federazione",
       "subtitle": "Configura la federazione ActivityPub",
