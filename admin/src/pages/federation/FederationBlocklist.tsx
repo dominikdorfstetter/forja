@@ -101,7 +101,7 @@ export default function FederationBlocklist() {
   if (!selectedSiteId) {
     return (
       <Box data-testid="federation-blocklist.page">
-        <PageHeader title="Blocklist" subtitle="Blocked instances and actors" />
+        <PageHeader title="Blocklist" subtitle="Blocked instances and actors" breadcrumbs={[{ label: 'Federation', path: '/federation' }, { label: 'Blocklist' }]} />
         <EmptyState icon={<BlockIcon sx={{ fontSize: 64 }} />} title="No site selected" description="Select a site to manage blocks." />
       </Box>
     );
@@ -111,7 +111,7 @@ export default function FederationBlocklist() {
 
   return (
     <Box data-testid="federation-blocklist.page">
-      <PageHeader title="Blocklist" subtitle="Blocked instances and actors" />
+      <PageHeader title="Blocklist" subtitle="Blocked instances and actors" breadcrumbs={[{ label: 'Federation', path: '/federation' }, { label: 'Blocklist' }]} />
 
       <Paper>
         <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ borderBottom: 1, borderColor: 'divider' }}>

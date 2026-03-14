@@ -81,7 +81,7 @@ export default function FederationFollowers() {
   if (!selectedSiteId) {
     return (
       <Box data-testid="federation-followers.page">
-        <PageHeader title="Followers" subtitle="Fediverse followers for this site" />
+        <PageHeader title="Followers" subtitle="Fediverse followers for this site" breadcrumbs={[{ label: 'Federation', path: '/federation' }, { label: 'Followers' }]} />
         <EmptyState icon={<PeopleIcon sx={{ fontSize: 64 }} />} title="No site selected" description="Select a site to view followers." />
       </Box>
     );
@@ -89,7 +89,7 @@ export default function FederationFollowers() {
 
   return (
     <Box data-testid="federation-followers.page">
-      <PageHeader title="Followers" subtitle="Fediverse followers for this site" />
+      <PageHeader title="Followers" subtitle="Fediverse followers for this site" breadcrumbs={[{ label: 'Federation', path: '/federation' }, { label: 'Followers' }]} />
 
       <Paper>
         <TableFilterBar

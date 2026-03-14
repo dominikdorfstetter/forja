@@ -114,7 +114,7 @@ export default function FederationComments() {
   if (!selectedSiteId) {
     return (
       <Box data-testid="federation-comments.page">
-        <PageHeader title="Comments" subtitle="Moderate federated comments" />
+        <PageHeader title="Comments" subtitle="Moderate federated comments" breadcrumbs={[{ label: 'Federation', path: '/federation' }, { label: 'Comments' }]} />
         <EmptyState icon={<CommentIcon sx={{ fontSize: 64 }} />} title="No site selected" description="Select a site to moderate comments." />
       </Box>
     );
@@ -122,7 +122,7 @@ export default function FederationComments() {
 
   return (
     <Box data-testid="federation-comments.page">
-      <PageHeader title="Comments" subtitle="Moderate federated comments" />
+      <PageHeader title="Comments" subtitle="Moderate federated comments" breadcrumbs={[{ label: 'Federation', path: '/federation' }, { label: 'Comments' }]} />
 
       <Paper>
         <TableFilterBar

@@ -174,11 +174,7 @@ export default function Layout() {
     ...(modules.federation ? [{
       label: 'Federation',
       items: [
-        { text: 'Overview', icon: <HubIcon />, path: '/federation' },
-        { text: 'Followers', icon: <PeopleIcon />, path: '/federation/followers' },
-        { text: 'Comments', icon: <RateReviewIcon />, path: '/federation/comments' },
-        { text: 'Activity', icon: <HistoryIcon />, path: '/federation/activity' },
-        { text: 'Blocklist', icon: <BlockIcon />, path: '/federation/blocks' },
+        { text: 'Federation', icon: <HubIcon />, path: '/federation' },
       ],
     }] : []),
     {

@@ -1,10 +1,13 @@
-import { Box, Card, CardContent, Chip, Grid, IconButton, Tooltip, Typography } from '@mui/material';
+import { Box, Card, CardActionArea, CardContent, Chip, Grid, IconButton, Tooltip, Typography } from '@mui/material';
 import PeopleIcon from '@mui/icons-material/People';
 import SendIcon from '@mui/icons-material/Send';
 import CommentIcon from '@mui/icons-material/Comment';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import BlockIcon from '@mui/icons-material/Block';
+import HistoryIcon from '@mui/icons-material/History';
 import HubIcon from '@mui/icons-material/Hub';
+import { useNavigate } from 'react-router';
 import { useSnackbar } from 'notistack';
 import { useSiteContext } from '@/store/SiteContext';
 import { useFederationStats, useFederationSettings } from '@/hooks/useFederationData';
@@ -33,12 +36,34 @@ function StatCard({ label, value, icon, color = 'primary.main' }: StatCardProps)
   );
 }
 
+interface NavCardProps {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  path: string;
+}
+
+function NavCard({ title, description, icon, path }: NavCardProps) {
+  const navigate = useNavigate();
+  return (
+    <Card>
+      <CardActionArea onClick={() => navigate(path)} sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 2 }}>
+        <Box sx={{ color: 'primary.main', display: 'flex' }}>{icon}</Box>
+        <Box>
+          <Typography variant="subtitle1" fontWeight={600}>{title}</Typography>
+          <Typography variant="body2" color="text.secondary">{description}</Typography>
+        </Box>
+      </CardActionArea>
+    </Card>
+  );
+}
+
 export default function FederationOverview() {
   const { selectedSiteId } = useSiteContext();
   const { data: stats, isLoading: statsLoading } = useFederationStats(selectedSiteId);
   const { data: settings, isLoading: settingsLoading } = useFederationSettings(selectedSiteId);
-
   const { enqueueSnackbar } = useSnackbar();
+
   const isLoading = statsLoading || settingsLoading;
 
   const handleCopyHandle = () => {
@@ -99,37 +124,36 @@ export default function FederationOverview() {
         />
       </Box>
 
-      <Grid container spacing={3}>
+      {/* Stats */}
+      <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <StatCard
-            label="Followers"
-            value={stats?.followersCount ?? 0}
-            icon={<PeopleIcon fontSize="large" />}
-          />
+          <StatCard label="Followers" value={stats?.followersCount ?? 0} icon={<PeopleIcon fontSize="large" />} />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <StatCard
-            label="Posts Syndicated"
-            value={stats?.postsSyndicated ?? 0}
-            icon={<SendIcon fontSize="large" />}
-            color="success.main"
-          />
+          <StatCard label="Posts Syndicated" value={stats?.postsSyndicated ?? 0} icon={<SendIcon fontSize="large" />} color="success.main" />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <StatCard
-            label="Pending Comments"
-            value={stats?.pendingComments ?? 0}
-            icon={<CommentIcon fontSize="large" />}
-            color="warning.main"
-          />
+          <StatCard label="Pending Comments" value={stats?.pendingComments ?? 0} icon={<CommentIcon fontSize="large" />} color="warning.main" />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <StatCard
-            label="Failed Deliveries"
-            value={stats?.failedDeliveries ?? 0}
-            icon={<ErrorOutlineIcon fontSize="large" />}
-            color="error.main"
-          />
+          <StatCard label="Failed Deliveries" value={stats?.failedDeliveries ?? 0} icon={<ErrorOutlineIcon fontSize="large" />} color="error.main" />
+        </Grid>
+      </Grid>
+
+      {/* Navigation to sub-pages */}
+      <Typography variant="h6" sx={{ mb: 2 }}>Manage</Typography>
+      <Grid container spacing={2}>
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <NavCard title="Followers" description="View and manage your Fediverse followers" icon={<PeopleIcon />} path="/federation/followers" />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <NavCard title="Comments" description="Moderate inbound replies from the Fediverse" icon={<CommentIcon />} path="/federation/comments" />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <NavCard title="Activity Log" description="View sent and received federation events" icon={<HistoryIcon />} path="/federation/activity" />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <NavCard title="Blocklist" description="Block instances or individual actors" icon={<BlockIcon />} path="/federation/blocks" />
         </Grid>
       </Grid>
     </Box>

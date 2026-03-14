@@ -102,7 +102,7 @@ export default function FederationActivityLog() {
   if (!selectedSiteId) {
     return (
       <Box data-testid="federation-activity.page">
-        <PageHeader title="Activity Log" subtitle="Federation activity history" />
+        <PageHeader title="Activity Log" subtitle="Federation activity history" breadcrumbs={[{ label: 'Federation', path: '/federation' }, { label: 'Activity Log' }]} />
         <EmptyState icon={<HistoryIcon sx={{ fontSize: 64 }} />} title="No site selected" description="Select a site to view activity." />
       </Box>
     );
@@ -110,7 +110,7 @@ export default function FederationActivityLog() {
 
   return (
     <Box data-testid="federation-activity.page">
-      <PageHeader title="Activity Log" subtitle="Federation activity history" />
+      <PageHeader title="Activity Log" subtitle="Federation activity history" breadcrumbs={[{ label: 'Federation', path: '/federation' }, { label: 'Activity Log' }]} />
 
       <Paper>
         <TableFilterBar
