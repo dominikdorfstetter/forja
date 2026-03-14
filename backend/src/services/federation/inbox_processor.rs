@@ -13,6 +13,7 @@ use crate::models::federation::comment::ApComment;
 use crate::models::federation::follower::ApFollower;
 use crate::models::federation::types::{ApCommentStatus, ApFollowerStatus};
 use crate::services::federation::sanitizer::sanitize_html;
+use crate::services::notification_service;
 
 /// Process a stored inbound activity by dispatching to the appropriate handler.
 pub async fn process_activity(
@@ -25,13 +26,37 @@ pub async fn process_activity(
         "Undo" => handle_undo(pool, activity).await,
         "Create" => handle_create(pool, activity, moderation_mode).await,
         "Update" => handle_update(pool, activity).await,
-        "Like" | "Announce" => {
-            // Already logged in ap_activities by the inbox handler — nothing more to do.
+        "Like" => {
             tracing::debug!(
                 activity_type = activity.activity_type,
                 activity_uri = activity.activity_uri,
-                "Inbox processor: logged {} (no further action needed)",
-                activity.activity_type,
+                "Inbox processor: logged Like"
+            );
+            notification_service::notify_federation_event(
+                pool.clone(),
+                activity.site_id,
+                "federation_like",
+                "activity",
+                activity.id,
+                "Your post was liked on the Fediverse",
+                None,
+            );
+            Ok(())
+        }
+        "Announce" => {
+            tracing::debug!(
+                activity_type = activity.activity_type,
+                activity_uri = activity.activity_uri,
+                "Inbox processor: logged Announce"
+            );
+            notification_service::notify_federation_event(
+                pool.clone(),
+                activity.site_id,
+                "federation_boost",
+                "activity",
+                activity.id,
+                "Your post was boosted on the Fediverse",
+                None,
             );
             Ok(())
         }
@@ -119,6 +144,21 @@ async fn handle_follow(pool: &PgPool, activity: &ApActivity) -> Result<(), ApiEr
         follower = follower_actor_uri,
         site_id = %activity.site_id,
         "Inbox processor: accepted Follow from remote actor"
+    );
+
+    // Notify site admins about the new follower
+    let display = username
+        .map(|u| format!("@{}", u))
+        .or(display_name.map(|n| n.to_string()))
+        .unwrap_or_else(|| follower_actor_uri.to_string());
+    notification_service::notify_federation_event(
+        pool.clone(),
+        activity.site_id,
+        "federation_follow",
+        "follower",
+        activity.id,
+        &format!("New follower: {}", display),
+        None,
     );
 
     // TODO: Send Accept activity back via delivery service
@@ -319,6 +359,18 @@ async fn handle_create(
         status = ?status,
         author = activity.actor_uri,
         "Inbox processor: created comment from Create(Note)"
+    );
+
+    // Notify site admins about the new comment
+    let author_label = author_name.unwrap_or(&activity.actor_uri);
+    notification_service::notify_federation_event(
+        pool.clone(),
+        activity.site_id,
+        "federation_comment",
+        "comment",
+        comment.id,
+        &format!("New Fediverse comment from {}", author_label),
+        None,
     );
 
     Ok(())
