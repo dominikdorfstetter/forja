@@ -145,6 +145,13 @@ import type {
   UpdateHelpStateRequest,
   OnboardingProgressResponse,
   CompleteStepRequest,
+  FederationSettings,
+  FederationStats,
+  FederationFollower,
+  FederationActivity,
+  FederationComment,
+  FederationBlockedInstance,
+  FederationBlockedActor,
 } from '@/types/api';
 
 const API_BASE_URL = '/api/v1';
@@ -1127,6 +1134,95 @@ class ApiService {
       undefined,
       { params: { retention_days: retentionDays } },
     );
+  }
+
+  // ===== Federation (ActivityPub) =====
+
+  // Settings
+  async getFederationSettings(siteId: string): Promise<FederationSettings> {
+    return apiRequest<FederationSettings>('GET', `/sites/${siteId}/federation/settings`);
+  }
+
+  async updateFederationSettings(siteId: string, data: Partial<FederationSettings>): Promise<FederationSettings> {
+    return apiRequest<FederationSettings>('PUT', `/sites/${siteId}/federation/settings`, data);
+  }
+
+  async enableFederation(siteId: string): Promise<FederationSettings> {
+    return apiRequest<FederationSettings>('POST', `/sites/${siteId}/federation/enable`);
+  }
+
+  async disableFederation(siteId: string): Promise<void> {
+    return apiRequest<void>('POST', `/sites/${siteId}/federation/disable`);
+  }
+
+  async rotateKeys(siteId: string): Promise<void> {
+    return apiRequest<void>('POST', `/sites/${siteId}/federation/rotate-keys`);
+  }
+
+  // Stats
+  async getFederationStats(siteId: string): Promise<FederationStats> {
+    return apiRequest<FederationStats>('GET', `/sites/${siteId}/federation/stats`);
+  }
+
+  // Followers
+  async getFederationFollowers(siteId: string, params?: ListQueryParams): Promise<Paginated<FederationFollower>> {
+    return apiRequest<Paginated<FederationFollower>>('GET', `/sites/${siteId}/federation/followers`, undefined, { params });
+  }
+
+  async removeFederationFollower(siteId: string, followerId: string): Promise<void> {
+    return apiRequest<void>('DELETE', `/sites/${siteId}/federation/followers/${followerId}`);
+  }
+
+  // Activities
+  async getFederationActivities(siteId: string, params?: ListQueryParams): Promise<Paginated<FederationActivity>> {
+    return apiRequest<Paginated<FederationActivity>>('GET', `/sites/${siteId}/federation/activities`, undefined, { params });
+  }
+
+  async retryFederationActivity(siteId: string, activityId: string): Promise<void> {
+    return apiRequest<void>('POST', `/sites/${siteId}/federation/activities/${activityId}/retry`);
+  }
+
+  // Comments
+  async getFederationComments(siteId: string, params?: ListQueryParams): Promise<Paginated<FederationComment>> {
+    return apiRequest<Paginated<FederationComment>>('GET', `/sites/${siteId}/federation/comments`, undefined, { params });
+  }
+
+  async approveFederationComment(siteId: string, commentId: string): Promise<void> {
+    return apiRequest<void>('PUT', `/sites/${siteId}/federation/comments/${commentId}/approve`);
+  }
+
+  async rejectFederationComment(siteId: string, commentId: string): Promise<void> {
+    return apiRequest<void>('PUT', `/sites/${siteId}/federation/comments/${commentId}/reject`);
+  }
+
+  async deleteFederationComment(siteId: string, commentId: string): Promise<void> {
+    return apiRequest<void>('DELETE', `/sites/${siteId}/federation/comments/${commentId}`);
+  }
+
+  // Blocks - Instances
+  async getBlockedInstances(siteId: string, params?: ListQueryParams): Promise<Paginated<FederationBlockedInstance>> {
+    return apiRequest<Paginated<FederationBlockedInstance>>('GET', `/sites/${siteId}/federation/blocks/instances`, undefined, { params });
+  }
+
+  async blockInstance(siteId: string, data: { instanceDomain: string; reason?: string }): Promise<FederationBlockedInstance> {
+    return apiRequest<FederationBlockedInstance>('POST', `/sites/${siteId}/federation/blocks/instances`, data);
+  }
+
+  async unblockInstance(siteId: string, blockId: string): Promise<void> {
+    return apiRequest<void>('DELETE', `/sites/${siteId}/federation/blocks/instances/${blockId}`);
+  }
+
+  // Blocks - Actors
+  async getBlockedActors(siteId: string, params?: ListQueryParams): Promise<Paginated<FederationBlockedActor>> {
+    return apiRequest<Paginated<FederationBlockedActor>>('GET', `/sites/${siteId}/federation/blocks/actors`, undefined, { params });
+  }
+
+  async blockActor(siteId: string, data: { actorUri: string; reason?: string }): Promise<FederationBlockedActor> {
+    return apiRequest<FederationBlockedActor>('POST', `/sites/${siteId}/federation/blocks/actors`, data);
+  }
+
+  async unblockActor(siteId: string, blockId: string): Promise<void> {
+    return apiRequest<void>('DELETE', `/sites/${siteId}/federation/blocks/actors/${blockId}`);
   }
 }
 

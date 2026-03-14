@@ -1571,3 +1571,80 @@ export interface CompleteStepRequest {
 export interface SeedContentResponse {
   deleted?: number;
 }
+
+// ── Federation (ActivityPub) ──────────────────────────────────────
+
+export interface FederationActor {
+  id: string;
+  siteId: string;
+  preferredUsername: string;
+  displayName: string;
+  summary: string | null;
+  avatarUrl: string | null;
+  signatureAlgorithm: string;
+  createdAt: string;
+}
+
+export interface FederationFollower {
+  id: string;
+  followerActorUri: string;
+  displayName: string | null;
+  username: string | null;
+  avatarUrl: string | null;
+  status: string;
+  followedAt: string;
+}
+
+export interface FederationActivity {
+  id: string;
+  activityType: string;
+  actorUri: string;
+  objectUri: string | null;
+  direction: 'in' | 'out';
+  status: string;
+  errorMessage: string | null;
+  createdAt: string;
+}
+
+export interface FederationComment {
+  id: string;
+  contentId: string;
+  authorActorUri: string;
+  authorName: string | null;
+  authorAvatarUrl: string | null;
+  bodyHtml: string;
+  status: 'pending' | 'approved' | 'rejected' | 'spam';
+  createdAt: string;
+  moderatedAt: string | null;
+}
+
+export interface FederationBlockedInstance {
+  id: string;
+  instanceDomain: string;
+  reason: string | null;
+  blockedAt: string;
+}
+
+export interface FederationBlockedActor {
+  id: string;
+  blockedActorUri: string;
+  reason: string | null;
+  blockedAt: string;
+}
+
+export interface FederationSettings {
+  enabled: boolean;
+  actorHandle: string | null;
+  signatureAlgorithm: string;
+  moderationMode: string;
+  autoPublish: boolean;
+  summary: string | null;
+  avatarUrl: string | null;
+}
+
+export interface FederationStats {
+  followersCount: number;
+  postsSyndicated: number;
+  pendingComments: number;
+  failedDeliveries: number;
+}

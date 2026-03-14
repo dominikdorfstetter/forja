@@ -197,6 +197,27 @@ vi.mock('@/services/api', () => {
     testAiConnection: vi.fn(),
     generateAiContent: vi.fn(),
     listAiModels: vi.fn(),
+    // Federation methods
+    getFederationSettings: vi.fn(),
+    updateFederationSettings: vi.fn(),
+    enableFederation: vi.fn(),
+    disableFederation: vi.fn(),
+    rotateKeys: vi.fn(),
+    getFederationStats: vi.fn(),
+    getFederationFollowers: vi.fn(),
+    removeFederationFollower: vi.fn(),
+    getFederationActivities: vi.fn(),
+    retryFederationActivity: vi.fn(),
+    getFederationComments: vi.fn(),
+    approveFederationComment: vi.fn(),
+    rejectFederationComment: vi.fn(),
+    deleteFederationComment: vi.fn(),
+    getBlockedInstances: vi.fn(),
+    blockInstance: vi.fn(),
+    unblockInstance: vi.fn(),
+    getBlockedActors: vi.fn(),
+    blockActor: vi.fn(),
+    unblockActor: vi.fn(),
   };
   return { default: apiService, ApiService: vi.fn(() => apiService) };
 });
