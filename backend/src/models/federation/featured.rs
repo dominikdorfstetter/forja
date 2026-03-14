@@ -47,10 +47,9 @@ impl ApFeaturedPost {
                 fp.position,
                 fp.created_at,
                 cl.title,
-                b.slug
+                c.slug
             FROM ap_featured_posts fp
             LEFT JOIN contents c ON fp.content_id = c.id
-            LEFT JOIN blogs b ON b.content_id = c.id
             LEFT JOIN LATERAL (
                 SELECT title FROM content_localizations
                 WHERE content_id = c.id
