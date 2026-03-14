@@ -1247,7 +1247,7 @@ class ApiService {
   }
 
   // Notes (Quick Post)
-  async createFederationNote(siteId: string, data: { body: string }): Promise<FederationNote> {
+  async createFederationNote(siteId: string, data: { body: string; scheduled_at?: string }): Promise<FederationNote> {
     return apiRequest<FederationNote>('POST', `/sites/${siteId}/federation/notes`, data);
   }
 

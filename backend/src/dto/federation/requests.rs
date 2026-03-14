@@ -82,6 +82,10 @@ pub struct CreateNoteRequest {
         message = "Body must be between 1 and 500 characters"
     ))]
     pub body: String,
+
+    /// Optional ISO 8601 timestamp to schedule the note for future publication.
+    #[schema(example = "2026-04-01T12:00:00Z")]
+    pub scheduled_at: Option<String>,
 }
 
 /// Request to pin a blog post in the featured collection.

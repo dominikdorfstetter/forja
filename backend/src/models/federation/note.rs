@@ -18,21 +18,32 @@ pub struct ApNote {
     pub activity_uri: Option<String>,
     pub created_by: Option<Uuid>,
     pub created_at: DateTime<Utc>,
+    pub status: String,
+    pub scheduled_at: Option<DateTime<Utc>>,
 }
 
 impl ApNote {
-    /// Create a new note.
+    /// Create a new note. If `scheduled_at` is provided and in the future,
+    /// the note is saved with status = 'scheduled'; otherwise 'published'.
     pub async fn create(
         pool: &PgPool,
         site_id: Uuid,
         body: &str,
         body_html: &str,
         created_by: Option<Uuid>,
+        scheduled_at: Option<DateTime<Utc>>,
     ) -> Result<Self, ApiError> {
+        let is_scheduled = scheduled_at.map(|dt| dt > Utc::now()).unwrap_or(false);
+        let status = if is_scheduled {
+            "scheduled"
+        } else {
+            "published"
+        };
+
         let note = sqlx::query_as::<_, Self>(
             r#"
-            INSERT INTO ap_notes (site_id, body, body_html, created_by)
-            VALUES ($1, $2, $3, $4)
+            INSERT INTO ap_notes (site_id, body, body_html, created_by, status, scheduled_at)
+            VALUES ($1, $2, $3, $4, $5, $6)
             RETURNING *
             "#,
         )
@@ -40,6 +51,8 @@ impl ApNote {
         .bind(body)
         .bind(body_html)
         .bind(created_by)
+        .bind(status)
+        .bind(if is_scheduled { scheduled_at } else { None })
         .fetch_one(pool)
         .await?;
 
@@ -72,7 +85,9 @@ impl ApNote {
             r#"
             SELECT * FROM ap_notes
             WHERE site_id = $1
-            ORDER BY published_at DESC
+            ORDER BY
+                CASE WHEN status = 'scheduled' THEN 0 ELSE 1 END,
+                COALESCE(scheduled_at, published_at) DESC
             LIMIT $2 OFFSET $3
             "#,
         )
@@ -104,6 +119,32 @@ impl ApNote {
 
         Ok(row.0)
     }
+
+    /// Find scheduled notes that are due for publication.
+    pub async fn find_due_scheduled(pool: &PgPool) -> Result<Vec<Self>, ApiError> {
+        let notes = sqlx::query_as::<_, Self>(
+            r#"
+            SELECT * FROM ap_notes
+            WHERE status = 'scheduled'
+              AND scheduled_at <= NOW()
+            ORDER BY scheduled_at ASC
+            "#,
+        )
+        .fetch_all(pool)
+        .await?;
+
+        Ok(notes)
+    }
+
+    /// Mark a scheduled note as published.
+    pub async fn mark_published(pool: &PgPool, id: Uuid) -> Result<(), ApiError> {
+        sqlx::query("UPDATE ap_notes SET status = 'published', published_at = NOW() WHERE id = $1")
+            .bind(id)
+            .execute(pool)
+            .await?;
+
+        Ok(())
+    }
 }
 
 #[cfg(test)]
@@ -121,11 +162,14 @@ mod tests {
             activity_uri: Some("https://example.com/ap/notes/1".to_string()),
             created_by: Some(Uuid::new_v4()),
             created_at: Utc::now(),
+            status: "published".to_string(),
+            scheduled_at: None,
         };
 
         assert_eq!(note.body, "Hello Fediverse!");
         assert!(note.activity_uri.is_some());
         assert!(note.created_by.is_some());
+        assert_eq!(note.status, "published");
     }
 
     #[test]
@@ -139,10 +183,14 @@ mod tests {
             activity_uri: None,
             created_by: None,
             created_at: Utc::now(),
+            status: "scheduled".to_string(),
+            scheduled_at: Some(Utc::now()),
         };
 
         let json = serde_json::to_value(&note).unwrap();
         assert_eq!(json["body"], "Test note");
         assert!(json["activity_uri"].is_null());
+        assert_eq!(json["status"], "scheduled");
+        assert!(json["scheduled_at"].is_string());
     }
 }

@@ -1644,6 +1644,8 @@ export interface FederationNote {
   body_html: string;
   published_at: string;
   activity_uri: string | null;
+  status: string;
+  scheduled_at?: string | null;
 }
 
 export interface FederationSettings {

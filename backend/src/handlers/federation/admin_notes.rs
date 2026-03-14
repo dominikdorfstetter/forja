@@ -96,11 +96,32 @@ pub async fn create_note(
     req.validate()
         .map_err(|e| ApiError::bad_request(format!("Validation error: {e}")))?;
 
+    // Parse optional scheduled_at
+    let scheduled_at = req.scheduled_at.as_deref().and_then(|s| {
+        chrono::DateTime::parse_from_rfc3339(s)
+            .ok()
+            .map(|dt| dt.with_timezone(&chrono::Utc))
+    });
+
     // Convert body to HTML
     let body_html = text_to_html(&req.body);
 
-    // Insert into ap_notes
-    let note = ApNote::create(&state.db, site_id, &req.body, &body_html, None).await?;
+    // Insert into ap_notes (with optional scheduling)
+    let note = ApNote::create(
+        &state.db,
+        site_id,
+        &req.body,
+        &body_html,
+        None,
+        scheduled_at,
+    )
+    .await?;
+
+    // If scheduled for the future, return early without federating
+    if note.status == "scheduled" {
+        let response: NoteResponse = note.into();
+        return Ok((Status::Created, Json(response)));
+    }
 
     // Get actor
     let actor = ApActor::find_by_site_id(&state.db, site_id)

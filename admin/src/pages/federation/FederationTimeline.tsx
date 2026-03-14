@@ -2,8 +2,10 @@ import {
   Avatar,
   Box,
   Card,
+  Chip,
   CircularProgress,
   Divider,
+  Stack,
   Typography,
 } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
@@ -13,10 +15,11 @@ import CommentIcon from '@mui/icons-material/Comment';
 import SendIcon from '@mui/icons-material/Send';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ScheduleIcon from '@mui/icons-material/Schedule';
 import HubIcon from '@mui/icons-material/Hub';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { formatDistanceToNow } from 'date-fns';
+import { format, formatDistanceToNow } from 'date-fns';
 import apiService from '@/services/api';
 import type { FederationActivity, FederationNote } from '@/types/api';
 
@@ -117,12 +120,16 @@ function ActivityItem({ activity }: { activity: FederationActivity }) {
 }
 
 function NoteItem({ note, handle, avatarUrl }: { note: FederationNote; handle?: string; avatarUrl?: string }) {
-  const timeAgo = formatDistanceToNow(new Date(note.published_at), { addSuffix: true });
+  const { t } = useTranslation();
+  const isScheduled = note.status === 'scheduled';
+  const timeAgo = isScheduled && note.scheduled_at
+    ? format(new Date(note.scheduled_at), 'PPp')
+    : formatDistanceToNow(new Date(note.published_at), { addSuffix: true });
 
   return (
     <Box sx={{ display: 'flex', gap: 1.5, px: 2, py: 1.5 }}>
-      <Avatar src={avatarUrl || undefined} sx={{ bgcolor: 'primary.main', width: 36, height: 36 }}>
-        <HubIcon sx={{ fontSize: 18 }} />
+      <Avatar src={avatarUrl || undefined} sx={{ bgcolor: isScheduled ? 'action.disabled' : 'primary.main', width: 36, height: 36 }}>
+        {isScheduled ? <ScheduleIcon sx={{ fontSize: 18 }} /> : <HubIcon sx={{ fontSize: 18 }} />}
       </Avatar>
       <Box sx={{ flex: 1, minWidth: 0 }}>
         {handle && (
@@ -133,7 +140,21 @@ function NoteItem({ note, handle, avatarUrl }: { note: FederationNote; handle?: 
         <Typography variant="body2" sx={{ mt: 0.25, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
           {note.body}
         </Typography>
-        <Typography variant="caption" color="text.disabled" sx={{ mt: 0.5, display: 'block' }}>{timeAgo}</Typography>
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 0.5 }}>
+          <Typography variant="caption" color="text.disabled">
+            {isScheduled ? t('federation.quickPost.scheduledFor', { date: timeAgo }) : timeAgo}
+          </Typography>
+          {isScheduled && (
+            <Chip
+              icon={<ScheduleIcon />}
+              label={t('federation.quickPost.schedule')}
+              size="small"
+              variant="outlined"
+              color="warning"
+              sx={{ height: 20, fontSize: '0.7rem' }}
+            />
+          )}
+        </Stack>
       </Box>
     </Box>
   );

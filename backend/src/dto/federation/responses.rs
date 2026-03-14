@@ -185,6 +185,12 @@ pub struct NoteResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub activity_uri: Option<String>,
+
+    #[schema(example = "published")]
+    pub status: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub scheduled_at: Option<DateTime<Utc>>,
 }
 
 // ── Featured/Pinned Posts ────────────────────────────────────────────────
@@ -292,6 +298,8 @@ impl From<ApNote> for NoteResponse {
             body_html: n.body_html,
             published_at: n.published_at,
             activity_uri: n.activity_uri,
+            status: n.status,
+            scheduled_at: n.scheduled_at,
         }
     }
 }

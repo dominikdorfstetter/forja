@@ -2583,7 +2583,11 @@
       "deleted": "Post deleted",
       "recentPosts": "Recent Posts",
       "noPosts": "No posts yet. Share your first thought!",
-      "charCount": "{{count}}/500"
+      "charCount": "{{count}}/500",
+      "schedule": "Schedule",
+      "scheduledFor": "Scheduled for {{date}}",
+      "schedulePost": "Schedule Post",
+      "scheduledSuccess": "Post scheduled!"
     },
     "timeline": {
       "empty": "Your timeline is empty. Post something or wait for interactions from the Fediverse!",

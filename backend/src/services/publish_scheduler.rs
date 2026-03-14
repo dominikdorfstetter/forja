@@ -11,6 +11,14 @@ use rocket::{Orbit, Rocket};
 use sqlx::PgPool;
 use uuid::Uuid;
 
+use crate::models::federation::activity::ApActivity;
+use crate::models::federation::actor::ApActor;
+use crate::models::federation::block::ApBlockedInstance;
+use crate::models::federation::follower::{self, ApFollower};
+use crate::models::federation::note::ApNote;
+use crate::models::federation::types::{ApActivityDirection, ApActivityStatus};
+use crate::models::site::Site;
+use crate::services::federation::queue::DeliveryQueue;
 use crate::services::publish_hooks;
 use crate::AppState;
 
@@ -58,6 +66,7 @@ impl Fairing for PublishScheduler {
             loop {
                 interval.tick().await;
                 publish_due_content(&pool).await;
+                publish_due_notes(&pool).await;
             }
         });
     }
@@ -160,6 +169,130 @@ async fn fetch_due_content(pool: &PgPool) -> Result<Vec<ScheduledContentRow>, sq
     .await?;
 
     Ok(rows)
+}
+
+/// Find scheduled federation notes that are due and publish + federate them.
+async fn publish_due_notes(pool: &PgPool) {
+    let notes = match ApNote::find_due_scheduled(pool).await {
+        Ok(notes) => notes,
+        Err(e) => {
+            tracing::warn!("Publish scheduler: failed to query due notes: {e}");
+            return;
+        }
+    };
+
+    if notes.is_empty() {
+        return;
+    }
+
+    tracing::info!(
+        "Publish scheduler: found {} scheduled note(s) due for publishing",
+        notes.len()
+    );
+
+    for note in &notes {
+        // Mark as published
+        if let Err(e) = ApNote::mark_published(pool, note.id).await {
+            tracing::warn!(
+                note_id = %note.id,
+                "Publish scheduler: failed to mark note as published: {e}"
+            );
+            continue;
+        }
+
+        // Federate the note — same logic as create_note handler
+        if let Err(e) = federate_note(pool, note).await {
+            tracing::warn!(
+                note_id = %note.id,
+                "Publish scheduler: failed to federate scheduled note: {e}"
+            );
+        }
+    }
+}
+
+/// Federate a single note (build Create activity and fan out to followers).
+async fn federate_note(pool: &PgPool, note: &ApNote) -> Result<(), crate::errors::ApiError> {
+    let site = Site::find_by_id(pool, note.site_id).await?;
+
+    let actor = ApActor::find_by_site_id(pool, note.site_id)
+        .await?
+        .ok_or_else(|| crate::errors::ApiError::internal("No actor for site"))?;
+
+    let domain: String = sqlx::query_scalar(
+        "SELECT domain FROM site_domains WHERE site_id = $1 AND is_primary = TRUE AND environment = 'production' LIMIT 1"
+    )
+    .bind(note.site_id)
+    .fetch_optional(pool)
+    .await?
+    .unwrap_or_else(|| "localhost".to_string());
+
+    let actor_uri = actor.actor_uri(&domain, &site.slug);
+    let note_uri = format!("https://{}/ap/{}/notes/{}", domain, site.slug, note.id);
+    let followers_url = actor.followers_url.clone();
+
+    let ap_note = serde_json::json!({
+        "@context": "https://www.w3.org/ns/activitystreams",
+        "type": "Note",
+        "id": note_uri,
+        "attributedTo": actor_uri,
+        "content": note.body_html,
+        "published": chrono::Utc::now().to_rfc3339(),
+        "to": ["https://www.w3.org/ns/activitystreams#Public"],
+        "cc": [followers_url]
+    });
+
+    let activity_uri = format!("https://{}/ap/activities/{}", domain, Uuid::new_v4());
+    let activity_payload = serde_json::json!({
+        "@context": ["https://www.w3.org/ns/activitystreams", "https://w3id.org/security/v1"],
+        "type": "Create",
+        "id": activity_uri,
+        "actor": actor_uri,
+        "object": ap_note,
+        "to": ["https://www.w3.org/ns/activitystreams#Public"],
+        "cc": [followers_url],
+        "published": chrono::Utc::now().to_rfc3339()
+    });
+
+    let stored = ApActivity::create(
+        pool,
+        note.site_id,
+        "Create",
+        &activity_uri,
+        &actor_uri,
+        Some(&note_uri),
+        Some("Note"),
+        &activity_payload,
+        ApActivityDirection::Out,
+        ApActivityStatus::Pending,
+        None,
+    )
+    .await?;
+
+    ApNote::set_activity_uri(pool, note.id, &note_uri).await?;
+
+    let followers = ApFollower::find_by_actor(pool, actor.id).await?;
+    let targets = follower::delivery_targets(&followers);
+
+    let queue = crate::services::federation::queue::CompositeQueue::new(pool.clone(), None);
+
+    for target in &targets {
+        if let Some(target_domain) =
+            crate::models::federation::block::extract_domain(&target.inbox_uri)
+        {
+            if ApBlockedInstance::is_instance_blocked(pool, actor.id, &target_domain).await? {
+                continue;
+            }
+        }
+        queue.enqueue(stored.id, &target.inbox_uri).await?;
+    }
+
+    tracing::info!(
+        note_id = %note.id,
+        targets = targets.len(),
+        "Publish scheduler: federated scheduled note"
+    );
+
+    Ok(())
 }
 
 /// Update a content record from scheduled to published.
