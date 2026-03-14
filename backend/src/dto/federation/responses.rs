@@ -36,6 +36,11 @@ pub struct FederationSettingsResponse {
     #[schema(example = "A blog about web development")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub summary: Option<String>,
+
+    /// The actor's avatar/profile picture URL.
+    #[schema(example = "https://example.com/avatar.png")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub avatar_url: Option<String>,
 }
 
 // ── Stats ───────────────────────────────────────────────────────────────
@@ -304,6 +309,7 @@ mod tests {
             actor_uri: Some("https://example.com/ap/blog/actor".to_string()),
             webfinger_address: Some("blog@example.com".to_string()),
             summary: Some("A test blog".to_string()),
+            avatar_url: Some("https://example.com/avatar.png".to_string()),
         };
 
         let json = serde_json::to_value(&settings).unwrap();
@@ -323,12 +329,14 @@ mod tests {
             actor_uri: None,
             webfinger_address: None,
             summary: None,
+            avatar_url: None,
         };
 
         let json = serde_json::to_string(&settings).unwrap();
         assert!(!json.contains("actor_uri"));
         assert!(!json.contains("webfinger_address"));
         assert!(!json.contains("summary"));
+        assert!(!json.contains("avatar_url"));
     }
 
     #[test]

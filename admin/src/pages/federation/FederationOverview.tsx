@@ -97,10 +97,10 @@ export default function FederationOverview() {
           {settings?.enabled && (
             <>
               {/* Composer */}
-              <QuickPostComposer siteId={selectedSiteId} handle={settings.webfinger_address} />
+              <QuickPostComposer siteId={selectedSiteId} handle={settings.webfinger_address} avatarUrl={settings.avatar_url} />
 
               {/* Timeline */}
-              <FederationTimeline siteId={selectedSiteId} handle={settings.webfinger_address} />
+              <FederationTimeline siteId={selectedSiteId} handle={settings.webfinger_address} avatarUrl={settings.avatar_url} />
             </>
           )}
 
@@ -121,7 +121,10 @@ export default function FederationOverview() {
             <Card sx={{ mb: 3 }}>
               <CardContent>
                 <Stack direction="row" alignItems="center" spacing={2}>
-                  <Avatar sx={{ bgcolor: 'primary.main', width: 48, height: 48 }}>
+                  <Avatar
+                    src={settings.avatar_url || undefined}
+                    sx={{ bgcolor: 'primary.main', width: 48, height: 48 }}
+                  >
                     <HubIcon />
                   </Avatar>
                   <Box sx={{ flex: 1, minWidth: 0 }}>

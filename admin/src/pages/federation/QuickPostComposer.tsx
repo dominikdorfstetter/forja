@@ -18,11 +18,12 @@ import apiService from '@/services/api';
 interface QuickPostComposerProps {
   siteId: string;
   handle?: string;
+  avatarUrl?: string;
 }
 
 const MAX_CHARS = 500;
 
-export default function QuickPostComposer({ siteId, handle }: QuickPostComposerProps) {
+export default function QuickPostComposer({ siteId, handle, avatarUrl }: QuickPostComposerProps) {
   const { t } = useTranslation();
   const { enqueueSnackbar } = useSnackbar();
   const queryClient = useQueryClient();
@@ -49,7 +50,7 @@ export default function QuickPostComposer({ siteId, handle }: QuickPostComposerP
     <Card sx={{ mb: 2 }}>
       <CardContent sx={{ pb: '12px !important' }}>
         <Box sx={{ display: 'flex', gap: 1.5 }}>
-          <Avatar sx={{ bgcolor: 'primary.main', width: 40, height: 40, mt: 0.5 }}>
+          <Avatar src={avatarUrl || undefined} sx={{ bgcolor: 'primary.main', width: 40, height: 40, mt: 0.5 }}>
             <HubIcon fontSize="small" />
           </Avatar>
           <Box sx={{ flex: 1 }}>

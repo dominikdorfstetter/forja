@@ -64,7 +64,7 @@ async fn build_settings_response(
     .as_bool()
     .unwrap_or(false);
 
-    let (actor_uri, webfinger_address, summary) = if enabled {
+    let (actor_uri, webfinger_address, summary, avatar_url) = if enabled {
         let actor = ApActor::find_by_site_id(&state.db, site_id).await?;
         if let Some(actor) = actor {
             let site = Site::find_by_id(&state.db, site_id).await?;
@@ -79,12 +79,13 @@ async fn build_settings_response(
             let uri = actor.actor_uri(&domain, &site.slug);
             let wf = format!("{}@{}", site.slug, domain);
             let sum = actor.summary.clone();
-            (Some(uri), Some(wf), sum)
+            let av = actor.avatar_url.clone();
+            (Some(uri), Some(wf), sum, av)
         } else {
-            (None, None, None)
+            (None, None, None, None)
         }
     } else {
-        (None, None, None)
+        (None, None, None, None)
     };
 
     Ok(FederationSettingsResponse {
@@ -95,6 +96,7 @@ async fn build_settings_response(
         actor_uri,
         webfinger_address,
         summary,
+        avatar_url,
     })
 }
 
@@ -212,6 +214,14 @@ pub async fn update_settings(
             Some(summary.as_str())
         };
         ApActor::update_summary(&state.db, site_id, summary_val).await?;
+    }
+    if let Some(ref avatar_url) = req.avatar_url {
+        let avatar_val = if avatar_url.is_empty() {
+            None
+        } else {
+            Some(avatar_url.as_str())
+        };
+        ApActor::update_avatar_url(&state.db, site_id, avatar_val).await?;
     }
 
     let response = build_settings_response(state.inner(), site_id).await?;

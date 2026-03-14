@@ -2613,6 +2613,8 @@
       "noSite": "Select a site to manage settings.",
       "loading": "Loading settings...",
       "profile": "Profile",
+      "avatarUrl": "Avatar URL",
+      "avatarUrlHelper": "URL to your profile picture (paste a link to an uploaded image)",
       "bio": "Bio",
       "bioHelper": "A short description of your blog for Fediverse profiles (max 500 characters)"
     },

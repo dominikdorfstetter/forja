@@ -117,6 +117,20 @@ impl ApActor {
         Ok(())
     }
 
+    /// Update the actor's avatar URL.
+    pub async fn update_avatar_url(
+        pool: &PgPool,
+        site_id: Uuid,
+        avatar_url: Option<&str>,
+    ) -> Result<(), ApiError> {
+        sqlx::query("UPDATE ap_actors SET avatar_url = $2, updated_at = NOW() WHERE site_id = $1")
+            .bind(site_id)
+            .bind(avatar_url)
+            .execute(pool)
+            .await?;
+        Ok(())
+    }
+
     /// Delete the actor for a given site.
     pub async fn delete_by_site_id(pool: &PgPool, site_id: Uuid) -> Result<(), ApiError> {
         sqlx::query("DELETE FROM ap_actors WHERE site_id = $1")

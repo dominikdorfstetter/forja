@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Box,
   Button,
   Card,
@@ -44,9 +45,11 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
 
   const [rotateConfirmOpen, setRotateConfirmOpen] = useState(false);
   const [bio, setBio] = useState<string | undefined>(undefined);
+  const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined);
 
-  // Sync local bio state with settings when data loads
+  // Sync local state with settings when data loads
   const bioValue = bio ?? settings?.summary ?? '';
+  const avatarUrlValue = avatarUrl ?? settings?.avatar_url ?? '';
 
   if (!selectedSiteId) {
     return (
@@ -89,6 +92,23 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
           <Card variant="outlined">
             <CardHeader avatar={<PersonIcon />} title={t('federation.settings.profile')} />
             <CardContent>
+              <Stack direction="row" alignItems="flex-start" spacing={2} sx={{ mb: 2 }}>
+                <Avatar
+                  src={avatarUrlValue || undefined}
+                  sx={{ width: 56, height: 56, mt: 0.5 }}
+                >
+                  <PersonIcon />
+                </Avatar>
+                <TextField
+                  fullWidth
+                  label={t('federation.settings.avatarUrl')}
+                  helperText={t('federation.settings.avatarUrlHelper')}
+                  value={avatarUrlValue}
+                  onChange={(e) => setAvatarUrl(e.target.value)}
+                  onBlur={() => updateSettings.mutate({ avatar_url: avatarUrlValue })}
+                  inputProps={{ maxLength: 500 }}
+                />
+              </Stack>
               <TextField
                 fullWidth
                 multiline

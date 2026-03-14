@@ -23,6 +23,7 @@ import type { FederationActivity, FederationNote } from '@/types/api';
 interface FederationTimelineProps {
   siteId: string;
   handle?: string;
+  avatarUrl?: string;
 }
 
 interface TimelineItem {
@@ -115,12 +116,12 @@ function ActivityItem({ activity }: { activity: FederationActivity }) {
   );
 }
 
-function NoteItem({ note, handle }: { note: FederationNote; handle?: string }) {
+function NoteItem({ note, handle, avatarUrl }: { note: FederationNote; handle?: string; avatarUrl?: string }) {
   const timeAgo = formatDistanceToNow(new Date(note.published_at), { addSuffix: true });
 
   return (
     <Box sx={{ display: 'flex', gap: 1.5, px: 2, py: 1.5 }}>
-      <Avatar sx={{ bgcolor: 'primary.main', width: 36, height: 36 }}>
+      <Avatar src={avatarUrl || undefined} sx={{ bgcolor: 'primary.main', width: 36, height: 36 }}>
         <HubIcon sx={{ fontSize: 18 }} />
       </Avatar>
       <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -138,7 +139,7 @@ function NoteItem({ note, handle }: { note: FederationNote; handle?: string }) {
   );
 }
 
-export default function FederationTimeline({ siteId, handle }: FederationTimelineProps) {
+export default function FederationTimeline({ siteId, handle, avatarUrl }: FederationTimelineProps) {
   const { t } = useTranslation();
 
   const { data: activitiesData, isLoading: activitiesLoading } = useQuery({
@@ -207,7 +208,7 @@ export default function FederationTimeline({ siteId, handle }: FederationTimelin
         <Box key={item.id}>
           {i > 0 && <Divider />}
           {item.type === 'note' && item.note && (
-            <NoteItem note={item.note} handle={handle} />
+            <NoteItem note={item.note} handle={handle} avatarUrl={avatarUrl} />
           )}
           {item.type === 'activity' && item.activity && (
             <ActivityItem activity={item.activity} />

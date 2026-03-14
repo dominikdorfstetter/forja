@@ -29,6 +29,11 @@ pub struct UpdateFederationSettingsRequest {
     #[schema(example = "A blog about web development and Rust")]
     #[validate(length(max = 500, message = "Summary cannot exceed 500 characters"))]
     pub summary: Option<String>,
+
+    /// Avatar/profile picture URL for the Fediverse actor (max 500 characters).
+    #[schema(example = "https://example.com/avatar.png")]
+    #[validate(length(max = 500, message = "Avatar URL cannot exceed 500 characters"))]
+    pub avatar_url: Option<String>,
 }
 
 /// Request to block a remote instance domain.
@@ -139,6 +144,7 @@ mod tests {
             moderation_mode: Some("manual".to_string()),
             auto_publish: Some(false),
             summary: Some("A test blog".to_string()),
+            avatar_url: Some("https://example.com/avatar.png".to_string()),
         };
         assert!(req.validate().is_ok());
     }
@@ -151,6 +157,7 @@ mod tests {
             moderation_mode: None,
             auto_publish: None,
             summary: None,
+            avatar_url: None,
         };
         assert!(req.validate().is_ok());
     }
@@ -163,6 +170,7 @@ mod tests {
             moderation_mode: None,
             auto_publish: None,
             summary: None,
+            avatar_url: None,
         };
         assert!(req.validate().is_err());
     }
@@ -175,6 +183,7 @@ mod tests {
             moderation_mode: Some("yolo".to_string()),
             auto_publish: None,
             summary: None,
+            avatar_url: None,
         };
         assert!(req.validate().is_err());
     }
@@ -187,6 +196,20 @@ mod tests {
             moderation_mode: None,
             auto_publish: None,
             summary: Some("x".repeat(501)),
+            avatar_url: None,
+        };
+        assert!(req.validate().is_err());
+    }
+
+    #[test]
+    fn test_update_federation_settings_avatar_url_too_long() {
+        let req = UpdateFederationSettingsRequest {
+            enabled: None,
+            signature_algorithm: None,
+            moderation_mode: None,
+            auto_publish: None,
+            summary: None,
+            avatar_url: Some("x".repeat(501)),
         };
         assert!(req.validate().is_err());
     }

@@ -1653,6 +1653,7 @@ export interface FederationSettings {
   actor_uri?: string;
   webfinger_address?: string;
   summary?: string;
+  avatar_url?: string;
 }
 
 export interface FederationStats {
