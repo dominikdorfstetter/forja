@@ -330,6 +330,7 @@ async fn rocket() -> _ {
         }))
         .attach(FederationWorker)
         .mount("/", handlers::system::routes())
+        .mount("/", handlers::federation::protocol_routes())
         .mount("/api/v1", handlers::routes())
         .mount("/dashboard", handlers::dashboard::routes())
         // API documentation: consumer (public) + admin (session-protected) + redirect

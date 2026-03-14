@@ -55,6 +55,9 @@ pub mod social;
 pub mod taxonomy;
 pub mod webhook;
 
+// Federation (ActivityPub)
+pub mod federation;
+
 use rocket::Route;
 
 /// Collect all API routes
@@ -132,6 +135,9 @@ pub fn routes() -> Vec<Route> {
 
     // Error code catalog
     routes.extend(error_codes::routes());
+
+    // Federation admin API
+    routes.extend(federation::admin_routes());
 
     routes
 }
