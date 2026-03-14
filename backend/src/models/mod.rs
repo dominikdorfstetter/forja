@@ -12,6 +12,7 @@ pub mod content_template;
 pub mod cv;
 pub mod document;
 pub mod environment;
+pub mod federation;
 pub mod legal;
 pub mod locale;
 pub mod media;
