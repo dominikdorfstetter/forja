@@ -84,6 +84,13 @@ nix = { version = "0.31", features = ["fs"] }
 # RSS feed
 rss = "2"
 
+# Federation - cryptography
+rsa = { version = "0.9.10", features = ["pem"] }
+ed25519-dalek = { version = "2.2.0", features = ["rand_core"] }
+
+# Federation - content safety
+ammonia = "4.1.2"
+
 # Utilities
 async-trait = "0.1.89"
 futures = "0.3.32"
