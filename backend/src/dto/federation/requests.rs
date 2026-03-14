@@ -88,6 +88,20 @@ pub struct CreateNoteRequest {
     pub scheduled_at: Option<String>,
 }
 
+/// Request to update a quick-post Note body.
+#[derive(Debug, Clone, Deserialize, Validate, utoipa::ToSchema)]
+#[schema(description = "Update the body of an existing Fediverse note")]
+pub struct UpdateNoteRequest {
+    /// The new plain-text body (1–500 characters).
+    #[schema(example = "Updated: Hello from Forja!")]
+    #[validate(length(
+        min = 1,
+        max = 500,
+        message = "Body must be between 1 and 500 characters"
+    ))]
+    pub body: String,
+}
+
 /// Request to pin a blog post in the featured collection.
 #[derive(Debug, Clone, Deserialize, Validate, utoipa::ToSchema)]
 #[schema(description = "Pin a blog post to the ActivityPub featured collection")]

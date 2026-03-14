@@ -6,7 +6,7 @@ use rocket::{Route, State};
 use uuid::Uuid;
 use validator::Validate;
 
-use crate::dto::federation::requests::CreateNoteRequest;
+use crate::dto::federation::requests::{CreateNoteRequest, UpdateNoteRequest};
 use crate::dto::federation::responses::NoteResponse;
 use crate::errors::{ApiError, ProblemDetails};
 use crate::guards::auth_guard::ReadKey;
@@ -261,6 +261,144 @@ pub async fn list_notes(
     Ok(Json(paginated))
 }
 
+/// Update a note body and send an Update activity
+#[utoipa::path(
+    tag = "Federation",
+    operation_id = "update_federation_note",
+    description = "Update the body of a quick-post note and send an Update activity to the Fediverse",
+    params(
+        ("site_id" = Uuid, Path, description = "Site UUID"),
+        ("note_id" = Uuid, Path, description = "Note UUID")
+    ),
+    request_body(content = UpdateNoteRequest, description = "Updated note body"),
+    responses(
+        (status = 200, description = "Note updated", body = NoteResponse),
+        (status = 400, description = "Validation error", body = ProblemDetails),
+        (status = 401, description = "Unauthorized", body = ProblemDetails),
+        (status = 403, description = "Forbidden", body = ProblemDetails),
+        (status = 404, description = "Note not found", body = ProblemDetails)
+    ),
+    security(("api_key" = []))
+)]
+#[put("/sites/<site_id>/federation/notes/<note_id>", data = "<body>")]
+pub async fn update_note(
+    state: &State<AppState>,
+    site_id: Uuid,
+    note_id: Uuid,
+    body: Json<UpdateNoteRequest>,
+    auth: ReadKey,
+    _module: ModuleGuard<FederationModule>,
+) -> Result<Json<NoteResponse>, ApiError> {
+    let role = auth
+        .0
+        .require_site_role(&state.db, site_id, &SiteRole::Reviewer)
+        .await?;
+    if !can_publish_to_fediverse(&role) {
+        return Err(ApiError::forbidden("Insufficient role to edit notes"));
+    }
+
+    let site = Site::find_by_id(&state.db, site_id).await?;
+
+    let req = body.into_inner();
+    req.validate()
+        .map_err(|e| ApiError::bad_request(format!("Validation error: {e}")))?;
+
+    // Convert body to HTML
+    let body_html = text_to_html(&req.body);
+
+    // Update the note
+    let note = ApNote::update_body(&state.db, note_id, &req.body, &body_html)
+        .await?
+        .ok_or_else(|| ApiError::not_found("Note not found"))?;
+
+    // If the note was federated, send an Update activity
+    if let Some(ref note_uri) = note.activity_uri {
+        let actor = ApActor::find_by_site_id(&state.db, site_id).await?;
+
+        if let Some(actor) = actor {
+            let domain: String = sqlx::query_scalar(
+                "SELECT domain FROM site_domains WHERE site_id = $1 AND is_primary = TRUE AND environment = 'production' LIMIT 1"
+            )
+            .bind(site_id)
+            .fetch_optional(&state.db)
+            .await?
+            .unwrap_or_else(|| "localhost".to_string());
+
+            let actor_uri = actor.actor_uri(&domain, &site.slug);
+            let followers_url = actor.followers_url.clone();
+
+            // Build updated Note object
+            let ap_note = serde_json::json!({
+                "@context": "https://www.w3.org/ns/activitystreams",
+                "type": "Note",
+                "id": note_uri,
+                "attributedTo": actor_uri,
+                "content": body_html,
+                "published": note.published_at.to_rfc3339(),
+                "updated": chrono::Utc::now().to_rfc3339(),
+                "to": ["https://www.w3.org/ns/activitystreams#Public"],
+                "cc": [followers_url]
+            });
+
+            // Wrap in Update activity
+            let activity_uri = format!("https://{}/ap/activities/{}", domain, Uuid::new_v4());
+            let activity_payload = serde_json::json!({
+                "@context": ["https://www.w3.org/ns/activitystreams", "https://w3id.org/security/v1"],
+                "type": "Update",
+                "id": activity_uri,
+                "actor": actor_uri,
+                "object": ap_note,
+                "to": ["https://www.w3.org/ns/activitystreams#Public"],
+                "cc": [followers_url],
+                "published": chrono::Utc::now().to_rfc3339()
+            });
+
+            let stored = ApActivity::create(
+                &state.db,
+                site_id,
+                "Update",
+                &activity_uri,
+                &actor_uri,
+                Some(note_uri),
+                Some("Note"),
+                &activity_payload,
+                ApActivityDirection::Out,
+                ApActivityStatus::Pending,
+                None,
+            )
+            .await?;
+
+            // Fan out Update to followers
+            let followers = ApFollower::find_by_actor(&state.db, actor.id).await?;
+            let targets = follower::delivery_targets(&followers);
+
+            let queue =
+                crate::services::federation::queue::CompositeQueue::new(state.db.clone(), None);
+
+            for target in &targets {
+                if let Some(target_domain) =
+                    crate::models::federation::block::extract_domain(&target.inbox_uri)
+                {
+                    if ApBlockedInstance::is_instance_blocked(&state.db, actor.id, &target_domain)
+                        .await?
+                    {
+                        continue;
+                    }
+                }
+                queue.enqueue(stored.id, &target.inbox_uri).await?;
+            }
+
+            tracing::info!(
+                note_id = %note_id,
+                "Quick Post: enqueued Update Note activity"
+            );
+        }
+    }
+
+    let response: NoteResponse = note.into();
+    Ok(Json(response))
+}
+
 /// Delete a note and send a Delete activity
 #[utoipa::path(
     tag = "Federation",
@@ -374,7 +512,7 @@ pub async fn delete_note(
 
 /// Collect admin notes routes
 pub fn routes() -> Vec<Route> {
-    routes![create_note, list_notes, delete_note]
+    routes![create_note, list_notes, update_note, delete_note]
 }
 
 #[cfg(test)]
@@ -423,6 +561,6 @@ mod tests {
     #[test]
     fn test_routes_count() {
         let routes = routes();
-        assert_eq!(routes.len(), 3, "Should have 3 admin notes routes");
+        assert_eq!(routes.len(), 4, "Should have 4 admin notes routes");
     }
 }

@@ -136,6 +136,30 @@ impl ApNote {
         Ok(notes)
     }
 
+    /// Update the body and body_html of an existing note.
+    pub async fn update_body(
+        pool: &PgPool,
+        id: Uuid,
+        body: &str,
+        body_html: &str,
+    ) -> Result<Option<Self>, ApiError> {
+        let note = sqlx::query_as::<_, Self>(
+            r#"
+            UPDATE ap_notes
+            SET body = $2, body_html = $3
+            WHERE id = $1
+            RETURNING *
+            "#,
+        )
+        .bind(id)
+        .bind(body)
+        .bind(body_html)
+        .fetch_optional(pool)
+        .await?;
+
+        Ok(note)
+    }
+
     /// Mark a scheduled note as published.
     pub async fn mark_published(pool: &PgPool, id: Uuid) -> Result<(), ApiError> {
         sqlx::query("UPDATE ap_notes SET status = 'published', published_at = NOW() WHERE id = $1")

@@ -223,6 +223,7 @@ vi.mock('@/services/api', () => {
     unpinPost: vi.fn(),
     createFederationNote: vi.fn(),
     getFederationNotes: vi.fn(),
+    updateFederationNote: vi.fn(),
     deleteFederationNote: vi.fn(),
   };
   return { default: apiService, ApiService: vi.fn(() => apiService) };

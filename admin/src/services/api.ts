@@ -1255,6 +1255,10 @@ class ApiService {
     return apiRequest<Paginated<FederationNote>>('GET', `/sites/${siteId}/federation/notes`, undefined, { params });
   }
 
+  async updateFederationNote(siteId: string, noteId: string, data: { body: string }): Promise<FederationNote> {
+    return apiRequest<FederationNote>('PUT', `/sites/${siteId}/federation/notes/${noteId}`, data);
+  }
+
   async deleteFederationNote(siteId: string, noteId: string): Promise<void> {
     return apiRequest<void>('DELETE', `/sites/${siteId}/federation/notes/${noteId}`);
   }
