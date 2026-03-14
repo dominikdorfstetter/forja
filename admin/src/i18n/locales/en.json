@@ -2587,7 +2587,9 @@
       "schedule": "Schedule",
       "scheduledFor": "Scheduled for {{date}}",
       "schedulePost": "Schedule Post",
-      "scheduledSuccess": "Post scheduled!"
+      "scheduledSuccess": "Post scheduled!",
+      "cancelScheduled": "Cancel scheduled post",
+      "cancelledSuccess": "Scheduled post cancelled"
     },
     "timeline": {
       "empty": "Your timeline is empty. Post something or wait for interactions from the Fediverse!",

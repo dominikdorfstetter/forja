@@ -5,7 +5,9 @@ import {
   Chip,
   CircularProgress,
   Divider,
+  IconButton,
   Stack,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
@@ -13,6 +15,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import RepeatIcon from '@mui/icons-material/Repeat';
 import CommentIcon from '@mui/icons-material/Comment';
 import SendIcon from '@mui/icons-material/Send';
+import CancelIcon from '@mui/icons-material/Cancel';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ScheduleIcon from '@mui/icons-material/Schedule';
@@ -27,6 +30,7 @@ interface FederationTimelineProps {
   siteId: string;
   handle?: string;
   avatarUrl?: string;
+  onCancelNote?: (noteId: string) => void;
 }
 
 interface TimelineItem {
@@ -119,7 +123,7 @@ function ActivityItem({ activity }: { activity: FederationActivity }) {
   );
 }
 
-function NoteItem({ note, handle, avatarUrl }: { note: FederationNote; handle?: string; avatarUrl?: string }) {
+function NoteItem({ note, handle, avatarUrl, onCancel }: { note: FederationNote; handle?: string; avatarUrl?: string; onCancel?: (id: string) => void }) {
   const { t } = useTranslation();
   const isScheduled = note.status === 'scheduled';
   const timeAgo = isScheduled && note.scheduled_at
@@ -145,14 +149,23 @@ function NoteItem({ note, handle, avatarUrl }: { note: FederationNote; handle?: 
             {isScheduled ? t('federation.quickPost.scheduledFor', { date: timeAgo }) : timeAgo}
           </Typography>
           {isScheduled && (
-            <Chip
-              icon={<ScheduleIcon />}
-              label={t('federation.quickPost.schedule')}
-              size="small"
-              variant="outlined"
-              color="warning"
-              sx={{ height: 20, fontSize: '0.7rem' }}
-            />
+            <>
+              <Chip
+                icon={<ScheduleIcon />}
+                label={t('federation.quickPost.schedule')}
+                size="small"
+                variant="outlined"
+                color="warning"
+                sx={{ height: 20, fontSize: '0.7rem' }}
+              />
+              {onCancel && (
+                <Tooltip title={t('federation.quickPost.cancelScheduled')}>
+                  <IconButton size="small" color="error" onClick={() => onCancel(note.id)} sx={{ p: 0.25 }}>
+                    <CancelIcon sx={{ fontSize: 16 }} />
+                  </IconButton>
+                </Tooltip>
+              )}
+            </>
           )}
         </Stack>
       </Box>
@@ -160,7 +173,7 @@ function NoteItem({ note, handle, avatarUrl }: { note: FederationNote; handle?: 
   );
 }
 
-export default function FederationTimeline({ siteId, handle, avatarUrl }: FederationTimelineProps) {
+export default function FederationTimeline({ siteId, handle, avatarUrl, onCancelNote }: FederationTimelineProps) {
   const { t } = useTranslation();
 
   const { data: activitiesData, isLoading: activitiesLoading } = useQuery({
@@ -229,7 +242,7 @@ export default function FederationTimeline({ siteId, handle, avatarUrl }: Federa
         <Box key={item.id}>
           {i > 0 && <Divider />}
           {item.type === 'note' && item.note && (
-            <NoteItem note={item.note} handle={handle} avatarUrl={avatarUrl} />
+            <NoteItem note={item.note} handle={handle} avatarUrl={avatarUrl} onCancel={onCancelNote} />
           )}
           {item.type === 'activity' && item.activity && (
             <ActivityItem activity={item.activity} />

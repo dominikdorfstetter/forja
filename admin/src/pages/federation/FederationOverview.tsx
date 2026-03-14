@@ -18,6 +18,7 @@ import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { useSiteContext } from '@/store/SiteContext';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useFederationStats, useFederationSettings, useFeaturedPosts } from '@/hooks/useFederationData';
 import { useFederationMutations } from '@/hooks/useFederationMutations';
 import PageHeader from '@/components/shared/PageHeader';
@@ -168,6 +169,15 @@ export default function FederationOverview() {
   const { updateSettings, pinPostMutation, unpinPostMutation } = useFederationMutations(selectedSiteId);
   const { data: featuredPosts } = useFeaturedPosts(selectedSiteId);
 
+  const queryClient = useQueryClient();
+  const cancelNoteMutation = useMutation({
+    mutationFn: (noteId: string) => apiService.deleteFederationNote(selectedSiteId, noteId),
+    onSuccess: () => {
+      enqueueSnackbar(t('federation.quickPost.cancelledSuccess'), { variant: 'success' });
+      queryClient.invalidateQueries({ queryKey: ['federation-notes', selectedSiteId] });
+    },
+  });
+
   const [editingProfile, setEditingProfile] = useState(false);
   const [pinDialogOpen, setPinDialogOpen] = useState(false);
   const [bio, setBio] = useState<string | undefined>(undefined);
@@ -232,7 +242,7 @@ export default function FederationOverview() {
               <QuickPostComposer siteId={selectedSiteId} handle={settings.webfinger_address} avatarUrl={settings.avatar_url} />
 
               {/* Timeline */}
-              <FederationTimeline siteId={selectedSiteId} handle={settings.webfinger_address} avatarUrl={settings.avatar_url} />
+              <FederationTimeline siteId={selectedSiteId} handle={settings.webfinger_address} avatarUrl={settings.avatar_url} onCancelNote={(noteId) => cancelNoteMutation.mutate(noteId)} />
             </>
           )}
 
