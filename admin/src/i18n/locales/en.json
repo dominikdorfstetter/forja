@@ -2589,7 +2589,16 @@
       "schedulePost": "Schedule Post",
       "scheduledSuccess": "Post scheduled!",
       "cancelScheduled": "Cancel scheduled post",
-      "cancelledSuccess": "Scheduled post cancelled"
+      "cancelledSuccess": "Scheduled post cancelled",
+      "editPost": "Edit",
+      "deletePost": "Delete post",
+      "deletePostConfirm": "Delete this post? A Delete activity will be sent to the Fediverse.",
+      "editSave": "Save",
+      "editCancel": "Cancel",
+      "edited": "Post updated",
+      "deletedPost": "Post deleted",
+      "scheduledCount": "{{count}} post(s) scheduled",
+      "scheduledCountBanner": "{{count}} scheduled"
     },
     "timeline": {
       "empty": "Your timeline is empty. Post something or wait for interactions from the Fediverse!",

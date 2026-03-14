@@ -11,6 +11,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import EditIcon from '@mui/icons-material/Edit';
 import ImageIcon from '@mui/icons-material/Image';
 import PushPinIcon from '@mui/icons-material/PushPin';
+import ScheduleIcon from '@mui/icons-material/Schedule';
 import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router';
@@ -170,10 +171,28 @@ export default function FederationOverview() {
   const { data: featuredPosts } = useFeaturedPosts(selectedSiteId);
 
   const queryClient = useQueryClient();
-  const cancelNoteMutation = useMutation({
+
+  const { data: notesData } = useQuery({
+    queryKey: ['federation-notes', selectedSiteId],
+    queryFn: () => apiService.getFederationNotes(selectedSiteId, { page: 1, page_size: 50 }),
+    enabled: !!selectedSiteId && !!settings?.enabled,
+    refetchInterval: 30_000,
+  });
+  const scheduledCount = (notesData?.data ?? []).filter((n) => n.status === 'scheduled').length;
+
+  const deleteNoteMutation = useMutation({
     mutationFn: (noteId: string) => apiService.deleteFederationNote(selectedSiteId, noteId),
     onSuccess: () => {
-      enqueueSnackbar(t('federation.quickPost.cancelledSuccess'), { variant: 'success' });
+      enqueueSnackbar(t('federation.quickPost.deletedPost'), { variant: 'success' });
+      queryClient.invalidateQueries({ queryKey: ['federation-notes', selectedSiteId] });
+    },
+  });
+
+  const editNoteMutation = useMutation({
+    mutationFn: ({ noteId, body }: { noteId: string; body: string }) =>
+      apiService.updateFederationNote(selectedSiteId, noteId, { body }),
+    onSuccess: () => {
+      enqueueSnackbar(t('federation.quickPost.edited'), { variant: 'success' });
       queryClient.invalidateQueries({ queryKey: ['federation-notes', selectedSiteId] });
     },
   });
@@ -242,7 +261,13 @@ export default function FederationOverview() {
               <QuickPostComposer siteId={selectedSiteId} handle={settings.webfinger_address} avatarUrl={settings.avatar_url} />
 
               {/* Timeline */}
-              <FederationTimeline siteId={selectedSiteId} handle={settings.webfinger_address} avatarUrl={settings.avatar_url} onCancelNote={(noteId) => cancelNoteMutation.mutate(noteId)} />
+              <FederationTimeline
+                siteId={selectedSiteId}
+                handle={settings.webfinger_address}
+                avatarUrl={settings.avatar_url}
+                onDeleteNote={(noteId) => deleteNoteMutation.mutate(noteId)}
+                onEditNote={(noteId, body) => editNoteMutation.mutate({ noteId, body })}
+              />
             </>
           )}
 
@@ -312,6 +337,22 @@ export default function FederationOverview() {
                   </Box>
                 </Stack>
               </CardContent>
+            </Card>
+          )}
+
+          {/* Scheduled posts indicator */}
+          {settings?.enabled && scheduledCount > 0 && (
+            <Card sx={{ mb: 3 }}>
+              <CardActionArea
+                onClick={() => navigate('/federation/activity')}
+                sx={{ display: 'flex', alignItems: 'center', gap: 1.5, px: 2, py: 1.5, borderRadius: 1 }}
+              >
+                <ScheduleIcon sx={{ color: 'warning.main', fontSize: 20 }} />
+                <Typography variant="body2" sx={{ flex: 1 }}>
+                  {t('federation.quickPost.scheduledCount', { count: scheduledCount })}
+                </Typography>
+                <ArrowForwardIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
+              </CardActionArea>
             </Card>
           )}
 

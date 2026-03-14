@@ -1,12 +1,15 @@
+import { useState } from 'react';
 import {
   Avatar,
   Box,
+  Button,
   Card,
   Chip,
   CircularProgress,
   Divider,
   IconButton,
   Stack,
+  TextField,
   Tooltip,
   Typography,
 } from '@mui/material';
@@ -15,14 +18,13 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import RepeatIcon from '@mui/icons-material/Repeat';
 import CommentIcon from '@mui/icons-material/Comment';
 import SendIcon from '@mui/icons-material/Send';
-import CancelIcon from '@mui/icons-material/Cancel';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import HubIcon from '@mui/icons-material/Hub';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { format, formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import apiService from '@/services/api';
 import type { FederationActivity, FederationNote } from '@/types/api';
 
@@ -30,7 +32,8 @@ interface FederationTimelineProps {
   siteId: string;
   handle?: string;
   avatarUrl?: string;
-  onCancelNote?: (noteId: string) => void;
+  onDeleteNote?: (noteId: string) => void;
+  onEditNote?: (noteId: string, body: string) => void;
 }
 
 interface TimelineItem {
@@ -123,17 +126,42 @@ function ActivityItem({ activity }: { activity: FederationActivity }) {
   );
 }
 
-function NoteItem({ note, handle, avatarUrl, onCancel }: { note: FederationNote; handle?: string; avatarUrl?: string; onCancel?: (id: string) => void }) {
+interface NoteItemProps {
+  note: FederationNote;
+  handle?: string;
+  avatarUrl?: string;
+  onDelete?: (id: string) => void;
+  onEdit?: (id: string, body: string) => void;
+}
+
+function NoteItem({ note, handle, avatarUrl, onDelete, onEdit }: NoteItemProps) {
   const { t } = useTranslation();
-  const isScheduled = note.status === 'scheduled';
-  const timeAgo = isScheduled && note.scheduled_at
-    ? format(new Date(note.scheduled_at), 'PPp')
-    : formatDistanceToNow(new Date(note.published_at), { addSuffix: true });
+  const [editing, setEditing] = useState(false);
+  const [editBody, setEditBody] = useState(note.body);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const timeAgo = formatDistanceToNow(new Date(note.published_at), { addSuffix: true });
+
+  const handleSave = () => {
+    if (editBody.trim() && editBody !== note.body) {
+      onEdit?.(note.id, editBody.trim());
+    }
+    setEditing(false);
+  };
+
+  const handleCancelEdit = () => {
+    setEditBody(note.body);
+    setEditing(false);
+  };
+
+  const handleDelete = () => {
+    onDelete?.(note.id);
+    setConfirmDelete(false);
+  };
 
   return (
     <Box sx={{ display: 'flex', gap: 1.5, px: 2, py: 1.5 }}>
-      <Avatar src={avatarUrl || undefined} sx={{ bgcolor: isScheduled ? 'action.disabled' : 'primary.main', width: 36, height: 36 }}>
-        {isScheduled ? <ScheduleIcon sx={{ fontSize: 18 }} /> : <HubIcon sx={{ fontSize: 18 }} />}
+      <Avatar src={avatarUrl || undefined} sx={{ bgcolor: 'primary.main', width: 36, height: 36 }}>
+        <HubIcon sx={{ fontSize: 18 }} />
       </Avatar>
       <Box sx={{ flex: 1, minWidth: 0 }}>
         {handle && (
@@ -141,31 +169,79 @@ function NoteItem({ note, handle, avatarUrl, onCancel }: { note: FederationNote;
             @{handle}
           </Typography>
         )}
-        <Typography variant="body2" sx={{ mt: 0.25, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-          {note.body}
-        </Typography>
+
+        {editing ? (
+          <Box sx={{ mt: 0.5 }}>
+            <TextField
+              fullWidth
+              multiline
+              size="small"
+              minRows={2}
+              maxRows={6}
+              value={editBody}
+              onChange={(e) => setEditBody(e.target.value)}
+              inputProps={{ maxLength: 500 }}
+            />
+            <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+              <Button size="small" variant="contained" onClick={handleSave} disabled={!editBody.trim()}>
+                {t('federation.quickPost.editSave')}
+              </Button>
+              <Button size="small" onClick={handleCancelEdit}>
+                {t('federation.quickPost.editCancel')}
+              </Button>
+            </Stack>
+          </Box>
+        ) : (
+          <Typography variant="body2" sx={{ mt: 0.25, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+            {note.body}
+          </Typography>
+        )}
+
         <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 0.5 }}>
           <Typography variant="caption" color="text.disabled">
-            {isScheduled ? t('federation.quickPost.scheduledFor', { date: timeAgo }) : timeAgo}
+            {timeAgo}
           </Typography>
-          {isScheduled && (
+
+          {!editing && !confirmDelete && (
             <>
-              <Chip
-                icon={<ScheduleIcon />}
-                label={t('federation.quickPost.schedule')}
-                size="small"
-                variant="outlined"
-                color="warning"
-                sx={{ height: 20, fontSize: '0.7rem' }}
-              />
-              {onCancel && (
-                <Tooltip title={t('federation.quickPost.cancelScheduled')}>
-                  <IconButton size="small" color="error" onClick={() => onCancel(note.id)} sx={{ p: 0.25 }}>
-                    <CancelIcon sx={{ fontSize: 16 }} />
+              {onEdit && (
+                <Tooltip title={t('federation.quickPost.editPost')}>
+                  <IconButton
+                    size="small"
+                    onClick={() => { setEditBody(note.body); setEditing(true); }}
+                    sx={{ p: 0.25 }}
+                  >
+                    <EditIcon sx={{ fontSize: 16 }} />
+                  </IconButton>
+                </Tooltip>
+              )}
+              {onDelete && (
+                <Tooltip title={t('federation.quickPost.deletePost')}>
+                  <IconButton
+                    size="small"
+                    color="error"
+                    onClick={() => setConfirmDelete(true)}
+                    sx={{ p: 0.25 }}
+                  >
+                    <DeleteIcon sx={{ fontSize: 16 }} />
                   </IconButton>
                 </Tooltip>
               )}
             </>
+          )}
+
+          {confirmDelete && (
+            <Stack direction="row" alignItems="center" spacing={0.5}>
+              <Typography variant="caption" color="error">
+                {t('federation.quickPost.deletePostConfirm')}
+              </Typography>
+              <Button size="small" color="error" variant="outlined" onClick={handleDelete} sx={{ minWidth: 0, px: 1, py: 0, fontSize: '0.7rem' }}>
+                {t('federation.quickPost.deleteConfirm')}
+              </Button>
+              <Button size="small" onClick={() => setConfirmDelete(false)} sx={{ minWidth: 0, px: 1, py: 0, fontSize: '0.7rem' }}>
+                {t('federation.quickPost.editCancel')}
+              </Button>
+            </Stack>
           )}
         </Stack>
       </Box>
@@ -173,7 +249,7 @@ function NoteItem({ note, handle, avatarUrl, onCancel }: { note: FederationNote;
   );
 }
 
-export default function FederationTimeline({ siteId, handle, avatarUrl, onCancelNote }: FederationTimelineProps) {
+export default function FederationTimeline({ siteId, handle, avatarUrl, onDeleteNote, onEditNote }: FederationTimelineProps) {
   const { t } = useTranslation();
 
   const { data: activitiesData, isLoading: activitiesLoading } = useQuery({
@@ -192,10 +268,14 @@ export default function FederationTimeline({ siteId, handle, avatarUrl, onCancel
 
   const isLoading = activitiesLoading || notesLoading;
 
-  // Merge activities and notes into a single timeline, sorted by date
+  const allNotes = notesData?.data ?? [];
+  const publishedNotes = allNotes.filter((n) => n.status !== 'scheduled');
+  const scheduledCount = allNotes.filter((n) => n.status === 'scheduled').length;
+
+  // Merge activities and published notes into a single timeline, sorted by date
   const timeline: TimelineItem[] = [];
 
-  for (const note of (notesData?.data ?? [])) {
+  for (const note of publishedNotes) {
     timeline.push({ id: `note-${note.id}`, type: 'note', timestamp: note.published_at, note });
   }
 
@@ -223,7 +303,7 @@ export default function FederationTimeline({ siteId, handle, avatarUrl, onCancel
     );
   }
 
-  if (items.length === 0) {
+  if (items.length === 0 && scheduledCount === 0) {
     return (
       <Card>
         <Box sx={{ textAlign: 'center', py: 4 }}>
@@ -238,11 +318,32 @@ export default function FederationTimeline({ siteId, handle, avatarUrl, onCancel
 
   return (
     <Card>
+      {scheduledCount > 0 && (
+        <>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 1 }}>
+            <ScheduleIcon sx={{ fontSize: 16, color: 'warning.main' }} />
+            <Chip
+              label={t('federation.quickPost.scheduledCountBanner', { count: scheduledCount })}
+              size="small"
+              variant="outlined"
+              color="warning"
+              sx={{ height: 22, fontSize: '0.75rem' }}
+            />
+          </Box>
+          {items.length > 0 && <Divider />}
+        </>
+      )}
       {items.map((item, i) => (
         <Box key={item.id}>
           {i > 0 && <Divider />}
           {item.type === 'note' && item.note && (
-            <NoteItem note={item.note} handle={handle} avatarUrl={avatarUrl} onCancel={onCancelNote} />
+            <NoteItem
+              note={item.note}
+              handle={handle}
+              avatarUrl={avatarUrl}
+              onDelete={onDeleteNote}
+              onEdit={onEditNote}
+            />
           )}
           {item.type === 'activity' && item.activity && (
             <ActivityItem activity={item.activity} />
