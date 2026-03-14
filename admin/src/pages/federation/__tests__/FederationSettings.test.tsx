@@ -29,12 +29,11 @@ vi.mock('@/store/AuthContext', () => ({
 
 const mockSettings: FederationSettings = {
   enabled: true,
-  actorHandle: '@myblog@example.com',
-  signatureAlgorithm: 'rsa-sha256',
-  moderationMode: 'queue_all',
-  autoPublish: true,
-  summary: 'A blog about tech',
-  avatarUrl: null,
+  signature_algorithm: 'rsa-sha256',
+  moderation_mode: 'queue_all',
+  auto_publish: true,
+  actor_uri: 'https://example.com/ap/actor/myblog',
+  webfinger_address: 'myblog@example.com',
 };
 
 let FederationSettingsPage: typeof import('../FederationSettings').default;

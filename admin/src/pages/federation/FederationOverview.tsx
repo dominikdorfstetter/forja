@@ -1,9 +1,11 @@
-import { Box, Card, CardContent, Chip, Grid, Typography } from '@mui/material';
+import { Box, Card, CardContent, Chip, Grid, IconButton, Tooltip, Typography } from '@mui/material';
 import PeopleIcon from '@mui/icons-material/People';
 import SendIcon from '@mui/icons-material/Send';
 import CommentIcon from '@mui/icons-material/Comment';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import HubIcon from '@mui/icons-material/Hub';
+import { useSnackbar } from 'notistack';
 import { useSiteContext } from '@/store/SiteContext';
 import { useFederationStats, useFederationSettings } from '@/hooks/useFederationData';
 import PageHeader from '@/components/shared/PageHeader';
@@ -36,7 +38,15 @@ export default function FederationOverview() {
   const { data: stats, isLoading: statsLoading } = useFederationStats(selectedSiteId);
   const { data: settings, isLoading: settingsLoading } = useFederationSettings(selectedSiteId);
 
+  const { enqueueSnackbar } = useSnackbar();
   const isLoading = statsLoading || settingsLoading;
+
+  const handleCopyHandle = () => {
+    if (settings?.webfinger_address) {
+      navigator.clipboard.writeText(`@${settings.webfinger_address}`);
+      enqueueSnackbar('Handle copied to clipboard', { variant: 'success' });
+    }
+  };
 
   if (!selectedSiteId) {
     return (
@@ -60,17 +70,33 @@ export default function FederationOverview() {
     <Box data-testid="federation-overview.page">
       <PageHeader title="Federation" subtitle="ActivityPub federation overview" />
 
+      {settings?.webfinger_address && (
+        <Card sx={{ mb: 3 }}>
+          <CardContent>
+            <Typography variant="overline" color="text.secondary">Your Fediverse Handle</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+              <Typography variant="h5" fontFamily="monospace">
+                @{settings.webfinger_address}
+              </Typography>
+              <Tooltip title="Copy handle">
+                <IconButton size="small" onClick={handleCopyHandle} aria-label="Copy handle">
+                  <ContentCopyIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </Box>
+            <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
+              Share this handle so people on Mastodon, Pleroma, or Misskey can follow your blog.
+            </Typography>
+          </CardContent>
+        </Card>
+      )}
+
       <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
         <Chip
           label={settings?.enabled ? 'Enabled' : 'Disabled'}
           color={settings?.enabled ? 'success' : 'default'}
           size="small"
         />
-        {settings?.actorHandle && (
-          <Typography variant="body1" fontFamily="monospace">
-            {settings.actorHandle}
-          </Typography>
-        )}
       </Box>
 
       <Grid container spacing={3}>

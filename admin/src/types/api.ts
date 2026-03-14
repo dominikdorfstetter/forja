@@ -1637,12 +1637,11 @@ export interface FederationBlockedActor {
 
 export interface FederationSettings {
   enabled: boolean;
-  actorHandle: string | null;
-  signatureAlgorithm: string;
-  moderationMode: string;
-  autoPublish: boolean;
-  summary: string | null;
-  avatarUrl: string | null;
+  signature_algorithm: string;
+  moderation_mode: string;
+  auto_publish: boolean;
+  actor_uri?: string;
+  webfinger_address?: string;
 }
 
 export interface FederationStats {

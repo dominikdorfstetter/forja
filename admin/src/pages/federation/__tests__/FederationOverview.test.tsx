@@ -36,12 +36,11 @@ const mockStats: FederationStats = {
 
 const mockSettings: FederationSettings = {
   enabled: true,
-  actorHandle: '@myblog@example.com',
-  signatureAlgorithm: 'rsa-sha256',
-  moderationMode: 'queue_all',
-  autoPublish: true,
-  summary: null,
-  avatarUrl: null,
+  signature_algorithm: 'rsa-sha256',
+  moderation_mode: 'queue_all',
+  auto_publish: true,
+  actor_uri: 'https://example.com/ap/actor/myblog',
+  webfinger_address: 'myblog@example.com',
 };
 
 let FederationOverview: typeof import('../FederationOverview').default;
@@ -70,6 +69,7 @@ describe('FederationOverview', () => {
 
     renderWithProviders(<FederationOverview />);
     expect(await screen.findByText('@myblog@example.com')).toBeInTheDocument();
+    expect(screen.getByLabelText('Copy handle')).toBeInTheDocument();
   });
 
   it('shows disabled state when federation is off', async () => {
@@ -82,7 +82,8 @@ describe('FederationOverview', () => {
     vi.mocked(apiService.getFederationSettings).mockResolvedValue({
       ...mockSettings,
       enabled: false,
-      actorHandle: null,
+      actor_uri: undefined,
+      webfinger_address: undefined,
     });
 
     renderWithProviders(<FederationOverview />);

@@ -122,7 +122,7 @@ export default function FederationBlocklist() {
         {isLoading ? (
           <Box sx={{ p: 3 }}><LoadingState label="Loading blocklist..." /></Box>
         ) : tab === 0 ? (
-          !instanceData?.data.length ? (
+          !instanceData?.data?.length ? (
             <Box sx={{ p: 3 }}>
               <EmptyState
                 icon={<BlockIcon sx={{ fontSize: 48 }} />}
@@ -143,7 +143,7 @@ export default function FederationBlocklist() {
             />
           )
         ) : (
-          !actorData?.data.length ? (
+          !actorData?.data?.length ? (
             <Box sx={{ p: 3 }}>
               <EmptyState
                 icon={<BlockIcon sx={{ fontSize: 48 }} />}

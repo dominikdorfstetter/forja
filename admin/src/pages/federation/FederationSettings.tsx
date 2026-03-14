@@ -69,11 +69,11 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
 
       <Paper sx={{ p: 3 }} elevation={embedded ? 0 : 1}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-          {settings?.actorHandle && (
+          {settings?.webfinger_address && (
             <Box>
               <Typography variant="subtitle2" color="text.secondary">Fediverse Handle</Typography>
               <Typography variant="body1" sx={{ fontFamily: 'monospace' }}>
-                {settings.actorHandle}
+                @{settings.webfinger_address}
               </Typography>
             </Box>
           )}
@@ -84,9 +84,9 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
               <FormControl fullWidth size="small">
                 <InputLabel>Algorithm</InputLabel>
                 <Select
-                  value={settings?.signatureAlgorithm ?? 'rsa-sha256'}
+                  value={settings?.signature_algorithm ?? 'rsa-sha256'}
                   label="Algorithm"
-                  onChange={(e) => updateSettings.mutate({ signatureAlgorithm: e.target.value })}
+                  onChange={(e) => updateSettings.mutate({ signature_algorithm: e.target.value })}
                 >
                   <MenuItem value="rsa-sha256">RSA-SHA256</MenuItem>
                   <MenuItem value="ed25519">Ed25519</MenuItem>
@@ -101,9 +101,9 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
               <FormControl fullWidth size="small">
                 <InputLabel>Mode</InputLabel>
                 <Select
-                  value={settings?.moderationMode ?? 'queue_all'}
+                  value={settings?.moderation_mode ?? 'queue_all'}
                   label="Mode"
-                  onChange={(e) => updateSettings.mutate({ moderationMode: e.target.value })}
+                  onChange={(e) => updateSettings.mutate({ moderation_mode: e.target.value })}
                 >
                   <MenuItem value="queue_all">Queue All (manual review)</MenuItem>
                   <MenuItem value="auto_approve">Auto Approve</MenuItem>
@@ -114,8 +114,8 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
                 sx={{ mt: 2 }}
                 control={
                   <Switch
-                    checked={settings?.autoPublish ?? true}
-                    onChange={(e) => updateSettings.mutate({ autoPublish: e.target.checked })}
+                    checked={settings?.auto_publish ?? true}
+                    onChange={(e) => updateSettings.mutate({ auto_publish: e.target.checked })}
                   />
                 }
                 label="Auto-publish new posts to federation"
