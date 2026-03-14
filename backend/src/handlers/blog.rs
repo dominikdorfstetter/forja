@@ -35,7 +35,7 @@ use crate::models::taxonomy::Category;
 use crate::services::{
     audit_service,
     bulk_content_service::BulkContentService,
-    notification_service,
+    notification_service, publish_hooks,
     review_service::{ReviewContext, ReviewService},
     webhook_service, workflow_service,
 };
@@ -541,6 +541,19 @@ pub async fn update_blog(
                 &slug,
                 Some(auth.0.id),
             );
+        }
+        // Run publish side effects (webhook, federation, audit) on status -> Published
+        if blog.status == ContentStatus::Published && existing.status != ContentStatus::Published {
+            publish_hooks::on_content_published(
+                &state.db,
+                blog.content_id,
+                sid,
+                "blog",
+                id,
+                Some(auth.0.id),
+                None,
+            )
+            .await;
         }
     }
     Ok(Json(BlogResponse::from(blog)))
