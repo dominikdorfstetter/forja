@@ -17,6 +17,7 @@ import {
 import SettingsIcon from '@mui/icons-material/Settings';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import HubIcon from '@mui/icons-material/Hub';
+import { useTranslation } from 'react-i18next';
 import { useSiteContext } from '@/store/SiteContext';
 import { useFederationSettings } from '@/hooks/useFederationData';
 import { useFederationMutations } from '@/hooks/useFederationMutations';
@@ -31,6 +32,7 @@ interface FederationSettingsProps {
 }
 
 export default function FederationSettingsPage({ embedded }: FederationSettingsProps = {}) {
+  const { t } = useTranslation();
   const { selectedSiteId } = useSiteContext();
   const { data: settings, isLoading } = useFederationSettings(selectedSiteId);
   const {
@@ -43,8 +45,8 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
   if (!selectedSiteId) {
     return (
       <Box data-testid="federation-settings.page">
-        {!embedded && <PageHeader title="Federation Settings" subtitle="Configure ActivityPub federation" />}
-        <EmptyState icon={<SettingsIcon sx={{ fontSize: 64 }} />} title="No site selected" description="Select a site to manage settings." />
+        {!embedded && <PageHeader title={t('federation.settings.title')} subtitle={t('federation.settings.subtitle')} />}
+        <EmptyState icon={<SettingsIcon sx={{ fontSize: 64 }} />} title={t('federation.noSiteSelected')} description={t('federation.settings.noSite')} />
       </Box>
     );
   }
@@ -52,8 +54,8 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
   if (isLoading) {
     return (
       <Box data-testid="federation-settings.page">
-        {!embedded && <PageHeader title="Federation Settings" subtitle="Configure ActivityPub federation" />}
-        <LoadingState label="Loading settings..." />
+        {!embedded && <PageHeader title={t('federation.settings.title')} subtitle={t('federation.settings.subtitle')} />}
+        <LoadingState label={t('federation.settings.loading')} />
       </Box>
     );
   }
@@ -63,7 +65,7 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
       {!embedded && (
         <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
           <HubIcon />
-          <Typography variant="h5">Federation Settings</Typography>
+          <Typography variant="h5">{t('federation.settings.title')}</Typography>
         </Stack>
       )}
 
@@ -71,7 +73,7 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           {settings?.webfinger_address && (
             <Box>
-              <Typography variant="subtitle2" color="text.secondary">Fediverse Handle</Typography>
+              <Typography variant="subtitle2" color="text.secondary">{t('federation.settings.handle')}</Typography>
               <Typography variant="body1" sx={{ fontFamily: 'monospace' }}>
                 @{settings.webfinger_address}
               </Typography>
@@ -79,13 +81,13 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
           )}
 
           <Card variant="outlined">
-            <CardHeader title="Signature Algorithm" />
+            <CardHeader title={t('federation.settings.signatureAlgorithm')} />
             <CardContent>
               <FormControl fullWidth size="small">
-                <InputLabel>Algorithm</InputLabel>
+                <InputLabel>{t('federation.settings.algorithm')}</InputLabel>
                 <Select
                   value={settings?.signature_algorithm ?? 'rsa-sha256'}
-                  label="Algorithm"
+                  label={t('federation.settings.algorithm')}
                   onChange={(e) => updateSettings.mutate({ signature_algorithm: e.target.value })}
                 >
                   <MenuItem value="rsa-sha256">RSA-SHA256</MenuItem>
@@ -96,18 +98,18 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
           </Card>
 
           <Card variant="outlined">
-            <CardHeader title="Moderation" />
+            <CardHeader title={t('federation.settings.moderation')} />
             <CardContent>
               <FormControl fullWidth size="small">
-                <InputLabel>Mode</InputLabel>
+                <InputLabel>{t('federation.settings.mode')}</InputLabel>
                 <Select
                   value={settings?.moderation_mode ?? 'queue_all'}
-                  label="Mode"
+                  label={t('federation.settings.mode')}
                   onChange={(e) => updateSettings.mutate({ moderation_mode: e.target.value })}
                 >
-                  <MenuItem value="queue_all">Queue All (manual review)</MenuItem>
-                  <MenuItem value="auto_approve">Auto Approve</MenuItem>
-                  <MenuItem value="followers_only">Followers Only</MenuItem>
+                  <MenuItem value="queue_all">{t('federation.settings.modeQueueAll')}</MenuItem>
+                  <MenuItem value="auto_approve">{t('federation.settings.modeAutoApprove')}</MenuItem>
+                  <MenuItem value="followers_only">{t('federation.settings.modeFollowersOnly')}</MenuItem>
                 </Select>
               </FormControl>
               <FormControlLabel
@@ -118,16 +120,16 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
                     onChange={(e) => updateSettings.mutate({ auto_publish: e.target.checked })}
                   />
                 }
-                label="Auto-publish new posts to federation"
+                label={t('federation.settings.autoPublish')}
               />
             </CardContent>
           </Card>
 
           <Card variant="outlined">
-            <CardHeader title="Key Management" />
+            <CardHeader title={t('federation.settings.keyManagement')} />
             <CardContent>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                Rotating keys will invalidate existing HTTP signatures. Remote servers will need to re-fetch your public key.
+                {t('federation.settings.keyRotateWarning')}
               </Typography>
               <Button
                 variant="outlined"
@@ -136,7 +138,7 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
                 onClick={() => setRotateConfirmOpen(true)}
                 disabled={rotateKeysMutation.isPending}
               >
-                Rotate Keys
+                {t('federation.settings.rotateKeys')}
               </Button>
             </CardContent>
           </Card>
@@ -145,9 +147,9 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
 
       <ConfirmDialog
         open={rotateConfirmOpen}
-        title="Rotate Signing Keys"
-        message="This will generate new signing keys. Remote servers will need to re-fetch your public key, which may temporarily disrupt federation. Continue?"
-        confirmLabel="Rotate Keys"
+        title={t('federation.settings.rotateKeysConfirm')}
+        message={t('federation.settings.rotateKeysMessage')}
+        confirmLabel={t('federation.settings.rotateKeys')}
         confirmColor="warning"
         onConfirm={() => {
           rotateKeysMutation.mutate();

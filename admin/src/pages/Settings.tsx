@@ -90,7 +90,7 @@ export default function SettingsPage() {
     tabs.push({
       key: 'federation',
       icon: <HubIcon />,
-      label: 'Federation',
+      label: t('settings.tabs.federation'),
       content: <FederationSettingsPage embedded />,
     });
   }

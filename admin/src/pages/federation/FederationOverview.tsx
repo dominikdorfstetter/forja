@@ -9,6 +9,7 @@ import HistoryIcon from '@mui/icons-material/History';
 import HubIcon from '@mui/icons-material/Hub';
 import { useNavigate } from 'react-router';
 import { useSnackbar } from 'notistack';
+import { useTranslation } from 'react-i18next';
 import { useSiteContext } from '@/store/SiteContext';
 import { useFederationStats, useFederationSettings } from '@/hooks/useFederationData';
 import PageHeader from '@/components/shared/PageHeader';
@@ -59,6 +60,7 @@ function NavCard({ title, description, icon, path }: NavCardProps) {
 }
 
 export default function FederationOverview() {
+  const { t } = useTranslation();
   const { selectedSiteId } = useSiteContext();
   const { data: stats, isLoading: statsLoading } = useFederationStats(selectedSiteId);
   const { data: settings, isLoading: settingsLoading } = useFederationSettings(selectedSiteId);
@@ -69,15 +71,15 @@ export default function FederationOverview() {
   const handleCopyHandle = () => {
     if (settings?.webfinger_address) {
       navigator.clipboard.writeText(`@${settings.webfinger_address}`);
-      enqueueSnackbar('Handle copied to clipboard', { variant: 'success' });
+      enqueueSnackbar(t('federation.handle.copied'), { variant: 'success' });
     }
   };
 
   if (!selectedSiteId) {
     return (
       <Box data-testid="federation-overview.page">
-        <PageHeader title="Federation" subtitle="ActivityPub federation overview" />
-        <EmptyState icon={<HubIcon sx={{ fontSize: 64 }} />} title="No site selected" description="Select a site to view federation status." />
+        <PageHeader title={t('federation.title')} subtitle={t('federation.subtitle')} />
+        <EmptyState icon={<HubIcon sx={{ fontSize: 64 }} />} title={t('federation.noSiteSelected')} description={t('federation.noSiteDescription')} />
       </Box>
     );
   }
@@ -85,32 +87,32 @@ export default function FederationOverview() {
   if (isLoading) {
     return (
       <Box data-testid="federation-overview.page">
-        <PageHeader title="Federation" subtitle="ActivityPub federation overview" />
-        <LoadingState label="Loading federation data..." />
+        <PageHeader title={t('federation.title')} subtitle={t('federation.subtitle')} />
+        <LoadingState label={t('federation.loadingData')} />
       </Box>
     );
   }
 
   return (
     <Box data-testid="federation-overview.page">
-      <PageHeader title="Federation" subtitle="ActivityPub federation overview" />
+      <PageHeader title={t('federation.title')} subtitle={t('federation.subtitle')} />
 
       {settings?.webfinger_address && (
         <Card sx={{ mb: 3 }}>
           <CardContent>
-            <Typography variant="overline" color="text.secondary">Your Fediverse Handle</Typography>
+            <Typography variant="overline" color="text.secondary">{t('federation.handle.title')}</Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
               <Typography variant="h5" fontFamily="monospace">
                 @{settings.webfinger_address}
               </Typography>
-              <Tooltip title="Copy handle">
-                <IconButton size="small" onClick={handleCopyHandle} aria-label="Copy handle">
+              <Tooltip title={t('federation.handle.copy')}>
+                <IconButton size="small" onClick={handleCopyHandle} aria-label={t('federation.handle.copy')}>
                   <ContentCopyIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
             </Box>
             <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-              Share this handle so people on Mastodon, Pleroma, or Misskey can follow your blog.
+              {t('federation.handle.description')}
             </Typography>
           </CardContent>
         </Card>
@@ -118,7 +120,7 @@ export default function FederationOverview() {
 
       <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
         <Chip
-          label={settings?.enabled ? 'Enabled' : 'Disabled'}
+          label={settings?.enabled ? t('federation.status.enabled') : t('federation.status.disabled')}
           color={settings?.enabled ? 'success' : 'default'}
           size="small"
         />
@@ -127,33 +129,33 @@ export default function FederationOverview() {
       {/* Stats */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <StatCard label="Followers" value={stats?.followersCount ?? 0} icon={<PeopleIcon fontSize="large" />} />
+          <StatCard label={t('federation.stats.followers')} value={stats?.followersCount ?? 0} icon={<PeopleIcon fontSize="large" />} />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <StatCard label="Posts Syndicated" value={stats?.postsSyndicated ?? 0} icon={<SendIcon fontSize="large" />} color="success.main" />
+          <StatCard label={t('federation.stats.postsSyndicated')} value={stats?.postsSyndicated ?? 0} icon={<SendIcon fontSize="large" />} color="success.main" />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <StatCard label="Pending Comments" value={stats?.pendingComments ?? 0} icon={<CommentIcon fontSize="large" />} color="warning.main" />
+          <StatCard label={t('federation.stats.pendingComments')} value={stats?.pendingComments ?? 0} icon={<CommentIcon fontSize="large" />} color="warning.main" />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <StatCard label="Failed Deliveries" value={stats?.failedDeliveries ?? 0} icon={<ErrorOutlineIcon fontSize="large" />} color="error.main" />
+          <StatCard label={t('federation.stats.failedDeliveries')} value={stats?.failedDeliveries ?? 0} icon={<ErrorOutlineIcon fontSize="large" />} color="error.main" />
         </Grid>
       </Grid>
 
       {/* Navigation to sub-pages */}
-      <Typography variant="h6" sx={{ mb: 2 }}>Manage</Typography>
+      <Typography variant="h6" sx={{ mb: 2 }}>{t('federation.manage')}</Typography>
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, sm: 6 }}>
-          <NavCard title="Followers" description="View and manage your Fediverse followers" icon={<PeopleIcon />} path="/federation/followers" />
+          <NavCard title={t('federation.nav.followers')} description={t('federation.nav.followersDesc')} icon={<PeopleIcon />} path="/federation/followers" />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
-          <NavCard title="Comments" description="Moderate inbound replies from the Fediverse" icon={<CommentIcon />} path="/federation/comments" />
+          <NavCard title={t('federation.nav.comments')} description={t('federation.nav.commentsDesc')} icon={<CommentIcon />} path="/federation/comments" />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
-          <NavCard title="Activity Log" description="View sent and received federation events" icon={<HistoryIcon />} path="/federation/activity" />
+          <NavCard title={t('federation.nav.activityLog')} description={t('federation.nav.activityLogDesc')} icon={<HistoryIcon />} path="/federation/activity" />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
-          <NavCard title="Blocklist" description="Block instances or individual actors" icon={<BlockIcon />} path="/federation/blocks" />
+          <NavCard title={t('federation.nav.blocklist')} description={t('federation.nav.blocklistDesc')} icon={<BlockIcon />} path="/federation/blocks" />
         </Grid>
       </Grid>
     </Box>

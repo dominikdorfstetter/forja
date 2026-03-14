@@ -7,6 +7,7 @@ import apiService from '@/services/api';
 import type { FederationFollower } from '@/types/api';
 import { useSiteContext } from '@/store/SiteContext';
 import { useListPageState } from '@/hooks/useListPageState';
+import { useTranslation } from 'react-i18next';
 import { useFederationMutations } from '@/hooks/useFederationMutations';
 import PageHeader from '@/components/shared/PageHeader';
 import TableFilterBar from '@/components/shared/TableFilterBar';
@@ -16,6 +17,7 @@ import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import DataTable, { type DataTableColumn } from '@/components/shared/DataTable';
 
 export default function FederationFollowers() {
+  const { t } = useTranslation();
   const { selectedSiteId } = useSiteContext();
   const {
     page, pageSize, deleting,
@@ -40,11 +42,11 @@ export default function FederationFollowers() {
 
   const columns: DataTableColumn<FederationFollower>[] = [
     {
-      header: 'Name',
+      header: t('federation.followers.columns.name'),
       render: (f) => f.displayName ?? f.username ?? 'Unknown',
     },
     {
-      header: 'Actor URI',
+      header: t('federation.followers.columns.actorUri'),
       render: (f) => (
         <Box component="span" sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>
           {f.followerActorUri}
@@ -52,7 +54,7 @@ export default function FederationFollowers() {
       ),
     },
     {
-      header: 'Status',
+      header: t('federation.followers.columns.status'),
       render: (f) => (
         <Chip
           label={f.status}
@@ -62,14 +64,14 @@ export default function FederationFollowers() {
       ),
     },
     {
-      header: 'Followed',
+      header: t('federation.followers.columns.followed'),
       render: (f) => format(new Date(f.followedAt), 'PP'),
     },
     {
-      header: 'Actions',
+      header: t('federation.followers.columns.actions'),
       align: 'right',
       render: (f) => (
-        <Tooltip title="Remove follower">
+        <Tooltip title={t('federation.followers.removeTooltip')}>
           <IconButton size="small" color="error" onClick={() => openDelete(f)}>
             <DeleteIcon fontSize="small" />
           </IconButton>
@@ -81,30 +83,30 @@ export default function FederationFollowers() {
   if (!selectedSiteId) {
     return (
       <Box data-testid="federation-followers.page">
-        <PageHeader title="Followers" subtitle="Fediverse followers for this site" breadcrumbs={[{ label: 'Federation', path: '/federation' }, { label: 'Followers' }]} />
-        <EmptyState icon={<PeopleIcon sx={{ fontSize: 64 }} />} title="No site selected" description="Select a site to view followers." />
+        <PageHeader title={t('federation.followers.title')} subtitle={t('federation.followers.subtitle')} breadcrumbs={[{ label: t('federation.breadcrumbs.federation'), path: '/federation' }, { label: t('federation.followers.title') }]} />
+        <EmptyState icon={<PeopleIcon sx={{ fontSize: 64 }} />} title={t('federation.noSiteSelected')} description={t('federation.followers.noSite')} />
       </Box>
     );
   }
 
   return (
     <Box data-testid="federation-followers.page">
-      <PageHeader title="Followers" subtitle="Fediverse followers for this site" breadcrumbs={[{ label: 'Federation', path: '/federation' }, { label: 'Followers' }]} />
+      <PageHeader title={t('federation.followers.title')} subtitle={t('federation.followers.subtitle')} breadcrumbs={[{ label: t('federation.breadcrumbs.federation'), path: '/federation' }, { label: t('federation.followers.title') }]} />
 
       <Paper>
         <TableFilterBar
           searchValue={search}
           onSearchChange={setSearch}
-          searchPlaceholder="Search followers..."
+          searchPlaceholder={t('federation.followers.searchPlaceholder')}
         />
         {isLoading ? (
-          <Box sx={{ p: 3 }}><LoadingState label="Loading followers..." /></Box>
+          <Box sx={{ p: 3 }}><LoadingState label={t('federation.followers.loading')} /></Box>
         ) : !followers || followers.length === 0 ? (
           <Box sx={{ p: 3 }}>
             <EmptyState
               icon={<PeopleIcon sx={{ fontSize: 48 }} />}
-              title="No followers yet"
-              description="When other fediverse users follow your site, they will appear here."
+              title={t('federation.followers.empty')}
+              description={t('federation.followers.emptyDescription')}
             />
           </Box>
         ) : (
@@ -123,9 +125,9 @@ export default function FederationFollowers() {
 
       <ConfirmDialog
         open={!!deleting}
-        title="Remove Follower"
-        message={`Remove ${deleting?.displayName ?? deleting?.followerActorUri}? They will need to re-follow your site.`}
-        confirmLabel="Remove"
+        title={t('federation.followers.removeTitle')}
+        message={t('federation.followers.removeMessage', { name: deleting?.displayName ?? deleting?.followerActorUri })}
+        confirmLabel={t('federation.followers.removeConfirm')}
         onConfirm={() => deleting && removeFollower.mutate(deleting.id)}
         onCancel={closeDelete}
         loading={removeFollower.isPending}

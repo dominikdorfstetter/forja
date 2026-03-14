@@ -31,7 +31,6 @@ import WebhookIcon from '@mui/icons-material/Webhook';
 import AltRouteIcon from '@mui/icons-material/AltRoute';
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import HubIcon from '@mui/icons-material/Hub';
-import BlockIcon from '@mui/icons-material/Block';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { Tooltip, Fade } from '@mui/material';
 import { useTranslation } from 'react-i18next';
@@ -172,9 +171,9 @@ export default function Layout() {
       ],
     },
     ...(modules.federation ? [{
-      label: 'Federation',
+      label: t('layout.sidebar.federation'),
       items: [
-        { text: 'Federation', icon: <HubIcon />, path: '/federation' },
+        { text: t('layout.sidebar.federation'), icon: <HubIcon />, path: '/federation' },
       ],
     }] : []),
     {

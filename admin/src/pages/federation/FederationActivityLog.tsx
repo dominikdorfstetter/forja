@@ -7,6 +7,7 @@ import apiService from '@/services/api';
 import type { FederationActivity } from '@/types/api';
 import { useSiteContext } from '@/store/SiteContext';
 import { useListPageState } from '@/hooks/useListPageState';
+import { useTranslation } from 'react-i18next';
 import { useFederationMutations } from '@/hooks/useFederationMutations';
 import PageHeader from '@/components/shared/PageHeader';
 import TableFilterBar from '@/components/shared/TableFilterBar';
@@ -30,6 +31,7 @@ function statusColor(status: string): 'success' | 'error' | 'warning' | 'default
 }
 
 export default function FederationActivityLog() {
+  const { t } = useTranslation();
   const { selectedSiteId } = useSiteContext();
   const {
     page, pageSize,
@@ -53,11 +55,11 @@ export default function FederationActivityLog() {
 
   const columns: DataTableColumn<FederationActivity>[] = [
     {
-      header: 'Type',
+      header: t('federation.activityLog.columns.type'),
       render: (a) => a.activityType,
     },
     {
-      header: 'Actor',
+      header: t('federation.activityLog.columns.actor'),
       render: (a) => (
         <Box component="span" sx={{ fontFamily: 'monospace', fontSize: '0.85rem', maxWidth: 250, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block' }}>
           {a.actorUri}
@@ -65,10 +67,10 @@ export default function FederationActivityLog() {
       ),
     },
     {
-      header: 'Direction',
+      header: t('federation.activityLog.columns.direction'),
       render: (a) => (
         <Chip
-          label={a.direction === 'in' ? 'Inbound' : 'Outbound'}
+          label={a.direction === 'in' ? t('federation.activityLog.inbound') : t('federation.activityLog.outbound')}
           size="small"
           variant="outlined"
           color={a.direction === 'in' ? 'info' : 'secondary'}
@@ -76,21 +78,21 @@ export default function FederationActivityLog() {
       ),
     },
     {
-      header: 'Status',
+      header: t('federation.activityLog.columns.status'),
       render: (a) => (
         <Chip label={a.status} size="small" color={statusColor(a.status)} />
       ),
     },
     {
-      header: 'Date',
+      header: t('federation.activityLog.columns.date'),
       render: (a) => format(new Date(a.createdAt), 'PPp'),
     },
     {
-      header: 'Actions',
+      header: t('federation.activityLog.columns.actions'),
       align: 'right',
       render: (a) =>
         a.status === 'failed' ? (
-          <Tooltip title="Retry delivery">
+          <Tooltip title={t('federation.activityLog.retryTooltip')}>
             <IconButton size="small" onClick={() => retryActivity.mutate(a.id)}>
               <ReplayIcon fontSize="small" />
             </IconButton>
@@ -102,30 +104,30 @@ export default function FederationActivityLog() {
   if (!selectedSiteId) {
     return (
       <Box data-testid="federation-activity.page">
-        <PageHeader title="Activity Log" subtitle="Federation activity history" breadcrumbs={[{ label: 'Federation', path: '/federation' }, { label: 'Activity Log' }]} />
-        <EmptyState icon={<HistoryIcon sx={{ fontSize: 64 }} />} title="No site selected" description="Select a site to view activity." />
+        <PageHeader title={t('federation.activityLog.title')} subtitle={t('federation.activityLog.subtitle')} breadcrumbs={[{ label: t('federation.breadcrumbs.federation'), path: '/federation' }, { label: t('federation.activityLog.title') }]} />
+        <EmptyState icon={<HistoryIcon sx={{ fontSize: 64 }} />} title={t('federation.noSiteSelected')} description={t('federation.activityLog.noSite')} />
       </Box>
     );
   }
 
   return (
     <Box data-testid="federation-activity.page">
-      <PageHeader title="Activity Log" subtitle="Federation activity history" breadcrumbs={[{ label: 'Federation', path: '/federation' }, { label: 'Activity Log' }]} />
+      <PageHeader title={t('federation.activityLog.title')} subtitle={t('federation.activityLog.subtitle')} breadcrumbs={[{ label: t('federation.breadcrumbs.federation'), path: '/federation' }, { label: t('federation.activityLog.title') }]} />
 
       <Paper>
         <TableFilterBar
           searchValue={search}
           onSearchChange={setSearch}
-          searchPlaceholder="Search activities..."
+          searchPlaceholder={t('federation.activityLog.searchPlaceholder')}
         />
         {isLoading ? (
-          <Box sx={{ p: 3 }}><LoadingState label="Loading activities..." /></Box>
+          <Box sx={{ p: 3 }}><LoadingState label={t('federation.activityLog.loading')} /></Box>
         ) : !activities || activities.length === 0 ? (
           <Box sx={{ p: 3 }}>
             <EmptyState
               icon={<HistoryIcon sx={{ fontSize: 48 }} />}
-              title="No activity yet"
-              description="Federation activities will appear here when they occur."
+              title={t('federation.activityLog.empty')}
+              description={t('federation.activityLog.emptyDescription')}
             />
           </Box>
         ) : (

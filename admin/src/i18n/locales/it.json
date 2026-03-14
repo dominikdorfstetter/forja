@@ -134,7 +134,8 @@
       "locales": "Lingue",
       "apiDocs": "Documentazione API",
       "myDrafts": "Le mie bozze",
-      "logout": "Esci"
+      "logout": "Esci",
+      "federation": "Federazione"
     },
     "toolbar": {
       "toggleDrawer": "Apri/chiudi menu laterale",
@@ -1292,7 +1293,8 @@
       "legal": "Legale",
       "apiKeys": "Chiavi API",
       "modules": "Moduli",
-      "ai": "Assistente IA"
+      "ai": "Assistente IA",
+      "federation": "Federazione"
     },
     "modules": {
       "title": "Moduli di contenuto",
@@ -2318,38 +2320,276 @@
     }
   },
   "errorCodes": {
-    "AUTH_MISSING_CREDENTIALS": { "message": "Autenticazione richiesta", "action": "Accedi per continuare." },
-    "AUTH_TOKEN_INVALID": { "message": "Sessione scaduta", "action": "Accedi di nuovo." },
-    "AUTH_INSUFFICIENT_ROLE": { "message": "Permessi insufficienti", "action": "Contatta un amministratore per un accesso elevato." },
-    "AUTH_SITE_ACCESS_DENIED": { "message": "Accesso al sito negato", "action": "Contatta il proprietario del sito per l'accesso." },
-    "AUTH_API_KEY_INVALID": { "message": "Chiave API non valida", "action": "Controlla la configurazione della chiave API." },
-    "AUTH_ACCOUNT_SOLE_OWNER": { "message": "Impossibile eliminare l'account", "action": "Trasferisci prima la proprietà del sito." },
-    "BLOG_SLUG_TAKEN": { "message": "Slug del blog già in uso", "action": "Scegli uno slug diverso." },
-    "PAGE_SLUG_TAKEN": { "message": "Slug della pagina già in uso", "action": "Scegli uno slug diverso." },
-    "SITE_SLUG_TAKEN": { "message": "Slug del sito già in uso", "action": "Scegli uno slug diverso." },
-    "TAG_SLUG_TAKEN": { "message": "Slug del tag già in uso", "action": "Scegli uno slug diverso." },
-    "CATEGORY_SLUG_TAKEN": { "message": "Slug della categoria già in uso", "action": "Scegli uno slug diverso." },
-    "LOCALE_CODE_TAKEN": { "message": "Codice lingua già esistente", "action": "Usa un codice lingua diverso." },
-    "RATE_LIMIT_EXCEEDED": { "message": "Troppe richieste", "action": "Attendi un momento e riprova." },
-    "MEMBER_ALREADY_EXISTS": { "message": "Membro già esistente", "action": "Questo utente è già membro del sito." },
-    "MEMBER_CANNOT_REMOVE_OWNER": { "message": "Impossibile rimuovere il proprietario", "action": "Trasferisci la proprietà prima di rimuovere questo membro." },
-    "MEDIA_UPLOAD_TOO_LARGE": { "message": "File troppo grande", "action": "Riduci la dimensione del file o modifica le impostazioni del sito." },
-    "MEDIA_UPLOAD_INVALID_TYPE": { "message": "Tipo di file non supportato", "action": "Controlla i tipi di file consentiti." },
-    "AI_NOT_CONFIGURED": { "message": "IA non configurata", "action": "Configura un provider IA nelle impostazioni del sito." },
-    "AI_PROVIDER_UNAVAILABLE": { "message": "Provider IA non disponibile", "action": "Controlla la configurazione IA o riprova più tardi." },
-    "WORKFLOW_REVIEW_REQUIRED": { "message": "Revisione richiesta", "action": "Invia il contenuto per la revisione prima di pubblicare." },
-    "WORKFLOW_NO_PERMISSION": { "message": "Permesso workflow negato", "action": "Non hai il permesso per questa azione del workflow." },
-    "MODULE_NOT_ENABLED": { "message": "Modulo non abilitato", "action": "Abilita questo modulo nelle impostazioni del sito." },
-    "LOCALE_DELETE_IN_USE": { "message": "Lingua in uso", "action": "Rimuovi prima tutti i contenuti che utilizzano questa lingua." },
-    "SITE_LOCALE_LAST_LANGUAGE": { "message": "Impossibile rimuovere l'ultima lingua", "action": "I siti devono avere almeno una lingua." },
-    "REDIRECT_SAME_PATH": { "message": "Loop di reindirizzamento rilevato", "action": "I percorsi di origine e destinazione devono essere diversi." },
+    "AUTH_MISSING_CREDENTIALS": {
+      "message": "Autenticazione richiesta",
+      "action": "Accedi per continuare."
+    },
+    "AUTH_TOKEN_INVALID": {
+      "message": "Sessione scaduta",
+      "action": "Accedi di nuovo."
+    },
+    "AUTH_INSUFFICIENT_ROLE": {
+      "message": "Permessi insufficienti",
+      "action": "Contatta un amministratore per un accesso elevato."
+    },
+    "AUTH_SITE_ACCESS_DENIED": {
+      "message": "Accesso al sito negato",
+      "action": "Contatta il proprietario del sito per l'accesso."
+    },
+    "AUTH_API_KEY_INVALID": {
+      "message": "Chiave API non valida",
+      "action": "Controlla la configurazione della chiave API."
+    },
+    "AUTH_ACCOUNT_SOLE_OWNER": {
+      "message": "Impossibile eliminare l'account",
+      "action": "Trasferisci prima la proprietà del sito."
+    },
+    "BLOG_SLUG_TAKEN": {
+      "message": "Slug del blog già in uso",
+      "action": "Scegli uno slug diverso."
+    },
+    "PAGE_SLUG_TAKEN": {
+      "message": "Slug della pagina già in uso",
+      "action": "Scegli uno slug diverso."
+    },
+    "SITE_SLUG_TAKEN": {
+      "message": "Slug del sito già in uso",
+      "action": "Scegli uno slug diverso."
+    },
+    "TAG_SLUG_TAKEN": {
+      "message": "Slug del tag già in uso",
+      "action": "Scegli uno slug diverso."
+    },
+    "CATEGORY_SLUG_TAKEN": {
+      "message": "Slug della categoria già in uso",
+      "action": "Scegli uno slug diverso."
+    },
+    "LOCALE_CODE_TAKEN": {
+      "message": "Codice lingua già esistente",
+      "action": "Usa un codice lingua diverso."
+    },
+    "RATE_LIMIT_EXCEEDED": {
+      "message": "Troppe richieste",
+      "action": "Attendi un momento e riprova."
+    },
+    "MEMBER_ALREADY_EXISTS": {
+      "message": "Membro già esistente",
+      "action": "Questo utente è già membro del sito."
+    },
+    "MEMBER_CANNOT_REMOVE_OWNER": {
+      "message": "Impossibile rimuovere il proprietario",
+      "action": "Trasferisci la proprietà prima di rimuovere questo membro."
+    },
+    "MEDIA_UPLOAD_TOO_LARGE": {
+      "message": "File troppo grande",
+      "action": "Riduci la dimensione del file o modifica le impostazioni del sito."
+    },
+    "MEDIA_UPLOAD_INVALID_TYPE": {
+      "message": "Tipo di file non supportato",
+      "action": "Controlla i tipi di file consentiti."
+    },
+    "AI_NOT_CONFIGURED": {
+      "message": "IA non configurata",
+      "action": "Configura un provider IA nelle impostazioni del sito."
+    },
+    "AI_PROVIDER_UNAVAILABLE": {
+      "message": "Provider IA non disponibile",
+      "action": "Controlla la configurazione IA o riprova più tardi."
+    },
+    "WORKFLOW_REVIEW_REQUIRED": {
+      "message": "Revisione richiesta",
+      "action": "Invia il contenuto per la revisione prima di pubblicare."
+    },
+    "WORKFLOW_NO_PERMISSION": {
+      "message": "Permesso workflow negato",
+      "action": "Non hai il permesso per questa azione del workflow."
+    },
+    "MODULE_NOT_ENABLED": {
+      "message": "Modulo non abilitato",
+      "action": "Abilita questo modulo nelle impostazioni del sito."
+    },
+    "LOCALE_DELETE_IN_USE": {
+      "message": "Lingua in uso",
+      "action": "Rimuovi prima tutti i contenuti che utilizzano questa lingua."
+    },
+    "SITE_LOCALE_LAST_LANGUAGE": {
+      "message": "Impossibile rimuovere l'ultima lingua",
+      "action": "I siti devono avere almeno una lingua."
+    },
+    "REDIRECT_SAME_PATH": {
+      "message": "Loop di reindirizzamento rilevato",
+      "action": "I percorsi di origine e destinazione devono essere diversi."
+    },
     "patterns": {
-      "notFound": { "message": "Risorsa non trovata", "action": "Potrebbe essere stata eliminata o spostata." },
-      "slugTaken": { "message": "Slug già in uso", "action": "Scegli uno slug diverso." },
-      "accessDenied": { "message": "Accesso negato", "action": "Non hai il permesso per questa azione." },
-      "auth": { "message": "Errore di autenticazione", "action": "Prova ad accedere di nuovo." },
-      "validation": { "message": "Errore di validazione", "action": "Controlla i campi del modulo e riprova." },
-      "mediaUpload": { "message": "Caricamento fallito", "action": "Controlla il file e riprova." }
+      "notFound": {
+        "message": "Risorsa non trovata",
+        "action": "Potrebbe essere stata eliminata o spostata."
+      },
+      "slugTaken": {
+        "message": "Slug già in uso",
+        "action": "Scegli uno slug diverso."
+      },
+      "accessDenied": {
+        "message": "Accesso negato",
+        "action": "Non hai il permesso per questa azione."
+      },
+      "auth": {
+        "message": "Errore di autenticazione",
+        "action": "Prova ad accedere di nuovo."
+      },
+      "validation": {
+        "message": "Errore di validazione",
+        "action": "Controlla i campi del modulo e riprova."
+      },
+      "mediaUpload": {
+        "message": "Caricamento fallito",
+        "action": "Controlla il file e riprova."
+      }
+    }
+  },
+  "federation": {
+    "title": "Federazione",
+    "subtitle": "Panoramica della federazione ActivityPub",
+    "handle": {
+      "title": "Il tuo handle Fediverse",
+      "description": "Condividi questo handle affinché le persone su Mastodon, Pleroma o Misskey possano seguire il tuo blog.",
+      "copied": "Handle copiato negli appunti",
+      "copy": "Copia handle"
+    },
+    "stats": {
+      "followers": "Follower",
+      "postsSyndicated": "Articoli sindacati",
+      "pendingComments": "Commenti in attesa",
+      "failedDeliveries": "Consegne fallite"
+    },
+    "manage": "Gestisci",
+    "noSiteSelected": "Nessun sito selezionato",
+    "noSiteDescription": "Seleziona un sito per vedere lo stato della federazione.",
+    "loadingData": "Caricamento dati federazione...",
+    "nav": {
+      "followers": "Follower",
+      "followersDesc": "Visualizza e gestisci i tuoi follower Fediverse",
+      "comments": "Commenti",
+      "commentsDesc": "Modera le risposte in arrivo dal Fediverse",
+      "activityLog": "Registro attività",
+      "activityLogDesc": "Visualizza gli eventi di federazione inviati e ricevuti",
+      "blocklist": "Lista blocco",
+      "blocklistDesc": "Blocca istanze o singoli attori"
+    },
+    "followers": {
+      "title": "Follower",
+      "subtitle": "Follower Fediverse di questo sito",
+      "searchPlaceholder": "Cerca follower...",
+      "noSite": "Seleziona un sito per vedere i follower.",
+      "empty": "Nessun follower ancora",
+      "emptyDescription": "Quando altri utenti Fediverse seguiranno il tuo sito, appariranno qui.",
+      "loading": "Caricamento follower...",
+      "removeTitle": "Rimuovi follower",
+      "removeMessage": "Rimuovere {{name}}? Dovrà seguire nuovamente il tuo sito.",
+      "removeConfirm": "Rimuovi",
+      "removeTooltip": "Rimuovi follower",
+      "columns": {
+        "name": "Nome",
+        "actorUri": "URI attore",
+        "status": "Stato",
+        "followed": "Segue dal",
+        "actions": "Azioni"
+      }
+    },
+    "comments": {
+      "title": "Commenti",
+      "subtitle": "Modera i commenti federati",
+      "searchPlaceholder": "Cerca commenti...",
+      "noSite": "Seleziona un sito per moderare i commenti.",
+      "empty": "Nessun commento",
+      "emptyDescription": "I commenti federati appariranno qui quando saranno ricevuti.",
+      "loading": "Caricamento commenti...",
+      "deleteTitle": "Elimina commento",
+      "deleteMessage": "Eliminare il commento di {{name}}? Questa azione non può essere annullata.",
+      "deleteConfirm": "Elimina",
+      "approveTooltip": "Approva",
+      "rejectTooltip": "Rifiuta",
+      "deleteTooltip": "Elimina",
+      "columns": {
+        "author": "Autore",
+        "comment": "Commento",
+        "status": "Stato",
+        "date": "Data",
+        "actions": "Azioni"
+      }
+    },
+    "activityLog": {
+      "title": "Registro attività",
+      "subtitle": "Cronologia attività di federazione",
+      "searchPlaceholder": "Cerca attività...",
+      "noSite": "Seleziona un sito per vedere le attività.",
+      "empty": "Nessuna attività ancora",
+      "emptyDescription": "Le attività di federazione appariranno qui quando si verificheranno.",
+      "loading": "Caricamento attività...",
+      "retryTooltip": "Riprova consegna",
+      "inbound": "In entrata",
+      "outbound": "In uscita",
+      "columns": {
+        "type": "Tipo",
+        "actor": "Attore",
+        "direction": "Direzione",
+        "status": "Stato",
+        "date": "Data",
+        "actions": "Azioni"
+      }
+    },
+    "blocklist": {
+      "title": "Lista blocco",
+      "subtitle": "Istanze e attori bloccati",
+      "noSite": "Seleziona un sito per gestire i blocchi.",
+      "instances": "Istanze",
+      "actors": "Attori",
+      "loading": "Caricamento lista blocco...",
+      "noBlockedInstances": "Nessuna istanza bloccata",
+      "noBlockedInstancesDesc": "Le istanze bloccate appariranno qui.",
+      "noBlockedActors": "Nessun attore bloccato",
+      "noBlockedActorsDesc": "Gli attori bloccati appariranno qui.",
+      "unblockInstanceTitle": "Sblocca istanza",
+      "unblockInstanceMessage": "Sbloccare {{domain}}?",
+      "unblockActorTitle": "Sblocca attore",
+      "unblockActorMessage": "Sbloccare {{actor}}?",
+      "unblockConfirm": "Sblocca",
+      "unblockInstanceTooltip": "Sblocca istanza",
+      "unblockActorTooltip": "Sblocca attore",
+      "columns": {
+        "domain": "Dominio",
+        "actorUri": "URI attore",
+        "reason": "Motivo",
+        "blocked": "Bloccato",
+        "actions": "Azioni"
+      }
+    },
+    "settings": {
+      "title": "Impostazioni federazione",
+      "subtitle": "Configura la federazione ActivityPub",
+      "handle": "Handle Fediverse",
+      "signatureAlgorithm": "Algoritmo di firma",
+      "algorithm": "Algoritmo",
+      "moderation": "Moderazione",
+      "mode": "Modalità",
+      "modeQueueAll": "Metti tutto in coda (revisione manuale)",
+      "modeAutoApprove": "Approvazione automatica",
+      "modeFollowersOnly": "Solo follower",
+      "autoPublish": "Pubblica automaticamente i nuovi articoli nella federazione",
+      "keyManagement": "Gestione chiavi",
+      "keyRotateWarning": "La rotazione delle chiavi invaliderà le firme HTTP esistenti. I server remoti dovranno recuperare la tua chiave pubblica.",
+      "rotateKeys": "Ruota chiavi",
+      "rotateKeysConfirm": "Ruota chiavi di firma",
+      "rotateKeysMessage": "Verranno generate nuove chiavi di firma. I server remoti dovranno recuperare la tua chiave pubblica, il che potrebbe temporaneamente interrompere la federazione. Continuare?",
+      "noSite": "Seleziona un sito per gestire le impostazioni.",
+      "loading": "Caricamento impostazioni..."
+    },
+    "breadcrumbs": {
+      "federation": "Federazione"
+    },
+    "status": {
+      "enabled": "Abilitato",
+      "disabled": "Disabilitato"
     }
   }
 }

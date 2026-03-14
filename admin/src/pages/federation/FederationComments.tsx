@@ -9,6 +9,7 @@ import apiService from '@/services/api';
 import type { FederationComment } from '@/types/api';
 import { useSiteContext } from '@/store/SiteContext';
 import { useListPageState } from '@/hooks/useListPageState';
+import { useTranslation } from 'react-i18next';
 import { useFederationMutations } from '@/hooks/useFederationMutations';
 import PageHeader from '@/components/shared/PageHeader';
 import TableFilterBar from '@/components/shared/TableFilterBar';
@@ -34,6 +35,7 @@ function stripHtml(html: string): string {
 }
 
 export default function FederationComments() {
+  const { t } = useTranslation();
   const { selectedSiteId } = useSiteContext();
   const {
     page, pageSize, deleting,
@@ -58,11 +60,11 @@ export default function FederationComments() {
 
   const columns: DataTableColumn<FederationComment>[] = [
     {
-      header: 'Author',
+      header: t('federation.comments.columns.author'),
       render: (c) => c.authorName ?? c.authorActorUri,
     },
     {
-      header: 'Comment',
+      header: t('federation.comments.columns.comment'),
       render: (c) => (
         <Typography
           variant="body2"
@@ -73,35 +75,35 @@ export default function FederationComments() {
       ),
     },
     {
-      header: 'Status',
+      header: t('federation.comments.columns.status'),
       render: (c) => (
         <Chip label={c.status} size="small" color={statusColor(c.status)} />
       ),
     },
     {
-      header: 'Date',
+      header: t('federation.comments.columns.date'),
       render: (c) => format(new Date(c.createdAt), 'PP'),
     },
     {
-      header: 'Actions',
+      header: t('federation.comments.columns.actions'),
       align: 'right',
       render: (c) => (
         <>
           {c.status === 'pending' && (
             <>
-              <Tooltip title="Approve">
+              <Tooltip title={t('federation.comments.approveTooltip')}>
                 <IconButton size="small" color="success" onClick={() => approveComment.mutate(c.id)}>
                   <CheckIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Reject">
+              <Tooltip title={t('federation.comments.rejectTooltip')}>
                 <IconButton size="small" color="warning" onClick={() => rejectComment.mutate(c.id)}>
                   <CloseIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
             </>
           )}
-          <Tooltip title="Delete">
+          <Tooltip title={t('federation.comments.deleteTooltip')}>
             <IconButton size="small" color="error" onClick={() => openDelete(c)}>
               <DeleteIcon fontSize="small" />
             </IconButton>
@@ -114,30 +116,30 @@ export default function FederationComments() {
   if (!selectedSiteId) {
     return (
       <Box data-testid="federation-comments.page">
-        <PageHeader title="Comments" subtitle="Moderate federated comments" breadcrumbs={[{ label: 'Federation', path: '/federation' }, { label: 'Comments' }]} />
-        <EmptyState icon={<CommentIcon sx={{ fontSize: 64 }} />} title="No site selected" description="Select a site to moderate comments." />
+        <PageHeader title={t('federation.comments.title')} subtitle={t('federation.comments.subtitle')} breadcrumbs={[{ label: t('federation.breadcrumbs.federation'), path: '/federation' }, { label: t('federation.comments.title') }]} />
+        <EmptyState icon={<CommentIcon sx={{ fontSize: 64 }} />} title={t('federation.noSiteSelected')} description={t('federation.comments.noSite')} />
       </Box>
     );
   }
 
   return (
     <Box data-testid="federation-comments.page">
-      <PageHeader title="Comments" subtitle="Moderate federated comments" breadcrumbs={[{ label: 'Federation', path: '/federation' }, { label: 'Comments' }]} />
+      <PageHeader title={t('federation.comments.title')} subtitle={t('federation.comments.subtitle')} breadcrumbs={[{ label: t('federation.breadcrumbs.federation'), path: '/federation' }, { label: t('federation.comments.title') }]} />
 
       <Paper>
         <TableFilterBar
           searchValue={search}
           onSearchChange={setSearch}
-          searchPlaceholder="Search comments..."
+          searchPlaceholder={t('federation.comments.searchPlaceholder')}
         />
         {isLoading ? (
-          <Box sx={{ p: 3 }}><LoadingState label="Loading comments..." /></Box>
+          <Box sx={{ p: 3 }}><LoadingState label={t('federation.comments.loading')} /></Box>
         ) : !comments || comments.length === 0 ? (
           <Box sx={{ p: 3 }}>
             <EmptyState
               icon={<CommentIcon sx={{ fontSize: 48 }} />}
-              title="No comments"
-              description="Federated comments will appear here when received."
+              title={t('federation.comments.empty')}
+              description={t('federation.comments.emptyDescription')}
             />
           </Box>
         ) : (
@@ -156,9 +158,9 @@ export default function FederationComments() {
 
       <ConfirmDialog
         open={!!deleting}
-        title="Delete Comment"
-        message={`Delete comment by ${deleting?.authorName ?? deleting?.authorActorUri}? This cannot be undone.`}
-        confirmLabel="Delete"
+        title={t('federation.comments.deleteTitle')}
+        message={t('federation.comments.deleteMessage', { name: deleting?.authorName ?? deleting?.authorActorUri })}
+        confirmLabel={t('federation.comments.deleteConfirm')}
         onConfirm={() => deleting && deleteComment.mutate(deleting.id)}
         onCancel={closeDelete}
         loading={deleteComment.isPending}
