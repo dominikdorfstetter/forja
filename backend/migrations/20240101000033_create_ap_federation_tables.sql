@@ -65,7 +65,7 @@ CREATE TABLE ap_comments (
     status ap_comment_status NOT NULL DEFAULT 'pending',
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     moderated_at TIMESTAMPTZ,
-    moderated_by UUID REFERENCES users(id)
+    moderated_by UUID
 );
 
 CREATE INDEX idx_ap_comments_site ON ap_comments(site_id, status, created_at DESC);
