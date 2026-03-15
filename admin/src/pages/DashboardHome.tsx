@@ -1,4 +1,4 @@
-import { useReducer, useCallback, useEffect } from 'react';
+import { useReducer, useCallback, useEffect, lazy, Suspense } from 'react';
 import {
   Alert,
   Box,
@@ -24,7 +24,7 @@ import AttentionPanel from '@/components/dashboard/AttentionPanel';
 import RecentActivityPanel from '@/components/dashboard/RecentActivityPanel';
 import QuickPostDialog from '@/components/blogs/QuickPostDialog';
 import TeamWorkflowPrompt from '@/components/TeamWorkflowPrompt';
-import AnalyticsWidget from '@/components/dashboard/AnalyticsWidget';
+const AnalyticsWidget = lazy(() => import('@/components/dashboard/AnalyticsWidget'));
 import SystemHealthPanel from '@/components/dashboard/SystemHealthPanel';
 import ApiKeysPanel from '@/components/dashboard/ApiKeysPanel';
 import { computeWizardDefaults } from '@/utils/onboardingDefaults';
@@ -355,8 +355,8 @@ export default function DashboardHome() {
 
         <Grid size={{ xs: 12, md: hasSite ? 5 : 12 }}>
           <Stack spacing={3}>
-            {/* Analytics — self-hides when feature is disabled */}
-            <AnalyticsWidget />
+            {/* Analytics — lazy-loaded, self-hides when feature is disabled */}
+            <Suspense fallback={null}><AnalyticsWidget /></Suspense>
 
             {/* System Health */}
             {dashboard.healthData && (

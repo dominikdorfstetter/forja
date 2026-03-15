@@ -1,4 +1,5 @@
 import { Box, Skeleton, Typography, useTheme } from '@mui/material';
+// react-doctor: recharts is lazy-loaded at the route level via React.lazy in index.ts
 import {
   AreaChart,
   Area,
