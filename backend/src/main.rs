@@ -31,7 +31,7 @@ async fn rocket() -> _ {
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "forja=debug,rocket=info,sqlx=warn".into()),
+                .unwrap_or_else(|_| "forja=info,rocket=warn,sqlx=warn".into()),
         )
         .with(tracing_subscriber::fmt::layer())
         .init();
@@ -373,6 +373,7 @@ async fn rocket() -> _ {
         }))
         .attach(FederationWorker)
         .attach(PublishScheduler)
+        .register("/", handlers::system::catchers())
         .mount("/", handlers::system::routes())
         .mount("/", handlers::federation::protocol_routes())
         .mount("/api/v1", handlers::routes())

@@ -1,10 +1,13 @@
 //! System endpoints (health check and API root)
 
+use rocket::http::{ContentType, Status};
 use rocket::response::Redirect;
 use rocket::serde::json::Json;
+use rocket::Request;
 use std::time::Instant;
 
 use crate::dto::health::{HealthResponse, ServiceHealth, StorageHealth};
+use crate::errors::ProblemDetails;
 use crate::AppState;
 
 #[utoipa::path(
@@ -176,9 +179,32 @@ pub async fn health(
     )
 }
 
+/// Catcher for 429 Too Many Requests — returns RFC 7807 JSON instead of Rocket's default HTML.
+#[catch(429)]
+pub fn too_many_requests(_req: &Request<'_>) -> (Status, (ContentType, String)) {
+    let body = ProblemDetails {
+        problem_type: "https://forja.dev/errors/rate_limited".to_string(),
+        title: "Too Many Requests".to_string(),
+        status: 429,
+        detail: Some(
+            "Rate limit exceeded. Please slow down and retry after a short delay.".to_string(),
+        ),
+        instance: None,
+        code: "RATE_LIMITED".to_string(),
+        errors: None,
+    };
+    let json = serde_json::to_string(&body).unwrap_or_default();
+    (Status::TooManyRequests, (ContentType::JSON, json))
+}
+
 use rocket::Route;
 
 /// System routes (mounted at "/")
 pub fn routes() -> Vec<Route> {
     routes![index, health]
+}
+
+/// System catchers (429, etc.)
+pub fn catchers() -> Vec<rocket::Catcher> {
+    catchers![too_many_requests]
 }
