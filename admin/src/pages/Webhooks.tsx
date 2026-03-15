@@ -12,6 +12,7 @@ import { format } from 'date-fns';
 import apiService from '@/services/api';
 import type { Webhook, CreateWebhookRequest, UpdateWebhookRequest } from '@/types/api';
 import { useSiteContext } from '@/store/SiteContext';
+import { useAuth } from '@/store/AuthContext';
 import { useListPageState } from '@/hooks/useListPageState';
 import { useCrudMutations } from '@/hooks/useCrudMutations';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
@@ -27,6 +28,7 @@ import WebhookDeliveryLog from '@/components/webhooks/WebhookDeliveryLog';
 export default function WebhooksPage() {
   const { t } = useTranslation();
   const { selectedSiteId } = useSiteContext();
+  const { isAdmin } = useAuth();
   const { showError, showSuccess } = useErrorSnackbar();
 
   const {
@@ -132,10 +134,10 @@ export default function WebhooksPage() {
       align: 'right',
       render: (wh) => (
         <>
-          <Tooltip title={t('webhooks.sendTest')}><span><IconButton size="small" onClick={() => testMutation.mutate(wh.id)} disabled={testingWebhookId === wh.id}><PlayArrowIcon fontSize="small" /></IconButton></span></Tooltip>
+          {isAdmin && <Tooltip title={t('webhooks.sendTest')}><span><IconButton size="small" onClick={() => testMutation.mutate(wh.id)} disabled={testingWebhookId === wh.id}><PlayArrowIcon fontSize="small" /></IconButton></span></Tooltip>}
           <Tooltip title={t('webhooks.viewDeliveries')}><IconButton size="small" onClick={() => setDeliveryWebhookId(wh.id)}><HistoryIcon fontSize="small" /></IconButton></Tooltip>
-          <Tooltip title={t('common.actions.edit')}><IconButton size="small" onClick={() => openEdit(wh)}><EditIcon fontSize="small" /></IconButton></Tooltip>
-          <Tooltip title={t('common.actions.delete')}><IconButton size="small" color="error" onClick={() => openDelete(wh)}><DeleteIcon fontSize="small" /></IconButton></Tooltip>
+          {isAdmin && <Tooltip title={t('common.actions.edit')}><IconButton size="small" onClick={() => openEdit(wh)}><EditIcon fontSize="small" /></IconButton></Tooltip>}
+          {isAdmin && <Tooltip title={t('common.actions.delete')}><IconButton size="small" color="error" onClick={() => openDelete(wh)}><DeleteIcon fontSize="small" /></IconButton></Tooltip>}
         </>
       ),
     },
@@ -146,7 +148,7 @@ export default function WebhooksPage() {
       <PageHeader
         title={t('webhooks.title')}
         subtitle={t('webhooks.subtitle')}
-        action={selectedSiteId ? { label: t('webhooks.addWebhook'), icon: <AddIcon />, onClick: openCreate } : undefined}
+        action={selectedSiteId ? { label: t('webhooks.addWebhook'), icon: <AddIcon />, onClick: openCreate, hidden: !isAdmin } : undefined}
       />
 
       {!selectedSiteId ? (
@@ -161,7 +163,7 @@ export default function WebhooksPage() {
           {isLoading ? (
             <Box sx={{ p: 3 }}><LoadingState label={t('webhooks.loading')} /></Box>
           ) : !webhooks || webhooks.length === 0 ? (
-            <Box sx={{ p: 3 }}><EmptyState icon={<WebhookIcon sx={{ fontSize: 48 }} />} title={t('webhooks.empty.title')} description={t('webhooks.empty.description')} action={{ label: t('webhooks.addWebhook'), onClick: openCreate }} /></Box>
+            <Box sx={{ p: 3 }}><EmptyState icon={<WebhookIcon sx={{ fontSize: 48 }} />} title={t('webhooks.empty.title')} description={t('webhooks.empty.description')} action={isAdmin ? { label: t('webhooks.addWebhook'), onClick: openCreate } : undefined} /></Box>
           ) : (
             <DataTable
               data={webhooks}
