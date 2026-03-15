@@ -2572,11 +2572,17 @@
       },
       "import": "Importeren",
       "importTitle": "Blokkeerlijst importeren",
-      "importDescription": "Plak domeinen (één per regel) of upload een CSV/TXT-bestand",
+      "importDescription": "Plak domeinen (één per regel) of upload een CSV/TXT-bestand. Ondersteunt Mastodon CSV-exports.",
       "importButton": "Domeinen importeren",
       "importSuccess": "{{imported}} domeinen geïmporteerd ({{skipped}} al geblokkeerd)",
-      "importPaste": "Plak domeinen hier (één per regel)...",
-      "importFile": "Of upload een bestand"
+      "importPaste": "Plak domeinen hier (één per regel) of de inhoud van een Mastodon CSV...",
+      "importFile": "Of upload een bestand",
+      "editReasonTitle": "Reden bewerken voor {{domain}}",
+      "editReasonTooltip": "Reden bewerken",
+      "clearAll": "Alles wissen",
+      "clearAllTitle": "Blokkeerlijst wissen",
+      "clearAllMessage": "Dit verwijdert alle geblokkeerde instanties. Deze actie kan niet ongedaan worden gemaakt.",
+      "clearAllConfirm": "Alles wissen"
     },
     "quickPost": {
       "title": "Snelbericht",
@@ -2711,6 +2717,7 @@
     "featureSeo": "SEO-geoptimaliseerd",
     "featureSeoDesc": "Ingebouwde metadata, sitemaps en gestructureerde gegevens.",
     "openSource": "Open Source",
+    "docs": "Documentatie",
     "madeWith": "Gebouwd met Rust",
     "createdBy": "Gemaakt door {{name}}",
     "madeInEu": "Ontworpen & gebouwd in de EU"

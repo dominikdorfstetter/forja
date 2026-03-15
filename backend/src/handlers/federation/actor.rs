@@ -34,14 +34,7 @@ async fn resolve_actor(
         .await?
         .ok_or_else(|| ApiError::not_found("No ActivityPub actor for this site"))?;
 
-    // Look up the primary production domain for this site
-    let domain: String = sqlx::query_scalar(
-        "SELECT domain FROM site_domains WHERE site_id = $1 AND is_primary = TRUE AND environment = 'production' LIMIT 1"
-    )
-    .bind(site.id)
-    .fetch_optional(&state.db)
-    .await?
-    .unwrap_or_else(|| "localhost".to_string());
+    let domain = Site::resolve_domain(&state.db, site.id).await?;
 
     Ok((site, actor, domain))
 }

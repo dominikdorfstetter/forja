@@ -164,6 +164,36 @@ impl Site {
         Ok(site)
     }
 
+    /// Resolve the primary production domain for a site.
+    ///
+    /// Tries: primary production domain → any active production domain → any active domain.
+    /// Returns an error if no domain is configured at all, instead of silently
+    /// falling back to "localhost" which would produce broken federation handles.
+    pub async fn resolve_domain(pool: &PgPool, site_id: Uuid) -> Result<String, ApiError> {
+        let domain: Option<String> = sqlx::query_scalar(
+            r#"
+            SELECT domain FROM site_domains
+            WHERE site_id = $1 AND is_active = TRUE
+            ORDER BY
+                (is_primary = TRUE AND environment = 'production') DESC,
+                (environment = 'production') DESC,
+                is_primary DESC,
+                created_at ASC
+            LIMIT 1
+            "#,
+        )
+        .bind(site_id)
+        .fetch_optional(pool)
+        .await?;
+
+        domain.ok_or_else(|| {
+            tracing::warn!(site_id = %site_id, "No domain configured for site");
+            ApiError::bad_request(
+                "No domain configured for this site. Add a domain before enabling federation.",
+            )
+        })
+    }
+
     /// Soft delete a site
     pub async fn soft_delete(pool: &PgPool, id: Uuid) -> Result<(), ApiError> {
         let result = sqlx::query(

@@ -24,6 +24,8 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 import BlockIcon from '@mui/icons-material/Block';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import HubIcon from '@mui/icons-material/Hub';
 import { useTranslation } from 'react-i18next';
@@ -41,11 +43,37 @@ import EmptyState from '@/components/shared/EmptyState';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import DataTable, { type DataTableColumn } from '@/components/shared/DataTable';
 
+/**
+ * Parse domains from text, supporting:
+ * - One domain per line
+ * - Mastodon CSV format (#domain,#severity,...) — extracts first column only
+ * - Plain comma-separated domain lists
+ */
 function parseDomains(text: string): string[] {
-  return text
-    .split(/[\n,]+/)
-    .map((d) => d.trim().toLowerCase())
-    .filter((d) => d.length > 0 && d.length <= 253);
+  const lines = text.split(/\r?\n/).filter((line) => line.trim().length > 0);
+  const domains: string[] = [];
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+
+    // Skip CSV header rows (Mastodon uses #domain as first column header)
+    if (trimmed.startsWith('#')) continue;
+
+    // If line contains commas, treat as CSV — extract first column only
+    if (trimmed.includes(',')) {
+      const firstCol = trimmed.split(',')[0].trim().toLowerCase();
+      if (firstCol.length > 0 && firstCol.length <= 253) {
+        domains.push(firstCol);
+      }
+    } else {
+      const domain = trimmed.toLowerCase();
+      if (domain.length > 0 && domain.length <= 253) {
+        domains.push(domain);
+      }
+    }
+  }
+
+  return domains;
 }
 
 interface ImportBlocklistDialogProps {
@@ -148,6 +176,55 @@ function ImportBlocklistDialog({ open, onClose, onImport, isPending }: ImportBlo
   );
 }
 
+interface EditReasonDialogProps {
+  open: boolean;
+  instance: FederationBlockedInstance | null;
+  onClose: () => void;
+  onSave: (domain: string, reason: string) => void;
+  isPending: boolean;
+}
+
+function EditReasonDialog({ open, instance, onClose, onSave, isPending }: EditReasonDialogProps) {
+  const { t } = useTranslation();
+  const [reason, setReason] = useState('');
+
+  const handleOpen = () => {
+    setReason(instance?.reason ?? '');
+  };
+
+  const handleSave = () => {
+    if (instance) {
+      onSave(instance.domain, reason);
+    }
+  };
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth TransitionProps={{ onEnter: handleOpen }}>
+      <DialogTitle>{t('federation.blocklist.editReasonTitle', { domain: instance?.domain })}</DialogTitle>
+      <DialogContent>
+        <TextField
+          fullWidth
+          multiline
+          minRows={2}
+          maxRows={4}
+          label={t('federation.blocklist.columns.reason')}
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+          sx={{ mt: 1 }}
+        />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose} disabled={isPending}>
+          {t('common.actions.cancel')}
+        </Button>
+        <Button variant="contained" onClick={handleSave} disabled={isPending}>
+          {t('common.actions.save')}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
 interface FederationSettingsProps {
   embedded?: boolean;
 }
@@ -161,11 +238,15 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
     updateSettings,
     rotateKeysMutation,
     unblockInstanceMutation,
+    updateBlockedInstanceMutation,
+    clearBlocklistMutation,
     importBlocklistMutation,
   } = useFederationMutations(selectedSiteId);
 
   const [rotateConfirmOpen, setRotateConfirmOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
+  const [editing, setEditing] = useState<FederationBlockedInstance | null>(null);
 
   const instanceState = useListPageState<FederationBlockedInstance>();
 
@@ -190,6 +271,13 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
     });
   };
 
+  const handleEditSave = (domain: string, reason: string) => {
+    updateBlockedInstanceMutation.mutate(
+      { domain, reason: reason || undefined },
+      { onSuccess: () => setEditing(null) },
+    );
+  };
+
   const instanceColumns: DataTableColumn<FederationBlockedInstance>[] = [
     {
       header: t('federation.blocklist.columns.domain'),
@@ -207,11 +295,18 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
       header: t('federation.blocklist.columns.actions'),
       align: 'right',
       render: (b) => (
-        <Tooltip title={t('federation.blocklist.unblockInstanceTooltip')}>
-          <IconButton size="small" color="error" onClick={() => instanceState.openDelete(b)}>
-            <DeleteIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
+        <Stack direction="row" spacing={0} justifyContent="flex-end">
+          <Tooltip title={t('federation.blocklist.editReasonTooltip')}>
+            <IconButton size="small" onClick={() => setEditing(b)}>
+              <EditIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title={t('federation.blocklist.unblockInstanceTooltip')}>
+            <IconButton size="small" color="error" onClick={() => instanceState.openDelete(b)}>
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Stack>
       ),
     },
   ];
@@ -248,13 +343,26 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
               title={t('federation.blocklist.instances')}
               avatar={<BlockIcon />}
               action={
-                <Button
-                  size="small"
-                  variant="outlined"
-                  onClick={() => setImportOpen(true)}
-                >
-                  {t('federation.blocklist.import')}
-                </Button>
+                <Stack direction="row" spacing={1}>
+                  {instanceData?.data?.length ? (
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      color="error"
+                      startIcon={<DeleteSweepIcon />}
+                      onClick={() => setClearConfirmOpen(true)}
+                    >
+                      {t('federation.blocklist.clearAll')}
+                    </Button>
+                  ) : null}
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={() => setImportOpen(true)}
+                  >
+                    {t('federation.blocklist.import')}
+                  </Button>
+                </Stack>
               }
             />
             <CardContent>
@@ -325,6 +433,14 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
         isPending={importBlocklistMutation.isPending}
       />
 
+      <EditReasonDialog
+        open={!!editing}
+        instance={editing}
+        onClose={() => setEditing(null)}
+        onSave={handleEditSave}
+        isPending={updateBlockedInstanceMutation.isPending}
+      />
+
       <ConfirmDialog
         open={rotateConfirmOpen}
         title={t('federation.settings.rotateKeysConfirm')}
@@ -344,9 +460,30 @@ export default function FederationSettingsPage({ embedded }: FederationSettingsP
         title={t('federation.blocklist.unblockInstanceTitle')}
         message={t('federation.blocklist.unblockInstanceMessage', { domain: instanceState.deleting?.domain })}
         confirmLabel={t('federation.blocklist.unblockConfirm')}
-        onConfirm={() => instanceState.deleting && unblockInstanceMutation.mutate(instanceState.deleting.id)}
+        onConfirm={() => {
+          if (instanceState.deleting) {
+            unblockInstanceMutation.mutate(instanceState.deleting.domain, {
+              onSuccess: () => instanceState.closeDelete(),
+            });
+          }
+        }}
         onCancel={instanceState.closeDelete}
         loading={unblockInstanceMutation.isPending}
+      />
+
+      <ConfirmDialog
+        open={clearConfirmOpen}
+        title={t('federation.blocklist.clearAllTitle')}
+        message={t('federation.blocklist.clearAllMessage')}
+        confirmLabel={t('federation.blocklist.clearAllConfirm')}
+        confirmColor="error"
+        onConfirm={() => {
+          clearBlocklistMutation.mutate(undefined, {
+            onSuccess: () => setClearConfirmOpen(false),
+          });
+        }}
+        onCancel={() => setClearConfirmOpen(false)}
+        loading={clearBlocklistMutation.isPending}
       />
     </Box>
   );

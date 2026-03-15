@@ -218,13 +218,7 @@ async fn federate_note(pool: &PgPool, note: &ApNote) -> Result<(), crate::errors
         .await?
         .ok_or_else(|| crate::errors::ApiError::internal("No actor for site"))?;
 
-    let domain: String = sqlx::query_scalar(
-        "SELECT domain FROM site_domains WHERE site_id = $1 AND is_primary = TRUE AND environment = 'production' LIMIT 1"
-    )
-    .bind(note.site_id)
-    .fetch_optional(pool)
-    .await?
-    .unwrap_or_else(|| "localhost".to_string());
+    let domain = Site::resolve_domain(pool, note.site_id).await?;
 
     let actor_uri = actor.actor_uri(&domain, &site.slug);
     let note_uri = format!("https://{}/ap/{}/notes/{}", domain, site.slug, note.id);

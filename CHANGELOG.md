@@ -1,5 +1,28 @@
 # Changelog
 
+## v1.0.8
+
+### Fixed
+
+- **Federation handle showing `@user@localhost`** — centralized domain resolution into `Site::resolve_domain()` with smart fallback chain (primary production → any production → any active domain). Returns an error instead of silently defaulting to `localhost`, which produced broken ActivityPub handles and actor URIs
+- **Blocked instances not displaying after import** — backend `list_blocked_instances` now returns paginated response matching the frontend's expected `Paginated<>` format
+- **Unblock instance silently failing** — frontend was sending the block UUID to a backend route that expects the domain string; now sends the domain correctly
+- **Mastodon CSV blocklist import** — `parseDomains()` now handles Mastodon's multi-column CSV export format (skips `#`-prefixed headers, extracts first column only)
+- **Docusaurus baseUrl** — changed from `/forja/` to `/`
+
+### Added
+
+- **Edit block reason** — `PUT /sites/:id/federation/blocks/instances/:domain` endpoint and edit button in the admin UI
+- **Clear entire blocklist** — `DELETE /sites/:id/federation/blocks/instances` endpoint (Owner only) and "Clear All" button with confirmation dialog
+- Full i18n support for new blocklist features across all 8 languages
+
+### Changed
+
+- **Docker build optimization** — implemented `cargo-chef` dependency caching pattern in Dockerfile, reducing rebuild time from ~2 hours to ~20 minutes when only source code changes
+- CI Docker build now uses Buildx with GitHub Actions layer cache (`type=gha`)
+- Increased `CARGO_PROFILE_RELEASE_CODEGEN_UNITS` to 4 in Docker builds for faster compilation
+- Removed 7 copy-pasted domain resolution queries across federation handlers in favor of shared `Site::resolve_domain()`
+
 ## v1.0.7
 
 ### Added

@@ -2572,11 +2572,17 @@
       },
       "import": "Importieren",
       "importTitle": "Sperrliste importieren",
-      "importDescription": "Domains einfügen (eine pro Zeile) oder eine CSV-/TXT-Datei hochladen",
+      "importDescription": "Domains einfügen (eine pro Zeile) oder eine CSV-/TXT-Datei hochladen. Mastodon-Export-CSV wird unterstützt.",
       "importButton": "Domains importieren",
       "importSuccess": "{{imported}} Domains importiert ({{skipped}} bereits gesperrt)",
-      "importPaste": "Domains hier einfügen (eine pro Zeile)...",
-      "importFile": "Oder Datei hochladen"
+      "importPaste": "Domains hier einfügen (eine pro Zeile oder Mastodon-CSV)...",
+      "importFile": "Oder Datei hochladen",
+      "editReasonTitle": "Grund bearbeiten für {{domain}}",
+      "editReasonTooltip": "Grund bearbeiten",
+      "clearAll": "Alle löschen",
+      "clearAllTitle": "Sperrliste leeren",
+      "clearAllMessage": "Alle gesperrten Instanzen werden entfernt. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "clearAllConfirm": "Alle löschen"
     },
     "quickPost": {
       "title": "Schnellbeitrag",
@@ -2711,6 +2717,7 @@
     "featureSeo": "SEO-optimiert",
     "featureSeoDesc": "Integrierte Metadaten, Sitemaps und strukturierte Daten.",
     "openSource": "Open Source",
+    "docs": "Dokumentation",
     "madeWith": "Gebaut mit Rust",
     "createdBy": "Erstellt von {{name}}",
     "madeInEu": "Entworfen & gebaut in der EU"

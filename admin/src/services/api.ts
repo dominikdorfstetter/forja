@@ -1222,8 +1222,16 @@ class ApiService {
     return apiRequest<FederationBlockedInstance>('POST', `/sites/${siteId}/federation/blocks/instances`, data);
   }
 
-  async unblockInstance(siteId: string, blockId: string): Promise<void> {
-    return apiRequest<void>('DELETE', `/sites/${siteId}/federation/blocks/instances/${blockId}`);
+  async unblockInstance(siteId: string, domain: string): Promise<void> {
+    return apiRequest<void>('DELETE', `/sites/${siteId}/federation/blocks/instances/${encodeURIComponent(domain)}`);
+  }
+
+  async updateBlockedInstance(siteId: string, domain: string, data: { domain: string; reason?: string }): Promise<FederationBlockedInstance> {
+    return apiRequest<FederationBlockedInstance>('PUT', `/sites/${siteId}/federation/blocks/instances/${encodeURIComponent(domain)}`, data);
+  }
+
+  async clearBlocklist(siteId: string): Promise<void> {
+    return apiRequest<void>('DELETE', `/sites/${siteId}/federation/blocks/instances`);
   }
 
   async importBlocklist(siteId: string, domains: string[]): Promise<BlocklistImportResult> {

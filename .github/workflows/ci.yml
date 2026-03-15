@@ -225,8 +225,17 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Build Docker image
-        run: docker build -t forja:ci-test .
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build Docker image (with layer cache)
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: false
+          tags: forja:ci-test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   ci-pass:
     name: CI Pass

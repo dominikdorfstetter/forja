@@ -90,6 +90,40 @@ impl ApBlockedInstance {
         Ok(())
     }
 
+    /// Update the reason for a blocked instance domain. Returns None if not found.
+    pub async fn update_reason(
+        pool: &PgPool,
+        actor_id: Uuid,
+        instance_domain: &str,
+        reason: Option<&str>,
+    ) -> Result<Option<Self>, ApiError> {
+        let updated = sqlx::query_as::<_, Self>(
+            r#"
+            UPDATE ap_blocked_instances
+            SET reason = $3
+            WHERE actor_id = $1 AND instance_domain = $2
+            RETURNING *
+            "#,
+        )
+        .bind(actor_id)
+        .bind(instance_domain)
+        .bind(reason)
+        .fetch_optional(pool)
+        .await?;
+
+        Ok(updated)
+    }
+
+    /// Delete all blocked instances for an actor.
+    pub async fn delete_all(pool: &PgPool, actor_id: Uuid) -> Result<(), ApiError> {
+        sqlx::query("DELETE FROM ap_blocked_instances WHERE actor_id = $1")
+            .bind(actor_id)
+            .execute(pool)
+            .await?;
+
+        Ok(())
+    }
+
     /// Bulk-block a list of instance domains. Skips duplicates via ON CONFLICT DO NOTHING.
     /// Returns the count of actually inserted rows.
     pub async fn bulk_block_instances(

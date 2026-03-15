@@ -2572,11 +2572,17 @@
       },
       "import": "Importer",
       "importTitle": "Importer une liste de blocage",
-      "importDescription": "Collez des domaines (un par ligne) ou importez un fichier CSV/TXT",
+      "importDescription": "Collez des domaines (un par ligne) ou importez un fichier CSV/TXT. Prend en charge les exports CSV de Mastodon.",
       "importButton": "Importer les domaines",
       "importSuccess": "{{imported}} domaines importés ({{skipped}} déjà bloqués)",
-      "importPaste": "Collez les domaines ici (un par ligne)...",
-      "importFile": "Ou importer un fichier"
+      "importPaste": "Collez les domaines ici (un par ligne) ou le contenu d'un CSV Mastodon...",
+      "importFile": "Ou importer un fichier",
+      "editReasonTitle": "Modifier la raison pour {{domain}}",
+      "editReasonTooltip": "Modifier la raison",
+      "clearAll": "Tout supprimer",
+      "clearAllTitle": "Vider la liste de blocage",
+      "clearAllMessage": "Cela supprimera toutes les instances bloquées. Cette action est irréversible.",
+      "clearAllConfirm": "Tout supprimer"
     },
     "quickPost": {
       "title": "Publication rapide",
@@ -2711,6 +2717,7 @@
     "featureSeo": "Optimisé SEO",
     "featureSeoDesc": "Métadonnées, sitemaps et données structurées intégrés.",
     "openSource": "Open Source",
+    "docs": "Documentation",
     "madeWith": "Construit avec Rust",
     "createdBy": "Créé par {{name}}",
     "madeInEu": "Conçu & construit dans l'UE"
