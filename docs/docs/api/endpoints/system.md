@@ -13,6 +13,7 @@ System endpoints provide health checks, version information, and public configur
 | GET | `/` | No | API index -- returns version string |
 | GET | `/health` | No | Health check with service status |
 | GET | `/config` | No | Public frontend configuration |
+| GET | `/error-codes` | No | Error code catalog |
 
 ## API Index
 
@@ -101,5 +102,35 @@ curl https://your-domain.com/api/v1/config
 {
   "clerk_publishable_key": "pk_live_abc123...",
   "app_name": "Forja"
+}
+```
+
+## Error Code Catalog
+
+Returns the full catalog of machine-readable error codes used by the API. Each entry includes the code, its domain, the HTTP status it typically produces, and a human-readable description. This endpoint does not require authentication.
+
+```bash
+curl https://your-domain.com/api/v1/error-codes
+```
+
+**Response** `200 OK`
+
+```json
+{
+  "total": 42,
+  "codes": [
+    {
+      "code": "BLOG_NOT_FOUND",
+      "domain": "blog",
+      "http_status": 404,
+      "description": "The requested blog post does not exist"
+    },
+    {
+      "code": "SITE_SLUG_TAKEN",
+      "domain": "site",
+      "http_status": 409,
+      "description": "A site with this slug already exists"
+    }
+  ]
 }
 ```

@@ -2,7 +2,7 @@
 
 Multi-site CMS REST API built with Rust and Rocket.
 
-> Full documentation: **[dominikdorfstetter.github.io/forja](https://dominikdorfstetter.github.io/forja/)**
+> Full documentation: **[forja-docs.dorfstetter.at](https://forja-docs.dorfstetter.at)**
 
 ## Tech Stack
 
@@ -60,7 +60,7 @@ Multi-site CMS REST API built with Rust and Rocket.
 
 API: `http://localhost:8000` · Swagger UI: `http://localhost:8000/api-docs`
 
-See the [Getting Started guide](https://dominikdorfstetter.github.io/forja/getting-started) for full setup instructions.
+See the [Getting Started guide](https://forja-docs.dorfstetter.at/getting-started) for full setup instructions.
 
 ## Authentication
 
@@ -69,7 +69,7 @@ Forja supports dual authentication. Every protected endpoint accepts either meth
 - **API Key**: `X-API-Key` header with permission levels Master > Admin > Write > Read
 - **Clerk JWT**: `Authorization: Bearer <token>` for browser sessions
 
-See the [Authentication guide](https://dominikdorfstetter.github.io/forja/architecture/authentication) for details.
+See the [Authentication guide](https://forja-docs.dorfstetter.at/architecture/authentication) for details.
 
 ## Development
 
@@ -103,7 +103,7 @@ backend/
 └── .env.example         # Environment template
 ```
 
-See the [Architecture overview](https://dominikdorfstetter.github.io/forja/architecture/) and [API reference](https://dominikdorfstetter.github.io/forja/api/) for detailed documentation.
+See the [Architecture overview](https://forja-docs.dorfstetter.at/architecture/overview) and [API reference](https://forja-docs.dorfstetter.at/api/overview) for detailed documentation.
 
 ## License
 

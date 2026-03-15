@@ -2,7 +2,7 @@
 
 Helper scripts for managing the local development environment. Run from the repo root.
 
-> Full documentation: **[dominikdorfstetter.github.io/forja](https://dominikdorfstetter.github.io/forja/)**
+> Full documentation: **[forja-docs.dorfstetter.at](https://forja-docs.dorfstetter.at)**
 
 ## Scripts
 

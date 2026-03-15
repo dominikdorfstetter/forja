@@ -44,7 +44,25 @@ Pages can be assigned a type that defines their purpose and structure. Common pa
 
 ## Page Sections
 
-Pages in Forja are composed of **sections**. Each section is a content block within the page, allowing you to build complex page layouts:
+Pages in Forja are composed of **sections**. Each section is a content block within the page, allowing you to build complex page layouts.
+
+### Section Types
+
+Every section has a `section_type` that determines its purpose and the fields available for editing. The following types are supported:
+
+| Section Type | Description |
+|--------------|-------------|
+| **Hero** | Hero banner with heading, subheading, call-to-action button, and background image. Typically used as the first section on a landing page. |
+| **Features** | A grid of feature cards, each with an icon, title, and short description. |
+| **CTA** | A prominent call-to-action block with a button -- used to drive conversions or guide visitors to a next step. |
+| **Gallery** | An image gallery or grid, pulling images from the media library. |
+| **Testimonials** | Customer or user testimonial cards with quote, author name, and optional avatar. |
+| **Pricing** | Pricing table or cards for comparing plans or packages. |
+| **FAQ** | Frequently asked questions presented as expandable/collapsible items. |
+| **Contact** | Contact form or contact information block (email, phone, address). |
+| **Custom** | Freeform content section -- accepts Markdown or HTML for layouts that don't fit the predefined types. |
+
+Each section also carries a `display_order` value that controls its position on the page, and all section content can be **localized per locale** (see [Localizations](#localizations) below).
 
 ### Adding a Section
 

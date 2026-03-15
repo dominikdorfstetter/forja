@@ -2,7 +2,7 @@
 
 React-based admin interface for managing Forja CMS content.
 
-> Full documentation: **[dominikdorfstetter.github.io/forja](https://dominikdorfstetter.github.io/forja/)**
+> Full documentation: **[forja-docs.dorfstetter.at](https://forja-docs.dorfstetter.at)**
 
 ## Tech Stack
 
@@ -60,4 +60,4 @@ npm run test:coverage    # Coverage report
 
 The admin communicates with the backend REST API at `/api/v1`. Authentication is handled by Clerk — JWT tokens are attached to all API requests via the `Authorization: Bearer` header.
 
-See the [API reference](https://dominikdorfstetter.github.io/forja/api/) for endpoint details.
+See the [API reference](https://forja-docs.dorfstetter.at/api/overview) for endpoint details.

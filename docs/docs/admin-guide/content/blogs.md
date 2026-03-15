@@ -148,13 +148,49 @@ Toggle the featured flag in the post editor.
 
 ## Review Workflow
 
-For teams, Forja supports a basic review workflow:
+:::info
+The editorial workflow is **feature-gated**. An Admin or Master must enable it in **Settings > Site Settings** under the "Editorial Workflow" toggle before these features become available.
+:::
+
+For teams, Forja supports a structured editorial workflow with the following states:
+
+### State Machine
+
+```
+Draft ──▶ In Review ──▶ Published
+  ▲            │
+  └────────────┘  (Request Changes)
+
+Draft ──▶ Scheduled ──▶ Published  (via publish date)
+
+Any state ──▶ Archived
+```
+
+| State | Meaning |
+|-------|---------|
+| **Draft** | Work in progress. Only visible to team members in the admin. |
+| **In Review** | Submitted for editorial review. Waiting for an Admin or Master to act. |
+| **Published** | Live on the site and available via the public API. |
+| **Scheduled** | Will be published automatically at the configured date and time. |
+| **Archived** | Removed from the public site but retained in the system for reference. |
+
+### Review Actions
+
+When a post is **In Review**, reviewers can take one of two actions:
+
+- **Approve** -- moves the post to **Published** (or **Scheduled** if a future publish date is set).
+- **Request Changes** -- moves the post back to **Draft** so the author can revise it. The author receives a notification (see [Notifications](../notifications)).
+
+### Who Can Review
+
+Only users with the **Admin** or **Master** role on the site can approve posts or request changes. Writers (Write role) can submit content for review but cannot approve their own posts.
+
+### Typical Flow
 
 1. A writer creates a post and saves it as **Draft**.
-2. When ready for review, the writer changes the status to **In Review**.
-3. A reviewer or admin reviews the post and either:
-   - **Publishes** it (status changes to Published).
-   - **Requests changes** (status stays In Review, and feedback can be communicated via the team's preferred channel).
+2. When ready, the writer changes the status to **In Review**.
+3. An admin reviews the post and either approves it or requests changes.
+4. If changes are requested, the writer revises and resubmits.
 
 ## Cloning
 

@@ -28,6 +28,8 @@ Blog posts are the primary content type in Forja. They support localization, cat
 | DELETE | `/blogs/localizations/{loc_id}` | Editor | Delete a localization |
 | GET | `/sites/{site_id}/feed.rss` | Read | RSS 2.0 feed of published posts |
 | POST | `/sites/{site_id}/blogs/bulk` | Author/Editor | Bulk status update or delete |
+| POST | `/sites/{site_id}/blogs/seed` | Author | Seed sample blog content |
+| DELETE | `/sites/{site_id}/blogs/samples` | Editor | Delete sample blog content |
 
 ## List Blogs
 
@@ -116,4 +118,34 @@ curl -X POST \
     "status": "Published"
   }' \
   https://your-domain.com/api/v1/sites/{site_id}/blogs/bulk
+```
+
+## Seed Sample Content
+
+Creates 3 sample draft blog posts for a new site, marked as samples. Useful for onboarding so new sites are not empty. Returns `400` if sample content already exists.
+
+```bash
+curl -X POST \
+  -H "X-API-Key: oy_live_abc123..." \
+  https://your-domain.com/api/v1/sites/{site_id}/blogs/seed
+```
+
+**Response** `201 Created` -- Returns an array of the created `BlogResponse` objects.
+
+## Delete Sample Content
+
+Deletes all blog posts marked as sample content for a site. Requires Editor role.
+
+```bash
+curl -X DELETE \
+  -H "X-API-Key: oy_live_abc123..." \
+  https://your-domain.com/api/v1/sites/{site_id}/blogs/samples
+```
+
+**Response** `200 OK`
+
+```json
+{
+  "deleted": 3
+}
 ```

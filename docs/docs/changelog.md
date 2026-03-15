@@ -6,6 +6,27 @@ sidebar_position: 100
 
 This page tracks the release history of Forja. For the most up-to-date changelog, see the [CHANGELOG.md](https://github.com/dominikdorfstetter/forja/blob/main/CHANGELOG.md) file in the repository.
 
+## v1.0.10
+
+### Added
+
+- **Configurable rate limit fail mode** -- new `RATE_LIMIT_FAIL_MODE` env var (`open` or `closed`) controls whether requests are allowed or rejected when Redis is unavailable
+- **Proxy-aware IP extraction** -- new `TRUST_PROXY_HEADERS` env var enables reading client IPs from `X-Forwarded-For` and `X-Real-IP` headers for correct rate limiting behind reverse proxies
+
+### Fixed
+
+- **Federation domain using per-site domains** -- federation now uses the app public URL (`PUBLIC_URL`) for the federation domain instead of per-site custom domains, ensuring consistent actor identities
+- **Logging severity levels** -- adjusted log levels across the backend for clearer operational diagnostics; raised Clerk rate limits and added a 429 status catcher
+- **Missing RBAC guards on mutation handlers** -- all mutation API handlers now enforce `WriteKey`/`AdminKey` authorization
+- **Missing RBAC guards on Webhooks page** -- admin UI Webhooks page now respects role-based access control
+- **Missing RBAC guards on Redirects page** -- admin UI Redirects page now respects role-based access control
+
+### Changed
+
+- Updated rate-limiting, authentication, and configuration documentation to cover new options
+
+---
+
 ## v1.0.9
 
 ### Fixed

@@ -49,10 +49,42 @@ Click **Delete** on an entry and confirm. The entry is permanently removed.
 
 Skills are separate from CV entries and represent your competencies (e.g., "Rust", "TypeScript", "PostgreSQL").
 
+### Skill Categories
+
+Each skill is assigned to a category that groups it on your CV:
+
+| Category | Examples |
+|----------|----------|
+| **Programming** | Rust, TypeScript, Python |
+| **Framework** | React, Actix Web, Next.js |
+| **Database** | PostgreSQL, Redis, MongoDB |
+| **DevOps** | Docker, Kubernetes, CI/CD |
+| **Language** | English, German, French |
+| **SoftSkill** | Leadership, Communication |
+| **Tool** | Git, Figma, VS Code |
+| **Other** | Anything that doesn't fit the above |
+
+### Proficiency Levels
+
+Proficiency is expressed as a value from **0 to 100**:
+
+| Range | Level |
+|-------|-------|
+| 0 -- 25 | Beginner |
+| 25 -- 50 | Intermediate |
+| 50 -- 75 | Advanced |
+| 75 -- 100 | Expert |
+
+Your frontend template can render these as progress bars, star ratings, or any other visual format.
+
+### Skill Slugs
+
+Each skill can have a **slug** -- a URL-friendly identifier (e.g., `react`, `type-script`). Slugs are useful if your template links to dedicated skill detail pages or filters content by skill.
+
 ### Managing Skills
 
 1. In the CV section, switch to the **Skills** tab (if available) or scroll to the skills area.
-2. Add a new skill by entering the skill name and an optional proficiency level.
+2. Add a new skill by entering the skill name, selecting a category, and setting a proficiency level.
 3. Reorder skills to control their display order.
 4. Delete skills by clicking the remove icon.
 

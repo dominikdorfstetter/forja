@@ -2,7 +2,7 @@
 
 A server-rendered blog and portfolio site powered by [Astro](https://astro.build) and the Forja CMS backend.
 
-> Full documentation: **[dominikdorfstetter.github.io/forja](https://dominikdorfstetter.github.io/forja/)**
+> Full documentation: **[forja-docs.dorfstetter.at](https://forja-docs.dorfstetter.at)**
 
 ## Tech Stack
 
@@ -69,4 +69,4 @@ node dist/server/entry.mjs
 
 Since the template uses SSR, the build output is a Node.js server.
 
-See the [Templates guide](https://dominikdorfstetter.github.io/forja/guides/templates) for customization details.
+See the [Templates guide](https://forja-docs.dorfstetter.at/templates/overview) for customization details.

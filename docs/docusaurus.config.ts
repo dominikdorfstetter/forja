@@ -9,7 +9,7 @@ const config: Config = {
   tagline: 'Forge your content — a multi-site CMS built with Rust and React',
   favicon: 'img/logo.svg',
 
-  url: 'https://dominikdorfstetter.github.io',
+  url: 'https://forja-docs.dorfstetter.at',
   baseUrl: '/',
 
   organizationName: 'dominikdorfstetter',

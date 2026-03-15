@@ -239,3 +239,29 @@ Settings are loaded from environment variables with the `APP__` prefix (double u
 | `STORAGE_PROVIDER` | `local` or `s3` | `local` |
 | `APP__PORT` | Server port | `8000` |
 | `APP__HOST` | Bind address | `0.0.0.0` |
+
+## Background Services
+
+The backend spawns long-running background workers when the server starts. These are registered as Rocket fairings and launched in the `on_liftoff` lifecycle hook, running as Tokio background tasks alongside the main request-handling loop.
+
+### Publish Scheduler
+
+The publish scheduler enables timed content publishing. It runs on a **60-second polling interval**, checking for content whose `publish_start` timestamp has passed but whose status has not yet been set to Published.
+
+- Spawned on server startup via a Rocket `on_liftoff` fairing
+- Polls the database every 60 seconds for publishable content
+- Auto-publishes content by setting its status to `Published`
+- Supports both regular content types (blogs, pages) and federated notes
+- Runs as a Tokio background task for the lifetime of the server
+
+### Federation Worker
+
+The federation worker handles asynchronous processing of ActivityPub activities for the Fediverse integration. It manages both inbound messages (from remote followers) and outbound deliveries (to remote servers).
+
+- Spawned on server startup via a Rocket `on_liftoff` fairing
+- Polls every 5 seconds for pending inbound and outbound ActivityPub activities
+- Processes ActivityPub inbox messages received from remote followers
+- Dispatches outbound activity deliveries with HTTP signature signing
+- Bounded concurrency: max 10 outbound tasks, 5 inbound tasks at a time
+- Purges dead-letter jobs hourly (activities that exceeded the retry limit)
+- Only runs when federation is enabled for at least one site

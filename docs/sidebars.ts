@@ -68,8 +68,11 @@ const sidebars: SidebarsConfig = {
       label: 'Admin Guide',
       items: [
         'admin-guide/overview',
+        'admin-guide/onboarding',
         'admin-guide/authentication',
         'admin-guide/dashboard',
+        'admin-guide/my-drafts',
+        'admin-guide/profile',
         'admin-guide/sites',
         'admin-guide/site-modules',
         {
@@ -97,8 +100,10 @@ const sidebars: SidebarsConfig = {
         'admin-guide/ai-content-assist',
         'admin-guide/analytics',
         'admin-guide/locales',
+        'admin-guide/bulk-operations',
         'admin-guide/command-palette',
         'admin-guide/content-templates',
+        'admin-guide/help-system',
       ],
     },
     {
