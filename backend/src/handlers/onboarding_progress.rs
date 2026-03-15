@@ -9,7 +9,7 @@ use crate::dto::onboarding_progress::{
     CompleteStepRequest, OnboardingProgressResponse, OnboardingStepResponse,
 };
 use crate::errors::{codes, ApiError, ProblemDetails};
-use crate::guards::auth_guard::{AuthSource, ReadKey};
+use crate::guards::auth_guard::{AuthSource, AuthenticatedKey, ReadKey, WriteKey};
 use crate::models::onboarding_progress::OnboardingProgress;
 use crate::models::site_membership::SiteRole;
 use crate::AppState;
@@ -42,7 +42,7 @@ pub async fn get_onboarding_progress(
         .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)
         .await?;
 
-    let clerk_user_id = extract_clerk_user_id(&auth)?;
+    let clerk_user_id = extract_clerk_user_id(&auth.0)?;
 
     let steps = OnboardingProgress::find_for_user_site(&state.db, &clerk_user_id, site_id).await?;
 
@@ -97,13 +97,13 @@ pub async fn complete_onboarding_step(
     state: &State<AppState>,
     site_id: Uuid,
     body: Json<CompleteStepRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Json<OnboardingProgressResponse>, ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Viewer)
         .await?;
 
-    let clerk_user_id = extract_clerk_user_id(&auth)?;
+    let clerk_user_id = extract_clerk_user_id(&auth.0)?;
 
     let req = body.into_inner();
     req.validate()
@@ -145,8 +145,8 @@ pub async fn complete_onboarding_step(
 }
 
 /// Extract clerk_user_id from auth, returning an error for API key auth
-fn extract_clerk_user_id(auth: &ReadKey) -> Result<String, ApiError> {
-    match &auth.0.auth_source {
+fn extract_clerk_user_id(auth: &AuthenticatedKey) -> Result<String, ApiError> {
+    match &auth.auth_source {
         AuthSource::ClerkJwt { clerk_user_id } => Ok(clerk_user_id.clone()),
         AuthSource::ApiKey => Err(ApiError::bad_request(
             "Onboarding progress requires Clerk authentication",

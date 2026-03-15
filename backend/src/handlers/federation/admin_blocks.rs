@@ -13,7 +13,7 @@ use crate::dto::federation::responses::{
     BlockedActorResponse, BlockedInstanceResponse, BlocklistImportResponse,
 };
 use crate::errors::{ApiError, ProblemDetails};
-use crate::guards::auth_guard::ReadKey;
+use crate::guards::auth_guard::{AdminKey, ReadKey};
 use crate::guards::federation_guard::can_manage_federation;
 use crate::guards::module_guard::{FederationModule, ModuleGuard};
 use crate::models::federation::actor::ApActor;
@@ -124,7 +124,7 @@ pub async fn block_instance(
     state: &State<AppState>,
     site_id: Uuid,
     body: Json<BlockInstanceRequest>,
-    auth: ReadKey,
+    auth: AdminKey,
     _module: ModuleGuard<FederationModule>,
 ) -> Result<Json<BlockedInstanceResponse>, ApiError> {
     let role = auth
@@ -181,7 +181,7 @@ pub async fn update_blocked_instance(
     site_id: Uuid,
     domain: &str,
     body: Json<BlockInstanceRequest>,
-    auth: ReadKey,
+    auth: AdminKey,
     _module: ModuleGuard<FederationModule>,
 ) -> Result<Json<BlockedInstanceResponse>, ApiError> {
     let role = auth
@@ -229,7 +229,7 @@ pub async fn unblock_instance(
     state: &State<AppState>,
     site_id: Uuid,
     domain: &str,
-    auth: ReadKey,
+    auth: AdminKey,
     _module: ModuleGuard<FederationModule>,
 ) -> Result<Status, ApiError> {
     let role = auth
@@ -268,7 +268,7 @@ pub async fn unblock_instance(
 pub async fn clear_blocklist(
     state: &State<AppState>,
     site_id: Uuid,
-    auth: ReadKey,
+    auth: AdminKey,
     _module: ModuleGuard<FederationModule>,
 ) -> Result<Status, ApiError> {
     let role = auth
@@ -312,7 +312,7 @@ pub async fn import_blocklist(
     state: &State<AppState>,
     site_id: Uuid,
     body: Json<ImportBlocklistRequest>,
-    auth: ReadKey,
+    auth: AdminKey,
     _module: ModuleGuard<FederationModule>,
 ) -> Result<Json<BlocklistImportResponse>, ApiError> {
     let role = auth
@@ -425,7 +425,7 @@ pub async fn block_actor(
     state: &State<AppState>,
     site_id: Uuid,
     body: Json<BlockActorRequest>,
-    auth: ReadKey,
+    auth: AdminKey,
     _module: ModuleGuard<FederationModule>,
 ) -> Result<Json<BlockedActorResponse>, ApiError> {
     let role = auth
@@ -477,7 +477,7 @@ pub async fn unblock_actor(
     state: &State<AppState>,
     site_id: Uuid,
     actor_uri: &str,
-    auth: ReadKey,
+    auth: AdminKey,
     _module: ModuleGuard<FederationModule>,
 ) -> Result<Status, ApiError> {
     let role = auth

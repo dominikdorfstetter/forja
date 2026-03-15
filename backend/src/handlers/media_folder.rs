@@ -10,7 +10,7 @@ use crate::dto::media_folder::{
     CreateMediaFolderRequest, MediaFolderResponse, UpdateMediaFolderRequest,
 };
 use crate::errors::{ApiError, ProblemDetails};
-use crate::guards::auth_guard::ReadKey;
+use crate::guards::auth_guard::{ReadKey, WriteKey};
 use crate::models::media_folder::MediaFolder;
 use crate::models::site_membership::SiteRole;
 use crate::AppState;
@@ -61,7 +61,7 @@ pub async fn create_media_folder(
     state: &State<AppState>,
     site_id: Uuid,
     body: Json<CreateMediaFolderRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<(Status, Json<MediaFolderResponse>), ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Author)
@@ -93,7 +93,7 @@ pub async fn update_media_folder(
     state: &State<AppState>,
     id: Uuid,
     body: Json<UpdateMediaFolderRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Json<MediaFolderResponse>, ApiError> {
     let existing = MediaFolder::find_by_id(&state.db, id).await?;
     auth.0
@@ -125,7 +125,7 @@ pub async fn update_media_folder(
 pub async fn delete_media_folder(
     state: &State<AppState>,
     id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Status, ApiError> {
     let existing = MediaFolder::find_by_id(&state.db, id).await?;
     auth.0

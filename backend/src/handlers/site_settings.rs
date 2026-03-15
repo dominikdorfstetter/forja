@@ -7,7 +7,7 @@ use validator::Validate;
 
 use crate::dto::site_settings::{SiteSettingsResponse, UpdateSiteSettingsRequest};
 use crate::errors::{ApiError, ProblemDetails};
-use crate::guards::auth_guard::ReadKey;
+use crate::guards::auth_guard::{AdminKey, ReadKey};
 use crate::models::site::Site;
 use crate::models::site_membership::SiteRole;
 use crate::models::site_settings::SiteSetting;
@@ -64,7 +64,7 @@ pub async fn update_site_settings(
     state: &State<AppState>,
     site_id: Uuid,
     body: Json<UpdateSiteSettingsRequest>,
-    auth: ReadKey,
+    auth: AdminKey,
 ) -> Result<Json<SiteSettingsResponse>, ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Admin)

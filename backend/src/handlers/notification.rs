@@ -8,14 +8,14 @@ use crate::dto::notification::{
     MarkAllReadResponse, NotificationResponse, PaginatedNotifications, UnreadCountResponse,
 };
 use crate::errors::{codes, ApiError, ProblemDetails};
-use crate::guards::auth_guard::ReadKey;
+use crate::guards::auth_guard::{AuthenticatedKey, ReadKey, WriteKey};
 use crate::models::notification::Notification;
 use crate::utils::list_params::ListParams;
 use crate::AppState;
 
 /// Helper: extract clerk_user_id or return 403.
-fn require_clerk_user_id(auth: &ReadKey) -> Result<&str, ApiError> {
-    auth.0.clerk_user_id().ok_or_else(|| {
+fn require_clerk_user_id(auth: &AuthenticatedKey) -> Result<&str, ApiError> {
+    auth.clerk_user_id().ok_or_else(|| {
         ApiError::forbidden("Notification endpoints require Clerk JWT authentication")
             .with_code(codes::NOTIFICATION_REQUIRES_CLERK)
     })
@@ -50,7 +50,7 @@ pub async fn list_notifications(
     sort_dir: Option<String>,
     auth: ReadKey,
 ) -> Result<Json<PaginatedNotifications>, ApiError> {
-    let clerk_id = require_clerk_user_id(&auth)?;
+    let clerk_id = require_clerk_user_id(&auth.0)?;
     let params = ListParams::new(page, page_size.or(Some(20)), None, sort_by, sort_dir);
 
     let notifications =
@@ -87,7 +87,7 @@ pub async fn get_unread_count(
     site_id: Uuid,
     auth: ReadKey,
 ) -> Result<Json<UnreadCountResponse>, ApiError> {
-    let clerk_id = require_clerk_user_id(&auth)?;
+    let clerk_id = require_clerk_user_id(&auth.0)?;
     let unread_count = Notification::count_unread(&state.db, clerk_id, site_id).await?;
     Ok(Json(UnreadCountResponse { unread_count }))
 }
@@ -112,9 +112,9 @@ pub async fn get_unread_count(
 pub async fn mark_notification_read(
     state: &State<AppState>,
     id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Json<NotificationResponse>, ApiError> {
-    let clerk_id = require_clerk_user_id(&auth)?;
+    let clerk_id = require_clerk_user_id(&auth.0)?;
 
     // Ownership check
     let notification = Notification::find_by_id(&state.db, id).await?;
@@ -148,9 +148,9 @@ pub async fn mark_notification_read(
 pub async fn mark_all_notifications_read(
     state: &State<AppState>,
     site_id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Json<MarkAllReadResponse>, ApiError> {
-    let clerk_id = require_clerk_user_id(&auth)?;
+    let clerk_id = require_clerk_user_id(&auth.0)?;
     let updated = Notification::mark_all_read(&state.db, clerk_id, site_id).await?;
     Ok(Json(MarkAllReadResponse { updated }))
 }

@@ -11,7 +11,7 @@ use crate::dto::redirect::{
     UpdateRedirectRequest,
 };
 use crate::errors::{codes, ApiError, ProblemDetails};
-use crate::guards::auth_guard::ReadKey;
+use crate::guards::auth_guard::{ReadKey, WriteKey};
 use crate::models::audit::AuditAction;
 use crate::models::redirect::Redirect;
 use crate::models::site_membership::SiteRole;
@@ -112,7 +112,7 @@ pub async fn create_redirect(
     state: &State<AppState>,
     site_id: Uuid,
     body: Json<CreateRedirectRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<(Status, Json<RedirectResponse>), ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Author)
@@ -167,7 +167,7 @@ pub async fn update_redirect(
     state: &State<AppState>,
     id: Uuid,
     body: Json<UpdateRedirectRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Json<RedirectResponse>, ApiError> {
     let existing = Redirect::find_by_id(&state.db, id).await?;
     auth.0
@@ -224,7 +224,7 @@ pub async fn update_redirect(
 pub async fn delete_redirect(
     state: &State<AppState>,
     id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Status, ApiError> {
     let redirect = Redirect::find_by_id(&state.db, id).await?;
     auth.0

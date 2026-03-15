@@ -17,7 +17,7 @@ use crate::dto::page::{
 };
 use crate::dto::review::{ReviewActionRequest, ReviewActionResponse};
 use crate::errors::{codes, ApiError, ProblemDetails};
-use crate::guards::auth_guard::ReadKey;
+use crate::guards::auth_guard::{ReadKey, WriteKey};
 use crate::guards::module_guard::{ModuleGuard, PagesModule};
 use crate::models::audit::AuditAction;
 use crate::models::content::{Content, ContentLocalization, ContentStatus};
@@ -245,7 +245,7 @@ pub async fn get_page_sections(
 pub async fn create_page(
     state: &State<AppState>,
     body: Json<CreatePageRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<(Status, Json<PageResponse>), ApiError> {
     let req = body.into_inner();
     req.validate()
@@ -324,7 +324,7 @@ pub async fn update_page(
     state: &State<AppState>,
     id: Uuid,
     body: Json<UpdatePageRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Json<PageResponse>, ApiError> {
     let existing = Page::find_by_id(&state.db, id).await?;
     let site_ids = Content::find_site_ids(&state.db, existing.content_id).await?;
@@ -419,7 +419,7 @@ pub async fn update_page(
 pub async fn delete_page(
     state: &State<AppState>,
     id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Status, ApiError> {
     let page = Page::find_by_id(&state.db, id).await?;
     let site_ids = Content::find_site_ids(&state.db, page.content_id).await?;
@@ -474,7 +474,7 @@ pub async fn delete_page(
 pub async fn clone_page(
     state: &State<AppState>,
     id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<(Status, Json<PageResponse>), ApiError> {
     let existing = Page::find_by_id(&state.db, id).await?;
     let site_ids = Content::find_site_ids(&state.db, existing.content_id).await?;
@@ -532,7 +532,7 @@ pub async fn create_page_section(
     state: &State<AppState>,
     page_id: Uuid,
     body: Json<CreatePageSectionRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<(Status, Json<PageSectionResponse>), ApiError> {
     let page = Page::find_by_id(&state.db, page_id).await?;
     let site_ids = Content::find_site_ids(&state.db, page.content_id).await?;
@@ -573,7 +573,7 @@ pub async fn update_page_section(
     state: &State<AppState>,
     id: Uuid,
     body: Json<UpdatePageSectionRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Json<PageSectionResponse>, ApiError> {
     let existing_section = PageSection::find_by_id(&state.db, id).await?;
     let page = Page::find_by_id(&state.db, existing_section.page_id).await?;
@@ -613,7 +613,7 @@ pub async fn update_page_section(
 pub async fn delete_page_section(
     state: &State<AppState>,
     id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Status, ApiError> {
     let section = PageSection::find_by_id(&state.db, id).await?;
     let page = Page::find_by_id(&state.db, section.page_id).await?;
@@ -652,7 +652,7 @@ pub async fn reorder_page_sections(
     state: &State<AppState>,
     page_id: Uuid,
     body: Json<ReorderPageSectionsRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Status, ApiError> {
     let page = Page::find_by_id(&state.db, page_id).await?;
     let site_ids = Content::find_site_ids(&state.db, page.content_id).await?;
@@ -775,7 +775,7 @@ pub async fn upsert_section_localization(
     state: &State<AppState>,
     section_id: Uuid,
     body: Json<UpsertSectionLocalizationRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Json<SectionLocalizationResponse>, ApiError> {
     let section = PageSection::find_by_id(&state.db, section_id).await?;
     let page = Page::find_by_id(&state.db, section.page_id).await?;
@@ -824,7 +824,7 @@ pub async fn upsert_section_localization(
 pub async fn delete_section_localization(
     state: &State<AppState>,
     id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Status, ApiError> {
     let loc = PageSectionLocalization::find_by_id(&state.db, id).await?;
     let section = PageSection::find_by_id(&state.db, loc.page_section_id).await?;
@@ -864,7 +864,7 @@ pub async fn review_page(
     state: &State<AppState>,
     id: Uuid,
     body: Json<ReviewActionRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Json<ReviewActionResponse>, ApiError> {
     let page = Page::find_by_id(&state.db, id).await?;
     let site_ids = Content::find_site_ids(&state.db, page.content_id).await?;
@@ -922,7 +922,7 @@ pub async fn bulk_pages(
     state: &State<AppState>,
     site_id: Uuid,
     body: Json<BulkContentRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
     _module: ModuleGuard<PagesModule>,
 ) -> Result<Json<BulkContentResponse>, ApiError> {
     let req = body.into_inner();
@@ -1067,7 +1067,7 @@ pub async fn create_page_localization(
     state: &State<AppState>,
     id: Uuid,
     body: Json<CreateLocalizationRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<(Status, Json<LocalizationResponse>), ApiError> {
     let req = body.into_inner();
     req.validate()
@@ -1133,7 +1133,7 @@ pub async fn update_page_localization(
     state: &State<AppState>,
     loc_id: Uuid,
     body: Json<UpdateLocalizationRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Json<LocalizationResponse>, ApiError> {
     let existing_loc = ContentLocalization::find_by_id(&state.db, loc_id).await?;
     let site_ids = Content::find_site_ids(&state.db, existing_loc.content_id).await?;
@@ -1184,7 +1184,7 @@ pub async fn update_page_localization(
 pub async fn delete_page_localization(
     state: &State<AppState>,
     loc_id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Status, ApiError> {
     let existing_loc = ContentLocalization::find_by_id(&state.db, loc_id).await?;
     let site_ids = Content::find_site_ids(&state.db, existing_loc.content_id).await?;

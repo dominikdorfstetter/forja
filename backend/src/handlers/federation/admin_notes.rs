@@ -9,7 +9,7 @@ use validator::Validate;
 use crate::dto::federation::requests::{CreateNoteRequest, UpdateNoteRequest};
 use crate::dto::federation::responses::NoteResponse;
 use crate::errors::{ApiError, ProblemDetails};
-use crate::guards::auth_guard::ReadKey;
+use crate::guards::auth_guard::{AdminKey, ReadKey};
 use crate::guards::federation_guard::{
     can_manage_federation, can_publish_to_fediverse, can_view_federation,
 };
@@ -77,7 +77,7 @@ pub async fn create_note(
     state: &State<AppState>,
     site_id: Uuid,
     body: Json<CreateNoteRequest>,
-    auth: ReadKey,
+    auth: AdminKey,
     _module: ModuleGuard<FederationModule>,
 ) -> Result<(Status, Json<NoteResponse>), ApiError> {
     let role = auth
@@ -280,7 +280,7 @@ pub async fn update_note(
     site_id: Uuid,
     note_id: Uuid,
     body: Json<UpdateNoteRequest>,
-    auth: ReadKey,
+    auth: AdminKey,
     _module: ModuleGuard<FederationModule>,
 ) -> Result<Json<NoteResponse>, ApiError> {
     let role = auth
@@ -409,7 +409,7 @@ pub async fn delete_note(
     state: &State<AppState>,
     site_id: Uuid,
     note_id: Uuid,
-    auth: ReadKey,
+    auth: AdminKey,
     _module: ModuleGuard<FederationModule>,
 ) -> Result<Status, ApiError> {
     let role = auth

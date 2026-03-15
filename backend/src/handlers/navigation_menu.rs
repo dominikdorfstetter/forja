@@ -12,7 +12,7 @@ use crate::dto::navigation_menu::{
     UpdateNavigationMenuRequest,
 };
 use crate::errors::{ApiError, ProblemDetails};
-use crate::guards::auth_guard::ReadKey;
+use crate::guards::auth_guard::{ReadKey, WriteKey};
 use crate::models::audit::AuditAction;
 use crate::models::navigation::NavigationItem;
 use crate::models::navigation_menu::{NavigationMenu, NavigationMenuLocalization};
@@ -83,7 +83,7 @@ pub async fn create_navigation_menu(
     state: &State<AppState>,
     site_id: Uuid,
     body: Json<CreateNavigationMenuRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<(Status, Json<NavigationMenuResponse>), ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Author)
@@ -261,7 +261,7 @@ pub async fn update_navigation_menu(
     state: &State<AppState>,
     id: Uuid,
     body: Json<UpdateNavigationMenuRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Json<NavigationMenuResponse>, ApiError> {
     let existing_menu = NavigationMenu::find_by_id(&state.db, id).await?;
     auth.0
@@ -335,7 +335,7 @@ pub async fn update_navigation_menu(
 pub async fn delete_navigation_menu(
     state: &State<AppState>,
     id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Status, ApiError> {
     let menu = NavigationMenu::find_by_id(&state.db, id).await?;
     auth.0
