@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.0.9
+
+### Fixed
+
+- **S3 uploaded files returning 403 Unauthorized** — `put_object()` calls now explicitly set `public-read` ACL so media files are publicly accessible via their URLs
+
 ## v1.0.8
 
 ### Fixed

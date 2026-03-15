@@ -6,6 +6,14 @@ sidebar_position: 100
 
 This page tracks the release history of Forja. For the most up-to-date changelog, see the [CHANGELOG.md](https://github.com/dominikdorfstetter/forja/blob/main/CHANGELOG.md) file in the repository.
 
+## v1.0.9
+
+### Fixed
+
+- **S3 uploaded files returning 403 Unauthorized** -- `put_object()` calls now explicitly set `public-read` ACL so media files are publicly accessible via their URLs
+
+---
+
 ## v1.0.8
 
 ### Fixed
