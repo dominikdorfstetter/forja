@@ -4,6 +4,18 @@
 
 use serde::Deserialize;
 
+/// Controls behavior when Redis is unavailable for rate limiting.
+///
+/// - `Open` (default): requests are allowed through — prioritizes availability.
+/// - `Closed`: requests are rejected with 429 — prioritizes security.
+#[derive(Debug, Clone, Default, PartialEq, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum RateLimitFailMode {
+    #[default]
+    Open,
+    Closed,
+}
+
 /// Security configuration
 #[derive(Debug, Clone, Deserialize)]
 pub struct SecurityConfig {
@@ -82,6 +94,18 @@ pub struct SecurityConfig {
     /// Base64-encoded 32-byte key for AES-256-GCM encryption of AI API keys
     #[serde(default)]
     pub ai_encryption_key: String,
+
+    /// Rate limit fail mode: "open" allows requests when Redis is down (availability),
+    /// "closed" rejects them (security). Default: "open".
+    #[serde(default)]
+    pub rate_limit_fail_mode: RateLimitFailMode,
+
+    /// Trust X-Forwarded-For and X-Real-IP headers for client IP extraction.
+    /// Enable only when running behind a trusted reverse proxy.
+    /// When false, the direct connection IP is used (loopback exempt from rate limiting).
+    /// When true, the real client IP is extracted from forwarded headers.
+    #[serde(default)]
+    pub trust_proxy_headers: bool,
 }
 
 // 10 MB
@@ -162,6 +186,8 @@ impl Default for SecurityConfig {
             tls_cert_path: String::new(),
             tls_key_path: String::new(),
             ai_encryption_key: String::new(),
+            rate_limit_fail_mode: RateLimitFailMode::default(),
+            trust_proxy_headers: false,
         }
     }
 }
@@ -191,6 +217,22 @@ mod tests {
         assert_eq!(config.max_json_size, 15 * 1024 * 1024);
         assert_eq!(config.rate_limit_per_second, 50);
         assert_eq!(config.rate_limit_per_minute, 500);
+        assert_eq!(config.rate_limit_fail_mode, RateLimitFailMode::Open);
+        assert!(!config.trust_proxy_headers);
+    }
+
+    #[test]
+    fn test_rate_limit_fail_mode_deserialize() {
+        let open: RateLimitFailMode = serde_json::from_str("\"open\"").unwrap();
+        assert_eq!(open, RateLimitFailMode::Open);
+
+        let closed: RateLimitFailMode = serde_json::from_str("\"closed\"").unwrap();
+        assert_eq!(closed, RateLimitFailMode::Closed);
+    }
+
+    #[test]
+    fn test_rate_limit_fail_mode_default() {
+        assert_eq!(RateLimitFailMode::default(), RateLimitFailMode::Open);
     }
 
     #[test]

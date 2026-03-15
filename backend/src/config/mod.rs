@@ -9,6 +9,6 @@ mod settings;
 mod storage;
 
 pub use database::DatabaseConfig;
-pub use security::SecurityConfig;
+pub use security::{RateLimitFailMode, SecurityConfig};
 pub use settings::Settings;
 pub use storage::StorageConfig;

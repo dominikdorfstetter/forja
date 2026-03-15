@@ -126,6 +126,8 @@ impl Settings {
             .set_default("security.enable_cors", true)?
             .set_default("security.cors_allowed_origins", "*")?
             .set_default("security.redis_url", "redis://127.0.0.1:6379")?
+            .set_default("security.rate_limit_fail_mode", "open")?
+            .set_default("security.trust_proxy_headers", false)?
             .set_default("public_url", "http://localhost:8000")?
             // Override with environment variables
             .add_source(
@@ -183,6 +185,16 @@ impl Settings {
             .set_override_option(
                 "storage.s3_endpoint",
                 std::env::var("STORAGE_S3_ENDPOINT").ok(),
+            )?
+            // RATE_LIMIT_FAIL_MODE override ("open" or "closed")
+            .set_override_option(
+                "security.rate_limit_fail_mode",
+                std::env::var("RATE_LIMIT_FAIL_MODE").ok(),
+            )?
+            // TRUST_PROXY_HEADERS override
+            .set_override_option(
+                "security.trust_proxy_headers",
+                std::env::var("TRUST_PROXY_HEADERS").ok(),
             )?
             // PUBLIC_URL override
             .set_override_option("public_url", std::env::var("PUBLIC_URL").ok())?
