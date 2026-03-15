@@ -6,7 +6,7 @@ into something useful, Forja lets you shape, manage, and deliver content across 
 **Author:** Dominik Dorfstetter
 **License:** AGPL-3.0-or-later
 
-> Full documentation: **[dominikdorfstetter.github.io/forja](https://dominikdorfstetter.github.io/forja/)**
+> Full documentation: **[forja-docs.dorfstetter.at](https://forja-docs.dorfstetter.at)**
 
 ## Architecture
 
@@ -75,7 +75,7 @@ npm run dev
 
 Dashboard: `http://localhost:5173` (proxied to backend). No `.env` needed — config is fetched from the backend.
 
-> See the [Getting Started guide](https://dominikdorfstetter.github.io/forja/getting-started) for full setup instructions including Clerk configuration.
+> See the [Getting Started guide](https://forja-docs.dorfstetter.at/getting-started) for full setup instructions including Clerk configuration.
 
 ## Docker
 
@@ -83,7 +83,7 @@ Dashboard: `http://localhost:5173` (proxied to backend). No `.env` needed — co
 docker pull dominikdorfstetter/forja
 ```
 
-See the [Docker deployment guide](https://dominikdorfstetter.github.io/forja/deployment/docker) for full configuration.
+See the [Docker deployment guide](https://forja-docs.dorfstetter.at/deployment/docker) for full configuration.
 
 ## Project Structure
 

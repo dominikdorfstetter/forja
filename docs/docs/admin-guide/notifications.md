@@ -27,6 +27,24 @@ Notifications are generated for various events:
 | **Webhook failure** | A webhook delivery has failed repeatedly. |
 | **System updates** | Important system-level announcements from the platform administrator. |
 
+### Editorial Workflow Notifications
+
+When the [editorial workflow](./content/blogs#review-workflow) is enabled, the following notification types are generated automatically:
+
+| Event | Recipient | Description |
+|-------|-----------|-------------|
+| **content_submitted** | Admin and Master users | A writer has submitted content for review. |
+| **content_approved** | The content author | A reviewer has approved the content for publication. |
+| **changes_requested** | The content author | A reviewer has requested changes to the submitted content. |
+
+These notifications link directly to the relevant blog post so you can take action immediately.
+
+### Scope and Availability
+
+- Notifications are **per-user, per-site** -- you only see notifications for sites you belong to.
+- Editorial workflow notifications require **Clerk JWT authentication**. They are not generated when using API keys.
+- No manual configuration is needed -- workflow notifications are created automatically when the editorial workflow is enabled and review actions are taken.
+
 ## Notification List
 
 The notification list shows:

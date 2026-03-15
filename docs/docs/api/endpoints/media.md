@@ -60,6 +60,84 @@ curl -X POST \
 
 If the same file (by checksum) has been uploaded before, the existing record is returned with `200 OK` instead.
 
+### Media Folders
+
+| Method | Path | Permission | Description |
+|--------|------|------------|-------------|
+| GET | `/sites/{site_id}/media-folders` | Read | List media folders for a site |
+| POST | `/sites/{site_id}/media-folders` | Author | Create a media folder |
+| PUT | `/media-folders/{id}` | Author | Update a media folder |
+| DELETE | `/media-folders/{id}` | Author | Delete a media folder |
+
+## List Media Folders
+
+Returns all media folders for a site, ordered by display order.
+
+```bash
+curl -H "X-API-Key: oy_live_abc123..." \
+  https://your-domain.com/api/v1/sites/{site_id}/media-folders
+```
+
+**Response** `200 OK`
+
+```json
+[
+  {
+    "id": "770e8400-e29b-41d4-a716-446655440000",
+    "site_id": "550e8400-e29b-41d4-a716-446655440000",
+    "parent_id": null,
+    "name": "Photos",
+    "display_order": 0,
+    "created_at": "2025-01-15T12:00:00Z",
+    "updated_at": "2025-01-15T12:00:00Z"
+  }
+]
+```
+
+## Create a Media Folder
+
+Creates a new media folder. Supports nesting via optional `parent_id`.
+
+```bash
+curl -X POST \
+  -H "X-API-Key: oy_live_abc123..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Photos",
+    "parent_id": null,
+    "display_order": 0
+  }' \
+  https://your-domain.com/api/v1/sites/{site_id}/media-folders
+```
+
+**Response** `201 Created` -- Returns the created `MediaFolderResponse`.
+
+## Update a Media Folder
+
+Updates a media folder's name, parent, or display order. All fields are optional.
+
+```bash
+curl -X PUT \
+  -H "X-API-Key: oy_live_abc123..." \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Updated Photos"}' \
+  https://your-domain.com/api/v1/media-folders/{id}
+```
+
+**Response** `200 OK` -- Returns the updated `MediaFolderResponse`.
+
+## Delete a Media Folder
+
+Deletes a media folder. Media files in the folder are not deleted -- they become unassigned.
+
+```bash
+curl -X DELETE \
+  -H "X-API-Key: oy_live_abc123..." \
+  https://your-domain.com/api/v1/media-folders/{id}
+```
+
+**Response** `204 No Content`
+
 ## File Size Limits
 
 File size limits are configurable per site via site settings. The default maximum is 50 MB.

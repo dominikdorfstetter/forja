@@ -87,6 +87,31 @@ In the file detail panel, click the **Copy URL** button to copy the file's publi
 Deleting a media file removes it from storage permanently. If the file is referenced in blog posts or pages, those references will break (display as missing images or broken links).
 :::
 
+## Media Metadata
+
+Each media item can have **per-locale metadata** that provides additional context for your frontend templates.
+
+### Metadata Fields
+
+| Field | Purpose |
+|-------|---------|
+| **Alt text** | A text description of the image, read by screen readers and used by search engines. Important for **accessibility** and **SEO**. |
+| **Caption** | Descriptive text displayed below the image in your frontend template. |
+| **Title** | Text shown as a tooltip when a user hovers over the image. |
+
+### Editing Metadata
+
+1. Click on a media item to open its detail panel.
+2. Switch to the desired locale using the locale selector.
+3. Fill in the alt text, caption, and/or title fields.
+4. Save.
+
+Because metadata is localized, you can provide translations for each language your site supports.
+
+:::tip
+Always fill in **alt text** for images. It improves your site's accessibility for users with screen readers and helps search engines understand your content.
+:::
+
 ## Using Media in Content
 
 When editing a blog post or page, you can insert media files from the library:
