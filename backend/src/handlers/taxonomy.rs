@@ -12,7 +12,7 @@ use crate::dto::taxonomy::{
     UpdateTagRequest,
 };
 use crate::errors::{ApiError, ProblemDetails};
-use crate::guards::auth_guard::ReadKey;
+use crate::guards::auth_guard::{ReadKey, WriteKey};
 use crate::models::audit::AuditAction;
 use crate::models::content::Content;
 use crate::models::site_membership::SiteRole;
@@ -268,7 +268,7 @@ pub async fn get_content_categories(
 pub async fn create_tag(
     state: &State<AppState>,
     body: Json<CreateTagRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<(Status, Json<TagResponse>), ApiError> {
     let req = body.into_inner();
     req.validate()
@@ -315,7 +315,7 @@ pub async fn update_tag(
     state: &State<AppState>,
     id: Uuid,
     body: Json<UpdateTagRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Json<TagResponse>, ApiError> {
     let req = body.into_inner();
     req.validate()
@@ -354,7 +354,7 @@ pub async fn update_tag(
 pub async fn delete_tag(
     state: &State<AppState>,
     id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Status, ApiError> {
     let site_id = Tag::find_site_ids(&state.db, id).await?.into_iter().next();
     Tag::soft_delete(&state.db, id).await?;
@@ -389,7 +389,7 @@ pub async fn delete_tag(
 pub async fn create_category(
     state: &State<AppState>,
     body: Json<CreateCategoryRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<(Status, Json<CategoryResponse>), ApiError> {
     let req = body.into_inner();
     req.validate()
@@ -436,7 +436,7 @@ pub async fn update_category(
     state: &State<AppState>,
     id: Uuid,
     body: Json<UpdateCategoryRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Json<CategoryResponse>, ApiError> {
     let req = body.into_inner();
     req.validate()
@@ -478,7 +478,7 @@ pub async fn update_category(
 pub async fn delete_category(
     state: &State<AppState>,
     id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Status, ApiError> {
     let site_id = Category::find_site_ids(&state.db, id)
         .await?
@@ -518,7 +518,7 @@ pub async fn assign_category_to_content(
     state: &State<AppState>,
     content_id: Uuid,
     body: Json<AssignCategoryRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Status, ApiError> {
     let req = body.into_inner();
     req.validate()
@@ -555,7 +555,7 @@ pub async fn remove_category_from_content(
     state: &State<AppState>,
     content_id: Uuid,
     category_id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Status, ApiError> {
     let site_ids = Content::find_site_ids(&state.db, content_id).await?;
     for site_id in &site_ids {

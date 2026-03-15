@@ -8,7 +8,7 @@ use uuid::Uuid;
 use crate::dto::federation::requests::PinPostRequest;
 use crate::dto::federation::responses::FeaturedPostResponse;
 use crate::errors::{ApiError, ProblemDetails};
-use crate::guards::auth_guard::ReadKey;
+use crate::guards::auth_guard::{AdminKey, ReadKey};
 use crate::guards::federation_guard::can_manage_federation;
 use crate::guards::module_guard::{FederationModule, ModuleGuard};
 use crate::models::federation::actor::ApActor;
@@ -83,7 +83,7 @@ pub async fn pin_post(
     state: &State<AppState>,
     site_id: Uuid,
     body: Json<PinPostRequest>,
-    auth: ReadKey,
+    auth: AdminKey,
     _module: ModuleGuard<FederationModule>,
 ) -> Result<(Status, Json<FeaturedPostResponse>), ApiError> {
     let role = auth
@@ -147,7 +147,7 @@ pub async fn unpin_post(
     state: &State<AppState>,
     site_id: Uuid,
     content_id: Uuid,
-    auth: ReadKey,
+    auth: AdminKey,
     _module: ModuleGuard<FederationModule>,
 ) -> Result<Status, ApiError> {
     let role = auth

@@ -16,7 +16,7 @@ use crate::dto::document::{
     UpdateDocumentFolderRequest, UpdateDocumentLocalizationRequest, UpdateDocumentRequest,
 };
 use crate::errors::{ApiError, ProblemDetails};
-use crate::guards::auth_guard::ReadKey;
+use crate::guards::auth_guard::{ReadKey, WriteKey};
 use crate::guards::module_guard::{DocumentsModule, ModuleGuard};
 use crate::models::audit::AuditAction;
 use crate::models::blog::Blog;
@@ -102,7 +102,7 @@ pub async fn create_document_folder(
     state: &State<AppState>,
     site_id: Uuid,
     body: Json<CreateDocumentFolderRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
     _module: ModuleGuard<DocumentsModule>,
 ) -> Result<(Status, Json<DocumentFolderResponse>), ApiError> {
     auth.0
@@ -145,7 +145,7 @@ pub async fn update_document_folder(
     state: &State<AppState>,
     id: Uuid,
     body: Json<UpdateDocumentFolderRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Json<DocumentFolderResponse>, ApiError> {
     let existing = DocumentFolder::find_by_id(&state.db, id).await?;
     auth.0
@@ -188,7 +188,7 @@ pub async fn update_document_folder(
 pub async fn delete_document_folder(
     state: &State<AppState>,
     id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Status, ApiError> {
     let existing = DocumentFolder::find_by_id(&state.db, id).await?;
     auth.0
@@ -279,7 +279,7 @@ pub async fn create_document(
     state: &State<AppState>,
     site_id: Uuid,
     body: Json<CreateDocumentRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
     _module: ModuleGuard<DocumentsModule>,
 ) -> Result<(Status, Json<DocumentListItem>), ApiError> {
     auth.0
@@ -371,7 +371,7 @@ pub async fn update_document(
     state: &State<AppState>,
     id: Uuid,
     body: Json<UpdateDocumentRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Json<DocumentListItem>, ApiError> {
     let req = body.into_inner();
     req.validate()
@@ -451,7 +451,7 @@ pub async fn update_document(
 pub async fn delete_document(
     state: &State<AppState>,
     id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Status, ApiError> {
     let existing = Document::find_by_id(&state.db, id).await?;
     auth.0
@@ -527,7 +527,7 @@ pub async fn create_document_localization(
     state: &State<AppState>,
     id: Uuid,
     body: Json<CreateDocumentLocalizationRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<(Status, Json<DocumentLocalizationResponse>), ApiError> {
     let req = body.into_inner();
     req.validate()
@@ -566,7 +566,7 @@ pub async fn update_document_localization(
     state: &State<AppState>,
     loc_id: Uuid,
     body: Json<UpdateDocumentLocalizationRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Json<DocumentLocalizationResponse>, ApiError> {
     let req = body.into_inner();
     req.validate()
@@ -611,7 +611,7 @@ pub async fn update_document_localization(
 pub async fn delete_document_localization(
     state: &State<AppState>,
     loc_id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Status, ApiError> {
     // Resolve site via parent document
     let existing = DocumentLocalization::find_by_id(&state.db, loc_id).await?;
@@ -686,7 +686,7 @@ pub async fn assign_blog_document(
     state: &State<AppState>,
     blog_id: Uuid,
     body: Json<AssignBlogDocumentRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<(Status, Json<BlogDocumentResponse>), ApiError> {
     let req = body.into_inner();
     req.validate()
@@ -764,7 +764,7 @@ pub async fn unassign_blog_document(
     state: &State<AppState>,
     blog_id: Uuid,
     doc_id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Status, ApiError> {
     // Resolve site via blog → content → site
     let blog = Blog::find_by_id(&state.db, blog_id).await?;

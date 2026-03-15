@@ -8,7 +8,7 @@ use validator::Validate;
 
 use crate::dto::ai::*;
 use crate::errors::{codes, ApiError, ProblemDetails};
-use crate::guards::auth_guard::ReadKey;
+use crate::guards::auth_guard::{AdminKey, ReadKey, WriteKey};
 use crate::guards::module_guard::{AiModule, ModuleGuard};
 use crate::models::ai_config::SiteAiConfig;
 use crate::models::audit::AuditAction;
@@ -80,7 +80,7 @@ pub async fn get_ai_config(
 pub async fn upsert_ai_config(
     state: &State<AppState>,
     site_id: Uuid,
-    auth: ReadKey,
+    auth: AdminKey,
     req: Json<CreateAiConfigRequest>,
 ) -> Result<Json<AiConfigResponse>, ApiError> {
     auth.0
@@ -152,7 +152,7 @@ pub async fn upsert_ai_config(
 pub async fn delete_ai_config(
     state: &State<AppState>,
     site_id: Uuid,
-    auth: ReadKey,
+    auth: AdminKey,
 ) -> Result<Status, ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Admin)
@@ -180,7 +180,7 @@ pub async fn delete_ai_config(
 pub async fn test_ai_connection(
     state: &State<AppState>,
     site_id: Uuid,
-    auth: ReadKey,
+    auth: AdminKey,
 ) -> Result<Json<AiTestResponse>, ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Admin)
@@ -223,7 +223,7 @@ pub async fn test_ai_connection(
 pub async fn generate_ai_content(
     state: &State<AppState>,
     site_id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
     req: Json<AiGenerateRequest>,
     _module: ModuleGuard<AiModule>,
 ) -> Result<Json<AiGenerateResponse>, ApiError> {
@@ -283,7 +283,7 @@ pub async fn generate_ai_content(
 pub async fn list_ai_models(
     state: &State<AppState>,
     site_id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
     req: Json<ListModelsRequest>,
 ) -> Result<Json<ListModelsResponse>, ApiError> {
     auth.0

@@ -23,7 +23,7 @@ use crate::dto::document::BlogDocumentResponse;
 use crate::dto::review::{ReviewActionRequest, ReviewActionResponse};
 use crate::dto::taxonomy::CategoryResponse;
 use crate::errors::{codes, ApiError, ProblemDetails};
-use crate::guards::auth_guard::ReadKey;
+use crate::guards::auth_guard::{ReadKey, WriteKey};
 use crate::guards::module_guard::{BlogModule, ModuleGuard};
 use crate::models::audit::AuditAction;
 use crate::models::blog::Blog;
@@ -390,7 +390,7 @@ pub async fn get_blog_by_slug(
 pub async fn create_blog(
     state: &State<AppState>,
     body: Json<CreateBlogRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<(Status, Json<BlogResponse>), ApiError> {
     let req = body.into_inner();
     req.validate()
@@ -469,7 +469,7 @@ pub async fn update_blog(
     state: &State<AppState>,
     id: Uuid,
     body: Json<UpdateBlogRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Json<BlogResponse>, ApiError> {
     let existing = Blog::find_by_id(&state.db, id).await?;
     let site_ids = Content::find_site_ids(&state.db, existing.content_id).await?;
@@ -577,7 +577,7 @@ pub async fn update_blog(
 pub async fn delete_blog(
     state: &State<AppState>,
     id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Status, ApiError> {
     let blog = Blog::find_by_id(&state.db, id).await?;
     let site_ids = Content::find_site_ids(&state.db, blog.content_id).await?;
@@ -632,7 +632,7 @@ pub async fn delete_blog(
 pub async fn clone_blog(
     state: &State<AppState>,
     id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<(Status, Json<BlogResponse>), ApiError> {
     let existing = Blog::find_by_id(&state.db, id).await?;
     let site_ids = Content::find_site_ids(&state.db, existing.content_id).await?;
@@ -784,7 +784,7 @@ pub async fn create_blog_localization(
     state: &State<AppState>,
     id: Uuid,
     body: Json<CreateLocalizationRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<(Status, Json<LocalizationResponse>), ApiError> {
     let req = body.into_inner();
     req.validate()
@@ -850,7 +850,7 @@ pub async fn update_blog_localization(
     state: &State<AppState>,
     loc_id: Uuid,
     body: Json<UpdateLocalizationRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Json<LocalizationResponse>, ApiError> {
     let existing_loc = ContentLocalization::find_by_id(&state.db, loc_id).await?;
     let site_ids = Content::find_site_ids(&state.db, existing_loc.content_id).await?;
@@ -901,7 +901,7 @@ pub async fn update_blog_localization(
 pub async fn delete_blog_localization(
     state: &State<AppState>,
     loc_id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Status, ApiError> {
     let existing_loc = ContentLocalization::find_by_id(&state.db, loc_id).await?;
     let site_ids = Content::find_site_ids(&state.db, existing_loc.content_id).await?;
@@ -939,7 +939,7 @@ pub async fn review_blog(
     state: &State<AppState>,
     id: Uuid,
     body: Json<ReviewActionRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Json<ReviewActionResponse>, ApiError> {
     let blog = Blog::find_by_id(&state.db, id).await?;
     let site_ids = Content::find_site_ids(&state.db, blog.content_id).await?;
@@ -1103,7 +1103,7 @@ pub async fn bulk_blogs(
     state: &State<AppState>,
     site_id: Uuid,
     body: Json<BulkContentRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
     _module: ModuleGuard<BlogModule>,
 ) -> Result<Json<BulkContentResponse>, ApiError> {
     let req = body.into_inner();
@@ -1167,7 +1167,7 @@ pub async fn bulk_blogs(
 pub async fn seed_sample_content(
     state: &State<AppState>,
     site_id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
     _module: ModuleGuard<BlogModule>,
 ) -> Result<(Status, Json<Vec<BlogResponse>>), ApiError> {
     auth.0
@@ -1242,7 +1242,7 @@ pub async fn seed_sample_content(
 pub async fn delete_sample_content(
     state: &State<AppState>,
     site_id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
     _module: ModuleGuard<BlogModule>,
 ) -> Result<Json<serde_json::Value>, ApiError> {
     auth.0

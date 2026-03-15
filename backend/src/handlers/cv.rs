@@ -11,7 +11,7 @@ use crate::dto::cv::{
     SkillResponse, UpdateCvEntryRequest, UpdateSkillRequest,
 };
 use crate::errors::{ApiError, ProblemDetails};
-use crate::guards::auth_guard::ReadKey;
+use crate::guards::auth_guard::{ReadKey, WriteKey};
 use crate::guards::module_guard::{CvModule, ModuleGuard};
 use crate::models::audit::AuditAction;
 use crate::models::cv::{CvEntry, CvEntryType, Skill};
@@ -129,7 +129,7 @@ pub async fn get_skill_by_slug(
 pub async fn create_skill(
     state: &State<AppState>,
     body: Json<CreateSkillRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<(Status, Json<SkillResponse>), ApiError> {
     let req = body.into_inner();
     req.validate()
@@ -180,7 +180,7 @@ pub async fn update_skill(
     state: &State<AppState>,
     id: Uuid,
     body: Json<UpdateSkillRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Json<SkillResponse>, ApiError> {
     let req = body.into_inner();
     req.validate()
@@ -218,7 +218,7 @@ pub async fn update_skill(
 pub async fn delete_skill(
     state: &State<AppState>,
     id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Status, ApiError> {
     Skill::soft_delete(&state.db, id).await?;
     audit_service::log_action(
@@ -333,7 +333,7 @@ pub async fn get_cv_entry(
 pub async fn create_cv_entry(
     state: &State<AppState>,
     body: Json<CreateCvEntryRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<(Status, Json<CvEntryResponse>), ApiError> {
     let req = body.into_inner();
     req.validate()
@@ -384,7 +384,7 @@ pub async fn update_cv_entry(
     state: &State<AppState>,
     id: Uuid,
     body: Json<UpdateCvEntryRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Json<CvEntryResponse>, ApiError> {
     let req = body.into_inner();
     req.validate()
@@ -422,7 +422,7 @@ pub async fn update_cv_entry(
 pub async fn delete_cv_entry(
     state: &State<AppState>,
     id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Status, ApiError> {
     CvEntry::soft_delete(&state.db, id).await?;
     audit_service::log_action(

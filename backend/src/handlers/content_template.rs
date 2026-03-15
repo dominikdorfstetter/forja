@@ -11,7 +11,7 @@ use crate::dto::content_template::{
     UpdateContentTemplateRequest,
 };
 use crate::errors::{ApiError, ProblemDetails};
-use crate::guards::auth_guard::ReadKey;
+use crate::guards::auth_guard::{ReadKey, WriteKey};
 use crate::models::audit::AuditAction;
 use crate::models::content_template::ContentTemplate;
 use crate::models::site_membership::SiteRole;
@@ -115,7 +115,7 @@ pub async fn create_content_template(
     state: &State<AppState>,
     site_id: Uuid,
     body: Json<CreateContentTemplateRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<(Status, Json<ContentTemplateResponse>), ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Author)
@@ -164,7 +164,7 @@ pub async fn update_content_template(
     state: &State<AppState>,
     id: Uuid,
     body: Json<UpdateContentTemplateRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Json<ContentTemplateResponse>, ApiError> {
     let existing = ContentTemplate::find_by_id(&state.db, id).await?;
     auth.0
@@ -208,7 +208,7 @@ pub async fn update_content_template(
 pub async fn delete_content_template(
     state: &State<AppState>,
     id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Status, ApiError> {
     let template = ContentTemplate::find_by_id(&state.db, id).await?;
     auth.0

@@ -14,7 +14,7 @@ use crate::dto::legal::{
     UpdateLegalItemRequest,
 };
 use crate::errors::{ApiError, ProblemDetails};
-use crate::guards::auth_guard::ReadKey;
+use crate::guards::auth_guard::{ReadKey, WriteKey};
 use crate::guards::module_guard::{LegalModule, ModuleGuard};
 use crate::models::audit::AuditAction;
 use crate::models::legal::{
@@ -215,7 +215,7 @@ pub async fn create_legal_document(
     state: &State<AppState>,
     site_id: Uuid,
     body: Json<CreateLegalDocumentRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
     _module: ModuleGuard<LegalModule>,
 ) -> Result<(Status, Json<LegalDocumentResponse>), ApiError> {
     auth.0
@@ -263,7 +263,7 @@ pub async fn update_legal_document(
     state: &State<AppState>,
     id: Uuid,
     body: Json<UpdateLegalDocumentRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Json<LegalDocumentResponse>, ApiError> {
     let site_id = LegalDocument::resolve_site_id(&state.db, id).await?;
     auth.0
@@ -306,7 +306,7 @@ pub async fn update_legal_document(
 pub async fn delete_legal_document(
     state: &State<AppState>,
     id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Status, ApiError> {
     let site_id = LegalDocument::resolve_site_id(&state.db, id).await?;
     auth.0
@@ -347,7 +347,7 @@ pub async fn create_legal_group(
     state: &State<AppState>,
     doc_id: Uuid,
     body: Json<CreateLegalGroupRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<(Status, Json<LegalGroupResponse>), ApiError> {
     let site_id = LegalDocument::resolve_site_id(&state.db, doc_id).await?;
     auth.0
@@ -392,7 +392,7 @@ pub async fn update_legal_group(
     state: &State<AppState>,
     id: Uuid,
     body: Json<UpdateLegalGroupRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Json<LegalGroupResponse>, ApiError> {
     let group = LegalGroup::find_by_id(&state.db, id).await?;
     let site_id = LegalDocument::resolve_site_id(&state.db, group.legal_document_id).await?;
@@ -436,7 +436,7 @@ pub async fn update_legal_group(
 pub async fn delete_legal_group(
     state: &State<AppState>,
     id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Status, ApiError> {
     let group = LegalGroup::find_by_id(&state.db, id).await?;
     let site_id = LegalDocument::resolve_site_id(&state.db, group.legal_document_id).await?;
@@ -478,7 +478,7 @@ pub async fn create_legal_item(
     state: &State<AppState>,
     group_id: Uuid,
     body: Json<CreateLegalItemRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<(Status, Json<LegalItemResponse>), ApiError> {
     let group = LegalGroup::find_by_id(&state.db, group_id).await?;
     let site_id = LegalDocument::resolve_site_id(&state.db, group.legal_document_id).await?;
@@ -524,7 +524,7 @@ pub async fn update_legal_item(
     state: &State<AppState>,
     id: Uuid,
     body: Json<UpdateLegalItemRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Json<LegalItemResponse>, ApiError> {
     let item = LegalItem::find_by_id(&state.db, id).await?;
     let group = LegalGroup::find_by_id(&state.db, item.legal_group_id).await?;
@@ -569,7 +569,7 @@ pub async fn update_legal_item(
 pub async fn delete_legal_item(
     state: &State<AppState>,
     id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Status, ApiError> {
     let item = LegalItem::find_by_id(&state.db, id).await?;
     let group = LegalGroup::find_by_id(&state.db, item.legal_group_id).await?;

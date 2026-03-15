@@ -7,7 +7,7 @@ use uuid::Uuid;
 
 use crate::dto::federation::responses::CommentResponse;
 use crate::errors::{ApiError, ProblemDetails};
-use crate::guards::auth_guard::ReadKey;
+use crate::guards::auth_guard::{AdminKey, ReadKey};
 use crate::guards::federation_guard::{
     can_manage_federation, can_moderate_federation, can_view_federation,
 };
@@ -121,7 +121,7 @@ pub async fn approve_comment(
     state: &State<AppState>,
     site_id: Uuid,
     comment_id: Uuid,
-    auth: ReadKey,
+    auth: AdminKey,
     _module: ModuleGuard<FederationModule>,
 ) -> Result<Json<CommentResponse>, ApiError> {
     let role = auth
@@ -174,7 +174,7 @@ pub async fn reject_comment(
     state: &State<AppState>,
     site_id: Uuid,
     comment_id: Uuid,
-    auth: ReadKey,
+    auth: AdminKey,
     _module: ModuleGuard<FederationModule>,
 ) -> Result<Json<CommentResponse>, ApiError> {
     let role = auth
@@ -226,7 +226,7 @@ pub async fn delete_comment(
     state: &State<AppState>,
     site_id: Uuid,
     comment_id: Uuid,
-    auth: ReadKey,
+    auth: AdminKey,
     _module: ModuleGuard<FederationModule>,
 ) -> Result<Status, ApiError> {
     let role = auth

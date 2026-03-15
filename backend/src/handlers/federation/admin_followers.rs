@@ -7,7 +7,7 @@ use uuid::Uuid;
 
 use crate::dto::federation::responses::FollowerResponse;
 use crate::errors::{ApiError, ProblemDetails};
-use crate::guards::auth_guard::ReadKey;
+use crate::guards::auth_guard::{AdminKey, ReadKey};
 use crate::guards::federation_guard::{can_manage_federation, can_view_federation};
 use crate::guards::module_guard::{FederationModule, ModuleGuard};
 use crate::models::federation::actor::ApActor;
@@ -114,7 +114,7 @@ pub async fn remove_follower(
     state: &State<AppState>,
     site_id: Uuid,
     follower_id: Uuid,
-    auth: ReadKey,
+    auth: AdminKey,
     _module: ModuleGuard<FederationModule>,
 ) -> Result<Status, ApiError> {
     let role = auth

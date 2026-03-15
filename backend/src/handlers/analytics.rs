@@ -16,7 +16,7 @@ use crate::dto::analytics::{
     ReferrerItem, TopContentItem, TrackPageviewRequest, TrackPageviewResponse, TrendDataPoint,
 };
 use crate::errors::{codes, ApiError};
-use crate::guards::auth_guard::ReadKey;
+use crate::guards::auth_guard::{AdminKey, ReadKey, WriteKey};
 use crate::models::analytics::{
     compute_visitor_hash, extract_referrer_domain, AnalyticsPageview, ReferrerRow,
 };
@@ -123,7 +123,7 @@ pub async fn track_pageview(
     state: &State<AppState>,
     site_id: Uuid,
     body: Json<TrackPageviewRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
     client_ip: ClientIp,
     user_agent: UserAgent,
 ) -> Result<(Status, Json<TrackPageviewResponse>), ApiError> {
@@ -256,7 +256,7 @@ pub async fn aggregate_analytics(
     state: &State<AppState>,
     site_id: Uuid,
     retention_days: Option<i64>,
-    auth: ReadKey,
+    auth: AdminKey,
 ) -> Result<Json<AnalyticsMaintenanceResponse>, ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Admin)

@@ -12,7 +12,7 @@ use crate::dto::navigation::{
     ReorderNavigationTreeRequest, UpdateNavigationItemRequest,
 };
 use crate::errors::{ApiError, ProblemDetails};
-use crate::guards::auth_guard::ReadKey;
+use crate::guards::auth_guard::{ReadKey, WriteKey};
 use crate::models::audit::AuditAction;
 use crate::models::navigation::{NavigationItem, NavigationItemLocalization};
 use crate::models::navigation_menu::NavigationMenu;
@@ -167,7 +167,7 @@ pub async fn create_navigation_item(
     state: &State<AppState>,
     site_id: Uuid,
     body: Json<CreateNavigationItemRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<(Status, Json<NavigationItemResponse>), ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Author)
@@ -227,7 +227,7 @@ pub async fn create_menu_item(
     state: &State<AppState>,
     menu_id: Uuid,
     body: Json<CreateNavigationItemRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<(Status, Json<NavigationItemResponse>), ApiError> {
     let menu = NavigationMenu::find_by_id(&state.db, menu_id).await?;
     auth.0
@@ -284,7 +284,7 @@ pub async fn update_navigation_item(
     state: &State<AppState>,
     id: Uuid,
     body: Json<UpdateNavigationItemRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Json<NavigationItemResponse>, ApiError> {
     let existing = NavigationItem::find_by_id(&state.db, id).await?;
     auth.0
@@ -342,7 +342,7 @@ pub async fn reorder_navigation_items(
     state: &State<AppState>,
     site_id: Uuid,
     body: Json<ReorderNavigationItemsRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Status, ApiError> {
     auth.0
         .authorize_site_action(&state.db, site_id, &SiteRole::Author)
@@ -380,7 +380,7 @@ pub async fn reorder_menu_items(
     state: &State<AppState>,
     menu_id: Uuid,
     body: Json<ReorderNavigationTreeRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Status, ApiError> {
     let menu = NavigationMenu::find_by_id(&state.db, menu_id).await?;
     auth.0
@@ -447,7 +447,7 @@ pub async fn upsert_navigation_item_localizations(
     state: &State<AppState>,
     id: Uuid,
     body: Json<Vec<NavigationItemLocalizationInput>>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Json<Vec<NavigationItemLocalizationResponse>>, ApiError> {
     let item = NavigationItem::find_by_id(&state.db, id).await?;
     auth.0
@@ -486,7 +486,7 @@ pub async fn upsert_navigation_item_localizations(
 pub async fn delete_navigation_item(
     state: &State<AppState>,
     id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Status, ApiError> {
     let item = NavigationItem::find_by_id(&state.db, id).await?;
     auth.0

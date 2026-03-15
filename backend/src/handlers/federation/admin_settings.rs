@@ -9,7 +9,7 @@ use validator::Validate;
 use crate::dto::federation::requests::UpdateFederationSettingsRequest;
 use crate::dto::federation::responses::FederationSettingsResponse;
 use crate::errors::{ApiError, ProblemDetails};
-use crate::guards::auth_guard::ReadKey;
+use crate::guards::auth_guard::{AdminKey, ReadKey};
 use crate::guards::federation_guard::{can_admin_federation, can_manage_federation};
 use crate::guards::module_guard::{FederationModule, ModuleGuard};
 use crate::models::federation::actor::{self, ApActor};
@@ -151,7 +151,7 @@ pub async fn update_settings(
     state: &State<AppState>,
     site_id: Uuid,
     body: Json<UpdateFederationSettingsRequest>,
-    auth: ReadKey,
+    auth: AdminKey,
     _module: ModuleGuard<FederationModule>,
 ) -> Result<Json<FederationSettingsResponse>, ApiError> {
     let role = auth
@@ -244,7 +244,7 @@ pub async fn update_settings(
 pub async fn enable_federation(
     state: &State<AppState>,
     site_id: Uuid,
-    auth: ReadKey,
+    auth: AdminKey,
 ) -> Result<Json<FederationSettingsResponse>, ApiError> {
     let role = auth
         .0
@@ -339,7 +339,7 @@ pub async fn enable_federation(
 pub async fn disable_federation(
     state: &State<AppState>,
     site_id: Uuid,
-    auth: ReadKey,
+    auth: AdminKey,
 ) -> Result<Status, ApiError> {
     let role = auth
         .0
@@ -385,7 +385,7 @@ pub async fn disable_federation(
 pub async fn rotate_keys(
     state: &State<AppState>,
     site_id: Uuid,
-    auth: ReadKey,
+    auth: AdminKey,
     _module: ModuleGuard<FederationModule>,
 ) -> Result<Status, ApiError> {
     let role = auth

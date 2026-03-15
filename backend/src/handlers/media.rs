@@ -15,7 +15,7 @@ use crate::dto::media::{
     UploadMediaRequest, ALL_ALLOWED_MIMES,
 };
 use crate::errors::{codes, ApiError, ProblemDetails};
-use crate::guards::auth_guard::ReadKey;
+use crate::guards::auth_guard::{ReadKey, WriteKey};
 use crate::models::audit::AuditAction;
 use crate::models::media::{MediaFile, MediaMetadata, MediaVariant, StorageProvider};
 use crate::models::site_membership::SiteRole;
@@ -149,7 +149,7 @@ pub async fn get_media(
 pub async fn create_media(
     state: &State<AppState>,
     body: Json<UploadMediaRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<(Status, Json<MediaListItem>), ApiError> {
     let req = body.into_inner();
     req.validate()
@@ -225,7 +225,7 @@ pub struct MediaUploadForm<'r> {
 #[post("/media/upload", data = "<form>")]
 pub async fn upload_media(
     state: &State<AppState>,
-    auth: ReadKey,
+    auth: WriteKey,
     form: Form<MediaUploadForm<'_>>,
 ) -> Result<(Status, Json<MediaResponse>), ApiError> {
     // 1. Parse site_ids from JSON string
@@ -513,7 +513,7 @@ pub async fn update_media(
     state: &State<AppState>,
     id: Uuid,
     body: Json<UpdateMediaRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Json<MediaListItem>, ApiError> {
     let existing = MediaFile::find_by_id(&state.db, id).await?;
     let site_ids = MediaFile::find_site_ids(&state.db, id).await?;
@@ -565,7 +565,7 @@ pub async fn update_media(
 pub async fn delete_media(
     state: &State<AppState>,
     id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Status, ApiError> {
     // Fetch media and variants before soft-deleting
     let media = MediaFile::find_by_id(&state.db, id).await?;
@@ -656,7 +656,7 @@ pub async fn create_media_metadata(
     state: &State<AppState>,
     id: Uuid,
     body: Json<AddMediaMetadataRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<(Status, Json<MediaMetadataResponse>), ApiError> {
     let req = body.into_inner();
     req.validate()
@@ -692,7 +692,7 @@ pub async fn update_media_metadata(
     state: &State<AppState>,
     metadata_id: Uuid,
     body: Json<UpdateMediaMetadataRequest>,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Json<MediaMetadataResponse>, ApiError> {
     let req = body.into_inner();
     req.validate()
@@ -726,7 +726,7 @@ pub async fn update_media_metadata(
 pub async fn delete_media_metadata(
     state: &State<AppState>,
     metadata_id: Uuid,
-    auth: ReadKey,
+    auth: WriteKey,
 ) -> Result<Status, ApiError> {
     let existing = MediaMetadata::find_by_id(&state.db, metadata_id).await?;
     let site_ids = MediaFile::find_site_ids(&state.db, existing.media_file_id).await?;
