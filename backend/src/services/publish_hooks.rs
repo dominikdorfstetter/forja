@@ -16,6 +16,7 @@ use crate::services::{audit_service, webhook_service};
 /// - Dispatches a `{entity_type}.published` webhook
 /// - Federates the post (if blog, federation enabled, and auto_publish is on)
 /// - Logs an audit entry
+#[allow(clippy::too_many_arguments)]
 pub async fn on_content_published(
     pool: &PgPool,
     content_id: Uuid,
@@ -24,6 +25,7 @@ pub async fn on_content_published(
     entity_id: Uuid,
     user_id: Option<Uuid>,
     metadata: Option<&str>,
+    public_domain: &str,
 ) {
     // 1. Webhook dispatch
     let event = format!("{}.published", entity_type);
@@ -35,7 +37,7 @@ pub async fn on_content_published(
 
     // 2. Federation: only for blogs, only if federation + auto_publish enabled
     if entity_type == "blog" {
-        federate_if_enabled(pool, site_id, content_id).await;
+        federate_if_enabled(pool, site_id, content_id, public_domain).await;
     }
 
     // 3. Audit log
@@ -56,7 +58,7 @@ pub async fn on_content_published(
 ///
 /// Uses `SiteRole::Owner` for the RBAC check since this is a system action
 /// (either from the scheduler or from an explicit publish by an authorized user).
-async fn federate_if_enabled(pool: &PgPool, site_id: Uuid, content_id: Uuid) {
+async fn federate_if_enabled(pool: &PgPool, site_id: Uuid, content_id: Uuid, domain: &str) {
     use crate::models::site_settings::KEY_FEDERATION_AUTO_PUBLISH;
     use crate::services::federation::delivery;
     use crate::services::federation::queue::CompositeQueue;
@@ -79,44 +81,12 @@ async fn federate_if_enabled(pool: &PgPool, site_id: Uuid, content_id: Uuid) {
         return;
     }
 
-    // Look up the production domain for this site
-    let domain: Option<String> = match sqlx::query_scalar(
-        "SELECT domain FROM site_domains WHERE site_id = $1 AND is_primary = TRUE AND environment = 'production' LIMIT 1",
-    )
-    .bind(site_id)
-    .fetch_optional(pool)
-    .await
-    {
-        Ok(d) => d,
-        Err(e) => {
-            tracing::warn!("Publish hooks: failed to look up domain for site {site_id}: {e}");
-            return;
-        }
-    };
-
-    let domain = match domain {
-        Some(d) => d,
-        None => {
-            tracing::debug!(
-                site_id = %site_id,
-                "Publish hooks: no production domain configured, skipping federation"
-            );
-            return;
-        }
-    };
-
     // Build a queue (same pattern used in admin_notes handler)
     let queue = CompositeQueue::new(pool.clone(), None);
 
-    if let Err(e) = delivery::handle_post_published(
-        pool,
-        &queue,
-        site_id,
-        content_id,
-        &SiteRole::Owner,
-        &domain,
-    )
-    .await
+    if let Err(e) =
+        delivery::handle_post_published(pool, &queue, site_id, content_id, &SiteRole::Owner, domain)
+            .await
     {
         tracing::warn!(
             content_id = %content_id,

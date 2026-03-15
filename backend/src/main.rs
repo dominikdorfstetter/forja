@@ -40,6 +40,11 @@ async fn rocket() -> _ {
 
     // Load configuration
     let settings = Settings::load().expect("Failed to load configuration");
+    tracing::info!(
+        "Public URL: {} (federation domain: {})",
+        settings.public_url,
+        settings.public_domain()
+    );
 
     // Configure request size limits from security settings
     // data-form limit must accommodate file uploads (use the larger of form vs file limit)

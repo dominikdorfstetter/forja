@@ -129,9 +129,9 @@ pub async fn create_note(
         .ok_or_else(|| ApiError::internal("No actor configured for federated site"))?;
 
     // Resolve domain
-    let domain = Site::resolve_domain(&state.db, site_id).await?;
+    let domain = state.settings.public_domain();
 
-    let actor_uri = actor.actor_uri(&domain, &site.slug);
+    let actor_uri = actor.actor_uri(domain, &site.slug);
     let note_uri = format!("https://{}/ap/{}/notes/{}", domain, site.slug, note.id);
     let followers_url = actor.followers_url.clone();
 
@@ -310,9 +310,9 @@ pub async fn update_note(
         let actor = ApActor::find_by_site_id(&state.db, site_id).await?;
 
         if let Some(actor) = actor {
-            let domain = Site::resolve_domain(&state.db, site_id).await?;
+            let domain = state.settings.public_domain();
 
-            let actor_uri = actor.actor_uri(&domain, &site.slug);
+            let actor_uri = actor.actor_uri(domain, &site.slug);
             let followers_url = actor.followers_url.clone();
 
             // Build updated Note object
@@ -432,9 +432,9 @@ pub async fn delete_note(
         let actor = ApActor::find_by_site_id(&state.db, site_id).await?;
 
         if let Some(actor) = actor {
-            let domain = Site::resolve_domain(&state.db, site_id).await?;
+            let domain = state.settings.public_domain();
 
-            let actor_uri = actor.actor_uri(&domain, &site.slug);
+            let actor_uri = actor.actor_uri(domain, &site.slug);
             let activity_uri = format!("https://{}/ap/activities/{}", domain, Uuid::new_v4());
 
             let activity_payload = serde_json::json!({
