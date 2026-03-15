@@ -128,6 +128,47 @@ async fn rocket() -> _ {
         .filter(|s| !s.is_empty())
         .collect();
 
+    // Resolve Clerk FAPI domain for CSP headers.
+    // Priority: CLERK_FAPI_DOMAIN env var > auto-extract from publishable key.
+    let clerk_fapi_domain: Option<String> = std::env::var("CLERK_FAPI_DOMAIN")
+        .ok()
+        .filter(|s| !s.is_empty())
+        .or_else(|| {
+            let pk = &settings.security.clerk_publishable_key;
+            let encoded = pk
+                .strip_prefix("pk_live_")
+                .or_else(|| pk.strip_prefix("pk_test_"));
+            encoded.and_then(|b64| {
+                use base64::Engine as _;
+                base64::engine::general_purpose::STANDARD
+                    .decode(b64)
+                    .ok()
+                    .and_then(|bytes| String::from_utf8(bytes).ok())
+                    .map(|s| s.trim_end_matches('$').to_string())
+            })
+        });
+    if let Some(ref domain) = clerk_fapi_domain {
+        tracing::info!("Clerk FAPI domain for CSP: {}", domain);
+    }
+
+    let dashboard_csp = {
+        let mut clerk_domains = String::from("https://clerk.com https://*.clerk.accounts.dev");
+        if let Some(ref fapi) = clerk_fapi_domain {
+            clerk_domains.push_str(&format!(" https://{fapi}"));
+        }
+        format!(
+            "default-src 'self'; \
+             script-src 'self' 'unsafe-inline' {clerk}; \
+             style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; \
+             font-src 'self' https://fonts.gstatic.com; \
+             img-src 'self' data: https:; \
+             connect-src 'self' {clerk}; \
+             frame-src 'self' {clerk}; \
+             worker-src 'self' blob:",
+            clerk = clerk_domains,
+        )
+    };
+
     // Initialize Clerk service if secret key is configured
     let clerk_service = if !settings.security.clerk_secret_key.is_empty() {
         Some(std::sync::Arc::new(
@@ -225,6 +266,7 @@ async fn rocket() -> _ {
     rocket_instance
         .attach(AdHoc::on_response("Security Headers", move |req, res| {
             let cors_origins = cors_origins.clone();
+            let dashboard_csp = dashboard_csp.clone();
             Box::pin(async move {
                 // CORS headers — use configured origins instead of wildcard
                 let allowed_origin = if cors_origins.len() == 1 && cors_origins[0] == "*" {
@@ -294,7 +336,7 @@ async fn rocket() -> _ {
                 } else if path.starts_with("/dashboard") {
                     res.set_header(rocket::http::Header::new(
                         "Content-Security-Policy",
-                        "default-src 'self'; script-src 'self' 'unsafe-inline' https://clerk.com https://*.clerk.accounts.dev; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://clerk.com https://*.clerk.accounts.dev; frame-src 'self' https://clerk.com https://*.clerk.accounts.dev; worker-src 'self' blob:",
+                        dashboard_csp.clone(),
                     ));
                 } else {
                     res.set_header(rocket::http::Header::new(
