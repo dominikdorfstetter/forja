@@ -6,7 +6,7 @@ description: Redis-backed rate limiting with per-IP and per-key tracking.
 
 # Rate Limiting
 
-Forja uses **Redis-backed fixed-window counters** for rate limiting. Rate limiting operates at two levels: per-IP (global) and per-API-key (individual). If Redis is unavailable, the system degrades gracefully and allows all requests through.
+Forja uses **Redis-backed fixed-window counters** for rate limiting. Rate limiting operates at two levels: per-IP (global) and per-API-key (individual). If Redis is unavailable, the behavior depends on the configured **fail mode** (`open` or `closed`).
 
 ## How It Works
 
@@ -17,9 +17,14 @@ Request authenticated
         │
         ▼
 ┌───────────────────┐
-│ Redis available?  │──── No ────▶ Skip rate limiting (fail-open)
+│ Redis available?  │──── No ──▶ fail mode = "open"? Allow : 429
 └───────┬───────────┘
         │ Yes
+        ▼
+┌───────────────────────────┐
+│ Resolve client IP         │  (uses X-Forwarded-For / X-Real-IP
+│ (proxy-aware extraction)  │   when TRUST_PROXY_HEADERS=true)
+└───────┬───────────────────┘
         ▼
 ┌───────────────────┐
 │ IP is loopback?   │──── Yes ───▶ Skip IP rate limit
@@ -66,7 +71,7 @@ rl:ip:192.168.1.100:m:28485601
 1. **INCR** the Redis key (atomic increment, returns new count).
 2. If the count is `1` (first request in window), **EXPIRE** the key with the window duration as TTL.
 3. If the count exceeds the limit, return `429 Too Many Requests`.
-4. If Redis returns an error at any step, log a warning and **allow the request** (fail-open).
+4. If Redis returns an error at any step, behavior depends on the fail mode: **fail-open** (default) logs a warning and allows the request; **fail-closed** rejects with 429.
 
 This approach is simple, atomic (INCR is a single Redis command), and self-cleaning (keys expire automatically).
 
@@ -84,6 +89,17 @@ Global rate limits apply to all requests from a given IP address, regardless of 
 ### Exemptions
 
 Loopback addresses (`127.0.0.1`, `::1`, `localhost`) are exempt from IP-based rate limiting. This prevents development environments from being throttled.
+
+### Client IP Extraction Behind Proxies
+
+When running behind a reverse proxy (nginx, Caddy, HAProxy), all connections appear to come from `127.0.0.1`, which would bypass IP-based rate limiting via the loopback exemption.
+
+To handle this, set `TRUST_PROXY_HEADERS=true`. When enabled, Forja extracts the real client IP from:
+
+1. **`X-Forwarded-For`** header (first entry) — standard proxy header
+2. **`X-Real-IP`** header — single-IP header set by nginx
+
+Only enable this when running behind a trusted proxy. Without a proxy, clients could forge these headers to rotate their apparent IP and bypass rate limiting.
 
 ## Per-Key Rate Limiting
 
@@ -146,13 +162,22 @@ When a rate limit is exceeded, the API returns a `429 Too Many Requests` respons
 
 ## Graceful Degradation
 
-Rate limiting is designed to be non-critical. If Redis is unavailable:
+Rate limiting behavior when Redis is unavailable is controlled by the `RATE_LIMIT_FAIL_MODE` setting:
+
+### Fail-Open (default)
 
 - **At startup**: The application logs a warning and starts without rate limiting.
 - **During operation**: If a Redis command fails, the request is allowed through and a warning is logged.
 - **No data loss**: Rate limits are ephemeral counters, so Redis restarts simply reset all windows.
 
-This fail-open approach ensures that a Redis outage does not cause a service-wide outage.
+This ensures that a Redis outage does not cause a service-wide outage.
+
+### Fail-Closed
+
+- **At startup**: The application starts normally (rate limiting begins once Redis connects).
+- **During operation**: If a Redis command fails, the request is rejected with `429 Too Many Requests` and an error is logged.
+
+This ensures that no requests bypass rate limiting, at the cost of availability during Redis outages. Choose this mode for high-security deployments.
 
 ## Configuration Summary
 
@@ -162,3 +187,5 @@ This fail-open approach ensures that a Redis outage does not cause a service-wid
 | `APP__SECURITY__RATE_LIMIT_PER_SECOND` | Global per-IP requests/second | `50` |
 | `APP__SECURITY__RATE_LIMIT_PER_MINUTE` | Global per-IP requests/minute | `500` |
 | `APP__SECURITY__RATE_LIMIT_BURST` | Burst size (max concurrent) | `20` |
+| `RATE_LIMIT_FAIL_MODE` | Behavior when Redis is down: `open` or `closed` | `open` |
+| `TRUST_PROXY_HEADERS` | Use `X-Forwarded-For`/`X-Real-IP` for client IP | `false` |

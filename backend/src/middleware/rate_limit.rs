@@ -1,14 +1,14 @@
 //! Rate limiting middleware using Redis-backed fixed-window counters
 //!
-//! Provides both per-API-key and per-IP rate limiting with graceful degradation
-//! when Redis is unavailable.
+//! Provides both per-API-key and per-IP rate limiting with configurable
+//! behavior when Redis is unavailable (fail-open or fail-closed).
 
 use std::sync::atomic::{AtomicU32, AtomicU64, Ordering};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use redis::AsyncCommands;
 
-use crate::config::SecurityConfig;
+use crate::config::{RateLimitFailMode, SecurityConfig};
 use crate::errors::ApiError;
 
 /// Per-key rate limits extracted from API key fields
@@ -74,11 +74,12 @@ impl RateLimiter {
     ///
     /// Returns Ok(RateLimitInfo) if the request is allowed,
     /// or Err(ApiError::RateLimited) if the limit is exceeded.
-    /// On Redis errors, logs a warning and allows the request (fail-open).
+    /// On Redis errors, behavior depends on `fail_mode`.
     pub async fn check_key(
         redis: &mut redis::aio::ConnectionManager,
         key_id: &str,
         limits: &RateLimits,
+        fail_mode: &RateLimitFailMode,
     ) -> Result<RateLimitInfo, ApiError> {
         let identifier = format!("key:{}", key_id);
         let windows = Self::build_key_windows(limits);
@@ -91,13 +92,13 @@ impl RateLimiter {
             });
         }
 
-        Self::check_windows(redis, &identifier, &windows).await
+        Self::check_windows(redis, &identifier, &windows, fail_mode).await
     }
 
     /// Check global IP-based rate limit.
     ///
     /// Uses the per-second and per-minute limits from SecurityConfig.
-    /// On Redis errors, logs a warning and allows the request (fail-open).
+    /// On Redis errors, behavior depends on `config.rate_limit_fail_mode`.
     pub async fn check_ip(
         redis: &mut redis::aio::ConnectionManager,
         ip: &str,
@@ -117,7 +118,7 @@ impl RateLimiter {
             },
         ];
 
-        Self::check_windows(redis, &identifier, &windows).await
+        Self::check_windows(redis, &identifier, &windows, &config.rate_limit_fail_mode).await
     }
 
     /// Build window definitions from per-key rate limits
@@ -168,10 +169,12 @@ impl RateLimiter {
     ///
     /// Uses Redis INCR + EXPIRE (atomic, race-free fixed-window counters).
     /// Returns the most restrictive window info for response headers.
+    /// On Redis errors, `fail_mode` controls whether the request is allowed or denied.
     async fn check_windows(
         redis: &mut redis::aio::ConnectionManager,
         identifier: &str,
         windows: &[Window],
+        fail_mode: &RateLimitFailMode,
     ) -> Result<RateLimitInfo, ApiError> {
         let now = SystemTime::now()
             .duration_since(UNIX_EPOCH)
@@ -193,12 +196,23 @@ impl RateLimiter {
             let count: u32 = match redis.incr(&key, 1u32).await {
                 Ok(c) => c,
                 Err(e) => {
-                    tracing::warn!(error = %e, key = %key, "Redis rate limit INCR failed, allowing request (fail-open)");
-                    return Ok(RateLimitInfo {
-                        limit: window.limit,
-                        remaining: window.limit.saturating_sub(1),
-                        reset: window.duration,
-                    });
+                    return match fail_mode {
+                        RateLimitFailMode::Open => {
+                            tracing::warn!(error = %e, key = %key, "Redis rate limit INCR failed, allowing request (fail-open)");
+                            Ok(RateLimitInfo {
+                                limit: window.limit,
+                                remaining: window.limit.saturating_sub(1),
+                                reset: window.duration,
+                            })
+                        }
+                        RateLimitFailMode::Closed => {
+                            tracing::error!(error = %e, key = %key, "Redis rate limit INCR failed, rejecting request (fail-closed)");
+                            Err(ApiError::rate_limited(
+                                "Rate limiting unavailable — requests blocked (fail-closed mode)"
+                                    .to_string(),
+                            ))
+                        }
+                    };
                 }
             };
 

@@ -18,9 +18,59 @@ use crate::AppState;
 /// Header name for API key
 pub const API_KEY_HEADER: &str = "X-API-Key";
 
-/// Check whether an IP string represents a loopback address (exempt from IP rate limiting)
+/// Check whether an IP string represents a loopback address (exempt from IP rate limiting).
+///
+/// Only applies to the resolved client IP — when `trust_proxy_headers` is enabled,
+/// the real client IP is extracted from forwarded headers, so this check won't
+/// match for proxied production traffic.
 fn is_loopback(ip: &str) -> bool {
     ip == "127.0.0.1" || ip == "::1" || ip == "localhost"
+}
+
+/// Resolve the best client IP from forwarded headers + direct connection IP.
+///
+/// When `trust_proxy_headers` is true, prefers `X-Forwarded-For` (first entry),
+/// then `X-Real-IP`, then falls back to `direct_ip`.
+///
+/// **Security**: only enable `trust_proxy_headers` when running behind a trusted
+/// reverse proxy. An untrusted client can forge these headers to bypass rate limiting.
+fn resolve_client_ip(
+    xff_header: Option<&str>,
+    real_ip_header: Option<&str>,
+    direct_ip: &str,
+    trust_proxy_headers: bool,
+) -> String {
+    if trust_proxy_headers {
+        // X-Forwarded-For: client, proxy1, proxy2 — leftmost is the original client
+        if let Some(xff) = xff_header {
+            let first_ip = xff.split(',').next().unwrap_or("").trim();
+            if !first_ip.is_empty() {
+                return first_ip.to_string();
+            }
+        }
+        // X-Real-IP: single IP set by the proxy
+        if let Some(real_ip) = real_ip_header {
+            let trimmed = real_ip.trim();
+            if !trimmed.is_empty() {
+                return trimmed.to_string();
+            }
+        }
+    }
+    direct_ip.to_string()
+}
+
+/// Extract the real client IP from a Rocket request, respecting forwarded headers.
+fn extract_client_ip(request: &Request<'_>, trust_proxy_headers: bool) -> String {
+    let direct_ip = request
+        .client_ip()
+        .map(|ip| ip.to_string())
+        .unwrap_or_else(|| "unknown".to_string());
+    resolve_client_ip(
+        request.headers().get_one("X-Forwarded-For"),
+        request.headers().get_one("X-Real-IP"),
+        &direct_ip,
+        trust_proxy_headers,
+    )
 }
 
 /// Namespace UUID for generating deterministic Clerk user UUIDs
@@ -253,16 +303,14 @@ async fn try_api_key(
     // Rate limiting (only if Redis is available)
     if let Some(ref redis) = state.redis {
         let mut redis_conn = redis.clone();
-        let ip_str = request
-            .client_ip()
-            .map(|ip| ip.to_string())
-            .unwrap_or_else(|| "unknown".to_string());
+        let security = &state.settings.security;
+        let ip_str = extract_client_ip(request, security.trust_proxy_headers);
 
         let header_info = request.local_cache(RateLimitHeaderInfo::default);
 
         // 1. Check global IP-based rate limit (skip for loopback)
         if !is_loopback(&ip_str) {
-            match RateLimiter::check_ip(&mut redis_conn, &ip_str, &state.settings.security).await {
+            match RateLimiter::check_ip(&mut redis_conn, &ip_str, security).await {
                 Ok(info) => {
                     header_info.update(&info);
                 }
@@ -277,6 +325,7 @@ async fn try_api_key(
             &mut redis_conn,
             &validation.id.to_string(),
             &validation.rate_limits,
+            &security.rate_limit_fail_mode,
         )
         .await
         {
@@ -329,22 +378,14 @@ impl<'r> FromRequest<'r> for AuthenticatedKey {
                 // Apply rate limiting for Clerk users too
                 if let Some(ref redis) = state.redis {
                     let mut redis_conn = redis.clone();
-                    let ip_str = request
-                        .client_ip()
-                        .map(|ip| ip.to_string())
-                        .unwrap_or_else(|| "unknown".to_string());
+                    let security = &state.settings.security;
+                    let ip_str = extract_client_ip(request, security.trust_proxy_headers);
 
                     let header_info = request.local_cache(RateLimitHeaderInfo::default);
 
                     // IP-based rate limit (skip for loopback)
                     if !is_loopback(&ip_str) {
-                        match RateLimiter::check_ip(
-                            &mut redis_conn,
-                            &ip_str,
-                            &state.settings.security,
-                        )
-                        .await
-                        {
+                        match RateLimiter::check_ip(&mut redis_conn, &ip_str, security).await {
                             Ok(info) => header_info.update(&info),
                             Err(e) => return Outcome::Error((Status::TooManyRequests, e)),
                         }
@@ -363,7 +404,13 @@ impl<'r> FromRequest<'r> for AuthenticatedKey {
                         per_hour: Some(5000),
                         per_day: Some(50000),
                     };
-                    match RateLimiter::check_key(&mut redis_conn, &clerk_key, &default_limits).await
+                    match RateLimiter::check_key(
+                        &mut redis_conn,
+                        &clerk_key,
+                        &default_limits,
+                        &security.rate_limit_fail_mode,
+                    )
+                    .await
                     {
                         Ok(info) => header_info.update(&info),
                         Err(e) => return Outcome::Error((Status::TooManyRequests, e)),
@@ -730,5 +777,95 @@ mod tests {
 
         let other_uuid = Uuid::new_v5(&CLERK_UUID_NAMESPACE, b"user_different");
         assert_ne!(uuid1, other_uuid);
+    }
+
+    // --- is_loopback tests ---
+
+    #[test]
+    fn test_is_loopback_ipv4() {
+        assert!(is_loopback("127.0.0.1"));
+    }
+
+    #[test]
+    fn test_is_loopback_ipv6() {
+        assert!(is_loopback("::1"));
+    }
+
+    #[test]
+    fn test_is_loopback_localhost() {
+        assert!(is_loopback("localhost"));
+    }
+
+    #[test]
+    fn test_is_loopback_public_ip() {
+        assert!(!is_loopback("203.0.113.42"));
+        assert!(!is_loopback("10.0.0.1"));
+    }
+
+    // --- resolve_client_ip tests ---
+
+    #[test]
+    fn test_resolve_client_ip_no_trust() {
+        // When trust_proxy_headers is false, always returns direct IP
+        let result = resolve_client_ip(
+            Some("203.0.113.42"),
+            Some("198.51.100.5"),
+            "127.0.0.1",
+            false,
+        );
+        assert_eq!(result, "127.0.0.1");
+    }
+
+    #[test]
+    fn test_resolve_client_ip_xff_trusted() {
+        // X-Forwarded-For takes priority when trusted
+        let result = resolve_client_ip(
+            Some("203.0.113.42, 10.0.0.1"),
+            Some("198.51.100.5"),
+            "127.0.0.1",
+            true,
+        );
+        assert_eq!(result, "203.0.113.42");
+    }
+
+    #[test]
+    fn test_resolve_client_ip_xff_single() {
+        let result = resolve_client_ip(Some("203.0.113.42"), None, "127.0.0.1", true);
+        assert_eq!(result, "203.0.113.42");
+    }
+
+    #[test]
+    fn test_resolve_client_ip_real_ip_fallback() {
+        // Falls back to X-Real-IP when X-Forwarded-For is absent
+        let result = resolve_client_ip(None, Some("198.51.100.5"), "127.0.0.1", true);
+        assert_eq!(result, "198.51.100.5");
+    }
+
+    #[test]
+    fn test_resolve_client_ip_direct_fallback() {
+        // Falls back to direct IP when no forwarded headers present
+        let result = resolve_client_ip(None, None, "127.0.0.1", true);
+        assert_eq!(result, "127.0.0.1");
+    }
+
+    #[test]
+    fn test_resolve_client_ip_empty_xff() {
+        // Empty X-Forwarded-For should fall through to X-Real-IP
+        let result = resolve_client_ip(Some(""), Some("198.51.100.5"), "127.0.0.1", true);
+        assert_eq!(result, "198.51.100.5");
+    }
+
+    #[test]
+    fn test_resolve_client_ip_whitespace_xff() {
+        // Whitespace-only X-Forwarded-For should fall through
+        let result = resolve_client_ip(Some("  "), Some("198.51.100.5"), "127.0.0.1", true);
+        assert_eq!(result, "198.51.100.5");
+    }
+
+    #[test]
+    fn test_resolve_client_ip_xff_with_spaces() {
+        // X-Forwarded-For entries may have surrounding whitespace
+        let result = resolve_client_ip(Some("  203.0.113.42 , 10.0.0.1 "), None, "127.0.0.1", true);
+        assert_eq!(result, "203.0.113.42");
     }
 }

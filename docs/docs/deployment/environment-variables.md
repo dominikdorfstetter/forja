@@ -31,11 +31,26 @@ Complete reference of all environment variables used by Forja. Variables are gro
 | `APP__DATABASE__MAX_CONNECTIONS` | `10` | No | Maximum number of connections in the pool |
 | `APP__DATABASE__MIN_CONNECTIONS` | `1` | No | Minimum number of connections in the pool |
 
-## Redis
+## Redis & Rate Limiting
 
 | Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
 | `REDIS_URL` | -- | **Yes** | Redis connection string, e.g., `redis://host:6379` |
+| `RATE_LIMIT_FAIL_MODE` | `open` | No | Behavior when Redis is unavailable: `open` allows requests (availability), `closed` rejects with 429 (security) |
+| `TRUST_PROXY_HEADERS` | `false` | No | Trust `X-Forwarded-For` and `X-Real-IP` headers for real client IP extraction. **Enable only behind a trusted reverse proxy.** |
+
+:::caution Rate Limiting Behind a Reverse Proxy
+If your Forja instance runs behind a reverse proxy (nginx, Caddy, HAProxy) on the same host, **you must set `TRUST_PROXY_HEADERS=true`**. Otherwise all requests appear to come from `127.0.0.1` and bypass IP-based rate limiting entirely.
+
+When enabled, Forja reads the client IP from `X-Forwarded-For` (first entry) or `X-Real-IP` headers. Make sure your proxy sets these headers and strips any client-provided values to prevent spoofing.
+:::
+
+:::tip Fail-Open vs Fail-Closed
+- **`open`** (default): If Redis goes down, rate limits are bypassed and requests are allowed through. This prioritizes API availability — a Redis outage won't take your API offline.
+- **`closed`**: If Redis goes down, all rate-limited requests are rejected with HTTP 429. This prioritizes security — no requests can bypass rate limiting, but a Redis outage effectively blocks API access.
+
+Choose `closed` for high-security deployments where unauthorized access is a bigger risk than downtime.
+:::
 
 ## CORS
 
@@ -110,8 +125,10 @@ APP__PORT=8000
 # Database
 DATABASE_URL=postgres://forja:forja@localhost:5432/forja
 
-# Redis
+# Redis & Rate Limiting
 REDIS_URL=redis://localhost:6379
+# RATE_LIMIT_FAIL_MODE=open       # "open" (default) or "closed"
+# TRUST_PROXY_HEADERS=false       # set true behind a reverse proxy
 
 # CORS (development)
 APP__CORS_ORIGINS=*
