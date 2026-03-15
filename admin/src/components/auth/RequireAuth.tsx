@@ -1,7 +1,8 @@
 import { ReactNode } from 'react';
-import { RedirectToSignIn, SignedIn, SignedOut } from '@clerk/clerk-react';
+import { SignedIn, SignedOut } from '@clerk/clerk-react';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { useAuth } from '@/store/AuthContext';
+import WelcomePage from '@/pages/Welcome';
 
 interface RequireAuthProps {
   children: ReactNode;
@@ -13,7 +14,7 @@ export default function RequireAuth({ children }: RequireAuthProps) {
   return (
     <>
       <SignedOut>
-        <RedirectToSignIn />
+        <WelcomePage />
       </SignedOut>
       <SignedIn>
         {loading ? (

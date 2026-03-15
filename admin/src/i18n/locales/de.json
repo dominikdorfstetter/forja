@@ -2688,5 +2688,21 @@
       "healthy": "Alle Instanzen gesund",
       "blockSuggestion": "Blockierung erwägen"
     }
+  },
+  "welcome": {
+    "tagline": "Schmiede deine digitale Präsenz",
+    "subtitle": "Open-Source Headless CMS, entwickelt in Rust für Geschwindigkeit, Sicherheit und Skalierbarkeit.",
+    "signIn": "Anmelden",
+    "register": "Konto erstellen",
+    "featureFast": "Blitzschnell",
+    "featureFastDesc": "Entwickelt in Rust für maximale Leistung und Zuverlässigkeit.",
+    "featureSecure": "Sicher von Grund auf",
+    "featureSecureDesc": "Enterprise-Authentifizierung mit verschlüsselter Speicherung.",
+    "featureFederation": "Fediverse-fähig",
+    "featureFederationDesc": "ActivityPub-Federation für dezentrales Publizieren.",
+    "featureMultilingual": "Mehrsprachig",
+    "featureMultilingualDesc": "Vollständige i18n-Unterstützung mit 8+ Sprachen ab Werk.",
+    "openSource": "Open Source",
+    "madeWith": "Gebaut mit Rust"
   }
 }

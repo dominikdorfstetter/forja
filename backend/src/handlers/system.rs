@@ -1,5 +1,6 @@
 //! System endpoints (health check and API root)
 
+use rocket::response::Redirect;
 use rocket::serde::json::Json;
 use std::time::Instant;
 
@@ -9,14 +10,14 @@ use crate::AppState;
 #[utoipa::path(
     tag = "System",
     operation_id = "index",
-    description = "API root endpoint returning version info",
+    description = "Redirects to the admin dashboard",
     responses(
-        (status = 200, description = "API version identifier string (e.g. 'Forja API v1.2.3')", body = String)
+        (status = 303, description = "Redirect to /dashboard")
     )
 )]
 #[get("/")]
-pub fn index() -> &'static str {
-    concat!("Forja API v", env!("CARGO_PKG_VERSION"))
+pub fn index() -> Redirect {
+    Redirect::to("/dashboard")
 }
 
 #[utoipa::path(

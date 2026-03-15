@@ -2688,5 +2688,21 @@
       "healthy": "Wszystkie instancje zdrowe",
       "blockSuggestion": "Rozważ zablokowanie"
     }
+  },
+  "welcome": {
+    "tagline": "Wykuj swoją cyfrową obecność",
+    "subtitle": "Headless CMS o otwartym kodzie źródłowym zbudowany w Rust dla szybkości, bezpieczeństwa i skalowalności.",
+    "signIn": "Zaloguj się",
+    "register": "Utwórz konto",
+    "featureFast": "Błyskawiczny",
+    "featureFastDesc": "Zbudowany w Rust dla maksymalnej wydajności i niezawodności.",
+    "featureSecure": "Domyślnie bezpieczny",
+    "featureSecureDesc": "Uwierzytelnianie klasy enterprise z zaszyfrowanym przechowywaniem.",
+    "featureFederation": "Gotowy na Fediverse",
+    "featureFederationDesc": "Federacja ActivityPub do zdecentralizowanego publikowania.",
+    "featureMultilingual": "Wielojęzyczny",
+    "featureMultilingualDesc": "Pełne wsparcie i18n z ponad 8 językami w zestawie.",
+    "openSource": "Otwarte źródło",
+    "madeWith": "Zbudowany w Rust"
   }
 }

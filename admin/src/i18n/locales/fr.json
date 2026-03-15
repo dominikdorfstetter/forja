@@ -2688,5 +2688,21 @@
       "healthy": "Toutes les instances en bonne santé",
       "blockSuggestion": "Envisager de bloquer"
     }
+  },
+  "welcome": {
+    "tagline": "Forgez votre présence numérique",
+    "subtitle": "CMS headless open-source construit en Rust pour la vitesse, la sécurité et la scalabilité.",
+    "signIn": "Se connecter",
+    "register": "Créer un compte",
+    "featureFast": "Ultra rapide",
+    "featureFastDesc": "Construit en Rust pour des performances et une fiabilité maximales.",
+    "featureSecure": "Sécurisé par défaut",
+    "featureSecureDesc": "Authentification entreprise avec stockage chiffré.",
+    "featureFederation": "Prêt pour le Fediverse",
+    "featureFederationDesc": "Fédération ActivityPub pour la publication décentralisée.",
+    "featureMultilingual": "Multilingue",
+    "featureMultilingualDesc": "Support i18n complet avec plus de 8 langues incluses.",
+    "openSource": "Open Source",
+    "madeWith": "Construit avec Rust"
   }
 }

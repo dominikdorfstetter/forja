@@ -2688,5 +2688,21 @@
       "healthy": "Alle instanties gezond",
       "blockSuggestion": "Overweeg te blokkeren"
     }
+  },
+  "welcome": {
+    "tagline": "Smeed je digitale aanwezigheid",
+    "subtitle": "Open-source headless CMS gebouwd in Rust voor snelheid, veiligheid en schaalbaarheid.",
+    "signIn": "Inloggen",
+    "register": "Account aanmaken",
+    "featureFast": "Razend snel",
+    "featureFastDesc": "Gebouwd in Rust voor maximale prestaties en betrouwbaarheid.",
+    "featureSecure": "Standaard veilig",
+    "featureSecureDesc": "Enterprise-authenticatie met versleutelde opslag.",
+    "featureFederation": "Fediverse-gereed",
+    "featureFederationDesc": "ActivityPub-federatie voor gedecentraliseerd publiceren.",
+    "featureMultilingual": "Meertalig",
+    "featureMultilingualDesc": "Volledige i18n-ondersteuning met meer dan 8 talen inbegrepen.",
+    "openSource": "Open Source",
+    "madeWith": "Gebouwd met Rust"
   }
 }
