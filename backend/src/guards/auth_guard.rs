@@ -358,10 +358,10 @@ impl<'r> FromRequest<'r> for AuthenticatedKey {
                         _ => auth.id.to_string(),
                     };
                     let default_limits = RateLimits {
-                        per_second: Some(10),
-                        per_minute: Some(100),
-                        per_hour: Some(1000),
-                        per_day: Some(10000),
+                        per_second: Some(50),
+                        per_minute: Some(500),
+                        per_hour: Some(5000),
+                        per_day: Some(50000),
                     };
                     match RateLimiter::check_key(&mut redis_conn, &clerk_key, &default_limits).await
                     {

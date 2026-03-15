@@ -552,6 +552,7 @@ pub async fn update_blog(
                 id,
                 Some(auth.0.id),
                 None,
+                state.settings.public_domain(),
             )
             .await;
         }

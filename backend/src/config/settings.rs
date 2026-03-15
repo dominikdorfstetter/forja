@@ -42,6 +42,11 @@ pub struct Settings {
     /// CORS allowed origins (comma-separated)
     #[serde(default)]
     pub cors_origins: Option<String>,
+
+    /// Public URL where this Forja instance is reachable (e.g., "https://cms.example.com").
+    /// Used for federation handles (`site-slug@domain`) and ActivityPub actor URIs.
+    #[serde(default = "default_public_url")]
+    pub public_url: String,
 }
 
 fn default_environment() -> String {
@@ -64,6 +69,10 @@ fn default_true() -> bool {
     true
 }
 
+fn default_public_url() -> String {
+    "http://localhost:8000".to_string()
+}
+
 impl Default for Settings {
     fn default() -> Self {
         Self {
@@ -76,6 +85,7 @@ impl Default for Settings {
             log_level: default_log_level(),
             enable_tracing: default_true(),
             cors_origins: None,
+            public_url: default_public_url(),
         }
     }
 }
@@ -116,6 +126,7 @@ impl Settings {
             .set_default("security.enable_cors", true)?
             .set_default("security.cors_allowed_origins", "*")?
             .set_default("security.redis_url", "redis://127.0.0.1:6379")?
+            .set_default("public_url", "http://localhost:8000")?
             // Override with environment variables
             .add_source(
                 config::Environment::default()
@@ -173,9 +184,23 @@ impl Settings {
                 "storage.s3_endpoint",
                 std::env::var("STORAGE_S3_ENDPOINT").ok(),
             )?
+            // PUBLIC_URL override
+            .set_override_option("public_url", std::env::var("PUBLIC_URL").ok())?
             .build()?;
 
         settings.try_deserialize()
+    }
+
+    /// Extract the hostname from `public_url` for federation handles.
+    ///
+    /// `"https://cms.example.com"` → `"cms.example.com"`
+    /// `"http://localhost:8000"` → `"localhost:8000"`
+    pub fn public_domain(&self) -> &str {
+        self.public_url
+            .strip_prefix("https://")
+            .or_else(|| self.public_url.strip_prefix("http://"))
+            .unwrap_or(&self.public_url)
+            .trim_end_matches('/')
     }
 
     /// Check if running in development mode
@@ -186,5 +211,46 @@ impl Settings {
     /// Check if running in production mode
     pub fn is_production(&self) -> bool {
         self.environment == "production"
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_public_domain_https() {
+        let s = Settings {
+            public_url: "https://cms.example.com".to_string(),
+            ..Default::default()
+        };
+        assert_eq!(s.public_domain(), "cms.example.com");
+    }
+
+    #[test]
+    fn test_public_domain_http_with_port() {
+        let s = Settings {
+            public_url: "http://localhost:8000".to_string(),
+            ..Default::default()
+        };
+        assert_eq!(s.public_domain(), "localhost:8000");
+    }
+
+    #[test]
+    fn test_public_domain_trailing_slash() {
+        let s = Settings {
+            public_url: "https://cms.example.com/".to_string(),
+            ..Default::default()
+        };
+        assert_eq!(s.public_domain(), "cms.example.com");
+    }
+
+    #[test]
+    fn test_public_domain_bare() {
+        let s = Settings {
+            public_url: "cms.example.com".to_string(),
+            ..Default::default()
+        };
+        assert_eq!(s.public_domain(), "cms.example.com");
     }
 }

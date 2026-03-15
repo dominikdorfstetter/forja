@@ -34,7 +34,7 @@ async fn resolve_actor(
         .await?
         .ok_or_else(|| ApiError::not_found("No ActivityPub actor for this site"))?;
 
-    let domain = Site::resolve_domain(&state.db, site.id).await?;
+    let domain = state.settings.public_domain().to_string();
 
     Ok((site, actor, domain))
 }

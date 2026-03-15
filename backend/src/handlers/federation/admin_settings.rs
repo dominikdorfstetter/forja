@@ -68,9 +68,9 @@ async fn build_settings_response(
         let actor = ApActor::find_by_site_id(&state.db, site_id).await?;
         if let Some(actor) = actor {
             let site = Site::find_by_id(&state.db, site_id).await?;
-            let domain = Site::resolve_domain(&state.db, site_id).await?;
+            let domain = state.settings.public_domain();
 
-            let uri = actor.actor_uri(&domain, &site.slug);
+            let uri = actor.actor_uri(domain, &site.slug);
             let wf = format!("{}@{}", site.slug, domain);
             let sum = actor.summary.clone();
             let av = actor.avatar_url.clone();
@@ -283,10 +283,10 @@ pub async fn enable_federation(
     let enc_key = encryption::resolve_key(&state.settings.security.ai_encryption_key)?;
     let (rsa_enc, rsa_nonce) = key_management::encrypt_private_key(&rsa_private_der, &enc_key)?;
 
-    // Look up the production domain
-    let domain = Site::resolve_domain(&state.db, site_id).await?;
+    // Use the app's public domain for federation handles and actor URIs
+    let domain = state.settings.public_domain();
 
-    let (inbox_url, outbox_url, followers_url) = actor::generate_urls(&domain, &site.slug);
+    let (inbox_url, outbox_url, followers_url) = actor::generate_urls(domain, &site.slug);
 
     // Create actor
     ApActor::create(
@@ -414,9 +414,9 @@ pub async fn rotate_keys(
     // Delete old actor and create new one with fresh keys
     ApActor::delete_by_site_id(&state.db, site_id).await?;
 
-    let domain = Site::resolve_domain(&state.db, site_id).await?;
+    let domain = state.settings.public_domain();
 
-    let (inbox_url, outbox_url, followers_url) = actor::generate_urls(&domain, &site.slug);
+    let (inbox_url, outbox_url, followers_url) = actor::generate_urls(domain, &site.slug);
 
     ApActor::create(
         &state.db,

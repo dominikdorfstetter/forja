@@ -56,6 +56,7 @@ impl Fairing for PublishScheduler {
         };
 
         let pool = state.db.clone();
+        let public_domain = state.settings.public_domain().to_string();
 
         tracing::info!("Publish scheduler starting (poll={}s)", POLL_INTERVAL_SECS,);
 
@@ -65,15 +66,15 @@ impl Fairing for PublishScheduler {
 
             loop {
                 interval.tick().await;
-                publish_due_content(&pool).await;
-                publish_due_notes(&pool).await;
+                publish_due_content(&pool, &public_domain).await;
+                publish_due_notes(&pool, &public_domain).await;
             }
         });
     }
 }
 
 /// Find all scheduled content that is due and publish it.
-async fn publish_due_content(pool: &PgPool) {
+async fn publish_due_content(pool: &PgPool, public_domain: &str) {
     let rows = match fetch_due_content(pool).await {
         Ok(rows) => rows,
         Err(e) => {
@@ -112,6 +113,7 @@ async fn publish_due_content(pool: &PgPool) {
             row.entity_id,
             None, // system action — no user
             Some("auto-published by scheduler"),
+            public_domain,
         )
         .await;
 
@@ -172,7 +174,7 @@ async fn fetch_due_content(pool: &PgPool) -> Result<Vec<ScheduledContentRow>, sq
 }
 
 /// Find scheduled federation notes that are due and publish + federate them.
-async fn publish_due_notes(pool: &PgPool) {
+async fn publish_due_notes(pool: &PgPool, public_domain: &str) {
     let notes = match ApNote::find_due_scheduled(pool).await {
         Ok(notes) => notes,
         Err(e) => {
@@ -201,7 +203,7 @@ async fn publish_due_notes(pool: &PgPool) {
         }
 
         // Federate the note — same logic as create_note handler
-        if let Err(e) = federate_note(pool, note).await {
+        if let Err(e) = federate_note(pool, note, public_domain).await {
             tracing::warn!(
                 note_id = %note.id,
                 "Publish scheduler: failed to federate scheduled note: {e}"
@@ -211,16 +213,18 @@ async fn publish_due_notes(pool: &PgPool) {
 }
 
 /// Federate a single note (build Create activity and fan out to followers).
-async fn federate_note(pool: &PgPool, note: &ApNote) -> Result<(), crate::errors::ApiError> {
+async fn federate_note(
+    pool: &PgPool,
+    note: &ApNote,
+    domain: &str,
+) -> Result<(), crate::errors::ApiError> {
     let site = Site::find_by_id(pool, note.site_id).await?;
 
     let actor = ApActor::find_by_site_id(pool, note.site_id)
         .await?
         .ok_or_else(|| crate::errors::ApiError::internal("No actor for site"))?;
 
-    let domain = Site::resolve_domain(pool, note.site_id).await?;
-
-    let actor_uri = actor.actor_uri(&domain, &site.slug);
+    let actor_uri = actor.actor_uri(domain, &site.slug);
     let note_uri = format!("https://{}/ap/{}/notes/{}", domain, site.slug, note.id);
     let followers_url = actor.followers_url.clone();
 

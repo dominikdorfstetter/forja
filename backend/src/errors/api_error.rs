@@ -250,12 +250,29 @@ impl<'r> Responder<'r, 'static> for ApiError {
         let code = self.code().to_string();
         let body = self.to_problem_details();
 
-        tracing::error!(
-            error = %self,
-            status = %status,
-            code = %code,
-            "API error response"
-        );
+        let status_code = status.code;
+        if status_code >= 500 {
+            tracing::error!(
+                error = %self,
+                status = %status,
+                code = %code,
+                "🔴 Server error"
+            );
+        } else if status_code == 429 {
+            tracing::warn!(
+                error = %self,
+                status = %status,
+                code = %code,
+                "🟠 Rate limited"
+            );
+        } else {
+            tracing::warn!(
+                error = %self,
+                status = %status,
+                code = %code,
+                "🟡 Client error"
+            );
+        }
 
         let json = serde_json::to_string(&body).map_err(|_| Status::InternalServerError)?;
 
