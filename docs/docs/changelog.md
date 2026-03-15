@@ -6,6 +6,30 @@ sidebar_position: 100
 
 This page tracks the release history of Forja. For the most up-to-date changelog, see the [CHANGELOG.md](https://github.com/dominikdorfstetter/forja/blob/main/CHANGELOG.md) file in the repository.
 
+## v1.0.7
+
+### Added
+
+- **Welcome page** -- branded landing page for unauthenticated visitors with Forja logo, tagline, feature carousel, and Sign In / Register buttons
+  - Auto-scrolling horizontal carousel showcasing 8 platform features
+  - Full i18n support across all 8 languages (EN, DE, FR, ES, IT, PT, NL, PL)
+  - Language selector for switching locale before login
+  - Creator credit, EU badge, version number, GitHub and Docs links in footer
+  - Uses Clerk hosted redirect (CSP-safe) instead of embedded sign-in components
+
+### Fixed
+
+- **CSP blocking Clerk on custom FAPI domains** -- Content-Security-Policy for `/dashboard` now dynamically includes the Clerk Frontend API domain extracted from `CLERK_PUBLISHABLE_KEY`. Custom Clerk domains (e.g. `clerk.dorfstetter.at`) no longer cause blank pages. Optional `CLERK_FAPI_DOMAIN` env var for explicit override.
+- **Docker tag immutability conflict** -- removed `major.minor` Docker tag from CI to avoid push conflicts on patch releases
+
+### Changed
+
+- Root route (`GET /`) now redirects to `/dashboard` instead of returning API version string
+- `ENCRYPTION_KEY` and `CLERK_FAPI_DOMAIN` documented in `.env.example`
+- App version injected at build time via Vite `define` from `package.json`
+
+---
+
 ## v1.0.6
 
 ### Added
