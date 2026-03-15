@@ -2688,5 +2688,31 @@
       "healthy": "Wszystkie instancje zdrowe",
       "blockSuggestion": "Rozważ zablokowanie"
     }
+  },
+  "welcome": {
+    "tagline": "Wykuj swoją cyfrową obecność",
+    "subtitle": "Headless CMS o otwartym kodzie źródłowym zbudowany w Rust dla szybkości, bezpieczeństwa i skalowalności.",
+    "signIn": "Zaloguj się",
+    "register": "Utwórz konto",
+    "featureFast": "Błyskawiczny",
+    "featureFastDesc": "Zbudowany w Rust dla maksymalnej wydajności i niezawodności.",
+    "featureSecure": "Domyślnie bezpieczny",
+    "featureSecureDesc": "Uwierzytelnianie klasy enterprise z zaszyfrowanym przechowywaniem.",
+    "featureFederation": "Gotowy na Fediverse",
+    "featureFederationDesc": "Federacja ActivityPub do zdecentralizowanego publikowania.",
+    "featureMultilingual": "Wielojęzyczny",
+    "featureMultilingualDesc": "Pełne wsparcie i18n z ponad 8 językami w zestawie.",
+    "featureApi": "REST API natywne",
+    "featureApiDesc": "Pełna dokumentacja OpenAPI z wbudowanym Swagger UI.",
+    "featureMultiSite": "Multi-site",
+    "featureMultiSiteDesc": "Zarządzaj wieloma stronami z jednego panelu.",
+    "featureStorage": "Elastyczne przechowywanie",
+    "featureStorageDesc": "Lokalny system plików lub magazyn chmurowy kompatybilny z S3.",
+    "featureSeo": "Zoptymalizowany pod SEO",
+    "featureSeoDesc": "Wbudowane metadane, mapy strony i dane strukturalne.",
+    "openSource": "Otwarte źródło",
+    "madeWith": "Zbudowany w Rust",
+    "createdBy": "Stworzone przez {{name}}",
+    "madeInEu": "Zaprojektowane i zbudowane w UE"
   }
 }

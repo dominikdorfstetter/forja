@@ -2689,5 +2689,31 @@
       "via": "Published via Forja",
       "notEnabled": "Enable federation to preview"
     }
+  },
+  "welcome": {
+    "tagline": "Forge your digital presence",
+    "subtitle": "Open-source headless CMS built with Rust for speed, security, and scale.",
+    "signIn": "Sign In",
+    "register": "Create Account",
+    "featureFast": "Blazing Fast",
+    "featureFastDesc": "Built in Rust for maximum performance and reliability.",
+    "featureSecure": "Secure by Default",
+    "featureSecureDesc": "Enterprise-grade authentication with encrypted storage.",
+    "featureFederation": "Fediverse Ready",
+    "featureFederationDesc": "ActivityPub federation for decentralized publishing.",
+    "featureMultilingual": "Multilingual",
+    "featureMultilingualDesc": "Full i18n support with 8+ languages out of the box.",
+    "featureApi": "REST API First",
+    "featureApiDesc": "Full OpenAPI docs with Swagger UI built in.",
+    "featureMultiSite": "Multi-Site",
+    "featureMultiSiteDesc": "Manage multiple websites from a single dashboard.",
+    "featureStorage": "Flexible Storage",
+    "featureStorageDesc": "Local filesystem or S3-compatible cloud storage.",
+    "featureSeo": "SEO Optimized",
+    "featureSeoDesc": "Built-in metadata, sitemaps, and structured data.",
+    "openSource": "Open Source",
+    "madeWith": "Made with Rust",
+    "createdBy": "Created by {{name}}",
+    "madeInEu": "Designed & built in the EU"
   }
 }
