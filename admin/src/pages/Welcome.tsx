@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
+import { useClerk } from '@clerk/clerk-react';
 import { Box, Button, Container, Stack, Typography, useMediaQuery } from '@mui/material';
 import WelcomeFeatureGrid from '@/components/welcome/WelcomeFeatureGrid';
 import WelcomeLanguageSelector from '@/components/welcome/WelcomeLanguageSelector';
@@ -8,7 +8,7 @@ import WelcomeFooter from '@/components/welcome/WelcomeFooter';
 
 export default function WelcomePage() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  const clerk = useClerk();
   const [mounted, setMounted] = useState(false);
   const isSmall = useMediaQuery('(max-width:600px)');
 
@@ -172,7 +172,7 @@ export default function WelcomePage() {
           {t('welcome.subtitle')}
         </Typography>
 
-        <WelcomeFeatureGrid mounted={mounted} isSmall={isSmall} />
+        <WelcomeFeatureGrid mounted={mounted} />
 
         {/* CTA buttons */}
         <Stack
@@ -188,7 +188,7 @@ export default function WelcomePage() {
           <Button
             variant="contained"
             size="large"
-            onClick={() => navigate('/login')}
+            onClick={() => clerk.redirectToSignIn({ signInFallbackRedirectUrl: '/dashboard' })}
             sx={{
               px: 5,
               py: 1.4,
@@ -209,7 +209,7 @@ export default function WelcomePage() {
           <Button
             variant="outlined"
             size="large"
-            onClick={() => navigate('/sign-up')}
+            onClick={() => clerk.redirectToSignUp({ signInFallbackRedirectUrl: '/dashboard' })}
             sx={{
               px: 5,
               py: 1.4,

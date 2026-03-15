@@ -2702,7 +2702,17 @@
     "featureFederationDesc": "Federação ActivityPub para publicação descentralizada.",
     "featureMultilingual": "Multilíngue",
     "featureMultilingualDesc": "Suporte i18n completo com mais de 8 idiomas incluídos.",
+    "featureApi": "API REST nativa",
+    "featureApiDesc": "Documentação OpenAPI completa com Swagger UI integrado.",
+    "featureMultiSite": "Multi-site",
+    "featureMultiSiteDesc": "Gerencie múltiplos sites a partir de um único painel.",
+    "featureStorage": "Armazenamento flexível",
+    "featureStorageDesc": "Sistema de arquivos local ou armazenamento cloud compatível com S3.",
+    "featureSeo": "Otimizado para SEO",
+    "featureSeoDesc": "Metadados, sitemaps e dados estruturados integrados.",
     "openSource": "Código aberto",
-    "madeWith": "Feito com Rust"
+    "madeWith": "Feito com Rust",
+    "createdBy": "Criado por {{name}}",
+    "madeInEu": "Projetado & construído na UE"
   }
 }
