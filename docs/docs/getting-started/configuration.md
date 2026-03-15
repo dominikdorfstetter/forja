@@ -53,13 +53,15 @@ APP__DATABASE__CONNECT_TIMEOUT_SECONDS=30
 APP__DATABASE__IDLE_TIMEOUT_SECONDS=600
 ```
 
-### Redis
+### Redis & Rate Limiting
 
-Redis is used for rate limiting. If Redis is unavailable, the backend starts without rate limiting.
+Redis is used for rate limiting. If Redis is unavailable at startup, the backend starts without rate limiting. During operation, the fail mode controls behavior (see below).
 
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `REDIS_URL` | `redis://127.0.0.1:6379` | Redis connection URL. Supports `redis://` and `rediss://` (TLS) schemes. |
+| `RATE_LIMIT_FAIL_MODE` | `open` | Behavior when Redis is unavailable: `open` allows requests through, `closed` rejects with 429. |
+| `TRUST_PROXY_HEADERS` | `false` | Trust `X-Forwarded-For` / `X-Real-IP` headers for client IP. **Set to `true` when behind a reverse proxy.** |
 
 ### CORS
 
@@ -198,8 +200,10 @@ APP__DATABASE__IDLE_TIMEOUT_SECONDS=600
 # CORS
 APP__CORS_ORIGINS=http://localhost:3000,http://localhost:5173,http://localhost:8080
 
-# Redis
+# Redis & Rate Limiting
 REDIS_URL=redis://127.0.0.1:6379
+# RATE_LIMIT_FAIL_MODE=open       # "open" or "closed"
+# TRUST_PROXY_HEADERS=false       # set true behind a reverse proxy
 
 # Clerk (uncomment and fill in your values)
 # CLERK_SECRET_KEY=sk_test_...

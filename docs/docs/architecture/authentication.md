@@ -165,10 +165,13 @@ API keys are stored as SHA-256 hashes in the database. The raw key is never pers
 
 After successful API key authentication, the guard checks rate limits if Redis is available:
 
-1. **IP-based rate limit** -- global, per-IP (skipped for loopback addresses `127.0.0.1` / `::1`).
-2. **Key-based rate limit** -- per API key, using the key's configured limits.
+1. **Resolve client IP** -- when `TRUST_PROXY_HEADERS=true`, the real client IP is extracted from `X-Forwarded-For` or `X-Real-IP` headers (for correct behavior behind reverse proxies). Otherwise, the direct connection IP is used.
+2. **IP-based rate limit** -- global, per-IP (skipped for loopback addresses `127.0.0.1` / `::1`).
+3. **Key-based rate limit** -- per API key, using the key's configured limits.
 
 If either limit is exceeded, the guard returns `429 Too Many Requests` with an RFC 7807 error body. Rate limit headers (`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`) are set on every response.
+
+If Redis is unavailable, the `RATE_LIMIT_FAIL_MODE` setting determines whether requests are allowed through (`open`, default) or rejected (`closed`). See [Rate Limiting](./rate-limiting) for details.
 
 ## Environment Variables
 
