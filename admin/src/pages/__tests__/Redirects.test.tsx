@@ -3,6 +3,15 @@ import { renderWithProviders, screen, waitFor } from '@/test/test-utils';
 import apiService from '@/services/api';
 import type { Paginated, Redirect } from '@/types/api';
 
+const mockAuth = vi.hoisted(() => ({
+  permission: 'Admin' as string,
+  loading: false,
+  canRead: true,
+  canWrite: true,
+  isAdmin: true,
+  isMaster: false,
+}));
+
 vi.mock('@/store/SiteContext', () => ({
   useSiteContext: () => ({
     selectedSiteId: 'site-1',
@@ -15,28 +24,7 @@ vi.mock('@/store/SiteContext', () => ({
 }));
 
 vi.mock('@/store/AuthContext', () => ({
-  useAuth: () => ({
-    permission: 'Admin' as const,
-    loading: false,
-    canRead: true,
-    canWrite: true,
-    isAdmin: true,
-    isMaster: false,
-    memberships: [],
-    isSystemAdmin: false,
-    siteId: null,
-    logout: vi.fn(),
-    refreshAuth: vi.fn(),
-    currentSiteRole: 'admin' as const,
-    canManageMembers: true,
-    canEditAll: true,
-    isOwner: false,
-    clerkUserId: 'clerk-1',
-    userEmail: 'test@example.com',
-    userFullName: 'Test User',
-    userImageUrl: null,
-    getRoleForSite: () => 'admin' as const,
-  }),
+  useAuth: () => mockAuth,
   AuthProvider: ({ children }: { children: React.ReactNode }) => children,
   notifySelectedSiteChanged: vi.fn(),
 }));
@@ -77,6 +65,14 @@ let RedirectsPage: typeof import('@/pages/Redirects').default;
 
 beforeEach(async () => {
   vi.clearAllMocks();
+  Object.assign(mockAuth, {
+    permission: 'Admin',
+    loading: false,
+    canRead: true,
+    canWrite: true,
+    isAdmin: true,
+    isMaster: false,
+  });
   const mod = await import('@/pages/Redirects');
   RedirectsPage = mod.default;
 });
@@ -106,5 +102,40 @@ describe('RedirectsPage', () => {
     });
     const statuses = screen.getAllByRole('status');
     expect(statuses.length).toBeGreaterThan(0);
+  });
+
+  describe('RBAC guards', () => {
+    it('hides edit and delete buttons for non-write users', async () => {
+      Object.assign(mockAuth, { permission: 'Read', canWrite: false, isAdmin: false });
+      vi.mocked(apiService.getRedirects).mockResolvedValue(mockPaginated);
+      renderWithProviders(<RedirectsPage />);
+      await waitFor(() => {
+        expect(screen.getByText('/old-page')).toBeInTheDocument();
+      });
+
+      const editButtons = screen.queryAllByRole('button').filter(
+        (b) => b.querySelector('[data-testid="EditIcon"]'),
+      );
+      const deleteButtons = screen.queryAllByRole('button').filter(
+        (b) => b.querySelector('[data-testid="DeleteIcon"]'),
+      );
+
+      expect(editButtons).toHaveLength(0);
+      expect(deleteButtons).toHaveLength(0);
+    });
+
+    it('hides create button in page header for non-write users', async () => {
+      Object.assign(mockAuth, { permission: 'Read', canWrite: false, isAdmin: false });
+      vi.mocked(apiService.getRedirects).mockResolvedValue(mockPaginated);
+      renderWithProviders(<RedirectsPage />);
+      await waitFor(() => {
+        expect(screen.getByText('/old-page')).toBeInTheDocument();
+      });
+
+      const addButtons = screen.queryAllByRole('button').filter(
+        (b) => b.textContent?.includes('redirect') || b.textContent?.includes('Redirect'),
+      );
+      expect(addButtons).toHaveLength(0);
+    });
   });
 });

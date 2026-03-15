@@ -10,6 +10,7 @@ import { format } from 'date-fns';
 import apiService from '@/services/api';
 import type { Redirect, CreateRedirectRequest, UpdateRedirectRequest } from '@/types/api';
 import { useSiteContext } from '@/store/SiteContext';
+import { useAuth } from '@/store/AuthContext';
 import { useListPageState } from '@/hooks/useListPageState';
 import { useCrudMutations } from '@/hooks/useCrudMutations';
 import PageHeader from '@/components/shared/PageHeader';
@@ -23,6 +24,7 @@ import RedirectFormDialog from '@/components/redirects/RedirectFormDialog';
 export default function RedirectsPage() {
   const { t } = useTranslation();
   const { selectedSiteId } = useSiteContext();
+  const { canWrite } = useAuth();
 
   const {
     page, pageSize, formOpen, editing, deleting,
@@ -135,8 +137,8 @@ export default function RedirectsPage() {
       align: 'right',
       render: (r) => (
         <>
-          <Tooltip title={t('common.actions.edit')}><IconButton size="small" onClick={() => openEdit(r)}><EditIcon fontSize="small" /></IconButton></Tooltip>
-          <Tooltip title={t('common.actions.delete')}><IconButton size="small" color="error" onClick={() => openDelete(r)}><DeleteIcon fontSize="small" /></IconButton></Tooltip>
+          {canWrite && <Tooltip title={t('common.actions.edit')}><IconButton size="small" onClick={() => openEdit(r)}><EditIcon fontSize="small" /></IconButton></Tooltip>}
+          {canWrite && <Tooltip title={t('common.actions.delete')}><IconButton size="small" color="error" onClick={() => openDelete(r)}><DeleteIcon fontSize="small" /></IconButton></Tooltip>}
         </>
       ),
     },
@@ -147,7 +149,7 @@ export default function RedirectsPage() {
       <PageHeader
         title={t('redirects.title')}
         subtitle={t('redirects.subtitle')}
-        action={selectedSiteId ? { label: t('redirects.addRedirect'), icon: <AddIcon />, onClick: openCreate } : undefined}
+        action={selectedSiteId ? { label: t('redirects.addRedirect'), icon: <AddIcon />, onClick: openCreate, hidden: !canWrite } : undefined}
       />
 
       {!selectedSiteId ? (
@@ -162,7 +164,7 @@ export default function RedirectsPage() {
           {isLoading ? (
             <Box sx={{ p: 3 }}><LoadingState label={t('redirects.loading')} /></Box>
           ) : !redirects || redirects.length === 0 ? (
-            <Box sx={{ p: 3 }}><EmptyState icon={<AltRouteIcon sx={{ fontSize: 48 }} />} title={t('redirects.empty.title')} description={t('redirects.empty.description')} action={{ label: t('redirects.addRedirect'), onClick: openCreate }} /></Box>
+            <Box sx={{ p: 3 }}><EmptyState icon={<AltRouteIcon sx={{ fontSize: 48 }} />} title={t('redirects.empty.title')} description={t('redirects.empty.description')} action={canWrite ? { label: t('redirects.addRedirect'), onClick: openCreate } : undefined} /></Box>
           ) : (
             <DataTable
               data={redirects}
