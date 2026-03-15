@@ -58,8 +58,20 @@ export function useFederationMutations(siteId: string) {
   });
 
   const unblockInstanceMutation = useMutation({
-    mutationFn: (blockId: string) => apiService.unblockInstance(siteId, blockId),
+    mutationFn: (domain: string) => apiService.unblockInstance(siteId, domain),
     onSuccess: () => { showSuccess('Instance unblocked'); invalidateBlockedInstances(); },
+    onError: showError,
+  });
+
+  const updateBlockedInstanceMutation = useMutation({
+    mutationFn: (data: { domain: string; reason?: string }) => apiService.updateBlockedInstance(siteId, data.domain, data),
+    onSuccess: () => { showSuccess('Block reason updated'); invalidateBlockedInstances(); },
+    onError: showError,
+  });
+
+  const clearBlocklistMutation = useMutation({
+    mutationFn: () => apiService.clearBlocklist(siteId),
+    onSuccess: () => { showSuccess('Blocklist cleared'); invalidateBlockedInstances(); },
     onError: showError,
   });
 
@@ -120,6 +132,8 @@ export function useFederationMutations(siteId: string) {
     importBlocklistMutation,
     blockInstanceMutation,
     unblockInstanceMutation,
+    updateBlockedInstanceMutation,
+    clearBlocklistMutation,
     blockActorMutation,
     unblockActorMutation,
     enableFederation,

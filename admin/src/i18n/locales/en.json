@@ -2574,11 +2574,17 @@
       },
       "import": "Import",
       "importTitle": "Import Blocklist",
-      "importDescription": "Paste domains (one per line) or upload a CSV/TXT file",
+      "importDescription": "Paste domains (one per line) or upload a CSV/TXT file. Mastodon export CSV is supported.",
       "importButton": "Import Domains",
       "importSuccess": "Imported {{imported}} domains ({{skipped}} already blocked)",
-      "importPaste": "Paste domains here (one per line)...",
-      "importFile": "Or upload a file"
+      "importPaste": "Paste domains here (one per line or Mastodon CSV)...",
+      "importFile": "Or upload a file",
+      "editReasonTitle": "Edit reason for {{domain}}",
+      "editReasonTooltip": "Edit reason",
+      "clearAll": "Clear All",
+      "clearAllTitle": "Clear Blocklist",
+      "clearAllMessage": "This will remove all blocked instances. This action cannot be undone.",
+      "clearAllConfirm": "Clear All"
     },
     "health": {
       "title": "Instance Health",
@@ -2712,6 +2718,7 @@
     "featureSeo": "SEO Optimized",
     "featureSeoDesc": "Built-in metadata, sitemaps, and structured data.",
     "openSource": "Open Source",
+    "docs": "Documentation",
     "madeWith": "Made with Rust",
     "createdBy": "Created by {{name}}",
     "madeInEu": "Designed & built in the EU"

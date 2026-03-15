@@ -129,13 +129,7 @@ pub async fn create_note(
         .ok_or_else(|| ApiError::internal("No actor configured for federated site"))?;
 
     // Resolve domain
-    let domain: String = sqlx::query_scalar(
-        "SELECT domain FROM site_domains WHERE site_id = $1 AND is_primary = TRUE AND environment = 'production' LIMIT 1"
-    )
-    .bind(site_id)
-    .fetch_optional(&state.db)
-    .await?
-    .unwrap_or_else(|| "localhost".to_string());
+    let domain = Site::resolve_domain(&state.db, site_id).await?;
 
     let actor_uri = actor.actor_uri(&domain, &site.slug);
     let note_uri = format!("https://{}/ap/{}/notes/{}", domain, site.slug, note.id);
@@ -316,13 +310,7 @@ pub async fn update_note(
         let actor = ApActor::find_by_site_id(&state.db, site_id).await?;
 
         if let Some(actor) = actor {
-            let domain: String = sqlx::query_scalar(
-                "SELECT domain FROM site_domains WHERE site_id = $1 AND is_primary = TRUE AND environment = 'production' LIMIT 1"
-            )
-            .bind(site_id)
-            .fetch_optional(&state.db)
-            .await?
-            .unwrap_or_else(|| "localhost".to_string());
+            let domain = Site::resolve_domain(&state.db, site_id).await?;
 
             let actor_uri = actor.actor_uri(&domain, &site.slug);
             let followers_url = actor.followers_url.clone();
@@ -444,13 +432,7 @@ pub async fn delete_note(
         let actor = ApActor::find_by_site_id(&state.db, site_id).await?;
 
         if let Some(actor) = actor {
-            let domain: String = sqlx::query_scalar(
-                "SELECT domain FROM site_domains WHERE site_id = $1 AND is_primary = TRUE AND environment = 'production' LIMIT 1"
-            )
-            .bind(site_id)
-            .fetch_optional(&state.db)
-            .await?
-            .unwrap_or_else(|| "localhost".to_string());
+            let domain = Site::resolve_domain(&state.db, site_id).await?;
 
             let actor_uri = actor.actor_uri(&domain, &site.slug);
             let activity_uri = format!("https://{}/ap/activities/{}", domain, Uuid::new_v4());

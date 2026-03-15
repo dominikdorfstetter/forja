@@ -68,13 +68,7 @@ async fn build_settings_response(
         let actor = ApActor::find_by_site_id(&state.db, site_id).await?;
         if let Some(actor) = actor {
             let site = Site::find_by_id(&state.db, site_id).await?;
-            let domain: String = sqlx::query_scalar(
-                "SELECT domain FROM site_domains WHERE site_id = $1 AND is_primary = TRUE AND environment = 'production' LIMIT 1"
-            )
-            .bind(site_id)
-            .fetch_optional(&state.db)
-            .await?
-            .unwrap_or_else(|| "localhost".to_string());
+            let domain = Site::resolve_domain(&state.db, site_id).await?;
 
             let uri = actor.actor_uri(&domain, &site.slug);
             let wf = format!("{}@{}", site.slug, domain);
@@ -290,13 +284,7 @@ pub async fn enable_federation(
     let (rsa_enc, rsa_nonce) = key_management::encrypt_private_key(&rsa_private_der, &enc_key)?;
 
     // Look up the production domain
-    let domain: String = sqlx::query_scalar(
-        "SELECT domain FROM site_domains WHERE site_id = $1 AND is_primary = TRUE AND environment = 'production' LIMIT 1"
-    )
-    .bind(site_id)
-    .fetch_optional(&state.db)
-    .await?
-    .unwrap_or_else(|| "localhost".to_string());
+    let domain = Site::resolve_domain(&state.db, site_id).await?;
 
     let (inbox_url, outbox_url, followers_url) = actor::generate_urls(&domain, &site.slug);
 
@@ -426,13 +414,7 @@ pub async fn rotate_keys(
     // Delete old actor and create new one with fresh keys
     ApActor::delete_by_site_id(&state.db, site_id).await?;
 
-    let domain: String = sqlx::query_scalar(
-        "SELECT domain FROM site_domains WHERE site_id = $1 AND is_primary = TRUE AND environment = 'production' LIMIT 1"
-    )
-    .bind(site_id)
-    .fetch_optional(&state.db)
-    .await?
-    .unwrap_or_else(|| "localhost".to_string());
+    let domain = Site::resolve_domain(&state.db, site_id).await?;
 
     let (inbox_url, outbox_url, followers_url) = actor::generate_urls(&domain, &site.slug);
 

@@ -10,7 +10,7 @@ const config: Config = {
   favicon: 'img/logo.svg',
 
   url: 'https://dominikdorfstetter.github.io',
-  baseUrl: '/forja/',
+  baseUrl: '/',
 
   organizationName: 'dominikdorfstetter',
   projectName: 'forja',

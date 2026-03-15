@@ -3,11 +3,19 @@
 .claude
 .idea
 .vscode
+.serena
+.superpowers
 docs
 templates
+libs
 
 # Build artifacts
 backend/target
 admin/node_modules
 admin/dist
+
+# Misc
 *.md
+*.png
+*.csv
+bad_output.png

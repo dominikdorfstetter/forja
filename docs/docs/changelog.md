@@ -6,6 +6,30 @@ sidebar_position: 100
 
 This page tracks the release history of Forja. For the most up-to-date changelog, see the [CHANGELOG.md](https://github.com/dominikdorfstetter/forja/blob/main/CHANGELOG.md) file in the repository.
 
+## v1.0.8
+
+### Fixed
+
+- **Federation handle showing `@user@localhost`** -- centralized domain resolution into `Site::resolve_domain()` with smart fallback chain (primary production → any production → any active domain). Returns an error instead of silently defaulting to `localhost`
+- **Blocked instances not displaying after import** -- backend `list_blocked_instances` now returns paginated response matching frontend format
+- **Unblock instance silently failing** -- frontend now sends domain string instead of UUID
+- **Mastodon CSV blocklist import** -- handles multi-column CSV export format (skips headers, extracts first column)
+- **Docusaurus baseUrl** -- changed from `/forja/` to `/`
+
+### Added
+
+- **Edit block reason** -- `PUT /sites/:id/federation/blocks/instances/:domain` endpoint and edit button in admin UI
+- **Clear entire blocklist** -- `DELETE /sites/:id/federation/blocks/instances` endpoint (Owner only) with confirmation dialog
+- Full i18n support for new blocklist features across all 8 languages
+
+### Changed
+
+- **Docker build optimization** -- `cargo-chef` dependency caching pattern reduces rebuild time from ~2 hours to ~20 minutes
+- CI Docker build uses Buildx with GitHub Actions layer cache
+- Consolidated 7 duplicate domain resolution queries into shared `Site::resolve_domain()`
+
+---
+
 ## v1.0.7
 
 ### Added

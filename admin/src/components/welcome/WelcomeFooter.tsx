@@ -53,7 +53,7 @@ export default function WelcomeFooter({ mounted }: WelcomeFooterProps) {
         </Link>
         <Dot />
         <Link
-          href="https://github.com/dominikdorfstetter/forja/wiki"
+          href="https://forja-docs.dorfstetter.at"
           target="_blank"
           rel="noopener"
           underline="none"
@@ -67,7 +67,7 @@ export default function WelcomeFooter({ mounted }: WelcomeFooterProps) {
           }}
         >
           <MenuBookRoundedIcon sx={{ fontSize: 14 }} />
-          Docs
+          {t('welcome.docs')}
         </Link>
         <Dot />
         <Typography component="span" sx={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.25)' }}>

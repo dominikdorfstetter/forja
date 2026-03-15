@@ -20,6 +20,7 @@ use crate::models::federation::actor::ApActor;
 use crate::models::federation::block::{ApBlockedActor, ApBlockedInstance};
 use crate::models::site::Site;
 use crate::models::site_membership::SiteRole;
+use crate::utils::pagination::{Paginated, PaginationParams};
 use crate::AppState;
 
 /// Resolve the actor for a site, returning 404 if not found.
@@ -31,27 +32,33 @@ async fn require_actor(state: &AppState, site_id: Uuid) -> Result<ApActor, ApiEr
 
 // ── Instance Blocks ──────────────────────────────────────────────────────
 
-/// List blocked instances for a site
+/// List blocked instances for a site (paginated)
 #[utoipa::path(
     tag = "Federation",
     operation_id = "list_blocked_instances",
-    description = "List blocked instance domains for a site",
-    params(("site_id" = Uuid, Path, description = "Site UUID")),
+    description = "List blocked instance domains for a site (paginated)",
+    params(
+        ("site_id" = Uuid, Path, description = "Site UUID"),
+        ("page" = Option<i64>, Query, description = "Page number (default: 1)"),
+        ("page_size" = Option<i64>, Query, description = "Items per page (default: 10, max: 100)")
+    ),
     responses(
-        (status = 200, description = "Blocked instances", body = Vec<BlockedInstanceResponse>),
+        (status = 200, description = "Paginated blocked instances", body = Paginated<BlockedInstanceResponse>),
         (status = 401, description = "Unauthorized", body = ProblemDetails),
         (status = 403, description = "Forbidden", body = ProblemDetails),
         (status = 404, description = "Site not found", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
-#[get("/sites/<site_id>/federation/blocks/instances")]
+#[get("/sites/<site_id>/federation/blocks/instances?<page>&<page_size>")]
 pub async fn list_blocked_instances(
     state: &State<AppState>,
     site_id: Uuid,
+    page: Option<i64>,
+    page_size: Option<i64>,
     auth: ReadKey,
     _module: ModuleGuard<FederationModule>,
-) -> Result<Json<Vec<BlockedInstanceResponse>>, ApiError> {
+) -> Result<Json<Paginated<BlockedInstanceResponse>>, ApiError> {
     let role = auth
         .0
         .require_site_role(&state.db, site_id, &SiteRole::Admin)
@@ -63,13 +70,37 @@ pub async fn list_blocked_instances(
     Site::find_by_id(&state.db, site_id).await?;
     let actor = require_actor(state.inner(), site_id).await?;
 
-    let blocked = ApBlockedInstance::find_by_actor(&state.db, actor.id).await?;
+    let params = PaginationParams::new(page, page_size);
+    let (limit, offset) = params.limit_offset();
+
+    let blocked: Vec<ApBlockedInstance> = sqlx::query_as::<_, ApBlockedInstance>(
+        r#"
+        SELECT * FROM ap_blocked_instances
+        WHERE actor_id = $1
+        ORDER BY blocked_at DESC
+        LIMIT $2 OFFSET $3
+        "#,
+    )
+    .bind(actor.id)
+    .bind(limit)
+    .bind(offset)
+    .fetch_all(&state.db)
+    .await?;
+
+    let total: (i64,) =
+        sqlx::query_as("SELECT COUNT(*) FROM ap_blocked_instances WHERE actor_id = $1")
+            .bind(actor.id)
+            .fetch_one(&state.db)
+            .await?;
+    let total = total.0;
+
     let items: Vec<BlockedInstanceResponse> = blocked
         .into_iter()
         .map(BlockedInstanceResponse::from)
         .collect();
+    let paginated = params.paginate(items, total);
 
-    Ok(Json(items))
+    Ok(Json(paginated))
 }
 
 /// Block an instance domain
@@ -123,6 +154,59 @@ pub async fn block_instance(
     Ok(Json(BlockedInstanceResponse::from(blocked)))
 }
 
+/// Update the reason for a blocked instance
+#[utoipa::path(
+    tag = "Federation",
+    operation_id = "update_blocked_instance",
+    description = "Update the reason for a blocked instance domain",
+    params(
+        ("site_id" = Uuid, Path, description = "Site UUID"),
+        ("domain" = String, Path, description = "Blocked domain to update")
+    ),
+    request_body(content = BlockInstanceRequest, description = "Updated block info"),
+    responses(
+        (status = 200, description = "Block updated", body = BlockedInstanceResponse),
+        (status = 401, description = "Unauthorized", body = ProblemDetails),
+        (status = 403, description = "Forbidden", body = ProblemDetails),
+        (status = 404, description = "Blocked instance not found", body = ProblemDetails)
+    ),
+    security(("api_key" = []))
+)]
+#[put(
+    "/sites/<site_id>/federation/blocks/instances/<domain>",
+    data = "<body>"
+)]
+pub async fn update_blocked_instance(
+    state: &State<AppState>,
+    site_id: Uuid,
+    domain: &str,
+    body: Json<BlockInstanceRequest>,
+    auth: ReadKey,
+    _module: ModuleGuard<FederationModule>,
+) -> Result<Json<BlockedInstanceResponse>, ApiError> {
+    let role = auth
+        .0
+        .require_site_role(&state.db, site_id, &SiteRole::Admin)
+        .await?;
+    if !can_manage_federation(&role) {
+        return Err(ApiError::forbidden("Insufficient role to manage blocklist"));
+    }
+
+    Site::find_by_id(&state.db, site_id).await?;
+    let actor = require_actor(state.inner(), site_id).await?;
+
+    let req = body.into_inner();
+
+    let updated =
+        ApBlockedInstance::update_reason(&state.db, actor.id, domain, req.reason.as_deref())
+            .await?
+            .ok_or_else(|| ApiError::not_found("Blocked instance not found"))?;
+
+    tracing::info!(site_id = %site_id, domain = domain, "Updated blocked instance reason");
+
+    Ok(Json(BlockedInstanceResponse::from(updated)))
+}
+
 /// Unblock an instance domain
 #[utoipa::path(
     tag = "Federation",
@@ -162,6 +246,47 @@ pub async fn unblock_instance(
     ApBlockedInstance::delete(&state.db, actor.id, domain).await?;
 
     tracing::info!(site_id = %site_id, domain = domain, "Unblocked instance");
+
+    Ok(Status::NoContent)
+}
+
+/// Clear all blocked instances for a site
+#[utoipa::path(
+    tag = "Federation",
+    operation_id = "clear_blocklist",
+    description = "Remove all blocked instance domains for a site",
+    params(("site_id" = Uuid, Path, description = "Site UUID")),
+    responses(
+        (status = 204, description = "Blocklist cleared"),
+        (status = 401, description = "Unauthorized", body = ProblemDetails),
+        (status = 403, description = "Forbidden", body = ProblemDetails),
+        (status = 404, description = "Site not found", body = ProblemDetails)
+    ),
+    security(("api_key" = []))
+)]
+#[delete("/sites/<site_id>/federation/blocks/instances")]
+pub async fn clear_blocklist(
+    state: &State<AppState>,
+    site_id: Uuid,
+    auth: ReadKey,
+    _module: ModuleGuard<FederationModule>,
+) -> Result<Status, ApiError> {
+    let role = auth
+        .0
+        .require_site_role(&state.db, site_id, &SiteRole::Owner)
+        .await?;
+    if !can_manage_federation(&role) {
+        return Err(ApiError::forbidden(
+            "Only site owners can clear the entire blocklist",
+        ));
+    }
+
+    Site::find_by_id(&state.db, site_id).await?;
+    let actor = require_actor(state.inner(), site_id).await?;
+
+    ApBlockedInstance::delete_all(&state.db, actor.id).await?;
+
+    tracing::info!(site_id = %site_id, "Cleared entire instance blocklist");
 
     Ok(Status::NoContent)
 }
@@ -383,8 +508,10 @@ pub fn routes() -> Vec<Route> {
     routes![
         list_blocked_instances,
         block_instance,
+        update_blocked_instance,
         import_blocklist,
         unblock_instance,
+        clear_blocklist,
         list_blocked_actors,
         block_actor,
         unblock_actor
@@ -398,6 +525,6 @@ mod tests {
     #[test]
     fn test_routes_count() {
         let routes = routes();
-        assert_eq!(routes.len(), 7, "Should have 7 block admin routes");
+        assert_eq!(routes.len(), 9, "Should have 9 block admin routes");
     }
 }
