@@ -3,6 +3,15 @@ import { renderWithProviders, screen, waitFor, userEvent } from '@/test/test-uti
 import apiService from '@/services/api';
 import type { Paginated, Webhook } from '@/types/api';
 
+const mockAuth = vi.hoisted(() => ({
+  permission: 'Admin' as string,
+  loading: false,
+  canRead: true,
+  canWrite: true,
+  isAdmin: true,
+  isMaster: false,
+}));
+
 // Mock store hooks to use our test providers
 vi.mock('@/store/SiteContext', () => ({
   useSiteContext: () => ({
@@ -16,14 +25,7 @@ vi.mock('@/store/SiteContext', () => ({
 }));
 
 vi.mock('@/store/AuthContext', () => ({
-  useAuth: () => ({
-    permission: 'Admin',
-    loading: false,
-    canRead: true,
-    canWrite: true,
-    isAdmin: true,
-    isMaster: false,
-  }),
+  useAuth: () => mockAuth,
   AuthProvider: ({ children }: { children: React.ReactNode }) => children,
   notifySelectedSiteChanged: vi.fn(),
 }));
@@ -64,6 +66,15 @@ let WebhooksPage: typeof import('@/pages/Webhooks').default;
 
 beforeEach(async () => {
   vi.clearAllMocks();
+  // Reset auth to admin defaults
+  Object.assign(mockAuth, {
+    permission: 'Admin',
+    loading: false,
+    canRead: true,
+    canWrite: true,
+    isAdmin: true,
+    isMaster: false,
+  });
   const mod = await import('@/pages/Webhooks');
   WebhooksPage = mod.default;
 });
@@ -164,5 +175,52 @@ describe('WebhooksPage', () => {
     // Should have active and inactive chips — look for chip content
     // Just check the data rendered
     expect(screen.getByText('https://other.com/hook')).toBeInTheDocument();
+  });
+
+  describe('RBAC guards', () => {
+    it('hides create, edit, delete, and test buttons for non-admin users', async () => {
+      Object.assign(mockAuth, { permission: 'Read', canWrite: false, isAdmin: false });
+      vi.mocked(apiService.getWebhooks).mockResolvedValue(mockPaginatedWebhooks);
+      renderWithProviders(<WebhooksPage />);
+      await waitFor(() => {
+        expect(screen.getByText('https://example.com/hook')).toBeInTheDocument();
+      });
+
+      // Test, edit, and delete icons should not be present
+      const playButtons = screen.queryAllByRole('button').filter(
+        (b) => b.querySelector('[data-testid="PlayArrowIcon"]'),
+      );
+      const editButtons = screen.queryAllByRole('button').filter(
+        (b) => b.querySelector('[data-testid="EditIcon"]'),
+      );
+      const deleteButtons = screen.queryAllByRole('button').filter(
+        (b) => b.querySelector('[data-testid="DeleteIcon"]'),
+      );
+
+      expect(playButtons).toHaveLength(0);
+      expect(editButtons).toHaveLength(0);
+      expect(deleteButtons).toHaveLength(0);
+
+      // Delivery log (HistoryIcon) should still be visible
+      const historyButtons = screen.queryAllByRole('button').filter(
+        (b) => b.querySelector('[data-testid="HistoryIcon"]'),
+      );
+      expect(historyButtons.length).toBeGreaterThan(0);
+    });
+
+    it('hides create button in page header for non-admin users', async () => {
+      Object.assign(mockAuth, { permission: 'Read', canWrite: false, isAdmin: false });
+      vi.mocked(apiService.getWebhooks).mockResolvedValue(mockPaginatedWebhooks);
+      renderWithProviders(<WebhooksPage />);
+      await waitFor(() => {
+        expect(screen.getByText('https://example.com/hook')).toBeInTheDocument();
+      });
+
+      // The add webhook button should not be rendered
+      const addButtons = screen.queryAllByRole('button').filter(
+        (b) => b.textContent?.includes('webhook') || b.textContent?.includes('Webhook'),
+      );
+      expect(addButtons).toHaveLength(0);
+    });
   });
 });
