@@ -90,6 +90,37 @@ pub struct AnalyticsReportResponse {
     pub trend: Vec<TrendDataPoint>,
 }
 
+/// Referrer domain with view count
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+#[schema(description = "Referrer domain with view count")]
+pub struct ReferrerItem {
+    /// Referrer domain (e.g., "google.com") or "(direct)" for no referrer
+    #[schema(example = "google.com")]
+    pub domain: String,
+    /// Number of views from this referrer
+    #[schema(example = 42)]
+    pub views: i64,
+}
+
+/// Per-page analytics detail response
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+#[schema(description = "Analytics detail for a single page")]
+pub struct AnalyticsPageDetailResponse {
+    /// The page path
+    #[schema(example = "/blog/my-post")]
+    pub path: String,
+    /// Total page views in the period
+    #[schema(example = 142)]
+    pub total_views: i64,
+    /// Approximate unique visitors in the period
+    #[schema(example = 89)]
+    pub total_unique_visitors: i64,
+    /// Daily view trend for this page
+    pub trend: Vec<TrendDataPoint>,
+    /// Top referrer domains
+    pub referrers: Vec<ReferrerItem>,
+}
+
 /// Response after recording a pageview
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 #[schema(description = "Pageview recorded acknowledgement")]

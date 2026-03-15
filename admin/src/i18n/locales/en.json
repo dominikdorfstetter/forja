@@ -135,7 +135,8 @@
       "apiDocs": "API Docs",
       "myDrafts": "My Drafts",
       "logout": "Logout",
-      "federation": "Federation"
+      "federation": "Federation",
+      "analytics": "Analytics"
     },
     "toolbar": {
       "toggleDrawer": "Toggle drawer",
@@ -2722,5 +2723,32 @@
     "madeWith": "Made with Rust",
     "createdBy": "Created by {{name}}",
     "madeInEu": "Designed & built in the EU"
+  },
+  "analytics": {
+    "title": "Analytics",
+    "totalViews": "Total Views",
+    "uniqueVisitors": "Unique Visitors",
+    "avgViewsPerDay": "Avg. Views/Day",
+    "topContent": "Top Content",
+    "referrers": "Referrers",
+    "noData": "No data for this period",
+    "backToOverview": "Back to Analytics",
+    "viewAnalytics": "View Analytics",
+    "pageDetail": "Page Detail",
+    "notEnabled": "Analytics is not enabled for this site. Enable it in Settings.",
+    "trend": "Trend",
+    "path": "Path",
+    "views": "Views",
+    "visitors": "Visitors",
+    "dateRange": {
+      "7days": "7 days",
+      "30days": "30 days",
+      "90days": "90 days",
+      "allTime": "All time",
+      "custom": "Custom",
+      "start": "Start date",
+      "end": "End date",
+      "apply": "Apply"
+    }
   }
 }

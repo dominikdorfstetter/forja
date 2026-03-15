@@ -135,7 +135,8 @@
       "apiDocs": "Documentação API",
       "myDrafts": "Meus rascunhos",
       "logout": "Terminar sessão",
-      "federation": "Federação"
+      "federation": "Federação",
+      "analytics": "Analítica"
     },
     "toolbar": {
       "toggleDrawer": "Alternar gaveta",
@@ -2606,7 +2607,6 @@
       "editPost": "Editar",
       "deletePost": "Eliminar publicação",
       "deletePostConfirm": "Eliminar esta publicação? Uma atividade de eliminação será enviada ao Fediverso.",
-      "deleteConfirm": "Eliminar",
       "editSave": "Guardar",
       "editCancel": "Cancelar",
       "edited": "Publicação atualizada",
@@ -2721,5 +2721,25 @@
     "madeWith": "Feito com Rust",
     "createdBy": "Criado por {{name}}",
     "madeInEu": "Projetado & construído na UE"
+  },
+  "analytics": {
+    "title": "Analítica",
+    "totalViews": "Visualizações totais",
+    "uniqueVisitors": "Visitantes únicos",
+    "avgViewsPerDay": "Visualizações/dia (média)",
+    "topContent": "Conteúdo popular",
+    "referrers": "Referências",
+    "noData": "Sem dados para este período",
+    "backToOverview": "Voltar à Analítica",
+    "viewAnalytics": "Ver analítica",
+    "pageDetail": "Detalhe da página",
+    "notEnabled": "A analítica não está ativada para este site. Ative-a nas Definições.",
+    "dateRange": {
+      "7days": "7 dias",
+      "30days": "30 dias",
+      "90days": "90 dias",
+      "allTime": "Todo o período",
+      "custom": "Personalizado"
+    }
   }
 }

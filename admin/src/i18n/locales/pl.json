@@ -135,7 +135,8 @@
       "apiDocs": "Dokumentacja API",
       "myDrafts": "Moje szkice",
       "logout": "Wyloguj",
-      "federation": "Federacja"
+      "federation": "Federacja",
+      "analytics": "Analityka"
     },
     "toolbar": {
       "toggleDrawer": "Przełącz panel boczny",
@@ -2606,7 +2607,6 @@
       "editPost": "Edytuj",
       "deletePost": "Usuń wpis",
       "deletePostConfirm": "Usunąć ten wpis? Aktywność usunięcia zostanie wysłana do Fediverse.",
-      "deleteConfirm": "Usuń",
       "editSave": "Zapisz",
       "editCancel": "Anuluj",
       "edited": "Wpis zaktualizowany",
@@ -2721,5 +2721,25 @@
     "madeWith": "Zbudowany w Rust",
     "createdBy": "Stworzone przez {{name}}",
     "madeInEu": "Zaprojektowane i zbudowane w UE"
+  },
+  "analytics": {
+    "title": "Analityka",
+    "totalViews": "Łączne wyświetlenia",
+    "uniqueVisitors": "Unikalni odwiedzający",
+    "avgViewsPerDay": "Wyświetlenia/dzień (śr.)",
+    "topContent": "Popularne treści",
+    "referrers": "Źródła odwiedzin",
+    "noData": "Brak danych dla tego okresu",
+    "backToOverview": "Powrót do Analityki",
+    "viewAnalytics": "Zobacz analitykę",
+    "pageDetail": "Szczegóły strony",
+    "notEnabled": "Analityka nie jest włączona dla tej witryny. Włącz ją w Ustawieniach.",
+    "dateRange": {
+      "7days": "7 dni",
+      "30days": "30 dni",
+      "90days": "90 dni",
+      "allTime": "Cały okres",
+      "custom": "Niestandardowy"
+    }
   }
 }

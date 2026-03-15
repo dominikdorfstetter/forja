@@ -1,9 +1,9 @@
-import 'react';
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router';
 import { SignUp } from '@clerk/clerk-react';
 import { SnackbarProvider, MaterialDesignContent } from 'notistack';
 import { styled } from '@mui/material/styles';
-import { Box, Button, Container, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Container, Typography } from '@mui/material';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ThemeModeProvider } from '@/theme';
@@ -38,6 +38,9 @@ import ProfilePage from '@/pages/Profile';
 import ClerkUsersPage from '@/pages/ClerkUsers';
 import ActivityLogPage from '@/pages/ActivityLog';
 import NotificationsPage from '@/pages/Notifications';
+// Lazy-load analytics pages (recharts is heavy)
+const AnalyticsOverview = lazy(() => import('@/pages/Analytics/AnalyticsOverview'));
+const AnalyticsPageDetail = lazy(() => import('@/pages/Analytics/AnalyticsPageDetail'));
 import NotFoundPage from '@/pages/NotFound';
 
 // Federation pages
@@ -157,6 +160,8 @@ function App() {
                   <Route path="navigation" element={<NavigationPage />} />
                   <Route path="social-links" element={<SocialLinksPage />} />
                   <Route path="activity" element={<ActivityLogPage />} />
+                  <Route path="analytics" element={<Suspense fallback={<CircularProgress sx={{ m: 4 }} />}><AnalyticsOverview /></Suspense>} />
+                  <Route path="analytics/page/:encodedPath" element={<Suspense fallback={<CircularProgress sx={{ m: 4 }} />}><AnalyticsPageDetail /></Suspense>} />
                   <Route path="notifications" element={<NotificationsPage />} />
                   <Route path="members" element={<MembersPage />} />
                   <Route path="clerk-users" element={<ClerkUsersPage />} />

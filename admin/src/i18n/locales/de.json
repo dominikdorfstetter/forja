@@ -135,7 +135,8 @@
       "invite": "Einladen",
       "reviews": "Überprüfungen",
       "aiSettings": "KI-Einstellungen",
-      "federation": "Federation"
+      "federation": "Federation",
+      "analytics": "Analytik"
     },
     "toolbar": {
       "toggleDrawer": "Seitenleiste umschalten",
@@ -2606,7 +2607,6 @@
       "editPost": "Bearbeiten",
       "deletePost": "Beitrag löschen",
       "deletePostConfirm": "Diesen Beitrag löschen? Eine Lösch-Aktivität wird an das Fediverse gesendet.",
-      "deleteConfirm": "Löschen",
       "editSave": "Speichern",
       "editCancel": "Abbrechen",
       "edited": "Beitrag aktualisiert",
@@ -2721,5 +2721,25 @@
     "madeWith": "Gebaut mit Rust",
     "createdBy": "Erstellt von {{name}}",
     "madeInEu": "Entworfen & gebaut in der EU"
+  },
+  "analytics": {
+    "title": "Analytik",
+    "totalViews": "Gesamtaufrufe",
+    "uniqueVisitors": "Einzelne Besucher",
+    "avgViewsPerDay": "Aufrufe/Tag (Durchschn.)",
+    "topContent": "Beliebteste Inhalte",
+    "referrers": "Verweisquellen",
+    "noData": "Keine Daten für diesen Zeitraum",
+    "backToOverview": "Zurück zur Analytik",
+    "viewAnalytics": "Analytik anzeigen",
+    "pageDetail": "Seitendetail",
+    "notEnabled": "Analytik ist für diese Seite nicht aktiviert. Aktivieren Sie es in den Einstellungen.",
+    "dateRange": {
+      "7days": "7 Tage",
+      "30days": "30 Tage",
+      "90days": "90 Tage",
+      "allTime": "Gesamter Zeitraum",
+      "custom": "Benutzerdefiniert"
+    }
   }
 }
