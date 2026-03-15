@@ -135,7 +135,8 @@
       "apiDocs": "Documentazione API",
       "myDrafts": "Le mie bozze",
       "logout": "Esci",
-      "federation": "Federazione"
+      "federation": "Federazione",
+      "analytics": "Analisi"
     },
     "toolbar": {
       "toggleDrawer": "Apri/chiudi menu laterale",
@@ -2606,7 +2607,6 @@
       "editPost": "Modifica",
       "deletePost": "Elimina post",
       "deletePostConfirm": "Eliminare questo post? Verrà inviata un'attività di eliminazione al Fediverso.",
-      "deleteConfirm": "Elimina",
       "editSave": "Salva",
       "editCancel": "Annulla",
       "edited": "Post aggiornato",
@@ -2721,5 +2721,25 @@
     "madeWith": "Costruito con Rust",
     "createdBy": "Creato da {{name}}",
     "madeInEu": "Progettato & costruito nell'UE"
+  },
+  "analytics": {
+    "title": "Analisi",
+    "totalViews": "Visualizzazioni totali",
+    "uniqueVisitors": "Visitatori unici",
+    "avgViewsPerDay": "Visualizzazioni/giorno (media)",
+    "topContent": "Contenuti popolari",
+    "referrers": "Referenti",
+    "noData": "Nessun dato per questo periodo",
+    "backToOverview": "Torna alle analisi",
+    "viewAnalytics": "Visualizza analisi",
+    "pageDetail": "Dettaglio pagina",
+    "notEnabled": "Le analisi non sono abilitate per questo sito. Abilitale nelle Impostazioni.",
+    "dateRange": {
+      "7days": "7 giorni",
+      "30days": "30 giorni",
+      "90days": "90 giorni",
+      "allTime": "Tutto il periodo",
+      "custom": "Personalizzato"
+    }
   }
 }

@@ -38,6 +38,7 @@ import ProfilePage from '@/pages/Profile';
 import ClerkUsersPage from '@/pages/ClerkUsers';
 import ActivityLogPage from '@/pages/ActivityLog';
 import NotificationsPage from '@/pages/Notifications';
+import { AnalyticsOverview, AnalyticsPageDetail } from '@/pages/Analytics';
 import NotFoundPage from '@/pages/NotFound';
 
 // Federation pages
@@ -157,6 +158,8 @@ function App() {
                   <Route path="navigation" element={<NavigationPage />} />
                   <Route path="social-links" element={<SocialLinksPage />} />
                   <Route path="activity" element={<ActivityLogPage />} />
+                  <Route path="analytics" element={<AnalyticsOverview />} />
+                  <Route path="analytics/page/:encodedPath" element={<AnalyticsPageDetail />} />
                   <Route path="notifications" element={<NotificationsPage />} />
                   <Route path="members" element={<MembersPage />} />
                   <Route path="clerk-users" element={<ClerkUsersPage />} />

@@ -11,7 +11,7 @@ export function useAnalyticsData(days: number = 30) {
 
   const { data: report, isLoading } = useQuery({
     queryKey: ['analytics-report', selectedSiteId, days],
-    queryFn: () => apiService.getAnalyticsReport(selectedSiteId!, days),
+    queryFn: () => apiService.getAnalyticsReport(selectedSiteId!, { days }),
     enabled: !!selectedSiteId && analyticsEnabled,
   });
 

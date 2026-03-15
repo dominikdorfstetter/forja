@@ -139,6 +139,9 @@ import type {
   ListModelsResponse,
   AnalyticsReportResponse,
   AnalyticsMaintenanceResponse,
+  AnalyticsPageDetailResponse,
+  AnalyticsReportParams,
+  AnalyticsPageDetailParams,
   OnboardingResponse,
   CompleteOnboardingRequest,
   HelpStateResponse,
@@ -1121,11 +1124,29 @@ class ApiService {
   // Analytics
   async getAnalyticsReport(
     siteId: string,
-    days?: number,
-    topN?: number,
+    params?: AnalyticsReportParams,
   ): Promise<AnalyticsReportResponse> {
     return apiRequest<AnalyticsReportResponse>('GET', `/sites/${siteId}/analytics/report`, undefined, {
-      params: { days, top_n: topN },
+      params: {
+        days: params?.days,
+        top_n: params?.topN,
+        start_date: params?.startDate,
+        end_date: params?.endDate,
+      },
+    });
+  }
+
+  async getAnalyticsPageDetail(
+    siteId: string,
+    params: AnalyticsPageDetailParams,
+  ): Promise<AnalyticsPageDetailResponse> {
+    return apiRequest<AnalyticsPageDetailResponse>('GET', `/sites/${siteId}/analytics/report/page`, undefined, {
+      params: {
+        path: params.path,
+        days: params.days,
+        start_date: params.startDate,
+        end_date: params.endDate,
+      },
     });
   }
 

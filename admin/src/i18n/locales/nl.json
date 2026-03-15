@@ -135,7 +135,8 @@
       "invite": "Uitnodigen",
       "reviews": "Beoordelingen",
       "aiSettings": "AI-instellingen",
-      "federation": "Federatie"
+      "federation": "Federatie",
+      "analytics": "Analyse"
     },
     "toolbar": {
       "toggleDrawer": "Zijbalk in-/uitschakelen",
@@ -2606,7 +2607,6 @@
       "editPost": "Bewerken",
       "deletePost": "Bericht verwijderen",
       "deletePostConfirm": "Dit bericht verwijderen? Er wordt een verwijderactiviteit naar het Fediverse gestuurd.",
-      "deleteConfirm": "Verwijderen",
       "editSave": "Opslaan",
       "editCancel": "Annuleren",
       "edited": "Bericht bijgewerkt",
@@ -2721,5 +2721,25 @@
     "madeWith": "Gebouwd met Rust",
     "createdBy": "Gemaakt door {{name}}",
     "madeInEu": "Ontworpen & gebouwd in de EU"
+  },
+  "analytics": {
+    "title": "Analyse",
+    "totalViews": "Totaal weergaven",
+    "uniqueVisitors": "Unieke bezoekers",
+    "avgViewsPerDay": "Weergaven/dag (gem.)",
+    "topContent": "Populaire inhoud",
+    "referrers": "Verwijzers",
+    "noData": "Geen gegevens voor deze periode",
+    "backToOverview": "Terug naar Analyse",
+    "viewAnalytics": "Analyse bekijken",
+    "pageDetail": "Paginadetail",
+    "notEnabled": "Analyse is niet ingeschakeld voor deze site. Schakel het in bij Instellingen.",
+    "dateRange": {
+      "7days": "7 dagen",
+      "30days": "30 dagen",
+      "90days": "90 dagen",
+      "allTime": "Alle tijd",
+      "custom": "Aangepast"
+    }
   }
 }

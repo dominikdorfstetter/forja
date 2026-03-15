@@ -21,6 +21,7 @@ import PermMediaIcon from '@mui/icons-material/PermMedia';
 import WorkIcon from '@mui/icons-material/Work';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import ShareIcon from '@mui/icons-material/Share';
+import BarChartIcon from '@mui/icons-material/BarChart';
 import HistoryIcon from '@mui/icons-material/History';
 import PeopleIcon from '@mui/icons-material/People';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
@@ -183,6 +184,7 @@ export default function Layout() {
         { text: t('layout.sidebar.redirects'), icon: <AltRouteIcon />, path: '/redirects' },
         ...(isAdmin ? [{ text: t('layout.sidebar.webhooks'), icon: <WebhookIcon />, path: '/webhooks' }] : []),
         ...(isAdmin ? [{ text: t('layout.sidebar.activity'), icon: <HistoryIcon />, path: '/activity' }] : []),
+        ...(context.features.analytics ? [{ text: t('layout.sidebar.analytics'), icon: <BarChartIcon />, path: '/analytics' }] : []),
         ...(isSolo && (canManageMembers || isAdmin)
           ? [{ text: t('layout.sidebar.invite'), icon: <PersonAddIcon />, path: '/members' }]
           : (canManageMembers || isAdmin)

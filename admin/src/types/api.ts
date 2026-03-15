@@ -1514,13 +1514,13 @@ export interface AiTestResponse {
 
 // ── Analytics ──────────────────────────────────────────────────────
 
-interface TopContentItem {
+export interface TopContentItem {
   path: string;
   total_views: number;
   unique_visitors: number;
 }
 
-interface TrendDataPoint {
+export interface TrendDataPoint {
   date: string;
   total_views: number;
   unique_visitors: number;
@@ -1533,12 +1533,36 @@ export interface AnalyticsReportResponse {
   trend: TrendDataPoint[];
 }
 
-// TrackPageviewRequest removed — was never used
-// TrackPageviewResponse removed — was never used
-
 export interface AnalyticsMaintenanceResponse {
   rows_affected: number;
   action: string;
+}
+
+export interface ReferrerItem {
+  domain: string;
+  views: number;
+}
+
+export interface AnalyticsPageDetailResponse {
+  path: string;
+  total_views: number;
+  total_unique_visitors: number;
+  trend: TrendDataPoint[];
+  referrers: ReferrerItem[];
+}
+
+export interface AnalyticsReportParams {
+  days?: number;
+  topN?: number;
+  startDate?: string;
+  endDate?: string;
+}
+
+export interface AnalyticsPageDetailParams {
+  path: string;
+  days?: number;
+  startDate?: string;
+  endDate?: string;
 }
 
 // Help system state

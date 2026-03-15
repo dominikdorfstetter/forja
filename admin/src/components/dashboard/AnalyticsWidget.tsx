@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router';
 import {
   Box,
   Paper,
@@ -13,13 +14,16 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Typography,
+  useTheme,
 } from '@mui/material';
 import BarChartIcon from '@mui/icons-material/BarChart';
+import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 import { useTranslation } from 'react-i18next';
 
 import { useAnalyticsData } from '@/hooks/useAnalyticsData';
 
 export default function AnalyticsWidget() {
+  const theme = useTheme();
   const { t } = useTranslation();
   const [days, setDays] = useState<number>(30);
   const { report, isLoading, analyticsEnabled } = useAnalyticsData(days);
@@ -85,6 +89,23 @@ export default function AnalyticsWidget() {
             </Box>
           </Stack>
 
+          {report!.trend.length > 0 && (
+            <Box sx={{ height: 60, mb: 1 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={report!.trend}>
+                  <Area
+                    type="monotone"
+                    dataKey="total_views"
+                    stroke={theme.palette.primary.main}
+                    fill={theme.palette.primary.main}
+                    fillOpacity={0.15}
+                    strokeWidth={1.5}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </Box>
+          )}
+
           {report!.top_content.length > 0 && (
             <TableContainer>
               <Table size="small">
@@ -109,6 +130,18 @@ export default function AnalyticsWidget() {
               </Table>
             </TableContainer>
           )}
+
+          <Box sx={{ mt: 2, textAlign: 'right' }}>
+            <Typography
+              component={Link}
+              to="/analytics"
+              variant="body2"
+              color="primary"
+              sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+            >
+              {t('analytics.viewAnalytics', 'View Analytics')} →
+            </Typography>
+          </Box>
         </>
       )}
     </Paper>
