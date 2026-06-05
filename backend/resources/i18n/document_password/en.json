@@ -1,0 +1,15 @@
+{
+  "title": "Protected Document — Forja",
+  "heading": "Protected Document",
+  "subtitle": "This file is encrypted and requires a password",
+  "badgeEncrypted": "AES-256 Encrypted",
+  "passwordLabel": "Password",
+  "passwordPlaceholder": "Enter document password",
+  "submitButton": "Unlock & Download",
+  "verifying": "Verifying…",
+  "downloaded": "✓ Downloaded",
+  "incorrectPassword": "Incorrect password",
+  "expired": "This document is no longer available",
+  "locked": "Too many incorrect attempts — contact the document owner",
+  "footer": "Secured by Forja"
+}

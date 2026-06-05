@@ -1,0 +1,61 @@
+---
+// Generic public route for page-type custom collections (#801):
+// `/{collection}/{slug}`. Built-in routes (e.g. /blog/x, /legal/x) are
+// static-prefixed and resolve first; this 2-dynamic-segment route is the
+// generic fallback for configured page collections. Data-only collections
+// never produce paths here.
+import Base from "../../layouts/Base.astro";
+import SeoHead from "../../components/SeoHead.astro";
+import CollectionEntry from "../../components/CollectionEntry.astro";
+import { fetchSite, getSiteUrl } from "../../lib/api";
+import {
+  fetchCollectionSchema,
+  fetchPublishedCollectionEntries,
+} from "../../lib/api";
+import {
+  buildCollectionStaticPaths,
+  getPageCollectionKeys,
+  entryTitle,
+} from "../../lib/collections";
+import { buildSeoMeta } from "../../lib/seo";
+
+export async function getStaticPaths() {
+  const keys = getPageCollectionKeys();
+  const collections = await Promise.all(
+    keys.map(async (typeKey) => {
+      const schema = await fetchCollectionSchema(typeKey).catch(() => null);
+      const entries = schema
+        ? await fetchPublishedCollectionEntries(typeKey).catch(() => [])
+        : [];
+      return { typeKey, schema, entries };
+    }),
+  );
+  return buildCollectionStaticPaths(collections);
+}
+
+const { entry, schema, typeKey } = Astro.props as {
+  entry: import("@forjacms/client").PublicCollectionEntry;
+  schema: import("@forjacms/client").PublicCollectionSchema;
+  typeKey: string;
+};
+
+const title = entryTitle(schema, entry);
+const site = await fetchSite().catch(() => null);
+const siteName = site?.name ?? "My Site";
+const siteUrl = getSiteUrl();
+
+const seo = buildSeoMeta({
+  title: `${title} — ${siteName}`,
+  description: `${title} for ${siteName}.`,
+  canonicalUrl: `${siteUrl}/${typeKey}/${entry.slug}/`,
+  siteUrl,
+  siteName,
+});
+
+Astro.response.headers.set("Cache-Control", "public, max-age=3600, s-maxage=86400");
+---
+
+<Base title={title}>
+  <SeoHead seo={seo} slot="head" />
+  <CollectionEntry schema={schema} entry={entry} />
+</Base>

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 🔒 Report a security vulnerability
+    url: https://github.com/dominikdorfstetter/forja/security/advisories/new
+    about: Please report vulnerabilities privately via a GitHub Security Advisory — do NOT open a public issue. See SECURITY.md.
+  - name: 📖 Documentation
+    url: https://forja-docs.dorfstetter.at
+    about: Admin guide, API reference, architecture, and deployment docs.

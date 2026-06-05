@@ -1,0 +1,18 @@
+[package]
+name = "forja-macros"
+# Versioned in lockstep with the host `forja` crate (see scripts/bump-version.sh).
+# A breaking change in the macro is, by definition, a breaking change in the
+# host's compile output — so the two stay synced on every release.
+version = "2.0.0"
+edition = "2021"
+description = "Internal proc-macros for Forja (ValidatedDto derive)."
+license = "AGPL-3.0-or-later"
+publish = false
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = { version = "2", features = ["full"] }
+quote = "1"
+proc-macro2 = "1"

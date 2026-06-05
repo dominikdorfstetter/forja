@@ -1,0 +1,419 @@
+//! Webhook DTOs
+
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+use uuid::Uuid;
+use validator::Validate;
+
+use crate::dto::validated::ValidatedDto;
+use crate::models::webhook::{Webhook, WebhookDelivery};
+use crate::utils::pagination::Paginated;
+
+/// Known webhook event types.
+pub const VALID_WEBHOOK_EVENTS: &[&str] = &[
+    "blog.created",
+    "blog.updated",
+    "blog.deleted",
+    "blog.published",
+    "page.created",
+    "page.updated",
+    "page.deleted",
+    "page.published",
+    "document.created",
+    "document.updated",
+    "document.deleted",
+    "media.created",
+    "media.deleted",
+    "cv.created",
+    "cv.updated",
+    "cv.deleted",
+    "cv.published",
+    "project.created",
+    "project.updated",
+    "project.deleted",
+    "project.published",
+    "legal.created",
+    "legal.updated",
+    "legal.deleted",
+    "legal.published",
+    "navigation.created",
+    "navigation.updated",
+    "navigation.deleted",
+];
+
+/// Request to create a webhook.
+#[derive(Debug, Deserialize, Validate, ValidatedDto, ToSchema)]
+pub struct CreateWebhookRequest {
+    #[validate(url(message = "Must be a valid URL"))]
+    #[schema(example = "https://example.com/webhook")]
+    pub url: String,
+    #[validate(length(max = 500, message = "Description cannot exceed 500 characters"))]
+    #[schema(example = "My webhook")]
+    pub description: Option<String>,
+    #[validate(custom(function = "validate_webhook_events"))]
+    #[schema(example = json!(["blog.created", "blog.updated"]))]
+    pub events: Option<Vec<String>>,
+    #[validate(range(
+        min = 0,
+        max = 300,
+        message = "Debounce must be between 0 and 300 seconds"
+    ))]
+    #[schema(example = 0)]
+    pub debounce_seconds: Option<i32>,
+}
+
+/// Request to update a webhook.
+#[derive(Debug, Deserialize, Validate, ValidatedDto, ToSchema)]
+pub struct UpdateWebhookRequest {
+    #[validate(url(message = "Must be a valid URL"))]
+    #[schema(example = "https://updated.example.com/webhook")]
+    pub url: Option<String>,
+    #[validate(length(max = 500, message = "Description cannot exceed 500 characters"))]
+    #[schema(example = "Updated webhook description")]
+    pub description: Option<String>,
+    #[validate(custom(function = "validate_webhook_events"))]
+    #[schema(example = json!(["page.created", "page.updated"]))]
+    pub events: Option<Vec<String>>,
+    #[schema(example = true)]
+    pub is_active: Option<bool>,
+    #[validate(range(
+        min = 0,
+        max = 300,
+        message = "Debounce must be between 0 and 300 seconds"
+    ))]
+    #[schema(example = 0)]
+    pub debounce_seconds: Option<i32>,
+}
+
+/// Validate that all event names are known webhook events.
+fn validate_webhook_events(events: &[String]) -> Result<(), validator::ValidationError> {
+    for event in events {
+        if !VALID_WEBHOOK_EVENTS.contains(&event.as_str()) {
+            let mut err = validator::ValidationError::new("invalid_event");
+            err.message = Some(format!("Unknown webhook event: '{}'", event).into());
+            return Err(err);
+        }
+    }
+    Ok(())
+}
+
+/// Webhook response (secret is excluded).
+#[derive(Debug, Serialize, ToSchema)]
+pub struct WebhookResponse {
+    #[schema(example = "550e8400-e29b-41d4-a716-446655440000")]
+    pub id: Uuid,
+    #[schema(example = "660e8400-e29b-41d4-a716-446655440000")]
+    pub site_id: Uuid,
+    #[schema(example = "https://example.com/webhook")]
+    pub url: String,
+    #[schema(example = "Blog event notifications")]
+    pub description: Option<String>,
+    #[schema(example = json!(["blog.created", "blog.updated"]))]
+    pub events: Vec<String>,
+    #[schema(example = true)]
+    pub is_active: bool,
+    #[schema(example = 0)]
+    pub debounce_seconds: i32,
+    #[schema(example = "2024-01-15T10:30:00Z")]
+    pub created_at: DateTime<Utc>,
+    #[schema(example = "2024-06-01T08:00:00Z")]
+    pub updated_at: DateTime<Utc>,
+}
+
+impl From<Webhook> for WebhookResponse {
+    fn from(w: Webhook) -> Self {
+        Self {
+            id: w.id,
+            site_id: w.site_id,
+            url: w.url,
+            description: w.description,
+            events: w.events,
+            is_active: w.is_active,
+            debounce_seconds: w.debounce_seconds,
+            created_at: w.created_at,
+            updated_at: w.updated_at,
+        }
+    }
+}
+
+/// Webhook delivery log response.
+#[derive(Debug, Serialize, ToSchema)]
+pub struct WebhookDeliveryResponse {
+    #[schema(example = "550e8400-e29b-41d4-a716-446655440000")]
+    pub id: Uuid,
+    #[schema(example = "660e8400-e29b-41d4-a716-446655440000")]
+    pub webhook_id: Uuid,
+    #[schema(example = "blog.created")]
+    pub event_type: String,
+    #[schema(example = json!({"id": "770e8400-e29b-41d4-a716-446655440000", "slug": "hello-world"}))]
+    pub payload: serde_json::Value,
+    #[schema(example = 200)]
+    pub status_code: Option<i16>,
+    #[schema(example = "OK")]
+    pub response_body: Option<String>,
+    #[schema(example = "Connection refused")]
+    pub error_message: Option<String>,
+    #[schema(example = 1)]
+    pub attempt_number: i16,
+    #[schema(example = "2024-06-15T10:30:00Z")]
+    pub delivered_at: DateTime<Utc>,
+}
+
+impl From<WebhookDelivery> for WebhookDeliveryResponse {
+    fn from(d: WebhookDelivery) -> Self {
+        Self {
+            id: d.id,
+            webhook_id: d.webhook_id,
+            event_type: d.event_type,
+            payload: d.payload,
+            status_code: d.status_code,
+            response_body: d.response_body,
+            error_message: d.error_message,
+            attempt_number: d.attempt_number,
+            delivered_at: d.delivered_at,
+        }
+    }
+}
+
+/// Paginated webhooks response.
+pub type PaginatedWebhooks = Paginated<WebhookResponse>;
+
+/// Paginated webhook deliveries response.
+pub type PaginatedWebhookDeliveries = Paginated<WebhookDeliveryResponse>;
+
+/// Parse a human-readable stats window string into hours.
+pub fn parse_stats_window(window: &str) -> Option<i64> {
+    match window {
+        "1h" => Some(1),
+        "24h" => Some(24),
+        "7d" => Some(168),
+        "30d" => Some(720),
+        _ => None,
+    }
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct WebhookEventStats {
+    pub event_type: String,
+    pub total: i64,
+    pub successful: i64,
+    pub failed: i64,
+}
+
+#[derive(Debug, Serialize, ToSchema)]
+pub struct WebhookStatsResponse {
+    pub webhook_id: Uuid,
+    pub window: String,
+    pub total_deliveries: i64,
+    pub successful: i64,
+    pub failed: i64,
+    pub pending_retry: i64,
+    pub success_rate: f64,
+    #[schema(example = "2024-06-15T10:30:00Z")]
+    pub last_delivery_at: Option<DateTime<Utc>>,
+    pub by_event: Vec<WebhookEventStats>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use validator::Validate;
+
+    #[test]
+    fn test_create_webhook_valid() {
+        let req = CreateWebhookRequest {
+            url: "https://example.com/webhook".to_string(),
+            description: Some("My webhook".to_string()),
+            events: Some(vec!["blog.created".to_string(), "blog.updated".to_string()]),
+            debounce_seconds: None,
+        };
+        assert!(req.validate().is_ok());
+    }
+
+    #[test]
+    fn test_create_webhook_valid_no_events() {
+        let req = CreateWebhookRequest {
+            url: "https://example.com/webhook".to_string(),
+            description: None,
+            events: None,
+            debounce_seconds: None,
+        };
+        assert!(req.validate().is_ok());
+    }
+
+    #[test]
+    fn test_create_webhook_valid_empty_events() {
+        let req = CreateWebhookRequest {
+            url: "https://example.com/webhook".to_string(),
+            description: None,
+            events: Some(vec![]),
+            debounce_seconds: None,
+        };
+        assert!(req.validate().is_ok());
+    }
+
+    #[test]
+    fn test_create_webhook_invalid_url() {
+        let req = CreateWebhookRequest {
+            url: "not-a-url".to_string(),
+            description: None,
+            events: None,
+            debounce_seconds: None,
+        };
+        assert!(req.validate().is_err());
+    }
+
+    #[test]
+    fn test_create_webhook_invalid_event() {
+        let req = CreateWebhookRequest {
+            url: "https://example.com/webhook".to_string(),
+            description: None,
+            events: Some(vec![
+                "blog.created".to_string(),
+                "invalid.event".to_string(),
+            ]),
+            debounce_seconds: None,
+        };
+        let result = req.validate();
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_create_webhook_description_too_long() {
+        let req = CreateWebhookRequest {
+            url: "https://example.com/webhook".to_string(),
+            description: Some("a".repeat(501)),
+            events: None,
+            debounce_seconds: None,
+        };
+        let result = req.validate();
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_create_webhook_all_valid_events() {
+        let req = CreateWebhookRequest {
+            url: "https://example.com/webhook".to_string(),
+            description: None,
+            events: Some(VALID_WEBHOOK_EVENTS.iter().map(|e| e.to_string()).collect()),
+            debounce_seconds: None,
+        };
+        assert!(req.validate().is_ok());
+    }
+
+    #[test]
+    fn test_update_webhook_valid() {
+        let req = UpdateWebhookRequest {
+            url: Some("https://updated.example.com/hook".to_string()),
+            description: Some("Updated description".to_string()),
+            events: Some(vec!["page.created".to_string()]),
+            is_active: Some(false),
+            debounce_seconds: None,
+        };
+        assert!(req.validate().is_ok());
+    }
+
+    #[test]
+    fn test_update_webhook_all_none() {
+        let req = UpdateWebhookRequest {
+            url: None,
+            description: None,
+            events: None,
+            is_active: None,
+            debounce_seconds: None,
+        };
+        assert!(req.validate().is_ok());
+    }
+
+    #[test]
+    fn test_update_webhook_invalid_event() {
+        let req = UpdateWebhookRequest {
+            url: None,
+            description: None,
+            events: Some(vec!["unknown.event".to_string()]),
+            is_active: None,
+            debounce_seconds: None,
+        };
+        assert!(req.validate().is_err());
+    }
+
+    #[test]
+    fn test_update_webhook_description_too_long() {
+        let req = UpdateWebhookRequest {
+            url: None,
+            description: Some("a".repeat(501)),
+            events: None,
+            is_active: None,
+            debounce_seconds: None,
+        };
+        assert!(req.validate().is_err());
+    }
+
+    #[test]
+    fn test_webhook_response_serialization() {
+        let resp = WebhookResponse {
+            id: Uuid::new_v4(),
+            site_id: Uuid::new_v4(),
+            url: "https://example.com/hook".to_string(),
+            description: Some("Test".to_string()),
+            events: vec!["blog.created".to_string()],
+            is_active: true,
+            debounce_seconds: 0,
+            created_at: Utc::now(),
+            updated_at: Utc::now(),
+        };
+        let json = serde_json::to_string(&resp).unwrap();
+        assert!(json.contains("\"is_active\":true"));
+        assert!(json.contains("\"blog.created\""));
+    }
+
+    #[test]
+    fn test_webhook_delivery_response_serialization() {
+        let resp = WebhookDeliveryResponse {
+            id: Uuid::new_v4(),
+            webhook_id: Uuid::new_v4(),
+            event_type: "blog.created".to_string(),
+            payload: serde_json::json!({"id": "123"}),
+            status_code: Some(200),
+            response_body: Some("OK".to_string()),
+            error_message: None,
+            attempt_number: 1,
+            delivered_at: Utc::now(),
+        };
+        let json = serde_json::to_string(&resp).unwrap();
+        assert!(json.contains("\"status_code\":200"));
+        assert!(json.contains("\"attempt_number\":1"));
+    }
+
+    #[test]
+    fn test_create_webhook_valid_with_debounce() {
+        let req = CreateWebhookRequest {
+            url: "https://example.com/webhook".to_string(),
+            description: None,
+            events: None,
+            debounce_seconds: Some(30),
+        };
+        assert!(req.validate().is_ok());
+    }
+
+    #[test]
+    fn test_create_webhook_debounce_out_of_range() {
+        let req = CreateWebhookRequest {
+            url: "https://example.com/webhook".to_string(),
+            description: None,
+            events: None,
+            debounce_seconds: Some(999),
+        };
+        assert!(req.validate().is_err());
+    }
+
+    #[test]
+    fn test_stats_window_parsing() {
+        assert_eq!(parse_stats_window("1h"), Some(1));
+        assert_eq!(parse_stats_window("24h"), Some(24));
+        assert_eq!(parse_stats_window("7d"), Some(168));
+        assert_eq!(parse_stats_window("30d"), Some(720));
+        assert_eq!(parse_stats_window("invalid"), None);
+    }
+}

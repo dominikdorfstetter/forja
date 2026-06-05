@@ -1,0 +1,349 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      admin: ${{ steps.filter.outputs.admin }}
+      analytics: ${{ steps.filter.outputs.analytics }}
+      client: ${{ steps.filter.outputs.client }}
+      astro-blog: ${{ steps.filter.outputs.astro-blog }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+            admin:
+              - 'admin/**'
+            analytics:
+              - 'libs/analytics/**'
+            client:
+              - 'libs/client/**'
+            astro-blog:
+              - 'templates/astro-blog/**'
+              - 'libs/client/**'
+              - 'libs/sections/**'
+
+  backend:
+    name: Backend (Rust)
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: forja
+          POSTGRES_PASSWORD: forja
+          POSTGRES_DB: forja
+        options: >-
+          --health-cmd "pg_isready -U forja"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    env:
+      DATABASE_URL: postgres://forja:forja@localhost:5432/forja
+
+    steps:
+      - name: Free disk space
+        working-directory: /
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/share/boost || true
+          sudo apt-get clean || true
+          df -h /
+
+      - uses: actions/checkout@v6
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo registry & build
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            backend/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('backend/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
+
+      - name: Check formatting
+        run: cargo fmt --check
+
+      - name: Lint with Clippy
+        run: cargo clippy -- -D warnings
+
+      - name: Install ripgrep (required by validation seam gate)
+        run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends ripgrep
+
+      - name: Self-test the ValidatedJson seam gate (issue #828)
+        run: ./scripts/check-validated-extractor.test.sh
+
+      - name: Enforce ValidatedJson seam (issues #610 / #828)
+        run: ./scripts/check-validated-extractor.sh
+
+      - name: Enforce AuditedMutation seam (issue #621)
+        run: ./scripts/check-audited-mutation.sh
+
+      - name: Self-test the handler-auth gate (issue #856)
+        run: ./scripts/check-handler-auth.test.sh
+
+      - name: Enforce per-handler auth declaration (issues #855 / #856)
+        run: ./scripts/check-handler-auth.sh
+
+      - name: Self-test the handler error-code gate (issue #922)
+        run: ./scripts/check-handler-error-codes.test.sh
+
+      - name: Enforce explicit handler error codes (issue #922)
+        run: ./scripts/check-handler-error-codes.sh
+
+      - name: Clean build artifacts before tests
+        run: cargo clean
+
+      - name: Initialize databases
+        run: |
+          psql "$DATABASE_URL" -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
+          psql "$DATABASE_URL" -c 'CREATE EXTENSION IF NOT EXISTS "citext";'
+          psql "$DATABASE_URL" -c 'CREATE EXTENSION IF NOT EXISTS "pg_trgm";'
+          psql "$DATABASE_URL" -c 'CREATE DATABASE forja_test;'
+          psql "postgres://forja:forja@localhost:5432/forja_test" -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
+          psql "postgres://forja:forja@localhost:5432/forja_test" -c 'CREATE EXTENSION IF NOT EXISTS "citext";'
+          psql "postgres://forja:forja@localhost:5432/forja_test" -c 'CREATE EXTENSION IF NOT EXISTS "pg_trgm";'
+
+      - name: Run unit tests
+        run: cargo test --lib
+
+      - name: Run all integration test suites
+        # Runs every backend/tests/*.rs binary (not just integration_tests) so a
+        # regression in any DB-backed module gates CI. --no-fail-fast surfaces all
+        # failing suites in one run. The test DB is provisioned above; each suite
+        # migrates it idempotently via tests/common::test_db_pool.
+        run: cargo test --tests --no-fail-fast
+        env:
+          TEST_DATABASE_URL: postgres://forja:forja@localhost:5432/forja_test
+
+  openapi-drift:
+    name: OpenAPI codegen drift
+    needs: changes
+    if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.admin == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo registry & build
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            backend/target
+          key: ${{ runner.os }}-cargo-openapi-${{ hashFiles('backend/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-openapi-
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: admin/package-lock.json
+
+      - name: Install admin dependencies
+        working-directory: admin
+        run: npm ci
+
+      - name: Verify generated api-types.ts is in sync
+        run: ./scripts/check-openapi-drift.sh
+
+  admin:
+    name: Admin (React)
+    needs: changes
+    if: needs.changes.outputs.admin == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: admin
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: admin/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: React Doctor
+        if: github.event_name == 'pull_request'
+        id: doctor
+        uses: millionco/react-doctor@main
+        # Informational only — the follow-up "Check health score" step warns
+        # but never fails. The action's internal `npx react-doctor@latest`
+        # invocation has bitten us with breaking minor-version drift, so the
+        # step itself is marked non-fatal too.
+        continue-on-error: true
+        with:
+          directory: admin
+          diff: main
+          verbose: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check health score
+        if: github.event_name == 'pull_request'
+        env:
+          SCORE: ${{ steps.doctor.outputs.score }}
+        run: |
+          echo "React Doctor score: $SCORE"
+          if [ "$SCORE" -lt 50 ]; then
+            echo "::warning::React health score is below threshold: $SCORE/100"
+          fi
+
+      - name: Run tests
+        run: npm test
+
+  analytics:
+    name: Analytics Library
+    needs: changes
+    if: needs.changes.outputs.analytics == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: libs/analytics
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: libs/analytics/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run lint
+
+      - name: Run tests with coverage
+        run: npm test
+
+  client:
+    name: Client SDK
+    needs: changes
+    if: needs.changes.outputs.client == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: libs/client
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: libs/client/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run lint
+
+      - name: Run tests with coverage
+        run: npm test
+
+  astro-blog:
+    name: Astro Blog Template
+    needs: changes
+    if: needs.changes.outputs.astro-blog == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: templates/astro-blog/package-lock.json
+
+      - name: Build analytics dependency
+        working-directory: libs/analytics
+        run: npm ci && npm run build
+
+      - name: Build client SDK dependency
+        working-directory: libs/client
+        run: npm ci && npm run build
+
+      - name: Build sections dependency
+        working-directory: libs/sections
+        run: npm ci && npm run build
+
+      - name: Install dependencies
+        working-directory: templates/astro-blog
+        run: npm ci
+
+      - name: Type check
+        working-directory: templates/astro-blog
+        run: npx astro check
+
+  # Docker build removed from CI — images are built on tagged releases via docker-publish.yml
+
+  ci-pass:
+    name: CI Pass
+    if: always()
+    needs: [backend, admin, analytics, client, astro-blog]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check required jobs
+        run: |
+          if [[ "${{ needs.backend.result }}" == "failure" || "${{ needs.admin.result }}" == "failure" || "${{ needs.analytics.result }}" == "failure" || "${{ needs.client.result }}" == "failure" || "${{ needs.astro-blog.result }}" == "failure" ]]; then
+            echo "One or more required jobs failed"
+            exit 1
+          fi

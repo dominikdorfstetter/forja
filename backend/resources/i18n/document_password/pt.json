@@ -1,0 +1,15 @@
+{
+  "title": "Documento protegido — Forja",
+  "heading": "Documento protegido",
+  "subtitle": "Este arquivo está criptografado e requer uma senha",
+  "badgeEncrypted": "Criptografia AES-256",
+  "passwordLabel": "Senha",
+  "passwordPlaceholder": "Insira a senha do documento",
+  "submitButton": "Desbloquear e baixar",
+  "verifying": "Verificando…",
+  "downloaded": "✓ Baixado",
+  "incorrectPassword": "Senha incorreta",
+  "expired": "Este documento não está mais disponível",
+  "locked": "Muitas tentativas incorretas — contate o proprietário do documento",
+  "footer": "Protegido por Forja"
+}

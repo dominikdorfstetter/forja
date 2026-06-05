@@ -1,0 +1,15 @@
+{
+  "title": "مستند محمي — Forja",
+  "heading": "مستند محمي",
+  "subtitle": "هذا الملف مشفر ويتطلب كلمة مرور",
+  "badgeEncrypted": "مشفر بـ AES-256",
+  "passwordLabel": "كلمة المرور",
+  "passwordPlaceholder": "أدخل كلمة مرور المستند",
+  "submitButton": "فك القفل والتنزيل",
+  "verifying": "جارٍ التحقق…",
+  "downloaded": "✓ تم التنزيل",
+  "incorrectPassword": "كلمة المرور غير صحيحة",
+  "expired": "هذا المستند لم يعد متاحًا",
+  "locked": "محاولات خاطئة كثيرة — يرجى التواصل مع مالك المستند",
+  "footer": "محمي بواسطة Forja"
+}

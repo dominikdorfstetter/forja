@@ -1,0 +1,15 @@
+{
+  "title": "Dokument chroniony — Forja",
+  "heading": "Dokument chroniony",
+  "subtitle": "Ten plik jest zaszyfrowany i wymaga hasła",
+  "badgeEncrypted": "Szyfrowanie AES-256",
+  "passwordLabel": "Hasło",
+  "passwordPlaceholder": "Wprowadź hasło dokumentu",
+  "submitButton": "Odblokuj i pobierz",
+  "verifying": "Weryfikacja…",
+  "downloaded": "✓ Pobrano",
+  "incorrectPassword": "Nieprawidłowe hasło",
+  "expired": "Ten dokument nie jest już dostępny",
+  "locked": "Zbyt wiele błędnych prób — skontaktuj się z właścicielem dokumentu",
+  "footer": "Zabezpieczone przez Forja"
+}

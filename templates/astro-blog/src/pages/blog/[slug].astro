@@ -1,0 +1,107 @@
+---
+import Base from "../../layouts/Base.astro";
+import SeoHead from "../../components/SeoHead.astro";
+import ResponsiveImage from "../../components/ResponsiveImage.astro";
+import BlogCard from "../../components/BlogCard.astro";
+import { fetchBlogBySlug, fetchBlogDetails, fetchMedia, fetchMediaBatch, fetchSimilarBlogs, fetchSite, getSiteUrl } from "../../lib/api";
+import type { BlogDetailResponse, MediaResponse } from "../../lib/api";
+import { renderMarkdown } from "../../lib/markdown";
+import { buildSeoMeta } from "../../lib/seo";
+import { localize, formatDate, hasLocale } from "../../lib/locale";
+
+const locale = Astro.locals.locale ?? { locale_id: '', code: 'en', name: 'English', direction: 'ltr' as const, is_default: true, is_active: true };
+const { slug } = Astro.params;
+
+if (!slug) return Astro.redirect("/blog");
+
+const blog = await fetchBlogBySlug(slug).catch(() => null);
+if (!blog) return new Response(null, { status: 404, statusText: "Not Found" });
+
+const loc = localize(blog.localizations, locale);
+if (!loc) return new Response(null, { status: 404, statusText: "Not Found" });
+
+const title = loc.title ?? "Untitled";
+const body = renderMarkdown(loc.body);
+const metaTitle = loc.meta_title ?? title;
+const metaDescription = loc.meta_description ?? loc.excerpt ?? "";
+const date = formatDate(blog.published_date, locale);
+
+const coverMedia: MediaResponse | null = blog.cover_image_id ? await fetchMedia(blog.cover_image_id).catch(() => null) : null;
+
+// Similar blogs — fetch extra to compensate for locale filtering
+const similarItems = await fetchSimilarBlogs(blog.id, 6).catch(() => []);
+const allSimilarBlogs: BlogDetailResponse[] = similarItems.length > 0 ? await fetchBlogDetails(similarItems.map((b) => b.id)).catch(() => []) : [];
+const similarBlogs = allSimilarBlogs.filter((b) => hasLocale(b.localizations, locale)).slice(0, 3);
+const similarCoverIds = similarBlogs.map((b) => b.cover_image_id).filter((id): id is string => !!id);
+const similarMediaMap = similarCoverIds.length > 0 ? await fetchMediaBatch(similarCoverIds).catch(() => new Map()) : new Map();
+
+const site = await fetchSite().catch(() => null);
+const siteName = site?.name ?? "My Site";
+const siteUrl = getSiteUrl();
+
+const seo = buildSeoMeta({
+  title: metaTitle.includes(siteName) ? metaTitle : `${metaTitle} — ${siteName}`,
+  description: metaDescription,
+  canonicalUrl: `${siteUrl}/blog/${slug}/`,
+  siteUrl, siteName, ogType: "article",
+  ogImage: coverMedia?.public_url ?? undefined, ogImageAlt: title,
+  article: { publishedTime: blog.published_date, author: blog.author, tags: blog.categories.map((c) => c.slug) },
+});
+
+Astro.response.headers.set("Cache-Control", "public, max-age=300, s-maxage=900");
+---
+
+<Base title={title} metaTitle={metaTitle} metaDescription={metaDescription}>
+  <SeoHead seo={seo} slot="head" />
+
+  <article class="max-w-prose mx-auto">
+    <div class="flex items-center gap-1.5 text-xs text-zinc-400 dark:text-zinc-500 mb-6">
+      <a href="/blog" class="text-zinc-500 dark:text-zinc-400 no-underline hover:text-violet-600 dark:hover:text-violet-400 hover:no-underline">Blog</a>
+      <span>/</span>
+      <span class="text-zinc-500 dark:text-zinc-400 truncate">{title}</span>
+    </div>
+
+    {blog.categories.length > 0 && (
+      <div class="flex gap-1.5 mb-4 flex-wrap">
+        {blog.categories.map((cat, i) => (
+          <a href={`/blog/category/${cat.slug}`} class={`text-[11px] font-medium px-2.5 py-0.5 rounded-full no-underline hover:no-underline transition-colors ${i === 0 ? "bg-gradient-to-r from-violet-600 to-violet-400 text-white" : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400"}`}>
+            {cat.slug}
+          </a>
+        ))}
+      </div>
+    )}
+
+    <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mb-4">{title}</h1>
+
+    <div class="flex items-center gap-4 text-sm text-zinc-500 dark:text-zinc-400 pb-6 border-b border-zinc-200 dark:border-zinc-800">
+      {blog.author && <span>{blog.author}</span>}
+      <span class="text-zinc-300 dark:text-zinc-700">&middot;</span>
+      <span>{date}</span>
+      {blog.reading_time_minutes && (
+        <>
+          <span class="text-zinc-300 dark:text-zinc-700">&middot;</span>
+          <span>{blog.reading_time_minutes} min read</span>
+        </>
+      )}
+    </div>
+
+    {coverMedia && (
+      <div class="my-6">
+        <ResponsiveImage media={coverMedia} alt={title} class="w-full rounded-xl" sizes="(max-width: 768px) 100vw, 740px" loading="eager" />
+      </div>
+    )}
+
+    <div class="prose" set:html={body} />
+  </article>
+
+  {similarBlogs.length > 0 && (
+    <section class="max-w-5xl mx-auto mt-16 pt-10 border-t border-zinc-200 dark:border-zinc-800">
+      <h2 class="text-xl font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mb-6">Continue Reading</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {similarBlogs.map((sb) => (
+          <BlogCard blog={sb} coverMedia={sb.cover_image_id ? similarMediaMap.get(sb.cover_image_id) ?? null : null} localeId={locale.locale_id} />
+        ))}
+      </div>
+    </section>
+  )}
+</Base>

@@ -1,0 +1,117 @@
+import { Component, Prop, h } from '@stencil/core';
+import type { NavItem, SocialLink } from '../../types';
+
+/** SVG path data for known social platforms (24x24 viewBox, fill). */
+const SOCIAL_ICONS: Record<string, string> = {
+  github: '<path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.49.5.09.682-.217.682-.482 0-.237-.009-.866-.013-1.7-2.782.603-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.088 2.91.832.091-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.577.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>',
+  twitter: '<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>',
+  x: '<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>',
+  linkedin: '<path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>',
+  youtube: '<path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>',
+  instagram: '<path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913a5.885 5.885 0 001.384 2.126A5.868 5.868 0 004.14 23.37c.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558a5.898 5.898 0 002.126-1.384 5.86 5.86 0 001.384-2.126c.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913a5.89 5.89 0 00-1.384-2.126A5.847 5.847 0 0019.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227a3.81 3.81 0 01-.899 1.382 3.744 3.744 0 01-1.38.896c-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421a3.716 3.716 0 01-1.379-.899 3.644 3.644 0 01-.9-1.38c-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678a6.162 6.162 0 100 12.324 6.162 6.162 0 100-12.324zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405a1.441 1.441 0 11-2.882 0 1.441 1.441 0 012.882 0z"/>',
+  mastodon: '<path d="M23.268 5.313c-.35-2.578-2.617-4.61-5.304-5.004C17.51.242 15.792 0 11.813 0h-.03c-3.98 0-4.835.242-5.288.309C3.882.692 1.496 2.518.917 5.127.64 6.412.61 7.837.661 9.143c.074 1.874.088 3.745.26 5.611.118 1.24.325 2.47.62 3.68.55 2.237 2.777 4.098 4.96 4.857 2.336.792 4.849.923 7.256.38.265-.061.527-.132.786-.213.585-.184 1.27-.39 1.774-.753a.057.057 0 00.023-.043v-1.809a.052.052 0 00-.02-.041.053.053 0 00-.046-.01 20.282 20.282 0 01-4.709.547c-2.73 0-3.463-1.284-3.674-1.818a5.593 5.593 0 01-.319-1.433.053.053 0 01.066-.054 19.648 19.648 0 004.622.536h.348c1.587 0 3.187-.109 4.75-.409 0-.012.035-.013.042-.017 2.1-.407 4.1-1.679 4.309-5.084.008-.138.04-1.46.04-1.602.001-.489.14-3.473-.067-5.309z"/>',
+  bluesky: '<path d="M12 10.8c-1.087-2.114-4.046-6.053-6.798-7.995C2.566.944 1.561 1.266.902 1.565.139 1.908 0 3.08 0 3.768c0 .69.378 5.65.624 6.479.785 2.627 3.57 3.493 6.164 3.18-3.636.58-6.84 1.996-2.678 7.035 4.956 5.048 6.564-.485 7.89-3.597.064-.15.114-.266.143-.183.03-.083.08.033.143.183 1.326 3.112 2.934 8.645 7.89 3.597 4.163-5.04.958-6.455-2.678-7.035 2.593.313 5.379-.553 6.164-3.18.246-.829.624-5.789.624-6.479 0-.688-.139-1.86-.902-2.203-.66-.299-1.664-.621-4.3 1.24C16.046 4.748 13.087 8.687 12 10.8z"/>',
+  email: '<path d="M1.5 8.67v8.58a3 3 0 003 3h15a3 3 0 003-3V8.67l-8.928 5.493a3 3 0 01-3.144 0L1.5 8.67z"/><path d="M22.5 6.908V6.75a3 3 0 00-3-3h-15a3 3 0 00-3 3v.158l9.714 5.978a1.5 1.5 0 001.572 0L22.5 6.908z"/>',
+};
+
+const FALLBACK_ICON = '<path d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101" stroke="currentColor" stroke-width="2" fill="none"/><path d="M10.172 13.828a4 4 0 005.656 0l4-4a4 4 0 10-5.656-5.656l-1.102 1.101" stroke="currentColor" stroke-width="2" fill="none"/>';
+
+function getSocialIcon(slug: string): string {
+  const key = slug.toLowerCase().replace(/[^a-z]/g, '');
+  return SOCIAL_ICONS[key] || FALLBACK_ICON;
+}
+
+@Component({ tag: 'forja-footer', shadow: false })
+export class ForjaFooter {
+  @Prop() siteName?: string;
+  @Prop() homeHref?: string = '/';
+  @Prop() items?: NavItem[];
+  @Prop() socialLinks?: SocialLink[];
+  @Prop() showRss?: boolean = true;
+  @Prop() showSitemap?: boolean = true;
+  @Prop() tagline?: string = 'Built with Forja';
+
+  render() {
+    const year = new Date().getFullYear();
+    const hasItems = this.items && this.items.length > 0;
+    const hasSocial = this.socialLinks && this.socialLinks.length > 0;
+
+    return (
+      <footer class="forja-footer">
+        <div class="forja-footer__content">
+          {/* Brand */}
+          <div class="forja-footer__brand">
+            {this.siteName && (
+              <a href={this.homeHref} class="forja-footer__brand-link">{this.siteName}</a>
+            )}
+            {this.tagline && <p class="forja-footer__tagline">{this.tagline}</p>}
+          </div>
+
+          {/* Nav links */}
+          {hasItems && (
+            <nav class="forja-footer__nav" aria-label="Footer navigation">
+              <p class="forja-footer__nav-heading">Links</p>
+              <ul class="forja-footer__nav-list">
+                {this.items!.map(item => (
+                  <li>
+                    <a
+                      href={item.href}
+                      target={item.openInNewTab ? '_blank' : undefined}
+                      rel={item.openInNewTab ? 'noopener noreferrer' : undefined}
+                      class="forja-footer__nav-link"
+                    >
+                      {item.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          )}
+
+          {/* Social */}
+          {hasSocial && (
+            <div class="forja-footer__social">
+              <p class="forja-footer__nav-heading">Connect</p>
+              <div class="forja-footer__social-links" role="list" aria-label="Social links">
+                {this.socialLinks!.map(link => (
+                  <a
+                    href={link.url}
+                    class="forja-footer__social-link"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={link.title}
+                    role="listitem"
+                  >
+                    <span
+                      class="forja-footer__social-icon"
+                      aria-hidden="true"
+                      innerHTML={`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">${getSocialIcon(link.icon)}</svg>`}
+                    />
+                    <span class="forja-footer__sr-only">{link.title}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Bottom bar */}
+        <div class="forja-footer__bottom">
+          <p class="forja-footer__copyright">
+            &copy; {year} {this.siteName || 'Site'}. All rights reserved.
+          </p>
+          <div class="forja-footer__bottom-links">
+            {this.showRss && (
+              <a href="/rss.xml" class="forja-footer__bottom-link" aria-label="RSS Feed">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
+              </a>
+            )}
+            {this.showSitemap && (
+              <a href="/sitemap.xml" class="forja-footer__bottom-link">Sitemap</a>
+            )}
+          </div>
+        </div>
+      </footer>
+    );
+  }
+}

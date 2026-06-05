@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Pre-commit hook: lint and test checks scoped to what's staged.
+# Rust checks only run when .rs files are staged.
+# Frontend checks only run when admin/ files are staged.
+
+set -e
+
+ROOT="$(git rev-parse --show-toplevel)"
+
+if git diff --cached --name-only | grep -q '\.rs$'; then
+  echo "Running cargo fmt..."
+  (cd "$ROOT/backend" && cargo fmt)
+
+  # Re-stage any tracked Rust files that fmt modified
+  git diff --name-only | grep '\.rs$' | while read -r file; do
+    git add "$ROOT/$file"
+  done
+
+  echo "Running cargo clippy..."
+  (cd "$ROOT/backend" && cargo clippy -- -D warnings)
+fi
+
+if git diff --cached --name-only | grep -q '^admin/'; then
+  echo "Running npm lint..."
+  (cd "$ROOT/admin" && npm run lint)
+
+  echo "Running npm test..."
+  (cd "$ROOT/admin" && npm test)
+fi

@@ -1,0 +1,57 @@
+{
+  "$comment": "Screenshot manifest consumed by capture-screenshots.mjs. Each entry: path (admin route after /dashboard), out (file under static/img/screenshots), waitFor (selector to await before capture), clip (optional element selector to clip to; omitted = main content area), and notes. Routes assume the seeded local site (John Forja / localhost:4321).",
+  "baseUrl": "http://localhost:3000/dashboard",
+  "shots": [
+    {
+      "path": "/",
+      "out": "admin-guide/dashboard-workbench.webp",
+      "waitFor": "[data-testid=\"dashboard.page\"]",
+      "clipMain": true,
+      "notes": "Workbench: focus cards + feed. Logged in as Owner/Admin with seeded content."
+    },
+    {
+      "path": "/",
+      "out": "admin-guide/layout-overview.webp",
+      "waitFor": "[data-testid=\"dashboard.page\"]",
+      "fullWindow": true,
+      "notes": "Full window: sidebar + top bar + main content to illustrate the three-zone layout."
+    },
+    {
+      "path": "/my-drafts",
+      "out": "admin-guide/my-drafts.webp",
+      "waitFor": "[data-testid=\"my-drafts.page\"]",
+      "clipMain": true,
+      "notes": "My Drafts list with seeded draft blog posts."
+    },
+    {
+      "path": "/blogs",
+      "out": "content/blogs-list.webp",
+      "waitFor": "[data-testid=\"create-post\"]",
+      "clipMain": true,
+      "notes": "Blogs listing: Active tab, status filter chips, slug/author/status/published columns."
+    },
+    {
+      "path": "/blogs",
+      "out": "content/blog-editor.webp",
+      "waitFor": "[data-testid=\"create-post\"]",
+      "clickText": "eight-week-launch-plan",
+      "thenWaitFor": "[data-testid=\"save-post\"]",
+      "clipMain": true,
+      "notes": "Blog editor: title/subtitle, Tiptap toolbar, TOC panel, SEO sidebar tab. Opens a known seeded published post."
+    },
+    {
+      "path": "/pages",
+      "out": "content/pages-list.webp",
+      "waitFor": "[data-testid=\"create-page\"]",
+      "clipMain": true,
+      "notes": "Pages listing: route/type/status columns, All types filter, status chips."
+    },
+    {
+      "path": "/media/library",
+      "out": "admin-guide/assets-library.webp",
+      "waitFor": "[data-testid=\"media-item\"]",
+      "clipMain": true,
+      "notes": "Assets library: Media/Documents tabs, type chips, grid, folders panel. Use /media/library to skip the /media redirect."
+    }
+  ]
+}

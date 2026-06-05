@@ -1,0 +1,28 @@
+{
+  "name": "@forjacms/e2e",
+  "version": "2.0.0",
+  "license": "AGPL-3.0-or-later",
+  "private": true,
+  "description": "End-to-end tests for Forja using Cucumber + Playwright",
+  "scripts": {
+    "test": "cucumber-js",
+    "test:dry": "cucumber-js --dry-run",
+    "test:tags": "cucumber-js --tags",
+    "setup-db": "./scripts/setup-test-db.sh",
+    "e2e": "./scripts/run-e2e.sh"
+  },
+  "dependencies": {
+    "@clerk/testing": "^2.0.35",
+    "@cucumber/cucumber": "^13.0.0",
+    "dotenv": "^17.4.2",
+    "playwright": "^1.60.0",
+    "ts-node": "^10.9.2"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3"
+  },
+  "overrides": {
+    "typescript": "^6.0.3",
+    "js-cookie": "^3.0.7"
+  }
+}

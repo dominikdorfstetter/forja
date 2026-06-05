@@ -1,0 +1,4657 @@
+{
+  "common": {
+    "appName": "Forja",
+    "actions": {
+      "save": "حفظ",
+      "cancel": "إلغاء",
+      "delete": "حذف",
+      "edit": "تعديل",
+      "create": "إنشاء",
+      "add": "إضافة",
+      "close": "إغلاق",
+      "confirm": "تأكيد",
+      "back": "رجوع",
+      "refresh": "تحديث",
+      "search": "بحث",
+      "clear": "مسح",
+      "view": "عرض",
+      "manage": "إدارة",
+      "submit": "إرسال",
+      "saving": "جارٍ الحفظ...",
+      "loading": "جارٍ التحميل...",
+      "deleting": "جارٍ الحذف...",
+      "clone": "استنساخ",
+      "upload": "رفع",
+      "selectFile": "اختيار ملف",
+      "next": "التالي",
+      "preview": "معاينة",
+      "viewDetails": "عرض التفاصيل",
+      "clickToCopy": "انقر للنسخ",
+      "copied": "تم النسخ!",
+      "copyLabel": "نسخ {{value}} إلى الحافظة",
+      "moveUp": "نقل لأعلى",
+      "moveDown": "نقل لأسفل",
+      "open": "فتح",
+      "more": "المزيد",
+      "remove": "إزالة",
+      "showSecret": "إظهار السر",
+      "hideSecret": "إخفاء السر"
+    },
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "draft": "مسودة",
+      "published": "منشور",
+      "blocked": "محظور",
+      "expired": "منتهي الصلاحية",
+      "revoked": "ملغى",
+      "healthy": "سليم",
+      "degraded": "متدهور",
+      "unhealthy": "غير سليم",
+      "up": "يعمل",
+      "down": "متوقف",
+      "scheduled": "مجدول",
+      "inReview": "قيد المراجعة",
+      "archived": "مؤرشف",
+      "maintenance": "صيانة"
+    },
+    "search": {
+      "placeholder": "البحث بالاسم أو المعرّف..."
+    },
+    "table": {
+      "actions": "الإجراءات",
+      "name": "الاسم",
+      "status": "الحالة",
+      "created": "تاريخ الإنشاء",
+      "type": "النوع",
+      "slug": "المعرّف",
+      "noData": "لا توجد بيانات",
+      "maintenance": "صيانة",
+      "members": "الأعضاء",
+      "storage": "التخزين",
+      "used": "مستخدم",
+      "usage": "الاستخدام"
+    },
+    "confirm": {
+      "cannotBeUndone": "لا يمكن التراجع عن هذا الإجراء.",
+      "areYouSure": "هل أنت متأكد؟"
+    },
+    "confirmDialog": {
+      "typeToConfirm": "اكتب \"{{word}}\" للتأكيد"
+    },
+    "filters": {
+      "all": "الكل",
+      "status": "الحالة",
+      "permission": "الصلاحية",
+      "filterByType": "تصفية حسب النوع"
+    },
+    "labels": {
+      "yes": "نعم",
+      "no": "لا",
+      "default": "افتراضي",
+      "global": "عام",
+      "site": "موقع",
+      "child": "فرعي",
+      "featured": "مميز",
+      "present": "الحالي",
+      "never": "أبداً",
+      "none": "لا شيء",
+      "untitled": "بدون عنوان",
+      "internal": "داخلي",
+      "external": "خارجي",
+      "page": "صفحة",
+      "blog": "مقالة",
+      "cv": "السيرة الذاتية",
+      "legal": "قانوني",
+      "legalDocuments": "المستندات القانونية",
+      "cookieConsent": "موافقة ملفات تعريف الارتباط"
+    },
+    "errors": {
+      "loadFailed": "فشل تحميل البيانات",
+      "saveFailed": "فشل الحفظ",
+      "deleteFailed": "فشل الحذف",
+      "serverUnreachable": "لا يمكن الوصول إلى الخادم",
+      "required": "هذا الحقل مطلوب"
+    },
+    "noSiteSelected": "لم يتم اختيار موقع",
+    "selectSitePrompt": "اختر موقعاً من شريط الأدوات",
+    "selectSite": "اختر موقعاً...",
+    "noSiteOption": "لم يتم اختيار موقع",
+    "lockedByScope": "مقيّد بنطاق مفتاح API",
+    "skipToMain": "انتقل إلى المحتوى الرئيسي"
+  },
+  "scheduling": {
+    "publishAt": "النشر في",
+    "unpublishAt": "إلغاء النشر في (اختياري)",
+    "scheduledFor": "مجدول لـ {{date}}",
+    "clearSchedule": "مسح الجدولة",
+    "expiresAt": "تنتهي الصلاحية {{date}}"
+  },
+  "layout": {
+    "sidebar": {
+      "dashboard": "لوحة التحكم",
+      "content": "المحتوى",
+      "blogs": "المدونات",
+      "pages": "الصفحات",
+      "media": "الوسائط",
+      "documents": "المستندات",
+      "assets": "الأصول",
+      "structure": "الهيكل",
+      "navigation": "التنقل",
+      "taxonomy": "التصنيف",
+      "site": "الموقع",
+      "socialLinks": "الروابط الاجتماعية",
+      "activity": "النشاط",
+      "legal": "الشؤون القانونية",
+      "cv": "السيرة الذاتية",
+      "members": "الأعضاء",
+      "invite": "دعوة",
+      "reviews": "المراجعات",
+      "apiKeys": "مفاتيح API",
+      "contentTemplates": "القوالب",
+      "redirects": "إعادات التوجيه",
+      "webhooks": "خطافات الويب",
+      "settings": "الإعدادات",
+      "aiSettings": "إعدادات الذكاء الاصطناعي",
+      "sites": "المواقع",
+      "locales": "اللغات",
+      "apiDocs": "وثائق API",
+      "myDrafts": "مسوداتي",
+      "trash": "سلة المحذوفات",
+      "logout": "تسجيل الخروج",
+      "leaveDemo": "مغادرة العرض التجريبي",
+      "analytics": "التحليلات",
+      "administration": "الإدارة",
+      "portfolio": "معرض الأعمال",
+      "cookieConsent": "موافقة ملفات تعريف الارتباط",
+      "legalDocuments": "المستندات القانونية",
+      "forms": "النماذج",
+      "collections": "المجموعات"
+    },
+    "toolbar": {
+      "toggleDrawer": "تبديل القائمة الجانبية",
+      "account": "الحساب",
+      "profile": "الملف الشخصي",
+      "theme": "المظهر",
+      "language": "اللغة",
+      "siteSelector": "اختر موقعاً",
+      "switchSite": "تبديل الموقع",
+      "openSiteDetails": "فتح تفاصيل الموقع"
+    },
+    "accountMenu": {
+      "system": "مدير النظام",
+      "sites": "إدارة المواقع",
+      "locales": "اللغات",
+      "apiDocs": "وثائق API",
+      "preferences": "التفضيلات"
+    },
+    "demoBanner": {
+      "message": "أنت تشاهد نسخة تجريبية",
+      "signUp": "سجّل لإنشاء موقعك الخاص"
+    },
+    "demoInstance": "هذه نسخة تجريبية لأغراض الاختبار فقط. قد يتم إعادة تعيين قاعدة البيانات وقد تتوقف الميزات عن العمل دون إشعار مسبق."
+  },
+  "login": {
+    "title": "Forja",
+    "subtitle": "أدخل مفتاح API للوصول إلى لوحة الإدارة",
+    "apiKeyLabel": "مفتاح API",
+    "apiKeyPlaceholder": "dk_xxxxxxxx_xxxxxxxxxxxxxxxx",
+    "loginButton": "تسجيل الدخول",
+    "verifying": "جارٍ التحقق...",
+    "success": "تم تسجيل الدخول بنجاح",
+    "errors": {
+      "required": "مفتاح API مطلوب",
+      "invalid": "مفتاح API غير صالح"
+    }
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "managing": "إدارة {{name}}",
+    "selectSitePrompt": "اختر موقعاً من المشغّل لعرض إحصائيات المحتوى.",
+    "readOnlyNotice": "لديك صلاحية <strong>قراءة فقط</strong>. المحتوى مرئي ولكن لا يمكن تعديله.",
+    "badges": {
+      "aiEnabled": "الذكاء الاصطناعي مفعّل"
+    },
+    "systemHealth": "صحة النظام",
+    "overall": "الحالة العامة: {{status}}",
+    "stats": {
+      "sites": "المواقع",
+      "blogPosts": "تدوينات المدونة",
+      "pages": "الصفحات",
+      "mediaFiles": "ملفات الوسائط",
+      "users": "المستخدمون",
+      "apiKeys": "مفاتيح API"
+    },
+    "recentPosts": "أحدث التدوينات",
+    "publishedPosts": "التدوينات المنشورة",
+    "newPost": "تدوينة جديدة",
+    "noPosts": "لا توجد تدوينات بعد.",
+    "noPostsCreate": "لا توجد تدوينات بعد. أنشئ تدوينتك الأولى!",
+    "drafts": "المسودات",
+    "viewAllDrafts": "عرض الكل",
+    "noDrafts": "لا مسودات — كل المحتوى منشور أو قيد المراجعة.",
+    "quickActions": "إجراءات سريعة",
+    "byAuthor": "بواسطة {{author}}",
+    "requests": "{{count}} طلب",
+    "apiKeysPanel": {
+      "active": "{{count}} نشط",
+      "blocked": "{{count}} محظور",
+      "expiringSoon": "{{count}} ينتهي قريباً",
+      "expiresIn": "ينتهي خلال {{days}} يوم",
+      "expired": "منتهي الصلاحية",
+      "monthlyQuota": "الحصة الشهرية: {{limit}} طلب",
+      "resetsIn": "يُعاد التعيين خلال {{days}} يوم",
+      "anomalyBlocked": "تم حظر الشذوذ",
+      "noKeys": "لم يتم تكوين مفاتيح API"
+    },
+    "yourSites": "مواقعك",
+    "noSites": "لم يتم العثور على مواقع",
+    "noSitesCreate": "أنشئ موقعك الأول للبدء",
+    "permissions": {
+      "master": "مدير النظام",
+      "owner": "مالك الموقع",
+      "admin": "مدير",
+      "write": "كتابة",
+      "readOnly": "قراءة فقط"
+    },
+    "contentOverview": "نظرة عامة على المحتوى",
+    "chart": {
+      "noContent": "لا يوجد محتوى بعد. أنشئ أول تدوينة أو صفحة."
+    },
+    "attention": {
+      "awaitingReview": "بانتظار مراجعتك",
+      "draftsToFinish": "مسودات لإنهائها",
+      "recentlyPublished": "نُشر مؤخراً",
+      "noItemsReview": "لا توجد عناصر بانتظار المراجعة.",
+      "noItemsDrafts": "كل المحتوى منشور أو قيد المراجعة.",
+      "noItemsPublished": "لا يوجد محتوى منشور بعد.",
+      "viewAll": "عرض الكل"
+    },
+    "recentActivity": "النشاط الأخير",
+    "recentActivityEmpty": "لا يوجد نشاط أخير بعد.",
+    "updatedAgo": "{{time}}",
+    "analytics": {
+      "pageViews": "مشاهدات الصفحات",
+      "totalViews": "إجمالي المشاهدات",
+      "uniqueVisitors": "الزوار الفريدون",
+      "noData": "لا توجد بيانات مشاهدات بعد",
+      "path": "المسار",
+      "views": "المشاهدات",
+      "visitors": "الزوار"
+    },
+    "workbench": {
+      "title": "مكتب عملك",
+      "focus": {
+        "needsReview": "يحتاج إلى مراجعتك",
+        "needsReviewHint_one": "{{count}} بانتظار الموافقة",
+        "needsReviewHint_other": "{{count}} بانتظار الموافقة",
+        "drafts": "المسودات قيد التقدم",
+        "draftsHint_one": "{{count}} قيد التنفيذ",
+        "draftsHint_other": "{{count}} قيد التنفيذ",
+        "publishingSoon": "سيتم النشر قريبًا",
+        "scheduledHint_one": "{{count}} مجدول",
+        "scheduledHint_other": "{{count}} مجدولة"
+      },
+      "feed": {
+        "filter": {
+          "attention": "يتطلب الاهتمام",
+          "drafts": "المسودات",
+          "review": "مراجعة",
+          "scheduled": "مجدول"
+        },
+        "kinds": {
+          "needsReview": "بحاجة إلى مراجعة",
+          "draft": "مسودة",
+          "scheduled": "مجدول"
+        },
+        "action": {
+          "review": "مراجعة",
+          "continue": "متابعة"
+        },
+        "loading": "جار التحميل…",
+        "empty": "كل شيء مكتمل 🎉"
+      },
+      "health": {
+        "healthy": "جميع الأنظمة تعمل",
+        "checking": "جار فحص الخدمات…",
+        "degraded": "الخدمة متدهورة",
+        "noServices": "لا توجد خدمات مبلغ عنها"
+      },
+      "analytics": {
+        "totalViews_one": "{{count}} مشاهدة صفحة",
+        "totalViews_other": "{{count}} مشاهدات صفحات",
+        "vsLastWeek": "مقارنة بالأسبوع الماضي",
+        "noData": "التحليلات غير متاحة"
+      }
+    }
+  },
+  "myDrafts": {
+    "title": "مسوداتي",
+    "subtitle": "جميع المسودات في مكان واحد",
+    "loading": "جارٍ تحميل المسودات...",
+    "table": {
+      "name": "الاسم",
+      "type": "النوع",
+      "lastModified": "آخر تعديل"
+    },
+    "empty": {
+      "noSite": "اختر موقعاً من شريط الأدوات لعرض المسودات",
+      "title": "لا مسودات",
+      "description": "كل محتواك منشور أو مجدول — لا توجد مسودات."
+    }
+  },
+  "trash": {
+    "title": "سلة المحذوفات",
+    "subtitle": "المحتوى المحذوف مؤخراً — حذف تلقائي بعد 30 يوماً",
+    "empty": "سلة المحذوفات فارغة",
+    "restore": "استعادة",
+    "permanentDelete": "حذف نهائي",
+    "permanentDeleteConfirm": "لا يمكن التراجع عن هذا الإجراء. هل أنت متأكد؟",
+    "restored": "تم استعادة العنصر",
+    "deleted": "تم حذف العنصر نهائياً",
+    "deletedAt": "حُذف {{date}}",
+    "daysRemaining": "{{days}} يوم حتى الحذف التلقائي",
+    "columnDeleted": "محذوف",
+    "columnAutoPurge": "حذف تلقائي",
+    "emptyTrash": "إفراغ سلة المحذوفات",
+    "emptyTrashConfirm": "حذف جميع العناصر ({{count}}) نهائياً؟ لا يمكن التراجع عن هذا الإجراء.",
+    "type": {
+      "blog": "مدونة",
+      "page": "صفحة",
+      "media": "وسائط",
+      "document": "مستند",
+      "legal": "مستند قانوني",
+      "menu": "قائمة التنقل",
+      "menu_item": "عنصر القائمة",
+      "social": "رابط اجتماعي",
+      "project": "مشروع",
+      "cv_entry": "إدخال السيرة الذاتية",
+      "skill": "مهارة"
+    }
+  },
+  "blogs": {
+    "title": "المدونات",
+    "createButton": "إنشاء تدوينة",
+    "table": {
+      "slug": "المعرّف",
+      "author": "الكاتب",
+      "status": "الحالة",
+      "featured": "مميز",
+      "published": "تاريخ النشر",
+      "actions": "الإجراءات",
+      "selectAll": "تحديد جميع التدوينات",
+      "selectRow": "تحديد التدوينة {{slug}}",
+      "caption": "قائمة تدوينات المدونة"
+    },
+    "viewDetail": "عرض التفاصيل",
+    "empty": {
+      "title": "لا توجد تدوينات بعد",
+      "description": "تدوينات المدونة هي العمود الفقري لمحتواك. اكتب مقالات أو دروساً تعليمية أو أخباراً — كل منها مع ترجمات وتصنيفات وبيانات وصفية لمحركات البحث.",
+      "seedSamples": "البدء بتدوينات نموذجية"
+    },
+    "messages": {
+      "created": "تم إنشاء التدوينة — جارٍ فتح المحرر",
+      "cloned": "تم استنساخ التدوينة بنجاح",
+      "sampleSeeded": "تم إنشاء تدوينات نموذجية"
+    },
+    "deleteDialog": {
+      "title": "حذف التدوينة",
+      "message": "حذف التدوينة \"{{slug}}\"؟ لا يمكن التراجع عن هذا الإجراء."
+    },
+    "publishDialog": {
+      "title": "نشر التدوينة؟",
+      "message": "سيؤدي هذا إلى جعل \"{{slug}}\" مرئية للعموم."
+    },
+    "unpublishDialog": {
+      "title": "إلغاء نشر التدوينة؟",
+      "message": "سيؤدي هذا إلى إزالة \"{{slug}}\" من العرض العام وإعادتها إلى حالة المسودة."
+    },
+    "archiveDialog": {
+      "title": "أرشفة التدوينة؟",
+      "message": "سيؤدي هذا إلى أرشفة \"{{slug}}\" ونقلها إلى عرض الأرشيف."
+    },
+    "restoreDialog": {
+      "title": "استعادة التدوينة؟",
+      "message": "سيؤدي هذا إلى استعادة \"{{slug}}\" إلى حالة المسودة."
+    },
+    "moreActions": "المزيد",
+    "wizard": {
+      "title": "إنشاء تدوينة",
+      "steps": {
+        "method": "الطريقة",
+        "details": "التفاصيل"
+      },
+      "methods": {
+        "scratch": "من الصفر",
+        "scratchDesc": "البدء بتدوينة فارغة",
+        "template": "من قالب",
+        "templateDesc": "استخدام قالب محتوى جاهز",
+        "import": "استيراد Markdown",
+        "importDesc": "استيراد محتوى من ملف .md",
+        "ai": "مساعد الذكاء الاصطناعي",
+        "aiDesc": "توليد تدوينة من فكرة باستخدام الذكاء الاصطناعي"
+      },
+      "fields": {
+        "slug": "المعرّف",
+        "slugHint": "معرّف صديق لعنوان URL (مثال: my-first-post)",
+        "author": "الكاتب",
+        "title": "العنوان"
+      },
+      "creating": "جارٍ الإنشاء...",
+      "create": "إنشاء تدوينة"
+    },
+    "picker": {
+      "label": "اختر مقالة",
+      "placeholder": "البحث حسب slug...",
+      "empty": "لم يتم العثور على مقالات",
+      "loading": "جاري تحميل المقالات..."
+    },
+    "actions": {
+      "manageTemplates": "إدارة القوالب"
+    },
+    "list": {
+      "title": "المدونات",
+      "subtitle": "إدارة تدوينات المدونة عبر مواقعك",
+      "breadcrumb": "المدونات",
+      "loading": "جارٍ تحميل المدونات...",
+      "loadError": "فشل تحميل المدونات",
+      "empty": {
+        "title": "لا توجد تدوينات بعد",
+        "description": "تدوينات المدونة هي العمود الفقري لمحتواك. اكتب مقالات أو دروساً تعليمية أو أخباراً — كل منها مع ترجمات وتصنيفات وبيانات وصفية لمحركات البحث.",
+        "noSite": "اختر موقعاً من شريط الأدوات لعرض تدويناته"
+      },
+      "searchPlaceholder": "البحث بالمعرف أو المعرّف أو الكاتب...",
+      "tabs": {
+        "active": "نشطة",
+        "archived": "مؤرشفة"
+      },
+      "messages": {
+        "updated": "تم تحديث التدوينة",
+        "deleted": "تم حذف التدوينة"
+      }
+    }
+  },
+  "blogDetail": {
+    "title": "تفاصيل التدوينة",
+    "back": "العودة إلى المدونات",
+    "loading": "جارٍ تحميل التدوينة...",
+    "notFound": "التدوينة غير موجودة",
+    "loadError": "فشل في تحميل المدونة",
+    "tabs": {
+      "content": "المحتوى",
+      "preview": "معاينة",
+      "seo": "SEO",
+      "settings": "الإعدادات",
+      "attachments": "المرفقات",
+      "metadata": "البيانات الوصفية",
+      "documents": "المستندات"
+    },
+    "toolbar": {
+      "unsavedChanges": "تغييرات غير محفوظة"
+    },
+    "ai": {
+      "generateSeo": "توليد SEO",
+      "generateExcerpt": "توليد مقتطف",
+      "translate": "ترجمة بالذكاء الاصطناعي",
+      "generating": "جارٍ التوليد...",
+      "writeContentFirst": "اكتب بعض المحتوى أولاً",
+      "selectTargetLocale": "اللغة المستهدفة",
+      "suggestTranslation": "اقتراح ترجمة",
+      "applyTranslation": "تطبيق",
+      "refreshField": "إعادة ترجمة هذا الحقل",
+      "translationPreview": "معاينة الترجمة"
+    },
+    "seo": {
+      "serpPreview": "معاينة نتائج محرك البحث",
+      "charCount": "{{current}}/{{max}}",
+      "socialPreview": "معاينة بطاقة وسائل التواصل",
+      "socialPreviewNoCover": "أضف صورة الغلاف",
+      "socialPreviewApproximate": "تقريبية؛ يختلف العرض الفعلي بحسب المنصة.",
+      "socialPreviewTitleWarning": "قد يُقتطع العنوان عند المشاركة",
+      "socialPreviewDescriptionWarning": "قد يُقتطع الوصف عند المشاركة"
+    },
+    "fields": {
+      "title": "العنوان",
+      "subtitle": "العنوان الفرعي",
+      "slug": "المعرّف",
+      "author": "الكاتب",
+      "status": "الحالة",
+      "locale": "اللغة",
+      "excerpt": "المقتطف",
+      "content": "المحتوى",
+      "body": "النص (Markdown)",
+      "coverImage": "رابط صورة الغلاف",
+      "publishedDate": "تاريخ النشر",
+      "featured": "مميز",
+      "tags": "الوسوم",
+      "categories": "التصنيفات",
+      "metaTitle": "العنوان الوصفي",
+      "metaDescription": "الوصف الوصفي"
+    },
+    "metadata": {
+      "title": "البيانات الوصفية",
+      "slug": "المعرّف:",
+      "author": "الكاتب:",
+      "status": "الحالة:",
+      "published": "تاريخ النشر:",
+      "readingTime": "وقت القراءة",
+      "manualOverride": "تعديل يدوي",
+      "autoCalculated": "محسوب تلقائياً من المحتوى",
+      "resetAuto": "إعادة التعيين للحساب التلقائي",
+      "info": "البيانات الوصفية",
+      "blogId": "معرّف التدوينة",
+      "contentId": "معرّف المحتوى",
+      "publishedAt": "نُشر في",
+      "createdAt": "تاريخ الإنشاء",
+      "updatedAt": "آخر تحديث"
+    },
+    "images": {
+      "title": "الصور",
+      "coverImageId": "صورة الغلاف",
+      "headerImageId": "صورة الرأس",
+      "selectImage": "اختيار صورة",
+      "changeImage": "تغيير",
+      "removeImage": "إزالة",
+      "noImage": "لم يتم اختيار صورة"
+    },
+    "settings": {
+      "title": "الإعدادات",
+      "featured": "مميز",
+      "notFeatured": "غير مميز",
+      "commentsOn": "التعليقات مفعّلة",
+      "commentsOff": "التعليقات معطّلة"
+    },
+    "toc": "جدول المحتويات",
+    "createTranslation": "إنشاء ترجمة {{locale}}",
+    "noLocalesAlert": "لم يتم تكوين لغات نشطة. انتقل إلى <strong>الإعدادات ← اللغات</strong> وأنشئ لغة نشطة واحدة على الأقل (مثال: \"en\") لبدء كتابة محتوى المدونة.",
+    "messages": {
+      "saved": "تم حفظ التدوينة",
+      "saveFailed": "فشل حفظ التدوينة"
+    },
+    "documents": {
+      "title": "المستندات المرفقة",
+      "attach": "إرفاق مستند",
+      "empty": "لا توجد مستندات مرفقة",
+      "emptyDescription": "أرفق مستندات بهذه التدوينة",
+      "detached": "تم فصل المستند",
+      "attached": "تم إرفاق المستند"
+    },
+    "sections": {
+      "media": "الوسائط",
+      "seo": "SEO والبيانات الوصفية",
+      "settings": "الإعدادات",
+      "categoriesAndTags": "التصنيفات والوسوم",
+      "attachments": "المرفقات",
+      "preview": "معاينة"
+    },
+    "sidebar": {
+      "toggle": "تبديل الشريط الجانبي",
+      "seo": "SEO",
+      "general": "عام",
+      "media": "الوسائط",
+      "relations": "العلاقات"
+    },
+    "tags": {
+      "empty": "لا توجد علامات معينة",
+      "assigned": "تم تعيين العلامة",
+      "removed": "تم إزالة العلامة",
+      "assignFailed": "فشل تعيين العلامة",
+      "removeFailed": "فشل إزالة العلامة",
+      "createFailed": "فشل إنشاء العلامة",
+      "suggestTags": "اقتراح العلامات",
+      "suggesting": "جارٍ الاقتراح...",
+      "suggestTitle": "العلامات المقترحة",
+      "suggestSubtitle": "اختر العلامات التي تريد تطبيقها. يُعاد استخدام العلامات الموجودة — أما الجديدة فمعلَّمة بـ +.",
+      "suggestPickHint": "انقر على شريحة لتحديدها أو إلغاء تحديدها.",
+      "suggestApply": "تطبيق {{count}} علامة",
+      "suggestEmpty": "لا توجد اقتراحات بعد.",
+      "suggestApplied": "تم تطبيق العلامات",
+      "suggestApplyFailed": "فشل تطبيق العلامة {{slug}}",
+      "suggestTruncated": "عرض أفضل {{max}} اقتراحات."
+    }
+  },
+  "pages": {
+    "createButton": "إنشاء صفحة",
+    "table": {
+      "route": "المسار",
+      "type": "النوع",
+      "status": "الحالة",
+      "inNav": "في التنقل",
+      "created": "تاريخ الإنشاء",
+      "actions": "الإجراءات",
+      "selectAll": "تحديد جميع الصفحات",
+      "selectRow": "تحديد الصفحة {{route}}",
+      "caption": "قائمة الصفحات"
+    },
+    "viewDetails": "عرض التفاصيل",
+    "messages": {
+      "created": "تم إنشاء الصفحة",
+      "cloned": "تم استنساخ الصفحة بنجاح"
+    },
+    "deleteDialog": {
+      "title": "حذف الصفحة",
+      "message": "حذف الصفحة \"{{route}}\"؟ لا يمكن التراجع عن هذا الإجراء."
+    },
+    "publishDialog": {
+      "title": "نشر الصفحة؟",
+      "message": "سيؤدي هذا إلى جعل \"{{route}}\" مرئية للعموم."
+    },
+    "unpublishDialog": {
+      "title": "إلغاء نشر الصفحة؟",
+      "message": "سيؤدي هذا إلى إزالة \"{{route}}\" من العرض العام وإعادتها إلى حالة المسودة."
+    },
+    "archiveDialog": {
+      "title": "أرشفة الصفحة؟",
+      "message": "سيؤدي هذا إلى أرشفة \"{{route}}\" ونقلها إلى عرض الأرشيف."
+    },
+    "restoreDialog": {
+      "title": "استعادة الصفحة؟",
+      "message": "سيؤدي هذا إلى استعادة \"{{route}}\" إلى حالة المسودة."
+    },
+    "wizard": {
+      "steps": {
+        "pageType": "نوع الصفحة",
+        "identity": "الهوية",
+        "options": "الخيارات"
+      },
+      "next": "التالي",
+      "back": "رجوع",
+      "createPage": "إنشاء صفحة",
+      "creating": "جارٍ الإنشاء...",
+      "types": {
+        "static": "ثابتة",
+        "staticDesc": "صفحة محتوى قياسية",
+        "landing": "هبوط",
+        "landingDesc": "صفحة تسويقية بأقسام رئيسية",
+        "contact": "اتصال",
+        "contactDesc": "نموذج اتصال ومعلومات",
+        "blogIndex": "فهرس المدونة",
+        "blogIndexDesc": "صفحة قائمة تدوينات المدونة",
+        "custom": "مخصصة",
+        "customDesc": "تخطيط صفحة مخصص بالكامل"
+      },
+      "routeHint": "مسار URL للصفحة (مثال: /about)",
+      "slugHint": "معرّف صديق لعنوان URL، يُنشأ تلقائياً من المسار",
+      "site": "الموقع",
+      "inNavigation": "عرض في التنقل"
+    },
+    "picker": {
+      "label": "اختر صفحة",
+      "placeholder": "البحث حسب العنوان أو المسار...",
+      "empty": "لم يتم العثور على صفحات",
+      "loading": "جاري تحميل الصفحات..."
+    },
+    "list": {
+      "title": "الصفحات",
+      "subtitle": "إدارة الصفحات عبر مواقعك",
+      "breadcrumb": "الصفحات",
+      "loading": "جارٍ تحميل الصفحات...",
+      "loadError": "فشل تحميل الصفحات",
+      "empty": {
+        "title": "لا توجد صفحات بعد",
+        "description": "الصفحات هي اللبنات الأساسية لموقعك. أنشئ صفحات هبوط أو أقسام تعريفية أو أي تخطيط مخصص بأقسام معيارية.",
+        "noSite": "اختر موقعاً من شريط الأدوات لعرض صفحاته"
+      },
+      "searchPlaceholder": "البحث بالمعرف أو المسار أو المعرّف...",
+      "tabs": {
+        "active": "نشطة",
+        "archived": "مؤرشفة"
+      },
+      "messages": {
+        "updated": "تم تحديث الصفحة",
+        "deleted": "تم حذف الصفحة"
+      }
+    }
+  },
+  "pageDetail": {
+    "title": "تفاصيل الصفحة",
+    "back": "العودة إلى الصفحات",
+    "loading": "جارٍ تحميل الصفحة...",
+    "loadFailed": "فشل تحميل الصفحة",
+    "notFound": "الصفحة غير موجودة",
+    "pageInfo": "معلومات الصفحة",
+    "parentPageId": "معرّف الصفحة الأم",
+    "pageSubtitle": "صفحة {{type}}",
+    "metadata": "البيانات الوصفية",
+    "contentId": "معرّف المحتوى",
+    "template": "القالب",
+    "sections": {
+      "title": "الأقسام",
+      "coverImage": "صورة الغلاف",
+      "add": "إضافة قسم",
+      "empty": "لا توجد أقسام بعد",
+      "emptyDescription": "أضف أقساماً لبناء تخطيط صفحتك",
+      "deleted": "تم حذف القسم",
+      "saved": "تم حفظ القسم",
+      "reordered": "تمت إعادة ترتيب الأقسام",
+      "added": "تمت إضافة القسم",
+      "loadingSections": "جارٍ تحميل الأقسام...",
+      "deleteTitle": "حذف القسم",
+      "deleteMessage": "حذف قسم {{type}} هذا؟ لا يمكن التراجع عن هذا الإجراء.",
+      "untitled": "بدون عنوان"
+    },
+    "table": {
+      "type": "النوع",
+      "order": "الترتيب",
+      "content": "المحتوى",
+      "localizations": "الترجمات",
+      "coverImage": "صورة الغلاف",
+      "ctaRoute": "مسار دعوة الإجراء",
+      "actions": "الإجراءات"
+    },
+    "dialog": {
+      "sectionType": "نوع القسم",
+      "displayOrder": "ترتيب العرض",
+      "displayOrderRequired": "ترتيب العرض مطلوب",
+      "adding": "جارٍ الإضافة..."
+    },
+    "fields": {
+      "route": "المسار",
+      "title": "العنوان",
+      "description": "الوصف",
+      "status": "الحالة",
+      "pageType": "نوع الصفحة",
+      "inNavigation": "في التنقل",
+      "navTitle": "عنوان التنقل",
+      "navOrder": "ترتيب التنقل",
+      "metaTitle": "العنوان الوصفي",
+      "metaDescription": "الوصف الوصفي",
+      "excerpt": "المقتطف",
+      "slug": "المعرّف",
+      "id": "المعرّف",
+      "published": "تاريخ النشر",
+      "created": "تاريخ الإنشاء",
+      "updated": "تاريخ التحديث"
+    },
+    "tabs": {
+      "info": "المعلومات",
+      "seo": "SEO",
+      "sections": "الأقسام"
+    },
+    "seo": {
+      "serpPreview": "معاينة نتائج محرك البحث"
+    },
+    "toolbar": {},
+    "messages": {
+      "saved": "تم حفظ الصفحة",
+      "saveFailed": "فشل حفظ الصفحة",
+      "updated": "تم تحديث الصفحة"
+    }
+  },
+  "media": {
+    "title": "الوسائط",
+    "subtitle": "إدارة ملفات الوسائط عبر مواقعك",
+    "registerButton": "تسجيل وسائط",
+    "uploadButton": "رفع ملف",
+    "folders": "المجلدات",
+    "searchPlaceholder": "البحث بالاسم أو النص البديل أو التعليق أو العنوان...",
+    "categories": {
+      "images": "صور",
+      "videos": "فيديوهات",
+      "audio": "صوتيات",
+      "documents": "مستندات"
+    },
+    "picker": {
+      "title": "اختيار صورة",
+      "search": "البحث في الصور...",
+      "noResults": "لم يتم العثور على صور",
+      "select": "اختيار",
+      "clear": "مسح الاختيار"
+    },
+    "openUrl": "فتح URL",
+    "copyUrl": "نسخ URL العام",
+    "empty": {
+      "noSite": "اختر موقعاً من شريط الأدوات لعرض ملفات الوسائط الخاصة به",
+      "title": "لا توجد وسائط بعد",
+      "description": "ارفع وأدر الصور والفيديوهات والمستندات. يمكن إرفاق ملفات الوسائط بتدوينات المدونة والصفحات والأقسام.",
+      "noMatch": "لا توجد وسائط مطابقة",
+      "noMatchDescription": "جرّب تعديل البحث أو المرشحات",
+      "noFilesInFolder": "لا توجد ملفات في هذا المجلد"
+    },
+    "loading": "جارٍ تحميل الوسائط...",
+    "loadError": "فشل تحميل الوسائط",
+    "messages": {
+      "registered": "تم تسجيل الوسائط",
+      "deleted": "تم حذف الوسائط",
+      "moved": "تم النقل إلى المجلد",
+      "folderCreated": "تم إنشاء المجلد",
+      "folderRenamed": "تم إعادة تسمية المجلد",
+      "folderDeleted": "تم حذف المجلد"
+    },
+    "ai": {
+      "title": "رؤية الذكاء الاصطناعي",
+      "generateAltText": "توليد النص البديل",
+      "generateTags": "اقتراح وسوم",
+      "suggestTags": "اقتراح وسوم",
+      "altTextGenerated": "تم توليد النص البديل",
+      "tagsGenerated": "تم توليد الوسوم",
+      "generationFailed": "فشل التوليد بالذكاء الاصطناعي",
+      "suggestedTags": "وسوم مقترحة — انقر للإضافة:",
+      "generateCaption": "إنشاء وصف",
+      "generateTitle": "إنشاء عنوان",
+      "fieldGenerated": "تم إنشاء محتوى الذكاء الاصطناعي",
+      "translateFrom": "ترجمة من {{locale}}",
+      "noSourceContent": "لا يوجد محتوى في اللغة الافتراضية للترجمة",
+      "translated": "تمت ترجمة البيانات الوصفية"
+    },
+    "deleteDialog": {
+      "title": "حذف الوسائط",
+      "message": "حذف \"{{filename}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+      "forceDelete": "حذف إجباري (حتى لو قيد الاستخدام)"
+    },
+    "deleteFolderDialog": {
+      "title": "حذف المجلد؟",
+      "message": "سيؤدي هذا إلى حذف هذا المجلد نهائياً ونقل ملفاته إلى المستوى الجذر."
+    },
+    "upload": {
+      "dragDrop": "اسحب وأفلت الملفات هنا، أو انقر للتصفح",
+      "uploading": "جارٍ الرفع...",
+      "progress": "جارٍ الرفع {{percent}}%",
+      "success": "تم رفع الملف بنجاح",
+      "tooLarge": "الملف يتجاوز الحجم الأقصى {{maxSize}}",
+      "invalidType": "نوع الملف غير مدعوم"
+    },
+    "tabs": {
+      "tags": "الوسوم",
+      "metadata": "البيانات الوصفية",
+      "variants": "المتغيرات",
+      "usage": "الاستخدام"
+    },
+    "tags": {
+      "save": "حفظ الوسوم",
+      "saved": "تم حفظ الوسوم"
+    },
+    "variants": {
+      "none": "لا توجد متغيرات متاحة"
+    },
+    "usage": {
+      "none": "غير مُشار إليه من أي محتوى"
+    }
+  },
+  "documents": {
+    "title": "المستندات",
+    "subtitle": "إدارة المستندات القابلة للتنزيل",
+    "createButton": "إضافة مستند",
+    "copyUrl": "نسخ URL العام",
+    "searchPlaceholder": "البحث بالاسم أو اسم الملف أو الرابط أو النوع...",
+    "table": {
+      "title": "العنوان",
+      "slug": "المعرّف",
+      "type": "النوع",
+      "fileSize": "حجم الملف",
+      "downloads": "التنزيلات",
+      "status": "الحالة",
+      "created": "تاريخ الإنشاء",
+      "actions": "الإجراءات"
+    },
+    "empty": {
+      "noSite": "اختر موقعاً من شريط الأدوات لعرض مستنداته",
+      "title": "لا توجد مستندات بعد",
+      "description": "أدر الملفات القابلة للتنزيل مثل ملفات PDF والأوراق البيضاء أو الأدلة. يمكن ربط المستندات بتدوينات المدونة والصفحات."
+    },
+    "loading": "جارٍ تحميل المستندات...",
+    "loadError": "فشل تحميل المستندات",
+    "messages": {
+      "created": "تم إنشاء المستند",
+      "updated": "تم تحديث المستند",
+      "deleted": "تم حذف المستند"
+    },
+    "deleteDialog": {
+      "title": "حذف المستند",
+      "message": "حذف هذا المستند؟ لا يمكن التراجع عن هذا الإجراء."
+    },
+    "deleteFolderDialog": {
+      "title": "حذف المجلد؟",
+      "message": "سيؤدي هذا إلى حذف هذا المجلد نهائياً ونقل مستنداته إلى المستوى الجذر."
+    },
+    "privacy": {
+      "action": "الخصوصية",
+      "enterPassword": "أدخل كلمة المرور",
+      "password": "كلمة المرور",
+      "confirmPassword": "تأكيد كلمة المرور",
+      "incorrectPassword": "كلمة مرور غير صحيحة",
+      "download": "تنزيل",
+      "setTitle": "تعيين خصوصية المستند",
+      "setDescription": "احمِ هذا المستند بكلمة مرور. سيحتاج المستخدمون إلى إدخال كلمة المرور لتنزيله.",
+      "setButton": "تعيين كلمة المرور",
+      "setSuccess": "تم تفعيل خصوصية المستند",
+      "removeTitle": "إزالة خصوصية المستند",
+      "removeDescription": "إزالة حماية كلمة المرور من هذا المستند. أدخل كلمة المرور الحالية أو استخدم استرداد المدير.",
+      "removeButton": "إزالة الخصوصية",
+      "removeSuccess": "تم إزالة خصوصية المستند",
+      "adminRecoveryNote": "بصفتك مديراً، يمكنك ترك كلمة المرور فارغة لإزالة الخصوصية بدون كلمة المرور الأصلية.",
+      "minLength": "يجب أن تكون كلمة المرور {{min}} أحرف على الأقل",
+      "mismatch": "كلمات المرور غير متطابقة",
+      "generate": "توليد كلمة مرور آمنة",
+      "ttl": {
+        "label": "نافذة الوصول",
+        "never": "لا تنتهي صلاحيته",
+        "1h": "ساعة واحدة",
+        "6h": "6 ساعات",
+        "24h": "24 ساعة",
+        "7d": "7 أيام",
+        "30d": "30 يومًا"
+      },
+      "expiringBadge": "على وشك الانتهاء",
+      "expiredBadge": "منتهي الصلاحية",
+      "lockedBadge": "مقفل",
+      "unlock": "فتح القفل",
+      "unlockConfirm": "فتح قفل هذا المستند؟ يمكن لأي شخص لديه كلمة المرور والرابط محاولة الوصول مرة أخرى.",
+      "unlockSuccess": "تم فتح قفل المستند",
+      "unlockError": "تعذر فتح قفل المستند",
+      "errors": {
+        "expired": "انتهت صلاحية هذا المستند",
+        "locked": "هذا المستند مقفل",
+        "invalidTtl": "تاريخ انتهاء غير صالح — يجب أن يكون في المستقبل وبحد أقصى عام واحد",
+        "notLocked": "المستند غير مقفل"
+      },
+      "badge": "خاص",
+      "unlockTitle": "فتح قفل المستند"
+    }
+  },
+  "navigation": {
+    "title": "التنقل",
+    "subtitle": "إدارة عناصر التنقل لمواقعك",
+    "addItem": "إضافة عنصر",
+    "table": {
+      "link": "الرابط",
+      "type": "النوع",
+      "icon": "الأيقونة",
+      "newTab": "علامة تبويب جديدة",
+      "actions": "الإجراءات",
+      "languages": "اللغات"
+    },
+    "empty": {
+      "noSite": "اختر موقعاً من شريط الأدوات لإدارة التنقل فيه",
+      "title": "لا توجد عناصر تنقل بعد",
+      "description": "حدد كيفية تنقل الزوار في موقعك. أنشئ قوائم بروابط للصفحات أو عناوين URL خارجية، منظمة في تسلسل هرمي."
+    },
+    "loading": "جارٍ تحميل التنقل...",
+    "loadError": "فشل تحميل التنقل",
+    "messages": {
+      "created": "تم إنشاء عنصر التنقل",
+      "updated": "تم تحديث عنصر التنقل",
+      "deleted": "تم حذف عنصر التنقل"
+    },
+    "deleteDialog": {
+      "title": "حذف عنصر التنقل",
+      "message": "حذف عنصر التنقل هذا؟ سيؤدي هذا أيضاً إلى حذف ترجماته."
+    },
+    "fields": {
+      "title": "العنوان",
+      "parent": "العنصر الأب",
+      "parentHelp": "اختر عنصرًا أبًا أو اتركه كجذر",
+      "noParent": "بدون (مستوى جذر)",
+      "titles": "العناوين"
+    },
+    "wizard": {
+      "title": {
+        "create": "إضافة عنصر تنقل",
+        "edit": "تعديل عنصر التنقل"
+      },
+      "steps": {
+        "linkTarget": "هدف الرابط",
+        "translations": "الترجمات",
+        "options": "الخيارات"
+      },
+      "validation": {
+        "pageRequired": "يرجى اختيار صفحة",
+        "urlRequired": "يرجى إدخال عنوان URL",
+        "urlInvalid": "يرجى إدخال عنوان URL صالح",
+        "titleRequired": "مطلوب عنوان واحد على الأقل"
+      },
+      "translationsHelp": "أدخل عنوانًا لكل لغة. مطلوب عنوان واحد على الأقل.",
+      "noLocales": "لم يتم تكوين لغات لهذا الموقع.",
+      "iconHelp": "اسم الأيقونة اختياري",
+      "blogHelp": "سيشير الرابط إلى /blog/{slug}",
+      "contentType": "نوع المحتوى",
+      "cvInfo": "سيرتبط بصفحة السيرة الذاتية على /cv",
+      "externalHelp": "أي عنوان URL — مستندات، ملفات، مواقع خارجية",
+      "legalDocType": "مستند قانوني",
+      "legalHelp": "سيشير الرابط إلى /legal/{slug}"
+    },
+    "tree": {
+      "expand": "توسيع",
+      "collapse": "طي",
+      "childCount": "{{count}} عناصر"
+    },
+    "row": {
+      "locales": "{{count}}/{{total}} لغات",
+      "active": "نشط",
+      "inactive": "غير نشط"
+    },
+    "menu": {
+      "inactive": "(غير نشط)"
+    },
+    "dragToReorder": "اسحب لإعادة الترتيب",
+    "menus": {
+      "createTitle": "إنشاء قائمة",
+      "editTitle": "تعديل القائمة",
+      "addMenu": "إضافة قائمة",
+      "editMenu": "إعدادات القائمة",
+      "deleteMenu": "حذف القائمة",
+      "fields": {
+        "slug": "Slug",
+        "slugHelp": "مثال: primary, footer, sidebar",
+        "description": "الوصف",
+        "maxDepth": "أقصى عمق",
+        "maxDepthHelp": "أقصى عمق تداخل (1-10)",
+        "active": "نشطة"
+      },
+      "messages": {
+        "created": "تم إنشاء القائمة",
+        "updated": "تم تحديث القائمة",
+        "deleted": "تم حذف القائمة"
+      },
+      "empty": {
+        "title": "لا توجد قوائم بعد",
+        "description": "أنشئ قائمة تنقل للبدء"
+      },
+      "deleteDialog": {
+        "title": "حذف القائمة",
+        "message": "سيؤدي هذا إلى حذف هذه القائمة وجميع عناصر التنقل نهائيًا. لا يمكن التراجع عن هذا الإجراء."
+      }
+    }
+  },
+  "socialLinks": {
+    "title": "الروابط الاجتماعية",
+    "subtitle": "إدارة روابط وسائل التواصل الاجتماعي لمواقعك",
+    "addLink": "إضافة رابط",
+    "table": {
+      "title": "العنوان",
+      "url": "URL",
+      "icon": "الأيقونة",
+      "actions": "الإجراءات"
+    },
+    "empty": {
+      "noSite": "اختر موقعاً من شريط الأدوات لإدارة روابطه الاجتماعية",
+      "title": "لا توجد روابط اجتماعية بعد",
+      "description": "أضف روابط لملفاتك الشخصية على وسائل التواصل الاجتماعي. يتم تقديمها عبر API حتى يتمكن واجهتك الأمامية من عرضها في أي مكان."
+    },
+    "loading": "جارٍ تحميل الروابط الاجتماعية...",
+    "loadError": "فشل تحميل الروابط الاجتماعية",
+    "messages": {
+      "created": "تم إنشاء الرابط الاجتماعي",
+      "updated": "تم تحديث الرابط الاجتماعي",
+      "deleted": "تم حذف الرابط الاجتماعي"
+    },
+    "deleteDialog": {
+      "title": "حذف الرابط الاجتماعي",
+      "message": "حذف \"{{title}}\"؟ لا يمكن التراجع عن هذا الإجراء."
+    }
+  },
+  "taxonomy": {
+    "title": "التصنيف",
+    "subtitle": "إدارة الوسوم والتصنيفات لمواقعك",
+    "info": {
+      "tags": "تسميات مسطحة شبيهة بالهاشتاقات — عدّة لكل تدوينة (مثل «rust»، «tutorial»). مثالية للتصفية والمواضيع المتقاطعة.",
+      "categories": "تسلسل هرمي شجري، مثل «التقنية › الويب › React». تنتمي كل تدوينة عادةً إلى واحدة."
+    },
+    "tags": {
+      "title": "الوسوم",
+      "addTag": "إضافة وسم",
+      "table": {
+        "slug": "المعرّف",
+        "scope": "النطاق",
+        "created": "تاريخ الإنشاء",
+        "actions": "الإجراءات"
+      },
+      "empty": {
+        "title": "لا توجد وسوم بعد",
+        "description": "الوسوم هي تسميات مسطحة للمواضيع المتقاطعة — كالهاشتاقات. عيّن عدة وسوم لكل تدوينة (مثل \"rust\"، \"tutorial\") لتمكين الزوار من التصفية واكتشاف المحتوى."
+      },
+      "loading": "جارٍ تحميل الوسوم...",
+      "searchPlaceholder": "البحث في الوسوم بالمعرّف...",
+      "messages": {
+        "created": "تم إنشاء الوسم",
+        "updated": "تم تحديث الوسم",
+        "deleted": "تم حذف الوسم"
+      },
+      "deleteDialog": {
+        "title": "حذف الوسم",
+        "message": "حذف الوسم \"{{slug}}\"؟ سيؤدي هذا إلى إلغاء تفعيل الوسم."
+      }
+    },
+    "categories": {
+      "title": "التصنيفات",
+      "addCategory": "إضافة تصنيف",
+      "table": {
+        "slug": "المعرّف",
+        "parent": "الأب",
+        "scope": "النطاق",
+        "created": "تاريخ الإنشاء",
+        "actions": "الإجراءات"
+      },
+      "empty": {
+        "title": "لا توجد تصنيفات بعد",
+        "description": "التصنيفات تنشئ تسلسلاً هرمياً شبيهاً بالشجرة لمحتواك. جمّع التدوينات ذات الصلة تحت فروع مثل \"التقنية > تطوير الويب\" للتنقل المنظم."
+      },
+      "loading": "جارٍ تحميل التصنيفات...",
+      "searchPlaceholder": "البحث في التصنيفات بالمعرّف...",
+      "messages": {
+        "created": "تم إنشاء التصنيف",
+        "updated": "تم تحديث التصنيف",
+        "deleted": "تم حذف التصنيف"
+      },
+      "deleteDialog": {
+        "title": "حذف التصنيف",
+        "message": "حذف التصنيف \"{{slug}}\"؟ سيؤدي هذا إلى إلغاء تفعيل التصنيف."
+      }
+    },
+    "empty": {
+      "noSite": "اختر موقعاً من شريط الأدوات لإدارة تصنيفاته"
+    }
+  },
+  "webhooks": {
+    "title": "خطافات الويب",
+    "subtitle": "إشعار الخدمات الخارجية عند تغيير المحتوى",
+    "addWebhook": "إضافة Webhook",
+    "searchPlaceholder": "البحث بـ URL...",
+    "allEvents": "جميع الأحداث",
+    "viewDeliveries": "عرض عمليات التسليم",
+    "sendTest": "إرسال اختبار",
+    "testSuccess": "تم تسليم الاختبار — {{status}}",
+    "testFailed": "فشل تسليم الاختبار",
+    "table": {
+      "url": "URL",
+      "events": "الأحداث",
+      "status": "الحالة",
+      "created": "تاريخ الإنشاء",
+      "actions": "الإجراءات",
+      "successRate": "النجاح (24 س)"
+    },
+    "empty": {
+      "noSite": "اختر موقعاً من شريط الأدوات لإدارة Webhooks الخاصة به",
+      "title": "لا توجد Webhooks بعد",
+      "description": "تُشعر Webhooks الخدمات الخارجية عند إنشاء المحتوى أو تحديثه أو حذفه. استخدمها لتشغيل عمليات البناء أو مزامنة البيانات أو إرسال الإشعارات."
+    },
+    "loading": "جارٍ تحميل Webhooks...",
+    "messages": {
+      "created": "تم إنشاء Webhook",
+      "updated": "تم تحديث Webhook",
+      "deleted": "تم حذف Webhook"
+    },
+    "deleteDialog": {
+      "title": "حذف Webhook",
+      "message": "حذف Webhook لـ \"{{url}}\"؟ لا يمكن التراجع عن هذا الإجراء."
+    },
+    "deliveries": {
+      "title": "سجل التسليم",
+      "loading": "جارٍ تحميل عمليات التسليم...",
+      "empty": "لا توجد عمليات تسليم بعد",
+      "emptyDescription": "ستظهر عمليات التسليم هنا بعد تفعيل Webhook.",
+      "table": {
+        "event": "الحدث",
+        "status": "الحالة",
+        "attempt": "المحاولة",
+        "timestamp": "الطابع الزمني",
+        "error": "الخطأ"
+      }
+    },
+    "templates": {
+      "title": "اختر قالباً",
+      "custom": "مخصص",
+      "customDesc": "تكوين webhook من الصفر",
+      "vercel": "Vercel",
+      "vercelDesc": "تشغيل نشر Vercel عند تغيير المحتوى",
+      "netlify": "Netlify",
+      "netlifyDesc": "تشغيل بناء Netlify عند تغيير المحتوى",
+      "cloudflare": "Cloudflare Pages",
+      "cloudflareDesc": "تشغيل بناء Cloudflare Pages عند تغيير المحتوى",
+      "errors": {
+        "urlMismatch": "لا يبدو أن هذا الـ URL هو deploy hook لـ {{provider}}"
+      }
+    },
+    "analytics": {
+      "title": "تحليلات التسليم",
+      "viewAnalytics": "عرض التحليلات",
+      "window": {
+        "1h": "الساعة الأخيرة",
+        "24h": "آخر 24 ساعة",
+        "7d": "آخر 7 أيام",
+        "30d": "آخر 30 يوماً"
+      },
+      "cards": {
+        "total": "إجمالي عمليات التسليم",
+        "successRate": "معدل النجاح",
+        "pendingRetry": "إعادات المحاولة المعلقة"
+      },
+      "byEvent": {
+        "title": "حسب نوع الحدث",
+        "event": "الحدث",
+        "total": "الإجمالي",
+        "successful": "ناجح",
+        "failed": "فاشل"
+      },
+      "errors": {
+        "fetchFailed": "تعذر تحميل إحصائيات التسليم"
+      }
+    }
+  },
+  "redirects": {
+    "title": "إعادات التوجيه",
+    "subtitle": "إدارة إعادات توجيه URL لمواقعك",
+    "addRedirect": "إضافة إعادة توجيه",
+    "searchPlaceholder": "البحث بالمسار...",
+    "table": {
+      "sourcePath": "المسار المصدر",
+      "destination": "الوجهة",
+      "type": "النوع",
+      "status": "الحالة",
+      "created": "تاريخ الإنشاء",
+      "actions": "الإجراءات",
+      "permanent": "301 دائمة",
+      "temporary": "302 مؤقتة",
+      "temporaryStrict": "307 مؤقتة",
+      "permanentStrict": "308 دائمة"
+    },
+    "empty": {
+      "noSite": "اختر موقعاً من شريط الأدوات لإدارة إعادات التوجيه فيه",
+      "title": "لا توجد إعادات توجيه بعد",
+      "description": "أعدّ إعادات توجيه URL للحفاظ على عمل الروابط القديمة عند نقل المحتوى. استخدم 301 للنقل الدائم و302 للمؤقت."
+    },
+    "loading": "جارٍ تحميل إعادات التوجيه...",
+    "messages": {
+      "created": "تم إنشاء إعادة التوجيه",
+      "updated": "تم تحديث إعادة التوجيه",
+      "deleted": "تم حذف إعادة التوجيه"
+    },
+    "deleteDialog": {
+      "title": "حذف إعادة التوجيه",
+      "message": "حذف إعادة التوجيه لـ \"{{source}}\"؟ لا يمكن التراجع عن هذا الإجراء."
+    }
+  },
+  "locales": {
+    "title": "اللغات",
+    "subtitle": "إدارة اللغات والإعدادات المحلية على مستوى النظام",
+    "addLanguage": "إضافة لغة",
+    "loading": "جارٍ تحميل اللغات...",
+    "columns": {
+      "code": "الرمز",
+      "name": "الاسم",
+      "nativeName": "الاسم الأصلي",
+      "direction": "الاتجاه",
+      "active": "نشطة",
+      "created": "تاريخ الإنشاء",
+      "actions": "الإجراءات"
+    },
+    "empty": {
+      "title": "لا توجد لغات بعد",
+      "description": "تتيح اللغات المحتوى متعدد اللغات. أضف اللغات التي تريد دعمها — يمكن بعد ذلك ترجمة كل قطعة محتوى."
+    },
+    "messages": {
+      "created": "تم إنشاء اللغة",
+      "updated": "تم تحديث اللغة",
+      "deleted": "تم حذف اللغة"
+    },
+    "deleteDialog": {
+      "title": "حذف اللغة",
+      "message": "حذف اللغة \"{{code}}\"؟ لا يمكن التراجع عن هذا الإجراء."
+    },
+    "errors": {
+      "inUse": "لا يمكن الحذف: اللغة مُسندة إلى موقع واحد أو أكثر"
+    },
+    "active": {
+      "title": "اللغات النشطة",
+      "empty": "لم يتم تفعيل أي لغات بعد. فعّل اللغات من الكتالوج أدناه."
+    },
+    "catalog": {
+      "title": "اللغات المتاحة",
+      "enable": "تفعيل"
+    },
+    "deactivate": {
+      "title": "إلغاء تفعيل اللغة؟",
+      "message": "{{name}} مستخدمة حالياً من قبل {{count}} موقع(مواقع). سيتم الاحتفاظ بالمحتوى والترجمات الحالية، لكن لن يتمكن أصحاب المواقع من إضافة محتوى جديد بهذه اللغة.",
+      "confirm": "إلغاء التفعيل"
+    }
+  },
+  "members": {
+    "title": "الأعضاء",
+    "subtitle": "إدارة أعضاء الموقع وأدوارهم",
+    "addMember": "إضافة عضو",
+    "table": {
+      "name": "الاسم",
+      "email": "البريد الإلكتروني",
+      "role": "الدور",
+      "joined": "تاريخ الانضمام",
+      "actions": "الإجراءات"
+    },
+    "roles": {
+      "owner": "المالك",
+      "admin": "مدير",
+      "editor": "محرر",
+      "author": "كاتب",
+      "reviewer": "مراجع",
+      "viewer": "مشاهد"
+    },
+    "roleDescriptions": {
+      "admin": "صلاحية إدارة كاملة للموقع",
+      "editor": "يمكنه إدارة جميع المحتوى والكتّاب",
+      "author": "يمكنه كتابة وتعديل محتواه الخاص",
+      "reviewer": "يمكنه مراجعة المحتوى المقدم للموافقة",
+      "viewer": "يمكنه عرض المحتوى (قراءة فقط)"
+    },
+    "empty": {
+      "noSite": "اختر موقعاً من شريط الأدوات لإدارة أعضائه",
+      "title": "لا يوجد أعضاء فريق بعد",
+      "description": "ادعُ متعاونين للمساعدة في إدارة هذا الموقع. عيّن أدواراً مثل محرر أو كاتب أو مراجع للتحكم في الوصول."
+    },
+    "loading": "جارٍ تحميل الأعضاء...",
+    "loadError": "فشل تحميل الأعضاء",
+    "messages": {
+      "added": "تمت إضافة العضو",
+      "roleUpdated": "تم تحديث دور العضو",
+      "removed": "تمت إزالة العضو",
+      "ownershipTransferred": "تم نقل الملكية"
+    },
+    "addDialog": {
+      "title": "إضافة عضو",
+      "searchPlaceholder": "البحث في مستخدمي Clerk...",
+      "selectRole": "اختيار دور",
+      "noResults": "لم يتم العثور على مستخدمين"
+    },
+    "removeDialog": {
+      "title": "إزالة العضو",
+      "message": "إزالة هذا العضو من الموقع؟ سيفقد جميع صلاحيات الوصول."
+    },
+    "transferDialog": {
+      "title": "نقل الملكية",
+      "message": "نقل ملكية الموقع إلى {{name}}؟ سيتم تخفيض رتبتك إلى مدير.",
+      "confirm": "نقل الملكية"
+    },
+    "leaveSite": "مغادرة الموقع",
+    "leaveConfirm": {
+      "title": "مغادرة {{siteName}}؟",
+      "message": "ستفقد الوصول إلى جميع المحتويات في هذا الموقع. لا يمكن التراجع عن هذا الإجراء.",
+      "confirm": "مغادرة الموقع"
+    }
+  },
+  "apiKeys": {
+    "title": "مفاتيح API",
+    "subtitle": "إدارة مفاتيح API للوصول إلى الخادم الخلفي",
+    "createButton": "إنشاء مفتاح API",
+    "searchPlaceholder": "البحث بالاسم أو بادئة المفتاح...",
+    "filters": {
+      "allStatuses": "جميع الحالات",
+      "allPermissions": "جميع الصلاحيات"
+    },
+    "permissions": {
+      "Master": "رئيسي",
+      "Admin": "مسؤول",
+      "Write": "كتابة",
+      "Read": "قراءة"
+    },
+    "table": {
+      "name": "الاسم",
+      "keyPrefix": "بادئة المفتاح",
+      "site": "الموقع",
+      "permission": "الصلاحية",
+      "status": "الحالة",
+      "requests": "الطلبات",
+      "lastUsed": "آخر استخدام",
+      "actions": "الإجراءات"
+    },
+    "empty": {
+      "title": "لا توجد مفاتيح API بعد",
+      "description": "تتيح مفاتيح API للتطبيقات الخارجية الوصول إلى محتواك. أنشئ مفاتيح بمستويات صلاحيات ونطاقات مواقع محددة.",
+      "filterHint": "جرّب تغيير المرشحات"
+    },
+    "loading": "جارٍ تحميل مفاتيح API...",
+    "loadError": "فشل تحميل مفاتيح API",
+    "messages": {
+      "created": "تم إنشاء مفتاح API",
+      "blocked": "تم حظر مفتاح API",
+      "unblocked": "تم إلغاء حظر مفتاح API",
+      "revoked": "تم إلغاء مفتاح API",
+      "deleted": "تم حذف مفتاح API",
+      "updated": "تم تحديث مفتاح API"
+    },
+    "blockDialog": {
+      "title": "حظر مفتاح API",
+      "reason": "سبب الحظر",
+      "reasonPlaceholder": "لماذا يتم حظر هذا المفتاح؟",
+      "reasonRequired": "السبب مطلوب"
+    },
+    "revokeDialog": {
+      "title": "إلغاء مفتاح API",
+      "message": "هل أنت متأكد من إلغاء \"{{name}}\"؟ هذا الإجراء دائم ولا يمكن التراجع عنه.",
+      "confirmWord": "إلغاء"
+    },
+    "deleteDialog": {
+      "title": "حذف مفتاح API",
+      "message": "هل أنت متأكد من الحذف النهائي لـ \"{{name}}\"؟"
+    },
+    "createDialog": {
+      "title": "إنشاء مفتاح API",
+      "fields": {
+        "name": "الاسم",
+        "permission": "الصلاحية",
+        "site": "الموقع",
+        "user": "المستخدم (اختياري)",
+        "noUser": "بدون مستخدم",
+        "expiresAt": "تاريخ الانتهاء (اختياري)"
+      },
+      "created": {
+        "title": "تم إنشاء مفتاح API",
+        "warning": "انسخ هذا المفتاح الآن. لن تتمكن من رؤيته مرة أخرى!",
+        "copied": "تم نسخ المفتاح إلى الحافظة"
+      },
+      "quotas": {
+        "title": "حصص الاستخدام",
+        "hint": "الحد الأقصى لعدد الطلبات المسموح بها لكل فترة قبل تقييد المفتاح.",
+        "hourly": "كل ساعة",
+        "daily": "يوميًا",
+        "monthly": "شهريًا"
+      }
+    },
+    "usageDialog": {
+      "title": "استخدام مفتاح API",
+      "subtitle": "إحصائيات الاستخدام لـ {{name}}",
+      "totalRequests": "إجمالي الطلبات",
+      "recentRequests": "الطلبات الأخيرة",
+      "endpoint": "نقطة النهاية",
+      "method": "الطريقة",
+      "statusCode": "رمز الحالة",
+      "timestamp": "الطابع الزمني",
+      "noUsage": "لا تتوفر بيانات استخدام",
+      "loadError": "فشل في تحميل بيانات الاستخدام",
+      "quota": {
+        "hourly": "بالساعة",
+        "daily": "يومي",
+        "monthly": "شهري",
+        "used": "{{used}} / {{limit}} مستخدم",
+        "remaining": "{{remaining}} متبقٍ",
+        "resetsIn": "يُعاد التعيين خلال {{time}}",
+        "exhausted": "تم استنفاد الحصة",
+        "unavailable": "بيانات الحصة غير متوفرة"
+      },
+      "timeline": {
+        "title": "الاستخدام اليومي (آخر 30 يومًا)",
+        "successful": "ناجحة",
+        "failed": "فاشلة",
+        "requests": "الطلبات"
+      },
+      "stats": {
+        "allTime": "إجمالي الطلبات",
+        "lastUsed": "آخر استخدام",
+        "rateLimitHits": "تجاوزات حد المعدل اليوم"
+      }
+    },
+    "actionsMenu": {
+      "viewUsage": "عرض الاستخدام",
+      "block": "حظر",
+      "unblock": "إلغاء الحظر",
+      "revoke": "إلغاء",
+      "delete": "حذف",
+      "edit": "تعديل"
+    },
+    "editDialog": {
+      "title": "تعديل مفتاح API",
+      "fields": {
+        "description": "الوصف"
+      }
+    }
+  },
+  "cv": {
+    "title": "السيرة الذاتية",
+    "subtitle": "إدارة إدخالات السيرة الذاتية والمهارات لمواقعك",
+    "tabs": {
+      "entries": "الإدخالات",
+      "skills": "المهارات"
+    },
+    "entries": {
+      "addEntry": "إضافة إدخال",
+      "searchPlaceholder": "البحث بالشركة أو الموقع...",
+      "table": {
+        "company": "الشركة",
+        "location": "الموقع",
+        "type": "النوع",
+        "dates": "التواريخ",
+        "current": "الحالي",
+        "order": "الترتيب",
+        "actions": "الإجراءات"
+      },
+      "empty": {
+        "title": "لا توجد إدخالات سيرة ذاتية بعد",
+        "description": "أضف خبرتك العملية وتعليمك ومحطات مسيرتك المهنية. يتم تقديم الإدخالات عبر API لملفك الشخصي."
+      },
+      "loading": "جارٍ تحميل إدخالات السيرة الذاتية...",
+      "loadError": "فشل تحميل إدخالات السيرة الذاتية",
+      "messages": {
+        "created": "تم إنشاء إدخال السيرة الذاتية",
+        "updated": "تم تحديث إدخال السيرة الذاتية",
+        "deleted": "تم حذف إدخال السيرة الذاتية"
+      },
+      "deleteDialog": {
+        "title": "حذف إدخال السيرة الذاتية",
+        "message": "حذف إدخال \"{{company}}\"؟ لا يمكن التراجع عن هذا الإجراء."
+      }
+    },
+    "skills": {
+      "addSkill": "إضافة مهارة",
+      "searchPlaceholder": "البحث باسم المهارة...",
+      "table": {
+        "name": "الاسم",
+        "slug": "المعرّف",
+        "category": "التصنيف",
+        "proficiency": "مستوى الإتقان",
+        "icon": "الأيقونة",
+        "actions": "الإجراءات"
+      },
+      "empty": {
+        "title": "لا توجد مهارات بعد",
+        "description": "أدرج مهاراتك التقنية والمهنية مع مستويات الإتقان والتصنيفات لملفك الشخصي."
+      },
+      "loading": "جارٍ تحميل المهارات...",
+      "loadError": "فشل تحميل المهارات",
+      "messages": {
+        "created": "تم إنشاء المهارة",
+        "updated": "تم تحديث المهارة",
+        "deleted": "تم حذف المهارة"
+      },
+      "deleteDialog": {
+        "title": "حذف المهارة",
+        "message": "حذف المهارة \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء."
+      }
+    },
+    "empty": {
+      "noSite": "اختر موقعاً من شريط الأدوات لإدارة بيانات السيرة الذاتية"
+    }
+  },
+  "cookieConsent": {
+    "title": "موافقة ملفات تعريف الارتباط",
+    "subtitle": "إدارة تكوين الموافقة على ملفات تعريف الارتباط لموقعك",
+    "loading": "جارٍ تحميل موافقة ملفات تعريف الارتباط...",
+    "empty": {
+      "noSite": "اختر موقعًا لإدارة موافقة ملفات تعريف الارتباط.",
+      "title": "لم يتم تكوين موافقة ملفات تعريف الارتباط",
+      "description": "أنشئ مستند موافقة ملفات تعريف الارتباط للبدء."
+    },
+    "managementTitle": "تم تكوين موافقة ملفات تعريف الارتباط",
+    "managementDescription": "تم إعداد مستند موافقة ملفات تعريف الارتباط الخاص بك. قم بإدارة المجموعات والعناصر من صفحة التفاصيل.",
+    "manageGroups": "إدارة المجموعات والعناصر",
+    "createDocument": "إنشاء موافقة ملفات تعريف الارتباط",
+    "editContent": "تحرير المحتوى",
+    "manageDocument": "إدارة المستند",
+    "messages": {
+      "created": "تم إنشاء مستند موافقة ملفات تعريف الارتباط"
+    }
+  },
+  "legal": {
+    "title": "المستندات القانونية",
+    "subtitle": "إدارة المستندات القانونية لمواقعك",
+    "addDocument": "إضافة مستند",
+    "table": {
+      "cookieName": "اسم الكوكيز",
+      "type": "النوع",
+      "created": "تاريخ الإنشاء",
+      "actions": "الإجراءات",
+      "name": "الاسم",
+      "status": "الحالة",
+      "selectAll": "تحديد جميع المستندات",
+      "selectRow": "تحديد المستند {{name}}"
+    },
+    "empty": {
+      "noSite": "اختر موقعاً من شريط الأدوات لإدارة مستنداته القانونية",
+      "title": "لا توجد مستندات قانونية بعد",
+      "description": "أدر موافقات الكوكيز وسياسات الخصوصية والمتطلبات القانونية الأخرى. جمّع العناصر لبنارات موافقة منظمة."
+    },
+    "messages": {
+      "created": "تم إنشاء المستند القانوني",
+      "published": "تم نشر المستند",
+      "unpublished": "تم إلغاء نشر المستند",
+      "archived": "تم أرشفة المستند"
+    },
+    "deleteDialog": {
+      "title": "حذف المستند القانوني",
+      "message": "حذف المستند القانوني \"{{cookieName}}\"؟ سيؤدي هذا أيضاً إلى حذف مجموعاته وعناصره."
+    },
+    "publishDialog": {
+      "title": "نشر المستند",
+      "message": "هل أنت متأكد أنك تريد نشر \"{{name}}\"؟"
+    },
+    "unpublishDialog": {
+      "title": "إلغاء نشر المستند",
+      "message": "هل أنت متأكد أنك تريد إلغاء نشر \"{{name}}\"؟"
+    },
+    "archiveDialog": {
+      "title": "أرشفة المستند",
+      "message": "هل أنت متأكد أنك تريد أرشفة \"{{name}}\"؟"
+    },
+    "picker": {
+      "label": "اختر مستندًا قانونيًا",
+      "placeholder": "البحث عن مستندات قانونية...",
+      "empty": "لم يتم العثور على مستندات قانونية",
+      "loading": "جاري تحميل المستندات القانونية..."
+    },
+    "documentTypes": {
+      "CookieConsent": "موافقة ملفات تعريف الارتباط",
+      "PrivacyPolicy": "سياسة الخصوصية",
+      "TermsOfService": "شروط الخدمة",
+      "Imprint": "بصمة",
+      "Disclaimer": "إخلاء المسؤولية"
+    },
+    "tabs": {
+      "documents": "المستندات",
+      "cookieConsent": "موافقة ملفات تعريف الارتباط"
+    },
+    "wizard": {
+      "title": "إنشاء مستند قانوني",
+      "description": "أعطِ وثيقتك اسماً. يمكنك تعيين النوع وتحرير المحتوى في الصفحة التالية.",
+      "steps": {
+        "type": "اختر النوع",
+        "details": "تفاصيل المستند"
+      },
+      "fields": {
+        "name": "اسم المستند",
+        "nameHelper": "معرّف قصير لهذا المستند"
+      },
+      "typeOptions": {
+        "PrivacyPolicy": "سياسة الخصوصية",
+        "PrivacyPolicyDesc": "ممارسات الخصوصية والتعامل مع البيانات في موقعك",
+        "TermsOfService": "شروط الخدمة",
+        "TermsOfServiceDesc": "القواعد والاتفاقيات الخاصة باستخدام خدمتك",
+        "Imprint": "بيانات النشر",
+        "ImprintDesc": "معلومات الكيان القانوني وبيانات الاتصال",
+        "Disclaimer": "إخلاء المسؤولية",
+        "DisclaimerDesc": "حدود المسؤولية والإشعارات القانونية"
+      }
+    },
+    "filters": {
+      "status": "الحالة"
+    },
+    "list": {
+      "title": "المستندات القانونية",
+      "subtitle": "إدارة المستندات القانونية لمواقعك",
+      "breadcrumb": "المستندات القانونية",
+      "loading": "جارٍ تحميل المستندات القانونية...",
+      "loadError": "فشل تحميل المستندات القانونية",
+      "empty": {
+        "title": "لا توجد مستندات قانونية بعد",
+        "description": "أدر موافقات الكوكيز وسياسات الخصوصية والمتطلبات القانونية الأخرى. جمّع العناصر لبنارات موافقة منظمة.",
+        "noSite": "اختر موقعاً من شريط الأدوات لإدارة مستنداته القانونية"
+      },
+      "searchPlaceholder": "البحث باسم الكوكيز...",
+      "tabs": {
+        "active": "نشط",
+        "archived": "مؤرشف"
+      },
+      "messages": {
+        "updated": "تم تحديث المستند القانوني",
+        "deleted": "تم حذف المستند القانوني"
+      }
+    }
+  },
+  "legalDetail": {
+    "title": "تفاصيل المستند القانوني",
+    "back": "العودة إلى المستندات القانونية",
+    "loading": "جارٍ تحميل المستند القانوني...",
+    "notFound": "المستند القانوني غير موجود",
+    "editDocument": "تعديل المستند",
+    "cookieName": "اسم الكوكيز",
+    "documentType": "نوع المستند",
+    "documentId": "معرّف المستند",
+    "updatedMessage": "تم تحديث المستند القانوني",
+    "loadGroupsFailed": "فشل تحميل المجموعات",
+    "groups": {
+      "title": "المجموعات",
+      "add": "إضافة مجموعة",
+      "empty": "لا توجد مجموعات",
+      "emptyDescription": "أضف المجموعة الأولى لهذا المستند القانوني",
+      "editGroup": "تعديل المجموعة",
+      "deleteGroup": "حذف المجموعة",
+      "deleteMessage": "حذف المجموعة \"{{name}}\"؟ سيؤدي هذا أيضاً إلى حذف جميع العناصر في هذه المجموعة.",
+      "loadingGroups": "جارٍ تحميل المجموعات...",
+      "order": "الترتيب: {{order}}",
+      "required": "مطلوب",
+      "optional": "اختياري",
+      "enabled": "مفعّل",
+      "disabled": "معطّل",
+      "messages": {
+        "created": "تم إنشاء المجموعة",
+        "updated": "تم تحديث المجموعة",
+        "deleted": "تم حذف المجموعة"
+      }
+    },
+    "items": {
+      "title": "العناصر",
+      "add": "إضافة عنصر",
+      "empty": "لا توجد عناصر في هذه المجموعة",
+      "loadingItems": "جارٍ تحميل العناصر...",
+      "deleteItem": "حذف العنصر",
+      "deleteMessage": "حذف العنصر \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+      "messages": {
+        "created": "تم إنشاء العنصر",
+        "updated": "تم تحديث العنصر",
+        "deleted": "تم حذف العنصر"
+      }
+    },
+    "dialog": {
+      "editGroup": "تعديل المجموعة",
+      "addGroup": "إضافة مجموعة",
+      "editItem": "تعديل العنصر",
+      "addItem": "إضافة عنصر",
+      "cookieName": "اسم الكوكيز",
+      "cookieNameRequired": "اسم الكوكيز مطلوب",
+      "displayOrder": "ترتيب العرض",
+      "required": "مطلوب",
+      "defaultEnabled": "مفعّل افتراضياً"
+    },
+    "messages": {
+      "saved": "تم حفظ المستند القانوني",
+      "published": "تم نشر المستند القانوني",
+      "unpublished": "تم إلغاء نشر المستند القانوني",
+      "loadFailed": "فشل تحميل المستند القانوني"
+    },
+    "toolbar": {},
+    "fields": {
+      "title": "العنوان",
+      "intro": "المقدمة",
+      "body": "المحتوى",
+      "metaTitle": "عنوان الميتا",
+      "metaDescription": "وصف الميتا"
+    },
+    "seo": {
+      "title": "إعدادات SEO"
+    },
+    "archiveDialog": {
+      "title": "أرشفة المستند القانوني",
+      "message": "هل أنت متأكد أنك تريد أرشفة «{{slug}}»؟ لن يكون مرئيًا للعامة بعد الآن."
+    },
+    "restoreDialog": {
+      "title": "استعادة المستند القانوني",
+      "message": "استعادة «{{slug}}» من الأرشيف؟"
+    },
+    "versions": {
+      "title": "سجل الإصدارات",
+      "noVersions": "لا توجد إصدارات سابقة",
+      "createNew": "إنشاء إصدار جديد",
+      "created": "تم إنشاء إصدار جديد"
+    }
+  },
+  "sites": {
+    "title": "المواقع",
+    "subtitle": "إدارة مواقعك الإلكترونية وتكوينها",
+    "createButton": "إنشاء موقع",
+    "empty": {
+      "title": "لا توجد مواقع بعد",
+      "description": "المواقع هي الأساس لنظام إدارة المحتوى الخاص بك. لكل موقع محتواه ولغاته وتنقله وإعداداته الخاصة."
+    },
+    "loading": "جارٍ تحميل المواقع...",
+    "loadError": "فشل تحميل المواقع",
+    "messages": {
+      "created": "تم إنشاء الموقع بنجاح",
+      "updated": "تم تحديث الموقع بنجاح",
+      "deleted": "تم حذف الموقع بنجاح"
+    },
+    "deleteDialog": {
+      "title": "حذف الموقع",
+      "message": "هل أنت متأكد من حذف \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء."
+    },
+    "card": {
+      "view": "عرض",
+      "edit": "تعديل",
+      "delete": "حذف"
+    },
+    "launcher": {
+      "title": "اختر موقعاً",
+      "subtitle": "اختر موقعاً لبدء العمل"
+    },
+    "wizard": {
+      "title": "إنشاء موقع جديد",
+      "steps": {
+        "basics": "الأساسيات",
+        "modules": "الوحدات",
+        "workflow": "سير العمل",
+        "languages": "اللغات"
+      },
+      "modulesDescription": "اختر وحدات المحتوى التي تريد تفعيلها. يمكنك تغييرها لاحقاً في الإعدادات.",
+      "modules": {
+        "blog": "المدونة",
+        "blogDesc": "نشر مقالات ودروس وأخبار",
+        "pages": "الصفحات",
+        "pagesDesc": "إنشاء صفحات ثابتة بأقسام وتخطيطات",
+        "cv": "السيرة الذاتية",
+        "cvDesc": "إدارة الخبرة العملية والتعليم والمهارات",
+        "legal": "القانوني",
+        "legalDesc": "سياسة الخصوصية وشروط الخدمة والمستندات القانونية",
+        "documents": "المستندات",
+        "documentsDesc": "رفع وإدارة الملفات القابلة للتنزيل",
+        "ai": "مساعد الذكاء الاصطناعي",
+        "aiDesc": "توليد SEO ومقتطفات تلقائية واقتراحات ترجمة",
+        "portfolio": "معرض الأعمال",
+        "portfolioDesc": "إدارة سجلات السيرة الذاتية والمهارات والمشاريع",
+        "forms": "النماذج",
+        "formsDesc": "اجمع الردود من الزوار باستخدام حقول مخصصة"
+      },
+      "workflowDescription": "كيف ستدير المحتوى على هذا الموقع؟",
+      "workflow": {
+        "solo": "فردي",
+        "soloDesc": "أنت الكاتب الوحيد. المحتوى يُنشر عندما تنشره.",
+        "team": "فريق",
+        "teamDesc": "عدة كتّاب يتعاونون. يُفعّل سير العمل التحريري."
+      },
+      "languagesDescription": "اختر اللغات التي سيدعمها موقعك. يمكنك إضافة المزيد لاحقاً."
+    }
+  },
+  "siteDetail": {
+    "title": "تفاصيل الموقع",
+    "back": "العودة إلى المواقع",
+    "loading": "جارٍ تحميل الموقع...",
+    "loadFailed": "فشل تحميل الموقع",
+    "notFound": "الموقع غير موجود",
+    "siteInfo": "معلومات الموقع",
+    "noDescription": "لا يوجد وصف",
+    "metadata": "البيانات الوصفية",
+    "quickLinks": "روابط سريعة",
+    "deleteSite": "حذف الموقع",
+    "fields": {
+      "name": "الاسم",
+      "slug": "المعرّف",
+      "description": "الوصف",
+      "domain": "النطاق",
+      "active": "نشط",
+      "timezone": "المنطقة الزمنية",
+      "status": "الحالة",
+      "id": "المعرّف",
+      "created": "تاريخ الإنشاء",
+      "updated": "تاريخ التحديث"
+    },
+    "messages": {
+      "updated": "تم تحديث الموقع",
+      "deleted": "تم حذف الموقع",
+      "quotaUpdated": "تم تحديث حصة التخزين"
+    },
+    "openSettings": "فتح إعدادات الموقع",
+    "stats": {
+      "content": "المحتوى",
+      "members": "الأعضاء النشطون",
+      "membersHint": "إدارة الفريق ←",
+      "owner": "المالك",
+      "ownerMissing": "لم يتم تعيين مالك",
+      "storage": "المساحة المستخدمة",
+      "storageOf": "{{used}} of {{quota}}"
+    },
+    "sysadmin": {
+      "enabledHelp": "عند إيقاف التشغيل، لا يمكن للزوار الوصول إلى الموقع ولا يمكن للمسؤولين الوصول إليه من مبدل المواقع.",
+      "enabledLabel": "الموقع مفعل",
+      "quotaHelp": "الحد الأقصى للتخزين المستخدم بواسطة الوسائط والمستندات لهذا الموقع.",
+      "quotaLabel": "حصة التخزين (GB)",
+      "quotaSave": "تحديث الحصة",
+      "subtitle": "هذه الضوابط مرئية فقط لمسؤولي النظام.",
+      "title": "ضوابط مسؤول النظام"
+    }
+  },
+  "system": {
+    "title": "إدارة النظام",
+    "subtitle": "الإدارة والتكوين على مستوى المثيل",
+    "nav": {
+      "dashboard": "نظرة عامة",
+      "sites": "المواقع",
+      "users": "المستخدمون",
+      "languages": "اللغات"
+    },
+    "dashboard": {
+      "title": "نظرة عامة على النظام",
+      "sites": "إجمالي المواقع",
+      "health": "صحة النظام",
+      "viewAll": "عرض الكل",
+      "sitesRegistered_one": "{{count}} موقع مسجل",
+      "sitesRegistered_other": "{{count}} مواقع مسجلة",
+      "servicesMonitored_one": "{{count}} خدمة مراقبة",
+      "servicesMonitored_other": "{{count}} خدمات مراقبة",
+      "sitesLabel_one": "موقع مسجل",
+      "sitesLabel_other": "مواقع مسجلة",
+      "services": {
+        "database": "قاعدة البيانات",
+        "cache": "الذاكرة المؤقتة",
+        "idp": "IDP",
+        "storage": "التخزين"
+      },
+      "storage": {
+        "bucket": "Bucket: {{name}}",
+        "usedPercent": "{{percent}}% مستخدم",
+        "freeBytes": "{{bytes}} متاح",
+        "totalBytes": "{{bytes}} إجمالي"
+      }
+    },
+    "sites": {
+      "title": "جميع المواقع",
+      "subtitle": "إدارة جميع المواقع عبر المثيل"
+    },
+    "accessDenied": "تحتاج إلى صلاحية مدير النظام لعرض هذه الصفحة.",
+    "users": {
+      "title": "المستخدمون",
+      "subtitle": "إدارة المستخدمين وإجراءات الإشراف.",
+      "actions": {
+        "suspend": "تعليق",
+        "ban": "حظر",
+        "unsuspend": "إلغاء التعليق",
+        "delete": "حذف المستخدم"
+      },
+      "suspend": {
+        "title": "تعليق المستخدم",
+        "reason": "السبب",
+        "duration": "المدة",
+        "until": "معلق حتى",
+        "confirm": "تعليق",
+        "pending": "جارٍ التعليق...",
+        "success": "تم تعليق المستخدم",
+        "error": "فشل تعليق المستخدم"
+      },
+      "ban": {
+        "title": "حظر المستخدم",
+        "warning": "هذا الإجراء يحظر المستخدم نهائيًا.",
+        "confirm": "حظر نهائي",
+        "pending": "جارٍ الحظر...",
+        "success": "تم حظر المستخدم",
+        "error": "فشل حظر المستخدم"
+      },
+      "unsuspend": {
+        "success": "تم إلغاء تعليق المستخدم",
+        "error": "فشل إلغاء التعليق"
+      },
+      "delete": {
+        "title": "حذف المستخدم",
+        "warning": "هذا الإجراء لا رجعة فيه. سيتم حذف حساب المستخدم وجميع البيانات المرتبطة نهائياً.",
+        "consequences": "ستتم إزالة جميع عضويات المواقع وسيتم فصل المحتوى الذي أنشأه هذا المستخدم.",
+        "confirm": "حذف نهائياً",
+        "pending": "جارٍ الحذف...",
+        "success": "تم حذف المستخدم",
+        "error": "فشل حذف المستخدم"
+      },
+      "joined": "انضم",
+      "lastSignIn": "آخر تسجيل دخول",
+      "activity": "سجل النشاط",
+      "noActivity": "لا يوجد نشاط مسجل",
+      "loading": "جارٍ تحميل المستخدم...",
+      "loadingActivity": "جارٍ تحميل النشاط...",
+      "notFound": "المستخدم غير موجود",
+      "unknownUser": "مستخدم غير معروف",
+      "moderationReason": "السبب",
+      "columns": {
+        "user": "المستخدم",
+        "email": "البريد الإلكتروني",
+        "status": "الحالة",
+        "lastSignIn": "آخر تسجيل دخول",
+        "actions": "الإجراءات"
+      },
+      "status": {
+        "active": "نشط",
+        "suspended": "معلق",
+        "banned": "محظور"
+      }
+    },
+    "cache": {
+      "title": "ذاكرة التخزين المؤقت للاستجابات (كل المواقع)",
+      "totalEntries": "{{n}} إدخالات مخزَّنة عبر كل المواقع",
+      "invalidateAll": "إبطال الكل",
+      "redisUnavailable": "Redis غير متاح — التخزين المؤقت معطَّل."
+    }
+  },
+  "siteSettings": {
+    "title": "إعدادات الموقع",
+    "subtitle": "تكوين إعدادات وميزات موقعك",
+    "nav": {
+      "overview": "نظرة عامة",
+      "content": "المحتوى",
+      "modules": "الوحدات",
+      "ai": "مساعد الذكاء الاصطناعي",
+      "seo": "تحسين محركات البحث",
+      "codeInjection": "حقن الكود",
+      "favicon": "أيقونة الموقع",
+      "branding": "العلامة التجارية",
+      "apiKeys": "مفاتيح API",
+      "webhooks": "خطافات الويب",
+      "members": "الأعضاء",
+      "dangerZone": "منطقة الخطر",
+      "forms": "النماذج"
+    },
+    "storage": {
+      "title": "التخزين",
+      "usage": "{{used}} / {{total}} مستخدم",
+      "quota": "حصة التخزين",
+      "quotaHelp": "الحد الأقصى للتخزين المسموح لهذا الموقع (100 ميجابايت – 1 تيرابايت)",
+      "media": "الوسائط",
+      "documents": "المستندات",
+      "quotaExceeded": "تم تجاوز حصة التخزين. قم بتحرير مساحة أو اتصل بالمسؤول.",
+      "systemOverview": "نظرة عامة على التخزين"
+    },
+    "cors": {
+      "title": "الأصول المسموح بها",
+      "help": "النطاقات المسموح لها بإرسال طلبات API عبر الأصول إلى هذا الموقع. أدخل أصلاً واحداً لكل سطر (مثل https://mysite.com).",
+      "placeholder": "https://example.com",
+      "invalidOrigin": "تنسيق الأصل غير صالح. استخدم المخطط://المضيف[:المنفذ] (مثل https://example.com).",
+      "emptyHelp": "لم يتم تكوين أي أصول — سيتم حظر الطلبات عبر الأصول."
+    },
+    "sidebar": {
+      "label": "التنقل في الإعدادات",
+      "filterPlaceholder": "تصفية القائمة…",
+      "noMatches": "لا توجد أقسام تطابق \"{{q}}\""
+    },
+    "groups": {
+      "configuration": "التهيئة",
+      "discovery": "الاكتشاف",
+      "integration": "التكامل",
+      "access": "الوصول",
+      "danger": "خطر"
+    },
+    "overview": {
+      "title": "نظرة عامة",
+      "subtitle": "أساسيات الهوية والوصول لهذا الموقع.",
+      "slug": "Slug",
+      "groups": {
+        "identity": "الهوية",
+        "status": "الحالة"
+      }
+    },
+    "branding": {
+      "title": "العلامة التجارية",
+      "subtitle": "أيقونة الموقع وأيقونات المفضلة وألوان السمة المستخدمة بواسطة المتصفحات و PWA."
+    },
+    "content": {
+      "title": "المحتوى",
+      "subtitle": "حدود الرفع وكلمات المرور وكيفية بناء روابط المعاينة."
+    },
+    "modules": {
+      "title": "الوحدات",
+      "subtitle": "تفعيل أو تعطيل الوحدات على مستوى الموقع.",
+      "enabledCount": "{{enabled}} من {{total}} مفعّلة"
+    },
+    "seo": {
+      "title": "تحسين محركات البحث",
+      "subtitle": "القيم الافتراضية المطبقة على مستوى الموقع. يمكن لكل منشور تجاوزها."
+    },
+    "codeInjection": {
+      "title": "حقن التعليمات البرمجية",
+      "subtitle": "احقن HTML مخصصًا في الصفحة. فقط من مصادر موثوقة."
+    },
+    "ai": {
+      "title": "مساعد الذكاء الاصطناعي",
+      "subtitle": "مزود الذكاء الاصطناعي المستخدم لإنشاء المسودات وإعادة الكتابة والترجمات."
+    },
+    "deletedSites": {
+      "title": "المواقع المحذوفة مؤخرًا",
+      "subtitle": "يمكن استعادة المواقع المحذوفة خلال 30 يومًا قبل إزالتها نهائيًا.",
+      "entry": "المحذوفة مؤخرًا",
+      "empty": "لا توجد مواقع محذوفة مؤخرًا.",
+      "deletedOn": "حُذف في {{date}}",
+      "expiresIn": "تنتهي خلال {{days}} يومًا",
+      "restore": "استعادة",
+      "restoreLabel": "استعادة {{site}}",
+      "restored": "تمت استعادة الموقع.",
+      "expired": "انتهت نافذة الاستعادة البالغة 30 يومًا لهذا الموقع."
+    },
+    "danger": {
+      "title": "منطقة الخطر",
+      "subtitle": "إجراءات مدمرة تؤثر على جميع مستخدمي هذا الموقع. تحقق مرتين قبل التنفيذ.",
+      "export": {
+        "title": "تصدير أرشيف الموقع",
+        "description": "نزّل ملف zip يحتوي على كل المحتوى والأصول والبيانات الوصفية للموقع. غير مدمر.",
+        "action": "تصدير",
+        "inProgress": "جارٍ التصدير…",
+        "ready": "تصديرك جاهز للتنزيل.",
+        "download": "تنزيل الأرشيف",
+        "failed": "فشل التصدير. يُرجى المحاولة مرة أخرى."
+      },
+      "transfer": {
+        "title": "نقل الملكية",
+        "description": "سلّم هذا الموقع لعضو آخر. ستصبح محررًا وتفقد الوصول إلى الفوترة.",
+        "action": "نقل",
+        "success": "تم نقل الملكية — أنت الآن محرر في هذا الموقع.",
+        "notMember": "هذا المستخدم لم يعد عضوًا في هذا الموقع.",
+        "pick": {
+          "title": "نقل الملكية",
+          "body": "اختر عضوًا ليصبح المالك الجديد. سيتم خفضك إلى محرر وستفقد الوصول إلى الفوترة.",
+          "label": "المالك الجديد",
+          "empty": "لا يوجد أعضاء آخرون لنقل الملكية إليهم. ادعُ عضوًا أولاً.",
+          "continue": "متابعة"
+        },
+        "confirm": {
+          "title": "نقل هذا الموقع؟",
+          "body": "ستنتقل ملكية «{{site}}» إلى {{member}}. ستصبح محررًا. لا يمكن التراجع عن ذلك من هنا.",
+          "label": "نقل الملكية"
+        }
+      },
+      "reset": {
+        "title": "إعادة تعيين كل المحتوى",
+        "description": "احذف كل منشور وصفحة وأصل. سيتم الاحتفاظ بالإعدادات والأعضاء. لا يمكن التراجع.",
+        "action": "إعادة تعيين المحتوى",
+        "confirm": {
+          "title": "إعادة تعيين كل المحتوى؟",
+          "body": "سيتم نقل كل منشور وصفحة ومستند وأصل في «{{site}}» إلى سلة المهملات. تُحفظ الإعدادات والأعضاء ويبقى الموقع. يمكنك استعادة العناصر خلال 30 يومًا قبل حذفها نهائيًا.",
+          "label": "إعادة تعيين المحتوى"
+        },
+        "success": "تمت إعادة تعيين المحتوى — تم نقل المنشورات والصفحات والأصول إلى سلة المهملات. يمكنك استعادتها خلال 30 يومًا."
+      },
+      "delete": {
+        "title": "حذف هذا الموقع",
+        "description": "احذف هذا الموقع ومحتواه وأعضاءه ومفاتيح API نهائيًا. هذا الإجراء نهائي.",
+        "action": "حذف الموقع",
+        "confirm": {
+          "title": "حذف هذا الموقع؟",
+          "body": "سيتم حذف «{{site}}» وكل محتواه وأعضائه ومفاتيح API. يمكنك استعادته خلال 30 يومًا قبل حذفه نهائيًا.",
+          "label": "حذف الموقع"
+        },
+        "gracePeriodNote": "تم حذف الموقع — يمكنك استعادته خلال 30 يومًا."
+      },
+      "confirm": {
+        "typeToConfirm": "اكتب {{phrase}} للتأكيد",
+        "placeholder": "اكتب للتأكيد",
+        "cancel": "إلغاء",
+        "mismatch": "النص غير مطابق. اكتبه تمامًا للمتابعة."
+      }
+    },
+    "forms": {
+      "title": "النماذج",
+      "subtitle": "إعدادات على مستوى الموقع تنطبق على كل نموذج.",
+      "botProtection": {
+        "title": "الحماية من الروبوتات",
+        "description": "لن تقبل النماذج ذات الحماية الإلزامية أي إرسالات حتى يجتاز الزائر فحص الحماية من الروبوتات. خيار ALTCHA المُستضاف ذاتيًا هو الإعداد الافتراضي — دون تسجيل، دون طلبات لأطراف خارجية، ومتوافق مع اللائحة العامة لحماية البيانات. يمكنك التبديل إلى مزوّد كابتشا مخصّص إذا رغبت.",
+        "loading": "يتم تحميل إعدادات الحماية من الروبوتات…",
+        "saved": "تم حفظ الحماية من الروبوتات.",
+        "saveFailed": "فشل حفظ الحماية من الروبوتات.",
+        "removed": "تمت إزالة الحماية من الروبوتات.",
+        "removeFailed": "فشلت إزالة الحماية من الروبوتات.",
+        "reconfigure": "إعادة التكوين",
+        "remove": "إزالة",
+        "reenterSecret": "لأسباب أمنية لا يُسترجَع السر أبدًا. أعد إدخاله لحفظ أي تغييرات.",
+        "statusConfigured": "مُكوَّن",
+        "verifyUrlLabel": "رابط التحقق",
+        "fields": {
+          "label": "تسمية المزود",
+          "labelHelp": "تسمية نصية تظهر في لوحة الإدارة (مثل \"Turnstile\"). لا تُستخدم لاختيار المزود — الرابط هو ما يفعل ذلك.",
+          "verifyUrl": "رابط التحقق",
+          "verifyUrlHelp": "نقطة نهاية siteverify الخاصة بالمزود. ترسل Forja `secret`+`response` هنا مع كل إرسال محمي إلزاميًا.",
+          "secret": "السر",
+          "secretHelp": "سر لكل موقع يصدره مزود Captcha. يتم تخزينه مشفّرًا."
+        },
+        "errors": {
+          "labelRequired": "تسمية المزود مطلوبة.",
+          "urlRequired": "رابط التحقق مطلوب.",
+          "urlInvalid": "رابط التحقق غير صالح.",
+          "urlScheme": "يجب أن يستخدم رابط التحقق http أو https.",
+          "secretRequired": "السر مطلوب (أعد إدخاله مع كل حفظ)."
+        },
+        "deleteConfirm": {
+          "title": "إزالة الحماية من الروبوتات؟",
+          "body": "ستبدأ النماذج الإلزامية برفض الإرسال حتى تُعيد تكوين مُتحقِّق."
+        },
+        "mode": {
+          "label": "المزوّد",
+          "altcha": "ALTCHA (مُستضاف ذاتيًا)",
+          "altchaRecommended": "ALTCHA (مُستضاف ذاتيًا) — موصى به",
+          "remote": "مزوّد كابتشا مخصّص"
+        },
+        "altcha": {
+          "description": "إثبات عمل مُستضاف ذاتيًا. دون حساب، ودون طلبات لأطراف خارجية، ودون ملفات تعريف ارتباط — لا تغادر بيانات الزائر بنيتك التحتية أبدًا. يُنشأ مفتاح التوقيع ويُخزَّن مشفّرًا عند الحفظ.",
+          "regenerateKey": "إعادة توليد المفتاح",
+          "keyRegenerated": "تمت إعادة توليد مفتاح ALTCHA.",
+          "keyRegenerateFailed": "فشلت إعادة توليد المفتاح.",
+          "regenConfirm": {
+            "title": "إعادة توليد مفتاح ALTCHA؟",
+            "body": "يُنشأ مفتاح توقيع جديد على الفور. يصبح أي تحدٍّ يحلّه أحد الزوّار حاليًا غير صالح ويجب جلبه من جديد."
+          },
+          "challengeUrlLabel": "عنوان URL لتحدي الأداة",
+          "challengeUrlHint": "اضبط `challenge` لأداة ALTCHA على نقطة النهاية هذه على مضيف واجهة برمجة التطبيقات العامة الخاصة بك، مع استبدال <form-slug> بـ slug كل نموذج."
+        },
+        "loadError": "تعذّر تحميل إعدادات الحماية من الروبوتات الحالية. لا يزال بإمكانك ضبطها أدناه؛ سيؤدي الحفظ إلى استبدال ما هو مخزَّن."
+      }
+    },
+    "cache": {
+      "title": "ذاكرة التخزين المؤقت للاستجابات",
+      "description": "القراءات العامة المخزَّنة مؤقتًا لهذا الموقع. المسح يفرض بيانات جديدة؛ وإعادة البناء تُسخِّن أيضًا الموارد الشائعة.",
+      "entryCount": "{{n}} إدخالات مخزَّنة",
+      "invalidate": "إبطال",
+      "rebuild": "إعادة بناء",
+      "rebuildHelp": "تُفرغ إعادة البناء ذاكرة التخزين المؤقت وتُسخِّن الموارد الحتمية؛ ويُعاد ملء الباقي عند الطلب.",
+      "invalidated": "تم مسح ذاكرة التخزين المؤقت (أُزيلت {{n}} إدخالات)",
+      "rebuilt": "أُعيد بناء الذاكرة المؤقتة ({{n}} مُسحت، {{warmed}} سُخِّنت)",
+      "actionFailed": "فشل إجراء ذاكرة التخزين المؤقت"
+    }
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "subtitle": "تكوين الموقع ومعلومات النظام",
+    "tabs": {
+      "siteSettings": "إعدادات الموقع",
+      "systemInfo": "معلومات النظام",
+      "preferences": "التفضيلات",
+      "legal": "القانوني",
+      "apiKeys": "مفاتيح API",
+      "modules": "الوحدات",
+      "ai": "مساعد الذكاء الاصطناعي"
+    },
+    "modules": {
+      "title": "وحدات المحتوى",
+      "description": "فعّل أو عطّل وحدات المحتوى لهذا الموقع. الوحدات المعطّلة تُخفى من الشريط الجانبي وترجع نقاط نهاية API الخاصة بها 403.",
+      "blog": "المدونة",
+      "blogDesc": "نشر مقالات ودروس وأخبار",
+      "pages": "الصفحات",
+      "pagesDesc": "إنشاء صفحات ثابتة بأقسام وتخطيطات",
+      "cv": "السيرة الذاتية",
+      "cvDesc": "إدارة الخبرة العملية والتعليم والمهارات",
+      "legal": "القانوني",
+      "legalDesc": "سياسة الخصوصية وشروط الخدمة والمستندات القانونية",
+      "documents": "المستندات",
+      "documentsDesc": "رفع وإدارة الملفات القابلة للتنزيل",
+      "ai": "مساعد الذكاء الاصطناعي",
+      "aiDesc": "توليد SEO ومقتطفات تلقائية واقتراحات ترجمة",
+      "portfolio": "معرض الأعمال",
+      "portfolioDesc": "إدارة سجلات السيرة الذاتية والمهارات والمشاريع",
+      "forms": "النماذج",
+      "formsDesc": "اجمع البيانات المنظمة باستخدام حقول مخصصة والتحقق والامتثال للائحة العامة لحماية البيانات",
+      "collections": "المجموعات",
+      "collectionsDesc": "أنواع محتوى مخصّصة مع ضوابط اللائحة العامة لحماية البيانات المدمجة."
+    },
+    "selectSiteAlert": "اختر موقعاً من الرأس لإدارة إعداداته.",
+    "loadingSiteSettings": "جارٍ تحميل إعدادات الموقع...",
+    "uploadLimits": {
+      "title": "حدود الرفع",
+      "maxDocumentSize": "الحجم الأقصى لملف المستند",
+      "maxMediaSize": "الحجم الأقصى لملف الوسائط"
+    },
+    "general": {
+      "title": "عام",
+      "contactEmail": "بريد الاتصال الإلكتروني",
+      "siteUrl": "رابط الموقع",
+      "siteUrlHelper": "الرابط العام الأساسي لموقعك (مثال: https://example.com). يُستخدم لخرائط الموقع وعلامات SEO وروابط المعاينة.",
+      "siteUrlPlaceholder": "https://example.com"
+    },
+    "advanced": {
+      "title": "الإعدادات المتقدمة",
+      "description": "خيارات التكوين للمستخدمين المتقدمين وسير العمل الجماعي"
+    },
+    "featureToggles": {
+      "title": "تبديل الميزات",
+      "analytics": "التحليلات",
+      "analyticsDescription": "تفعيل تتبع تحليلات الموقع",
+      "maintenanceMode": "وضع الصيانة",
+      "maintenanceModeDescription": "عرض صفحة الصيانة للزوار",
+      "maintenanceModeActive": "وضع الصيانة نشط — موقعك غير متاح للزوار.",
+      "turnOffMaintenance": "إيقاف",
+      "editorialWorkflow": "سير العمل التحريري",
+      "editorialWorkflowDescription": "يتطلب مراجعة المحتوى قبل النشر. يجب على الكتّاب تقديم المحتوى للمراجعة، والمراجعون يوافقون أو يطلبون تغييرات."
+    },
+    "passwordPolicy": {
+      "title": "سياسة كلمة مرور المستند",
+      "description": "تكوين متطلبات كلمة المرور للمستندات المحمية",
+      "minLength": "الحد الأدنى لطول كلمة المرور",
+      "regex": "نمط كلمة المرور (Regex)",
+      "regexHelp": "اتركه فارغاً لعدم اشتراط نمط"
+    },
+    "preview": {
+      "title": "قوالب المعاينة",
+      "description": "تكوين عناوين URL لخادم التطوير للمعاينة المباشرة",
+      "name": "اسم القالب",
+      "url": "URL المعاينة",
+      "add": "إضافة قالب",
+      "openPreview": "فتح المعاينة"
+    },
+    "saveButton": "حفظ الإعدادات",
+    "messages": {
+      "saved": "تم حفظ الإعدادات",
+      "saveFailed": "فشل حفظ الإعدادات"
+    },
+    "systemInfo": {
+      "serverHealth": "صحة الخادم",
+      "checkingHealth": "جارٍ فحص صحة الخادم...",
+      "overallStatus": "الحالة العامة:",
+      "service": "الخدمة",
+      "status": "الحالة",
+      "latency": "زمن الاستجابة",
+      "details": "التفاصيل",
+      "autoRefresh": "تحديث تلقائي كل 30 ثانية",
+      "environments": "البيئات",
+      "loadingEnvironments": "جارٍ تحميل البيئات...",
+      "noEnvironments": "لم يتم تكوين بيئات",
+      "envName": "الاسم",
+      "envDisplayName": "اسم العرض",
+      "envDefault": "افتراضي",
+      "envCreated": "تاريخ الإنشاء",
+      "locales": "اللغات المحلية",
+      "loadingLocales": "جارٍ تحميل اللغات المحلية...",
+      "noLocales": "لم يتم تكوين لغات محلية",
+      "localeCode": "الرمز",
+      "localeName": "الاسم",
+      "localeNativeName": "الاسم الأصلي",
+      "localeDirection": "الاتجاه",
+      "localeActive": "نشطة",
+      "localesMovedDescription": "تتم إدارة اللغات الآن في صفحتها المخصصة.",
+      "manageLocales": "إدارة اللغات"
+    },
+    "preferences": {
+      "title": "التفضيلات",
+      "language": {
+        "title": "اللغة",
+        "label": "لغة الإدارة",
+        "description": "اختر لغة العرض لواجهة الإدارة"
+      },
+      "theme": {
+        "title": "المظهر",
+        "label": "مظهر الألوان",
+        "description": "اختر مظهر ألوان لواجهة الإدارة"
+      },
+      "tableDisplay": {
+        "title": "عرض الجدول",
+        "pageSizeLabel": "عدد الصفوف في الصفحة",
+        "pageSizeDescription": "العدد الافتراضي للصفوف المعروضة في جداول الإدارة"
+      },
+      "accent": {
+        "title": "لون التمييز",
+        "label": "التمييز",
+        "description": "يُطبَّق على جميع السمات؛ تستخدم متغيرات Catppuccin تدرّجات مطابقة للوحتها",
+        "violet": "بنفسجي",
+        "coral": "مرجاني",
+        "teal": "أزرق مخضر",
+        "amber": "كهرماني"
+      },
+      "density": {
+        "title": "الكثافة",
+        "label": "كثافة الصفوف",
+        "description": "الضغط يقلص القوائم وعناصر التنقل",
+        "comfortable": "مريح",
+        "compact": "مضغوط"
+      }
+    },
+    "robotsTxt": {
+      "title": "إعدادات robots.txt",
+      "description": "تحكم في كيفية وصول زواحف محركات البحث إلى موقعك.",
+      "userAgent": "وكيل المستخدم",
+      "userAgentPlaceholder": "مثال: * أو Googlebot",
+      "directive": "Directive",
+      "path": "Path",
+      "pathPlaceholder": "e.g. / or /admin",
+      "addDirective": "إضافة توجيه",
+      "addUserAgent": "إضافة كتلة وكيل المستخدم",
+      "removeBlock": "إزالة الكتلة",
+      "removeDirective": "إزالة التوجيه",
+      "resetDefaults": "إعادة التعيين",
+      "preview": "معاينة",
+      "previewDescription": "هكذا سيظهر ملف robots.txt للزواحف:",
+      "allow": "سماح",
+      "disallow": "منع",
+      "sitemapNote": "يُضاف توجيه خريطة الموقع تلقائيًا عند تكوين عنوان URL للموقع.",
+      "quickAdd": "إضافة سريعة:",
+      "emptyBlock": "كتلة فارغة",
+      "emptyBlockTooltip": "إضافة كتلة وكيل مستخدم فارغة",
+      "saved": "تم حفظ قواعد robots.txt بنجاح",
+      "saveFailed": "فشل حفظ قواعد robots.txt"
+    },
+    "seoDefaults": {
+      "title": "القيم الافتراضية لتحسين محركات البحث",
+      "description": "عيّن قيمًا احتياطية لعناوين الميتا والأوصاف وصور Open Graph.",
+      "titleTemplate": "قالب العنوان",
+      "titleTemplateHelper": "استخدم {{title}} لعنوان المحتوى و{{site_name}} لاسم الموقع",
+      "titlePreview": "معاينة",
+      "defaultDescription": "وصف الميتا الافتراضي",
+      "defaultDescriptionPlaceholder": "وصف موجز لموقعك لمحركات البحث...",
+      "charsRecommended": "حرف موصى به",
+      "defaultOgImage": "صورة Open Graph الافتراضية",
+      "selectImage": "اختيار صورة",
+      "changeImage": "تغيير الصورة",
+      "clearImage": "إزالة",
+      "ogImageHelper": "صورة احتياطية عندما لا يحتوي المحتوى على صورة غلاف. الحجم الموصى: 1200×630 بكسل.",
+      "resetDefaults": "إعادة التعيين",
+      "saved": "تم حفظ القيم الافتراضية لتحسين محركات البحث",
+      "saveFailed": "فشل حفظ القيم الافتراضية"
+    },
+    "codeInjection": {
+      "warning": "الكود المضاف هنا يُنفَّذ على موقعك المباشر. أضف فقط نصوصًا برمجية من مصادر موثوقة.",
+      "headTitle": "حقن كود Head",
+      "headDescription": "HTML أو CSS أو JavaScript يُحقن في قسم <head>.",
+      "headPlaceholder": "<!-- مثال: Google Analytics، التحقق من Search Console -->",
+      "footerTitle": "حقن كود Footer",
+      "footerDescription": "HTML أو JavaScript يُحقن قبل وسم </body>.",
+      "footerPlaceholder": "<!-- مثال: أداة محادثة، نصوص تتبع -->",
+      "chars": "حرف",
+      "saved": "تم حفظ حقن الكود بنجاح",
+      "saveFailed": "فشل حفظ حقن الكود"
+    },
+    "favicon": {
+      "title": "أيقونة الموقع",
+      "description": "ارفع صورة مصدرية (512×512 بكسل أو أكبر موصى به) لإنشاء حزمة favicon كاملة.",
+      "dropHere": "اسحب وأسقط صورتك هنا",
+      "recommended": "PNG أو JPEG أو GIF أو WebP. 512×512 بكسل أو أكبر موصى به.",
+      "selectFile": "اختيار ملف",
+      "generating": "جارٍ الإنشاء...",
+      "variants": "المتغيرات المولدة",
+      "colors": "ألوان السمة",
+      "themeColor": "لون السمة",
+      "bgColor": "لون الخلفية",
+      "snippet": "مقتطف HTML",
+      "copySnippet": "نسخ إلى الحافظة",
+      "snippetCopied": "تم نسخ المقتطف",
+      "noFavicon": "لم يتم إنشاء حزمة favicon بعد. ارفع صورة مصدرية.",
+      "uploadSuccess": "تم إنشاء حزمة favicon بنجاح",
+      "uploadFailed": "فشل إنشاء حزمة favicon",
+      "colorsSaved": "تم حفظ ألوان السمة",
+      "download": "تحميل الحزمة",
+      "downloadFailed": "فشل تحميل حزمة favicon",
+      "chooseFromMedia": "اختيار من مكتبة الوسائط",
+      "fileTooLarge": "الملف كبير جداً (الحد الأقصى {{maxMB}} ميجابايت)"
+    }
+  },
+  "onboarding": {
+    "welcome": "مرحباً بك في Forja",
+    "subtitle": "نظام إدارة المحتوى الخاص بك لإدارة المحتوى متعدد المواقع ومتعدد اللغات.",
+    "description": "أنشئ موقعك الأول لبدء إدارة الصفحات وتدوينات المدونة والوسائط والمزيد — كل ذلك يُقدم من خلال REST API قوي.",
+    "features": {
+      "multiSite": "متعدد المواقع",
+      "multiSiteDesc": "إدارة مواقع متعددة من لوحة تحكم واحدة بمحتوى وإعدادات مستقلة.",
+      "multilingual": "متعدد اللغات",
+      "multilingualDesc": "توطين مدمج مع دعم لأي لغة واتجاه النص من اليمين إلى اليسار.",
+      "apiFirst": "API أولاً",
+      "apiFirstDesc": "بنية بدون واجهة أمامية مع REST API كامل. قدّم المحتوى لأي واجهة أمامية."
+    },
+    "preferences": {
+      "title": "تفضيلاتك",
+      "description": "اضبط لغتك ومظهرك المفضل قبل البدء."
+    },
+    "createSite": "إنشاء موقعك الأول",
+    "stepPrefix": "الخطوة 1 من 1",
+    "survey": {
+      "subtitle": "لنقم بالإعداد من أجلك.",
+      "description": "أجب عن بعض الأسئلة السريعة لنتمكن من تخصيص تجربتك.",
+      "getStarted": "ابدأ",
+      "skip": "تخطي",
+      "finish": "إنهاء وإنشاء الموقع",
+      "userTypeTitle": "ما الذي يصفك أفضل؟",
+      "userTypeDescription": "يساعدنا هذا في تخصيص الواجهة والإعدادات الافتراضية وفقاً لاحتياجاتك.",
+      "userTypes": {
+        "solo": "منشئ فردي",
+        "soloDesc": "أبني لنفسي",
+        "team": "فريق صغير",
+        "teamDesc": "2–10 أشخاص يتعاونون",
+        "agency": "وكالة / استوديو",
+        "agencyDesc": "إدارة مواقع عملاء متعددة"
+      },
+      "intentTitle": "ماذا تبني؟",
+      "intentDescription": "اختر كل ما ينطبق. سنقوم بتكوين الوحدات المناسبة لك مسبقاً.",
+      "intents": {
+        "blog": "مدونة / نشرة إخبارية",
+        "blogDesc": "نشر مقالات أو أخبار أو نشرات إخبارية",
+        "portfolio": "معرض أعمال",
+        "portfolioDesc": "عرض المشاريع أو نماذج العمل أو السيرة الذاتية",
+        "marketing": "موقع تسويقي / صفحات هبوط",
+        "marketingDesc": "صفحات المنتجات والحملات أو صفحات الهبوط",
+        "docs": "توثيق / قاعدة معرفية",
+        "docsDesc": "مستندات تقنية أو أدلة أو مقالات مساعدة",
+        "company": "موقع شركة",
+        "companyDesc": "موقع شركة مع مدونة وصفحات ومحتوى قانوني"
+      }
+    }
+  },
+  "setupChecklist": {
+    "title": "البدء",
+    "description": "أكمل هذه الخطوات لإعداد موقعك وبدء النشر.",
+    "completeTitle": "كل شيء جاهز!",
+    "completeDescription": "لقد أكملت جميع خطوات الإعداد. أنت مستعد للنشر!",
+    "progress": "{{completed}} من {{total}} مكتمل",
+    "dismiss": "إخفاء",
+    "deleteSamples": "حذف جميع المحتوى النموذجي",
+    "steps": {
+      "create_site": "إنشاء موقعك",
+      "edit_first_post": "تعديل أول تدوينة",
+      "preview_site": "معاينة موقعك",
+      "publish_first_post": "نشر أول تدوينة",
+      "customize_settings": "تخصيص إعدادات موقعك",
+      "invite_team": "دعوة عضو فريق",
+      "setup_workflow": "إعداد سير العمل التحريري",
+      "createSite": "إنشاء موقعك",
+      "addLanguage": "إضافة لغة",
+      "createPage": "إنشاء صفحة",
+      "writeBlog": "كتابة تدوينة",
+      "setupNav": "إعداد التنقل"
+    },
+    "descriptions": {
+      "create_site": "تم إنشاء موقعك",
+      "edit_first_post": "افتح تدوينة نموذجية واجعلها خاصة بك",
+      "preview_site": "شاهد كيف يبدو محتواك للزوار",
+      "publish_first_post": "انشر بنقرة واحدة",
+      "customize_settings": "الاسم والوصف والمظهر",
+      "invite_team": "أضف متعاونين لموقعك",
+      "setup_workflow": "تكوين عملية المراجعة التحريرية"
+    },
+    "estimates": {
+      "done": "تم!",
+      "30sec": "30 ثانية",
+      "1min": "دقيقة واحدة",
+      "2min": "دقيقتان"
+    }
+  },
+  "firstRunTip": {
+    "title": "نصيحة سريعة",
+    "description": "ابدأ بتعديل العنوان، ثم استخدم مفتاح / لإضافة عناوين وصور والمزيد. عندما تكون جاهزاً، انقر على \"نشر\" في شريط الأدوات."
+  },
+  "firstPublish": {
+    "title": "أنت الآن مباشر!",
+    "description": "تم نشر أول تدوينة لك.",
+    "viewPost": "عرض تدوينتك",
+    "writeAnother": "كتابة أخرى"
+  },
+  "teamWorkflowPrompt": {
+    "message": "موقعك لديه الآن عدة مساهمين. فعّل المراجعة التحريرية ليتم مراجعة المحتوى قبل النشر.",
+    "enableButton": "تفعيل في الإعدادات",
+    "dismissButton": "إخفاء"
+  },
+  "activity": {
+    "title": "النشاط",
+    "subtitle": "سجل تدقيق لجميع التغييرات على هذا الموقع",
+    "loading": "جارٍ تحميل النشاط...",
+    "empty": "لا يوجد نشاط بعد",
+    "emptyDescription": "ستظهر هنا الإجراءات مثل الإنشاء والتحديث والحذف.",
+    "noFilterResults": "لا يوجد نشاط مطابق",
+    "noFilterResultsDescription": "لا يوجد نشاط يطابق المرشحات المحددة. جرّب تغيير المرشحات أو مسحها.",
+    "columns": {
+      "timestamp": "الطابع الزمني",
+      "action": "الإجراء",
+      "entityType": "نوع الكيان",
+      "entityId": "معرّف الكيان",
+      "userId": "المستخدم",
+      "entity": "الكيان"
+    },
+    "filters": {
+      "action": "الإجراء",
+      "entityType": "نوع الكيان",
+      "all": "كل الوقت",
+      "last24h": "آخر 24 ساعة",
+      "last30d": "آخر 30 يومًا",
+      "last7d": "آخر 7 أيام",
+      "timeframe": "الإطار الزمني"
+    },
+    "actions": {
+      "Approve": "تمت الموافقة",
+      "Archive": "مؤرشفة",
+      "Create": "تم الإنشاء",
+      "Delete": "محذوفة",
+      "Export": "تم التصدير",
+      "Login": "تم تسجيل الدخول",
+      "Logout": "تم تسجيل الخروج",
+      "OwnershipTransfer": "تم نقل الملكية",
+      "PermissionDenied": "تم رفض الإذن",
+      "Publish": "منشورة",
+      "Read": "تمت المشاهدة",
+      "RequestChanges": "تم طلب تغييرات",
+      "Restore": "تمت الاستعادة",
+      "SettingsUpdate": "تم تحديث الإعدادات",
+      "SubmitReview": "تم تقديم للمراجعة",
+      "Unpublish": "غير منشورة",
+      "Update": "تم التحديث"
+    },
+    "aiUsage": {
+      "label": "تم استخدام AI",
+      "last30d": "آخر 30 يومًا",
+      "totalSuffix": "مرة"
+    },
+    "entities": {
+      "ai_config": "إعدادات AI",
+      "ai_generation": "توليد AI",
+      "api_key": "مفتاح API",
+      "blog": "المدونة",
+      "category": "الفئة",
+      "cv_entry": "السيرة الذاتية",
+      "document": "المستند",
+      "legal_document": "قانوني",
+      "media": "الوسائط",
+      "member": "العضو",
+      "navigation_item": "عنصر التنقل",
+      "navigation_menu": "قائمة التنقل",
+      "page": "الصفحة",
+      "project": "المشروع",
+      "site": "الموقع",
+      "site_settings": "إعدادات الموقع",
+      "skill": "المهارة",
+      "social_link": "رابط اجتماعي",
+      "tag": "الوسم",
+      "trash": "سلة المهملات"
+    }
+  },
+  "entityHistory": {
+    "title": "السجل",
+    "noHistory": "لم يتم تسجيل أي سجل بعد",
+    "events": "الأحداث",
+    "changes": "تغييرات الحقول",
+    "oldValue": "القديم",
+    "newValue": "الجديد",
+    "revert": "استعادة",
+    "revertConfirmTitle": "استعادة التغييرات",
+    "revertConfirmMessage": "استعادة الحقول التالية إلى قيمها السابقة؟",
+    "reverted": "تم استعادة التغييرات",
+    "revertFailed": "فشل استعادة التغييرات"
+  },
+  "unsavedChanges": {
+    "title": "تغييرات غير محفوظة",
+    "message": "لديك تغييرات غير محفوظة. تجاهل والمغادرة؟",
+    "stay": "البقاء",
+    "discard": "تجاهل",
+    "count_zero": "لا توجد تغييرات غير محفوظة",
+    "count_one": "تغيير واحد غير محفوظ",
+    "count_two": "تغييران غير محفوظين",
+    "count_few": "{{count}} تغييرات غير محفوظة",
+    "count_many": "{{count}} تغييرًا غير محفوظ",
+    "count_other": "{{count}} تغيير غير محفوظ",
+    "viewChanges": "عرض الحقول المعدّلة",
+    "changedFields": "الحقول المعدّلة",
+    "revertAll": "التراجع عن الكل",
+    "revertField": "التراجع عن {{field}}"
+  },
+  "inlineEdit": {
+    "clickToEdit": "انقر للتعديل"
+  },
+  "notFound": {
+    "title": "404",
+    "subtitle": "الصفحة غير موجودة",
+    "goToDashboard": "الذهاب إلى لوحة التحكم"
+  },
+  "apiDocs": {
+    "title": "وثائق API",
+    "subtitle": "وثائق API تفاعلية",
+    "adminTab": "API الإدارة",
+    "consumerTab": "API المستهلك",
+    "download": "تحميل المواصفات"
+  },
+  "forms": {
+    "blog": {
+      "createTitle": "إنشاء تدوينة",
+      "editTitle": "تعديل تدوينة",
+      "fields": {
+        "siteId": "الموقع",
+        "locale": "اللغة",
+        "slug": "المعرّف",
+        "author": "الكاتب",
+        "status": "الحالة",
+        "featured": "تدوينة مميزة",
+        "publishedDate": "تاريخ النشر"
+      }
+    },
+    "page": {
+      "createTitle": "إنشاء صفحة",
+      "editTitle": "تعديل صفحة",
+      "fields": {
+        "siteId": "الموقع",
+        "route": "المسار",
+        "pageType": "نوع الصفحة",
+        "status": "الحالة",
+        "inNavigation": "عرض في التنقل",
+        "navTitle": "عنوان التنقل",
+        "navOrder": "ترتيب التنقل"
+      }
+    },
+    "site": {
+      "createTitle": "إنشاء موقع",
+      "editTitle": "تعديل موقع",
+      "fields": {
+        "name": "الاسم",
+        "slug": "المعرّف",
+        "description": "الوصف",
+        "domain": "النطاق",
+        "active": "نشط",
+        "initialLanguages": "اللغات الأولية",
+        "initialLanguagesHelper": "اختر لغة واحدة على الأقل لموقعك",
+        "defaultLanguage": "اللغة الافتراضية"
+      },
+      "validation": {
+        "minOneLocale": "لغة واحدة على الأقل مطلوبة",
+        "exactlyOneDefault": "يجب تعيين لغة واحدة بالضبط كافتراضية"
+      }
+    },
+    "navigation": {
+      "createTitle": "إنشاء عنصر تنقل",
+      "editTitle": "تعديل عنصر تنقل",
+      "fields": {
+        "type": "النوع",
+        "page": "الصفحة",
+        "externalUrl": "URL خارجي",
+        "icon": "الأيقونة",
+        "openInNewTab": "فتح في علامة تبويب جديدة",
+        "label": "التسمية",
+        "locale": "اللغة",
+        "blog": "منشور المدونة"
+      }
+    },
+    "socialLink": {
+      "createTitle": "إنشاء رابط اجتماعي",
+      "editTitle": "تعديل رابط اجتماعي",
+      "fields": {
+        "title": "العنوان",
+        "url": "URL",
+        "icon": "الأيقونة",
+        "ariaLabel": "تسمية Aria"
+      }
+    },
+    "locale": {
+      "createTitle": "إضافة لغة",
+      "editTitle": "تعديل لغة",
+      "fields": {
+        "code": "الرمز",
+        "name": "الاسم",
+        "nativeName": "الاسم الأصلي",
+        "direction": "الاتجاه",
+        "active": "نشطة"
+      },
+      "validation": {
+        "codeFormat": "الصيغة: en أو en-US"
+      }
+    },
+    "tag": {
+      "createTitle": "إنشاء وسم",
+      "editTitle": "تعديل وسم",
+      "fields": {
+        "slug": "المعرّف",
+        "global": "عام (مشترك عبر جميع المواقع)",
+        "slugHelper": "معرّف صديق لعنوان URL — أحرف صغيرة وأرقام وشرطات (مثال: \"my-tag\")",
+        "globalHelper": "الوسوم العامة مشتركة عبر جميع المواقع. الوسوم الخاصة بالموقع تنتمي فقط إلى الموقع الحالي."
+      }
+    },
+    "category": {
+      "createTitle": "إنشاء تصنيف",
+      "editTitle": "تعديل تصنيف",
+      "fields": {
+        "slug": "المعرّف",
+        "parent": "التصنيف الأب",
+        "noParent": "لا شيء (مستوى أعلى)",
+        "global": "عام (مشترك عبر جميع المواقع)",
+        "slugHelper": "معرّف صديق لعنوان URL — أحرف صغيرة وأرقام وشرطات (مثال: \"web-development\")",
+        "globalHelper": "التصنيفات العامة مشتركة عبر جميع المواقع. التصنيفات الخاصة بالموقع تنتمي فقط إلى الموقع الحالي.",
+        "parentHelper": "ضع هذا التصنيف تحت تصنيف أب لبناء تسلسل هرمي (مثال: التقنية > تطوير الويب)"
+      }
+    },
+    "cvEntry": {
+      "createTitle": "إنشاء إدخال سيرة ذاتية",
+      "editTitle": "تعديل إدخال سيرة ذاتية",
+      "fields": {
+        "siteId": "الموقع",
+        "entryType": "نوع الإدخال",
+        "company": "الشركة / المنظمة",
+        "location": "الموقع",
+        "startDate": "تاريخ البدء",
+        "endDate": "تاريخ الانتهاء",
+        "isCurrent": "أعمل هنا حالياً",
+        "displayOrder": "ترتيب العرض",
+        "title": "المسمى الوظيفي",
+        "description": "الوصف",
+        "locale": "اللغة"
+      }
+    },
+    "skill": {
+      "createTitle": "إنشاء مهارة",
+      "editTitle": "تعديل مهارة",
+      "fields": {
+        "siteId": "الموقع",
+        "name": "الاسم",
+        "slug": "المعرّف",
+        "category": "التصنيف",
+        "proficiency": "مستوى الإتقان",
+        "icon": "الأيقونة",
+        "displayOrder": "ترتيب العرض"
+      }
+    },
+    "legal": {
+      "createTitle": "إنشاء مستند قانوني",
+      "editTitle": "تعديل مستند قانوني",
+      "fields": {
+        "cookieName": "اسم الكوكيز",
+        "documentType": "نوع المستند"
+      }
+    },
+    "mediaUpload": {
+      "title": "تسجيل وسائط",
+      "fields": {
+        "siteId": "الموقع",
+        "publicUrl": "URL العام",
+        "filename": "اسم الملف",
+        "originalFilename": "اسم الملف الأصلي",
+        "mimeType": "نوع MIME",
+        "fileSize": "حجم الملف (بايت)",
+        "width": "العرض (بكسل)",
+        "height": "الارتفاع (بكسل)",
+        "altText": "النص البديل",
+        "caption": "التعليق",
+        "title": "العنوان",
+        "folder": "المجلد"
+      }
+    },
+    "mediaDetail": {
+      "title": "تفاصيل الوسائط",
+      "fileInfo": "معلومات الملف",
+      "fields": {
+        "filename": "اسم الملف",
+        "originalFilename": "اسم الملف الأصلي",
+        "mimeType": "نوع MIME",
+        "fileSize": "حجم الملف",
+        "dimensions": "الأبعاد",
+        "publicUrl": "URL العام",
+        "altText": "النص البديل",
+        "caption": "التعليق",
+        "title": "العنوان",
+        "folder": "المجلد",
+        "noFolder": "بدون مجلد",
+        "created": "تاريخ الإنشاء",
+        "focalPoint": "نقطة التركيز"
+      },
+      "focalPoint": {
+        "instruction": "انقر على الصورة لتعيين نقطة التركيز",
+        "reset": "إعادة التعيين إلى المركز",
+        "saved": "تم تحديث نقطة التركيز"
+      },
+      "messages": {
+        "updated": "تم تحديث الوسائط",
+        "updateFailed": "فشل تحديث الوسائط"
+      }
+    },
+    "document": {
+      "createTitle": "إنشاء مستند",
+      "editTitle": "تعديل مستند",
+      "fields": {
+        "siteId": "الموقع",
+        "title": "العنوان",
+        "slug": "المعرّف",
+        "description": "الوصف",
+        "documentType": "نوع المستند",
+        "fileUrl": "URL الملف",
+        "fileSize": "حجم الملف (بايت)",
+        "mimeType": "نوع MIME",
+        "status": "الحالة",
+        "sourceType": "نوع المصدر",
+        "urlHelp": "URL الكامل للمستند أو المورد"
+      },
+      "source": {
+        "link": "رابط",
+        "upload": "رفع"
+      },
+      "currentFile": "الملف الحالي",
+      "errors": {
+        "noFile": "يرجى اختيار ملف للرفع"
+      }
+    },
+    "webhook": {
+      "createTitle": "إنشاء Webhook",
+      "editTitle": "تعديل Webhook",
+      "fields": {
+        "url": "URL",
+        "urlHelper": "نقطة النهاية التي ستتلقى طلبات POST ببيانات الأحداث",
+        "description": "الوصف",
+        "events": "الأحداث",
+        "eventsHelper": "اتركه فارغاً لتلقي جميع الأحداث",
+        "active": "نشط",
+        "debounce": "نافذة التأخير",
+        "debounceHelper": "تجميع الأحداث ضمن هذه النافذة في تسليم واحد (0 = فوري)",
+        "debounceUnit": "ثوانٍ"
+      }
+    },
+    "contentTemplate": {
+      "createTitle": "إنشاء قالب",
+      "editTitle": "تعديل قالب",
+      "sections": {
+        "metadata": "إعدادات القالب",
+        "content": "المحتوى الافتراضي"
+      },
+      "fields": {
+        "name": "الاسم",
+        "description": "الوصف",
+        "icon": "الأيقونة",
+        "slugPrefix": "بادئة المعرّف",
+        "isFeatured": "مميز افتراضياً",
+        "allowComments": "السماح بالتعليقات افتراضياً",
+        "isActive": "نشط",
+        "title": "العنوان",
+        "subtitle": "العنوان الفرعي",
+        "excerpt": "المقتطف",
+        "body": "النص (Markdown)",
+        "metaTitle": "العنوان الوصفي",
+        "metaDescription": "الوصف الوصفي"
+      }
+    },
+    "redirect": {
+      "createTitle": "إنشاء إعادة توجيه",
+      "editTitle": "تعديل إعادة توجيه",
+      "fields": {
+        "sourcePath": "المسار المصدر",
+        "sourcePathHelper": "مسار URL المراد إعادة التوجيه منه (مثال: /old-page)",
+        "destinationPath": "الوجهة",
+        "destinationPathHelper": "أين سيتم التوجيه إليه (مسار أو URL كامل)",
+        "statusCode": "نوع إعادة التوجيه",
+        "permanent": "301 — دائمة",
+        "temporary": "302 — مؤقتة",
+        "temporaryStrict": "307 — مؤقتة (تحافظ على الطريقة)",
+        "permanentStrict": "308 — دائمة (تحافظ على الطريقة)",
+        "description": "الوصف",
+        "active": "نشط"
+      }
+    },
+    "section": {
+      "title": "تعديل القسم",
+      "fields": {
+        "displayOrder": "ترتيب العرض",
+        "settings": "الإعدادات",
+        "buttonText": "نص الزر",
+        "ctaRoute": "مسار دعوة الإجراء",
+        "ctaHelperText": "مسار رابط دعوة الإجراء الاختياري",
+        "text": "النص"
+      },
+      "localizedContent": "المحتوى المترجم",
+      "sectionConfiguration": "تكوين القسم",
+      "noActiveLocales": "لم يتم تكوين لغات نشطة",
+      "localeExists": "موجود",
+      "sectionSaved": "تم حفظ القسم",
+      "ai": {
+        "generateContent": "توليد المحتوى",
+        "generating": "جارٍ التوليد…",
+        "translate": "ترجمة بالذكاء الاصطناعي",
+        "suggestTranslation": "اقتراح ترجمة",
+        "applyTranslation": "تطبيق",
+        "refreshField": "إعادة ترجمة هذا الحقل",
+        "translateHint": "الترجمة من اللغة الافتراضية إلى {{locale}} ({{code}}). راجع قبل التطبيق.",
+        "noSourceContent": "أضف المحتوى باللغة الافتراضية أولاً."
+      }
+    },
+    "undo": "تراجع",
+    "redo": "إعادة",
+    "validation": {
+      "required": "هذا الحقل مطلوب",
+      "minLength": "الحد الأدنى {{count}} أحرف",
+      "maxLength": "الحد الأقصى {{count}} أحرف",
+      "invalidEmail": "عنوان بريد إلكتروني غير صالح",
+      "invalidUrl": "URL غير صالح",
+      "min": "الحد الأدنى للقيمة هو {{value}}",
+      "max": "الحد الأقصى للقيمة هو {{value}}"
+    },
+    "project": {
+      "createTitle": "إنشاء مشروع",
+      "editTitle": "تعديل المشروع",
+      "fields": {
+        "slug": "المعرّف",
+        "displayOrder": "ترتيب العرض",
+        "isFeatured": "مميز",
+        "startDate": "تاريخ البدء",
+        "endDate": "تاريخ الانتهاء",
+        "isOngoing": "جارٍ",
+        "status": "الحالة"
+      }
+    }
+  },
+  "shared": {
+    "autosave": {
+      "retryFailed": "فشل الحفظ التلقائي بعد عدة محاولات. جرّب الحفظ يدوياً باستخدام Ctrl+S."
+    },
+    "confirmDialog": {
+      "defaultTitle": "تأكيد",
+      "defaultCancel": "إلغاء",
+      "confirmationInput": "نص التأكيد"
+    },
+    "loadingState": {
+      "defaultLabel": "جارٍ التحميل..."
+    },
+    "emptyState": {
+      "defaultTitle": "لا يوجد شيء هنا بعد"
+    },
+    "folderTree": {
+      "allFiles": "جميع الملفات",
+      "newFolder": "مجلد جديد",
+      "rename": "إعادة تسمية",
+      "delete": "حذف",
+      "createFolder": "إنشاء مجلد",
+      "folderName": "اسم المجلد",
+      "collapse": "طي {{name}}",
+      "expand": "توسيع {{name}}"
+    },
+    "pageHeader": {},
+    "statusChip": {},
+    "errorBoundary": {
+      "title": "حدث خطأ ما",
+      "description": "حدث خطأ غير متوقع في هذه الصفحة.",
+      "showDetails": "عرض التفاصيل",
+      "hideDetails": "إخفاء التفاصيل",
+      "tryAgain": "حاول مرة أخرى",
+      "goToDashboard": "الذهاب إلى لوحة التحكم",
+      "reloadPage": "إعادة تحميل الصفحة"
+    },
+    "navigationGuard": {
+      "title": "تغييرات غير محفوظة",
+      "message": "لديك تغييرات غير محفوظة. هل أنت متأكد من مغادرة هذه الصفحة؟",
+      "leave": "مغادرة",
+      "stay": "البقاء"
+    }
+  },
+  "imageCropper": {
+    "title": "قص الصورة",
+    "description": "اضبط منطقة القص لتحديد الجزء المطلوب من الصورة.",
+    "zoom": "تكبير",
+    "cancel": "إلغاء",
+    "apply": "تطبيق القص"
+  },
+  "profile": {
+    "title": "الملف الشخصي",
+    "subtitle": "إدارة حسابك وإعدادات الأمان والبيانات",
+    "accountInfo": "معلومات الحساب",
+    "unknownUser": "مستخدم غير معروف",
+    "manageAccount": "إدارة الحساب",
+    "security": "الأمان والجلسات",
+    "authMethod": "طريقة المصادقة",
+    "permissionLevel": "مستوى الصلاحية",
+    "siteScope": "نطاق الموقع",
+    "memberSince": "عضو منذ",
+    "lastSignIn": "آخر تسجيل دخول",
+    "dataPrivacy": "البيانات والخصوصية",
+    "dataPrivacyInfo": "يمكنك تصدير جميع بياناتك المخزنة في نظام إدارة المحتوى أو حذف حسابك نهائياً. تشمل البيانات المصدرة ملفك الشخصي وسجلات التدقيق ومفاتيح API وسجل التغييرات.",
+    "exportData": "تصدير بياناتي",
+    "exporting": "جارٍ التصدير...",
+    "exportSuccess": "تم تصدير البيانات بنجاح",
+    "exportError": "فشل تصدير البيانات",
+    "deleteAccount": "حذف الحساب",
+    "deleteAccountTitle": "حذف الحساب",
+    "deleteAccountMessage": "هذا الإجراء دائم ولا يمكن التراجع عنه. سيتم حذف حساب Clerk الخاص بك وستتم إخفاء هوية جميع بيانات نظام إدارة المحتوى المرتبطة. هل أنت متأكد من المتابعة؟",
+    "deleteAccountConfirm": "حذف حسابي",
+    "deleteSuccess": "تم حذف الحساب بنجاح",
+    "deleteError": "فشل حذف الحساب"
+  },
+  "siteLocales": {
+    "title": "اللغات",
+    "addLanguage": "إضافة لغة",
+    "columns": {
+      "language": "اللغة",
+      "nativeName": "الاسم الأصلي",
+      "urlPrefix": "بادئة URL",
+      "default": "افتراضي",
+      "active": "نشطة",
+      "actions": "الإجراءات"
+    },
+    "addDialog": {
+      "title": "إضافة لغة",
+      "selectLanguage": "اختيار لغة",
+      "urlPrefix": "بادئة URL",
+      "urlPrefixHelper": "مثال: en, de, fr (تُستخدم في عناوين URL)",
+      "setAsDefault": "تعيين كلغة افتراضية"
+    },
+    "setDefault": "تعيين كافتراضي",
+    "remove": "إزالة",
+    "empty": "لم يتم تعيين أي لغات لهذا الموقع بعد.",
+    "tooltips": {
+      "cannotRemoveDefault": "لا يمكن إزالة اللغة الافتراضية",
+      "cannotRemoveLast": "لا يمكن إزالة آخر لغة",
+      "alreadyDefault": "هي اللغة الافتراضية بالفعل"
+    },
+    "messages": {
+      "added": "تمت إضافة اللغة",
+      "updated": "تم تحديث اللغة",
+      "removed": "تمت إزالة اللغة",
+      "defaultSet": "تم تحديث اللغة الافتراضية",
+      "addFailed": "فشل إضافة اللغة",
+      "updateFailed": "فشل تحديث اللغة",
+      "removeFailed": "فشل إزالة اللغة",
+      "defaultFailed": "فشل تعيين اللغة الافتراضية"
+    },
+    "removeDialog": {
+      "confirm": "إزالة",
+      "message": "{{name}} ({{code}}) will be removed from this site. Content in that language will no longer be accessible. This cannot be undone.",
+      "title": "إزالة اللغة؟"
+    }
+  },
+  "commandPalette": {
+    "placeholder": "البحث في الأوامر...",
+    "noResults": "لم يتم العثور على نتائج",
+    "categories": {
+      "context": "إجراءات سريعة",
+      "navigation": "التنقل",
+      "actions": "الإجراءات",
+      "blogs": "المدونات",
+      "pages": "الصفحات",
+      "sites": "المواقع",
+      "media": "الوسائط"
+    },
+    "actions": {
+      "logout": "تسجيل الخروج",
+      "leaveDemo": "مغادرة العرض التوضيحي"
+    },
+    "contextActions": {
+      "createBlog": "إنشاء تدوينة جديدة",
+      "createPage": "إنشاء صفحة جديدة",
+      "uploadMedia": "رفع وسائط",
+      "createTemplate": "إنشاء قالب",
+      "createTag": "إنشاء وسم",
+      "createCategory": "إنشاء تصنيف",
+      "addNavItem": "إضافة عنصر تنقل",
+      "addSocialLink": "إضافة رابط اجتماعي",
+      "createWebhook": "إنشاء Webhook",
+      "createRedirect": "إنشاء إعادة توجيه",
+      "addMember": "إضافة عضو",
+      "addCvEntry": "إضافة إدخال سيرة ذاتية",
+      "addSkill": "إضافة مهارة",
+      "createSite": "إنشاء موقع",
+      "backToSites": "العودة إلى قائمة المواقع",
+      "addLanguage": "إضافة لغة",
+      "addLegalDoc": "إضافة مستند قانوني",
+      "backToLegal": "العودة إلى المستندات القانونية",
+      "createApiKey": "إنشاء مفتاح API",
+      "backToBlogs": "العودة إلى قائمة المدونات",
+      "backToPages": "العودة إلى قائمة الصفحات"
+    },
+    "open": "فتح لوحة الأوامر",
+    "searchLabel": "البحث في الأوامر",
+    "title": "لوحة الأوامر",
+    "resultCount": "{{count}} نتيجة متاحة",
+    "triggerPlaceholder": "البحث عن منشورات، صفحات، وسائط..."
+  },
+  "languages": {
+    "en": "الإنجليزية",
+    "de": "الألمانية",
+    "fr": "الفرنسية",
+    "es": "الإسبانية",
+    "it": "الإيطالية",
+    "pt": "البرتغالية",
+    "nl": "الهولندية",
+    "pl": "البولندية",
+    "ar": "العربية"
+  },
+  "workflow": {
+    "submitForReview": "تقديم للمراجعة",
+    "approve": "موافقة",
+    "requestChanges": "طلب تغييرات",
+    "reviewComment": "تعليق المراجعة",
+    "reviewCommentPlaceholder": "صف التغييرات المطلوبة...",
+    "submittedForReview": "تم تقديم المحتوى للمراجعة",
+    "approved": "تمت الموافقة على المحتوى",
+    "changesRequested": "تم طلب تغييرات",
+    "cannotPublish": "سير العمل التحريري مفعّل. قدّم المحتوى للمراجعة للنشر.",
+    "publish": "نشر",
+    "unpublish": "إلغاء النشر",
+    "archive": "أرشفة",
+    "restore": "استعادة",
+    "restoreAsDraft": "استعادة كمسودة"
+  },
+  "approveDialog": {
+    "title": "الموافقة على المحتوى",
+    "message": "اختر كيفية نشر هذا المحتوى.",
+    "publishNow": "نشر الآن",
+    "schedule": "جدولة",
+    "selectDate": "اختر تاريخ النشر"
+  },
+  "restoreDialog": {
+    "restore": "استعادة",
+    "restoreAsDraft": "استعادة كمسودة"
+  },
+  "notifications": {
+    "title": "الإشعارات",
+    "bell": "الإشعارات",
+    "bellWithCount": "الإشعارات، {{count}} غير مقروءة",
+    "unread": "غير مقروءة",
+    "empty": "لا توجد إشعارات بعد",
+    "markAllRead": "تعليم الكل كمقروء",
+    "viewAll": "عرض الكل",
+    "pageTitle": "الإشعارات",
+    "pageSubtitle": "مراجعة وإدارة إشعاراتك",
+    "searchPlaceholder": "البحث في الإشعارات...",
+    "columns": {
+      "type": "النوع",
+      "title": "العنوان",
+      "message": "الرسالة",
+      "time": "الوقت",
+      "status": "الحالة"
+    },
+    "read": "مقروء",
+    "noSite": "اختر موقعاً لعرض الإشعارات",
+    "types": {
+      "submitted": "مقدّم للمراجعة",
+      "approved": "تمت الموافقة",
+      "changesRequested": "تم طلب تغييرات",
+      "system": "النظام"
+    },
+    "actions": {
+      "confirmDeleteReadConfirm": "حذف {{count}}",
+      "confirmDeleteReadMessage": "سيتم إزالة {{count}} إشعار مقروء. لا يمكن التراجع عن هذا.",
+      "confirmDeleteReadTitle": "حذف جميع الإشعارات المقروءة؟",
+      "delete": "حذف الإشعار",
+      "deleteRead": "حذف جميع المقروءة"
+    },
+    "filters": {
+      "all": "الكل",
+      "read": "مقروءة",
+      "unread": "غير مقروءة"
+    },
+    "messages": {
+      "deleted": "تم حذف الإشعار",
+      "readCleared": "تم مسح {{count}} إشعار مقروء"
+    }
+  },
+  "bulk": {
+    "toolbar": "شريط أدوات الإجراءات الجماعية",
+    "selectedCount": "{{count}} محدد",
+    "publish": "نشر",
+    "unpublish": "إلغاء النشر",
+    "archive": "أرشفة",
+    "restore": "استعادة",
+    "delete": "حذف",
+    "clearSelection": "مسح التحديد",
+    "deleteDialog": {
+      "title": "حذف العناصر المحددة",
+      "message": "حذف {{count}} عناصر محددة؟ لا يمكن التراجع عن هذا الإجراء."
+    },
+    "publishDialog": {
+      "title": "نشر العناصر المحددة؟",
+      "message": "سيؤدي هذا إلى نشر {{count}} عنصر(عناصر) وجعلها مرئية للعموم."
+    },
+    "unpublishDialog": {
+      "title": "إلغاء نشر العناصر المحددة؟",
+      "message": "سيؤدي هذا إلى إلغاء نشر {{count}} عنصر(عناصر) وإعادتها إلى حالة المسودة."
+    },
+    "archiveDialog": {
+      "title": "أرشفة العناصر المحددة؟",
+      "message": "سيؤدي هذا إلى أرشفة {{count}} عنصر(عناصر) ونقلها إلى عرض الأرشيف."
+    },
+    "restoreDialog": {
+      "title": "استعادة العناصر المحددة؟",
+      "message": "سيؤدي هذا إلى استعادة {{count}} عنصر(عناصر) إلى حالة المسودة."
+    },
+    "messages": {
+      "success": "تم تحديث {{count}} عناصر بنجاح",
+      "partial": "{{succeeded}} نجحت، {{failed}} فشلت"
+    }
+  },
+  "contentTemplates": {
+    "title": "قوالب المدونة",
+    "subtitle": "إدارة القوالب القابلة لإعادة الاستخدام لتدوينات المدونة",
+    "addTemplate": "إضافة قالب",
+    "table": {
+      "name": "الاسم",
+      "description": "الوصف",
+      "icon": "الأيقونة",
+      "active": "نشط",
+      "created": "تاريخ الإنشاء",
+      "actions": "الإجراءات"
+    },
+    "empty": {
+      "noSite": "اختر موقعاً من شريط الأدوات لإدارة قوالبه",
+      "title": "لا توجد قوالب بعد",
+      "description": "أنشئ قوالب محتوى قابلة لإعادة الاستخدام لتسريع إنشاء تدوينات المدونة. تتضمن القوالب محتوى وبيانات وصفية وإعدادات مملوءة مسبقاً."
+    },
+    "loading": "جارٍ تحميل القوالب...",
+    "messages": {
+      "created": "تم إنشاء القالب",
+      "updated": "تم تحديث القالب",
+      "deleted": "تم حذف القالب"
+    },
+    "deleteDialog": {
+      "title": "حذف القالب",
+      "message": "حذف القالب \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء."
+    },
+    "wizard": {
+      "title": "إنشاء قالب",
+      "steps": {
+        "method": "الطريقة",
+        "details": "التفاصيل"
+      },
+      "methods": {
+        "scratch": "من الصفر",
+        "scratchDesc": "البدء بقالب فارغ",
+        "template": "من مدمج",
+        "templateDesc": "استخدام قالب مدمج كنقطة بداية",
+        "import": "استيراد Markdown",
+        "importDesc": "استيراد محتوى من ملف .md"
+      },
+      "slugPrefixHint": "بادئة URL للتدوينات المنشأة من هذا القالب"
+    },
+    "searchPlaceholder": "البحث عن قوالب بالاسم..."
+  },
+  "templates": {
+    "fromTemplate": "من قالب",
+    "dialogTitle": "إنشاء تدوينة من قالب",
+    "dialogSubtitle": "اختر قالباً للبدء بهيكل محتوى مملوء مسبقاً.",
+    "useTemplate": "استخدام القالب",
+    "searchPlaceholder": "البحث في القوالب...",
+    "builtIn": "مدمج",
+    "custom": "مخصص",
+    "manageTemplates": "إدارة القوالب",
+    "noResults": "لا توجد قوالب تطابق بحثك",
+    "page": "الصفحة {{current}} من {{total}}",
+    "tutorial": {
+      "name": "درس تعليمي",
+      "description": "دليل خطوة بخطوة مع متطلبات مسبقة وخطوات مرقمة ومراجع إضافية."
+    },
+    "changelog": {
+      "name": "سجل التغييرات",
+      "description": "ملاحظات الإصدار مع الميزات وإصلاحات الأخطاء والتغييرات الجذرية ودليل الترحيل."
+    },
+    "review": {
+      "name": "مراجعة",
+      "description": "مراجعة منتج أو أداة مع الميزات الرئيسية والإيجابيات والسلبيات والحكم."
+    },
+    "announcement": {
+      "name": "إعلان",
+      "description": "إعلان أخبار مع الأهمية والخطوات التالية ودعوة الإجراء."
+    }
+  },
+  "markdownImport": {
+    "importButton": "استيراد Markdown",
+    "dialogTitle": "استيراد من Markdown",
+    "dialogSubtitle": "ارفع ملف Markdown لإنشاء تدوينة مدونة جديدة. سيصبح عنوان H1 هو العنوان.",
+    "dropZone": "اسحب وأفلت ملف .md هنا، أو انقر للتصفح",
+    "dropZoneActive": "أفلت ملفك هنا",
+    "preview": "معاينة",
+    "titleLabel": "العنوان",
+    "excerptLabel": "المقتطف",
+    "slugLabel": "المعرّف",
+    "bodyPreview": "معاينة النص",
+    "back": "رجوع",
+    "import": "استيراد",
+    "importing": "جارٍ الاستيراد...",
+    "errors": {
+      "invalidExtension": "يُقبل فقط ملفات .md و .markdown",
+      "emptyFile": "الملف فارغ",
+      "noH1": "يجب أن يحتوي Markdown على عنوان H1 واحد بالضبط (# عنوان)",
+      "multipleH1": "يحتوي Markdown على عدة عناوين H1. استخدم واحداً فقط.",
+      "titleTooLong": "العنوان يتجاوز الحد الأقصى {{max}} حرف",
+      "bodyTooLong": "النص يتجاوز الحد الأقصى {{max}} حرف",
+      "readFailed": "فشل قراءة الملف"
+    }
+  },
+  "editor": {
+    "placeholder": "اكتب / لإدراج كتل...",
+    "sectionPlaceholder": "محتوى القسم...",
+    "toolbar": {
+      "label": "تنسيق النص",
+      "linkDialog": {
+        "title": "إدراج رابط",
+        "urlLabel": "URL",
+        "insert": "إدراج",
+        "remove": "إزالة الرابط"
+      },
+      "bold": "غامق (Ctrl+B)",
+      "italic": "مائل (Ctrl+I)",
+      "underline": "تسطير (Ctrl+U)",
+      "strikethrough": "يتوسطه خط",
+      "heading1": "عنوان 1",
+      "heading2": "عنوان 2",
+      "heading3": "عنوان 3",
+      "blockquote": "اقتباس",
+      "bulletList": "قائمة نقطية",
+      "orderedList": "قائمة مرقمة",
+      "taskList": "قائمة مهام",
+      "horizontalRule": "خط أفقي",
+      "link": "رابط",
+      "image": "صورة",
+      "codeBlock": "كتلة شيفرة",
+      "insertTable": "إدراج جدول",
+      "undo": "تراجع (Ctrl+Z)",
+      "redo": "إعادة (Ctrl+Y)"
+    },
+    "commands": {
+      "paragraph": "فقرة",
+      "heading1": "عنوان 1",
+      "heading2": "عنوان 2",
+      "heading3": "عنوان 3",
+      "bulletList": "قائمة نقطية",
+      "orderedList": "قائمة مرقمة",
+      "taskList": "قائمة مهام",
+      "blockquote": "اقتباس",
+      "codeBlock": "كتلة شيفرة",
+      "horizontalRule": "خط أفقي",
+      "image": "صورة",
+      "table": "جدول",
+      "zen": "وضع التركيز"
+    },
+    "zen": {
+      "enter": "تفعيل وضع التركيز",
+      "exit": "الخروج من وضع التركيز",
+      "tooltip": "كتابة بملء الشاشة بدون تشتيت"
+    },
+    "mediaPicker": {
+      "tabs": {
+        "gallery": "المعرض",
+        "upload": "رفع"
+      },
+      "upload": {
+        "dragDrop": "اسحب وأسقط صورة هنا، أو انقر للتصفح",
+        "uploading": "جارٍ الرفع...",
+        "success": "تم رفع الصورة بنجاح",
+        "invalidType": "يتم قبول ملفات الصور فقط (JPEG, PNG, GIF, WebP, AVIF, SVG)",
+        "tooLarge": "الملف يتجاوز الحد الأقصى لحجم الرفع"
+      }
+    }
+  },
+  "quickPost": {
+    "title": "تدوينة سريعة",
+    "titlePlaceholder": "عنوان التدوينة...",
+    "bodyPlaceholder": "ابدأ الكتابة...",
+    "publish": "نشر",
+    "publishNow": "نشر الآن",
+    "saveAsDraft": "حفظ كمسودة",
+    "moreOptions": "خيارات أخرى",
+    "success": "تم إنشاء تدوينة المدونة",
+    "dashboardButton": "تدوينة سريعة",
+    "ai": {
+      "manualMode": "كتابة",
+      "aiMode": "مساعد الذكاء الاصطناعي",
+      "ideaTitle": "عن ماذا تريد الكتابة؟",
+      "ideaPlaceholder": "صف فكرة تدوينتك أو الموضوع أو النقاط الرئيسية التي تريد تغطيتها...",
+      "generateOutline": "توليد مخطط",
+      "generating": "جارٍ التوليد...",
+      "titleLabel": "العنوان",
+      "subtitleLabel": "العنوان الفرعي",
+      "outlineLabel": "المخطط",
+      "addPoint": "إضافة نقطة",
+      "generatePost": "توليد التدوينة",
+      "startOver": "البدء من جديد",
+      "regenerateOutline": "العودة وتجربة فكرة جديدة",
+      "outlineError": "فشل توليد المخطط. يرجى المحاولة مرة أخرى.",
+      "postError": "فشل توليد التدوينة. يرجى المحاولة مرة أخرى.",
+      "insertPoint": "نقطة الإدراج أدناه",
+      "languageNotice": "Content will be generated in {{language}} (site default language)",
+      "regenerateOutlineBtn": "إعادة توليد المخطط"
+    }
+  },
+  "aiSettings": {
+    "title": "إعدادات الذكاء الاصطناعي",
+    "advanced": "الإعدادات الافتراضية",
+    "advancedDescription": "تنطبق هذه الإعدادات الافتراضية على جميع المهام ما لم يتم تجاوزها أدناه.",
+    "fields": {
+      "providerPreset": "المزوّد",
+      "providerName": "اسم المزوّد",
+      "providerNameHelp": "اسم العرض لتكوين هذا المزوّد",
+      "baseUrl": "URL الأساسي",
+      "baseUrlHelp": "نقطة نهاية API — تُملأ تلقائياً عند اختيار مزوّد",
+      "apiKey": "مفتاح API",
+      "apiKeyHelp": "مفتاح API الخاص بمزوّدك",
+      "apiKeyOptional": "اختياري — هذا المزوّد لا يتطلب مفتاح API",
+      "apiKeyExisting": "المفتاح الحالي",
+      "model": "النموذج",
+      "modelHelp": "اكتب اسم نموذج أو انقر على زر التحديث لاكتشاف النماذج المتاحة",
+      "temperature": "درجة الحرارة",
+      "maxTokens": "الحد الأقصى من الرموز",
+      "systemPromptsHelp": "اتركه فارغاً لاستخدام الإعدادات الافتراضية المدمجة. التعليمات المخصصة تحل محل الافتراضية بالكامل.",
+      "systemPromptSeo": "تعليمات توليد SEO",
+      "systemPromptExcerpt": "تعليمات توليد المقتطف",
+      "systemPromptTranslate": "تعليمات الترجمة",
+      "defaultPromptSeo": "أنت خبير SEO. قم بإنشاء عنوان ميتا محسّن (بحد أقصى 60 حرفًا) ووصف ميتا (بحد أقصى 160 حرفًا) من محتوى المدونة المقدم. قم بالرد فقط بـ JSON صالح: {\"meta_title\": \"...\", \"meta_description\": \"...\"}",
+      "defaultPromptExcerpt": "أنت محرر محتوى. قم بإنشاء ملخص موجز من 1-2 جمل يلخص النقاط الرئيسية لمحتوى المدونة المقدم. قم بالرد فقط بـ JSON صالح: {\"excerpt\": \"...\"}",
+      "defaultPromptTranslate": "أنت مترجم محترف. قم بترجمة المحتوى التالي إلى اللغة المستهدفة. حافظ على النبرة والأسلوب والتنسيق الأصلي. قم بالرد فقط بـ JSON صالح: {\"title\": \"...\", \"subtitle\": \"...\", \"excerpt\": \"...\", \"body\": \"...\", \"meta_title\": \"...\", \"meta_description\": \"...\"}"
+    },
+    "taskConfigs": {
+      "title": "تكوين لكل مهمة",
+      "description": "تجاوز النموذج أو درجة الحرارة أو الحد الأقصى للرموز أو تعليمات النظام للمهام الفردية. الحقول الفارغة ترث الإعدادات الافتراضية أعلاه.",
+      "custom": "مخصص",
+      "vision": "رؤية",
+      "modelHelp": "اتركه فارغاً لاستخدام النموذج الافتراضي",
+      "maxTokensHelp": "اتركه فارغاً لاستخدام القيمة الافتراضية ({{default}})",
+      "systemPrompt": "تعليمات نظام مخصصة",
+      "systemPromptPlaceholder": "اتركه فارغاً لاستخدام التعليمات الافتراضية المدمجة"
+    },
+    "tasks": {
+      "seo": "توليد SEO",
+      "seoDesc": "توليد عناوين وأوصاف ميتا من محتوى المدونة.",
+      "excerpt": "توليد المقتطف",
+      "excerptDesc": "إنشاء ملخصات موجزة لمقالات المدونة.",
+      "translate": "الترجمة",
+      "translateDesc": "ترجمة المحتوى إلى لغات أخرى.",
+      "draftOutline": "مسودة المخطط",
+      "draftOutlineDesc": "توليد مخطط منظم لمقال جديد.",
+      "draftPost": "مسودة المقال",
+      "draftPostDesc": "توليد مسودة كاملة من مخطط أو موضوع.",
+      "autoTag": "وسم تلقائي",
+      "autoTagDesc": "اقتراح وسوم تلقائياً للمحتوى أو الصور.",
+      "altText": "النص البديل",
+      "altTextDesc": "توليد نص بديل وصفي للصور (نموذج الرؤية)."
+    },
+    "actions": {
+      "save": "حفظ",
+      "testConnection": "اختبار الاتصال",
+      "remove": "إزالة التكوين",
+      "discoverModels": "اكتشاف النماذج المتاحة",
+      "viewUsage": "عرض الاستخدام"
+    },
+    "messages": {
+      "saved": "تم حفظ تكوين الذكاء الاصطناعي",
+      "saveFailed": "فشل حفظ تكوين الذكاء الاصطناعي",
+      "deleted": "تم إزالة تكوين الذكاء الاصطناعي",
+      "testFailed": "فشل اختبار الاتصال",
+      "modelsFound": "تم العثور على {{count}} نموذج(نماذج)",
+      "noModels": "لم يتم العثور على نماذج — تحقق من URL الأساسي ومفتاح API",
+      "modelsFailed": "فشل اكتشاف النماذج — تحقق من URL الأساسي ومفتاح API"
+    },
+    "deleteConfirm": {
+      "title": "إزالة تكوين الذكاء الاصطناعي؟",
+      "message": "سيؤدي هذا إلى تعطيل ميزات الذكاء الاصطناعي لهذا الموقع. يمكنك إعادة التكوين لاحقاً."
+    }
+  },
+  "help": {
+    "menu": {
+      "title": "المساعدة والموارد",
+      "documentation": "التوثيق",
+      "quickTour": "جولة سريعة",
+      "keyboardShortcuts": "اختصارات لوحة المفاتيح",
+      "feedback": "ملاحظات",
+      "version": "Forja v{{version}}"
+    },
+    "tour": {
+      "skip": "تخطي الجولة",
+      "next": "التالي",
+      "done": "تم",
+      "stepOf": "{{current}} من {{total}}",
+      "step1": "هذه لوحة التحكم الخاصة بك — شاهد نشاط موقعك بنظرة واحدة",
+      "step2": "أدر محتواك وهيكلك وإعداداتك من الشريط الجانبي",
+      "step3": "بدّل بين مواقعك من هنا",
+      "step4": "اضغط {{shortcut}} للتنقل بسرعة في أي مكان",
+      "step5": "تحتاج مساعدة؟ اعثر على التوثيق والاختصارات وهذه الجولة هنا في أي وقت"
+    },
+    "shortcuts": {
+      "title": "اختصارات لوحة المفاتيح",
+      "commandPalette": "فتح لوحة الأوامر",
+      "save": "حفظ",
+      "undo": "تراجع",
+      "redo": "إعادة",
+      "bold": "غامق",
+      "italic": "مائل",
+      "underline": "تسطير"
+    }
+  },
+  "errorCodes": {
+    "AUTH_MISSING_CREDENTIALS": {
+      "message": "المصادقة مطلوبة",
+      "action": "يرجى تسجيل الدخول للمتابعة."
+    },
+    "AUTH_TOKEN_INVALID": {
+      "message": "انتهت صلاحية الجلسة",
+      "action": "يرجى تسجيل الدخول مرة أخرى."
+    },
+    "AUTH_INSUFFICIENT_ROLE": {
+      "message": "صلاحيات غير كافية",
+      "action": "تواصل مع المدير للحصول على صلاحيات مرتفعة."
+    },
+    "AUTH_SITE_ACCESS_DENIED": {
+      "message": "تم رفض الوصول إلى الموقع",
+      "action": "تواصل مع مالك الموقع للحصول على الوصول."
+    },
+    "AUTH_API_KEY_INVALID": {
+      "message": "مفتاح API غير صالح",
+      "action": "تحقق من تكوين مفتاح API الخاص بك."
+    },
+    "AUTH_ACCOUNT_SOLE_OWNER": {
+      "message": "لا يمكن حذف الحساب",
+      "action": "انقل ملكية الموقع أولاً."
+    },
+    "BLOG_SLUG_TAKEN": {
+      "message": "معرّف المدونة مستخدم بالفعل",
+      "action": "اختر معرّفاً مختلفاً."
+    },
+    "PAGE_SLUG_TAKEN": {
+      "message": "معرّف الصفحة مستخدم بالفعل",
+      "action": "اختر معرّفاً مختلفاً."
+    },
+    "SITE_SLUG_TAKEN": {
+      "message": "معرّف الموقع مستخدم بالفعل",
+      "action": "اختر معرّفاً مختلفاً."
+    },
+    "TAG_SLUG_TAKEN": {
+      "message": "معرّف الوسم مستخدم بالفعل",
+      "action": "اختر معرّفاً مختلفاً."
+    },
+    "CATEGORY_SLUG_TAKEN": {
+      "message": "معرّف التصنيف مستخدم بالفعل",
+      "action": "اختر معرّفاً مختلفاً."
+    },
+    "LOCALE_CODE_TAKEN": {
+      "message": "رمز اللغة المحلية موجود بالفعل",
+      "action": "استخدم رمز لغة محلية مختلف."
+    },
+    "RATE_LIMIT_EXCEEDED": {
+      "message": "طلبات كثيرة جداً",
+      "action": "يرجى الانتظار لحظة والمحاولة مرة أخرى."
+    },
+    "MEMBER_ALREADY_EXISTS": {
+      "message": "العضو موجود بالفعل",
+      "action": "هذا المستخدم عضو بالفعل في الموقع."
+    },
+    "MEMBER_CANNOT_REMOVE_OWNER": {
+      "message": "لا يمكن إزالة المالك",
+      "action": "انقل الملكية قبل إزالة هذا العضو."
+    },
+    "MEDIA_UPLOAD_TOO_LARGE": {
+      "message": "الملف كبير جداً",
+      "action": "قلّل حجم الملف أو عدّل إعدادات الموقع."
+    },
+    "MEDIA_UPLOAD_INVALID_TYPE": {
+      "message": "نوع ملف غير مدعوم",
+      "action": "تحقق من أنواع الملفات المسموح بها."
+    },
+    "AI_NOT_CONFIGURED": {
+      "message": "الذكاء الاصطناعي غير مكوّن",
+      "action": "أعدّ مزوّد ذكاء اصطناعي في إعدادات الموقع."
+    },
+    "AI_PROVIDER_UNAVAILABLE": {
+      "message": "مزوّد الذكاء الاصطناعي غير متاح",
+      "action": "تحقق من تكوين الذكاء الاصطناعي أو حاول مرة أخرى لاحقاً."
+    },
+    "WORKFLOW_REVIEW_REQUIRED": {
+      "message": "المراجعة مطلوبة",
+      "action": "قدّم المحتوى للمراجعة قبل النشر."
+    },
+    "WORKFLOW_NO_PERMISSION": {
+      "message": "رفض صلاحية سير العمل",
+      "action": "ليس لديك صلاحية لهذا الإجراء في سير العمل."
+    },
+    "MODULE_NOT_ENABLED": {
+      "message": "الوحدة غير مفعّلة",
+      "action": "فعّل هذه الوحدة في إعدادات الموقع."
+    },
+    "LOCALE_DELETE_IN_USE": {
+      "message": "اللغة المحلية قيد الاستخدام",
+      "action": "أزل جميع المحتوى الذي يستخدم هذه اللغة المحلية أولاً."
+    },
+    "SITE_LOCALE_LAST_LANGUAGE": {
+      "message": "لا يمكن إزالة آخر لغة محلية",
+      "action": "يجب أن تحتوي المواقع على لغة محلية واحدة على الأقل."
+    },
+    "REDIRECT_SAME_PATH": {
+      "message": "تم اكتشاف حلقة إعادة توجيه",
+      "action": "يجب أن يكون المسار المصدر والوجهة مختلفين."
+    },
+    "LEGAL_PUBLISH_MISSING_TITLE": {
+      "message": "العنوان مطلوب للنشر",
+      "action": "أضف عنوانًا إلى نسخة لغوية واحدة على الأقل."
+    },
+    "LEGAL_PUBLISH_MISSING_BODY": {
+      "message": "المحتوى مطلوب للنشر",
+      "action": "أضف محتوى نصيًا إلى نسخة لغوية واحدة على الأقل."
+    },
+    "LEGAL_VERSION_SOURCE_DELETED": {
+      "message": "تم حذف المستند المصدر",
+      "action": "تم حذف المستند الذي تحاول إنشاء نسخة منه."
+    },
+    "patterns": {
+      "notFound": {
+        "message": "المورد غير موجود",
+        "action": "ربما تم حذفه أو نقله."
+      },
+      "slugTaken": {
+        "message": "المعرّف مستخدم بالفعل",
+        "action": "اختر معرّفاً مختلفاً."
+      },
+      "accessDenied": {
+        "message": "تم رفض الوصول",
+        "action": "ليس لديك صلاحية لهذا الإجراء."
+      },
+      "auth": {
+        "message": "خطأ في المصادقة",
+        "action": "جرّب تسجيل الدخول مرة أخرى."
+      },
+      "validation": {
+        "message": "خطأ في التحقق",
+        "action": "تحقق من حقول النموذج وحاول مرة أخرى."
+      },
+      "mediaUpload": {
+        "message": "فشل الرفع",
+        "action": "تحقق من الملف وحاول مرة أخرى."
+      }
+    },
+    "SITE_SETTINGS_INVALID_ORIGIN": "أصل واحد أو أكثر بتنسيق غير صالح. يجب أن يكون كل أصل بالشكل المخطط://المضيف (مثل https://example.com)."
+  },
+  "welcome": {
+    "tagline": "نظام إدارة المحتوى مفتوح المصدر لمواقع سريعة وآمنة ومتعددة اللغات",
+    "subtitle": "أدر محتوى عدة مواقع. بدون ملفات تعريف ارتباط، بدون تتبع، بدون تنازلات. استضافة ذاتية مجانية، إلى الأبد.",
+    "taglineMain": "نظام إدارة المحتوى الذي يضع الخصوصية أولاً",
+    "taglineAccent": "مبني بـ Rust",
+    "signIn": "سجّل الآن",
+    "login": "تسجيل الدخول",
+    "register": "استضف بنفسك",
+    "productPreview": "محرر حديث تستمتع به فرق المحتوى حقاً.",
+    "featureFast": "سريع للغاية",
+    "featureFastDesc": "استجابات API أقل من 10 مللي ثانية. محتواك يُحمّل فوراً.",
+    "featureSecure": "آمن افتراضياً",
+    "featureSecureDesc": "وصول قائم على الأدوار، تخزين مشفر، سجلات تدقيق. نم بهدوء.",
+    "featureMultilingual": "متعدد اللغات",
+    "featureMultilingualDesc": "11 لغة، دعم RTL. اوصل لكل جمهور.",
+    "featureApi": "API أولاً",
+    "featureApiDesc": "API أولاً مع وثائق تفاعلية. ابنِ أي واجهة أمامية.",
+    "featureMultiSite": "متعدد المواقع",
+    "featureMultiSiteDesc": "لوحة تحكم واحدة، مواقع غير محدودة. مثالي للوكالات.",
+    "featureStorage": "تخزين مرن",
+    "featureStorageDesc": "خزّن الوسائط محلياً أو في السحابة. اختيارك.",
+    "featureSeo": "SEO مدمج",
+    "featureSeoDesc": "خرائط الموقع، وسوم الميتا، وبطاقات التواصل الاجتماعي. احتل مرتبة أعلى.",
+    "whyForja": "لماذا تختار Forja؟",
+    "comparison": {
+      "traditional": "نظام إدارة محتوى تقليدي",
+      "forja": "Forja",
+      "monolithic": "مرتبط بقالب أو ثيم واحد",
+      "headless": "استخدم أي واجهة أمامية — Astro أو Next.js أو Hugo أو الخاصة بك",
+      "plugins": "يانصيب الإضافات: تصحيحات أمنية، مشاكل توافق",
+      "builtIn": "متعدد المواقع، i18n، SEO والذكاء الاصطناعي مدمجة — ليست مضافة لاحقاً",
+      "sharedHosting": "محتواك على خادم شخص آخر",
+      "selfHosted": "خادمك، بياناتك، قواعدك",
+      "legacy": "يصبح بطيئاً تحت الحمل",
+      "fast": "مدعوم بـ Rust — يبقى سريعاً بأي حجم",
+      "eyebrow": "لماذا تنتقل",
+      "lead": "ما يكلّفك نظام إدارة المحتوى التقليدي، وما يمنحك إيّاه Forja."
+    },
+    "builtFor": "مصمم لـ",
+    "useCases": {
+      "solo": "المبدعون المستقلون",
+      "soloDesc": "استضافة ذاتية مجانية. كتابة بمساعدة الذكاء الاصطناعي، SEO مدمج. بدون تقييد لمورد.",
+      "teams": "الفرق الصغيرة",
+      "teamsDesc": "وصول قائم على الأدوار لفريقك. دعم متعدد اللغات ومكتبة وسائط مشتركة — بدون أسعار المؤسسات.",
+      "agencies": "الوكالات",
+      "agenciesDesc": "لوحة تحكم واحدة لجميع مواقع العملاء. أدوار لكل موقع، استنساخ القوالب. توسع بدون زيادة التكاليف.",
+      "enterprise": "المؤسسات",
+      "enterpriseDesc": "استضافة ذاتية لسيادة البيانات. تخزين مشفر، سجلات تدقيق، إدارة مفاتيح API. انشر على بنيتك التحتية.",
+      "eyebrow": "لمن هو",
+      "lead": "من المطوّرين الأفراد إلى المؤسسات الملتزمة بالامتثال — يتوسّع Forja ليناسب الفريق."
+    },
+    "openSourceTrust": "100% مفتوح المصدر. استضف في أي مكان.",
+    "deployAnywhere": "Docker، Railway، Fly.io — بنيتك التحتية، اختيارك.",
+    "openSource": "مفتوح المصدر",
+    "docs": "التوثيق",
+    "madeWith": "صُنع بـ Rust",
+    "madeInEu": "صُمم وبُني في الاتحاد الأوروبي",
+    "tryDemo": "جرّب العرض التجريبي",
+    "demoDescription": "استكشف لوحة الإدارة بدون تسجيل",
+    "badge": "Open Source — AGPL License",
+    "socialProof": {
+      "rust": "مبني بـ Rust",
+      "react": "React 19",
+      "postgresql": "PostgreSQL",
+      "typescript": "TypeScript",
+      "gdpr": "متوافق مع GDPR"
+    },
+    "differentiators": {
+      "title": "لماذا Forja مختلف",
+      "privacy": "الخصوصية حسب التصميم",
+      "privacyDesc": "لا كوكيز. لا PII. لا بكسلات تتبع. التحليلات مدمجة، متوافقة مع GDPR من اليوم الأول. ليست مضافة كفكرة لاحقة.",
+      "performance": "أداء Rust",
+      "performanceDesc": "ملف ثنائي واحد. يبدأ في أجزاء من الثانية. يتحمل ذروات حركة المرور التي تُسقط أنظمة Node.js. فاتورة خادمك تبقى صغيرة.",
+      "multiTenant": "Multi-Tenant",
+      "multiTenantDesc": "نسخة واحدة، مواقع متعددة. مثالي للوكالات التي تدير مواقع العملاء. كل موقع يحصل على محتوى ومستخدمين وإعدادات معزولة.",
+      "developerFirst": "Developer-First",
+      "developerFirstDesc": "SDK TypeScript مكتوب الأنواع. وثائق OpenAPI. Webhooks. API keys بصلاحيات دقيقة. تكامل مع أي شيء."
+    },
+    "featureAi": "مساعد محتوى بالذكاء الاصطناعي",
+    "featureAiDesc": "مساعدة في الكتابة مدعومة بالذكاء الاصطناعي. أنشئ المحتوى وحسّنه وترجمه.",
+    "featureScheduling": "جدولة المحتوى",
+    "featureSchedulingDesc": "جدوِل المنشورات للنشر في الوقت المناسب. خطّط مسبقاً.",
+    "featureLegal": "المستندات القانونية",
+    "featureLegalDesc": "أدِر سياسات الخصوصية وشروط الخدمة والصفحات القانونية.",
+    "featuresTitle": "كل شيء مدمج",
+    "libraries": {
+      "title": "أطلق أسرع مع المكتبات الرسمية",
+      "client": "@forjacms/client",
+      "clientDesc": "TypeScript SDK مُنمَّط لواجهة برمجة المحتوى. يعمل في Node.js والمتصفحات وبيئات edge.",
+      "analytics": "@forjacms/analytics",
+      "analyticsDesc": "تتبع مشاهدات الصفحات مع أولوية الخصوصية. بدون cookies، بدون PII. متوافق مع GDPR بالتصميم.",
+      "sections": "@forjacms/sections",
+      "sectionsDesc": "Web Components جاهزة لأقسام الصفحات. مستقلة عن الإطار، بدون CSS، خطافات BEM.",
+      "sectionsReact": "@forjacms/sections-react",
+      "sectionsReactDesc": "أغلفة React لمكونات الأقسام. خصائص مُنمَّطة، متوافقة مع SSR."
+    },
+    "quickStart": {
+      "title": "استضافة ذاتية في 60 ثانية"
+    },
+    "whatIs": {
+      "heading": "ما هو Forja؟",
+      "lead": "‏Forja هو المكان الذي تعيش فيه نصوص موقعك وصوره. اكتبها هنا مرة واحدة، وتعرضها مواقعك تلقائيًا — مع تشفير البيانات الشخصية وتولّي الأعمال الورقية الخاصة بالامتثال نيابةً عنك.",
+      "point1": "اكتب محتواك مرة واحدة وأعد استخدامه عبر جميع مواقعك.",
+      "point2": "احتفظ ببيانات زوّارك الشخصية مشفّرة وخاصة افتراضيًا.",
+      "point3": "دع البرنامج يتولّى الأعمال الورقية الخاصة بالخصوصية والامتثال.",
+      "eyebrow": "ببساطة"
+    },
+    "hero": {
+      "eyebrow": "مفتوح المصدر · الخصوصية بحكم التصميم",
+      "headline": "نظام إدارة محتوى يبقى متوافقًا بحكم التصميم.",
+      "subline": "‏Forja يحفظ محتواك في مكان واحد وبيانات زوّارك مشفّرة — مع تولّي سجلات اللائحة العامة لحماية البيانات والمحو وسجلات التدقيق. استضِف كل ذلك بنفسك في ملف ثنائي واحد بلغة Rust.",
+      "ctaSignup": "إنشاء حساب",
+      "ctaDemo": "جرّب العرض التوضيحي",
+      "ctaSelfHost": "الاستضافة الذاتية على GitHub"
+    },
+    "features": {
+      "title": "ما الذي يفعله Forja اليوم",
+      "compliance": {
+        "title": "الامتثال بحكم التصميم",
+        "items": [
+          "تشفير مظروف للبيانات الشخصية، حقلًا بحقل",
+          "تصدير سجل أنشطة المعالجة (المادة 30)",
+          "محو بيانات اللائحة العامة بنقرة واحدة",
+          "تحليلات بلا ملفات تعريف ارتباط وصديقة للخصوصية",
+          "سجل تدقيق محصّن ضد العبث"
+        ]
+      },
+      "performance": {
+        "title": "أداء Rust",
+        "items": [
+          "يُسلَّم كملف ثنائي واحد",
+          "بدء تشغيل بارد سريع",
+          "يبقى سريعًا تحت الحِمل"
+        ]
+      },
+      "multiSite": {
+        "title": "مواقع متعددة",
+        "items": [
+          "نسخة واحدة، مواقع كثيرة",
+          "إعدادات وأدوار لكل موقع",
+          "محتوى ووسائط معزولة"
+        ]
+      },
+      "developer": {
+        "title": "للمطوّرين أولًا",
+        "items": [
+          "حزمة تطوير TypeScript بأنواع محددة",
+          "مواصفة OpenAPI",
+          "خطافات ويب موقّعة بـ HMAC",
+          "مفاتيح API بحصص استخدام"
+        ]
+      },
+      "authoring": {
+        "title": "التحرير",
+        "items": [
+          "‏Collections (أنواع محتوى مخصّصة)",
+          "محتوى بـ 11 لغة",
+          "نشر مجدول",
+          "حماية من الروبوتات عبر ALTCHA",
+          "مكتبة وسائط برؤية الذكاء الاصطناعي"
+        ]
+      },
+      "eyebrow": "ما الذي تحصل عليه",
+      "lead": "كل ميزة في الأسفل متاحة اليوم — لا شيء هنا مجرّد وعد."
+    },
+    "showcase": {
+      "heading": "Forja أثناء العمل",
+      "lead": "من مساحة عمل مرتّبة إلى محرّر متعدّد اللغات — المساحة التي يعمل فيها فريقك فعلاً.",
+      "dashboardAlt": "لوحة تحكم Forja تعرض مساحة عمل المحتوى مع عدّادات المراجعة والمسودات والنشر وقائمة بالمنشورات.",
+      "editorAlt": "محرّر محتوى Forja مع علامات تبويب متعدّدة اللغات، وشريط أدوات نص منسّق، وجدول محتويات، ولوحة SEO مباشرة.",
+      "eyebrow": "جولة في المنتج",
+      "dashboardCaption": "مساحة العمل — كل مسودة ومراجعة ونشر مُجدوَل في مكان واحد.",
+      "editorCaption": "المحرّر — محتوى متعدّد اللغات مع لوحة SEO مباشرة، دون إضافات."
+    }
+  },
+  "analytics": {
+    "title": "التحليلات",
+    "subtitle": "زوار موقعك، المحتوى الأكثر شعبية، ومصادر الإحالة",
+    "totalViews": "إجمالي المشاهدات",
+    "uniqueVisitors": "الزوار الفريدون",
+    "avgViewsPerDay": "متوسط المشاهدات/اليوم",
+    "topContent": "أفضل المحتوى",
+    "referrers": "المُحيلون",
+    "noData": "لا توجد بيانات لهذه الفترة",
+    "backToOverview": "العودة إلى التحليلات",
+    "viewAnalytics": "عرض التحليلات",
+    "pageDetail": "تفاصيل الصفحة",
+    "notEnabled": "التحليلات غير مفعّلة لهذا الموقع. فعّلها في الإعدادات.",
+    "trend": "الاتجاه",
+    "path": "المسار",
+    "views": "المشاهدات",
+    "visitors": "الزوار",
+    "dateRange": {
+      "7days": "7 أيام",
+      "30days": "30 يوماً",
+      "90days": "90 يوماً",
+      "allTime": "كل الوقت",
+      "custom": "مخصص",
+      "start": "تاريخ البدء",
+      "end": "تاريخ الانتهاء",
+      "apply": "تطبيق"
+    }
+  },
+  "audit": {
+    "action": "الإجراء",
+    "entityType": "الكيان",
+    "ipAddress": "عنوان IP",
+    "timestamp": "الوقت"
+  },
+  "portfolio": {
+    "pageTitle": "المعرض",
+    "pageSubtitle": "السيرة الذاتية والمهارات والمشاريع لموقعك",
+    "tabs": {
+      "cv": "السيرة الذاتية",
+      "projects": "المشاريع"
+    },
+    "projects": {
+      "addProject": "إضافة مشروع",
+      "searchPlaceholder": "البحث عن مشاريع...",
+      "empty": {
+        "title": "لا توجد مشاريع بعد",
+        "description": "أنشئ مشروعك الأول لعرض أعمالك"
+      },
+      "table": {
+        "slug": "المعرّف",
+        "status": "الحالة",
+        "featured": "مميز",
+        "dates": "التواريخ",
+        "ongoing": "جارٍ",
+        "displayOrder": "الترتيب",
+        "actions": "الإجراءات"
+      },
+      "messages": {
+        "created": "تم إنشاء المشروع بنجاح",
+        "updated": "تم تحديث المشروع بنجاح",
+        "deleted": "تم حذف المشروع بنجاح"
+      },
+      "deleteDialog": {
+        "title": "حذف المشروع",
+        "message": "هل أنت متأكد من حذف المشروع \"{{slug}}\"؟"
+      },
+      "loading": "جارٍ تحميل المشاريع...",
+      "loadError": "فشل تحميل المشاريع"
+    }
+  },
+  "wizard": {
+    "project": {
+      "createTitle": "إنشاء مشروع",
+      "editTitle": "تعديل مشروع",
+      "steps": {
+        "basics": "الأساسيات",
+        "content": "المحتوى والروابط",
+        "relations": "الوسائط والعلاقات"
+      },
+      "fields": {
+        "title": "العنوان",
+        "slug": "الرابط المختصر",
+        "shortDescription": "وصف قصير",
+        "description": "الوصف",
+        "startDate": "تاريخ البدء",
+        "endDate": "تاريخ الانتهاء",
+        "isOngoing": "مستمر",
+        "displayOrder": "ترتيب العرض",
+        "isFeatured": "مميز",
+        "status": "الحالة",
+        "siteIds": "المواقع",
+        "addImage": "إضافة صورة",
+        "coverImage": "الغلاف",
+        "skills": "المهارات",
+        "cvEntries": "إدخالات السيرة الذاتية",
+        "noSkillsAvailable": "لا توجد مهارات متاحة",
+        "noCvEntriesAvailable": "لا توجد إدخالات سيرة ذاتية متاحة",
+        "images": "الصور",
+        "linkIcon": "الأيقونة",
+        "linkLabel": "التسمية",
+        "links": "الروابط",
+        "linkType": "النوع",
+        "linkUrl": "الرابط"
+      },
+      "discardDialog": {
+        "title": "تجاهل التغييرات؟",
+        "message": "لديك تغييرات غير محفوظة. هل أنت متأكد أنك تريد تجاهلها؟",
+        "discard": "تجاهل",
+        "keepEditing": "متابعة التحرير"
+      },
+      "addImage": "إضافة صورة",
+      "addLink": "إضافة رابط",
+      "cover": "الغلاف",
+      "discardConfirm": "تجاهل",
+      "discardMessage": "لديك تغييرات غير محفوظة. هل أنت متأكد من رغبتك في تجاهلها؟",
+      "discardTitle": "تجاهل التغييرات؟",
+      "searchCvEntries": "ابحث في إدخالات السيرة الذاتية...",
+      "searchSkills": "ابحث في المهارات...",
+      "setCover": "تعيين كغلاف",
+      "siteNote": "ينتمي هذا المشروع إلى الموقع المحدد حاليًا."
+    },
+    "cvEntry": {
+      "createTitle": "إنشاء إدخال سيرة ذاتية",
+      "editTitle": "تعديل إدخال سيرة ذاتية",
+      "steps": {
+        "company": "الشركة",
+        "timeline": "الجدول الزمني",
+        "content": "المحتوى",
+        "skills": "المهارات"
+      },
+      "fields": {
+        "company": "الشركة",
+        "companyUrl": "رابط الشركة",
+        "companyLogo": "شعار الشركة",
+        "selectLogo": "اختيار الشعار",
+        "location": "الموقع",
+        "entryType": "نوع الإدخال",
+        "startDate": "تاريخ البدء",
+        "endDate": "تاريخ الانتهاء",
+        "isCurrent": "المنصب الحالي",
+        "status": "الحالة",
+        "siteIds": "المواقع",
+        "position": "المسمى الوظيفي",
+        "description": "الوصف",
+        "achievements": "الإنجازات",
+        "addAchievement": "إضافة إنجاز",
+        "skills": "المهارات",
+        "displayOrder": "ترتيب العرض",
+        "noSkillsAvailable": "لا توجد مهارات متاحة"
+      },
+      "discardDialog": {
+        "title": "تجاهل التغييرات؟",
+        "message": "لديك تغييرات غير محفوظة. هل أنت متأكد أنك تريد تجاهلها؟",
+        "discard": "تجاهل",
+        "keepEditing": "متابعة التحرير"
+      },
+      "achievementPlaceholder": "إنجاز...",
+      "addAchievement": "إضافة إنجاز",
+      "changeLogo": "تغيير الشعار",
+      "discardConfirm": "تجاهل",
+      "discardMessage": "لديك تغييرات غير محفوظة. هل أنت متأكد من رغبتك في تجاهلها؟",
+      "discardTitle": "تجاهل التغييرات؟",
+      "searchSkills": "ابحث في المهارات...",
+      "selectLogo": "اختر الشعار",
+      "siteNote": "ينتمي هذا الإدخال إلى الموقع المحدد حاليًا."
+    },
+    "links": {
+      "title": "الروابط",
+      "addLink": "إضافة رابط",
+      "label": "التسمية",
+      "url": "الرابط",
+      "linkType": "النوع",
+      "icon": "الأيقونة",
+      "types": {
+        "Source": "الكود المصدري",
+        "Demo": "عرض تجريبي",
+        "Documentation": "التوثيق",
+        "Website": "موقع إلكتروني",
+        "Other": "أخرى"
+      }
+    }
+  },
+  "listPage": {
+    "pagination": {
+      "rowsPerPage": "صفوف لكل صفحة:",
+      "of": "{{from}}–{{to}} من {{total}}",
+      "previous": "الصفحة السابقة",
+      "next": "الصفحة التالية"
+    },
+    "actions": {
+      "label": "الإجراءات"
+    },
+    "empty": {
+      "default": "لا يوجد شيء هنا بعد."
+    },
+    "selectAll": "تحديد كل الصفوف",
+    "selectRow": "تحديد الصف"
+  },
+  "sectionEditor": {
+    "addSection": "إضافة قسم",
+    "columns": "الأعمدة",
+    "dragToReorder": "اسحب لإعادة الترتيب",
+    "fullWidth": "عرض كامل",
+    "items": {
+      "count": "{{label}}s ({{count}})",
+      "faq": {
+        "answer": "الإجابة",
+        "label": "السؤال",
+        "question": "السؤال"
+      },
+      "feature": {
+        "description": "الوصف",
+        "icon": "الأيقونة (إيموجي أو اسم)",
+        "label": "الميزة",
+        "title": "العنوان"
+      },
+      "gallery": {
+        "alt": "النص البديل",
+        "caption": "التعليق",
+        "image": "الصورة",
+        "label": "الصورة"
+      },
+      "itemNumber": "{{label}} {{number}}",
+      "logoCloud": {
+        "companyName": "اسم الشركة",
+        "label": "الشعار",
+        "link": "الرابط (اختياري)",
+        "logo": "الشعار"
+      },
+      "pricing": {
+        "buttonLink": "رابط الزر",
+        "buttonText": "نص الزر",
+        "description": "الوصف",
+        "features": "الميزات (واحدة لكل سطر)",
+        "label": "المستوى",
+        "period": "المدة",
+        "planName": "اسم الخطة",
+        "price": "السعر"
+      },
+      "stat": {
+        "label": "الإحصائية",
+        "statLabel": "التسمية",
+        "value": "القيمة"
+      },
+      "team": {
+        "bio": "السيرة الذاتية",
+        "label": "العضو",
+        "name": "الاسم",
+        "photo": "الصورة",
+        "role": "الدور"
+      },
+      "testimonial": {
+        "author": "الكاتب",
+        "avatar": "الصورة الرمزية",
+        "label": "الشهادة",
+        "quote": "الاقتباس",
+        "role": "الدور / الشركة"
+      },
+      "timeline": {
+        "date": "التاريخ",
+        "description": "الوصف",
+        "label": "الحدث",
+        "title": "العنوان"
+      }
+    },
+    "layout": "التخطيط",
+    "nColumns": "{{n}} columns",
+    "provider": "المزود",
+    "settings": {
+      "contact": {
+        "formFields": "حقول النموذج",
+        "formFieldsHint": "أسماء الحقول مفصولة بفواصل",
+        "showMap": "إظهار الخريطة",
+        "title": "إعدادات الاتصال"
+      },
+      "cta": {
+        "banner": "لافتة",
+        "card": "بطاقة",
+        "floating": "عائم",
+        "title": "CTA Settings"
+      },
+      "custom": {
+        "jsonHint": "إعدادات JSON خام",
+        "title": "إعدادات مخصصة (JSON)"
+      },
+      "divider": {
+        "dots": "نقاط",
+        "line": "خط",
+        "showLabel": "إظهار التسمية",
+        "space": "مسافة",
+        "title": "إعدادات الفاصل"
+      },
+      "faq": {
+        "accordion": "أكورديون (قابل للطي)",
+        "title": "إعدادات الأسئلة الشائعة"
+      },
+      "features": {
+        "title": "إعدادات الميزات"
+      },
+      "gallery": {
+        "showCaptions": "إظهار التعليقات",
+        "title": "إعدادات المعرض"
+      },
+      "hero": {
+        "gradient": "تدرج لوني",
+        "gradientHint": "نص تدرج CSS",
+        "title": "إعدادات الواجهة"
+      },
+      "logoCloud": {
+        "grayscale": "تدرج رمادي",
+        "title": "إعدادات سحابة الشعارات"
+      },
+      "newsletter": {
+        "customProvider": "مخصص",
+        "generic": "عام",
+        "mailchimp": "ميل شيمب",
+        "showName": "إظهار حقل الاسم",
+        "title": "إعدادات النشرة البريدية"
+      },
+      "pricing": {
+        "showToggle": "إظهار تبديل شهري/سنوي",
+        "title": "إعدادات الأسعار"
+      },
+      "stats": {
+        "cardStyle": "بطاقة",
+        "inlineStyle": "مضمن",
+        "title": "إعدادات الإحصائيات"
+      },
+      "team": {
+        "showBio": "إظهار السيرة الذاتية",
+        "showRole": "إظهار الدور",
+        "title": "إعدادات الفريق"
+      },
+      "testimonials": {
+        "carousel": "دائري",
+        "grid": "شبكة",
+        "showAvatar": "إظهار الصورة الرمزية",
+        "title": "إعدادات الشهادات"
+      },
+      "text": {
+        "alignment": "المحاذاة",
+        "center": "وسط",
+        "default": "افتراضي",
+        "left": "يسار",
+        "narrow": "ضيق",
+        "title": "إعدادات النص",
+        "wide": "عريض",
+        "width": "العرض"
+      },
+      "timeline": {
+        "horizontal": "أفقي",
+        "showDates": "إظهار التواريخ",
+        "title": "إعدادات الجدول الزمني",
+        "vertical": "عمودي"
+      },
+      "video": {
+        "aspectRatio": "نسبة العرض إلى الارتفاع",
+        "autoplay": "تشغيل تلقائي",
+        "selfHosted": "استضافة ذاتية",
+        "title": "إعدادات الفيديو",
+        "vimeo": "فيميو",
+        "youtube": "يوتيوب"
+      }
+    },
+    "style": "النمط",
+    "typeNames": {
+      "Contact": "اتصال",
+      "Cta": "Call to Action",
+      "Custom": "مخصص",
+      "Divider": "فاصل",
+      "Faq": "FAQ",
+      "Features": "الميزات",
+      "Gallery": "معرض",
+      "Hero": "واجهة",
+      "LogoCloud": "سحابة الشعارات",
+      "Newsletter": "النشرة البريدية",
+      "Pricing": "الأسعار",
+      "Stats": "إحصائيات",
+      "Team": "الفريق",
+      "Testimonials": "الشهادات",
+      "Text": "نص",
+      "Timeline": "الجدول الزمني",
+      "Video": "فيديو"
+    },
+    "types": {
+      "Contact": "نموذج اتصال",
+      "Cta": "كتلة دعوة للإجراء",
+      "Custom": "قسم مخصص",
+      "Divider": "فاصل بصري",
+      "Faq": "أكورديون الأسئلة الشائعة",
+      "Features": "شبكة بطاقات الميزات",
+      "Gallery": "معرض الصور",
+      "Hero": "لافتة بعرض كامل مع عنوان رئيسي",
+      "LogoCloud": "شعارات الشركاء/العملاء",
+      "Newsletter": "اشتراك البريد الإلكتروني",
+      "Pricing": "جدول الأسعار",
+      "Stats": "عرض المقاييس الرئيسية",
+      "Team": "بطاقات أعضاء الفريق",
+      "Testimonials": "شهادات العملاء",
+      "Text": "كتلة نص منسق",
+      "Timeline": "أحداث زمنية",
+      "Video": "تضمين فيديو"
+    }
+  },
+  "formsModule": {
+    "list": {
+      "title": "النماذج",
+      "subtitle": "إدارة نماذج الإرسال — الحقول، التحقق، الاحتفاظ.",
+      "createButton": "إنشاء نموذج",
+      "manageTemplates": "إدارة القوالب",
+      "searchPlaceholder": "البحث في النماذج…",
+      "columns": {
+        "name": "الاسم",
+        "slug": "المعرف",
+        "fields": "الحقول",
+        "status": "الحالة",
+        "submissions": "الإرسالات",
+        "createdAt": "تاريخ الإنشاء"
+      },
+      "status": {
+        "active": "نشط",
+        "inactive": "غير نشط"
+      },
+      "empty": {
+        "title": "لا توجد نماذج بعد",
+        "description": "أنشئ نموذجًا لبدء جمع الإرسالات من موقعك.",
+        "cta": "أنشئ نموذجك الأول"
+      },
+      "actions": {
+        "edit": "تعديل",
+        "delete": "حذف",
+        "submissions": "الإرسالات",
+        "toggleActive": "تبديل الحالة"
+      },
+      "loadError": "فشل تحميل النماذج.",
+      "messages": {
+        "deleted": "تم حذف النموذج.",
+        "activated": "تم تفعيل النموذج.",
+        "deactivated": "تم إلغاء تفعيل النموذج.",
+        "created": "تم إنشاء النموذج."
+      },
+      "deleteConfirm": {
+        "title": "حذف النموذج؟",
+        "body": "سيتم إخفاء النموذج عن الزوار وإيقاف قبول الإرسالات. الإرسالات الموجودة محفوظة.",
+        "confirm": "حذف النموذج"
+      }
+    },
+    "builder": {
+      "heading": "الحقول",
+      "addField": "إضافة حقل",
+      "empty": "لا توجد حقول بعد. انقر على \"إضافة حقل\" لاختيار النوع.",
+      "drag": "اسحب لإعادة الترتيب",
+      "moveUp": "إلى الأعلى",
+      "moveDown": "إلى الأسفل",
+      "delete": "حذف الحقل",
+      "fieldIndex": "الحقل {{n}}",
+      "field": {
+        "label": "التسمية",
+        "placeholder": "نص توضيحي",
+        "helpText": "نص المساعدة",
+        "required": "مطلوب",
+        "minLength": "الحد الأدنى للطول",
+        "maxLength": "الحد الأقصى للطول",
+        "min": "الحد الأدنى",
+        "max": "الحد الأقصى",
+        "pattern": "نمط التعبير العادي",
+        "patternHelp": "تعبير عادي اختياري — يجب أن تطابق الإدخال قبل الإرسال.",
+        "options": "الخيارات",
+        "addOption": "إضافة خيار",
+        "optionsEmpty": "لا توجد خيارات بعد — أضف واحدًا لجعل هذا الحقل مفيدًا.",
+        "optionKey": "المفتاح",
+        "optionLabel": "التسمية"
+      }
+    },
+    "fieldType": {
+      "text": "نص",
+      "textarea": "نص طويل",
+      "email": "بريد إلكتروني",
+      "number": "رقم",
+      "select": "قائمة منسدلة",
+      "radio": "زر اختيار",
+      "checkbox": "مربع اختيار",
+      "date": "تاريخ",
+      "custom": "مخصص"
+    },
+    "locale": {
+      "heading": "ترجمات إلى {{name}}",
+      "help": "اترك الحقل فارغًا للرجوع إلى نص اللغة الافتراضية. تسميات الحقول تبقى كمفتاح تقني (بيانات الإرسال).",
+      "name": "اسم النموذج",
+      "description": "الوصف",
+      "consentText": "نص الموافقة",
+      "consentHelp": "يُستخدم فقط عندما يتطلب النموذج موافقة.",
+      "fieldsHeading": "ترجمات الحقول",
+      "technicalKey": "المفتاح:",
+      "displayLabel": "تسمية العرض",
+      "placeholder": "نص توضيحي",
+      "helpText": "نص المساعدة",
+      "translateAll": "ترجم من اللغة الافتراضية",
+      "translatingAll": "جارٍ الترجمة…",
+      "translateOne": "ترجم من اللغة الافتراضية بالذكاء الاصطناعي"
+    },
+    "detail": {
+      "tabs": {
+        "settings": "الإعدادات",
+        "fields": "الحقول",
+        "translations": "الترجمات"
+      },
+      "localePicker": "اللغة:",
+      "translations": {
+        "noLocales": "فعّل لغات إضافية في إعدادات الموقع لترجمة هذا النموذج.",
+        "pickLocale": "اختر لغة أعلاه لإضافة أو تحرير الترجمات."
+      },
+      "fields": {
+        "name": "الاسم",
+        "slug": "المعرف",
+        "description": "الوصف",
+        "active": "نشط",
+        "consentRequired": "طلب مربع الموافقة",
+        "consentText": "نص الموافقة",
+        "botProtection": "الحماية من الروبوتات",
+        "storageMode": "وضع التخزين",
+        "storageModeHelp": "Queryable يتيح البحث في بيانات الإرسال من جانب المسؤول؛ Simple يخزّن بشكل مدمج.",
+        "retentionDays": "الاحتفاظ (أيام)",
+        "retentionDaysHelp": "اتركه فارغًا للاحتفاظ بالإرسالات إلى أجل غير مسمى. رقم موجب يحذف تلقائيًا بعد N أيام.",
+        "placeholder": "سيظهر منشئ الحقول في الإصدار التالي (#587 الجزء 5)."
+      },
+      "botProtection": {
+        "none": "بدون",
+        "mandatory": "إلزامي"
+      },
+      "storageMode": {
+        "simple": "بسيط",
+        "queryable": "قابل للاستعلام"
+      },
+      "messages": {
+        "saved": "تم حفظ النموذج."
+      },
+      "viewSubmissions": "الإرسالات"
+    },
+    "submissions": {
+      "title": "الإرسالات",
+      "backToForm": "العودة إلى النموذج",
+      "loadError": "فشل تحميل الإرسالات.",
+      "exportCsv": {
+        "btn": "تصدير CSV",
+        "help": "تنزيل الصفحة المرئية بتنسيق CSV"
+      },
+      "filter": {
+        "all": "الكل",
+        "new": "جديد",
+        "in_review": "قيد المراجعة",
+        "resolved": "تم الحل",
+        "rejected": "مرفوض",
+        "archived": "مؤرشف"
+      },
+      "status": {
+        "new": "جديد",
+        "in_review": "قيد المراجعة",
+        "resolved": "تم الحل",
+        "rejected": "مرفوض",
+        "archived": "مؤرشف"
+      },
+      "columns": {
+        "referenceCode": "المرجع",
+        "status": "الحالة",
+        "preview": "معاينة",
+        "createdAt": "تاريخ الإرسال"
+      },
+      "empty": {
+        "title": "لا توجد إرسالات",
+        "descriptionAll": "لم يقم أحد بإرسال هذا النموذج بعد.",
+        "descriptionFiltered": "لا توجد إرسالات تطابق التصفية الحالية."
+      },
+      "detail": {
+        "referenceCode": "رمز المرجع",
+        "status": "الحالة",
+        "data": "البيانات المُرسلة",
+        "noData": "لا تحتوي هذه الإرسالة على قيم حقول.",
+        "notes": "الملاحظات",
+        "noNotes": "لا توجد ملاحظات بعد.",
+        "addNote": "إضافة ملاحظة",
+        "addNoteBtn": "إضافة",
+        "history": "سجل الحالة",
+        "initial": "تم الإنشاء",
+        "deleteBtn": "حذف الإرسال",
+        "close": "إغلاق",
+        "noHistory": "لا توجد تغييرات في الحالة بعد."
+      },
+      "messages": {
+        "statusUpdated": "تم تحديث الحالة.",
+        "noteAdded": "تمت إضافة الملاحظة.",
+        "noteDeleted": "تم حذف الملاحظة.",
+        "deleted": "تم حذف الإرسال."
+      },
+      "deleteConfirm": {
+        "title": "حذف الإرسال؟",
+        "body": "حذف ناعم للإرسال. لن يظهر بعد الآن في صندوق الوارد أو في الاستعلامات الذاتية.",
+        "confirm": "حذف"
+      },
+      "transition": {
+        "in_review": "بدء المراجعة",
+        "resolved": "وضع علامة كمحلول",
+        "rejected": "رفض",
+        "archived": "أرشفة"
+      },
+      "actions": {
+        "menu": "تغيير الحالة",
+        "none": "لا توجد انتقالات أخرى"
+      }
+    },
+    "templates": {
+      "title": "قوالب النماذج",
+      "subtitle": "إعدادات حقول قابلة لإعادة الاستخدام عند إنشاء نموذج جديد.",
+      "createButton": "إنشاء قالب",
+      "backToForms": "العودة إلى النماذج",
+      "loadError": "فشل تحميل القوالب.",
+      "columns": {
+        "name": "الاسم",
+        "description": "الوصف",
+        "fields": "الحقول",
+        "status": "الحالة"
+      },
+      "actions": {
+        "edit": "تعديل",
+        "delete": "حذف"
+      },
+      "fields": {
+        "name": "الاسم",
+        "description": "الوصف",
+        "icon": "الأيقونة (اسم Material Symbol)",
+        "iconHelp": "ligature اختيارية من Material Symbols، مثل \"contact_mail\".",
+        "active": "نشط (مقدَّم في CreateFormWizard)"
+      },
+      "dialog": {
+        "createTitle": "إنشاء قالب",
+        "editTitle": "تعديل القالب"
+      },
+      "deleteConfirm": {
+        "title": "حذف القالب؟",
+        "body": "النماذج التي تم إنشاؤها من هذا القالب لا تتأثر — القوالب تعمل بالنسخ عند الإنشاء.",
+        "confirm": "حذف القالب"
+      },
+      "empty": {
+        "title": "لا توجد قوالب بعد",
+        "description": "القوالب هي إعدادات حقول قابلة لإعادة الاستخدام. أنشئ واحدًا لتسريع إنشاء النماذج.",
+        "cta": "أنشئ قالبك الأول"
+      },
+      "messages": {
+        "created": "تم إنشاء القالب.",
+        "updated": "تم تحديث القالب.",
+        "deleted": "تم حذف القالب."
+      }
+    },
+    "wizard": {
+      "title": "إنشاء نموذج",
+      "btnCreate": "إنشاء نموذج",
+      "steps": {
+        "method": "الطريقة",
+        "details": "التفاصيل"
+      },
+      "method": {
+        "scratchTitle": "البدء من الصفر",
+        "scratchDesc": "أنشئ نموذجًا فارغًا وأضف الحقول واحدًا تلو الآخر.",
+        "templatesHeading": "أو اختر قالبًا",
+        "templatesEmpty": "لا توجد قوالب بعد. احفظ الحقول كقالب من أي نموذج لإعادة استخدامها."
+      },
+      "fields": {
+        "name": "اسم النموذج",
+        "slug": "المعرف",
+        "slugHelp": "معرّف آمن لعنوان URL. يُستخدم في المسار العام: /forms/<slug>"
+      }
+    }
+  },
+  "aiUsage": {
+    "title": "استخدام الذكاء الاصطناعي",
+    "subtitle": "نشاط الذكاء الاصطناعي لكل مكالمة في هذا الموقع. أعداد رموز تقريبية.",
+    "export": "تصدير CSV",
+    "exporting": "جارٍ التصدير…",
+    "empty": "لا يوجد نشاط للذكاء الاصطناعي في النطاق المحدد.",
+    "ownOnlyNotice": "تُعرض فقط مكالماتك الخاصة — يرى المالك والمسؤول نشاط الموقع بأكمله.",
+    "recentCalls": "المكالمات الأخيرة",
+    "filters": {
+      "from": "من",
+      "to": "إلى",
+      "action": "الإجراء",
+      "allActions": "جميع الإجراءات",
+      "groupBy": "تجميع حسب"
+    },
+    "groupBy": {
+      "action": "الإجراء",
+      "provider": "المزود",
+      "user": "المستخدم"
+    },
+    "columns": {
+      "timestamp": "الوقت",
+      "action": "الإجراء",
+      "provider": "المزود",
+      "model": "النموذج",
+      "calls": "المكالمات",
+      "inputTokens": "رموز الإدخال",
+      "outputTokens": "رموز الإخراج"
+    },
+    "totals": {
+      "calls": "إجمالي المكالمات",
+      "inputTokens": "رموز الإدخال",
+      "outputTokens": "رموز الإخراج"
+    },
+    "byGroup": {
+      "title": "الاستخدام حسب {{group}}"
+    }
+  },
+  "collections": {
+    "title": "المجموعات",
+    "subtitle": "أنواع محتوى مخصّصة",
+    "newType": "مجموعة جديدة",
+    "name": "الاسم",
+    "key": "المفتاح",
+    "addField": "إضافة حقل",
+    "removeField": "إزالة الحقل",
+    "fieldKey": "مفتاح الحقل",
+    "fieldLabel": "التسمية",
+    "fieldType": "النوع",
+    "required": "مطلوب",
+    "localized": "قابل للترجمة",
+    "titleField": "حقل العنوان",
+    "isPii": "بيانات شخصية",
+    "dataCategory": "فئة البيانات",
+    "purpose": "غرض المعالجة",
+    "legalBasis": "الأساس القانوني",
+    "enumOptions": "خيارات (مفصولة بفواصل)",
+    "retentionDays": "الاحتفاظ (أيام)",
+    "publiclyReadable": "قابل للقراءة علنًا",
+    "contentKind": "التوجيه",
+    "kindPage": "صفحة (رابط عام)",
+    "kindData": "بيانات فقط (API)",
+    "save": "حفظ المجموعة",
+    "piiHelp": "مشفّر عند التخزين، ويُزال من واجهة برمجة التطبيقات العامة، ويُدرج في سجل اللائحة العامة لحماية البيانات.",
+    "entries": "الإدخالات",
+    "newEntry": "إدخال جديد",
+    "noEntries": "لا توجد إدخالات",
+    "status": "الحالة",
+    "updated": "تم التحديث",
+    "publish": "نشر",
+    "unpublish": "إلغاء النشر",
+    "deleteEntry": "حذف الإدخال",
+    "piiBadge": "بيانات",
+    "empty": "لم تُعرّف أي مجموعات بعد.",
+    "colFields": "الحقول",
+    "colTitle": "العنوان",
+    "colSlug": "المعرف",
+    "emptyTitle": "لا توجد مجموعات بعد",
+    "noEntriesDesc": "أنشئ أول إدخال للبدء.",
+    "saveEntry": "حفظ الإدخال",
+    "sectionDetails": "التفاصيل",
+    "sectionDetailsDesc": "الاسم والمفتاح وسلوك الإدخالات.",
+    "sectionFields": "الحقول",
+    "sectionFieldsDesc": "حدّد بيانات كل إدخال. حقل واحد فقط هو العنوان.",
+    "keyHelp": "يُستخدم في مسارات API وعناوين URL. أحرف صغيرة، بدون مسافات.",
+    "keyLocked": "لا يمكن تغيير المفتاح بعد الإنشاء.",
+    "kindDataDesc": "تُقدَّم الإدخالات عبر API فقط — مثالية للبيانات المنظَّمة مثل أعضاء الفريق أو الأسئلة الشائعة أو الشهادات.",
+    "kindPageDesc": "يحصل كل إدخال أيضًا على عنوان URL عام خاص به على موقعك — مثالي لمحتوى مثل الوصفات أو المقالات أو المشاريع.",
+    "retentionHelp": "حذف الإدخالات تلقائيًا بعد هذا العدد من الأيام. اتركه فارغًا للاحتفاظ بها دائمًا.",
+    "saveChanges": "حفظ التغييرات",
+    "editHelp": "إعادة تسمية مفتاح الحقل تنقل قيمه المخزَّنة. إزالة حقل تخفيه عن الإدخالات الجديدة.",
+    "editStructure": "تعديل البنية",
+    "structureSaved": "تم حفظ بنية المجموعة.",
+    "openEntries": "فتح الإدخالات",
+    "deleteType": "حذف المجموعة",
+    "deleteTypeConfirm": "حذف المجموعة «{{name}}» وبنيتها؟ يجب إزالة الإدخالات أولًا.",
+    "typeDeleted": "تم حذف المجموعة.",
+    "allStatuses": "كل الحالات",
+    "statusDraft": "مسودة",
+    "statusPublished": "منشور",
+    "entryPublished": "تم نشر الإدخال.",
+    "entryUnpublished": "تم نقل الإدخال إلى المسودة.",
+    "entryDeleted": "تم حذف الإدخال.",
+    "deleteEntryConfirm": "حذف الإدخال «{{title}}»؟ لا يمكن التراجع عن ذلك.",
+    "perLanguage": "حسب اللغة · {{locale}}",
+    "dragToReorder": "اسحب لإعادة الترتيب"
+  },
+  "imprint": {
+    "title": "بيانات الناشر",
+    "link": "بيانات الناشر",
+    "back": "العودة إلى الصفحة الرئيسية",
+    "loadError": "تعذّر تحميل بيانات الناشر الآن. يُرجى المحاولة لاحقًا.",
+    "unconfigured": "لم تُضبَط بيانات الناشر لهذه النسخة.",
+    "operatorName": "المشغّل",
+    "address": "العنوان",
+    "email": "البريد الإلكتروني",
+    "phone": "الهاتف",
+    "vat": "الرقم الضريبي",
+    "register": "السجل التجاري",
+    "responsible": "المسؤول عن المحتوى"
+  }
+}

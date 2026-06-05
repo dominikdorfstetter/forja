@@ -1,0 +1,68 @@
+{
+  "name": "@forjacms/sections",
+  "version": "2.0.0",
+  "description": "Framework-agnostic Web Components for rendering Forja page sections. Zero CSS — bring your own styles via BEM class hooks.",
+  "author": "Dominik Dorfstetter <dominik@dorfstetter.at>",
+  "type": "module",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.js",
+  "types": "dist/types/index.d.ts",
+  "collection": "dist/collection/collection-manifest.json",
+  "collection:main": "dist/collection/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs.js",
+      "types": "./dist/types/index.d.ts"
+    },
+    "./loader": {
+      "import": "./loader/index.js",
+      "require": "./loader/index.cjs.js",
+      "types": "./loader/index.d.ts"
+    },
+    "./define": {
+      "import": "./dist/define-all.js",
+      "types": "./dist/define-all.d.ts"
+    }
+  },
+  "files": [
+    "dist/",
+    "loader/"
+  ],
+  "scripts": {
+    "build": "stencil build && node scripts/generate-define-all.js",
+    "dev": "stencil build --dev --watch",
+    "test": "stencil-test",
+    "test:watch": "stencil-test --watch",
+    "test:spec": "stencil-test --project spec",
+    "test:unit": "stencil-test --project unit"
+  },
+  "keywords": [
+    "web-components",
+    "stencil",
+    "sections",
+    "headless",
+    "cms",
+    "forja",
+    "accessible",
+    "custom-elements"
+  ],
+  "license": "AGPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dominikdorfstetter/forja.git",
+    "directory": "libs/sections"
+  },
+  "homepage": "https://github.com/dominikdorfstetter/forja/tree/main/libs/sections#readme",
+  "bugs": "https://github.com/dominikdorfstetter/forja/issues",
+  "dependencies": {
+    "@stencil/core": "^4.43.5",
+    "sanitize-html": "^2.17.4"
+  },
+  "devDependencies": {
+    "@stencil/react-output-target": "^1.5.3",
+    "@stencil/vitest": "^1.9.2",
+    "@types/sanitize-html": "^2.16.1",
+    "vitest": "^4.1.8"
+  }
+}

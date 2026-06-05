@@ -1,0 +1,158 @@
+---
+// Renders one form field as semantic, accessible HTML.
+// Field type drives the input element; validation rules render as
+// HTML attributes (required, minlength, pattern, min, max) so the
+// browser does first-pass validation before our inline script runs.
+
+import type { FormFieldDefinition } from "../../lib/api";
+
+interface Props {
+  field: FormFieldDefinition;
+}
+
+const { field } = Astro.props;
+const id = `form-field-${field.id}`;
+// `name` doubles as the JSONB submission key — must be the technical
+// `label`, never the localized `display_label`, so storage shape is
+// locale-invariant.
+const name = field.label;
+// Visitor-facing display text — set by the public endpoint when a
+// localization matches the requested locale; falls back to `label`.
+const displayLabel = field.display_label ?? field.label;
+const required = field.is_required || field.validation?.required === true;
+const placeholder = field.placeholder ?? undefined;
+const helpId = `${id}-help`;
+const errorId = `${id}-error`;
+
+function parseOptions(opts: unknown): { key: string; label: string }[] {
+  if (!Array.isArray(opts)) return [];
+  return opts.map((o) =>
+    typeof o === "string"
+      ? { key: o, label: o }
+      : { key: String((o as { key?: unknown }).key ?? ""), label: String((o as { label?: unknown }).label ?? (o as { key?: unknown }).key ?? "") },
+  );
+}
+
+const options = parseOptions(field.options);
+const baseInputClass =
+  "w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent disabled:opacity-50";
+---
+
+<div class="forja-form-field" data-field-label={field.label} data-field-type={field.field_type}>
+  <label for={id} class="block text-sm font-medium text-zinc-700 dark:text-zinc-200 mb-1">
+    {displayLabel}
+    {required && <span class="text-red-500 ml-0.5" aria-hidden="true">*</span>}
+  </label>
+
+  {field.help_text && (
+    <p id={helpId} class="text-xs text-zinc-500 dark:text-zinc-400 mb-1.5">{field.help_text}</p>
+  )}
+
+  {field.field_type === "textarea" && (
+    <textarea
+      id={id}
+      name={name}
+      rows="4"
+      required={required}
+      placeholder={placeholder}
+      minlength={field.validation?.min_length}
+      maxlength={field.validation?.max_length}
+      aria-describedby={`${helpId} ${errorId}`}
+      class={baseInputClass}
+    ></textarea>
+  )}
+
+  {field.field_type === "email" && (
+    <input
+      id={id}
+      type="email"
+      name={name}
+      required={required}
+      placeholder={placeholder}
+      aria-describedby={`${helpId} ${errorId}`}
+      class={baseInputClass}
+    />
+  )}
+
+  {field.field_type === "number" && (
+    <input
+      id={id}
+      type="number"
+      name={name}
+      required={required}
+      placeholder={placeholder}
+      min={field.validation?.min}
+      max={field.validation?.max}
+      aria-describedby={`${helpId} ${errorId}`}
+      class={baseInputClass}
+    />
+  )}
+
+  {field.field_type === "date" && (
+    <input
+      id={id}
+      type="date"
+      name={name}
+      required={required}
+      aria-describedby={`${helpId} ${errorId}`}
+      class={baseInputClass}
+    />
+  )}
+
+  {(field.field_type === "text" || field.field_type === "custom") && (
+    <input
+      id={id}
+      type="text"
+      name={name}
+      required={required}
+      placeholder={placeholder}
+      minlength={field.validation?.min_length}
+      maxlength={field.validation?.max_length}
+      pattern={field.validation?.pattern}
+      aria-describedby={`${helpId} ${errorId}`}
+      class={baseInputClass}
+    />
+  )}
+
+  {field.field_type === "select" && (
+    <select id={id} name={name} required={required} aria-describedby={`${helpId} ${errorId}`} class={baseInputClass}>
+      <option value="">{placeholder ?? "Choose…"}</option>
+      {options.map((o) => (
+        <option value={o.key}>{o.label}</option>
+      ))}
+    </select>
+  )}
+
+  {field.field_type === "radio" && (
+    <fieldset id={id} aria-describedby={`${helpId} ${errorId}`} class="space-y-1">
+      <legend class="sr-only">{displayLabel}</legend>
+      {options.map((o, i) => (
+        <label class="flex items-center gap-2 text-sm">
+          <input type="radio" name={name} value={o.key} required={required && i === 0} class="text-violet-600 focus:ring-violet-500" />
+          <span>{o.label}</span>
+        </label>
+      ))}
+    </fieldset>
+  )}
+
+  {field.field_type === "checkbox" && (
+    <fieldset id={id} aria-describedby={`${helpId} ${errorId}`} class="space-y-1">
+      <legend class="sr-only">{displayLabel}</legend>
+      {options.length > 0 ? (
+        options.map((o) => (
+          <label class="flex items-center gap-2 text-sm">
+            <input type="checkbox" name={`${name}[]`} value={o.key} class="text-violet-600 focus:ring-violet-500" />
+            <span>{o.label}</span>
+          </label>
+        ))
+      ) : (
+        <label class="flex items-center gap-2 text-sm">
+          <input type="checkbox" name={name} required={required} class="text-violet-600 focus:ring-violet-500" />
+          <span>{displayLabel}</span>
+        </label>
+      )}
+    </fieldset>
+  )}
+
+  <p id={errorId} class="forja-form-field__error hidden mt-1 text-sm text-red-600 dark:text-red-400" role="alert"></p>
+</div>

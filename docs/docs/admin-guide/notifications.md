@@ -1,0 +1,85 @@
+---
+sidebar_position: 15
+---
+
+# Notifications
+
+Forja includes an in-app notification system that keeps you informed about important events and updates within your sites.
+
+## Accessing Notifications
+
+There are two ways to access your notifications:
+
+1. **Notification bell** -- click the bell icon in the top bar. A badge shows the number of unread notifications.
+2. **Notifications page** -- navigate to **Notifications** in the sidebar for a full-page view.
+
+## Notification Types
+
+Notifications are generated for various events:
+
+| Event | Description |
+|-------|-------------|
+| **Member added** | You have been added to a site. |
+| **Role changed** | Your role on a site has been updated. |
+| **Content published** | A post you authored or are watching has been published. |
+| **Webhook failure** | A webhook delivery has failed repeatedly. |
+| **System updates** | Important system-level announcements from the platform administrator. |
+
+### Editorial Workflow Notifications
+
+When the [editorial workflow](./content/blogs#review-workflow) is enabled, the following notification types are generated automatically:
+
+| Event | Recipient | Description |
+|-------|-----------|-------------|
+| **content_submitted** | Reviewer, Editor, Admin, and Owner users | An author has submitted content for review. |
+| **content_approved** | The content author | A reviewer has approved the content for publication. |
+| **changes_requested** | The content author | A reviewer has requested changes to the submitted content. |
+
+These notifications link directly to the relevant blog post so you can take action immediately.
+
+### Scope and Availability
+
+- Notifications are **per-user, per-site** -- you only see notifications for sites you belong to.
+- Editorial workflow notifications require **Clerk JWT authentication**. They are not generated when using API keys.
+- No manual configuration is needed -- workflow notifications are created automatically when the editorial workflow is enabled and review actions are taken.
+
+## Notification List
+
+The notification list shows:
+
+| Field | Description |
+|-------|-------------|
+| **Icon** | An icon indicating the notification type. |
+| **Message** | A brief description of the event. |
+| **Timestamp** | When the notification was created (relative, e.g., "5 minutes ago"). |
+| **Read status** | Unread notifications are highlighted; read ones are dimmed. |
+
+Notifications are sorted with the newest at the top.
+
+## Reading Notifications
+
+- **Click a notification** to view its full details. If the notification relates to a specific resource (e.g., a blog post), clicking it navigates you to that resource.
+- Notifications are automatically marked as read when you click them.
+
+## Marking as Read
+
+### Individual
+
+Click on a notification to mark it as read.
+
+### Mark All as Read
+
+Click the **Mark all as read** button at the top of the notification list to mark all notifications as read at once.
+
+## Notification Bell Badge
+
+The bell icon in the top bar shows a badge with the count of unread notifications. The badge disappears when all notifications are read.
+
+## Permissions
+
+All authenticated users can view their own notifications. Notifications are personal and cannot be viewed by other users.
+
+| Action | Required Role |
+|--------|--------------|
+| View own notifications | Any authenticated user |
+| Mark as read | Any authenticated user |

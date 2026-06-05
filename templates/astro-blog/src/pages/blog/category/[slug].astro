@@ -1,0 +1,80 @@
+---
+import Base from "../../../layouts/Base.astro";
+import BlogCard from "../../../components/BlogCard.astro";
+import SeoHead from "../../../components/SeoHead.astro";
+import Pagination from "../../../components/Pagination.astro";
+import {
+  fetchPublishedBlogsByCategory,
+  fetchBlogDetails,
+  fetchMediaBatch,
+  fetchSite,
+  getSiteUrl,
+} from "../../../lib/api";
+import type { BlogDetailResponse, MediaResponse } from "../../../lib/api";
+import { buildSeoMeta } from "../../../lib/seo";
+
+const PER_PAGE = 12;
+const { slug } = Astro.params;
+
+if (!slug) {
+  return Astro.redirect("/blog/");
+}
+
+const locale = Astro.locals.locale;
+const page = Number(Astro.url.searchParams.get("page")) || 1;
+
+let blogs: BlogDetailResponse[] = [];
+let totalPages = 1;
+try {
+  // Server-side locale filtering — pagination counts match what user sees
+  const result = await fetchPublishedBlogsByCategory(slug, page, PER_PAGE, locale?.locale_id);
+  totalPages = result.meta.total_pages;
+  blogs = await fetchBlogDetails(result.data.map((b) => b.id));
+} catch (e) {
+  console.warn(`[CMS] Failed to fetch blogs for category ${slug}:`, e instanceof Error ? e.message : e);
+}
+
+const coverIds = blogs.map((b) => b.cover_image_id).filter(Boolean) as string[];
+const mediaMap: Map<string, MediaResponse> = coverIds.length > 0
+  ? await fetchMediaBatch(coverIds)
+  : new Map();
+
+const site = await fetchSite().catch(() => null);
+const siteName = site?.name ?? "My Site";
+const siteUrl = getSiteUrl();
+const categoryTitle = slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
+const seo = buildSeoMeta({
+  title: page > 1 ? `${categoryTitle} — Page ${page} — ${siteName}` : `${categoryTitle} — ${siteName}`,
+  description: `Blog posts in the "${categoryTitle}" category.`,
+  canonicalUrl: page > 1 ? `${siteUrl}/blog/category/${slug}/?page=${page}` : `${siteUrl}/blog/category/${slug}/`,
+  siteUrl,
+  siteName,
+});
+
+Astro.response.headers.set("Cache-Control", "public, max-age=300, s-maxage=600");
+---
+
+<Base title={categoryTitle} description={`Posts in ${categoryTitle}.`}>
+  <SeoHead seo={seo} slot="head" />
+  <div class="flex items-center gap-1.5 text-xs text-zinc-400 dark:text-zinc-500 mb-6">
+    <a href="/blog" class="text-zinc-500 dark:text-zinc-400 no-underline hover:text-violet-600 dark:hover:text-violet-400 hover:no-underline">Blog</a>
+    <span>/</span>
+    <span class="text-zinc-500 dark:text-zinc-400">{categoryTitle}</span>
+  </div>
+  <h1 class="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mb-6">{categoryTitle}</h1>
+  {blogs.length > 0 ? (
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {blogs.map((blog) => (
+        <BlogCard
+          blog={blog}
+          coverMedia={blog.cover_image_id ? mediaMap.get(blog.cover_image_id) ?? null : null}
+          localeId={locale?.locale_id}
+        />
+      ))}
+    </div>
+  ) : (
+    <p class="text-zinc-500 dark:text-zinc-400">No blog posts in this category yet.</p>
+  )}
+  <Pagination currentPage={page} totalPages={totalPages} baseUrl={`/blog/category/${slug}`} useQueryParam />
+</Base>

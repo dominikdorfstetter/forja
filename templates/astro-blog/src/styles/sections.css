@@ -1,0 +1,1057 @@
+/* ---------------------------------------------------------------------------
+   @forjacms/sections — Tailwind styling for Web Component BEM classes
+   These rules target the headless BEM classes emitted by @forjacms/sections
+   and apply the same visual design as the original StyledX.astro components.
+   --------------------------------------------------------------------------- */
+
+@reference "tailwindcss";
+@reference "./global.css";
+
+/* ---- Nav (Header) ------------------------------------------------------- */
+
+.forja-nav {
+  @apply sticky top-0 z-50 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-950/80 backdrop-blur-lg;
+}
+
+.forja-nav__container {
+  @apply max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14;
+}
+
+.forja-nav__brand {
+  @apply font-mono text-sm font-semibold text-zinc-900 dark:text-zinc-100 no-underline hover:text-violet-600 dark:hover:text-violet-400 hover:no-underline tracking-tight;
+}
+
+.forja-nav__desktop {
+  @apply hidden md:flex items-center gap-1;
+}
+
+.forja-nav__link {
+  @apply text-sm font-medium text-zinc-500 dark:text-zinc-400 px-3 py-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 no-underline hover:no-underline transition-colors duration-200;
+}
+
+.forja-nav__dropdown {
+  @apply relative;
+}
+
+.forja-nav__dropdown:hover .forja-nav__dropdown-menu {
+  @apply block;
+}
+
+.forja-nav__dropdown-menu {
+  @apply hidden absolute top-full left-0 pt-1 z-10;
+}
+
+.forja-nav__dropdown-menu::before {
+  content: "";
+  @apply block;
+}
+
+.forja-nav__dropdown-menu > :first-child {
+  @apply hidden;
+}
+
+.forja-nav__dropdown-item {
+  @apply block px-4 py-2 text-sm text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 no-underline hover:no-underline transition-colors bg-white dark:bg-zinc-900 first:rounded-t-lg last:rounded-b-lg;
+}
+
+/* Wrap dropdown items in a bordered container */
+.forja-nav__dropdown-menu {
+  @apply bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-lg min-w-[180px] overflow-hidden;
+}
+
+.forja-nav__theme-toggle {
+  @apply ml-2 w-8 h-8 flex items-center justify-center rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-violet-600 dark:hover:text-violet-400 hover:border-violet-300 dark:hover:border-violet-700 transition-colors duration-200 cursor-pointer;
+}
+
+.forja-nav__icon-sun {
+  @apply hidden;
+}
+
+:where([data-theme="dark"]) .forja-nav__icon-moon {
+  @apply hidden;
+}
+
+:where([data-theme="dark"]) .forja-nav__icon-sun {
+  @apply block;
+}
+
+.forja-nav__locale-switcher {
+  @apply relative;
+}
+
+.forja-nav__locale-toggle {
+  @apply text-sm font-medium text-zinc-500 dark:text-zinc-400 px-2 py-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors duration-200 cursor-pointer uppercase tracking-wide;
+}
+
+.forja-nav__locale-dropdown {
+  @apply absolute right-0 top-full mt-1 z-50 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg shadow-lg py-1 min-w-[140px];
+}
+
+.forja-nav__locale-option {
+  @apply block w-full text-left px-4 py-2 text-sm text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer;
+}
+
+.forja-nav__locale-option--active {
+  @apply text-violet-600 dark:text-violet-400 font-medium bg-violet-50 dark:bg-violet-950/30;
+}
+
+.forja-nav__hamburger {
+  @apply md:hidden w-8 h-8 flex items-center justify-center text-zinc-600 dark:text-zinc-300 cursor-pointer;
+}
+
+.forja-nav__mobile {
+  @apply md:hidden border-t border-zinc-200 dark:border-zinc-800 px-4 pb-4 pt-2;
+}
+
+.forja-nav__mobile-link {
+  @apply block py-2 text-sm text-zinc-600 dark:text-zinc-300 hover:text-violet-600 dark:hover:text-violet-400 no-underline hover:no-underline;
+}
+
+/* ---- Footer ------------------------------------------------------------- */
+
+.forja-footer {
+  @apply border-t border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900;
+}
+
+.forja-footer__content {
+  @apply max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-12 text-center sm:text-left;
+}
+
+.forja-footer__brand-link {
+  @apply font-mono text-sm font-semibold text-zinc-900 dark:text-zinc-100 no-underline hover:text-violet-600 dark:hover:text-violet-400 hover:no-underline;
+}
+
+.forja-footer__tagline {
+  @apply text-xs text-zinc-500 dark:text-zinc-400 mt-1;
+}
+
+.forja-footer__nav-heading {
+  @apply text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-3;
+}
+
+.forja-footer__nav-list {
+  @apply space-y-2 list-none pl-0;
+}
+
+.forja-footer__nav-link {
+  @apply text-sm text-zinc-600 dark:text-zinc-400 hover:text-violet-600 dark:hover:text-violet-400 no-underline hover:no-underline transition-colors;
+}
+
+.forja-footer__social-links {
+  @apply flex gap-2;
+}
+
+.forja-footer__social-link {
+  @apply w-8 h-8 flex items-center justify-center rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-violet-600 dark:hover:text-violet-400 hover:border-violet-300 dark:hover:border-violet-700 no-underline hover:no-underline transition-colors duration-200;
+}
+
+.forja-footer__social-icon {
+  @apply flex items-center justify-center;
+}
+
+.forja-footer__sr-only {
+  @apply sr-only;
+}
+
+.forja-footer__bottom {
+  @apply max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 border-t border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-zinc-400 dark:text-zinc-500;
+}
+
+.forja-footer__copyright {
+  /* no additional styles needed */
+}
+
+.forja-footer__bottom-links {
+  @apply flex items-center gap-3;
+}
+
+.forja-footer__bottom-link {
+  @apply hover:text-violet-600 dark:hover:text-violet-400 no-underline hover:no-underline transition-colors;
+}
+
+/* ---- Hero --------------------------------------------------------------- */
+
+.forja-hero {
+  @apply relative py-20 px-6;
+}
+
+.forja-hero__image {
+  @apply absolute inset-0 w-full h-full object-cover opacity-20;
+}
+
+.forja-hero__content {
+  @apply relative max-w-3xl mx-auto text-center;
+}
+
+.forja-hero__title {
+  @apply text-4xl md:text-5xl font-bold text-zinc-900 dark:text-white mb-6;
+}
+
+.forja-hero__text {
+  @apply text-lg leading-relaxed text-zinc-800 dark:text-zinc-200 mx-auto mb-8;
+}
+
+.forja-hero__cta {
+  @apply inline-block px-8 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-semibold transition-colors no-underline;
+}
+
+/* ---- Features ----------------------------------------------------------- */
+
+.forja-features {
+  @apply py-16 px-6;
+}
+
+.forja-features__header {
+  @apply max-w-6xl mx-auto;
+}
+
+.forja-features__title {
+  @apply text-3xl font-bold text-zinc-900 dark:text-white text-center mb-4;
+}
+
+.forja-features__text {
+  @apply text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-200 mx-auto text-center mb-12;
+}
+
+.forja-features__grid {
+  @apply max-w-6xl mx-auto grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3;
+}
+
+.forja-features__grid[data-columns="2"] {
+  @apply md:grid-cols-2 lg:grid-cols-2;
+}
+
+.forja-features__grid[data-columns="4"] {
+  @apply md:grid-cols-2 lg:grid-cols-4;
+}
+
+/* ---- CTA ---------------------------------------------------------------- */
+
+.forja-cta {
+  @apply py-16 px-6 bg-violet-50 dark:bg-violet-950/30 rounded-2xl;
+}
+
+.forja-cta__content {
+  @apply max-w-3xl mx-auto text-center;
+}
+
+.forja-cta__title {
+  @apply text-3xl font-bold text-zinc-900 dark:text-white mb-4;
+}
+
+.forja-cta__text {
+  @apply text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-200 mx-auto mb-8;
+}
+
+.forja-cta__button {
+  @apply inline-block px-8 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-semibold transition-colors no-underline;
+}
+
+.forja-cta__image {
+  @apply max-w-full rounded-lg mb-6 mx-auto;
+}
+
+/* ---- Gallery ------------------------------------------------------------ */
+
+.forja-gallery {
+  @apply py-16 px-6;
+}
+
+.forja-gallery__title {
+  @apply text-3xl font-bold text-zinc-900 dark:text-white text-center mb-8;
+}
+
+.forja-gallery__text {
+  @apply text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-200 mx-auto text-center mb-8;
+}
+
+.forja-gallery__grid {
+  @apply max-w-6xl mx-auto grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3;
+}
+
+.forja-gallery__grid[data-columns="2"] {
+  @apply md:grid-cols-2 lg:grid-cols-2;
+}
+
+.forja-gallery__grid[data-columns="4"] {
+  @apply md:grid-cols-2 lg:grid-cols-4;
+}
+
+.forja-gallery__image {
+  @apply w-full rounded-lg;
+}
+
+.forja-gallery__caption {
+  @apply text-sm text-zinc-500 dark:text-zinc-400 mt-2;
+}
+
+/* ---- Testimonials ------------------------------------------------------- */
+
+.forja-testimonials {
+  @apply py-16 px-6 bg-zinc-50 dark:bg-zinc-800/30 rounded-2xl;
+}
+
+.forja-testimonials__title {
+  @apply text-3xl font-bold text-zinc-900 dark:text-white text-center mb-10;
+}
+
+.forja-testimonials__text {
+  @apply text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-200 mx-auto text-center mb-10;
+}
+
+.forja-testimonials__list {
+  @apply max-w-6xl mx-auto grid gap-6 grid-cols-1 md:grid-cols-2;
+}
+
+.forja-testimonials__list[data-columns="3"] {
+  @apply md:grid-cols-2 lg:grid-cols-3;
+}
+
+.forja-testimonials__item {
+  @apply p-6 bg-white dark:bg-zinc-800 rounded-lg;
+}
+
+.forja-testimonials__quote {
+  @apply text-zinc-700 dark:text-zinc-300 mb-4;
+}
+
+.forja-testimonials__attribution {
+  @apply flex items-center gap-3;
+}
+
+.forja-testimonials__avatar {
+  @apply w-10 h-10 rounded-full;
+}
+
+.forja-testimonials__name {
+  @apply font-semibold text-zinc-900 dark:text-white block;
+}
+
+.forja-testimonials__role {
+  @apply text-sm text-zinc-500 dark:text-zinc-400 block;
+}
+
+/* ---- Pricing ------------------------------------------------------------ */
+
+.forja-pricing {
+  @apply py-16 px-6;
+}
+
+.forja-pricing__header {
+  @apply max-w-6xl mx-auto;
+}
+
+.forja-pricing__title {
+  @apply text-3xl font-bold text-zinc-900 dark:text-white text-center mb-4;
+}
+
+.forja-pricing__text {
+  @apply text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-200 mx-auto text-center mb-12;
+}
+
+.forja-pricing__tiers {
+  @apply max-w-6xl mx-auto grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3;
+}
+
+.forja-pricing__tiers[data-columns="2"] {
+  @apply md:grid-cols-2 lg:grid-cols-2;
+}
+
+.forja-pricing__tiers[data-columns="4"] {
+  @apply md:grid-cols-2 lg:grid-cols-4;
+}
+
+.forja-pricing__tier {
+  @apply p-6 bg-white dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700;
+}
+
+.forja-pricing__tier--highlighted {
+  @apply border-violet-500 ring-2 ring-violet-500;
+}
+
+.forja-pricing__tier-name {
+  @apply text-xl font-bold text-zinc-900 dark:text-white mb-2;
+}
+
+.forja-pricing__amount {
+  @apply text-3xl font-bold text-violet-600 dark:text-violet-400;
+}
+
+.forja-pricing__period {
+  @apply text-sm text-zinc-500 dark:text-zinc-400;
+}
+
+.forja-pricing__description {
+  @apply text-zinc-600 dark:text-zinc-300 mt-2 mb-4;
+}
+
+.forja-pricing__features {
+  @apply list-none pl-0 mb-6 space-y-2;
+}
+
+.forja-pricing__feature {
+  @apply text-zinc-700 dark:text-zinc-300;
+}
+
+.forja-pricing__cta {
+  @apply inline-block w-full text-center px-6 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-semibold transition-colors no-underline;
+}
+
+/* ---- FAQ ---------------------------------------------------------------- */
+
+.forja-faq {
+  @apply py-16 px-6;
+}
+
+.forja-faq__title {
+  @apply text-3xl font-bold text-zinc-900 dark:text-white text-center mb-10;
+}
+
+.forja-faq__text {
+  @apply text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-200 mx-auto text-center mb-10;
+}
+
+.forja-faq__list {
+  @apply max-w-3xl mx-auto divide-y divide-zinc-200 dark:divide-zinc-700;
+}
+
+.forja-faq__item {
+  @apply py-4;
+}
+
+.forja-faq__question {
+  @apply font-semibold text-zinc-900 dark:text-white cursor-pointer py-2;
+}
+
+.forja-faq__answer {
+  @apply text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-200 pt-2 pb-4;
+}
+
+/* ---- Contact ------------------------------------------------------------ */
+
+.forja-contact {
+  @apply py-16 px-6;
+}
+
+.forja-contact__content {
+  @apply max-w-2xl mx-auto text-center;
+}
+
+.forja-contact__title {
+  @apply text-3xl font-bold text-zinc-900 dark:text-white mb-4;
+}
+
+.forja-contact__text {
+  @apply text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-200 mx-auto mb-8;
+}
+
+.forja-contact__cta {
+  @apply inline-block px-8 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-semibold transition-colors no-underline mb-8;
+}
+
+.forja-contact__form {
+  @apply max-w-2xl mx-auto space-y-4;
+}
+
+.forja-contact__label {
+  @apply block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1;
+}
+
+.forja-contact__input {
+  @apply w-full px-4 py-2 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-lg focus:ring-2 focus:ring-violet-500;
+}
+
+.forja-contact__input--textarea {
+  @apply min-h-32 resize-y;
+}
+
+.forja-contact__submit {
+  @apply px-8 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-semibold transition-colors cursor-pointer;
+}
+
+/* ---- Newsletter --------------------------------------------------------- */
+
+.forja-newsletter {
+  @apply py-16 px-6;
+}
+
+.forja-newsletter__title {
+  @apply text-3xl font-bold text-zinc-900 dark:text-white text-center mb-4;
+}
+
+.forja-newsletter__text {
+  @apply text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-200 mx-auto text-center mb-8;
+}
+
+.forja-newsletter__form {
+  @apply max-w-md mx-auto space-y-4;
+}
+
+.forja-newsletter__label {
+  @apply block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1;
+}
+
+.forja-newsletter__input {
+  @apply w-full px-4 py-2 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded-lg focus:ring-2 focus:ring-violet-500;
+}
+
+.forja-newsletter__submit {
+  @apply w-full px-8 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-semibold transition-colors cursor-pointer;
+}
+
+/* ---- Stats -------------------------------------------------------------- */
+
+.forja-stats {
+  @apply py-16 px-6;
+}
+
+.forja-stats__title {
+  @apply text-3xl font-bold text-zinc-900 dark:text-white text-center mb-4;
+}
+
+.forja-stats__text {
+  @apply text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-200 mx-auto text-center mb-12;
+}
+
+.forja-stats__list {
+  @apply max-w-6xl mx-auto grid gap-8 grid-cols-2 md:grid-cols-4;
+}
+
+.forja-stats__item {
+  @apply text-center;
+}
+
+.forja-stats__value {
+  @apply text-3xl font-bold text-violet-600 dark:text-violet-400;
+}
+
+.forja-stats__label {
+  @apply text-sm text-zinc-500 dark:text-zinc-400 mt-1 font-normal;
+}
+
+/* ---- Team --------------------------------------------------------------- */
+
+.forja-team {
+  @apply py-16 px-6;
+}
+
+.forja-team__title {
+  @apply text-3xl font-bold text-zinc-900 dark:text-white text-center mb-4;
+}
+
+.forja-team__text {
+  @apply text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-200 mx-auto text-center mb-12;
+}
+
+.forja-team__grid {
+  @apply max-w-6xl mx-auto grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 list-none pl-0;
+}
+
+.forja-team__member {
+  @apply text-center;
+}
+
+.forja-team__image {
+  @apply w-24 h-24 rounded-full mx-auto mb-4 object-cover;
+}
+
+.forja-team__name {
+  @apply text-lg font-bold text-zinc-900 dark:text-white;
+}
+
+.forja-team__role {
+  @apply text-sm text-zinc-500 dark:text-zinc-400;
+}
+
+.forja-team__bio {
+  @apply text-sm text-zinc-600 dark:text-zinc-300 mt-2;
+}
+
+/* ---- Timeline ----------------------------------------------------------- */
+
+.forja-timeline {
+  @apply py-16 px-6;
+}
+
+.forja-timeline__title {
+  @apply text-3xl font-bold text-zinc-900 dark:text-white text-center mb-4;
+}
+
+.forja-timeline__text {
+  @apply text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-200 mx-auto text-center mb-12;
+}
+
+.forja-timeline__list {
+  @apply max-w-3xl mx-auto space-y-8 list-none pl-0;
+}
+
+.forja-timeline__item {
+  @apply border-l-2 border-violet-500 pl-6 relative;
+}
+
+.forja-timeline__date {
+  @apply text-sm text-violet-600 dark:text-violet-400 font-semibold;
+}
+
+.forja-timeline__event-title {
+  @apply text-lg font-bold text-zinc-900 dark:text-white;
+}
+
+.forja-timeline__event-text {
+  @apply text-sm leading-relaxed text-zinc-800 dark:text-zinc-200 mt-1;
+}
+
+/* ---- Logo Cloud --------------------------------------------------------- */
+
+.forja-logo-cloud {
+  @apply py-16 px-6;
+}
+
+.forja-logo-cloud__title {
+  @apply text-3xl font-bold text-zinc-900 dark:text-white text-center mb-4;
+}
+
+.forja-logo-cloud__text {
+  @apply text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-200 mx-auto text-center mb-12;
+}
+
+.forja-logo-cloud__grid {
+  @apply max-w-6xl mx-auto flex flex-wrap justify-center items-center gap-8 list-none pl-0;
+}
+
+.forja-logo-cloud__image {
+  @apply h-12 w-auto;
+}
+
+.forja-logo-cloud--grayscale .forja-logo-cloud__image {
+  @apply grayscale hover:grayscale-0 transition-all;
+}
+
+/* ---- Text Block --------------------------------------------------------- */
+
+.forja-text {
+  @apply py-12 px-6;
+}
+
+.forja-text__title {
+  @apply text-3xl font-bold text-zinc-900 dark:text-white mb-6;
+}
+
+.forja-text__content {
+  @apply text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-200;
+}
+
+.forja-text--narrow {
+  @apply max-w-2xl mx-auto;
+}
+
+.forja-text--center {
+  @apply text-center;
+}
+
+.forja-text--center .forja-text__content {
+  @apply mx-auto;
+}
+
+/* ---- Divider ------------------------------------------------------------ */
+
+.forja-divider {
+  @apply my-8;
+}
+
+.forja-divider__label {
+  @apply text-sm text-zinc-400 dark:text-zinc-500;
+}
+
+/* ---- Video -------------------------------------------------------------- */
+
+.forja-video {
+  @apply py-16 px-6;
+}
+
+.forja-video__title {
+  @apply text-3xl font-bold text-zinc-900 dark:text-white text-center mb-4;
+}
+
+.forja-video__text {
+  @apply text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-200 mx-auto text-center mb-8;
+}
+
+.forja-video__container {
+  @apply max-w-4xl mx-auto relative overflow-hidden rounded-lg;
+}
+
+.forja-video--16-9 .forja-video__container {
+  aspect-ratio: 16 / 9;
+}
+
+.forja-video--4-3 .forja-video__container {
+  aspect-ratio: 4 / 3;
+}
+
+.forja-video--1-1 .forja-video__container {
+  aspect-ratio: 1 / 1;
+}
+
+.forja-video__player,
+.forja-video__embed {
+  @apply w-full h-full object-cover;
+}
+
+.forja-video__embed {
+  @apply border-0;
+}
+
+/* ---- Portfolio / CV ------------------------------------------------------ */
+
+.forja-portfolio {
+  @apply py-16 px-6;
+}
+
+.forja-portfolio__title {
+  @apply text-3xl font-bold text-zinc-900 dark:text-white text-center mb-4;
+}
+
+.forja-portfolio__text {
+  @apply text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-200 mx-auto text-center mb-12;
+}
+
+.forja-portfolio__group-title {
+  @apply text-2xl font-semibold text-zinc-900 dark:text-white mb-6;
+}
+
+.forja-portfolio__list {
+  @apply list-none pl-0 space-y-6 mb-12;
+}
+
+.forja-portfolio__card {
+  @apply flex gap-4 items-start;
+}
+
+.forja-portfolio__logo {
+  @apply w-12 h-12 rounded-lg object-contain shrink-0;
+}
+
+.forja-portfolio__details {
+  @apply flex-1;
+}
+
+.forja-portfolio__role {
+  @apply text-lg font-bold text-zinc-900 dark:text-white;
+}
+
+.forja-portfolio__company {
+  @apply text-zinc-600 dark:text-zinc-400;
+}
+
+.forja-portfolio__period {
+  @apply text-sm text-violet-600 dark:text-violet-400 font-medium block mt-1;
+}
+
+.forja-portfolio__description {
+  @apply text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-200 mt-2;
+}
+
+.forja-portfolio__skill-category {
+  @apply text-lg font-semibold text-zinc-700 dark:text-zinc-300 mb-3;
+}
+
+.forja-portfolio__skill-list {
+  @apply flex flex-wrap gap-2 list-none pl-0 mb-6;
+}
+
+.forja-portfolio__skill {
+  @apply px-3 py-1 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-full text-sm;
+}
+
+/* ---- Tag Cloud ---------------------------------------------------------- */
+
+.forja-tag-cloud {
+  @apply py-16 px-6;
+}
+
+.forja-tag-cloud__title {
+  @apply text-3xl font-bold text-zinc-900 dark:text-white text-center mb-4;
+}
+
+.forja-tag-cloud__text {
+  @apply text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-200 mx-auto text-center mb-8;
+}
+
+.forja-tag-cloud__list {
+  @apply flex flex-wrap justify-center gap-3 list-none pl-0;
+}
+
+a.forja-tag-cloud__tag {
+  @apply inline-flex items-center gap-1 px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-full text-sm hover:bg-violet-100 dark:hover:bg-violet-900/30 hover:text-violet-700 dark:hover:text-violet-400 transition-colors no-underline;
+}
+
+span.forja-tag-cloud__tag {
+  @apply inline-flex items-center gap-1 px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-full text-sm;
+}
+
+.forja-tag-cloud__count {
+  @apply text-zinc-400 dark:text-zinc-500 text-xs;
+}
+
+/* ---- Projects ----------------------------------------------------------- */
+
+.forja-projects {
+  @apply py-16 px-6;
+}
+
+.forja-projects__title {
+  @apply text-3xl font-bold text-zinc-900 dark:text-white text-center mb-4;
+}
+
+.forja-projects__text {
+  @apply text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-200 mx-auto text-center mb-12;
+}
+
+.forja-projects__grid {
+  @apply max-w-6xl mx-auto grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3;
+}
+
+.forja-projects__grid[data-columns="2"] {
+  @apply md:grid-cols-2 lg:grid-cols-2;
+}
+
+.forja-projects__grid[data-columns="4"] {
+  @apply md:grid-cols-2 lg:grid-cols-4;
+}
+
+.forja-projects__card {
+  @apply bg-white dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700 overflow-hidden;
+}
+
+.forja-projects__image {
+  @apply w-full aspect-video object-cover;
+}
+
+.forja-projects__content {
+  @apply p-5;
+}
+
+.forja-projects__header {
+  @apply flex items-start justify-between gap-2 mb-2;
+}
+
+.forja-projects__name {
+  @apply text-lg font-bold text-zinc-900 dark:text-white;
+}
+
+.forja-projects__link {
+  @apply text-zinc-900 dark:text-white no-underline hover:text-violet-600 dark:hover:text-violet-400;
+}
+
+.forja-projects__status {
+  @apply text-xs px-2 py-0.5 rounded-full bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400 font-medium shrink-0;
+}
+
+.forja-projects__description {
+  @apply text-sm text-zinc-600 dark:text-zinc-300 mb-3;
+}
+
+.forja-projects__tags {
+  @apply flex flex-wrap gap-1.5 list-none pl-0;
+}
+
+.forja-projects__tag {
+  @apply text-xs px-2 py-0.5 bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-400 rounded;
+}
+
+/* ---- Blog --------------------------------------------------------------- */
+
+.forja-blog {
+  @apply py-16 px-6;
+}
+
+.forja-blog__title {
+  @apply text-3xl font-bold text-zinc-900 dark:text-white text-center mb-4;
+}
+
+.forja-blog__text {
+  @apply text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-200 mx-auto text-center mb-12;
+}
+
+.forja-blog__grid {
+  @apply max-w-6xl mx-auto grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3;
+}
+
+.forja-blog__grid[data-columns="2"] {
+  @apply md:grid-cols-2 lg:grid-cols-2;
+}
+
+.forja-blog__grid[data-columns="4"] {
+  @apply md:grid-cols-2 lg:grid-cols-4;
+}
+
+.forja-blog__card {
+  @apply bg-white dark:bg-zinc-800 rounded-lg border border-zinc-200 dark:border-zinc-700 overflow-hidden;
+}
+
+.forja-blog__image-link {
+  @apply block;
+}
+
+.forja-blog__image {
+  @apply w-full aspect-video object-cover;
+}
+
+.forja-blog__content {
+  @apply p-5;
+}
+
+.forja-blog__meta {
+  @apply flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 mb-2;
+}
+
+.forja-blog__date {
+  @apply text-violet-600 dark:text-violet-400 font-medium;
+}
+
+.forja-blog__author::before {
+  content: "·";
+  @apply mr-2;
+}
+
+.forja-blog__post-title {
+  @apply text-lg font-bold text-zinc-900 dark:text-white mb-2;
+}
+
+.forja-blog__link {
+  @apply text-zinc-900 dark:text-white no-underline hover:text-violet-600 dark:hover:text-violet-400;
+}
+
+.forja-blog__excerpt {
+  @apply text-sm text-zinc-600 dark:text-zinc-300 line-clamp-3;
+}
+
+.forja-blog__footer {
+  @apply text-center mt-10;
+}
+
+.forja-blog__cta {
+  @apply inline-block px-8 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-semibold transition-colors no-underline;
+}
+
+/* ---- Legal -------------------------------------------------------------- */
+
+.forja-legal {
+  @apply py-16 px-6 max-w-3xl mx-auto;
+}
+
+.forja-legal__header {
+  @apply mb-10;
+}
+
+.forja-legal__title {
+  @apply text-3xl font-bold text-zinc-900 dark:text-white mb-4;
+}
+
+.forja-legal__meta {
+  @apply flex flex-wrap items-center gap-3 text-sm;
+}
+
+.forja-legal__type {
+  @apply px-3 py-1 bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400 rounded-full font-medium;
+}
+
+.forja-legal__version {
+  @apply px-3 py-1 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded-full;
+}
+
+.forja-legal__date {
+  @apply text-zinc-500 dark:text-zinc-400;
+}
+
+.forja-legal__intro {
+  @apply text-lg leading-relaxed text-zinc-600 dark:text-zinc-300 border-l-4 border-violet-500 pl-4 mb-10;
+}
+
+.forja-legal__body {
+  @apply text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-200;
+}
+
+.forja-legal__body h2 {
+  @apply text-2xl font-semibold text-zinc-900 dark:text-zinc-100 mt-10 mb-3;
+}
+
+.forja-legal__body h3 {
+  @apply text-xl font-semibold text-zinc-900 dark:text-zinc-100 mt-8 mb-3;
+}
+
+.forja-legal__body p {
+  @apply mb-4;
+}
+
+.forja-legal__body ul {
+  @apply mb-4 pl-6 list-disc;
+}
+
+.forja-legal__body ol {
+  @apply mb-4 pl-6 list-decimal;
+}
+
+.forja-legal__body li {
+  @apply mb-1;
+}
+
+.forja-legal__body a {
+  @apply text-violet-600 dark:text-violet-400 underline underline-offset-2;
+}
+
+.forja-legal__body table {
+  @apply w-full border-collapse mb-6;
+}
+
+.forja-legal__body th,
+.forja-legal__body td {
+  @apply border border-zinc-200 dark:border-zinc-700 px-4 py-2 text-left;
+}
+
+.forja-legal__body th {
+  @apply bg-zinc-50 dark:bg-zinc-800 font-semibold;
+}
+
+/* ---- Custom / Fallback -------------------------------------------------- */
+
+.forja-custom {
+  @apply py-12 px-6;
+}
+
+.forja-custom__title {
+  @apply text-3xl font-bold text-zinc-900 dark:text-white mb-6;
+}
+
+.forja-custom__text {
+  @apply text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-200;
+}
+
+/* ---- Prevent FOUC for unregistered custom elements ---------------------- */
+
+forja-hero:not(:defined),
+forja-features:not(:defined),
+forja-cta:not(:defined),
+forja-gallery:not(:defined),
+forja-testimonials:not(:defined),
+forja-pricing:not(:defined),
+forja-faq:not(:defined),
+forja-contact:not(:defined),
+forja-stats:not(:defined),
+forja-team:not(:defined),
+forja-timeline:not(:defined),
+forja-logo-cloud:not(:defined),
+forja-newsletter:not(:defined),
+forja-video:not(:defined),
+forja-text-block:not(:defined),
+forja-divider:not(:defined),
+forja-legal:not(:defined),
+forja-portfolio:not(:defined),
+forja-tag-cloud:not(:defined),
+forja-projects:not(:defined),
+forja-blog:not(:defined),
+forja-section-renderer:not(:defined) {
+  display: block;
+  min-height: 4rem;
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "slug": "welcome-to-your-new-site",
+    "title": "Welcome to your new site",
+    "excerpt": "Your site is ready — here's what you can do with it.",
+    "body": "This is your first post. Feel free to edit it, delete it, or start fresh — it's all yours.\n\nUse the editor toolbar to add **bold text**, *italics*, headings, images, and more. When you're happy with your post, click **Publish** to share it with the world."
+  },
+  {
+    "slug": "getting-started-with-forja",
+    "title": "Getting started with Forja",
+    "excerpt": "A quick tour of the key features that make Forja powerful.",
+    "body": "Forja is a modern content management system designed for speed and flexibility.\n\n## Key Features\n\n- **Rich Editor** — Write with a block-based editor that supports headings, images, code blocks, and more\n- **Categories & Tags** — Organize your content with a flexible taxonomy system\n- **Multi-language** — Publish content in multiple languages with built-in localization\n- **Media Library** — Upload and manage images, documents, and other files\n\n## Next Steps\n\n1. Edit this post to make it your own\n2. Create your first original post\n3. Set up your site navigation"
+  },
+  {
+    "slug": "your-first-real-post",
+    "title": "Your first real post (delete me)",
+    "excerpt": "A blank canvas ready for your ideas.",
+    "body": "Replace this text with your own content. What will you write about?\n\nTip: Use the `/` key to insert blocks like headings, images, and quotes."
+  }
+]

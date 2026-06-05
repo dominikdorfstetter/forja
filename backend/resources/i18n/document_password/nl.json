@@ -1,0 +1,15 @@
+{
+  "title": "Beveiligd document — Forja",
+  "heading": "Beveiligd document",
+  "subtitle": "Dit bestand is versleuteld en vereist een wachtwoord",
+  "badgeEncrypted": "AES-256-versleuteld",
+  "passwordLabel": "Wachtwoord",
+  "passwordPlaceholder": "Voer documentwachtwoord in",
+  "submitButton": "Ontgrendelen en downloaden",
+  "verifying": "Controleren…",
+  "downloaded": "✓ Gedownload",
+  "incorrectPassword": "Onjuist wachtwoord",
+  "expired": "Dit document is niet meer beschikbaar",
+  "locked": "Te veel onjuiste pogingen — neem contact op met de eigenaar van het document",
+  "footer": "Beveiligd door Forja"
+}

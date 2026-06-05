@@ -1,0 +1,327 @@
+---
+import Base from "../../layouts/Base.astro";
+import SeoHead from "../../components/SeoHead.astro";
+import { fetchSite, getApiBaseUrl, getSiteDomain, getSiteUrl } from "../../lib/api";
+import { buildSeoMeta } from "../../lib/seo";
+
+// Self-service lookup page (#591).
+//
+// Three-step UI driven by an inline script — no SSR data fetch:
+// 1. Enter reference code -> POST /public/submissions/lookup -> show status
+// 2. "View full data" -> GET /public/submissions/{code} -> render fields
+// 3. "Delete my data" -> DELETE /public/submissions/{code} -> confirmation
+//
+// Everything is unauthenticated; the reference code is the sole proof.
+
+const apiBaseUrl = getApiBaseUrl();
+const siteDomain = getSiteDomain() ?? "";
+const siteUrl = getSiteUrl();
+const site = await fetchSite().catch(() => null);
+const siteName = site?.name ?? "My Site";
+
+const seo = buildSeoMeta({
+  title: "Manage Your Submission",
+  description:
+    "Look up, view, or delete a form submission you made - using only your reference code.",
+  canonicalUrl: `${siteUrl}/forms/lookup`,
+  siteUrl,
+  siteName,
+});
+
+Astro.response.headers.set("Cache-Control", "private, no-store");
+---
+
+<Base title="Manage Your Submission" description="Look up or delete a submission by reference code.">
+  <SeoHead seo={seo} slot="head" />
+
+  <section
+    class="max-w-2xl mx-auto px-4 py-12"
+    data-api-base={apiBaseUrl}
+    data-site-domain={siteDomain}
+  >
+    <header class="mb-8">
+      <h1 class="text-3xl font-bold text-zinc-900 dark:text-zinc-50">Manage your submission</h1>
+      <p class="mt-2 text-zinc-600 dark:text-zinc-400">
+        Enter the reference code you received when submitting a form to view
+        your data or request its deletion.
+      </p>
+    </header>
+
+    <form id="lookup-form" class="space-y-4" novalidate>
+      <div>
+        <label for="reference-code" class="block text-sm font-medium text-zinc-700 dark:text-zinc-200 mb-1">
+          Reference code
+        </label>
+        <input
+          id="reference-code"
+          name="reference_code"
+          type="text"
+          required
+          autocomplete="off"
+          inputmode="text"
+          spellcheck="false"
+          placeholder="XXXX-XXXX-XXXX"
+          pattern="[A-Za-z0-9\-]{1,32}"
+          class="w-full font-mono uppercase tracking-wider rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-violet-500"
+        />
+        <p id="lookup-error" class="hidden mt-1.5 text-sm text-red-600 dark:text-red-400" role="alert"></p>
+      </div>
+      <button
+        type="submit"
+        id="lookup-submit"
+        class="inline-flex items-center justify-center gap-2 rounded-md bg-violet-600 hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2.5 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+      >
+        Look up my submission
+      </button>
+    </form>
+
+    <div id="submission-panel" class="hidden mt-8" aria-live="polite">
+      <div class="rounded-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 p-5">
+        <div class="flex items-center justify-between gap-4 mb-4">
+          <p class="text-sm text-zinc-500 dark:text-zinc-400">
+            Status:
+            <span data-submission-status class="font-medium text-zinc-900 dark:text-zinc-100 ml-1"></span>
+          </p>
+          <p class="text-sm text-zinc-500 dark:text-zinc-400">
+            Submitted:
+            <span data-submission-date class="font-medium text-zinc-900 dark:text-zinc-100 ml-1"></span>
+          </p>
+        </div>
+
+        <h2 class="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-3">Your submitted data</h2>
+        <dl id="submission-fields" class="space-y-3"></dl>
+
+        <div class="mt-6 pt-5 border-t border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row gap-3">
+          <button
+            type="button"
+            id="delete-submission"
+            class="inline-flex items-center justify-center gap-2 rounded-md bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+          >
+            Delete my data
+          </button>
+          <button
+            type="button"
+            id="cancel-view"
+            class="inline-flex items-center justify-center rounded-md border border-zinc-300 dark:border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-400"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="deleted-panel"
+      class="hidden mt-8 rounded-md bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 p-5"
+      role="status"
+      aria-live="polite"
+    >
+      <p class="font-medium text-emerald-900 dark:text-emerald-100">Your submission has been deleted.</p>
+      <p class="text-sm text-emerald-800 dark:text-emerald-200 mt-1">
+        We've removed your data from our systems. The reference code is no
+        longer valid.
+      </p>
+    </div>
+  </section>
+</Base>
+
+<dialog
+  id="delete-confirm"
+  class="rounded-lg p-0 backdrop:bg-black/40 max-w-md w-full"
+>
+  <form method="dialog" class="bg-white dark:bg-zinc-900 rounded-lg overflow-hidden">
+    <div class="p-5">
+      <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-50">Delete your submission?</h3>
+      <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+        This permanently removes your data. The reference code will become
+        invalid and you won't be able to recover the submission.
+      </p>
+    </div>
+    <div class="bg-zinc-50 dark:bg-zinc-950 px-5 py-3 flex flex-row-reverse gap-2 border-t border-zinc-200 dark:border-zinc-800">
+      <button
+        value="confirm"
+        type="submit"
+        class="inline-flex items-center justify-center rounded-md bg-red-600 hover:bg-red-700 text-white px-4 py-2 text-sm font-medium"
+      >
+        Delete permanently
+      </button>
+      <button
+        value="cancel"
+        type="submit"
+        class="inline-flex items-center justify-center rounded-md border border-zinc-300 dark:border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+      >
+        Cancel
+      </button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+  type LookupResult = { status: string; created_at: string };
+  type SubmissionDetail = {
+    reference_code: string;
+    status: string;
+    data: Record<string, unknown>;
+    created_at: string;
+  };
+
+  const section = document.querySelector<HTMLElement>("[data-api-base]");
+  const apiBase = section!.dataset.apiBase!;
+  const siteDomain = section!.dataset.siteDomain ?? "";
+  const headers: HeadersInit = siteDomain ? { "X-Site-Domain": siteDomain } : {};
+
+  const lookupForm = document.getElementById("lookup-form") as HTMLFormElement;
+  const codeInput = document.getElementById("reference-code") as HTMLInputElement;
+  const lookupError = document.getElementById("lookup-error")!;
+  const submissionPanel = document.getElementById("submission-panel")!;
+  const deletedPanel = document.getElementById("deleted-panel")!;
+  const statusEl = submissionPanel.querySelector<HTMLElement>("[data-submission-status]")!;
+  const dateEl = submissionPanel.querySelector<HTMLElement>("[data-submission-date]")!;
+  const fieldsEl = document.getElementById("submission-fields")!;
+  const deleteBtn = document.getElementById("delete-submission") as HTMLButtonElement;
+  const cancelBtn = document.getElementById("cancel-view") as HTMLButtonElement;
+  const deleteConfirm = document.getElementById("delete-confirm") as HTMLDialogElement;
+  let currentCode: string | null = null;
+
+  function showError(msg: string) {
+    lookupError.textContent = msg;
+    lookupError.classList.remove("hidden");
+  }
+  function clearError() {
+    lookupError.textContent = "";
+    lookupError.classList.add("hidden");
+  }
+
+  function normalizeCode(raw: string): string {
+    return raw.trim().toUpperCase();
+  }
+
+  async function lookupAndShow(code: string) {
+    const lookupRes = await fetch(`${apiBase}/public/submissions/lookup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...headers },
+      body: JSON.stringify({ reference_code: code }),
+    });
+    if (lookupRes.status === 404) {
+      showError("Reference code not recognised.");
+      return;
+    }
+    if (lookupRes.status === 410) {
+      showError("This submission has already been deleted.");
+      return;
+    }
+    if (lookupRes.status === 429) {
+      showError("Too many lookups in a short period - please wait a minute and try again.");
+      return;
+    }
+    if (!lookupRes.ok) {
+      showError(`Lookup failed (status ${lookupRes.status}).`);
+      return;
+    }
+    const lookup = (await lookupRes.json()) as LookupResult;
+
+    const detailRes = await fetch(`${apiBase}/public/submissions/${encodeURIComponent(code)}`, { headers });
+    if (!detailRes.ok) {
+      showError(`Unable to load submission (status ${detailRes.status}).`);
+      return;
+    }
+    const detail = (await detailRes.json()) as SubmissionDetail;
+
+    renderSubmission(detail, lookup);
+    currentCode = code;
+  }
+
+  function renderSubmission(detail: SubmissionDetail, lookup: LookupResult) {
+    statusEl.textContent = detail.status;
+    const d = new Date(lookup.created_at);
+    dateEl.textContent = Number.isNaN(d.getTime()) ? lookup.created_at : d.toLocaleString();
+
+    // Replace children rather than setting innerHTML — keeps everything
+    // textContent-only so no untrusted string ever reaches the DOM parser.
+    fieldsEl.replaceChildren();
+    for (const [label, value] of Object.entries(detail.data)) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "grid grid-cols-1 sm:grid-cols-3 gap-1.5";
+
+      const dt = document.createElement("dt");
+      dt.className = "text-sm font-medium text-zinc-600 dark:text-zinc-400";
+      dt.textContent = label;
+
+      const dd = document.createElement("dd");
+      dd.className = "text-sm text-zinc-900 dark:text-zinc-100 sm:col-span-2 whitespace-pre-wrap break-words";
+      dd.textContent = formatValue(value);
+
+      wrapper.appendChild(dt);
+      wrapper.appendChild(dd);
+      fieldsEl.appendChild(wrapper);
+    }
+    submissionPanel.classList.remove("hidden");
+    lookupForm.classList.add("hidden");
+  }
+
+  function formatValue(v: unknown): string {
+    if (v === null || v === undefined) return "-";
+    if (Array.isArray(v)) return v.map(formatValue).join(", ");
+    if (typeof v === "boolean") return v ? "Yes" : "No";
+    if (typeof v === "object") return JSON.stringify(v);
+    return String(v);
+  }
+
+  async function performDelete() {
+    if (!currentCode) return;
+    deleteBtn.disabled = true;
+    try {
+      const res = await fetch(`${apiBase}/public/submissions/${encodeURIComponent(currentCode)}`, {
+        method: "DELETE",
+        headers,
+      });
+      if (res.status === 204 || res.status === 410) {
+        submissionPanel.classList.add("hidden");
+        deletedPanel.classList.remove("hidden");
+        currentCode = null;
+        return;
+      }
+      if (res.status === 404) {
+        showError("Reference code not recognised.");
+        return;
+      }
+      showError(`Delete failed (status ${res.status}).`);
+    } catch {
+      showError("Network error - please try again.");
+    } finally {
+      deleteBtn.disabled = false;
+    }
+  }
+
+  lookupForm.addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    clearError();
+    const code = normalizeCode(codeInput.value);
+    if (!code) {
+      showError("Please enter your reference code.");
+      return;
+    }
+    codeInput.value = code;
+    await lookupAndShow(code);
+  });
+
+  cancelBtn.addEventListener("click", () => {
+    submissionPanel.classList.add("hidden");
+    lookupForm.classList.remove("hidden");
+    currentCode = null;
+  });
+
+  deleteBtn.addEventListener("click", () => {
+    if (typeof deleteConfirm.showModal === "function") {
+      deleteConfirm.showModal();
+    } else if (confirm("Permanently delete this submission?")) {
+      performDelete();
+    }
+  });
+
+  deleteConfirm.addEventListener("close", () => {
+    if (deleteConfirm.returnValue === "confirm") {
+      performDelete();
+    }
+  });
+</script>

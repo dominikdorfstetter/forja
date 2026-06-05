@@ -1,0 +1,61 @@
+---
+import type {
+  PageSectionResponse,
+  SectionLocalizationResponse,
+} from "../lib/api";
+import { fetchMedia } from "../lib/api";
+import { renderMarkdown } from "../lib/markdown";
+
+interface Props {
+  section: PageSectionResponse;
+  localizations: SectionLocalizationResponse[];
+  localeId?: string;
+}
+
+const { section, localizations, localeId } = Astro.props;
+
+// Pick localization: prefer the active locale, fall back to first available
+const sectionLocs = localizations.filter((l) => l.page_section_id === section.id);
+const loc = (localeId ? sectionLocs.find((l) => l.locale_id === localeId) : null) ?? sectionLocs[0];
+const title = loc?.title ?? undefined;
+const text = renderMarkdown(loc?.text) ?? undefined;
+const buttonText = loc?.button_text ?? undefined;
+const buttonHref = section.call_to_action_route || undefined;
+const settings = (section.settings || {}) as Record<string, unknown>;
+const columns = (settings.columns as number) || undefined;
+
+let coverUrl: string | undefined;
+if (section.cover_image_id) {
+  try {
+    const media = await fetchMedia(section.cover_image_id);
+    coverUrl = media.public_url ?? undefined;
+  } catch {
+    // Skip cover image if not available
+  }
+}
+
+const sectionType = section.section_type;
+---
+
+{sectionType === 'Hero' && <forja-hero section-title={title} text={text} image-url={coverUrl} button-text={buttonText} button-href={buttonHref} />}
+{sectionType === 'Features' && <forja-features section-title={title} text={text} columns={columns} />}
+{sectionType === 'Cta' && <forja-cta section-title={title} text={text} button-text={buttonText} button-href={buttonHref} />}
+{sectionType === 'Gallery' && <forja-gallery section-title={title} text={text} columns={columns} />}
+{sectionType === 'Testimonials' && <forja-testimonials section-title={title} text={text} columns={columns} />}
+{sectionType === 'Pricing' && <forja-pricing section-title={title} text={text} columns={columns} />}
+{sectionType === 'Faq' && <forja-faq section-title={title} text={text} />}
+{sectionType === 'Contact' && <forja-contact section-title={title} text={text} button-text={buttonText} button-href={buttonHref} />}
+{sectionType === 'Stats' && <forja-stats section-title={title} text={text} columns={columns} />}
+{sectionType === 'Team' && <forja-team section-title={title} text={text} columns={columns} />}
+{sectionType === 'Timeline' && <forja-timeline section-title={title} text={text} />}
+{sectionType === 'LogoCloud' && <forja-logo-cloud section-title={title} text={text} columns={columns} />}
+{sectionType === 'Newsletter' && <forja-newsletter section-title={title} text={text} button-text={buttonText} />}
+{sectionType === 'Video' && <forja-video section-title={title} text={text} />}
+{sectionType === 'Divider' && <forja-divider />}
+{sectionType === 'Text' && <forja-text-block section-title={title} text={text} />}
+{sectionType === 'Portfolio' && <forja-portfolio section-title={title} text={text} columns={columns} />}
+{sectionType === 'TagCloud' && <forja-tag-cloud section-title={title} text={text} />}
+{sectionType === 'Projects' && <forja-projects section-title={title} text={text} columns={columns} />}
+{sectionType === 'Blog' && <forja-blog section-title={title} text={text} columns={columns} button-text={buttonText} button-href={buttonHref} />}
+{sectionType === 'Legal' && <forja-legal section-title={title} body={text} />}
+{(sectionType === 'Custom' || !['Hero','Features','Cta','Gallery','Testimonials','Pricing','Faq','Contact','Stats','Team','Timeline','LogoCloud','Newsletter','Video','Divider','Text','Portfolio','TagCloud','Projects','Blog','Legal'].includes(sectionType)) && <forja-section-renderer section-type={sectionType} section-title={title} text={text} />}

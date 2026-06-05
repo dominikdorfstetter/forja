@@ -1,0 +1,161 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { renderHook, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import type { ReactNode } from 'react';
+import { getUserPreferences, updateUserPreferences } from '@/services/auth';
+
+// Undo the global mock so we can test the real implementation
+vi.unmock('@/store/UserPreferencesContext');
+
+import { UserPreferencesProvider, useUserPreferences } from '../UserPreferencesContext';
+// Mock AuthContext
+vi.mock('@/store/AuthContext', () => ({
+  useAuth: () => ({
+    clerkUserId: 'user_test123',
+  }),
+}));
+
+// Mock ThemeContext
+vi.mock('@/theme/ThemeContext', () => ({
+  useThemeMode: () => ({
+    themeId: 'system',
+    setThemeId: vi.fn(),
+    resolvedFlavor: 'latte',
+    options: [],
+  }),
+}));
+
+// Mock i18next
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    i18n: {
+      language: 'en',
+      changeLanguage: vi.fn(),
+    },
+  }),
+}));
+
+const mockedApi = {
+  getUserPreferences: vi.mocked(getUserPreferences),
+  updateUserPreferences: vi.mocked(updateUserPreferences),
+};
+
+function createWrapper() {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  });
+  return function Wrapper({ children }: { children: ReactNode }) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <UserPreferencesProvider>{children}</UserPreferencesProvider>
+      </QueryClientProvider>
+    );
+  };
+}
+
+describe('UserPreferencesContext', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('returns default preferences while loading', () => {
+    mockedApi.getUserPreferences.mockReturnValue(new Promise(() => {})); // Never resolves
+    const { result } = renderHook(() => useUserPreferences(), { wrapper: createWrapper() });
+
+    expect(result.current.preferences).toHaveProperty('language');
+    expect(result.current.preferences).toHaveProperty('theme_id');
+    expect(result.current.isLoading).toBe(true);
+  });
+
+  it('returns server values when loaded', async () => {
+    mockedApi.getUserPreferences.mockResolvedValue({
+      language: 'de',
+      theme_id: 'mocha',
+      page_size: 50,
+    });
+
+    const { result } = renderHook(() => useUserPreferences(), { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+
+    expect(result.current.preferences).toEqual({
+      language: 'de',
+      theme_id: 'mocha',
+      page_size: 50,
+    });
+  });
+
+  it('calls API on updatePreferences', async () => {
+    mockedApi.getUserPreferences.mockResolvedValue({
+      language: 'en',
+      theme_id: 'system',
+      page_size: 25,
+    });
+    mockedApi.updateUserPreferences.mockResolvedValue({
+      language: 'en',
+      theme_id: 'system',
+      page_size: 50,
+    });
+
+    const { result } = renderHook(() => useUserPreferences(), { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+
+    await result.current.updatePreferences({ page_size: 50 });
+
+    expect(mockedApi.updateUserPreferences).toHaveBeenCalledWith({ page_size: 50 });
+  });
+
+  it('persists language change via API', async () => {
+    mockedApi.getUserPreferences.mockResolvedValue({
+      language: 'en',
+      theme_id: 'system',
+      page_size: 25,
+    });
+    mockedApi.updateUserPreferences.mockResolvedValue({
+      language: 'de',
+      theme_id: 'system',
+      page_size: 25,
+    });
+
+    const { result } = renderHook(() => useUserPreferences(), { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+
+    await result.current.updatePreferences({ language: 'de' });
+
+    expect(mockedApi.updateUserPreferences).toHaveBeenCalledWith({ language: 'de' });
+  });
+
+  it('persists theme change via API', async () => {
+    mockedApi.getUserPreferences.mockResolvedValue({
+      language: 'en',
+      theme_id: 'system',
+      page_size: 25,
+    });
+    mockedApi.updateUserPreferences.mockResolvedValue({
+      language: 'en',
+      theme_id: 'mocha',
+      page_size: 25,
+    });
+
+    const { result } = renderHook(() => useUserPreferences(), { wrapper: createWrapper() });
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+
+    await result.current.updatePreferences({ theme_id: 'mocha' });
+
+    expect(mockedApi.updateUserPreferences).toHaveBeenCalledWith({ theme_id: 'mocha' });
+  });
+});

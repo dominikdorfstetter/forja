@@ -1,0 +1,11 @@
+# Code owners for Forja.
+# These owners are requested for review automatically when matching files change.
+# Docs: https://docs.github.com/articles/about-code-owners
+
+# Default owner for everything in the repo.
+*                       @dominikdorfstetter
+
+# Security-sensitive surfaces — always reviewed by the maintainer.
+/.github/                @dominikdorfstetter
+/SECURITY.md             @dominikdorfstetter
+/backend/migrations/     @dominikdorfstetter
