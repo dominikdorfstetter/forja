@@ -1,0 +1,99 @@
+---
+import Base from "../layouts/Base.astro";
+import CvTimeline from "../components/CvTimeline.astro";
+import SeoHead from "../components/SeoHead.astro";
+import { fetchCvEntries, fetchSkills, fetchSite, getSiteUrl } from "../lib/api";
+import type { CvEntryResponse, SkillResponse } from "../lib/api";
+import { buildSeoMeta } from "../lib/seo";
+
+let entries: CvEntryResponse[] = [];
+let skills: SkillResponse[] = [];
+
+try {
+  entries = await fetchCvEntries();
+  // Sort by start_date descending (most recent first)
+  entries.sort(
+    (a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime(),
+  );
+} catch (e) {
+  console.warn("[CMS] Failed to fetch CV entries:", e instanceof Error ? e.message : e);
+}
+
+try {
+  skills = await fetchSkills();
+  // Sort by proficiency descending, then name
+  skills.sort((a, b) => {
+    const pa = a.proficiency_level ?? 0;
+    const pb = b.proficiency_level ?? 0;
+    if (pb !== pa) return pb - pa;
+    return a.name.localeCompare(b.name);
+  });
+} catch (e) {
+  console.warn("[CMS] Failed to fetch skills:", e instanceof Error ? e.message : e);
+}
+
+// Group skills by category
+const grouped = new Map<string, SkillResponse[]>();
+for (const skill of skills) {
+  const cat = skill.category ?? "Other";
+  const arr = grouped.get(cat) ?? [];
+  arr.push(skill);
+  grouped.set(cat, arr);
+}
+
+const site = await fetchSite().catch(() => null);
+const siteName = site?.name ?? "My Site";
+const siteUrl = getSiteUrl();
+
+const seo = buildSeoMeta({
+  title: `CV — ${siteName}`,
+  description: "Work experience, education, and skills.",
+  canonicalUrl: `${siteUrl}/cv/`,
+  siteUrl,
+  siteName,
+});
+
+Astro.response.headers.set("Cache-Control", "public, max-age=600, s-maxage=1800");
+---
+
+<Base title="CV" description="Work experience, education, and skills.">
+  <SeoHead seo={seo} slot="head" />
+  <div class="max-w-prose mx-auto">
+    <h1 class="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mb-8">Curriculum Vitae</h1>
+
+    {entries.length > 0 ? (
+      <CvTimeline entries={entries} />
+    ) : (
+      <p class="text-zinc-500 dark:text-zinc-400">No CV entries yet.</p>
+    )}
+
+    {skills.length > 0 && (
+      <section class="mt-16">
+        <h2 class="text-xl font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mb-6">Skills</h2>
+        {[...grouped.entries()].map(([category, items]) => (
+          <div class="mb-6">
+            <h3 class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-3">
+              {category}
+            </h3>
+            <div class="flex flex-wrap gap-2">
+              {items.map((skill) => (
+                <span class="inline-flex items-center gap-2 text-xs bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 px-3 py-1 rounded-lg">
+                  {skill.icon && <span>{skill.icon}</span>}
+                  {skill.name}
+                  {skill.proficiency_level != null && (
+                    <span class="w-10 h-0.5 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                      <span
+                        class="block h-full bg-gradient-to-r from-violet-600 to-violet-400 rounded-full"
+                        style={`width: ${skill.proficiency_level}%`}
+                      />
+                    </span>
+                  )}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </section>
+    )}
+  </div>
+</Base>

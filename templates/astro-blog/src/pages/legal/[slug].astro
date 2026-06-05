@@ -1,0 +1,50 @@
+---
+import Base from "../../layouts/Base.astro";
+import SeoHead from "../../components/SeoHead.astro";
+import { fetchLegalDocBySlug, fetchSite, getSiteUrl } from "../../lib/api";
+import { renderMarkdown } from "../../lib/markdown";
+import { buildSeoMeta } from "../../lib/seo";
+
+const { slug } = Astro.params;
+
+if (!slug) {
+  return Astro.redirect("/");
+}
+
+let doc;
+try {
+  doc = await fetchLegalDocBySlug(slug);
+} catch (e) {
+  console.warn("[CMS] Failed to fetch legal document:", e instanceof Error ? e.message : e);
+  return new Response(null, { status: 404, statusText: "Not Found" });
+}
+
+const loc = doc.localizations[0];
+const title = loc?.title ?? slug.replace(/-/g, " ");
+const intro = renderMarkdown(loc?.intro);
+
+const site = await fetchSite().catch(() => null);
+const siteName = site?.name ?? "My Site";
+const siteUrl = getSiteUrl();
+
+const seo = buildSeoMeta({
+  title: `${title} — ${siteName}`,
+  description: `${title} for ${siteName}.`,
+  canonicalUrl: `${siteUrl}/legal/${slug}/`,
+  siteUrl,
+  siteName,
+});
+
+Astro.response.headers.set("Cache-Control", "public, max-age=3600, s-maxage=86400");
+---
+
+<Base title={title}>
+  <SeoHead seo={seo} slot="head" />
+  <forja-legal
+    section-title={title}
+    intro={intro.length > 0 ? intro : undefined}
+    document-type={doc.document_type}
+    updated-at={doc.updated_at}
+    show-version={false}
+  />
+</Base>

@@ -1,0 +1,40 @@
+---
+import Base from "../../layouts/Base.astro";
+import BlogCard from "../../components/BlogCard.astro";
+import SeoHead from "../../components/SeoHead.astro";
+import Pagination from "../../components/Pagination.astro";
+import { fetchPublishedBlogs, fetchBlogDetails, fetchMediaBatch, fetchSite, getSiteUrl } from "../../lib/api";
+import type { BlogDetailResponse, MediaResponse } from "../../lib/api";
+import { buildSeoMeta } from "../../lib/seo";
+
+const PER_PAGE = 12;
+const locale = Astro.locals.locale;
+
+// Server-side locale filtering — API returns only blogs with content in this locale
+// and pagination metadata (total_pages) is accurate for the filtered set
+const result = await fetchPublishedBlogs(1, PER_PAGE, locale?.locale_id).catch(() => ({ data: [], meta: { total_pages: 1 } }));
+const blogs = await fetchBlogDetails(result.data.map((b: { id: string }) => b.id)).catch(() => [] as BlogDetailResponse[]);
+
+const coverIds = blogs.map((b) => b.cover_image_id).filter(Boolean) as string[];
+const mediaMap: Map<string, MediaResponse> = coverIds.length > 0 ? await fetchMediaBatch(coverIds) : new Map();
+
+const site = await fetchSite().catch(() => null);
+const siteName = site?.name ?? "My Site";
+const seo = buildSeoMeta({ title: `Blog — ${siteName}`, description: "All blog posts.", canonicalUrl: `${getSiteUrl()}/blog/`, siteUrl: getSiteUrl(), siteName });
+Astro.response.headers.set("Cache-Control", "public, max-age=300, s-maxage=600");
+---
+
+<Base title="Blog" description="All blog posts.">
+  <SeoHead seo={seo} slot="head" />
+  <h1 class="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mb-6">Blog</h1>
+  {blogs.length > 0 ? (
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {blogs.map((blog) => (
+        <BlogCard blog={blog} coverMedia={blog.cover_image_id ? mediaMap.get(blog.cover_image_id) ?? null : null} localeId={locale?.locale_id} />
+      ))}
+    </div>
+  ) : (
+    <p class="text-zinc-500 dark:text-zinc-400">No blog posts yet. Check back soon!</p>
+  )}
+  <Pagination currentPage={1} totalPages={result.meta.total_pages} baseUrl="/blog" />
+</Base>

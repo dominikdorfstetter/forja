@@ -1,0 +1,83 @@
+---
+import Base from "../layouts/Base.astro";
+import BlogCard from "../components/BlogCard.astro";
+import PageSection from "../components/PageSection.astro";
+import SeoHead from "../components/SeoHead.astro";
+import {
+  fetchSite,
+  fetchFeaturedBlogs,
+  fetchBlogDetails,
+  fetchMediaBatch,
+  fetchPageByRoute,
+  fetchPageSections,
+  fetchPageSectionLocalizations,
+  getSiteUrl,
+} from "../lib/api";
+import type { BlogDetailResponse, MediaResponse, PageSectionResponse, SectionLocalizationResponse } from "../lib/api";
+import { buildSeoMeta } from "../lib/seo";
+import { hasLocale } from "../lib/locale";
+
+const locale = Astro.locals.locale ?? { locale_id: '', code: 'en', name: 'English', direction: 'ltr' as const, is_default: true, is_active: true };
+
+const site = await fetchSite().catch(() => null);
+const siteName = site?.name ?? "My Site";
+const siteDescription = site?.description ?? "A developer portfolio and blog.";
+const siteUrl = getSiteUrl();
+
+// Load CMS-managed homepage sections (if a page with route "/" exists)
+let homeSections: PageSectionResponse[] = [];
+let homeLocalizations: SectionLocalizationResponse[] = [];
+try {
+  const homePage = await fetchPageByRoute("/");
+  if (homePage && homePage.status === "Published") {
+    homeSections = await fetchPageSections(homePage.id);
+    homeSections.sort((a, b) => a.display_order - b.display_order);
+    homeLocalizations = await fetchPageSectionLocalizations(homePage.id);
+  }
+} catch { /* No CMS homepage — use fallback */ }
+
+// Featured blogs filtered to active locale
+const allFeatured = await fetchFeaturedBlogs(6).then((items) => fetchBlogDetails(items.map((b) => b.id))).catch(() => [] as BlogDetailResponse[]);
+const featured = allFeatured.filter((b) => hasLocale(b.localizations, locale)).slice(0, 3);
+
+const coverIds = featured.map((b) => b.cover_image_id).filter(Boolean) as string[];
+const mediaMap: Map<string, MediaResponse> = coverIds.length > 0 ? await fetchMediaBatch(coverIds) : new Map();
+
+const seo = buildSeoMeta({ title: siteName, description: siteDescription, canonicalUrl: `${siteUrl}/`, siteUrl, siteName });
+Astro.response.headers.set("Cache-Control", "public, max-age=300, s-maxage=600");
+---
+
+<Base title="Home" description={siteDescription}>
+  <SeoHead seo={seo} slot="head" />
+
+  {homeSections.length > 0 ? (
+    <div>
+      {homeSections.map((section) => (
+        <PageSection section={section} localizations={homeLocalizations} localeId={locale.locale_id} />
+      ))}
+    </div>
+  ) : (
+    <section class="pt-12 pb-10">
+      <span class="inline-block text-xs font-semibold uppercase tracking-widest bg-gradient-to-r from-violet-600 to-violet-400 bg-clip-text text-transparent mb-3">Welcome</span>
+      <h1 class="text-4xl sm:text-5xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mb-3">{siteName}</h1>
+      <p class="text-base text-zinc-500 dark:text-zinc-400 max-w-lg leading-relaxed">{siteDescription}</p>
+    </section>
+  )}
+
+  {featured.length > 0 && (
+    <section>
+      <div class="flex items-center gap-3 mb-6">
+        <span class="text-xs font-semibold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">Featured</span>
+        <div class="flex-1 h-px bg-zinc-200 dark:bg-zinc-800"></div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {featured.map((blog) => (
+          <BlogCard blog={blog} coverMedia={blog.cover_image_id ? mediaMap.get(blog.cover_image_id) ?? null : null} localeId={locale.locale_id} />
+        ))}
+      </div>
+      <p class="mt-8">
+        <a href="/blog" class="text-sm font-medium text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 no-underline hover:no-underline">View all posts &rarr;</a>
+      </p>
+    </section>
+  )}
+</Base>

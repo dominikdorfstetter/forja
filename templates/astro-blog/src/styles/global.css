@@ -1,0 +1,124 @@
+/* ---------------------------------------------------------------------------
+   Forja Astro Blog — Tailwind v4 + Developer Modern Theme
+   Customize via @theme tokens below.
+   --------------------------------------------------------------------------- */
+
+@import "tailwindcss";
+@import "@fontsource/inter/latin.css";
+@import "@fontsource/jetbrains-mono/latin.css";
+
+/* ---- Theme tokens -------------------------------------------------------- */
+
+@theme {
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", monospace;
+}
+
+/* ---- Dark mode via data-theme attribute ---------------------------------- */
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ---- Base ---------------------------------------------------------------- */
+
+@layer base {
+  html {
+    color-scheme: light dark;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply min-h-dvh flex flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100;
+  }
+
+  main {
+    @apply flex-1 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
+  }
+
+  img {
+    @apply max-w-full h-auto block;
+  }
+
+  a {
+    @apply text-violet-600 dark:text-violet-400 no-underline transition-colors duration-200;
+  }
+
+  a:hover {
+    @apply text-violet-700 dark:text-violet-300 underline;
+  }
+
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible {
+    @apply outline-2 outline-offset-2 outline-violet-500;
+  }
+
+  code {
+    @apply font-mono bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded text-[0.9em];
+  }
+
+  pre {
+    @apply bg-zinc-100 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-800 p-4 rounded-lg overflow-x-auto;
+  }
+
+  pre code {
+    @apply bg-transparent p-0 text-inherit;
+  }
+
+  blockquote {
+    @apply border-l-2 border-violet-500 pl-4 text-zinc-500 dark:text-zinc-400 my-4 italic;
+  }
+
+  hr {
+    @apply border-0 border-t border-zinc-200 dark:border-zinc-800 my-8;
+  }
+}
+
+/* ---- Prose (for set:html rendered markdown) ------------------------------- */
+
+.prose {
+  @apply text-[15px] leading-[1.8] text-zinc-800 dark:text-zinc-200;
+}
+
+.prose h2 {
+  @apply text-2xl font-semibold text-zinc-900 dark:text-zinc-100 mt-10 mb-3 tracking-tight;
+}
+
+.prose h3 {
+  @apply text-xl font-semibold text-zinc-900 dark:text-zinc-100 mt-8 mb-3 tracking-tight;
+}
+
+.prose p {
+  @apply mb-4;
+}
+
+.prose ul {
+  @apply mb-4 pl-6 list-disc;
+}
+
+.prose ol {
+  @apply mb-4 pl-6 list-decimal;
+}
+
+.prose li {
+  @apply mb-1;
+}
+
+.prose img {
+  @apply rounded-lg my-4;
+}
+
+.prose a {
+  @apply text-violet-600 dark:text-violet-400 underline decoration-violet-300 dark:decoration-violet-700 underline-offset-2 hover:decoration-violet-500;
+}
+
+.prose pre {
+  @apply my-4;
+}
+
+.prose blockquote {
+  @apply my-6;
+}
+
+.prose hr {
+  @apply my-8;
+}

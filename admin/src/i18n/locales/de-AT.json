@@ -1,0 +1,4654 @@
+{
+  "common": {
+    "appName": "Forja",
+    "actions": {
+      "save": "Speichan",
+      "cancel": "Obbrechen",
+      "delete": "Leschn",
+      "edit": "Beorbeiten",
+      "create": "Erstöhn",
+      "add": "Dazuageben",
+      "close": "Zumochn",
+      "confirm": "Bestätign",
+      "back": "Zruck",
+      "refresh": "Aktualisiern",
+      "search": "Suchn",
+      "clear": "Leern",
+      "view": "Oschaun",
+      "manage": "Verwoidn",
+      "submit": "Obschickn",
+      "saving": "Wart a bissl, wird g'speichert...",
+      "loading": "Moment no, wird g'laden...",
+      "deleting": "Pfiat di, wird g'löscht...",
+      "clone": "Abkupfern",
+      "upload": "Auffelodn",
+      "selectFile": "Datei auswöhln",
+      "next": "Weida geht's",
+      "preview": "Amoi schaun",
+      "viewDetails": "Genauer hischaun",
+      "clickToCopy": "Draufdruckn zum Kopiern",
+      "copied": "Hob i!",
+      "copyLabel": "{{value}} in d'Zwischenoblog kopiern",
+      "moveUp": "Auffi",
+      "moveDown": "Owi",
+      "open": "Aufmochn",
+      "more": "Mehr",
+      "remove": "Entfernen",
+      "showSecret": "Geheimnis anzeigen",
+      "hideSecret": "Geheimnis ausblenden"
+    },
+    "status": {
+      "active": "Aktiv",
+      "inactive": "Inaktiv",
+      "draft": "Entwurf",
+      "published": "Veröffentlicht",
+      "blocked": "Gsperrt",
+      "expired": "Obglaufen",
+      "revoked": "Widarufen",
+      "healthy": "Passt scho",
+      "degraded": "Najo, geht so",
+      "unhealthy": "Do brennt da Huat",
+      "up": "Läuft",
+      "down": "Is hi",
+      "scheduled": "Eing'plont",
+      "inReview": "In Prüfung",
+      "archived": "Archiviert",
+      "maintenance": "Wortung"
+    },
+    "search": {
+      "placeholder": "Noch Nom oda Slug suchn..."
+    },
+    "table": {
+      "actions": "Aktionen",
+      "name": "Nom",
+      "status": "Status",
+      "created": "Erstöht",
+      "type": "Typ",
+      "slug": "Slug",
+      "noData": "Do is nix, Oida",
+      "maintenance": "Wortung",
+      "members": "Mitglieda",
+      "storage": "Speicher",
+      "used": "Verwendet",
+      "usage": "Auslastung"
+    },
+    "confirm": {
+      "cannotBeUndone": "Des is dann weg, do hilft ka Jammern.",
+      "areYouSure": "Wüst des wirklich?"
+    },
+    "confirmDialog": {
+      "typeToConfirm": "Tipp \"{{word}}\" ein zum Bestätign"
+    },
+    "filters": {
+      "all": "Olle",
+      "status": "Status",
+      "permission": "Berechtigung",
+      "filterByType": "Noch Typ filtern"
+    },
+    "labels": {
+      "yes": "Jo",
+      "no": "Na",
+      "default": "Standard",
+      "global": "Global",
+      "site": "Seitn",
+      "child": "Untergeordnet",
+      "featured": "Hervorgh'oben",
+      "present": "Aktuell",
+      "never": "Nie",
+      "none": "Kaner",
+      "untitled": "Ohne Titl",
+      "internal": "Intern",
+      "external": "Extern",
+      "page": "Seite",
+      "blog": "Blogbeitrag",
+      "cv": "Lebenslauf",
+      "legal": "Rechtliches",
+      "legalDocuments": "Rechtliche Dokumente",
+      "cookieConsent": "Cookie-Einwilligung"
+    },
+    "errors": {
+      "loadFailed": "Daten konntn ned glodn werdn",
+      "saveFailed": "Speichan is schiefgangen",
+      "deleteFailed": "Leschn is schiefgangen",
+      "serverUnreachable": "Server is ned erreichbor",
+      "required": "Des Föld is a Pflichtföld"
+    },
+    "noSiteSelected": "Na, wöche Seitn denn? Wähl zerscht amoi ane aus!",
+    "selectSitePrompt": "Wähl a Seitn aus da Leist'n aus",
+    "selectSite": "Seitn auswähln...",
+    "noSiteOption": "Ka Seitn ausgwählt",
+    "lockedByScope": "Durch API Key Bereich gsperrt",
+    "skipToMain": "Zum Hauptinhoit springn"
+  },
+  "scheduling": {
+    "publishAt": "Veröffentlichn am",
+    "unpublishAt": "Veröffentlichung beendn am (optional)",
+    "scheduledFor": "Eing'plont fia {{date}}",
+    "clearSchedule": "Zeitplon leschn",
+    "expiresAt": "Lauft ob {{date}}"
+  },
+  "layout": {
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "content": "Inhoite",
+      "blogs": "Blogs",
+      "pages": "Seitn",
+      "media": "Medien",
+      "documents": "Dokumente",
+      "assets": "Datein",
+      "structure": "Struktur",
+      "navigation": "Navigation",
+      "taxonomy": "Taxonomie",
+      "site": "Seitn",
+      "socialLinks": "Social Links",
+      "activity": "Aktivität",
+      "legal": "Rechtlichs",
+      "cv": "Lebenslauf",
+      "members": "Mitglieda",
+      "apiKeys": "API-Schlüssel",
+      "contentTemplates": "Vorlogn",
+      "redirects": "Weiterleitungen",
+      "webhooks": "Webhooks",
+      "settings": "Einstöllungen",
+      "sites": "Seitn",
+      "locales": "Sprochn",
+      "apiDocs": "API-Doku",
+      "myDrafts": "Meine Entwürf",
+      "trash": "Papierkorb",
+      "logout": "Obmeldn",
+      "invite": "Einlodn",
+      "reviews": "Überprüfungen",
+      "aiSettings": "KI-Einstöllungen",
+      "analytics": "Analytik",
+      "administration": "Verwoltung",
+      "portfolio": "Portfolio",
+      "cookieConsent": "Cookie-Einwilligung",
+      "leaveDemo": "Demo verlassen",
+      "legalDocuments": "Rechtliche Dokumente",
+      "forms": "Formulare",
+      "collections": "Sammlungen"
+    },
+    "toolbar": {
+      "toggleDrawer": "Seitnleistn umschoitn",
+      "account": "Konto",
+      "profile": "Profil",
+      "theme": "Design",
+      "language": "Sproch",
+      "siteSelector": "Seitn auswähln",
+      "switchSite": "Seitn wechsln",
+      "openSiteDetails": "Website-Details öffnen"
+    },
+    "accountMenu": {
+      "system": "System",
+      "sites": "Websites verwoidn",
+      "locales": "Sprochn",
+      "apiDocs": "API-Doku",
+      "preferences": "Einstöllungen"
+    },
+    "demoBanner": {
+      "message": "Du schaust da a Demo an",
+      "signUp": "Meld di an, um dei eigene Seitn z'erstölln"
+    },
+    "demoInstance": "Des is a Demo-Instanz nur zum Testn. D'Datenbank kann zrückgsetzt werdn und Funktionen kennan ohne Voronkündigung kaputtgehn."
+  },
+  "login": {
+    "title": "Forja",
+    "subtitle": "Gib dein API Key ein, um aufs Admin-Dashboard zuzugreifn",
+    "apiKeyLabel": "API-Schlüssel",
+    "apiKeyPlaceholder": "dk_xxxxxxxx_xxxxxxxxxxxxxxxx",
+    "loginButton": "Anmöldn",
+    "verifying": "Werd überprüft...",
+    "success": "Anmöldung erfolgreich",
+    "errors": {
+      "required": "API Key is a Pflichtföld",
+      "invalid": "Ungültiger API Key"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "managing": "Verwoidung vo {{name}}",
+    "selectSitePrompt": "Wähl a Seitn aus da Leist'n, um Inhoitsstatistiken z'seng.",
+    "readOnlyNotice": "Schaun derfst, <strong>angreifen ned</strong>. Wia im Museum, gö.",
+    "badges": {
+      "aiEnabled": "KI aktiviert"
+    },
+    "systemHealth": "Systemzustand",
+    "overall": "Gsomt: {{status}}",
+    "stats": {
+      "sites": "Seitn",
+      "blogPosts": "Blogbeiträg",
+      "pages": "Seitn",
+      "mediaFiles": "Mediendatein",
+      "users": "Leit",
+      "apiKeys": "API-Schlüssel"
+    },
+    "recentPosts": "De neichstn Blogbeiträg",
+    "publishedPosts": "Veröffentlichte Beiträg",
+    "newPost": "Neicher Beitrog",
+    "noPosts": "No nix gschriebn. Na servas.",
+    "noPostsCreate": "No ka Blogbeiträg do. Erstöh dein erschtn Beitrog!",
+    "drafts": "Entwürf",
+    "viewAllDrafts": "Olle oschaun",
+    "noDrafts": "Ka Entwürf — olle Inhoite san veröffentlicht oda in Prüfung.",
+    "quickActions": "Schnöllaktionen",
+    "byAuthor": "vo {{author}}",
+    "requests": "{{count}} Ofrogn",
+    "apiKeysPanel": {
+      "active": "{{count}} aktiv",
+      "blocked": "{{count}} gsperrt",
+      "expiringSoon": "{{count}} läuft bald ab",
+      "expiresIn": "Läuft ab in {{days}}T",
+      "expired": "Abgelaufen",
+      "monthlyQuota": "Monatliches Kontingent: {{limit}} Ofrogn",
+      "resetsIn": "Zrucksetzung in {{days}}T",
+      "anomalyBlocked": "Anomalie gsperrt",
+      "noKeys": "Ka API-Schlüssl konfiguriert"
+    },
+    "yourSites": "Deine Seitn",
+    "noSites": "Ka Seitn gfundn",
+    "noSitesCreate": "Erstöh dei erschte Seitn zum Loslegen",
+    "permissions": {
+      "master": "Systemadministrator",
+      "owner": "Seitn-Eigentümer",
+      "admin": "Admin",
+      "write": "Schreibn",
+      "readOnly": "Nur lesn"
+    },
+    "contentOverview": "Inhoitsübersicht",
+    "chart": {
+      "noContent": "No ka Inhoite. Erstöh dein erschtn Blogbeitrog oda a Seitn."
+    },
+    "attention": {
+      "awaitingReview": "Woartet auf dei Prüfung",
+      "draftsToFinish": "Entwürf zum Fertigmochn",
+      "recentlyPublished": "Vor kurzem veröffentlicht",
+      "noItemsReview": "Nix zum Überprüfn do.",
+      "noItemsDrafts": "Olle Inhoite san veröffentlicht oda in Prüfung.",
+      "noItemsPublished": "No nix veröffentlicht.",
+      "viewAll": "Olle oschaun"
+    },
+    "recentActivity": "Letzte Aktivitätn",
+    "recentActivityEmpty": "No ka Aktivitätn do.",
+    "updatedAgo": "{{time}}",
+    "analytics": {
+      "pageViews": "Seitnaufrufe",
+      "totalViews": "Aufrufe insgsamt",
+      "uniqueVisitors": "Eindeutige Besucha",
+      "noData": "No ka Seitnaufrufe do",
+      "path": "Pfad",
+      "views": "Aufrufe",
+      "visitors": "Besucha"
+    },
+    "workbench": {
+      "title": "Eich eichane Weakbank",
+      "focus": {
+        "needsReview": "Braucht Eichna Schau",
+        "needsReviewHint_one": "{{count}} woartet auf d'Freigoob",
+        "needsReviewHint_other": "{{count}} woartn auf d'Freigoob",
+        "drafts": "Entwürf in da Moch",
+        "draftsHint_one": "{{count}} in Beorbeitung",
+        "draftsHint_other": "{{count}} in Beorbeitung",
+        "publishingSoon": "Werd boid vaeffntlicht",
+        "scheduledHint_one": "{{count}} glond",
+        "scheduledHint_other": "{{count}} glond"
+      },
+      "feed": {
+        "filter": {
+          "attention": "Braucht Aufmerksamkeit",
+          "drafts": "Entwürf",
+          "review": "Schau",
+          "scheduled": "Glond"
+        },
+        "kinds": {
+          "needsReview": "Braucht Schau",
+          "draft": "Entwuaf",
+          "scheduled": "Glond"
+        },
+        "action": {
+          "review": "Schaun",
+          "continue": "Weitamochn"
+        },
+        "loading": "Lod grod…",
+        "empty": "Ois easledigt 🎉"
+      },
+      "health": {
+        "healthy": "Ois rennt",
+        "checking": "Prüf grod d'Diensta…",
+        "degraded": "Dienst hot an Schaden",
+        "noServices": "Koa Diensta gmäd't"
+      },
+      "analytics": {
+        "totalViews_one": "{{count}} Seitnaufruf",
+        "totalViews_other": "{{count}} Seitnaufruf",
+        "vsLastWeek": "vs. lezte Wochn",
+        "noData": "Analyse net vaafiagbar"
+      }
+    }
+  },
+  "myDrafts": {
+    "title": "Meine Entwürf",
+    "subtitle": "Olle Entwürf auf am Plotz",
+    "loading": "Entwürf werdn glodn...",
+    "table": {
+      "name": "Nom",
+      "type": "Typ",
+      "lastModified": "Zuletzt g'ändert"
+    },
+    "empty": {
+      "noSite": "Wähl a Seitn aus da Toolbar, um Entwürf z'seng",
+      "title": "Ka Entwürf",
+      "description": "Olle Inhoite san veröffentlicht oda eing'plont — nix im Entwurf."
+    }
+  },
+  "trash": {
+    "title": "Papierkorb",
+    "subtitle": "Kürzlich gleschte Inhoite — automatische Löschung noch 30 Tog",
+    "empty": "Papierkorb is leer",
+    "restore": "Wiederherstöhn",
+    "permanentDelete": "Endgültig leschn",
+    "permanentDeleteConfirm": "Des kaun ma ned rückgängig mochn. Bist da sicher?",
+    "restored": "Element wiederhergstöht",
+    "deleted": "Element endgültig glescht",
+    "deletedAt": "Glescht {{date}}",
+    "daysRemaining": "{{days}} Tog bis zur automatischen Leschung",
+    "columnDeleted": "Glescht",
+    "columnAutoPurge": "Auto-Leschung",
+    "emptyTrash": "Papierkorb leern",
+    "emptyTrashConfirm": "Olle {{count}} Elemente endgültig leschn? Des kaun ma ned rückgängig mochn.",
+    "type": {
+      "blog": "Blog",
+      "page": "Seitn",
+      "document": "Dokument",
+      "legal": "Rechtliches Dokument",
+      "media": "Medien",
+      "menu": "Navigationsmenü",
+      "menu_item": "Menüpunkt",
+      "social": "Social Link",
+      "project": "Projekt",
+      "cv_entry": "Lebenslauf-Eintrag",
+      "skill": "Fähigkeit"
+    }
+  },
+  "blogs": {
+    "title": "Blogs",
+    "createButton": "Blog erstöhn",
+    "table": {
+      "slug": "Slug",
+      "author": "Autor",
+      "status": "Status",
+      "featured": "Hervorgh'oben",
+      "published": "Veröffentlicht",
+      "actions": "Aktionen",
+      "selectAll": "Olle Blogbeiträg auswähln",
+      "selectRow": "Blogbeitrog {{slug}} auswähln",
+      "caption": "Listn vo de Blogbeiträg"
+    },
+    "viewDetail": "Details oschaun",
+    "empty": {
+      "title": "No ka Blogbeiträg",
+      "description": "Blogbeiträg san s'Herzstück vo deine Inhoite. Schreib Artikl, Tutorials oda Neuigkeitn — jedn mit Übasetzungen, Kategorien und SEO-Metadatn.",
+      "seedSamples": "Mit Beispielbeiträg startn"
+    },
+    "messages": {
+      "created": "Blog erstöht — Editor wird aufgmocht",
+      "cloned": "Blog erfolgreich klont",
+      "sampleSeeded": "Beispiel-Blogbeiträg erstöht"
+    },
+    "deleteDialog": {
+      "title": "Blog leschn",
+      "message": "Blog \"{{slug}}\" leschn? Des kaun ma ned rückgängig mochn."
+    },
+    "publishDialog": {
+      "title": "Blog veröffentlichn?",
+      "message": "Des mocht \"{{slug}}\" öffentlich sichtbor."
+    },
+    "unpublishDialog": {
+      "title": "Blog zruckziachn?",
+      "message": "Des nimmt \"{{slug}}\" aus da öffentlichn Ansicht und setzt's auf Entwurf zruck."
+    },
+    "archiveDialog": {
+      "title": "Blog archiviern?",
+      "message": "Des archiviert \"{{slug}}\" und verschiebt's ins Archiv."
+    },
+    "restoreDialog": {
+      "title": "Blog wiederherstöhn?",
+      "message": "Des stöht \"{{slug}}\" ois Entwurf wieda her."
+    },
+    "moreActions": "Mehr",
+    "wizard": {
+      "title": "Blog erstöhn",
+      "steps": {
+        "method": "Methode",
+        "details": "Details"
+      },
+      "methods": {
+        "scratch": "Vo Grund auf",
+        "scratchDesc": "Mit am leern Blogbeitrog startn",
+        "template": "Aus Vorlog",
+        "templateDesc": "A vorgfertigte Inhoitsvorlog verwenden",
+        "import": "Markdown importiern",
+        "importDesc": "Inhoit aus ana .md-Datei importiern",
+        "ai": "KI-Assistent",
+        "aiDesc": "An Blogbeitrog aus ana Idee mit KI generiern"
+      },
+      "fields": {
+        "slug": "Slug",
+        "slugHint": "URL-freindlicher Bezeichner (z.B. mei-erschter-beitrog)",
+        "author": "Autor",
+        "title": "Titel"
+      },
+      "creating": "Werd erstöht...",
+      "create": "Blog erstöhn"
+    },
+    "picker": {
+      "label": "Blogbeitrag auswählen",
+      "placeholder": "Nach Slug suchen...",
+      "empty": "Keine Blogbeiträge gefunden",
+      "loading": "Blogbeiträge werden geladen..."
+    },
+    "actions": {
+      "manageTemplates": "Vorlagen verwalten"
+    },
+    "list": {
+      "title": "Blogs",
+      "subtitle": "Blogbeiträg vo deine Seitn verwoidn",
+      "breadcrumb": "Blogs",
+      "loading": "Blogs werdn glodn...",
+      "loadError": "Blogs ham ned glodn werdn kenna",
+      "empty": {
+        "title": "No ka Blogbeiträg",
+        "description": "Blogbeiträg san s'Herzstück vo deine Inhoite. Schreib Artikl, Tutorials oda Neuigkeitn — jedn mit Übasetzungen, Kategorien und SEO-Metadatn.",
+        "noSite": "Wähl a Seitn aus da Leist'n, um de Blogbeiträg z'seng"
+      },
+      "searchPlaceholder": "Noch ID, Slug oda Autor suchn...",
+      "tabs": {
+        "active": "Aktiv",
+        "archived": "Archiviert"
+      },
+      "messages": {
+        "updated": "Blog aktualisiert",
+        "deleted": "Blog glescht"
+      }
+    }
+  },
+  "blogDetail": {
+    "title": "Blog-Details",
+    "back": "Zruck zu Blogs",
+    "loading": "Blog werd glodn...",
+    "notFound": "Blog ned gfundn",
+    "loadError": "Blog konnte nicht geladen werden",
+    "tabs": {
+      "content": "Inhoit",
+      "preview": "Vorschau",
+      "seo": "SEO",
+      "settings": "Einstöllungen",
+      "attachments": "Anhäng",
+      "metadata": "Metadatn",
+      "documents": "Dokumente"
+    },
+    "toolbar": {
+      "unsavedChanges": "Ungespeicherte Änderungen"
+    },
+    "ai": {
+      "generateSeo": "SEO generiern",
+      "generateExcerpt": "Auszug generiern",
+      "translate": "KI-Übasetzung",
+      "generating": "Werd generiert...",
+      "writeContentFirst": "Schreib zerscht amol wos",
+      "selectTargetLocale": "Zielsproch",
+      "suggestTranslation": "Übasetzung vorschlogn",
+      "applyTranslation": "Anwendn",
+      "refreshField": "Des Föld neu übasetzen",
+      "translationPreview": "Übasetzungsvorschau"
+    },
+    "seo": {
+      "serpPreview": "Suchmaschinenvorschau",
+      "charCount": "{{current}}/{{max}}",
+      "socialPreview": "Social-Media-Vorschau",
+      "socialPreviewNoCover": "Titelbild hinzufügen",
+      "socialPreviewApproximate": "Annäherung; die tatsächliche Darstellung variiert je nach Plattform.",
+      "socialPreviewTitleWarning": "Titel wird beim Teilen möglicherweise abgeschnitten",
+      "socialPreviewDescriptionWarning": "Beschreibung wird beim Teilen möglicherweise abgeschnitten"
+    },
+    "fields": {
+      "title": "Titl",
+      "subtitle": "Untertitl",
+      "slug": "Slug",
+      "author": "Autor",
+      "status": "Status",
+      "locale": "Sproch",
+      "excerpt": "Auszug",
+      "content": "Inhoit",
+      "body": "Inhoit (Markdown)",
+      "coverImage": "Titlbüd-URL",
+      "publishedDate": "Veröffentlichungsdatum",
+      "featured": "Hervorgh'oben",
+      "tags": "Tags",
+      "categories": "Kategorien",
+      "metaTitle": "Meta-Titl",
+      "metaDescription": "Meta-Beschreibung"
+    },
+    "metadata": {
+      "title": "Blog Metadatn",
+      "slug": "Slug:",
+      "author": "Autor:",
+      "status": "Status:",
+      "published": "Veröffentlicht:",
+      "readingTime": "Lesezeit",
+      "manualOverride": "Hondisch eingebn",
+      "autoCalculated": "Automatisch ausm Inhoit berechnet",
+      "resetAuto": "Auf automatische Berechnung zrucksetzen",
+      "info": "Metadatn",
+      "blogId": "Blog-ID",
+      "contentId": "Inhoits-ID",
+      "publishedAt": "Veröffentlicht am",
+      "createdAt": "Erstöht",
+      "updatedAt": "Zuletzt aktualisiert"
+    },
+    "images": {
+      "title": "Büda",
+      "coverImageId": "Titlbüd",
+      "headerImageId": "Headerbüd",
+      "selectImage": "Büd auswähln",
+      "changeImage": "Ändern",
+      "removeImage": "Entfernan",
+      "noImage": "Ka Büd ausgwählt"
+    },
+    "settings": {
+      "title": "Einstöllungen",
+      "featured": "Hervorgh'oben",
+      "notFeatured": "Ned hervorgh'oben",
+      "commentsOn": "Kommentare an",
+      "commentsOff": "Kommentare aus"
+    },
+    "toc": "Inhoitsverzeichnis",
+    "createTranslation": "{{locale}} Übasetzung erstöhn",
+    "noLocalesAlert": "Ka aktive Sprochn konfiguriert. Geh zu <strong>Einstöllungen → Sprochn</strong> und erstöh mindestens ane aktive Sproch (z.B. \"en\") zum Bloginhoit schreibn.",
+    "messages": {
+      "saved": "Blog gspeichert",
+      "saveFailed": "Blog hot ned gspeichert werdn kenna"
+    },
+    "documents": {
+      "title": "Angehängte Dokumente",
+      "attach": "Dokument anhängen",
+      "empty": "Ka Dokumente dron",
+      "emptyDescription": "Häng Dokumente an den Blogbeitrog o",
+      "detached": "Dokument obghängt",
+      "attached": "Dokument oghängt"
+    },
+    "sections": {
+      "media": "Medien",
+      "seo": "SEO & Metadatn",
+      "settings": "Einstöllungen",
+      "categoriesAndTags": "Kategorien & Tags",
+      "attachments": "Anhäng",
+      "preview": "Vorschau"
+    },
+    "sidebar": {
+      "toggle": "Seitnleistn",
+      "seo": "SEO",
+      "general": "Allgemein",
+      "media": "Medien",
+      "relations": "Verknüpfungen"
+    },
+    "tags": {
+      "empty": "Keine Schlagwörter zugewiesen",
+      "assigned": "Schlagwort zugewiesen",
+      "removed": "Schlagwort entfernt",
+      "assignFailed": "Schlagwort konnte nicht zugewiesen werden",
+      "removeFailed": "Schlagwort konnte nicht entfernt werden",
+      "createFailed": "Schlagwort konnte nicht angelegt werden",
+      "suggestTags": "Schlagwörter vorschlagen",
+      "suggesting": "Wird vorgeschlagen...",
+      "suggestTitle": "Vorgeschlagene Schlagwörter",
+      "suggestSubtitle": "Wähle die Schlagwörter aus, die du übernehmen willst. Bestehende werden wiederverwendet — neue sind mit + markiert.",
+      "suggestPickHint": "Klicke auf einen Chip, um ihn zu wählen oder die Auswahl wieder aufzuheben.",
+      "suggestApply": "{{count}} Schlagwort/e übernehmen",
+      "suggestEmpty": "Noch keine Vorschläge.",
+      "suggestApplied": "Schlagwörter übernommen",
+      "suggestApplyFailed": "Schlagwort {{slug}} konnte nicht übernommen werden",
+      "suggestTruncated": "Die besten {{max}} Vorschläge werden angezeigt."
+    }
+  },
+  "pages": {
+    "createButton": "Seitn erstöhn",
+    "table": {
+      "route": "Route",
+      "type": "Typ",
+      "status": "Status",
+      "inNav": "In Navigation",
+      "created": "Erstöht",
+      "actions": "Aktionen",
+      "selectAll": "Olle Seitn auswähln",
+      "selectRow": "Seitn {{route}} auswähln",
+      "caption": "Seitnlistn"
+    },
+    "viewDetails": "Details oschaun",
+    "messages": {
+      "created": "Seitn erstöht",
+      "cloned": "Seitn erfolgreich klont"
+    },
+    "deleteDialog": {
+      "title": "Seitn leschn",
+      "message": "Seitn \"{{route}}\" leschn? Des kaun ma ned rückgängig mochn."
+    },
+    "publishDialog": {
+      "title": "Seitn veröffentlichn?",
+      "message": "Des mocht \"{{route}}\" öffentlich sichtbor."
+    },
+    "unpublishDialog": {
+      "title": "Seitn zruckziachn?",
+      "message": "Des nimmt \"{{route}}\" aus da öffentlichn Ansicht und setzt's auf Entwurf zruck."
+    },
+    "archiveDialog": {
+      "title": "Seitn archiviern?",
+      "message": "Des archiviert \"{{route}}\" und verschiebt's ins Archiv."
+    },
+    "restoreDialog": {
+      "title": "Seitn wiederherstöhn?",
+      "message": "Des stöht \"{{route}}\" ois Entwurf wieda her."
+    },
+    "wizard": {
+      "steps": {
+        "pageType": "Seitntyp",
+        "identity": "Identität",
+        "options": "Optionen"
+      },
+      "next": "Weida",
+      "back": "Zruck",
+      "createPage": "Seitn erstöhn",
+      "creating": "Werd erstöht...",
+      "types": {
+        "static": "Statisch",
+        "staticDesc": "Standard-Inhoitsseitn",
+        "landing": "Landing",
+        "landingDesc": "Marketingseitn mit Hero-Bereichen",
+        "contact": "Kontakt",
+        "contactDesc": "Kontaktformular und Informationen",
+        "blogIndex": "Blog-Index",
+        "blogIndexDesc": "Blog-Beitragsübersicht",
+        "custom": "Benutzerdefiniert",
+        "customDesc": "Komplett benutzerdefiniertes Seitnlayout"
+      },
+      "routeHint": "URL-Pfod vo da Seitn (z.B. /ueba-uns)",
+      "slugHint": "URL-freindlicher Bezeichner, automatisch aus da Route generiert",
+      "site": "Website",
+      "inNavigation": "In da Navigation ozoagn"
+    },
+    "picker": {
+      "label": "Seite auswählen",
+      "placeholder": "Nach Titel oder Route suchen...",
+      "empty": "Keine Seiten gefunden",
+      "loading": "Seiten werden geladen..."
+    },
+    "list": {
+      "title": "Seitn",
+      "subtitle": "Seitn vo deine Websites verwoidn",
+      "breadcrumb": "Seitn",
+      "loading": "Seitn werdn glodn...",
+      "loadError": "Seitn ham ned glodn werdn kenna",
+      "empty": {
+        "title": "No ka Seitn do",
+        "description": "Seitn san de Baustein vo deiner Website. Erstöh Landingpages, Über-uns-Bereiche oda beliebige Layouts mit modularn Obschnittn.",
+        "noSite": "Wähl a Seitn aus da Leist'n, um de Seitn z'seng"
+      },
+      "searchPlaceholder": "Noch ID, Route oda Slug suchn...",
+      "tabs": {
+        "active": "Aktiv",
+        "archived": "Archiviert"
+      },
+      "messages": {
+        "updated": "Seitn aktualisiert",
+        "deleted": "Seitn glescht"
+      }
+    }
+  },
+  "pageDetail": {
+    "title": "Seitndetails",
+    "back": "Zruck zu Seitn",
+    "loading": "Seitn werd glodn...",
+    "loadFailed": "Seitn hot ned glodn werdn kenna",
+    "notFound": "Seitn ned gfundn",
+    "pageInfo": "Seitninfo",
+    "parentPageId": "Übergeordnete Seitn-ID",
+    "pageSubtitle": "{{type}} Seitn",
+    "metadata": "Metadatn",
+    "contentId": "Inhoits-ID",
+    "template": "Vorlog",
+    "sections": {
+      "title": "Obschnitte",
+      "coverImage": "Titlbüd",
+      "add": "Obschnitt dazuageben",
+      "empty": "No ka Obschnitte",
+      "emptyDescription": "Gib Obschnitte dazu, um dei Seitn aufzubaun",
+      "deleted": "Obschnitt glescht",
+      "saved": "Obschnitt gspeichert",
+      "reordered": "Obschnitte nei sortiert",
+      "added": "Obschnitt dazuageben",
+      "loadingSections": "Obschnitte werdn glodn...",
+      "deleteTitle": "Obschnitt leschn",
+      "deleteMessage": "Den {{type}} Obschnitt leschn? Des kaun ma ned rückgängig mochn.",
+      "untitled": "Ohne Titl"
+    },
+    "table": {
+      "type": "Typ",
+      "order": "Reihnfoig",
+      "content": "Inhoit",
+      "localizations": "Lokalisierungen",
+      "coverImage": "Titlbüd",
+      "ctaRoute": "CTA-Route",
+      "actions": "Aktionen"
+    },
+    "dialog": {
+      "sectionType": "Obschnittstyp",
+      "displayOrder": "Ozoagreihnfoig",
+      "displayOrderRequired": "Ozoagreihnfoig is a Pflichtföld",
+      "adding": "Werd dazuageben..."
+    },
+    "fields": {
+      "route": "Route",
+      "title": "Titl",
+      "description": "Beschreibung",
+      "status": "Status",
+      "pageType": "Seitntyp",
+      "inNavigation": "In da Navigation",
+      "navTitle": "Navigationstitl",
+      "navOrder": "Navigationsreihnfoig",
+      "metaTitle": "Meta-Titl",
+      "metaDescription": "Meta-Beschreibung",
+      "excerpt": "Auszug",
+      "slug": "Slug",
+      "id": "ID",
+      "published": "Veröffentlicht",
+      "created": "Erstöht",
+      "updated": "Aktualisiert"
+    },
+    "tabs": {
+      "info": "Info",
+      "seo": "SEO",
+      "sections": "Obschnitte"
+    },
+    "seo": {
+      "serpPreview": "Suchmaschinenvorschau"
+    },
+    "toolbar": {},
+    "messages": {
+      "saved": "Seitn gspeichert",
+      "saveFailed": "Seitn hot ned gspeichert werdn kenna",
+      "updated": "Seitn aktualisiert"
+    }
+  },
+  "media": {
+    "title": "Medien",
+    "subtitle": "Mediendatein vo deine Seitn verwoidn",
+    "registerButton": "Medium registriern",
+    "uploadButton": "Datei auffelodn",
+    "folders": "Ordna",
+    "searchPlaceholder": "Noch Dateinam, Alt-Text, Büdunterschrift, Titl suchn...",
+    "categories": {
+      "images": "Büda",
+      "videos": "Videos",
+      "audio": "Audio",
+      "documents": "Dokumente"
+    },
+    "picker": {
+      "title": "Büd auswähln",
+      "search": "Büda suchn...",
+      "noResults": "Ka Büda gfundn",
+      "select": "Auswähln",
+      "clear": "Auswohl aufhebn"
+    },
+    "openUrl": "URL aufmochn",
+    "copyUrl": "Öffentliche URL kopiern",
+    "empty": {
+      "noSite": "Wähl a Seitn aus da Leist'n, um de Mediendatein z'seng",
+      "title": "No ka Medien do",
+      "description": "Lod Büda, Videos und Dokumente affe und verwoid's. Mediendatein kennan an Blogbeiträg, Seitn und Obschnitte ohängt werdn.",
+      "noMatch": "Ka passenden Medien",
+      "noMatchDescription": "Probier dei Such oda deine Filter onzupassn",
+      "noFilesInFolder": "Ka Datein in dem Ordna"
+    },
+    "loading": "Medien werdn glodn...",
+    "loadError": "Medien ham ned glodn werdn kenna",
+    "messages": {
+      "registered": "Medium registriert",
+      "deleted": "Medium glescht",
+      "moved": "In Ordna verschobn",
+      "folderCreated": "Ordna erstöht",
+      "folderRenamed": "Ordna umbenannt",
+      "folderDeleted": "Ordna glescht"
+    },
+    "ai": {
+      "title": "KI-Vision",
+      "generateAltText": "Alt-Text generieren",
+      "generateTags": "Tags vorschlagen",
+      "suggestTags": "Tags vorschlagen",
+      "altTextGenerated": "Alt-Text generiert",
+      "tagsGenerated": "Tags generiert",
+      "generationFailed": "KI-Generierung is schiefgangen",
+      "suggestedTags": "Vorgeschlagene Tags — klicken zum Hinzufügen:",
+      "generateCaption": "Beschreibung generieren",
+      "generateTitle": "Titel generieren",
+      "fieldGenerated": "KI-Inhalt generiert",
+      "translateFrom": "Übersetzen von {{locale}}",
+      "noSourceContent": "Kein Inhalt in der Standardsprache zum Übersetzen",
+      "translated": "Metadaten übersetzt"
+    },
+    "deleteDialog": {
+      "title": "Medium leschn",
+      "message": "\"{{filename}}\" löschen? Dies kann nicht rückgängig gemacht werden.",
+      "forceDelete": "Erzwungenes Löschen (auch wenn in Verwendung)"
+    },
+    "deleteFolderDialog": {
+      "title": "Ordna leschn?",
+      "message": "Der Ordna werd endgültig glescht und seine Datein werdn in de Stammebene verschobn."
+    },
+    "upload": {
+      "dragDrop": "Datein do hiziachn oda klickn zum Durchschaun",
+      "uploading": "Werd auffegledn...",
+      "progress": "Auffelodn {{percent}}%",
+      "success": "Datei erfolgreich auffegledn",
+      "tooLarge": "Datei is z'groß — maximal {{maxSize}}",
+      "invalidType": "Dateityp werd ned unterstützt"
+    },
+    "tabs": {
+      "tags": "Tags",
+      "metadata": "Metadaten",
+      "variants": "Varianten",
+      "usage": "Verwendung"
+    },
+    "tags": {
+      "save": "Tags speichern",
+      "saved": "Tags gespeichert"
+    },
+    "variants": {
+      "none": "Keine Varianten verfügbar"
+    },
+    "usage": {
+      "none": "Wird von keinem Inhalt referenziert"
+    }
+  },
+  "documents": {
+    "title": "Dokumente",
+    "subtitle": "Downloadbore Dokumente verwoidn",
+    "createButton": "Dokument dazuageben",
+    "copyUrl": "Öffentliche URL kopiern",
+    "searchPlaceholder": "Nach Name, Dateiname, URL oder Typ suchen...",
+    "table": {
+      "title": "Titl",
+      "slug": "Slug",
+      "type": "Typ",
+      "fileSize": "Dateigreß",
+      "downloads": "Downloads",
+      "status": "Status",
+      "created": "Erstöht",
+      "actions": "Aktionen"
+    },
+    "empty": {
+      "noSite": "Wähl a Seitn aus da Leist'n, um de Dokumente z'seng",
+      "title": "No ka Dokumente do",
+      "description": "Verwoid downloadbore Datein wia PDFs, Whitepapers oda Leitfädn. Dokumente kennan mit Blogbeiträg und Seitn verknüpft werdn."
+    },
+    "loading": "Dokumente werdn glodn...",
+    "loadError": "Dokumente ham ned glodn werdn kenna",
+    "messages": {
+      "created": "Dokument erstöht",
+      "updated": "Dokument aktualisiert",
+      "deleted": "Dokument glescht"
+    },
+    "deleteDialog": {
+      "title": "Dokument leschn",
+      "message": "Des Dokument leschn? Des kaun ma ned rückgängig mochn."
+    },
+    "deleteFolderDialog": {
+      "title": "Ordna leschn?",
+      "message": "Der Ordna werd endgültig glescht und seine Dokumente werdn in de Stammebene verschobn."
+    },
+    "privacy": {
+      "action": "Datenschutz",
+      "enterPassword": "Posswort eingebn",
+      "password": "Posswort",
+      "confirmPassword": "Posswort bestätign",
+      "incorrectPassword": "Foisches Posswort",
+      "download": "Owelodn",
+      "setTitle": "Dokumentenschutz einstöhn",
+      "setDescription": "Schütz des Dokument mit am Posswort. Leit miassn des Posswort eingebn, um's owezulodn.",
+      "setButton": "Posswort setzen",
+      "setSuccess": "Dokumentenschutz aktiviert",
+      "removeTitle": "Dokumentenschutz entfernan",
+      "removeDescription": "Entfern den Posswortschutz vo dem Dokument. Gib des aktuelle Posswort ein oda verwend de Admin-Wiederherstellun.",
+      "removeButton": "Schutz entfernan",
+      "removeSuccess": "Dokumentenschutz entfernt",
+      "adminRecoveryNote": "Ois Admin kaunst des Posswort leer lossn, um den Schutz ohne des Originalposswort z'entfernan.",
+      "minLength": "Posswort muass mindestens {{min}} Zeichn haum",
+      "mismatch": "Posswörter stimmn ned überein",
+      "generate": "Sicheres Posswort generiern",
+      "ttl": {
+        "label": "Zugriffsfenster",
+        "never": "Läuft nie ab",
+        "1h": "1 Stunde",
+        "6h": "6 Stunden",
+        "24h": "24 Stunden",
+        "7d": "7 Tage",
+        "30d": "30 Tage"
+      },
+      "expiringBadge": "LÄUFT AB",
+      "expiredBadge": "ABGELAUFEN",
+      "lockedBadge": "GESPERRT",
+      "unlock": "Entsperren",
+      "unlockConfirm": "Dieses Dokument entsperren? Jeder mit Passwort und Link kann neuerlich versuchen, zuzugreifen.",
+      "unlockSuccess": "Dokument entsperrt",
+      "unlockError": "Dokument konnte nicht entsperrt werden",
+      "errors": {
+        "expired": "Dieses Dokument ist abgelaufen",
+        "locked": "Dieses Dokument ist gesperrt",
+        "invalidTtl": "Ungültiger Ablauf — muss in der Zukunft und höchstens ein Jahr entfernt liegen",
+        "notLocked": "Dokument ist nicht gesperrt"
+      },
+      "badge": "Privat",
+      "unlockTitle": "Dokument entsperren"
+    }
+  },
+  "navigation": {
+    "title": "Navigation",
+    "subtitle": "Navigationselemente vo deine Seitn verwoidn",
+    "addItem": "Element dazuageben",
+    "table": {
+      "link": "Link",
+      "type": "Typ",
+      "icon": "Symbol",
+      "newTab": "Neicher Tab",
+      "actions": "Aktionen",
+      "languages": "Sprachen"
+    },
+    "empty": {
+      "noSite": "Wähl a Seitn aus da Leist'n, um de Navigation z'verwoidn",
+      "title": "No ka Navigationselemente",
+      "description": "Bestimm, wia d'Besucher dei Website navigiern. Erstöh Menüs mit Links zu Seitn oda externen URLs in ana Hierarchie."
+    },
+    "loading": "Navigation werd glodn...",
+    "loadError": "Navigation hot ned glodn werdn kenna",
+    "messages": {
+      "created": "Navigationselement erstöht",
+      "updated": "Navigationselement aktualisiert",
+      "deleted": "Navigationselement glescht"
+    },
+    "deleteDialog": {
+      "title": "Navigationselement leschn",
+      "message": "Des Navigationselement leschn? Des lescht a seine Lokalisierungen."
+    },
+    "fields": {
+      "title": "Titel",
+      "parent": "Übergeordnet",
+      "parentHelp": "Übergeordnetes Element wählen oder als Wurzel belassen",
+      "noParent": "Keins (Wurzelebene)",
+      "titles": "Titel"
+    },
+    "wizard": {
+      "title": {
+        "create": "Navigationselement hinzufügen",
+        "edit": "Navigationselement bearbeiten"
+      },
+      "steps": {
+        "linkTarget": "Linkziel",
+        "translations": "Übersetzungen",
+        "options": "Optionen"
+      },
+      "validation": {
+        "pageRequired": "Bitte wählen Sie eine Seite",
+        "urlRequired": "Bitte geben Sie eine URL ein",
+        "urlInvalid": "Bitte geben Sie eine gültige URL ein",
+        "titleRequired": "Mindestens ein Titel ist erforderlich"
+      },
+      "translationsHelp": "Geben Sie einen Titel für jede Sprache ein. Mindestens ein Titel ist erforderlich.",
+      "noLocales": "Keine Sprachen für diese Seite konfiguriert.",
+      "iconHelp": "Optionaler Symbolname",
+      "blogHelp": "Link verweist auf /blog/{slug}",
+      "contentType": "Inhaltstyp",
+      "cvInfo": "Verlinkt zu Ihrer CV-Seite unter /cv",
+      "externalHelp": "Beliebige URL — Dokumente, Dateien, externe Seiten",
+      "legalDocType": "Rechtsdokument",
+      "legalHelp": "Link verweist auf /legal/{slug}"
+    },
+    "tree": {
+      "expand": "Aufklappen",
+      "collapse": "Zuklappen",
+      "childCount": "{{count}} Elemente"
+    },
+    "row": {
+      "locales": "{{count}}/{{total}} Sprachen",
+      "active": "Aktiv",
+      "inactive": "Inaktiv"
+    },
+    "menu": {
+      "inactive": "(inaktiv)"
+    },
+    "dragToReorder": "Zum Neuordnen ziehen",
+    "menus": {
+      "createTitle": "Menü erstellen",
+      "editTitle": "Menü bearbeiten",
+      "addMenu": "Menü hinzufügen",
+      "editMenu": "Menü-Einstellungen",
+      "deleteMenu": "Menü löschen",
+      "fields": {
+        "slug": "Slug",
+        "slugHelp": "z.B. primary, footer, sidebar",
+        "description": "Beschreibung",
+        "maxDepth": "Maximale Tiefe",
+        "maxDepthHelp": "Maximale Verschachtelungstiefe (1-10)",
+        "active": "Aktiv"
+      },
+      "messages": {
+        "created": "Menü erstellt",
+        "updated": "Menü aktualisiert",
+        "deleted": "Menü gelöscht"
+      },
+      "empty": {
+        "title": "Noch keine Menüs",
+        "description": "Erstellen Sie ein Navigationsmenü, um loszulegen"
+      },
+      "deleteDialog": {
+        "title": "Menü löschen",
+        "message": "Dies löscht das Menü und alle Navigationselemente dauerhaft. Diese Aktion kann nicht rückgängig gemacht werden."
+      }
+    }
+  },
+  "socialLinks": {
+    "title": "Social Links",
+    "subtitle": "Social-Media-Links vo deine Seitn verwoidn",
+    "addLink": "Link dazuageben",
+    "table": {
+      "title": "Titl",
+      "url": "URL",
+      "icon": "Symbol",
+      "actions": "Aktionen"
+    },
+    "empty": {
+      "noSite": "Wähl a Seitn aus da Leist'n, um de Social Links z'verwoidn",
+      "title": "No ka Social Links",
+      "description": "Fieg Links zu deine Social-Media-Profile dazu. De werdn über d'API bereitgstöht, damit dei Frontend's überoi ozoagn kaun."
+    },
+    "loading": "Social Links werdn glodn...",
+    "loadError": "Social Links ham ned glodn werdn kenna",
+    "messages": {
+      "created": "Social Link erstöht",
+      "updated": "Social Link aktualisiert",
+      "deleted": "Social Link glescht"
+    },
+    "deleteDialog": {
+      "title": "Social Link leschn",
+      "message": "\"{{title}}\" leschn? Des kaun ma ned rückgängig mochn."
+    }
+  },
+  "taxonomy": {
+    "title": "Taxonomie",
+    "subtitle": "Tags und Kategorien vo deine Seitn verwoidn",
+    "info": {
+      "tags": "Floche, hashtag-oatige Bezeichnungen — mehrere pro Beitrog (z.B. \"rust\", \"tutorial\"). Ideal zum Filtern und fia übagreifende Themen.",
+      "categories": "Hierarchische Baumstruktur, z.B. \"Technologie › Web › React\". A Beitrog ghört meistens genau ana."
+    },
+    "tags": {
+      "title": "Tags",
+      "addTag": "Tag dazuageben",
+      "table": {
+        "slug": "Slug",
+        "scope": "Bereich",
+        "created": "Erstöht",
+        "actions": "Aktionen"
+      },
+      "empty": {
+        "title": "No ka Tags",
+        "description": "Tags san floche Bezeichnungen fia übagreifende Themen — wia Hashtags. Weis mehare Tags pro Beitrog zu (z.B. \"rust\", \"tutorial\"), damit d'Besucher Inhoite filtern und entdeckn kennan."
+      },
+      "loading": "Tags werdn glodn...",
+      "searchPlaceholder": "Tags noch Slug suchn...",
+      "messages": {
+        "created": "Tag erstöht",
+        "updated": "Tag aktualisiert",
+        "deleted": "Tag glescht"
+      },
+      "deleteDialog": {
+        "title": "Tag leschn",
+        "message": "Tag \"{{slug}}\" leschn? Da Tag werd deaktiviert."
+      }
+    },
+    "categories": {
+      "title": "Kategorien",
+      "addCategory": "Kategorie dazuageben",
+      "table": {
+        "slug": "Slug",
+        "parent": "Übergeordnet",
+        "scope": "Bereich",
+        "created": "Erstöht",
+        "actions": "Aktionen"
+      },
+      "empty": {
+        "title": "No ka Kategorien",
+        "description": "Kategorien schoffn a baumartige Hierarchie fia deine Inhoite. Gruppier verwandte Beiträg unter Zweign wia \"Technologie > Webentwicklung\" fia strukturierte Navigation."
+      },
+      "loading": "Kategorien werdn glodn...",
+      "searchPlaceholder": "Kategorien noch Slug suchn...",
+      "messages": {
+        "created": "Kategorie erstöht",
+        "updated": "Kategorie aktualisiert",
+        "deleted": "Kategorie glescht"
+      },
+      "deleteDialog": {
+        "title": "Kategorie leschn",
+        "message": "Kategorie \"{{slug}}\" leschn? De Kategorie werd deaktiviert."
+      }
+    },
+    "empty": {
+      "noSite": "Wähl a Seitn aus da Leist'n, um de Taxonomie z'verwoidn"
+    }
+  },
+  "webhooks": {
+    "title": "Webhooks",
+    "subtitle": "Externe Dienste bei Inhoitsänderungen benochrichtign",
+    "addWebhook": "Webhook dazuageben",
+    "searchPlaceholder": "Noch URL suchn...",
+    "allEvents": "Olle Ereignisse",
+    "viewDeliveries": "Zustellungen oschaun",
+    "sendTest": "Test schickn",
+    "testSuccess": "Test zugstöht — {{status}}",
+    "testFailed": "Testzustellung is schiefgangen",
+    "table": {
+      "url": "URL",
+      "events": "Ereignisse",
+      "status": "Status",
+      "created": "Erstöht",
+      "actions": "Aktionen",
+      "successRate": "Erfolg (24h)"
+    },
+    "empty": {
+      "noSite": "Wähl a Seitn aus da Leist'n, um de Webhooks z'verwoidn",
+      "title": "No ka Webhooks",
+      "description": "Webhooks benochrichtign externe Dienste, waun Inhoite erstöht, aktualisiert oda glescht werdn."
+    },
+    "loading": "Webhooks werdn glodn...",
+    "messages": {
+      "created": "Webhook erstöht",
+      "updated": "Webhook aktualisiert",
+      "deleted": "Webhook glescht"
+    },
+    "deleteDialog": {
+      "title": "Webhook leschn",
+      "message": "Webhook fia \"{{url}}\" leschn? Des kaun ma ned rückgängig mochn."
+    },
+    "deliveries": {
+      "title": "Zustellungsprotokoll",
+      "loading": "Zustellungen werdn glodn...",
+      "empty": "No ka Zustellungen",
+      "emptyDescription": "Zustellungen scheinen do auf, waunn da Webhook ausgelöst werd.",
+      "table": {
+        "event": "Ereignis",
+        "status": "Status",
+        "attempt": "Versuch",
+        "timestamp": "Zeitstempel",
+        "error": "Fehla"
+      }
+    },
+    "templates": {
+      "title": "A Vorlog auswähln",
+      "custom": "Benutzerdefiniert",
+      "customDesc": "An Webhook vo Grund auf konfiguriern",
+      "vercel": "Vercel",
+      "vercelDesc": "A Vercel-Deployment auslösn, waunn si Inhoite ändern",
+      "netlify": "Netlify",
+      "netlifyDesc": "An Netlify-Build auslösn, waunn si Inhoite ändern",
+      "cloudflare": "Cloudflare Pages",
+      "cloudflareDesc": "An Cloudflare Pages-Build auslösn, waunn si Inhoite ändern",
+      "errors": {
+        "urlMismatch": "De URL schaut ned noch am {{provider}}-Deploy-Hook aus"
+      }
+    },
+    "analytics": {
+      "title": "Zustellungsanalyse",
+      "viewAnalytics": "Analyse oschaun",
+      "window": {
+        "1h": "Letzte Stund",
+        "24h": "Letzte 24 Stundn",
+        "7d": "Letzte 7 Tog",
+        "30d": "Letzte 30 Tog"
+      },
+      "cards": {
+        "total": "Zustellungen gsamt",
+        "successRate": "Erfolgsrate",
+        "pendingRetry": "Ausstehende Wiederholungen"
+      },
+      "byEvent": {
+        "title": "Noch Ereignistyp",
+        "event": "Ereignis",
+        "total": "Gsamt",
+        "successful": "Erfolgreich",
+        "failed": "Fehlgschlogn"
+      },
+      "errors": {
+        "fetchFailed": "Zustellungsstatistiken hom ned glodn werdn kenna"
+      }
+    }
+  },
+  "redirects": {
+    "title": "Weiterleitungen",
+    "subtitle": "URL-Weiterleitungen fia deine Seitn verwoidn",
+    "addRedirect": "Weiterleitung dazuageben",
+    "searchPlaceholder": "Noch Pfod suchn...",
+    "table": {
+      "sourcePath": "Quöll-Pfod",
+      "destination": "Ziel-URL",
+      "type": "Typ",
+      "status": "Status",
+      "created": "Erstöht",
+      "actions": "Aktionen",
+      "permanent": "301 Permanent",
+      "temporary": "302 Temporär",
+      "temporaryStrict": "307 Temporär",
+      "permanentStrict": "308 Permanent"
+    },
+    "empty": {
+      "noSite": "Wähl a Seitn aus da Leist'n, um de Weiterleitungen z'verwoidn",
+      "title": "No ka Weiterleitungen",
+      "description": "Weiterleitungen loassn oide Links funktionier'n, waun sich Inhoit verschiebt. Nimm 301 fia permanente und 302 fia temporäre."
+    },
+    "loading": "Weiterleitungen werdn glodn...",
+    "messages": {
+      "created": "Weiterleitung erstöht",
+      "updated": "Weiterleitung aktualisiert",
+      "deleted": "Weiterleitung glescht"
+    },
+    "deleteDialog": {
+      "title": "Weiterleitung leschn",
+      "message": "Weiterleitung vo \"{{source}}\" leschn? Des kaun ma ned rückgängig mochn."
+    }
+  },
+  "locales": {
+    "title": "Sprochn",
+    "subtitle": "Systemweite Sprochn und Gebietsschemas verwoidn",
+    "addLanguage": "Sproch dazuageben",
+    "loading": "Sprochn werdn glodn...",
+    "columns": {
+      "code": "Code",
+      "name": "Nom",
+      "nativeName": "Eigennom",
+      "direction": "Richtung",
+      "active": "Aktiv",
+      "created": "Erstöht",
+      "actions": "Aktionen"
+    },
+    "empty": {
+      "title": "No ka Sprochn",
+      "description": "Sprochn ermöglichn mehrsprochige Inhoite. Fieg de Sprochn dazu, de du unterstützn wüst — jeda Inhoit kaun donn übasetzt werdn."
+    },
+    "messages": {
+      "created": "Sproch erstöht",
+      "updated": "Sproch aktualisiert",
+      "deleted": "Sproch glescht"
+    },
+    "deleteDialog": {
+      "title": "Sproch leschn",
+      "message": "Sproch \"{{code}}\" leschn? Des kaun ma ned rückgängig mochn."
+    },
+    "errors": {
+      "inUse": "Leschn ned möglich: Sproch is ana oda mehreren Websites zuagwiesn"
+    },
+    "active": {
+      "title": "Aktive Sprochn",
+      "empty": "No ka Sprochn aktiviert. Aktivier Sprochn ausm Katalog do untn."
+    },
+    "catalog": {
+      "title": "Verfügbore Sprochn",
+      "enable": "Aktiviern"
+    },
+    "deactivate": {
+      "title": "Sproch deaktiviern?",
+      "message": "{{name}} werd grad vo {{count}} Seitn vawendt. Bestehende Inhoite und Übasetzungen bleibm erhoitn, oba Seitnbesitza kennan ka neichn Inhoit in dera Sproch mehr dazuageben.",
+      "confirm": "Deaktiviern"
+    }
+  },
+  "members": {
+    "title": "Mitglieda",
+    "subtitle": "Mitglieda und ihre Rolln verwoidn",
+    "addMember": "Mitglied dazuageben",
+    "table": {
+      "name": "Nom",
+      "email": "E-Mail",
+      "role": "Rolln",
+      "joined": "Beitrettn",
+      "actions": "Aktionen"
+    },
+    "roles": {
+      "owner": "Eigentümer",
+      "admin": "Administrator",
+      "editor": "Redakteur",
+      "author": "Autor",
+      "reviewer": "Prüfer",
+      "viewer": "Betrachter"
+    },
+    "roleDescriptions": {
+      "admin": "Voller Zugriff auf d'Seitnverwoidung",
+      "editor": "Kaun olle Inhoite und Autorn verwoidn",
+      "author": "Kaun eigene Inhoite schreibn und beorbeiten",
+      "reviewer": "Kaun eingereichte Inhoite überprüfn",
+      "viewer": "Kaun Inhoite oschaun (nur lesn)"
+    },
+    "empty": {
+      "noSite": "Wähl a Seitn aus da Leist'n, um de Mitglieda z'verwoidn",
+      "title": "No ka Teammitglieda",
+      "description": "Lod Mitorbeiter ein, de Website z'verwoidn. Weis Rolln wia Redakteur, Autor oda Prüfer zu, um den Zugriff z'steuern."
+    },
+    "loading": "Mitglieda werdn glodn...",
+    "loadError": "Fehla beim Lodn vo de Mitglieda",
+    "messages": {
+      "added": "Mitglied dazuageben",
+      "roleUpdated": "Mitgliedsrolln aktualisiert",
+      "removed": "Mitglied entfernt",
+      "ownershipTransferred": "Eigentümerschoft übatrong"
+    },
+    "addDialog": {
+      "title": "Mitglied dazuageben",
+      "searchPlaceholder": "Clerk-Benutzer suchn...",
+      "selectRole": "Rolln auswähln",
+      "noResults": "Ka Leit gfundn"
+    },
+    "removeDialog": {
+      "title": "Mitglied entfernan",
+      "message": "Des Mitglied vo da Seitn entfernan? Es valient jeden Zugriff."
+    },
+    "transferDialog": {
+      "title": "Eigentümerschoft übatrogn",
+      "message": "Eigentümerschoft an {{name}} übatrogn? Du werst zum Administrator zruckgstuft.",
+      "confirm": "Eigentümerschoft übatrogn"
+    },
+    "leaveSite": "Seite verlassen",
+    "leaveConfirm": {
+      "title": "{{siteName}} verlassen?",
+      "message": "Du verlierst den Zugang zu allen Inhalten dieser Seite. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "confirm": "Seite verlassen"
+    }
+  },
+  "apiKeys": {
+    "title": "API-Schlüssel",
+    "subtitle": "API Keys fian Backend-Zugriff verwoidn",
+    "createButton": "API Key erstöhn",
+    "searchPlaceholder": "Noch Nom oda Schlüsselpräfix suchn...",
+    "filters": {
+      "allStatuses": "Olle Status",
+      "allPermissions": "Olle Berechtigungen"
+    },
+    "permissions": {
+      "Master": "Master",
+      "Admin": "Administrator",
+      "Write": "Schreiben",
+      "Read": "Lesen"
+    },
+    "table": {
+      "name": "Nom",
+      "keyPrefix": "Key-Präfix",
+      "site": "Seitn",
+      "permission": "Berechtigung",
+      "status": "Status",
+      "requests": "Ofrogn",
+      "lastUsed": "Zuletzt vawendt",
+      "actions": "Aktionen"
+    },
+    "empty": {
+      "title": "No ka API Keys",
+      "description": "API Keys lossn externe Anwendungen auf deine Inhoite zuagreifn. Erstöh Keys mit bestimmten Berechtigungsstufn und Website-Bereichn.",
+      "filterHint": "Probier deine Filter z'ändern"
+    },
+    "loading": "API Keys werdn glodn...",
+    "loadError": "API Keys ham ned glodn werdn kenna",
+    "messages": {
+      "created": "API Key erstöht",
+      "blocked": "API Key gsperrt",
+      "unblocked": "API Key entsperrt",
+      "revoked": "API Key widarufen",
+      "deleted": "API Key glescht",
+      "updated": "API-Schlüssel aktualisiert"
+    },
+    "blockDialog": {
+      "title": "API Key sperrn",
+      "reason": "Sperrgrund",
+      "reasonPlaceholder": "Warum werd der Key gsperrt?",
+      "reasonRequired": "A Grund is erforderlich"
+    },
+    "revokeDialog": {
+      "title": "API Key widarufen",
+      "message": "Wüst du \"{{name}}\" wirklich widarufen? Des is permanent und kaun ned rückgängig gmocht werdn.",
+      "confirmWord": "Widarufen"
+    },
+    "deleteDialog": {
+      "title": "API Key leschn",
+      "message": "Wüst du \"{{name}}\" wirklich dauerhaft leschn?"
+    },
+    "createDialog": {
+      "title": "API Key erstöhn",
+      "fields": {
+        "name": "Nom",
+        "permission": "Berechtigung",
+        "site": "Seitn",
+        "user": "Benutzer (optional)",
+        "noUser": "Ka Benutzer",
+        "expiresAt": "Oblaufdatum (optional)"
+      },
+      "created": {
+        "title": "API Key erstöht",
+        "warning": "Kopier den Key jetzt. Danoch kaunst'n nimmer seng!",
+        "copied": "Key in d'Zwischenoblog kopiert"
+      },
+      "quotas": {
+        "title": "Nutzungskontingente",
+        "hint": "Maximale Anzahl an Anfragen pro Zeitraum, bevor der Schlüssel gedrosselt wird.",
+        "hourly": "Stündlich",
+        "daily": "Täglich",
+        "monthly": "Monatlich"
+      }
+    },
+    "usageDialog": {
+      "title": "API Key Nutzung",
+      "subtitle": "Nutzungsstatistiken fia {{name}}",
+      "totalRequests": "Ofrogn gsomt",
+      "recentRequests": "Letzte Ofrogn",
+      "endpoint": "Endpunkt",
+      "method": "Methode",
+      "statusCode": "Statuscode",
+      "timestamp": "Zeitstempel",
+      "noUsage": "Ka Nutzungsdatn verfügbor",
+      "loadError": "Nutzungsdatn konntn ned glodn werdn",
+      "quota": {
+        "hourly": "Stündlich",
+        "daily": "Täglich",
+        "monthly": "Monatlich",
+        "used": "{{used}} / {{limit}} verbraucht",
+        "remaining": "{{remaining}} verbleibend",
+        "resetsIn": "Zrucksetzung in {{time}}",
+        "exhausted": "Kontingent erschöpft",
+        "unavailable": "Kontingentdatn ned verfügbor"
+      },
+      "timeline": {
+        "title": "Tägliche Nutzung (letzte 30 Tag)",
+        "successful": "Erfolgreich",
+        "failed": "Fehlgschlogn",
+        "requests": "Ofrogn"
+      },
+      "stats": {
+        "allTime": "Ofrogn gsomt",
+        "lastUsed": "Zuletzt vawendt",
+        "rateLimitHits": "Rate-Limit-Treffer heit"
+      }
+    },
+    "actionsMenu": {
+      "viewUsage": "Nutzung oschaun",
+      "block": "Sperrn",
+      "unblock": "Entsperrn",
+      "revoke": "Widarufen",
+      "delete": "Leschn",
+      "edit": "Bearbeiten"
+    },
+    "editDialog": {
+      "title": "API-Schlüssel bearbeiten",
+      "fields": {
+        "description": "Beschreibung"
+      }
+    }
+  },
+  "cv": {
+    "title": "Lebenslauf",
+    "subtitle": "Lebenslauf-Einträg und Fähigkeitn vo deine Seitn verwoidn",
+    "tabs": {
+      "entries": "Einträg",
+      "skills": "Fähigkeitn"
+    },
+    "entries": {
+      "addEntry": "Eintrog dazuageben",
+      "searchPlaceholder": "Noch Firma oda Stondort suchn...",
+      "table": {
+        "company": "Firma",
+        "location": "Stondort",
+        "type": "Typ",
+        "dates": "Zeitraum",
+        "current": "Aktuell",
+        "order": "Reihnfoig",
+        "actions": "Aktionen"
+      },
+      "empty": {
+        "title": "No ka Lebenslaufeinträg",
+        "description": "Fieg Berufserfohrung, Ausbildung und andere Karrieremeilenstane dazu. Einträg werdn über d'API fia dei Portfolio bereitgstöht."
+      },
+      "loading": "Lebenslauf-Einträg werdn glodn...",
+      "loadError": "Lebenslauf-Einträg ham ned glodn werdn kenna",
+      "messages": {
+        "created": "Lebenslauf-Eintrog erstöht",
+        "updated": "Lebenslauf-Eintrog aktualisiert",
+        "deleted": "Lebenslauf-Eintrog glescht"
+      },
+      "deleteDialog": {
+        "title": "Lebenslauf-Eintrog leschn",
+        "message": "Eintrog \"{{company}}\" leschn? Des kaun ma ned rückgängig mochn."
+      }
+    },
+    "skills": {
+      "addSkill": "Fähigkeit dazuageben",
+      "searchPlaceholder": "Noch Fähigkeit suchn...",
+      "table": {
+        "name": "Nom",
+        "slug": "Slug",
+        "category": "Kategorie",
+        "proficiency": "Kenntnisstond",
+        "icon": "Symbol",
+        "actions": "Aktionen"
+      },
+      "empty": {
+        "title": "No ka Fähigkeitn",
+        "description": "List deine technischen und beruflichen Fähigkeitn mit Kompetenzstufen und Kategorien fia dei Portfolio auf."
+      },
+      "loading": "Fähigkeitn werdn glodn...",
+      "loadError": "Fähigkeitn ham ned glodn werdn kenna",
+      "messages": {
+        "created": "Fähigkeit erstöht",
+        "updated": "Fähigkeit aktualisiert",
+        "deleted": "Fähigkeit glescht"
+      },
+      "deleteDialog": {
+        "title": "Fähigkeit leschn",
+        "message": "Fähigkeit \"{{name}}\" leschn? Des kaun ma ned rückgängig mochn."
+      }
+    },
+    "empty": {
+      "noSite": "Wähl a Seitn aus da Leist'n, um de Lebenslauf-Datn z'verwoidn"
+    }
+  },
+  "cookieConsent": {
+    "title": "Cookie-Einwilligung",
+    "subtitle": "Cookie-Einwilligungskonfiguration für Ihre Website verwalten",
+    "loading": "Cookie-Einwilligung wird geladen...",
+    "empty": {
+      "noSite": "Wählen Sie eine Website, um die Cookie-Einwilligung zu verwalten.",
+      "title": "Keine Cookie-Einwilligung konfiguriert",
+      "description": "Erstellen Sie ein Cookie-Einwilligungsdokument, um zu beginnen."
+    },
+    "managementTitle": "Cookie-Einwilligung konfiguriert",
+    "managementDescription": "Ihr Cookie-Einwilligungsdokument ist eingerichtet. Verwalten Sie Gruppen und Elemente auf der Detailseite.",
+    "manageGroups": "Gruppen & Elemente verwalten",
+    "createDocument": "Cookie-Einwilligung erstellen",
+    "editContent": "Inhalt bearbeiten",
+    "manageDocument": "Dokument verwalten",
+    "messages": {
+      "created": "Cookie-Einwilligungsdokument erstellt"
+    }
+  },
+  "legal": {
+    "title": "Rechtliche Dokumente",
+    "subtitle": "Rechtliche Dokumente vo deine Seitn verwoidn",
+    "addDocument": "Dokument dazuageben",
+    "table": {
+      "cookieName": "Cookie-Nom",
+      "type": "Typ",
+      "created": "Erstöht",
+      "actions": "Aktionen",
+      "name": "Name",
+      "status": "Status",
+      "selectAll": "Olle Dokumente auswähln",
+      "selectRow": "Dokument {{name}} auswähln"
+    },
+    "empty": {
+      "noSite": "Wähl a Seitn aus da Leist'n, um de rechtlichen Dokumente z'verwoidn",
+      "title": "No ka Rechtsdokumente",
+      "description": "Verwoid Cookie-Einwilligungen, Datenschutzrichtlinien und ondare rechtliche Oforderungen. Gruppier Elemente fia strukturierte Einwilligungsbanner."
+    },
+    "messages": {
+      "created": "Rechtliches Dokument erstöht",
+      "published": "Dokument veröffentlicht",
+      "unpublished": "Veröffentlichung vom Dokument aufg'hoben",
+      "archived": "Dokument archiviert"
+    },
+    "deleteDialog": {
+      "title": "Rechtliches Dokument leschn",
+      "message": "Rechtliches Dokument \"{{cookieName}}\" leschn? Des lescht a seine Gruppm und Elemente."
+    },
+    "publishDialog": {
+      "title": "Dokument veröffentlichn",
+      "message": "Wüst du \"{{name}}\" wirkli veröffentlichn?"
+    },
+    "unpublishDialog": {
+      "title": "Veröffentlichung aufhebn",
+      "message": "Wüst du de Veröffentlichung vo \"{{name}}\" wirkli aufhebn?"
+    },
+    "archiveDialog": {
+      "title": "Dokument archiviern",
+      "message": "Wüst du \"{{name}}\" wirkli archiviern?"
+    },
+    "picker": {
+      "label": "Rechtsdokument auswählen",
+      "placeholder": "Rechtsdokumente suchen...",
+      "empty": "Keine Rechtsdokumente gefunden",
+      "loading": "Rechtsdokumente werden geladen..."
+    },
+    "documentTypes": {
+      "CookieConsent": "Cookie-Einwilligung",
+      "PrivacyPolicy": "Datenschutzerklärung",
+      "TermsOfService": "Nutzungsbedingungen",
+      "Imprint": "Impressum",
+      "Disclaimer": "Haftungsausschluss"
+    },
+    "tabs": {
+      "documents": "Dokumente",
+      "cookieConsent": "Cookie-Einwilligung"
+    },
+    "wizard": {
+      "title": "Rechtlichs Dokument erstöhn",
+      "description": "Geben Sie Ihrem Dokument einen Namen. Sie können den Typ und Inhalt auf der nächsten Seite bearbeiten.",
+      "steps": {
+        "type": "Typ wähln",
+        "details": "Dokumentdetails"
+      },
+      "fields": {
+        "name": "Dokumentname",
+        "nameHelper": "A kurze Bezeichnung fia des Dokument"
+      },
+      "typeOptions": {
+        "PrivacyPolicy": "Datenschutzerklärung",
+        "PrivacyPolicyDesc": "Datenschutz- und Datenverarbeitungspraktikn Ihrer Website",
+        "TermsOfService": "Nutzungsbedingungen",
+        "TermsOfServiceDesc": "Regeln und Vereinbarungen zur Nutzung Ihres Dienstes",
+        "Imprint": "Impressum",
+        "ImprintDesc": "Informationen zur juristischen Person und Kontaktdaten",
+        "Disclaimer": "Haftungsausschluss",
+        "DisclaimerDesc": "Haftungsbeschränkungen und rechtliche Hinweise"
+      }
+    },
+    "filters": {
+      "status": "Status"
+    },
+    "list": {
+      "title": "Rechtliche Dokumente",
+      "subtitle": "Rechtliche Dokumente vo deine Seitn verwoidn",
+      "breadcrumb": "Rechtliche Dokumente",
+      "loading": "Rechtliche Dokumente werdn glodn...",
+      "loadError": "Rechtliche Dokumente ham ned glodn werdn kenna",
+      "empty": {
+        "title": "No ka Rechtsdokumente",
+        "description": "Verwoid Cookie-Einwilligungen, Datenschutzrichtlinien und ondare rechtliche Oforderungen. Gruppier Elemente fia strukturierte Einwilligungsbanner.",
+        "noSite": "Wähl a Seitn aus da Leist'n, um de rechtlichen Dokumente z'verwoidn"
+      },
+      "searchPlaceholder": "Noch Cookie-Nom suchn...",
+      "tabs": {
+        "active": "Aktiv",
+        "archived": "Archiviert"
+      },
+      "messages": {
+        "updated": "Rechtliches Dokument aktualisiert",
+        "deleted": "Rechtliches Dokument glescht"
+      }
+    }
+  },
+  "legalDetail": {
+    "title": "Details zum rechtlichen Dokument",
+    "back": "Zruck zu de rechtlichen Dokumente",
+    "loading": "Rechtliches Dokument werd glodn...",
+    "notFound": "Rechtliches Dokument ned gfundn",
+    "editDocument": "Dokument beorbeiten",
+    "cookieName": "Cookie-Nom",
+    "documentType": "Dokumenttyp",
+    "documentId": "Dokument-ID",
+    "updatedMessage": "Dokument erfolgreich aktualisiert",
+    "loadGroupsFailed": "Gruppm ham ned glodn werdn kenna",
+    "groups": {
+      "title": "Gruppm",
+      "add": "Gruppn dazuageben",
+      "empty": "Ka Gruppm",
+      "emptyDescription": "Fieg dem Dokument Gruppm dazu",
+      "editGroup": "Gruppn beorbeiten",
+      "deleteGroup": "Gruppn leschn",
+      "deleteMessage": "Gruppn \"{{name}}\" leschn? Des lescht a olle Elemente in dera Gruppn.",
+      "loadingGroups": "Gruppm werdn glodn...",
+      "order": "Reihnfoig: {{order}}",
+      "required": "Erforderlich",
+      "optional": "Optional",
+      "enabled": "Aktiviert",
+      "disabled": "Deaktiviert",
+      "messages": {
+        "created": "Gruppn erstöht",
+        "updated": "Gruppn aktualisiert",
+        "deleted": "Gruppn glescht"
+      }
+    },
+    "items": {
+      "title": "Elemente",
+      "add": "Element dazuageben",
+      "empty": "Ka Elemente in dera Gruppn",
+      "loadingItems": "Elemente werdn glodn...",
+      "deleteItem": "Element leschn",
+      "deleteMessage": "Element \"{{name}}\" leschn? Des kaun ma ned rückgängig mochn.",
+      "messages": {
+        "created": "Element erstöht",
+        "updated": "Element aktualisiert",
+        "deleted": "Element glescht"
+      }
+    },
+    "dialog": {
+      "editGroup": "Gruppn beorbeiten",
+      "addGroup": "Gruppn dazuageben",
+      "editItem": "Element beorbeiten",
+      "addItem": "Element dazuageben",
+      "cookieName": "Cookie-Nom",
+      "cookieNameRequired": "Cookie-Nom is a Pflichtföld",
+      "displayOrder": "Ozoagreihnfoig",
+      "required": "Erforderlich",
+      "defaultEnabled": "Standardmäßig aktiviert"
+    },
+    "messages": {
+      "saved": "Rechtliches Dokument gspeichert",
+      "published": "Rechtliches Dokument veröffentlicht",
+      "unpublished": "Rechtliches Dokument zruckgnommen",
+      "loadFailed": "Rechtliches Dokument konnt net gladn wern"
+    },
+    "toolbar": {},
+    "fields": {
+      "title": "Titl",
+      "intro": "Einleitung",
+      "body": "Inhalt",
+      "metaTitle": "Meta-Titl",
+      "metaDescription": "Meta-Beschreibung"
+    },
+    "seo": {
+      "title": "SEO-Einstellungen"
+    },
+    "archiveDialog": {
+      "title": "Rechtliches Dokument archiviern",
+      "message": "Wüst „{{slug}}“ wirklich ins Archiv? Is nachher nimma öffentlich sichtbar."
+    },
+    "restoreDialog": {
+      "title": "Rechtliches Dokument zruckholn",
+      "message": "„{{slug}}“ aus'm Archiv wiederherstellen?"
+    },
+    "versions": {
+      "title": "Versionsverlauf",
+      "noVersions": "Kane früheren Versionen",
+      "createNew": "Neie Version erstellen",
+      "created": "Neie Version erstellt"
+    }
+  },
+  "sites": {
+    "title": "Websites",
+    "subtitle": "Verwoid deine Websites und ihre Konfiguration",
+    "createButton": "Website erstöhn",
+    "empty": {
+      "title": "No ka Websites",
+      "description": "Websites san des Fundament vo deim CMS. Jede Website hot eigene Inhoite, Sprochn, Navigation und Einstöllungen."
+    },
+    "loading": "Websites werdn glodn...",
+    "loadError": "Websites ham ned glodn werdn kenna",
+    "messages": {
+      "created": "Website erfolgreich erstöht",
+      "updated": "Website erfolgreich aktualisiert",
+      "deleted": "Website erfolgreich glescht"
+    },
+    "deleteDialog": {
+      "title": "Website leschn",
+      "message": "Wüst du \"{{name}}\" wirklich leschn? Des kaun ma ned rückgängig mochn."
+    },
+    "card": {
+      "view": "Oschaun",
+      "edit": "Beorbeiten",
+      "delete": "Leschn"
+    },
+    "launcher": {
+      "title": "Wähl a Seitn",
+      "subtitle": "Wähl a Seitn zum Losorbeiten"
+    },
+    "wizard": {
+      "title": "Neiche Seitn erstöhn",
+      "steps": {
+        "basics": "Grundlogn",
+        "modules": "Module",
+        "workflow": "Workflow",
+        "languages": "Sprochn"
+      },
+      "modulesDescription": "Wähl aus, wöche Inhoitsmodule aktiviert werdn solln. Du kaunst des späta in de Einstöllungen ändern.",
+      "modules": {
+        "blog": "Blog",
+        "blogDesc": "Artikl, Tutorials und Neuigkeitn veröffentlichn",
+        "pages": "Seitn",
+        "pagesDesc": "Statische Seitn mit Obschnittn und Layouts erstöhn",
+        "cv": "Lebenslauf",
+        "cvDesc": "Berufserfohrung, Ausbildung und Fähigkeitn verwoidn",
+        "legal": "Rechtlichs",
+        "legalDesc": "Datenschutzrichtlinie, Nutzungsbedingungen und rechtliche Dokumente",
+        "documents": "Dokumente",
+        "documentsDesc": "Downloadbore Datein auffelodn und verwoidn",
+        "ai": "KI-Assistent",
+        "aiDesc": "SEO-Generierung, automatische Auszüg und Übasetzungsvorschläg",
+        "portfolio": "Portfolio",
+        "portfolioDesc": "CV-Einträge, Fähigkeiten und Projekte verwalten",
+        "forms": "Formulare",
+        "formsDesc": "Sammelt Einsendungen von Besucher:innen mit eigenen Feldern"
+      },
+      "workflowDescription": "Wia wüst du Inhoite auf dera Seitn verwoidn?",
+      "workflow": {
+        "solo": "Allaner",
+        "soloDesc": "Du bist da einzige Autor. Inhoite werdn veröffentlicht, waun du auf Veröffentlichn druckst.",
+        "team": "Team",
+        "teamDesc": "Mehrere Autorn orbeiten zam. Aktiviert den redaktionellen Überprüfungs-Workflow."
+      },
+      "languagesDescription": "Wähl de Sprochn aus, de dei Seitn unterstützn soit. Du kaunst späta weiche dazuageben."
+    }
+  },
+  "siteDetail": {
+    "title": "Website-Details",
+    "back": "Zruck zu Websites",
+    "loading": "Website werd glodn...",
+    "loadFailed": "Website hot ned glodn werdn kenna",
+    "notFound": "Website ned gfundn",
+    "siteInfo": "Website-Info",
+    "noDescription": "Ka Beschreibung",
+    "metadata": "Metadatn",
+    "quickLinks": "Schnöllzugriffe",
+    "deleteSite": "Website leschn",
+    "fields": {
+      "name": "Nom",
+      "slug": "Slug",
+      "description": "Beschreibung",
+      "domain": "Domain",
+      "active": "Aktiv",
+      "timezone": "Zeitzone",
+      "status": "Status",
+      "id": "ID",
+      "created": "Erstöht",
+      "updated": "Aktualisiert"
+    },
+    "messages": {
+      "updated": "Website erfolgreich aktualisiert",
+      "deleted": "Website erfolgreich glescht",
+      "quotaUpdated": "Speicherkontingent aktualisiert"
+    },
+    "openSettings": "Website-Einstellungen öffnen",
+    "stats": {
+      "content": "Inhalte",
+      "members": "Aktive Mitglieder",
+      "membersHint": "Team verwalten →",
+      "owner": "Eigentümer",
+      "ownerMissing": "Kein Eigentümer zugewiesen",
+      "storage": "Speicher belegt",
+      "storageOf": "{{used}} von {{quota}}"
+    },
+    "sysadmin": {
+      "enabledHelp": "Ausgeschaltet ist die Website für Besucher nicht erreichbar und im Website-Wechsler ausgeblendet.",
+      "enabledLabel": "Website aktiv",
+      "quotaHelp": "Maximaler Speicher für Medien und Dokumente dieser Website.",
+      "quotaLabel": "Speicherkontingent (GB)",
+      "quotaSave": "Kontingent speichern",
+      "subtitle": "Diese Einstellungen sind nur für System-Administratoren sichtbar.",
+      "title": "Sysadmin-Einstellungen"
+    }
+  },
+  "system": {
+    "title": "Systemverwoidung",
+    "subtitle": "Instanzweite Verwoidung und Konfiguration",
+    "accessDenied": "Du brauchst Systemadministrator-Zugriff, um de Seitn ozoagn z'kennan.",
+    "nav": {
+      "dashboard": "Übersicht",
+      "sites": "Seitn",
+      "users": "Leit",
+      "languages": "Sprochn"
+    },
+    "dashboard": {
+      "title": "Systemübersicht",
+      "sites": "Seitn gsomt",
+      "health": "Systemzustand",
+      "viewAll": "Olle oschaun",
+      "sitesRegistered_one": "{{count}} Seite registriert",
+      "sitesRegistered_other": "{{count}} Seiten registriert",
+      "servicesMonitored_one": "{{count}} Dienst überwacht",
+      "servicesMonitored_other": "{{count}} Dienste überwacht",
+      "sitesLabel_one": "Seite registriert",
+      "sitesLabel_other": "Seiten registriert",
+      "services": {
+        "database": "Datenbank",
+        "cache": "Cache",
+        "idp": "IDP",
+        "storage": "Speicher"
+      },
+      "storage": {
+        "bucket": "Bucket: {{name}}",
+        "usedPercent": "{{percent}}% belegt",
+        "freeBytes": "{{bytes}} frei",
+        "totalBytes": "{{bytes}} gesamt"
+      }
+    },
+    "sites": {
+      "title": "Olle Seitn",
+      "subtitle": "Olle Seitn vo da Instanz verwoidn"
+    },
+    "users": {
+      "title": "Benutzer",
+      "subtitle": "Benutzer und Moderationsaktionen verwoidn.",
+      "actions": {
+        "suspend": "Sperrn",
+        "ban": "Bannen",
+        "unsuspend": "Entsperrn",
+        "delete": "Benutzer leschn"
+      },
+      "suspend": {
+        "title": "Benutzer sperrn",
+        "reason": "Grund",
+        "duration": "Dauer",
+        "until": "Gsperrt bis",
+        "confirm": "Sperrn",
+        "pending": "Werd gsperrt...",
+        "success": "Benutzer gsperrt",
+        "error": "Benutzer hot ned gsperrt werdn kennan"
+      },
+      "ban": {
+        "title": "Benutzer bannen",
+        "warning": "De Aktion bannt den Benutzer dauerhoft. Er kaun auf ka Website mehr zugreifn.",
+        "confirm": "Dauerhoft bannen",
+        "pending": "Werd bannt...",
+        "success": "Benutzer bannt",
+        "error": "Benutzer hot ned bannt werdn kennan"
+      },
+      "unsuspend": {
+        "success": "Benutzer entsperrt",
+        "error": "Benutzer hot ned entsperrt werdn kennan"
+      },
+      "delete": {
+        "title": "Benutzer leschn",
+        "warning": "De Aktion is unwiderruflich. Da Benutzer wird dauerhoft aus'm System entfernt.",
+        "consequences": "Olle Website-Mitgliedschoftn werdn entfernt. Inhoite bleibn erhoidn, san oba nimmamehr zugeordnet.",
+        "confirm": "Endgültig leschn",
+        "pending": "Werd glescht...",
+        "success": "Benutzer glescht",
+        "error": "Benutzer hot ned glescht werdn kennan"
+      },
+      "joined": "Beitretn",
+      "lastSignIn": "Letzte Anmöldung",
+      "activity": "Aktivitätsverlauf",
+      "noActivity": "Ka Aktivität aufgzeichnet",
+      "loading": "Benutzer werd glodn...",
+      "loadingActivity": "Aktivitätn werdn glodn...",
+      "notFound": "Benutzer ned gfundn",
+      "unknownUser": "Unbekonnter Benutzer",
+      "moderationReason": "Grund",
+      "columns": {
+        "user": "Benutzer",
+        "email": "E-Mail",
+        "status": "Status",
+        "lastSignIn": "Letzte Anmöldung",
+        "actions": "Aktionen"
+      },
+      "status": {
+        "active": "Aktiv",
+        "suspended": "Gsperrt",
+        "banned": "Bannt"
+      }
+    },
+    "cache": {
+      "title": "Antwort-Cache (alle Sites)",
+      "totalEntries": "{{n}} Cache-Einträge über alle Sites",
+      "invalidateAll": "Alle leeren",
+      "redisUnavailable": "Redis ist nicht verfügbar — Caching ist deaktiviert."
+    }
+  },
+  "siteSettings": {
+    "title": "Seitneinstöllungen",
+    "subtitle": "Einstöllungen und Funktionen vo deiner Seitn konfigurieren",
+    "nav": {
+      "overview": "Übersicht",
+      "content": "Inhoit",
+      "modules": "Module",
+      "ai": "KI-Assistent",
+      "seo": "SEO",
+      "codeInjection": "Code-Einbindung",
+      "favicon": "Website-Symbol",
+      "branding": "Branding",
+      "apiKeys": "API-Schlüssln",
+      "webhooks": "Webhooks",
+      "members": "Mitgliada",
+      "dangerZone": "Gfoabereich",
+      "forms": "Formulare"
+    },
+    "storage": {
+      "title": "Speicher",
+      "usage": "{{used}} / {{total}} verwendet",
+      "quota": "Speicherkontingent",
+      "quotaHelp": "Maximal erlaubter Speicher für diese Website (100 MB – 1 TB)",
+      "media": "Medien",
+      "documents": "Dokumente",
+      "quotaExceeded": "Speicherkontingent übaschrittn. Gib Speicher frei oda kontaktier dein Administrator.",
+      "systemOverview": "Speicherübersicht"
+    },
+    "cors": {
+      "title": "Erlaubte Ursprünge",
+      "help": "Domains, die Cross-Origin-API-Anfragen an diese Website senden dürfen. Geben Sie einen Ursprung pro Zeile ein (z.B. https://meinblog.at).",
+      "placeholder": "https://beispiel.at",
+      "invalidOrigin": "Ungültiges Ursprungsformat. Verwenden Sie Schema://Host[:Port] (z.B. https://beispiel.at).",
+      "emptyHelp": "Keine Ursprünge konfiguriert — Cross-Origin-Anfragen werden blockiert."
+    },
+    "sidebar": {
+      "label": "Einstellungsnavigation",
+      "filterPlaceholder": "Menü filtan…",
+      "noMatches": "Koane Abschnitt passn zu \"{{q}}\""
+    },
+    "groups": {
+      "configuration": "Konfiguration",
+      "discovery": "Auffindboakeit",
+      "integration": "Integration",
+      "access": "Zugriff",
+      "danger": "Gfoa"
+    },
+    "overview": {
+      "title": "Ümaschau",
+      "subtitle": "Identitäts- und Zugriffsgrundlogn fia de Site.",
+      "slug": "Slug",
+      "groups": {
+        "identity": "Identität",
+        "status": "Zuastand"
+      }
+    },
+    "branding": {
+      "title": "Branding",
+      "subtitle": "Site-Zeichn, Favicons und Themeforbn fia Browsa und PWAs."
+    },
+    "content": {
+      "title": "Inhoit",
+      "subtitle": "Upload-Limits, Passwörta und wia Vorschau-URLs auf'baut wean."
+    },
+    "modules": {
+      "title": "Moduln",
+      "subtitle": "Moduln fia de gonze Site o- oder abdrahn.",
+      "enabledCount": "{{enabled}} vo {{total}} aktiviat"
+    },
+    "seo": {
+      "title": "SEO",
+      "subtitle": "Site-weite Standardwert. Oanzelne Beiträg kennan de üaschreibn."
+    },
+    "codeInjection": {
+      "title": "Code-Injektion",
+      "subtitle": "Eichanes HTML eichasetzn. Bittscheen nua Skripte vo vatraunswürdign Quelln."
+    },
+    "ai": {
+      "title": "KI-Assistent",
+      "subtitle": "Da KI-Anbieta fürs Erstön vo Entwürf, Umschreibunga und Üasetzunga."
+    },
+    "deletedSites": {
+      "title": "Kiazlich gleschte Sites",
+      "subtitle": "Gleschte Sites kann ma innahoib vo 30 Tog wiedaherstöhn, bevor's fia ollaweu weg san.",
+      "entry": "Kiazlich glescht",
+      "empty": "Kane kiazlich gleschtn Sites.",
+      "deletedOn": "Glescht am {{date}}",
+      "expiresIn": "Lauft in {{days}} Tog ab",
+      "restore": "Wiedaherstöhn",
+      "restoreLabel": "{{site}} wiedaherstöhn",
+      "restored": "Site wiedahergstöht.",
+      "expired": "S'30-Tog-Wiedaherstöh-Fensta fia de Site is obglaffn."
+    },
+    "danger": {
+      "title": "Gfoabereich",
+      "subtitle": "Zastüarische Aktiona, de olle Nutza treffn. Schaust's nu amoi nach, was's mochst.",
+      "export": {
+        "title": "Site-Archiv expoatiern",
+        "description": "Load a ZIP owa mit olln Inhoitn, Assets und Metadoatn vo dera Site. Net zastüarisch.",
+        "action": "Expoatieren",
+        "inProgress": "Expoatiern…",
+        "ready": "Dei Export is zum Owalodn bereit.",
+        "download": "Archiv owalodn",
+        "failed": "Export hot net funktioniert. Probier’s no amoi."
+      },
+      "transfer": {
+        "title": "Eigntum üagebn",
+        "description": "Gibst de Site an an ondares Mitglied wei. Du werdst Editor und vaiast an Obrechnungszugriff.",
+        "action": "Üagebn",
+        "success": "Eigntum üagebn – du bist jetzt Editor auf dera Site.",
+        "notMember": "Der Benutzer is kaa Mitglied vo dera Site mehr.",
+        "pick": {
+          "title": "Eigntum üagebn",
+          "body": "Wäl a Mitglied aus, des da neiche Eigentümer wean soi. Du wirst zum Editor zruckgstuft und vaiast an Obrechnungszugriff.",
+          "label": "Neicha Eigentümer",
+          "empty": "Es gibt kane ondaren Mitglieda, an de ma's Eigntum üagebn kannt. Lod zerst a Mitglied ei.",
+          "continue": "Weida"
+        },
+        "confirm": {
+          "title": "De Site üagebn?",
+          "body": "S'Eigntum vo „{{site}}“ geht an {{member}} üba. Du wirst zum Editor. Des kann ma do net mehr ruckgängig mochn.",
+          "label": "Eigntum üagebn"
+        }
+      },
+      "reset": {
+        "title": "Olle Inhoit zrucksetzn",
+        "description": "Leschst jedn Beitrog, jede Seitn und jeds Asset. Einstellunga und Mitgliada bleibm. Net rückgängig zu mochn.",
+        "action": "Inhoit zrucksetzn",
+        "confirm": {
+          "title": "Olle Inhoit zrucksetzn?",
+          "body": "Jeda Beitrog, jede Seitn, jeds Dokument und jeds Asset in „{{site}}“ wird in’n Papierkorb gschobn. Einstellunga und Mitgliada bleibm und de Site bleibt a. Du konnst Sochn innahoib vo 30 Tog wiedaherstöhn, bevor’s fia ollaweu weg san.",
+          "label": "Inhoit zrucksetzn"
+        },
+        "success": "Inhoit zruckgsetzt – Beitrog, Seitn und Assets san in’n Papierkorb gschobn wuan. Du konnst se innahoib vo 30 Tog wiedaherstöhn."
+      },
+      "delete": {
+        "title": "De Site leschn",
+        "description": "Entfern de Site, eichane Inhoit, Mitgliada und API-Schlüssln fia ollaweu. De Aktion is entgültig.",
+        "action": "Site leschn",
+        "confirm": {
+          "title": "De Site leschn?",
+          "body": "„{{site}}“ und olle Inhoit, Mitgliada und API-Schlüssln wern entfernt. Du konnst se innahoib vo 30 Tog wiedaherstöhn, bevor's fia ollaweu weg is.",
+          "label": "Site leschn"
+        },
+        "gracePeriodNote": "Site glescht – du konnst se innahoib vo 30 Tog wiedaherstöhn."
+      },
+      "confirm": {
+        "typeToConfirm": "Tipp {{phrase}} ei, damit's bestätigt is",
+        "placeholder": "Zum Bestätigen eitippn",
+        "cancel": "Obbrechn",
+        "mismatch": "Da Text passt net. Tipp eam genau so ei, damit's weidageht."
+      }
+    },
+    "forms": {
+      "title": "Formulare",
+      "subtitle": "Site-weite Einstellungen, die für jedes Formular dieser Site gelten.",
+      "botProtection": {
+        "title": "Bot-Schutz",
+        "description": "Formulare mit Pflicht-Schutz nehmen erst Einsendungen an, wenn eine Bot-Schutz-Prüfung bestanden ist. Selbst gehostetes ALTCHA ist die Voreinstellung – keine Anmeldung, keine Drittanbieter-Aufrufe, DSGVO-konform. Bei Bedarf können Sie zu einem eigenen Captcha-Anbieter wechseln.",
+        "loading": "Bot-Schutz-Einstellungen werden geladen …",
+        "saved": "Bot-Schutz gespeichert.",
+        "saveFailed": "Speichern des Bot-Schutzes fehlgeschlagen.",
+        "removed": "Bot-Schutz entfernt.",
+        "removeFailed": "Entfernen des Bot-Schutzes fehlgeschlagen.",
+        "reconfigure": "Neu konfigurieren",
+        "remove": "Entfernen",
+        "reenterSecret": "Aus Sicherheitsgründen wird das Geheimnis nie zurückgelesen. Bitte erneut eingeben, um Änderungen zu speichern.",
+        "statusConfigured": "Konfiguriert",
+        "verifyUrlLabel": "Verify-URL",
+        "fields": {
+          "label": "Anbieter-Bezeichnung",
+          "labelHelp": "Freitext-Bezeichnung im Admin-UI (z. B. „Turnstile\"). Wird nicht zur Auswahl eines Anbieters verwendet – das macht die URL.",
+          "verifyUrl": "Verify-URL",
+          "verifyUrlHelp": "Der Server-seitige siteverify-Endpunkt des Anbieters. Forja sendet bei jeder pflicht-geschützten Einsendung `secret`+`response` dorthin.",
+          "secret": "Geheimnis",
+          "secretHelp": "Site-spezifisches Geheimnis Ihres Captcha-Anbieters. Verschlüsselt gespeichert."
+        },
+        "errors": {
+          "labelRequired": "Anbieter-Bezeichnung ist erforderlich.",
+          "urlRequired": "Verify-URL ist erforderlich.",
+          "urlInvalid": "Verify-URL ist keine gültige URL.",
+          "urlScheme": "Verify-URL muss http oder https verwenden.",
+          "secretRequired": "Geheimnis ist erforderlich (bei jedem Speichern erneut eingeben)."
+        },
+        "deleteConfirm": {
+          "title": "Bot-Schutz entfernen?",
+          "body": "Formulare mit Pflicht-Schutz werden Einsendungen ablehnen, bis Sie wieder einen Verifier konfigurieren."
+        },
+        "mode": {
+          "label": "Anbieter",
+          "altcha": "ALTCHA (selbst gehostet)",
+          "altchaRecommended": "ALTCHA (selbst gehostet) – empfohlen",
+          "remote": "Eigener Captcha-Anbieter"
+        },
+        "altcha": {
+          "description": "Selbst gehosteter Proof-of-Work. Kein Konto, keine Drittanbieter-Anfragen, keine Cookies – Besucherdaten verlassen niemals Ihre Infrastruktur. Der Signierschlüssel wird beim Speichern erzeugt und verschlüsselt abgelegt.",
+          "regenerateKey": "Schlüssel neu erzeugen",
+          "keyRegenerated": "ALTCHA-Schlüssel neu erzeugt.",
+          "keyRegenerateFailed": "Neuerzeugung des Schlüssels fehlgeschlagen.",
+          "regenConfirm": {
+            "title": "ALTCHA-Schlüssel neu erzeugen?",
+            "body": "Ein neuer Signierschlüssel wird sofort erzeugt. Eine gerade von einem Besucher gelöste Challenge wird ungültig und muss neu abgerufen werden."
+          },
+          "challengeUrlLabel": "Challenge-URL des Widgets",
+          "challengeUrlHint": "Setze die `challenge` deines ALTCHA-Widgets auf diesen Endpunkt auf deinem öffentlichen API-Host und ersetze <form-slug> durch den Slug des jeweiligen Formulars."
+        },
+        "loadError": "Die aktuellen Bot-Schutz-Einstellungen konnten nicht geladen werden. Du kannst sie unten trotzdem konfigurieren; beim Speichern wird der gespeicherte Wert überschrieben."
+      }
+    },
+    "cache": {
+      "title": "Antwort-Cache",
+      "description": "Zwischengespeicherte öffentliche Abfragen für diese Site. Leeren erzwingt frische Daten; Neuaufbau wärmt zudem die häufigen Ressourcen vor.",
+      "entryCount": "{{n}} Cache-Einträge",
+      "invalidate": "Leeren",
+      "rebuild": "Neu aufbauen",
+      "rebuildHelp": "Neuaufbau leert den Cache und wärmt deterministische Ressourcen vor; der Rest füllt sich bei Bedarf.",
+      "invalidated": "Cache geleert ({{n}} Einträge entfernt)",
+      "rebuilt": "Cache neu aufgebaut ({{n}} geleert, {{warmed}} vorgewärmt)",
+      "actionFailed": "Cache-Aktion fehlgeschlagen"
+    }
+  },
+  "settings": {
+    "title": "Einstöllungen",
+    "subtitle": "Seitnkonfiguration und Systeminformationen",
+    "tabs": {
+      "siteSettings": "Seitneinstöllungen",
+      "systemInfo": "Systeminfo",
+      "preferences": "Vorliebm",
+      "legal": "Rechtlichs",
+      "apiKeys": "API-Schlüssel",
+      "modules": "Module",
+      "ai": "KI-Assistent"
+    },
+    "modules": {
+      "title": "Inhoitsmodule",
+      "description": "Inhoitsmodule fia de Seitn aktiviern oda deaktiviern. Deaktivierte Module werdn in da Seitnleistn ausblend't und ihre API-Endpunkte gebn 403 zruck.",
+      "blog": "Blog",
+      "blogDesc": "Artikl, Tutorials und Neuigkeitn veröffentlichn",
+      "pages": "Seitn",
+      "pagesDesc": "Statische Seitn mit Obschnittn und Layouts erstöhn",
+      "cv": "Lebenslauf",
+      "cvDesc": "Berufserfohrung, Ausbildung und Fähigkeitn verwoidn",
+      "legal": "Rechtlichs",
+      "legalDesc": "Datenschutzrichtlinie, Nutzungsbedingungen und rechtliche Dokumente",
+      "documents": "Dokumente",
+      "documentsDesc": "Downloadbore Datein auffelodn und verwoidn",
+      "ai": "KI-Assistent",
+      "aiDesc": "SEO-Generierung, automatische Auszüg und Übasetzungsvorschläg",
+      "portfolio": "Portfolio",
+      "portfolioDesc": "CV-Einträge, Fähigkeiten und Projekte verwalten",
+      "forms": "Formulare",
+      "formsDesc": "Strukturierte Einsendungen mit eigenen Feldern, Validierung und DSGVO-Selbstauskunft sammeln",
+      "collections": "Sammlungen",
+      "collectionsDesc": "Benutzerdefinierte Inhaltstypen mit integrierten DSGVO-Kontrollen."
+    },
+    "selectSiteAlert": "Wähl a Seitn in da Kopfzeiln aus, um de Einstöllungen z'verwoidn.",
+    "loadingSiteSettings": "Seitneinstöllungen werdn glodn...",
+    "uploadLimits": {
+      "title": "Upload-Limits",
+      "maxDocumentSize": "Max. Dokumentdateigreß",
+      "maxMediaSize": "Max. Mediendateigreß"
+    },
+    "general": {
+      "title": "Allgemein",
+      "contactEmail": "Kontakt-E-Mail",
+      "siteUrl": "Website-URL",
+      "siteUrlHelper": "De kanonische öffentliche URL vo deiner Website (z.B. https://example.com). Werd fia Sitemaps, SEO-Tags und Vorschau-Links verwendet.",
+      "siteUrlPlaceholder": "https://beispiel.de"
+    },
+    "advanced": {
+      "title": "Erweiterte Einstöllungen",
+      "description": "Konfigurationsoptionen fia erfohrene Benutzer und Team-Workflows"
+    },
+    "featureToggles": {
+      "title": "Funktionsschoita",
+      "analytics": "Analytik",
+      "analyticsDescription": "Website-Analytik-Tracking aktiviern",
+      "maintenanceMode": "Wortungsmodus",
+      "maintenanceModeDescription": "Wortungsseitn fia Besucher ozoagn",
+      "maintenanceModeActive": "Wortungsmodus is aktiv — dei Seitn is fia Besucher ned erreichbor.",
+      "turnOffMaintenance": "Ausschoitn",
+      "editorialWorkflow": "Redaktioneller Workflow",
+      "editorialWorkflowDescription": "Inhoite vor da Veröffentlichung prüfn lossn. Autorn reichn zur Überprüfung ein, Reviewer genehmign oda fordern Änderungen o."
+    },
+    "passwordPolicy": {
+      "title": "Dokumenten-Posswortrichtlinie",
+      "description": "Posswortoforderungen fia gschützte Dokumente konfigurieren",
+      "minLength": "Minimale Posswortläng",
+      "regex": "Posswortmuster (Regex)",
+      "regexHelp": "Leer lossn fia ka Musteroforderung"
+    },
+    "preview": {
+      "title": "Vorschau-Templates",
+      "description": "Dev-Server-URLs fia de Live-Vorschau konfigurieren",
+      "name": "Template-Nom",
+      "url": "Vorschau-URL",
+      "add": "Template dazuageben",
+      "openPreview": "Vorschau aufmochn"
+    },
+    "saveButton": "Einstöllungen speichan",
+    "messages": {
+      "saved": "Einstöllungen gspeichert",
+      "saveFailed": "Einstöllungen ham ned gspeichert werdn kenna"
+    },
+    "systemInfo": {
+      "serverHealth": "Serverzustand",
+      "checkingHealth": "Serverzustand werd überprüft...",
+      "overallStatus": "Gsomtstatus:",
+      "service": "Dienst",
+      "status": "Status",
+      "latency": "Latenz",
+      "details": "Details",
+      "autoRefresh": "Automatische Aktualisierung olle 30 Sekundn",
+      "environments": "Umgebungen",
+      "loadingEnvironments": "Umgebungen werdn glodn...",
+      "noEnvironments": "Ka Umgebungen konfiguriert",
+      "envName": "Nom",
+      "envDisplayName": "Ozoagnom",
+      "envDefault": "Standard",
+      "envCreated": "Erstöht",
+      "locales": "Sprochn",
+      "loadingLocales": "Sprochn werdn glodn...",
+      "noLocales": "Ka Sprochn konfiguriert",
+      "localeCode": "Code",
+      "localeName": "Nom",
+      "localeNativeName": "Eigennom",
+      "localeDirection": "Richtung",
+      "localeActive": "Aktiv",
+      "localesMovedDescription": "Sprochn werdn jetzt auf ana eigenen Seitn verwoidn.",
+      "manageLocales": "Sprochn verwoidn"
+    },
+    "preferences": {
+      "title": "Vorliebm",
+      "language": {
+        "title": "Sproch",
+        "label": "Admin-Sproch",
+        "description": "Wähl de Ozoagsproch fia de Admin-Oberfläche"
+      },
+      "theme": {
+        "title": "Design",
+        "label": "Forbschema",
+        "description": "Wähl a Forbschema fia de Admin-Oberfläche"
+      },
+      "tableDisplay": {
+        "title": "Tabellenozoag",
+        "pageSizeLabel": "Zeiln pro Seitn",
+        "pageSizeDescription": "Standardonzohl vo Zeiln in Admin-Tabelln"
+      },
+      "accent": {
+        "title": "Akzentforb",
+        "label": "Akzent",
+        "description": "Wird auf ollе Designs angewendet; Catppuccin-Varianten nutzen paletten-passende Akzente",
+        "violet": "Violett",
+        "coral": "Koralle",
+        "teal": "Blaugreen",
+        "amber": "Beanstoa"
+      },
+      "density": {
+        "title": "Dichtn",
+        "label": "Zeilendichtn",
+        "description": "Kompakt mocht Listen und Navigationsdingsbums kleana",
+        "comfortable": "Bequeem",
+        "compact": "Kompokt"
+      }
+    },
+    "robotsTxt": {
+      "title": "robots.txt-Konfiguration",
+      "description": "Leg fest, wia Suchmaschinen-Crawler auf dei Seitn zuagreifn. Änderungen wirken sofort am öffentlichen robots.txt-Endpunkt.",
+      "userAgent": "User-Agent",
+      "userAgentPlaceholder": "z. B. * oda Googlebot",
+      "directive": "Direktive",
+      "path": "Pfod",
+      "pathPlaceholder": "z. B. / oda /admin",
+      "addDirective": "Direktive dazuageben",
+      "addUserAgent": "User-Agent-Block dazuageben",
+      "removeBlock": "Block entfernen",
+      "removeDirective": "Direktive entfernen",
+      "resetDefaults": "Auf Standardwerte zrucksetzen",
+      "preview": "Vorschau",
+      "previewDescription": "So schaut dei robots.txt fia Crawler aus:",
+      "allow": "Erlaubn",
+      "disallow": "Verbietn",
+      "sitemapNote": "De Sitemap-Direktive werd automatisch dazuagfügt, waun a Website-URL konfiguriert is.",
+      "quickAdd": "Schnö dazuageben:",
+      "emptyBlock": "Leerer Block",
+      "emptyBlockTooltip": "An leerern User-Agent-Block dazuageben",
+      "saved": "robots.txt-Regeln erfolgreich gspeichert",
+      "saveFailed": "Fehler beim Speichern vo de robots.txt-Regeln"
+    },
+    "seoDefaults": {
+      "title": "SEO-Standardwerte",
+      "description": "Leg seitenweite Fallbacks fia Meta-Titel, Beschreibungen und Open-Graph-Büdl fest. De Werte werdn verwendet, waun Inhoite ka eigene SEO-Metadaten hobn.",
+      "titleTemplate": "Titel-Vorlog",
+      "titleTemplateHelper": "Verwend {{title}} fia den Inhoidstitel und {{site_name}} fia den Seitennomen",
+      "titlePreview": "Vorschau",
+      "defaultDescription": "Standard-Meta-Beschreibung",
+      "defaultDescriptionPlaceholder": "A kurze Beschreibung vo deiner Website fia Suchmaschinen...",
+      "charsRecommended": "Zeichn empfohln",
+      "defaultOgImage": "Standard-Open-Graph-Büdl",
+      "selectImage": "Büdl auswähln",
+      "changeImage": "Büdl ändern",
+      "clearImage": "Entfernen",
+      "ogImageHelper": "Fallback-Büdl, waun a Inhoit ka Titelbüdl hot. Empfohln: 1200×630 px.",
+      "resetDefaults": "Auf Standardwerte zrucksetzen",
+      "saved": "SEO-Standardwerte erfolgreich gspeichert",
+      "saveFailed": "Fehler beim Speichern vo de SEO-Standardwerte"
+    },
+    "codeInjection": {
+      "warning": "Code, der do eintraogn werd, lauft auf deiner Live-Seitn. Füg nur Skripte aus vertrauenswürdigen Quelln dazua.",
+      "headTitle": "Head-Code-Einbindung",
+      "headDescription": "HTML, CSS oda JavaScript, des in den <head>-Bereich eingfügt werd. Verwend des fia Analytics, Verifizierungs-Tags oda eigene Meta-Tags.",
+      "headPlaceholder": "<!-- z. B. Google Analytics, Search Console-Verifizierung -->",
+      "footerTitle": "Footer-Code-Einbindung",
+      "footerDescription": "HTML oda JavaScript, des vor dem schließenden </body>-Tag eingfügt werd. Verwend des fia Chat-Widgets, Tracking-Pixel oda ondare Skripte.",
+      "footerPlaceholder": "<!-- z. B. Chat-Widget, Tracking-Skripte -->",
+      "chars": "Zeichn",
+      "saved": "Code-Einbindung erfolgreich gspeichert",
+      "saveFailed": "Fehler beim Speichern vo da Code-Einbindung"
+    },
+    "favicon": {
+      "title": "Website-Symbol",
+      "description": "Lod a Quellbüdl hoch (512×512 px oda größer empfohln), um a vollständiges Favicon-Paket zum Generieren.",
+      "dropHere": "Büdl do her ziachn",
+      "recommended": "PNG, JPEG, GIF oda WebP. 512×512 px oda größer empfohln.",
+      "selectFile": "Datei auswähln",
+      "generating": "Werd generiert...",
+      "variants": "Generierte Variantn",
+      "colors": "Themenforbn",
+      "themeColor": "Themenforb",
+      "bgColor": "Hintergrundforb",
+      "snippet": "HTML-Snippet",
+      "copySnippet": "In de Zwischnoblog kopieren",
+      "snippetCopied": "Snippet in de Zwischnoblog kopiert",
+      "noFavicon": "No ka Favicon-Paket generiert. Lod a Quellbüdl hoch.",
+      "uploadSuccess": "Favicon-Paket erfolgreich generiert",
+      "uploadFailed": "Fehler beim Generieren vom Favicon-Paket",
+      "colorsSaved": "Themenforbn gspeichert",
+      "download": "Paket runterlodn",
+      "downloadFailed": "Fehler beim Runterlodn vom Favicon-Paket",
+      "chooseFromMedia": "Aus da Mediabibliothek wähln",
+      "fileTooLarge": "Datei z'groß (max. {{maxMB}} MB)"
+    }
+  },
+  "onboarding": {
+    "welcome": "Servas bei Forja!",
+    "subtitle": "Des Headless-CMS, wos ois kaun — Multi-Site, mehrsprochig, und a REST-API, de si g'woschn hot.",
+    "description": "Moch dei erschte Website auf und leg los mit Seitn, Blogbeiträg, Medien und mehr. Ois über a gscheite API, wia si's g'hört.",
+    "features": {
+      "multiSite": "Multi-Site",
+      "multiSiteDesc": "Olle deine Websites auf am Fleck — jede mit eigene Inhoite und Einstöllungen. Praktisch, gö?",
+      "multilingual": "Mehrsprochig",
+      "multilingualDesc": "Eingebaute Lokalisierung mit Unterstützung fia jede Sproch und RTL-Textrichtung.",
+      "apiFirst": "API-First",
+      "apiFirstDesc": "Headless, REST-API, liefert an jedes Frontend. Schmäh pur, oba technisch sauber."
+    },
+    "preferences": {
+      "title": "Deine Einstöllungen",
+      "description": "Leg dei bevorzugte Sproch und dei Design fest, bevors losgeht."
+    },
+    "createSite": "Erschte Website erstöhn",
+    "stepPrefix": "Schritt 1 vo 1",
+    "survey": {
+      "subtitle": "Gemma, richt ma des g'schwind ein.",
+      "description": "A poor Fragen und dann passt's scho — dauert ned lang, versprochen.",
+      "getStarted": "Na dann, los!",
+      "skip": "I pfeif drauf",
+      "finish": "Fertig, moch ma de Seitn!",
+      "userTypeTitle": "Wos bist du fia a Typ?",
+      "userTypeDescription": "So kenna ma d'Oberfläche und Standardeinstöllungen auf dei Bedürfnisse abstimmen.",
+      "userTypes": {
+        "solo": "Einzelkämpfer",
+        "soloDesc": "I moch des ois allein, braucht ka Hilfe",
+        "team": "Klanes Team",
+        "teamDesc": "2–10 Leit orbeiten zam",
+        "agency": "Agentur / Studio",
+        "agencyDesc": "Verwoidung vo mehrere Kundn-Seitn"
+      },
+      "intentTitle": "Wos wüst du baun?",
+      "intentDescription": "Wähl ois aus, wos zutrifft. Mia konfigurieren de passenden Module fia di vor.",
+      "intents": {
+        "blog": "Blog / Newsletter",
+        "blogDesc": "Artikl, Neuigkeitn oda Newsletter veröffentlichn",
+        "portfolio": "Portfolio / Showcase",
+        "portfolioDesc": "Projekte, Orbeitsprobm oda an Lebenslauf präsentiern",
+        "marketing": "Marketing-Website / Landingpages",
+        "marketingDesc": "Produktseitn, Kampagnen oda Landingpages",
+        "docs": "Dokumentation / Wissensdonabank",
+        "docsDesc": "Technische Doku, Onleitungen oda Hüfeartikel",
+        "company": "Firmenwebsite",
+        "companyDesc": "Firmenauftritt mit Blog, Seitn und rechtlichen Inhoitn"
+      }
+    }
+  },
+  "setupChecklist": {
+    "title": "Erschte Schritte",
+    "description": "Moch de Schritte fertig, um dei Website einz'richtn und Inhoite z'veröffentlichn.",
+    "completeTitle": "Ois erledigt!",
+    "completeDescription": "Du host olle Einrichtungsschritte fertig. Kaunnst jetzt veröffentlichn!",
+    "progress": "{{completed}} vo {{total}} erledigt",
+    "dismiss": "Checklistn ausblndn",
+    "deleteSamples": "Olle Beispielinhoite leschn",
+    "steps": {
+      "create_site": "Website erstöhn",
+      "edit_first_post": "Erschtn Beitrog beorbeiten",
+      "preview_site": "Website-Vorschau oschaun",
+      "publish_first_post": "Erschtn Beitrog veröffentlichn",
+      "customize_settings": "Website-Einstöllungen opassn",
+      "invite_team": "Teammitglied einlodn",
+      "setup_workflow": "Redaktionellen Workflow einrichtn",
+      "createSite": "Erschte Website erstöhn",
+      "addLanguage": "Sproch dazuageben",
+      "createPage": "Seitn erstöhn",
+      "writeBlog": "Blogbeitrog schreibn",
+      "setupNav": "Navigation einrichtn"
+    },
+    "descriptions": {
+      "create_site": "Dei Website is erstöht wordn",
+      "edit_first_post": "Moch an Blogbeitrog auf und gstoit'n noch deine Wünsch",
+      "preview_site": "Schau da o, wia dei Inhoite fia d'Besucher ausschaun",
+      "publish_first_post": "Mit am Klick online gehn",
+      "customize_settings": "Nom, Beschreibung und Erscheinungsbüd",
+      "invite_team": "Fieg Mitorbeiter zu deiner Website dazu",
+      "setup_workflow": "Freigob- und Genehmigungsprozess aktiviern"
+    },
+    "estimates": {
+      "done": "Erledigt",
+      "30sec": "~30 Sek.",
+      "1min": "~1 Min.",
+      "2min": "~2 Min."
+    }
+  },
+  "firstRunTip": {
+    "title": "Kurzer Tipp",
+    "description": "Beorbeit zerscht den Titl, donn verwend de /-Taste, um Überschriften, Büda und mehr dazuzuageben. Waunnst fertig bist, druck in da Toolbar auf \"Veröffentlichn\"."
+  },
+  "firstPublish": {
+    "title": "Du bist online!",
+    "description": "Dei erschter Beitrog is veröffentlicht.",
+    "viewPost": "Beitrog oschaun",
+    "writeAnother": "An weitern schreibn"
+  },
+  "teamWorkflowPrompt": {
+    "message": "Dei Seitn hot jetzt mehrere Mitwirkende. Aktivier de redaktionelle Überprüfung, damit Inhoite vor da Veröffentlichung prüft werdn.",
+    "enableButton": "In Einstöllungen aktiviern",
+    "dismissButton": "Verwerfen"
+  },
+  "activity": {
+    "title": "Aktivität",
+    "subtitle": "Protokoll vo olle Änderungen auf dera Website",
+    "loading": "Aktivität werd glodn...",
+    "empty": "No ka Aktivität",
+    "emptyDescription": "Aktionen wia Erstöhn, Aktualisieren und Leschn vo Inhoitn werdn do ozoagt.",
+    "noFilterResults": "Ka passende Aktivität",
+    "noFilterResultsDescription": "Ka Aktivität passt zu de ausgwählten Filter. Probier de Filter z'ändern oda zruckzusetzen.",
+    "columns": {
+      "timestamp": "Zeitstempel",
+      "action": "Aktion",
+      "entityType": "Entitätstyp",
+      "entityId": "Entitäts-ID",
+      "userId": "Benutzer",
+      "entity": "Entität"
+    },
+    "filters": {
+      "action": "Aktion",
+      "entityType": "Entitätstyp",
+      "all": "Gesamter Zeitraum",
+      "last24h": "Letzte 24 Stunden",
+      "last30d": "Letzte 30 Tage",
+      "last7d": "Letzte 7 Tage",
+      "timeframe": "Zeitraum"
+    },
+    "actions": {
+      "Approve": "Genehmigt",
+      "Archive": "Archiviert",
+      "Create": "Erstellt",
+      "Delete": "Gelöscht",
+      "Export": "Exportiert",
+      "Login": "Angemeldet",
+      "Logout": "Abgemeldet",
+      "OwnershipTransfer": "Eigentümer übertragen",
+      "PermissionDenied": "Zugriff verweigert",
+      "Publish": "Veröffentlicht",
+      "Read": "Angesehen",
+      "RequestChanges": "Änderungen angefordert",
+      "Restore": "Wiederhergestellt",
+      "SettingsUpdate": "Einstellungen aktualisiert",
+      "SubmitReview": "Zur Prüfung eingereicht",
+      "Unpublish": "Zurückgezogen",
+      "Update": "Aktualisiert"
+    },
+    "aiUsage": {
+      "label": "KI genutzt",
+      "last30d": "letzte 30 Tage",
+      "totalSuffix": "mal"
+    },
+    "entities": {
+      "ai_config": "KI-Konfiguration",
+      "ai_generation": "KI-Generierung",
+      "api_key": "API-Schlüssel",
+      "blog": "Blog",
+      "category": "Kategorie",
+      "cv_entry": "CV-Eintrag",
+      "document": "Dokument",
+      "legal_document": "Rechtliches",
+      "media": "Medium",
+      "member": "Mitglied",
+      "navigation_item": "Nav-Eintrag",
+      "navigation_menu": "Nav-Menü",
+      "page": "Seite",
+      "project": "Projekt",
+      "site": "Website",
+      "site_settings": "Website-Einstellungen",
+      "skill": "Fähigkeit",
+      "social_link": "Social-Link",
+      "tag": "Schlagwort",
+      "trash": "Papierkorb"
+    }
+  },
+  "entityHistory": {
+    "title": "Verlauf",
+    "noHistory": "No ka Verlauf aufgzeichnet",
+    "events": "Ereignisse",
+    "changes": "Földonnerungen",
+    "oldValue": "Oid",
+    "newValue": "Nei",
+    "revert": "Zrucksetzen",
+    "revertConfirmTitle": "Änderungen zrucksetzen",
+    "revertConfirmMessage": "Foigende Földer auf ihre vorherigen Werte zrucksetzen?",
+    "reverted": "Änderungen zruckgsetzt",
+    "revertFailed": "Zrucksetzen is schiefgangen"
+  },
+  "unsavedChanges": {
+    "title": "Ungespeicherte Änderungen",
+    "message": "Du host ungespeicherte Änderungen. Verwerfen und gehn?",
+    "stay": "Bleibn",
+    "discard": "Verwerfen",
+    "count_one": "{{count}} ungespeicherte Änderung",
+    "count_other": "{{count}} ungespeicherte Änderungen",
+    "viewChanges": "Geänderte Felder anzeigen",
+    "changedFields": "Geänderte Felder",
+    "revertAll": "Alle zurücksetzen",
+    "revertField": "{{field}} zurücksetzen"
+  },
+  "inlineEdit": {
+    "clickToEdit": "Drauf druckn zum Beorbeiten"
+  },
+  "notFound": {
+    "title": "404",
+    "subtitle": "Seitn ned gfundn",
+    "goToDashboard": "Zum Dashboard"
+  },
+  "apiDocs": {
+    "title": "API-Dokumentation",
+    "subtitle": "Interaktive API-Dokumentation",
+    "adminTab": "Admin-API",
+    "consumerTab": "Consumer-API",
+    "download": "Spec herunterladen"
+  },
+  "forms": {
+    "blog": {
+      "createTitle": "Blog erstöhn",
+      "editTitle": "Blog beorbeiten",
+      "fields": {
+        "siteId": "Seitn",
+        "locale": "Sproch",
+        "slug": "Slug",
+        "author": "Autor",
+        "status": "Status",
+        "featured": "Hervorgh'obener Beitrog",
+        "publishedDate": "Veröffentlichungsdatum"
+      }
+    },
+    "page": {
+      "createTitle": "Seitn erstöhn",
+      "editTitle": "Seitn beorbeiten",
+      "fields": {
+        "siteId": "Seitn",
+        "route": "Route",
+        "pageType": "Seitntyp",
+        "status": "Status",
+        "inNavigation": "In da Navigation ozoagn",
+        "navTitle": "Navigationstitl",
+        "navOrder": "Navigationsreihnfoig"
+      }
+    },
+    "site": {
+      "createTitle": "Website erstöhn",
+      "editTitle": "Website beorbeiten",
+      "fields": {
+        "name": "Nom",
+        "slug": "Slug",
+        "description": "Beschreibung",
+        "domain": "Domain",
+        "active": "Aktiv",
+        "initialLanguages": "Ofongssprochn",
+        "initialLanguagesHelper": "Wähl mindestens a Sproch fia dei Seitn",
+        "defaultLanguage": "Standardsproch"
+      },
+      "validation": {
+        "minOneLocale": "Mindestens a Sproch is erforderlich",
+        "exactlyOneDefault": "Genau a Sproch muass ois Standard festglegt werdn"
+      }
+    },
+    "navigation": {
+      "createTitle": "Navigationselement erstöhn",
+      "editTitle": "Navigationselement beorbeiten",
+      "fields": {
+        "type": "Typ",
+        "page": "Seitn",
+        "externalUrl": "Externe URL",
+        "icon": "Symbol",
+        "openInNewTab": "In neichem Tab aufmochn",
+        "label": "Bezeichnung",
+        "locale": "Sproch",
+        "blog": "Blog-Beitrag"
+      }
+    },
+    "socialLink": {
+      "createTitle": "Social Link erstöhn",
+      "editTitle": "Social Link beorbeiten",
+      "fields": {
+        "title": "Titl",
+        "url": "URL",
+        "icon": "Symbol",
+        "ariaLabel": "Aria-Label"
+      }
+    },
+    "locale": {
+      "createTitle": "Sproch dazuageben",
+      "editTitle": "Sproch beorbeiten",
+      "fields": {
+        "code": "Code",
+        "name": "Nom",
+        "nativeName": "Eigennom",
+        "direction": "Richtung",
+        "active": "Aktiv"
+      },
+      "validation": {
+        "codeFormat": "Format: en oda en-US"
+      }
+    },
+    "tag": {
+      "createTitle": "Tag erstöhn",
+      "editTitle": "Tag beorbeiten",
+      "fields": {
+        "slug": "Slug",
+        "global": "Global (seitnübagreifend)",
+        "slugHelper": "URL-freindlicher Bezeichner — Klanbuchstabn, Zohln und Bindestriche (z.B. \"mei-tag\")",
+        "globalHelper": "Globale Tags werdn üba olle Seitn teilt. Seitnspezifische Tags ghörn nur zur aktuelln Seitn."
+      }
+    },
+    "category": {
+      "createTitle": "Kategorie erstöhn",
+      "editTitle": "Kategorie beorbeiten",
+      "fields": {
+        "slug": "Slug",
+        "parent": "Übergeordnete Kategorie",
+        "noParent": "Kaner (oberste Ebene)",
+        "global": "Global (seitnübagreifend)",
+        "slugHelper": "URL-freindlicher Bezeichner — Klanbuchstabn, Zohln und Bindestriche (z.B. \"webentwicklung\")",
+        "globalHelper": "Globale Kategorien werdn üba olle Seitn teilt. Seitnspezifische Kategorien ghörn nur zur aktuelln Seitn.",
+        "parentHelper": "Ordne de Kategorie ana übergeordnetn zu, um a Hierarchie aufz'baun (z.B. Technologie > Webentwicklung)"
+      }
+    },
+    "cvEntry": {
+      "createTitle": "Lebenslauf-Eintrog erstöhn",
+      "editTitle": "Lebenslauf-Eintrog beorbeiten",
+      "fields": {
+        "siteId": "Seitn",
+        "entryType": "Eintragstyp",
+        "company": "Firma / Organisation",
+        "location": "Stondort",
+        "startDate": "Startdatum",
+        "endDate": "Enddatum",
+        "isCurrent": "Aktuell do tätig",
+        "displayOrder": "Ozoagreihnfoig",
+        "title": "Berufsbezeichnung",
+        "description": "Beschreibung",
+        "locale": "Sproch"
+      }
+    },
+    "skill": {
+      "createTitle": "Fähigkeit erstöhn",
+      "editTitle": "Fähigkeit beorbeiten",
+      "fields": {
+        "siteId": "Seitn",
+        "name": "Nom",
+        "slug": "Slug",
+        "category": "Kategorie",
+        "proficiency": "Kenntnisstond",
+        "icon": "Symbol",
+        "displayOrder": "Ozoagreihnfoig"
+      }
+    },
+    "legal": {
+      "createTitle": "Rechtliches Dokument erstöhn",
+      "editTitle": "Rechtliches Dokument beorbeiten",
+      "fields": {
+        "cookieName": "Cookie-Nom",
+        "documentType": "Dokumenttyp"
+      }
+    },
+    "mediaUpload": {
+      "title": "Medium registriern",
+      "fields": {
+        "siteId": "Seitn",
+        "publicUrl": "Öffentliche URL",
+        "filename": "Dateinam",
+        "originalFilename": "Originaldateinam",
+        "mimeType": "MIME-Typ",
+        "fileSize": "Dateigreß (Bytes)",
+        "width": "Breitn (px)",
+        "height": "Heh (px)",
+        "altText": "Alt-Text",
+        "caption": "Büdunterschrift",
+        "title": "Titl",
+        "folder": "Ordna"
+      }
+    },
+    "mediaDetail": {
+      "title": "Mediendetails",
+      "fileInfo": "Dateiinformationen",
+      "fields": {
+        "filename": "Dateinam",
+        "originalFilename": "Originaldateinam",
+        "mimeType": "MIME-Typ",
+        "fileSize": "Dateigreß",
+        "dimensions": "Obmaßungen",
+        "publicUrl": "Öffentliche URL",
+        "altText": "Alt-Text",
+        "caption": "Büdunterschrift",
+        "title": "Titl",
+        "folder": "Ordna",
+        "noFolder": "Ka Ordna",
+        "created": "Erstöht",
+        "focalPoint": "Fokuspunkt"
+      },
+      "focalPoint": {
+        "instruction": "Klick aufs Büd, um den Fokuspunkt z'setzn",
+        "reset": "Auf Mittn zrucksetzen",
+        "saved": "Fokuspunkt aktualisiert"
+      },
+      "messages": {
+        "updated": "Medium aktualisiert",
+        "updateFailed": "Medium hot ned aktualisiert werdn kenna"
+      }
+    },
+    "document": {
+      "createTitle": "Dokument erstöhn",
+      "editTitle": "Dokument beorbeiten",
+      "fields": {
+        "siteId": "Seitn",
+        "title": "Titl",
+        "slug": "Slug",
+        "description": "Beschreibung",
+        "documentType": "Dokumenttyp",
+        "fileUrl": "Datei-URL",
+        "fileSize": "Dateigreß (Bytes)",
+        "mimeType": "MIME-Typ",
+        "status": "Status",
+        "sourceType": "Quöllntyp",
+        "urlHelp": "Voiständige URL zum Dokument oda zur Ressource"
+      },
+      "source": {
+        "link": "Link",
+        "upload": "Auffelodn"
+      },
+      "currentFile": "Aktuelle Datei",
+      "errors": {
+        "noFile": "Bitte wähl a Datei zum Auffelodn aus"
+      }
+    },
+    "webhook": {
+      "createTitle": "Webhook erstöhn",
+      "editTitle": "Webhook beorbeiten",
+      "fields": {
+        "url": "URL",
+        "urlHelper": "Da Endpunkt, der POST-Ofrogn mit Ereignisdatn empfangt",
+        "description": "Beschreibung",
+        "events": "Ereignisse",
+        "eventsHelper": "Leer lossn fia olle Ereignisse",
+        "active": "Aktiv",
+        "debounce": "Entprell-Fensta",
+        "debounceHelper": "Ereignisse innerhoib vo dem Zeitfensta zu ana einzelnen Zustellung bündln (0 = sofort)",
+        "debounceUnit": "Sekundn"
+      }
+    },
+    "contentTemplate": {
+      "createTitle": "Vorlog erstöhn",
+      "editTitle": "Vorlog beorbeiten",
+      "sections": {
+        "metadata": "Vorlogneinstöllungen",
+        "content": "Standardinhoit"
+      },
+      "fields": {
+        "name": "Nom",
+        "description": "Beschreibung",
+        "icon": "Symbol",
+        "slugPrefix": "Slug-Präfix",
+        "isFeatured": "Standardmäßig hervorgh'oben",
+        "allowComments": "Kommentare standardmäßig erlaubn",
+        "isActive": "Aktiv",
+        "title": "Titl",
+        "subtitle": "Untertitl",
+        "excerpt": "Auszug",
+        "body": "Inhoit (Markdown)",
+        "metaTitle": "Meta-Titl",
+        "metaDescription": "Meta-Beschreibung"
+      }
+    },
+    "redirect": {
+      "createTitle": "Weiterleitung erstöhn",
+      "editTitle": "Weiterleitung beorbeiten",
+      "fields": {
+        "sourcePath": "Quöll-Pfod",
+        "sourcePathHelper": "Da Pfod, der umgleitet werdn soit (z.B. /oida-pfod)",
+        "destinationPath": "Ziel-URL",
+        "destinationPathHelper": "De Ziel-URL (z.B. /neicher-pfod oda https://example.com)",
+        "statusCode": "Weiterleitungstyp",
+        "permanent": "301 — Permanent",
+        "temporary": "302 — Temporär",
+        "temporaryStrict": "307 — Temporär (Methode bleibt erhalten)",
+        "permanentStrict": "308 — Permanent (Methode bleibt erhalten)",
+        "description": "Beschreibung",
+        "active": "Aktiv"
+      }
+    },
+    "section": {
+      "title": "Obschnitt beorbeiten",
+      "fields": {
+        "displayOrder": "Ozoagreihnfoig",
+        "settings": "Einstöllungen",
+        "buttonText": "Schaltflächntext",
+        "ctaRoute": "Call-to-Action-Route",
+        "ctaHelperText": "Optionaler CTA-Link-Pfod",
+        "text": "Text"
+      },
+      "localizedContent": "Lokalisierter Inhoit",
+      "sectionConfiguration": "Obschnittskonfiguration",
+      "noActiveLocales": "Ka aktive Sprochn konfiguriert",
+      "localeExists": "vorhandn",
+      "sectionSaved": "Obschnitt gspeichert",
+      "ai": {
+        "generateContent": "Inhalt generieren",
+        "generating": "Wird generiert…",
+        "translate": "KI-Übersetzung",
+        "suggestTranslation": "Übersetzung vorschlagen",
+        "applyTranslation": "Übernehmen",
+        "refreshField": "Feld neu übersetzen",
+        "translateHint": "Aus der Standardsprache nach {{locale}} ({{code}}) übersetzen. Vor dem Übernehmen prüfen und anpassen.",
+        "noSourceContent": "Bitte zuerst Inhalt in der Standardsprache eingeben."
+      }
+    },
+    "undo": "Rückgängig",
+    "redo": "Wiederhoin",
+    "validation": {
+      "required": "Des Föld is a Pflichtföld",
+      "minLength": "Mindestens {{count}} Zeichn",
+      "maxLength": "Maximal {{count}} Zeichn",
+      "invalidEmail": "Ungültige E-Mail-Adress",
+      "invalidUrl": "Ungültige URL",
+      "min": "Mindestwert is {{value}}",
+      "max": "Maximalwert is {{value}}"
+    },
+    "project": {
+      "createTitle": "Projekt erstellen",
+      "editTitle": "Projekt bearbeiten",
+      "fields": {
+        "slug": "Slug",
+        "displayOrder": "Anzeigereihenfolge",
+        "isFeatured": "Hervorgehoben",
+        "startDate": "Startdatum",
+        "endDate": "Enddatum",
+        "isOngoing": "Laufend",
+        "status": "Status"
+      }
+    }
+  },
+  "shared": {
+    "autosave": {
+      "retryFailed": "Automatisches Speichan is noch mehrere Versuch schiefgangen. Probier händisch mit Strg+S z'speichan."
+    },
+    "confirmDialog": {
+      "defaultTitle": "Bestätign",
+      "defaultCancel": "Obbrechen",
+      "confirmationInput": "Bestätigungstext"
+    },
+    "loadingState": {
+      "defaultLabel": "Werd glodn..."
+    },
+    "emptyState": {
+      "defaultTitle": "No nix do"
+    },
+    "folderTree": {
+      "allFiles": "Olle Datein",
+      "newFolder": "Neicher Ordna",
+      "rename": "Umbenenna",
+      "delete": "Leschn",
+      "createFolder": "Ordna erstöhn",
+      "folderName": "Ordnanom",
+      "collapse": "{{name}} eikloppm",
+      "expand": "{{name}} auskloppm"
+    },
+    "pageHeader": {},
+    "statusChip": {},
+    "errorBoundary": {
+      "title": "Do is wos schiefgangen",
+      "description": "Auf dera Seitn is a unerwarteter Fehla aufg'tretn.",
+      "showDetails": "Details ozoagn",
+      "hideDetails": "Details ausblndn",
+      "tryAgain": "Nochmal probiern",
+      "goToDashboard": "Zum Dashboard",
+      "reloadPage": "Seitn neu lodn"
+    },
+    "navigationGuard": {
+      "title": "Ungespeicherte Änderungen",
+      "message": "Du host ungespeicherte Änderungen. Wüst de Seitn wirklich verlossn?",
+      "leave": "Verlossn",
+      "stay": "Bleibn"
+    }
+  },
+  "imageCropper": {
+    "title": "Büdl zuschneidn",
+    "description": "Pass den Zuschneidebereich au, um den gwünschtn Büdlausschnitt auszuwähln.",
+    "zoom": "Zoom",
+    "cancel": "Obbrechen",
+    "apply": "Zuschnitt anwendn"
+  },
+  "profile": {
+    "title": "Profil",
+    "subtitle": "Verwoid dei Konto, Sicherheitseinstöllungen und Datn",
+    "accountInfo": "Kontoinformationen",
+    "unknownUser": "Unbekonnter Benutzer",
+    "manageAccount": "Konto verwoidn",
+    "security": "Sicherheit & Sitzungen",
+    "authMethod": "Authentifizierungsmethode",
+    "permissionLevel": "Berechtigungsstufn",
+    "siteScope": "Seitnbereich",
+    "memberSince": "Mitglied seit",
+    "lastSignIn": "Letzte Anmöldung",
+    "dataPrivacy": "Datn & Datenschutz",
+    "dataPrivacyInfo": "Du kaunst olle deine im CMS gspeicherten Datn exportiern oda dei Konto dauerhaft leschn. Exportierte Datn umfossn dei Profil, Audit-Logs, API Keys und Änderungsverlauf.",
+    "exportData": "Meine Datn exportiern",
+    "exporting": "Werd exportiert...",
+    "exportSuccess": "Datn erfolgreich exportiert",
+    "exportError": "Datnexport is schiefgangen",
+    "deleteAccount": "Konto leschn",
+    "deleteAccountTitle": "Konto leschn",
+    "deleteAccountMessage": "De Aktion is dauerhaft und kaun ned rückgängig gmocht werdn. Dei Clerk-Konto werd glescht und olle zuag'hörigen CMS-Datn werdn anonymisiert. Wüst du wirklich weitamochn?",
+    "deleteAccountConfirm": "Mei Konto leschn",
+    "deleteSuccess": "Konto erfolgreich glescht",
+    "deleteError": "Konto hot ned glescht werdn kenna"
+  },
+  "siteLocales": {
+    "title": "Sprochn",
+    "addLanguage": "Sproch dazuageben",
+    "columns": {
+      "language": "Sproch",
+      "nativeName": "Eigennom",
+      "urlPrefix": "URL-Präfix",
+      "default": "Standard",
+      "active": "Aktiv",
+      "actions": "Aktionen"
+    },
+    "addDialog": {
+      "title": "Sproch dazuageben",
+      "selectLanguage": "Sproch auswähln",
+      "urlPrefix": "URL-Präfix",
+      "urlPrefixHelper": "z.B. en, de, fr (werd in URLs vawendt)",
+      "setAsDefault": "Ois Standardsproch festlegn"
+    },
+    "setDefault": "Ois Standard festlegn",
+    "remove": "Entfernan",
+    "empty": "Dera Seitn san no ka Sprochn zuag'wiesn.",
+    "tooltips": {
+      "cannotRemoveDefault": "D'Standardsproch kaun ned entfernt werdn",
+      "cannotRemoveLast": "De letzte Sproch kaun ned entfernt werdn",
+      "alreadyDefault": "Is scho de Standardsproch"
+    },
+    "messages": {
+      "added": "Sproch dazuageben",
+      "updated": "Sproch aktualisiert",
+      "removed": "Sproch entfernt",
+      "defaultSet": "Standardsproch aktualisiert",
+      "addFailed": "Sproch hot ned dazuageben werdn kenna",
+      "updateFailed": "Sproch hot ned aktualisiert werdn kenna",
+      "removeFailed": "Sproch hot ned entfernt werdn kenna",
+      "defaultFailed": "Standardsproch hot ned festglegt werdn kenna"
+    },
+    "removeDialog": {
+      "confirm": "Entfernen",
+      "message": "{{name}} ({{code}}) wird von dieser Website entfernt. Inhalte in dieser Sprache sind anschließend nicht mehr erreichbar. Das kann nicht rückgängig gemacht werden.",
+      "title": "Sprache entfernen?"
+    }
+  },
+  "commandPalette": {
+    "placeholder": "Befehle suchn...",
+    "noResults": "Nix gfundn",
+    "categories": {
+      "context": "Schnöllaktionen",
+      "navigation": "Navigation",
+      "actions": "Aktionen",
+      "blogs": "Blogs",
+      "pages": "Seitn",
+      "sites": "Websites",
+      "media": "Medien"
+    },
+    "actions": {
+      "logout": "Obmeldn",
+      "leaveDemo": "Demo verlassen"
+    },
+    "contextActions": {
+      "createBlog": "Neichn Blog erstöhn",
+      "createPage": "Neiche Seitn erstöhn",
+      "uploadMedia": "Medien auffelodn",
+      "createTemplate": "Vorlog erstöhn",
+      "createTag": "Tag erstöhn",
+      "createCategory": "Kategorie erstöhn",
+      "addNavItem": "Navigationselement dazuageben",
+      "addSocialLink": "Social-Link dazuageben",
+      "createWebhook": "Webhook erstöhn",
+      "createRedirect": "Weiterleitung erstöhn",
+      "addMember": "Mitglied dazuageben",
+      "addCvEntry": "CV-Eintrog dazuageben",
+      "addSkill": "Fähigkeit dazuageben",
+      "createSite": "Website erstöhn",
+      "backToSites": "Zruck zur Website-Listn",
+      "addLanguage": "Sproch dazuageben",
+      "addLegalDoc": "Rechtsdokument dazuageben",
+      "backToLegal": "Zruck zu Rechtsdokumente",
+      "createApiKey": "API Key erstöhn",
+      "backToBlogs": "Zruck zur Blog-Listn",
+      "backToPages": "Zruck zur Seitnlistn"
+    },
+    "open": "Befehlspalette aufmochn",
+    "searchLabel": "Befehle suchn",
+    "title": "Befehlspalette",
+    "resultCount": "{{count}} Ergebnisse verfügbor",
+    "triggerPlaceholder": "Beiträge, Seiten, Medien suchen …"
+  },
+  "languages": {
+    "en": "English",
+    "de": "Deutsch",
+    "de-AT": "Wienerisch",
+    "fr": "Français",
+    "es": "Español",
+    "it": "Italiano",
+    "pt": "Português",
+    "nl": "Nederlands",
+    "pl": "Polski",
+    "ar": "العربية"
+  },
+  "workflow": {
+    "submitForReview": "Zur Überprüfung einreichn",
+    "approve": "Genehmign",
+    "requestChanges": "Änderungen ofordern",
+    "reviewComment": "Kommentar zur Überprüfung",
+    "reviewCommentPlaceholder": "Beschreib, wöche Änderungen nötig san...",
+    "submittedForReview": "Inhoit zur Überprüfung eingreicht",
+    "approved": "Inhoit genehmigt",
+    "changesRequested": "Änderungen ogefordert",
+    "cannotPublish": "Da redaktionelle Workflow is aktiviert. Reich Inhoite zur Überprüfung ein, um's z'veröffentlichn.",
+    "publish": "Veröffentlichn",
+    "unpublish": "Zruckziachn",
+    "archive": "Archiviern",
+    "restore": "Wiederherstöhn",
+    "restoreAsDraft": "Ois Entwurf wiederherstöhn"
+  },
+  "approveDialog": {
+    "title": "Inhoit genehmign",
+    "message": "Wähl, wia der Inhoit veröffentlicht werdn soit.",
+    "publishNow": "Jetzt veröffentlichn",
+    "schedule": "Einplonn",
+    "selectDate": "Veröffentlichungsdatum wähln"
+  },
+  "restoreDialog": {
+    "restore": "Wiederherstöhn",
+    "restoreAsDraft": "Ois Entwurf wiederherstöhn"
+  },
+  "notifications": {
+    "title": "Benochrichtigungen",
+    "bell": "Benochrichtigungen",
+    "bellWithCount": "Benochrichtigungen, {{count}} ungelesn",
+    "unread": "Ungelesn",
+    "empty": "No ka Benochrichtigungen",
+    "markAllRead": "Olle ois gelesn markiern",
+    "viewAll": "Olle oschaun",
+    "pageTitle": "Benochrichtigungen",
+    "pageSubtitle": "Benochrichtigungen oschaun und verwoidn",
+    "searchPlaceholder": "Benochrichtigungen durchsuchn...",
+    "columns": {
+      "type": "Typ",
+      "title": "Titl",
+      "message": "Nochricht",
+      "time": "Zeit",
+      "status": "Status"
+    },
+    "read": "Gelesn",
+    "noSite": "Wähl a Website aus, um Benochrichtigungen z'seng",
+    "types": {
+      "submitted": "Zur Überprüfung eingreicht",
+      "approved": "Genehmigt",
+      "changesRequested": "Änderungen ogefordert",
+      "system": "System"
+    },
+    "actions": {
+      "confirmDeleteReadConfirm": "{{count}} löschen",
+      "confirmDeleteReadMessage": "{{count}} bereits gelesene Benachrichtigung(en) werden entfernt. Das kann nicht rückgängig gemacht werden.",
+      "confirmDeleteReadTitle": "Alle gelesenen Benachrichtigungen löschen?",
+      "delete": "Benachrichtigung löschen",
+      "deleteRead": "Gelesene löschen"
+    },
+    "filters": {
+      "all": "Alle",
+      "read": "Gelesen",
+      "unread": "Ungelesen"
+    },
+    "messages": {
+      "deleted": "Benachrichtigung gelöscht",
+      "readCleared": "{{count}} gelesene Benachrichtigung(en) entfernt"
+    }
+  },
+  "bulk": {
+    "toolbar": "Massenaktionen-Werkzeugleistn",
+    "selectedCount": "{{count}} ausgwählt",
+    "publish": "Veröffentlichn",
+    "unpublish": "Zruckziachn",
+    "archive": "Archiviern",
+    "restore": "Wiederherstöhn",
+    "delete": "Leschn",
+    "clearSelection": "Auswohl aufhebn",
+    "deleteDialog": {
+      "title": "Ausgwählte Elemente leschn",
+      "message": "{{count}} ausgwählte Elemente leschn? Des kaun ma ned rückgängig mochn."
+    },
+    "publishDialog": {
+      "title": "Ausgwählte Elemente veröffentlichn?",
+      "message": "{{count}} Element(e) werdn veröffentlicht und öffentlich sichtbor gmocht."
+    },
+    "unpublishDialog": {
+      "title": "Ausgwählte Elemente zruckziachn?",
+      "message": "{{count}} Element(e) werdn zruckzogn und auf Entwurf zruckgsetzt."
+    },
+    "archiveDialog": {
+      "title": "Ausgwählte Elemente archiviern?",
+      "message": "Des archiviert {{count}} Element(e) und verschiebt's ins Archiv."
+    },
+    "restoreDialog": {
+      "title": "Ausgwählte Elemente wiederherstöhn?",
+      "message": "Des stöht {{count}} Element(e) ois Entwurf wieda her."
+    },
+    "messages": {
+      "success": "{{count}} Elemente erfolgreich aktualisiert",
+      "partial": "{{succeeded}} erfolgreich, {{failed}} schiefgangen"
+    }
+  },
+  "contentTemplates": {
+    "title": "Blog-Vorlogn",
+    "subtitle": "Wiederverwendbore Vorlogn fia Blogbeiträg verwoidn",
+    "addTemplate": "Vorlog dazuageben",
+    "table": {
+      "name": "Nom",
+      "description": "Beschreibung",
+      "icon": "Symbol",
+      "active": "Aktiv",
+      "created": "Erstöht",
+      "actions": "Aktionen"
+    },
+    "empty": {
+      "noSite": "Wähl a Seitn aus da Leist'n, um de Vorlogn z'verwoidn",
+      "title": "No ka Vorlogn",
+      "description": "Erstöh wiederverwendbore Inhoitsvorlogn, um d'Erstellung vo Blogbeiträg z'beschleunign."
+    },
+    "loading": "Vorlogn werdn glodn...",
+    "messages": {
+      "created": "Vorlog erstöht",
+      "updated": "Vorlog aktualisiert",
+      "deleted": "Vorlog glescht"
+    },
+    "deleteDialog": {
+      "title": "Vorlog leschn",
+      "message": "Vorlog \"{{name}}\" leschn? Des kaun ma ned rückgängig mochn."
+    },
+    "wizard": {
+      "title": "Vorlog erstöhn",
+      "steps": {
+        "method": "Methode",
+        "details": "Details"
+      },
+      "methods": {
+        "scratch": "Vo Grund auf",
+        "scratchDesc": "Mit ana leeren Vorlog startn",
+        "template": "Vo Vorlage",
+        "templateDesc": "A eingebaute Vorlog ois Ausgangspunkt verwendn",
+        "import": "Markdown importiern",
+        "importDesc": "Inhoit aus ana .md-Datei importiern"
+      },
+      "slugPrefixHint": "URL-Präfix fia Blogs, de mit dera Vorlog erstöht werdn"
+    },
+    "searchPlaceholder": "Vorlagen nach Name suchen..."
+  },
+  "templates": {
+    "fromTemplate": "Aus Vorlog",
+    "dialogTitle": "Blog aus Vorlog erstöhn",
+    "dialogSubtitle": "Wähl a Vorlog mit vorausgfüllter Inhoitsstruktur.",
+    "useTemplate": "Vorlog verwendn",
+    "searchPlaceholder": "Vorlogn suchn...",
+    "builtIn": "Eingebaut",
+    "custom": "Benutzerdefiniert",
+    "manageTemplates": "Vorlogn verwoidn",
+    "noResults": "Ka Vorlogn gfundn",
+    "page": "Seitn {{current}} vo {{total}}",
+    "tutorial": {
+      "name": "Anleitung",
+      "description": "Schritt-fia-Schritt-Onleitung mit Voraussetzungen, nummeriertn Schrittn und weiterführendn Links."
+    },
+    "changelog": {
+      "name": "Änderungsprotokoll",
+      "description": "Release-Notes mit Features, Bugfixes, Breaking Changes und Migrationsleitfadn."
+    },
+    "review": {
+      "name": "Bewertung",
+      "description": "Produkt- oda Tool-Bewertung mit Hauptfunktionen, Vor- und Nochteile und Fazit."
+    },
+    "announcement": {
+      "name": "Ankündigung",
+      "description": "Nochricht mit Bedeutung, nächste Schritte und Handlungsauffoderung."
+    }
+  },
+  "markdownImport": {
+    "importButton": "Markdown importiern",
+    "dialogTitle": "Aus Markdown importiern",
+    "dialogSubtitle": "Lod a Markdown-Datei affe, um an neichn Blogbeitrog z'erstöhn. De H1-Überschrift werd zum Titl.",
+    "dropZone": "Ziag a .md-Datei do hi oda klick zum Durchschaun",
+    "dropZoneActive": "Datei do oblegn",
+    "preview": "Vorschau",
+    "titleLabel": "Titl",
+    "excerptLabel": "Auszug",
+    "slugLabel": "Slug",
+    "bodyPreview": "Inhoitsvorschau",
+    "back": "Zruck",
+    "import": "Importiern",
+    "importing": "Werd importiert...",
+    "errors": {
+      "invalidExtension": "Nur .md- und .markdown-Datein werdn akzeptiert",
+      "emptyFile": "Datei is leer",
+      "noH1": "Markdown muass genau a H1-Überschrift enthoitn (# Titl)",
+      "multipleH1": "Markdown enthoit mehrere H1-Überschriftn. Verwend nur ane.",
+      "titleTooLong": "Titl überschreitet de maximale Läng vo {{max}} Zeichn",
+      "bodyTooLong": "Inhoit überschreitet de maximale Läng vo {{max}} Zeichn",
+      "readFailed": "Datei hot ned gelesn werdn kenna"
+    }
+  },
+  "editor": {
+    "placeholder": "Tipp / um Blöcke einzufügn...",
+    "sectionPlaceholder": "Obschnittsinhoit...",
+    "toolbar": {
+      "label": "Textformatierung",
+      "linkDialog": {
+        "title": "Link einfügn",
+        "urlLabel": "URL",
+        "insert": "Einfügn",
+        "remove": "Link entfernan"
+      },
+      "bold": "Fett (Strg+B)",
+      "italic": "Kursiv (Strg+I)",
+      "underline": "Unterstrichn (Strg+U)",
+      "strikethrough": "Durchgstrichn",
+      "heading1": "Überschrift 1",
+      "heading2": "Überschrift 2",
+      "heading3": "Überschrift 3",
+      "blockquote": "Zitat",
+      "bulletList": "Aufzählung",
+      "orderedList": "Nummerierte Listn",
+      "taskList": "Aufgobnlistn",
+      "horizontalRule": "Horizontale Linie",
+      "link": "Link",
+      "image": "Büd",
+      "codeBlock": "Codeblock",
+      "insertTable": "Tabelln einfügn",
+      "undo": "Rückgängig (Strg+Z)",
+      "redo": "Wiederhoin (Strg+Y)"
+    },
+    "commands": {
+      "paragraph": "Obsatz",
+      "heading1": "Überschrift 1",
+      "heading2": "Überschrift 2",
+      "heading3": "Überschrift 3",
+      "bulletList": "Aufzählung",
+      "orderedList": "Nummerierte Listn",
+      "taskList": "Aufgobnlistn",
+      "blockquote": "Zitat",
+      "codeBlock": "Codeblock",
+      "horizontalRule": "Horizontale Linie",
+      "image": "Büd",
+      "table": "Tabelln",
+      "zen": "Zen-Modus"
+    },
+    "zen": {
+      "enter": "Zen-Modus einscholtn",
+      "exit": "Zen-Modus beendn",
+      "tooltip": "Vollbüd ohne Oblenkung schreibn"
+    },
+    "mediaPicker": {
+      "tabs": {
+        "gallery": "Galerie",
+        "upload": "Hochlodn"
+      },
+      "upload": {
+        "dragDrop": "Büd hieher ziachn oda klickn zum Durchsuchn",
+        "uploading": "Werd hochglodn...",
+        "success": "Büd erfolgreich hochglodn",
+        "invalidType": "Nua Büddateien wern akzeptiert (JPEG, PNG, GIF, WebP, AVIF, SVG)",
+        "tooLarge": "Datei überschreitet de maximale Upload-Greß"
+      }
+    }
+  },
+  "quickPost": {
+    "title": "Schnöllbeitrog",
+    "titlePlaceholder": "Beitrogs-Titl...",
+    "bodyPlaceholder": "Fong o z'schreibn...",
+    "publish": "Veröffentlichn",
+    "publishNow": "Jetzt veröffentlichn",
+    "saveAsDraft": "Ois Entwurf speichan",
+    "moreOptions": "Weitere Optionen",
+    "success": "Blogbeitrog erstöht",
+    "dashboardButton": "Schnöllbeitrog",
+    "ai": {
+      "manualMode": "Schreibn",
+      "aiMode": "KI-Assistent",
+      "ideaTitle": "Worüba wüst du schreibn?",
+      "ideaPlaceholder": "Beschreib dei Blogbeitrogs-Idee, des Thema oda de wichtigstn Punkte, de du behanln wüst...",
+      "generateOutline": "Gliedarung erstöhn",
+      "generating": "Werd generiert...",
+      "titleLabel": "Titl",
+      "subtitleLabel": "Untertitl",
+      "outlineLabel": "Gliedarung",
+      "addPoint": "Punkt dazuageben",
+      "generatePost": "Beitrog generiern",
+      "startOver": "Vo vorn ofongen",
+      "regenerateOutline": "Zruck und a neiche Idee probiern",
+      "outlineError": "Gliedarung hot ned erstöht werdn kenna. Probier's nochmal.",
+      "postError": "Beitrog hot ned generiert werdn kenna. Probier's nochmal.",
+      "insertPoint": "Einfügepunkt unterhalb",
+      "languageNotice": "Inhalt wird in {{language}} generiert (Standardsprache der Site)",
+      "regenerateOutlineBtn": "Gliederung neu generieren"
+    }
+  },
+  "aiSettings": {
+    "title": "KI-Einstöllungen",
+    "advanced": "Standardeinstöllungen",
+    "advancedDescription": "De Standardwerte götn fia olle Aufgobn, sofern sie ned untn überschriebn werdn.",
+    "fields": {
+      "providerPreset": "Onbieter",
+      "providerName": "Onbieternom",
+      "providerNameHelp": "Ozoagnom fia de Onbieterkonfiguration",
+      "baseUrl": "Basis-URL",
+      "baseUrlHelp": "API-Endpunkt — werd automatisch ausgfüllt bei Onbieterauswohl",
+      "apiKey": "API-Schlüssel",
+      "apiKeyHelp": "API Key vo deim Onbieter",
+      "apiKeyOptional": "Optional — der Onbieter braucht kan API Key",
+      "apiKeyExisting": "Aktueller Key",
+      "model": "Modell",
+      "modelHelp": "Modellnom eingebn oda Aktualisieren druckn, um verfügbore Modelle z'entdeckn",
+      "temperature": "Temperatur",
+      "maxTokens": "Max. Tokens",
+      "systemPromptsHelp": "Leer lossn fia eingebaute Standardwerte. Benutzerdefinierte Prompts ersetzn de Standardwerte voiständig.",
+      "systemPromptSeo": "SEO-Generierungs-Prompt",
+      "systemPromptExcerpt": "Auszug-Generierungs-Prompt",
+      "systemPromptTranslate": "Übasetzungs-Prompt",
+      "defaultPromptSeo": "Du bist a SEO-Experte. Generier an SEO-optimiertn Meta-Titl (max. 60 Zeichn) und a Meta-Beschreibung (max. 160 Zeichn) ausm bereitgstöhtn Blog-Inhoit.",
+      "defaultPromptExcerpt": "Du bist a Content-Editor. Generier an kurzen Auszug in 1-2 Sätz, der de wichtigstn Punkte vom Blog-Inhoit zamfosst.",
+      "defaultPromptTranslate": "Du bist a professioneller Übasetzer. Übersetz den foigndn Inhoit in de Zielsproch. Behoid den ursprünglichn Ton, Stil und de Markdown-Formatierung bei."
+    },
+    "taskConfigs": {
+      "title": "Aufgobnspezifische Konfiguration",
+      "description": "Modell, Temperatur, Max. Tokens oda System-Prompt fia einzelne Aufgobn überschreibn. Leere Felder erbn de obigen Standardwerte.",
+      "custom": "Benutzerdefiniert",
+      "vision": "Vision",
+      "modelHelp": "Leer lossn, um des Standardmodell z'verwendn",
+      "maxTokensHelp": "Leer lossn fia Standardwert ({{default}})",
+      "systemPrompt": "Benutzerdefinierter System-Prompt",
+      "systemPromptPlaceholder": "Leer lossn, um den eingebautn Standard z'verwendn"
+    },
+    "tasks": {
+      "seo": "SEO-Generierung",
+      "seoDesc": "Meta-Titl und Beschreibungen ausm Blog-Inhoit generieren.",
+      "excerpt": "Auszug-Generierung",
+      "excerptDesc": "Kurze Zamfossungen vo Blogbeiträg erstöhn.",
+      "translate": "Übasetzung",
+      "translateDesc": "Inhoite in ondere Sprochn übasetzen.",
+      "draftOutline": "Entwurfsgliederung",
+      "draftOutlineDesc": "A strukturierte Gliederung fia an neien Beitrog generieren.",
+      "draftPost": "Beitrogsentwurf",
+      "draftPostDesc": "An voiständign Entwurf aus ana Gliederung oda am Thema generieren.",
+      "autoTag": "Auto-Tagging",
+      "autoTagDesc": "Automatisch Tags fia Inhoite oda Büda vorschlogen.",
+      "altText": "Alt-Text",
+      "altTextDesc": "Beschreibendn Alt-Text fia Büda generieren (Vision-Modell)."
+    },
+    "actions": {
+      "save": "Speichan",
+      "testConnection": "Verbindung testn",
+      "remove": "Konfiguration entfernan",
+      "discoverModels": "Verfügbore Modelle entdeckn",
+      "viewUsage": "Nutzung anzeigen"
+    },
+    "messages": {
+      "saved": "KI-Konfiguration gspeichert",
+      "saveFailed": "Fehla beim Speichan vo da KI-Konfiguration",
+      "deleted": "KI-Konfiguration entfernt",
+      "testFailed": "Verbindungstest is schiefgangen",
+      "modelsFound": "{{count}} Modell(e) gfundn",
+      "noModels": "Ka Modelle gfundn — Basis-URL und API Key prüfn",
+      "modelsFailed": "Modelle ham ned entdeckt werdn kenna — Basis-URL und API Key prüfn"
+    },
+    "deleteConfirm": {
+      "title": "KI-Konfiguration entfernan?",
+      "message": "Dadurch werdn KI-Funktionen fia de Website deaktiviert. Du kaunst späta nei konfigurieren."
+    }
+  },
+  "help": {
+    "menu": {
+      "title": "Hülfe & Ressourcen",
+      "documentation": "Dokumentation",
+      "quickTour": "Schnölltour",
+      "keyboardShortcuts": "Tastenkürzel",
+      "feedback": "Feedback",
+      "version": "Forja v{{version}}"
+    },
+    "tour": {
+      "skip": "Tour übaspringen",
+      "next": "Weida",
+      "done": "Fertig",
+      "stepOf": "{{current}} vo {{total}}",
+      "step1": "Des is dei Dashboard — siag de Aktivität vo deiner Seitn auf an Blick",
+      "step2": "Verwoid deine Inhoite, Struktur und Einstöllungen über de Seitnleistn",
+      "step3": "Wechsl do zwischen deine Websites",
+      "step4": "Druck {{shortcut}}, um schnöll überoi hin z'navigiern",
+      "step5": "Brauchst Hülfe? Find Doku, Tastenkürzel und de Tour do jederzeit"
+    },
+    "shortcuts": {
+      "title": "Tastenkürzel",
+      "commandPalette": "Befehlspalette aufmochn",
+      "save": "Speichan",
+      "undo": "Rückgängig",
+      "redo": "Wiederhoin",
+      "bold": "Fett",
+      "italic": "Kursiv",
+      "underline": "Unterstrichn"
+    }
+  },
+  "errorCodes": {
+    "AUTH_MISSING_CREDENTIALS": {
+      "message": "Authentifizierung erforderlich",
+      "action": "Bitte moid di o, um weitermochn z'kennan."
+    },
+    "AUTH_TOKEN_INVALID": {
+      "message": "Sitzung obglaufen",
+      "action": "Bitte moid di nochmal o."
+    },
+    "AUTH_INSUFFICIENT_ROLE": {
+      "message": "Unzureichende Berechtigungen",
+      "action": "Kontaktier an Admin fia erweiterten Zugang."
+    },
+    "AUTH_SITE_ACCESS_DENIED": {
+      "message": "Seitnzugriff verweigert",
+      "action": "Kontaktier den Seitninhober fia Zugang."
+    },
+    "AUTH_API_KEY_INVALID": {
+      "message": "Ungültiger API Key",
+      "action": "Überprüf dei API Key Konfiguration."
+    },
+    "AUTH_ACCOUNT_SOLE_OWNER": {
+      "message": "Konto kaun ned glescht werdn",
+      "action": "Übatrog zerscht de Eigentümerschoft."
+    },
+    "BLOG_SLUG_TAKEN": {
+      "message": "Blog-Slug scho vergeben",
+      "action": "Wähl an anderen Slug."
+    },
+    "PAGE_SLUG_TAKEN": {
+      "message": "Seitn-Slug scho vergeben",
+      "action": "Wähl an anderen Slug."
+    },
+    "SITE_SLUG_TAKEN": {
+      "message": "Site-Slug scho vergeben",
+      "action": "Wähl an anderen Slug."
+    },
+    "TAG_SLUG_TAKEN": {
+      "message": "Tag-Slug scho vergeben",
+      "action": "Wähl an anderen Slug."
+    },
+    "CATEGORY_SLUG_TAKEN": {
+      "message": "Kategorie-Slug scho vergeben",
+      "action": "Wähl an anderen Slug."
+    },
+    "LOCALE_CODE_TAKEN": {
+      "message": "Sprochcode existiert scho",
+      "action": "Verwend an anderen Sprochcode."
+    },
+    "RATE_LIMIT_EXCEEDED": {
+      "message": "Z'vüle Ofrogn",
+      "action": "Bitte wort an Moment und probier's nochmal."
+    },
+    "MEMBER_ALREADY_EXISTS": {
+      "message": "Mitglied existiert scho",
+      "action": "Der Benutzer is scho a Mitglied vo da Seitn."
+    },
+    "MEMBER_CANNOT_REMOVE_OWNER": {
+      "message": "Eigentümer kaun ned entfernt werdn",
+      "action": "Übatrog de Eigentümerschoft, bevor du des Mitglied entfernst."
+    },
+    "MEDIA_UPLOAD_TOO_LARGE": {
+      "message": "Datei is z'groß",
+      "action": "Moch de Datei klaner oda pass de Site-Einstöllungen o."
+    },
+    "MEDIA_UPLOAD_INVALID_TYPE": {
+      "message": "Ned unterstützter Dateityp",
+      "action": "Überprüf de erlaubtn Dateitypen."
+    },
+    "AI_NOT_CONFIGURED": {
+      "message": "KI ned konfiguriert",
+      "action": "Richt an KI-Onbieter in de Site-Einstöllungen ein."
+    },
+    "AI_PROVIDER_UNAVAILABLE": {
+      "message": "KI-Onbieter ned verfügbor",
+      "action": "Überprüf dei KI-Konfiguration oda probier's späta nochmal."
+    },
+    "WORKFLOW_REVIEW_REQUIRED": {
+      "message": "Überprüfung erforderlich",
+      "action": "Reich den Inhoit zur Überprüfung ein, bevor du veröffentlichst."
+    },
+    "WORKFLOW_NO_PERMISSION": {
+      "message": "Workflow-Berechtigung verweigert",
+      "action": "Du host ka Berechtigung fia de Workflow-Aktion."
+    },
+    "MODULE_NOT_ENABLED": {
+      "message": "Modul ned aktiviert",
+      "action": "Aktivier des Modul in de Site-Einstöllungen."
+    },
+    "LOCALE_DELETE_IN_USE": {
+      "message": "Sproch in Verwendung",
+      "action": "Entfern zerscht olle Inhoite, de de Sproch verwendn."
+    },
+    "SITE_LOCALE_LAST_LANGUAGE": {
+      "message": "Letzte Sproch kaun ned entfernt werdn",
+      "action": "Seitn miassn mindestens a Sproch haum."
+    },
+    "REDIRECT_SAME_PATH": {
+      "message": "Weiterleitungsschleifn erkannt",
+      "action": "Quöll- und Zielpfod miassn unterschiedlich sein."
+    },
+    "LEGAL_PUBLISH_MISSING_TITLE": {
+      "message": "Tütel fürs Veröffentlichn nötig",
+      "action": "Gib mindestens aner Sprachversion an Tütel."
+    },
+    "LEGAL_PUBLISH_MISSING_BODY": {
+      "message": "Inhalt fürs Veröffentlichn nötig",
+      "action": "Gib mindestens aner Sprachversion an Textinhalt."
+    },
+    "LEGAL_VERSION_SOURCE_DELETED": {
+      "message": "Quelldokument glöscht",
+      "action": "Des Dokument, des du versioniern wüllst, wurd glöscht."
+    },
+    "patterns": {
+      "notFound": {
+        "message": "Ressource ned gfundn",
+        "action": "Wurd vielleicht glescht oda verschobn."
+      },
+      "slugTaken": {
+        "message": "Slug scho vergeben",
+        "action": "Wähl an anderen Slug."
+      },
+      "accessDenied": {
+        "message": "Zugriff verweigert",
+        "action": "Du host ka Berechtigung fia de Aktion."
+      },
+      "auth": {
+        "message": "Authentifizierungsfehla",
+        "action": "Probier di nochmal ozumöldn."
+      },
+      "validation": {
+        "message": "Validierungsfehla",
+        "action": "Überprüf de Formularfölder und probier's nochmal."
+      },
+      "mediaUpload": {
+        "message": "Upload is schiefgangen",
+        "action": "Überprüf de Datei und probier's nochmal."
+      }
+    },
+    "SITE_SETTINGS_INVALID_ORIGIN": "Mindestens ein Ursprung hat ein ungültiges Format. Jeder Ursprung muss Schema://Host sein (z.B. https://beispiel.at)."
+  },
+  "welcome": {
+    "tagline": "Des Open-Source-CMS fia schnölle, sichere, mehrsprochige Websites",
+    "subtitle": "Verwoid Inhoite fia mehrere Websites. Ka Cookies, ka Tracking, ka Kompromisse. Söbst hostn, gratis, fia imma.",
+    "taglineMain": "Des datenschutzorientierte CMS",
+    "taglineAccent": "gebaut in Rust",
+    "signIn": "Jetzt registriern",
+    "login": "Einloggen",
+    "register": "Söbst hostn",
+    "productPreview": "A moderner Editor, den Content-Teams wirklich gern verwenden.",
+    "featureFast": "Sauschnöll",
+    "featureFastDesc": "API-Ontwortn unter 10ms. Dei Inhoite lodn sofort.",
+    "featureSecure": "Sicher vo Haus aus",
+    "featureSecureDesc": "Rollenbasierter Zugriff, verschlüsselte Speicherung, Audit-Logs. Schlof ruhig.",
+    "featureMultilingual": "Mehrsprochig",
+    "featureMultilingualDesc": "11 Sprochn, RTL-Unterstützung. Erreich jedes Publikum.",
+    "featureApi": "API First",
+    "featureApiDesc": "API-first mit interaktiver Doku. Bau dir jedes Frontend.",
+    "featureMultiSite": "Multi-Site",
+    "featureMultiSiteDesc": "A Dashboard, unbegrenzt Websites. Perfekt fia Agenturen.",
+    "featureStorage": "Flexibler Speicher",
+    "featureStorageDesc": "Speicher Medien lokal oda in da Cloud. Dei Wahl.",
+    "featureSeo": "SEO eingebaut",
+    "featureSeoDesc": "Sitemaps, Meta-Tags und Social Cards. Rank besser.",
+    "whyForja": "Warum Forja?",
+    "comparison": {
+      "traditional": "Traditionelles CMS",
+      "forja": "Forja",
+      "monolithic": "An a Theme oda Template gebunden",
+      "headless": "Nimm jedes Frontend — Astro, Next.js, Hugo oda dei eigenes",
+      "plugins": "Plugin-Roulette: Sicherheits-Patches, Kompatibilitätsprobleme",
+      "builtIn": "Multi-Site, i18n, SEO und KI eingebaut — ned nachgerüstet",
+      "sharedHosting": "Dei Inhoite auf am Server vo wem Anderen",
+      "selfHosted": "Dei Server, dei Daten, dei Regeln",
+      "legacy": "Wird unter Lost langsam",
+      "fast": "Rust-basiert — bleibt schnöll bei jeder Lost",
+      "eyebrow": "Warum wechseln",
+      "lead": "Was ein klassisches CMS kostet – und was Forja zurückgibt."
+    },
+    "builtFor": "Baut fia",
+    "useCases": {
+      "solo": "Einzelkämpfer",
+      "soloDesc": "Self-Hosting gratis. KI-unterstütztes Schreiben, SEO eingebaut. Ka Vendor Lock-in.",
+      "teams": "Klane Teams",
+      "teamsDesc": "Rollenbasierter Zugriff fia dei Team. Mehrsprochig und gemeinsame Mediathek — ohne Enterprise-Preise.",
+      "agencies": "Agenturen",
+      "agenciesDesc": "A Dashboard fia olle Kunden-Websites. Rolln pro Website, Templates klonen. Skalieren ohne steigende Kostn.",
+      "enterprise": "Enterprise",
+      "enterpriseDesc": "Self-Hosting fia Datensouveränität. Verschlüsselte Speicherung, Audit-Logs, API-Schlüssel-Management. Deploy auf deiner Infrastruktur.",
+      "eyebrow": "Für wen",
+      "lead": "Vom Einzelprojekt bis zum compliance-pflichtigen Unternehmen – Forja wächst mit dem Team."
+    },
+    "openSourceTrust": "100% Open Source. Überoi söbst hostn.",
+    "deployAnywhere": "Docker, Railway, Fly.io — dei Infrastruktur, dei Wahl.",
+    "openSource": "Open Source",
+    "docs": "Dokumentation",
+    "madeWith": "Baut mit Rust",
+    "madeInEu": "Designed & baut in da EU",
+    "tryDemo": "Demo ausprobieren",
+    "demoDescription": "Schau da des Admin-Dashboard an ohne Registrierung",
+    "badge": "Open Source — AGPL-Lizenz",
+    "socialProof": {
+      "rust": "Baut mit Rust",
+      "react": "React 19",
+      "postgresql": "PostgreSQL",
+      "typescript": "TypeScript",
+      "gdpr": "DSGVO-konform"
+    },
+    "differentiators": {
+      "title": "Warum Forja anders is",
+      "privacy": "Privacy by Design",
+      "privacyDesc": "Ka Cookies. Ka personenbezogene Daten. Ka Tracking-Pixel. Analytics is eingebaut, DSGVO-konform vom ersten Tag an. Ned nachträglich dranpickt.",
+      "performance": "Rust Performance",
+      "performanceDesc": "A einzelnes Binary. Startet in Millisekunden. Packt Traffic-Spitzen, de Node.js-CMSe zum Absturz bringen. Dei Serverrechnung bleibt kloa.",
+      "multiTenant": "Multi-Tenant",
+      "multiTenantDesc": "A Instanz, vü Seitn. Perfekt für Agenturen, de Kundenseitn verwaltn. Jede Seitn kriagt isolierte Inhoite, Benutzer und Einstellungen.",
+      "developerFirst": "Developer-First",
+      "developerFirstDesc": "Typisiertes TypeScript SDK. OpenAPI-Doku. Webhooks. API Keys mit granularen Berechtigungen. Integrier mit oim."
+    },
+    "featureAi": "KI-Inhaltshüfe",
+    "featureAiDesc": "KI-gestützte Schreibunterstützung. Inhoite generieren, verfeinern und übersetzn.",
+    "featureScheduling": "Inhoitsplanung",
+    "featureSchedulingDesc": "Plan Beiträge für den richtigen Zeitpunkt. Vorausplanen leicht gmocht.",
+    "featureLegal": "Rechtliche Dokumente",
+    "featureLegalDesc": "Verwoit Datenschutzrichtlinien, Nutzungsbedingungen und rechtliche Seitn.",
+    "featuresTitle": "Ois eingebaut",
+    "libraries": {
+      "title": "Schnöller ausliefern mit offizielln Bibliothekkn",
+      "client": "@forjacms/client",
+      "clientDesc": "Typisiertes TypeScript SDK fia de Content-API. Funktioniert in Node.js, Browsern und Edge-Runtimes.",
+      "analytics": "@forjacms/analytics",
+      "analyticsDesc": "Datenschutzorientiertes Seitenaufruf-Tracking. Ka Cookies, ka PII. GDPR-konform vo Grund auf.",
+      "sections": "@forjacms/sections",
+      "sectionsDesc": "Vorgfertigte Web Components fia Seitenobschnitte. Framework-unobhängig, ka CSS, BEM-Hooks.",
+      "sectionsReact": "@forjacms/sections-react",
+      "sectionsReactDesc": "React-Wrapper fia Obschnittskomponenten. Typisierte Props, SSR-kompatibel."
+    },
+    "quickStart": {
+      "title": "Self-Hosting in 60 Sekunden"
+    },
+    "whatIs": {
+      "heading": "Was ist Forja?",
+      "lead": "Forja ist der Ort, an dem die Texte und Bilder deiner Website zu Hause sind. Schreib sie einmal hier, und deine Seiten zeigen sie automatisch an – personenbezogene Daten verschlüsselt und den Compliance-Papierkram nehmen wir dir ab.",
+      "point1": "Schreib deine Inhalte einmal und verwende sie auf all deinen Seiten.",
+      "point2": "Halt die persönlichen Daten deiner Besucher von Haus aus verschlüsselt und privat.",
+      "point3": "Überlass der Software den Datenschutz- und Compliance-Papierkram.",
+      "eyebrow": "Kurz erklärt"
+    },
+    "hero": {
+      "eyebrow": "Open Source · Datenschutz von Haus aus",
+      "headline": "Ein CMS, das von Haus aus konform bleibt.",
+      "subline": "Forja bewahrt deine Inhalte an einem Ort und die Daten deiner Besucher verschlüsselt – DSGVO-Nachweise, Löschungen und Audit-Logs nehmen wir dir ab. Host alles selbst in einer einzigen Rust-Binary.",
+      "ctaSignup": "Registrieren",
+      "ctaDemo": "Demo ausprobieren",
+      "ctaSelfHost": "Auf GitHub selbst hosten"
+    },
+    "features": {
+      "title": "Was Forja heute kann",
+      "compliance": {
+        "title": "Compliance von Haus aus",
+        "items": [
+          "Feldweise PII-Envelope-Verschlüsselung",
+          "RoPA-Export (Art. 30)",
+          "DSGVO-Löschung per Klick",
+          "Cookie-freie, datenschutzfreundliche Analytik",
+          "Manipulationssicheres Audit-Log"
+        ]
+      },
+      "performance": {
+        "title": "Rust-Performance",
+        "items": [
+          "Läuft als einzelne Binary",
+          "Schneller Kaltstart",
+          "Bleibt auch unter Last flott"
+        ]
+      },
+      "multiSite": {
+        "title": "Multi-Site",
+        "items": [
+          "Eine Instanz, viele Sites",
+          "Konfiguration und Rollen je Site",
+          "Getrennte Inhalte und Medien"
+        ]
+      },
+      "developer": {
+        "title": "Entwickler zuerst",
+        "items": [
+          "Typisiertes TypeScript-SDK",
+          "OpenAPI-Spezifikation",
+          "HMAC-signierte Webhooks",
+          "API-Schlüssel mit Nutzungskontingenten"
+        ]
+      },
+      "authoring": {
+        "title": "Redaktion",
+        "items": [
+          "Collections (eigene Inhaltstypen)",
+          "Inhalte in 11 Sprachen",
+          "Geplante Veröffentlichung",
+          "ALTCHA-Bot-Schutz",
+          "Medienbibliothek mit KI-Bilderkennung"
+        ]
+      },
+      "eyebrow": "Das bekommen Sie",
+      "lead": "Jede Funktion unten gibt's heute schon – nichts davon ist bloß ein Versprechen."
+    },
+    "showcase": {
+      "heading": "Forja in Aktion",
+      "lead": "Von der aufgeräumten Arbeitsfläche bis zum mehrsprachigen Editor – der Arbeitsbereich, in dem Ihr Team wirklich arbeitet.",
+      "dashboardAlt": "Forja-Dashboard mit der Inhalts-Arbeitsfläche, Zählern für Prüfung, Entwürfe und Veröffentlichungen sowie einer Liste von Beiträgen.",
+      "editorAlt": "Forja-Inhaltseditor mit mehrsprachigen Tabs, Rich-Text-Symbolleiste, Inhaltsverzeichnis und einem Live-SEO-Panel.",
+      "eyebrow": "Produkt-Rundgang",
+      "dashboardCaption": "Die Arbeitsfläche – jeder Entwurf, jede Prüfung und jede geplante Veröffentlichung an einem Ort.",
+      "editorCaption": "Der Editor – mehrsprachige Inhalte mit Live-SEO-Panel, ganz ohne Plugins."
+    }
+  },
+  "analytics": {
+    "title": "Analytik",
+    "subtitle": "Besucherzoihn, beliebte Inhoite und Vawasquelln fia deine Seiten",
+    "totalViews": "Gsomtaufrufe",
+    "uniqueVisitors": "Einzelne Besucher",
+    "avgViewsPerDay": "Aufrufe/Tog (Durchschn.)",
+    "topContent": "Beliebteste Inhoite",
+    "referrers": "Verweisquölln",
+    "noData": "Ka Datn fia den Zeitraum",
+    "backToOverview": "Zruck zur Analytik",
+    "viewAnalytics": "Analytik oschaun",
+    "pageDetail": "Seitndetail",
+    "notEnabled": "Analytik is fia de Seitn ned aktiviert. Aktivier's in de Einstöllungen.",
+    "trend": "Trend",
+    "path": "Pfod",
+    "views": "Aufrufe",
+    "visitors": "Besucher",
+    "dateRange": {
+      "7days": "7 Tog",
+      "30days": "30 Tog",
+      "90days": "90 Tog",
+      "allTime": "Gsomter Zeitraum",
+      "custom": "Benutzerdefiniert",
+      "start": "Startdatum",
+      "end": "Enddatum",
+      "apply": "Anwendn"
+    }
+  },
+  "audit": {
+    "action": "Aktion",
+    "entityType": "Entität",
+    "ipAddress": "IP-Adresse",
+    "timestamp": "Zeit"
+  },
+  "portfolio": {
+    "pageTitle": "Portfolio",
+    "pageSubtitle": "Lebenslauf, Kenntnisse und Projekte von deiner Seit'n",
+    "tabs": {
+      "cv": "Lebenslauf",
+      "projects": "Projekte"
+    },
+    "projects": {
+      "addProject": "Projekt hinzufügen",
+      "searchPlaceholder": "Projekte suchen...",
+      "empty": {
+        "title": "Noch keine Projekte",
+        "description": "Erstellen Sie Ihr erstes Projekt, um Ihre Arbeit zu präsentieren"
+      },
+      "table": {
+        "slug": "Slug",
+        "status": "Status",
+        "featured": "Hervorgehoben",
+        "dates": "Daten",
+        "ongoing": "Laufend",
+        "displayOrder": "Reihenfolge",
+        "actions": "Aktionen"
+      },
+      "messages": {
+        "created": "Projekt erfolgreich erstellt",
+        "updated": "Projekt erfolgreich aktualisiert",
+        "deleted": "Projekt erfolgreich gelöscht"
+      },
+      "deleteDialog": {
+        "title": "Projekt löschen",
+        "message": "Möchten Sie das Projekt \"{{slug}}\" wirklich löschen?"
+      },
+      "loading": "Projekte werden geladen...",
+      "loadError": "Fehler beim Laden der Projekte"
+    }
+  },
+  "wizard": {
+    "project": {
+      "createTitle": "Projekt erstellen",
+      "editTitle": "Projekt bearbeiten",
+      "steps": {
+        "basics": "Grundlagen",
+        "content": "Inhalt & Links",
+        "relations": "Medien & Verknüpfungen"
+      },
+      "fields": {
+        "title": "Titel",
+        "slug": "Slug",
+        "shortDescription": "Kurzbeschreibung",
+        "description": "Beschreibung",
+        "startDate": "Startdatum",
+        "endDate": "Enddatum",
+        "isOngoing": "Laufend",
+        "displayOrder": "Anzeigereihenfolge",
+        "isFeatured": "Hervorgehoben",
+        "status": "Status",
+        "siteIds": "Webseiten",
+        "addImage": "Bild hinzufügen",
+        "coverImage": "Titelbild",
+        "skills": "Fähigkeiten",
+        "cvEntries": "Lebenslauf-Einträge",
+        "noSkillsAvailable": "Keine Fähigkeiten verfügbar",
+        "noCvEntriesAvailable": "Keine Lebenslauf-Einträge verfügbar",
+        "images": "Bilder",
+        "linkIcon": "Symbol",
+        "linkLabel": "Bezeichnung",
+        "links": "Links",
+        "linkType": "Typ",
+        "linkUrl": "URL"
+      },
+      "discardDialog": {
+        "title": "Änderungen verwerfen?",
+        "message": "Sie haben ungespeicherte Änderungen. Möchten Sie diese wirklich verwerfen?",
+        "discard": "Verwerfen",
+        "keepEditing": "Weiter bearbeiten"
+      },
+      "addImage": "Bild hinzufügen",
+      "addLink": "Link hinzufügen",
+      "cover": "Titelbild",
+      "discardConfirm": "Verwerfen",
+      "discardMessage": "Sie haben ungespeicherte Änderungen. Möchten Sie diese wirklich verwerfen?",
+      "discardTitle": "Änderungen verwerfen?",
+      "searchCvEntries": "CV-Einträge suchen...",
+      "searchSkills": "Fähigkeiten suchen...",
+      "setCover": "Als Titelbild setzen",
+      "siteNote": "Dieses Projekt gehört zur aktuell ausgewählten Seite."
+    },
+    "cvEntry": {
+      "createTitle": "Lebenslauf-Eintrag erstellen",
+      "editTitle": "Lebenslauf-Eintrag bearbeiten",
+      "steps": {
+        "company": "Unternehmen",
+        "timeline": "Zeitraum",
+        "content": "Inhalt",
+        "skills": "Fähigkeiten"
+      },
+      "fields": {
+        "company": "Unternehmen",
+        "companyUrl": "Unternehmens-URL",
+        "companyLogo": "Unternehmenslogo",
+        "selectLogo": "Logo auswählen",
+        "location": "Standort",
+        "entryType": "Eintragstyp",
+        "startDate": "Startdatum",
+        "endDate": "Enddatum",
+        "isCurrent": "Aktuelle Position",
+        "status": "Status",
+        "siteIds": "Webseiten",
+        "position": "Positionsbezeichnung",
+        "description": "Beschreibung",
+        "achievements": "Erfolge",
+        "addAchievement": "Erfolg hinzufügen",
+        "skills": "Fähigkeiten",
+        "displayOrder": "Anzeigereihenfolge",
+        "noSkillsAvailable": "Keine Fähigkeiten verfügbar"
+      },
+      "discardDialog": {
+        "title": "Änderungen verwerfen?",
+        "message": "Sie haben ungespeicherte Änderungen. Möchten Sie diese wirklich verwerfen?",
+        "discard": "Verwerfen",
+        "keepEditing": "Weiter bearbeiten"
+      },
+      "achievementPlaceholder": "Errungenschaft...",
+      "addAchievement": "Errungenschaft hinzufügen",
+      "changeLogo": "Logo ändern",
+      "discardConfirm": "Verwerfen",
+      "discardMessage": "Sie haben ungespeicherte Änderungen. Möchten Sie diese wirklich verwerfen?",
+      "discardTitle": "Änderungen verwerfen?",
+      "searchSkills": "Fähigkeiten suchen...",
+      "selectLogo": "Logo auswählen",
+      "siteNote": "Dieser Eintrag gehört zur aktuell ausgewählten Seite."
+    },
+    "links": {
+      "title": "Links",
+      "addLink": "Link hinzufügen",
+      "label": "Bezeichnung",
+      "url": "URL",
+      "linkType": "Typ",
+      "icon": "Symbol",
+      "types": {
+        "Source": "Quellcode",
+        "Demo": "Demo",
+        "Documentation": "Dokumentation",
+        "Website": "Webseite",
+        "Other": "Sonstiges"
+      }
+    }
+  },
+  "listPage": {
+    "pagination": {
+      "rowsPerPage": "Zeiln pro Seitn:",
+      "of": "{{from}}–{{to}} vo {{total}}",
+      "previous": "Vurige Seitn",
+      "next": "Nagschte Seitn"
+    },
+    "actions": {
+      "label": "Aktiona"
+    },
+    "empty": {
+      "default": "Nu nix do."
+    },
+    "selectAll": "Olle Zeiln auswöhln",
+    "selectRow": "Zeil auswöhln"
+  },
+  "sectionEditor": {
+    "addSection": "Abschnitt hinzufügen",
+    "columns": "Spalten",
+    "dragToReorder": "Zum Neuanordnen ziehen",
+    "fullWidth": "Volle Breite",
+    "items": {
+      "count": "{{label}}s ({{count}})",
+      "faq": {
+        "answer": "Antwort",
+        "label": "Frage",
+        "question": "Frage"
+      },
+      "feature": {
+        "description": "Beschreibung",
+        "icon": "Icon (Emoji oder Name)",
+        "label": "Funktion",
+        "title": "Titel"
+      },
+      "gallery": {
+        "alt": "Alt-Text",
+        "caption": "Bildunterschrift",
+        "image": "Bild",
+        "label": "Bild"
+      },
+      "itemNumber": "{{label}} {{number}}",
+      "logoCloud": {
+        "companyName": "Firmenname",
+        "label": "Logo",
+        "link": "Link (optional)",
+        "logo": "Logo"
+      },
+      "pricing": {
+        "buttonLink": "Button-Link",
+        "buttonText": "Button-Text",
+        "description": "Beschreibung",
+        "features": "Features (eine pro Zeile)",
+        "label": "Tarif",
+        "period": "Zeitraum",
+        "planName": "Tarifname",
+        "price": "Preis"
+      },
+      "stat": {
+        "label": "Statistik",
+        "statLabel": "Label",
+        "value": "Wert"
+      },
+      "team": {
+        "bio": "Bio",
+        "label": "Mitglied",
+        "name": "Name",
+        "photo": "Foto",
+        "role": "Rolle"
+      },
+      "testimonial": {
+        "author": "Autor",
+        "avatar": "Avatar",
+        "label": "Testimonial",
+        "quote": "Zitat",
+        "role": "Rolle / Unternehmen"
+      },
+      "timeline": {
+        "date": "Datum",
+        "description": "Beschreibung",
+        "label": "Ereignis",
+        "title": "Titel"
+      }
+    },
+    "layout": "Layout",
+    "nColumns": "{{n}} Spalten",
+    "provider": "Anbieter",
+    "settings": {
+      "contact": {
+        "formFields": "Formularfelder",
+        "formFieldsHint": "Kommagetrennte Feldnamen",
+        "showMap": "Karte anzeigen",
+        "title": "Kontakt-Einstellungen"
+      },
+      "cta": {
+        "banner": "Banner",
+        "card": "Karte",
+        "floating": "Schwebend",
+        "title": "CTA-Einstellungen"
+      },
+      "custom": {
+        "jsonHint": "Rohe JSON-Einstellungen",
+        "title": "Benutzerdefinierte Einstellungen (JSON)"
+      },
+      "divider": {
+        "dots": "Punkte",
+        "line": "Linie",
+        "showLabel": "Label anzeigen",
+        "space": "Abstand",
+        "title": "Trenner-Einstellungen"
+      },
+      "faq": {
+        "accordion": "Akkordeon (einklappbar)",
+        "title": "FAQ-Einstellungen"
+      },
+      "features": {
+        "title": "Features-Einstellungen"
+      },
+      "gallery": {
+        "showCaptions": "Bildunterschriften anzeigen",
+        "title": "Galerie-Einstellungen"
+      },
+      "hero": {
+        "gradient": "Farbverlauf",
+        "gradientHint": "CSS-Verlaufszeichenfolge",
+        "title": "Hero-Einstellungen"
+      },
+      "logoCloud": {
+        "grayscale": "Graustufen",
+        "title": "Logo Cloud-Einstellungen"
+      },
+      "newsletter": {
+        "customProvider": "Benutzerdefiniert",
+        "generic": "Generisch",
+        "mailchimp": "Mailchimp",
+        "showName": "Namensfeld anzeigen",
+        "title": "Newsletter-Einstellungen"
+      },
+      "pricing": {
+        "showToggle": "Monats-/Jahresumschalter anzeigen",
+        "title": "Preis-Einstellungen"
+      },
+      "stats": {
+        "cardStyle": "Karte",
+        "inlineStyle": "Inline",
+        "title": "Statistik-Einstellungen"
+      },
+      "team": {
+        "showBio": "Bio anzeigen",
+        "showRole": "Rolle anzeigen",
+        "title": "Team-Einstellungen"
+      },
+      "testimonials": {
+        "carousel": "Karussell",
+        "grid": "Raster",
+        "showAvatar": "Avatar anzeigen",
+        "title": "Testimonials-Einstellungen"
+      },
+      "text": {
+        "alignment": "Ausrichtung",
+        "center": "Zentriert",
+        "default": "Standard",
+        "left": "Links",
+        "narrow": "Schmal",
+        "title": "Text-Einstellungen",
+        "wide": "Breit",
+        "width": "Breite"
+      },
+      "timeline": {
+        "horizontal": "Horizontal",
+        "showDates": "Daten anzeigen",
+        "title": "Timeline-Einstellungen",
+        "vertical": "Vertikal"
+      },
+      "video": {
+        "aspectRatio": "Seitenverhältnis",
+        "autoplay": "Autoplay",
+        "selfHosted": "Selbst gehostet",
+        "title": "Video-Einstellungen",
+        "vimeo": "Vimeo",
+        "youtube": "YouTube"
+      }
+    },
+    "style": "Stil",
+    "typeNames": {
+      "Contact": "Kontakt",
+      "Cta": "Handlungsaufforderung",
+      "Custom": "Benutzerdefiniert",
+      "Divider": "Trenner",
+      "Faq": "FAQ",
+      "Features": "Features",
+      "Gallery": "Galerie",
+      "Hero": "Hero",
+      "LogoCloud": "Logo-Wolke",
+      "Newsletter": "Newsletter",
+      "Pricing": "Preise",
+      "Stats": "Statistiken",
+      "Team": "Team",
+      "Testimonials": "Testimonials",
+      "Text": "Text",
+      "Timeline": "Zeitleiste",
+      "Video": "Video"
+    },
+    "types": {
+      "Contact": "Kontaktformular",
+      "Cta": "Handlungsaufforderungs-Block",
+      "Custom": "Benutzerdefinierter Abschnitt",
+      "Divider": "Visueller Trenner",
+      "Faq": "FAQ-Akkordeon",
+      "Features": "Feature-Karten-Raster",
+      "Gallery": "Bildergalerie",
+      "Hero": "Volle Breite Banner mit Überschrift",
+      "LogoCloud": "Partner-/Kundenlogos",
+      "Newsletter": "E-Mail-Abonnement",
+      "Pricing": "Preistabelle",
+      "Stats": "Kennzahlen-Anzeige",
+      "Team": "Team-Mitglieder-Karten",
+      "Testimonials": "Kundenstimmen",
+      "Text": "Rich-Text-Block",
+      "Timeline": "Chronologische Ereignisse",
+      "Video": "Video-Einbettung"
+    }
+  },
+  "formsModule": {
+    "list": {
+      "title": "Formulare",
+      "subtitle": "Verwalte Formulare — Felder, Validierung, Aufbewahrung.",
+      "createButton": "Formular erstellen",
+      "manageTemplates": "Vorlagen verwalten",
+      "searchPlaceholder": "Formulare durchsuchen…",
+      "columns": {
+        "name": "Name",
+        "slug": "Slug",
+        "fields": "Felder",
+        "status": "Status",
+        "submissions": "Einsendungen",
+        "createdAt": "Erstellt"
+      },
+      "status": {
+        "active": "Aktiv",
+        "inactive": "Inaktiv"
+      },
+      "empty": {
+        "title": "Noch keine Formulare",
+        "description": "Erstelle ein Formular, um Einsendungen von deiner Website zu sammeln.",
+        "cta": "Erstes Formular anlegen"
+      },
+      "actions": {
+        "edit": "Bearbeiten",
+        "delete": "Löschen",
+        "submissions": "Einsendungen",
+        "toggleActive": "Aktiv umschalten"
+      },
+      "loadError": "Formulare konnten nicht geladen werden.",
+      "messages": {
+        "deleted": "Formular gelöscht.",
+        "activated": "Formular aktiviert.",
+        "deactivated": "Formular deaktiviert.",
+        "created": "Formular erstellt."
+      },
+      "deleteConfirm": {
+        "title": "Formular löschen?",
+        "body": "Das Formular wird für Besucher ausgeblendet und nimmt keine Einsendungen mehr entgegen. Bestehende Einsendungen bleiben erhalten.",
+        "confirm": "Formular löschen"
+      }
+    },
+    "builder": {
+      "heading": "Felder",
+      "addField": "Feld hinzufügen",
+      "empty": "Noch keine Felder. Klicke auf \"Feld hinzufügen\", um einen Typ zu wählen.",
+      "drag": "Zum Umsortieren ziehen",
+      "moveUp": "Nach oben",
+      "moveDown": "Nach unten",
+      "delete": "Feld löschen",
+      "fieldIndex": "Feld {{n}}",
+      "field": {
+        "label": "Bezeichnung",
+        "placeholder": "Platzhalter",
+        "helpText": "Hilfetext",
+        "required": "Pflichtfeld",
+        "minLength": "Min. Länge",
+        "maxLength": "Max. Länge",
+        "min": "Min",
+        "max": "Max",
+        "pattern": "Regex-Muster",
+        "patternHelp": "Optionaler regulärer Ausdruck — Eingabe muss vor dem Absenden passen.",
+        "options": "Optionen",
+        "addOption": "Option hinzufügen",
+        "optionsEmpty": "Noch keine Optionen — füge eine hinzu, damit dieses Feld nutzbar wird.",
+        "optionKey": "Schlüssel",
+        "optionLabel": "Bezeichnung"
+      }
+    },
+    "fieldType": {
+      "text": "Text",
+      "textarea": "Langtext",
+      "email": "E-Mail",
+      "number": "Zahl",
+      "select": "Dropdown",
+      "radio": "Radio",
+      "checkbox": "Checkbox",
+      "date": "Datum",
+      "custom": "Benutzerdefiniert"
+    },
+    "locale": {
+      "heading": "Übersetzungen für {{name}}",
+      "help": "Leere Felder fallen auf den Default-Locale-Text zurück. Feld-Labels bleiben als technischer Schlüssel (Submission-Daten).",
+      "name": "Formularname",
+      "description": "Beschreibung",
+      "consentText": "Zustimmungstext",
+      "consentHelp": "Wird nur verwendet, wenn das Formular Zustimmung erfordert.",
+      "fieldsHeading": "Feld-Übersetzungen",
+      "technicalKey": "Schlüssel:",
+      "displayLabel": "Anzeige-Label",
+      "placeholder": "Platzhalter",
+      "helpText": "Hilfetext",
+      "translateAll": "Vom Default übersetzen",
+      "translatingAll": "Übersetze…",
+      "translateOne": "Vom Default mit KI übersetzen"
+    },
+    "detail": {
+      "tabs": {
+        "settings": "Einstellungen",
+        "fields": "Felder",
+        "translations": "Übersetzungen"
+      },
+      "localePicker": "Sprache:",
+      "translations": {
+        "noLocales": "Aktiviere weitere Sprachen in den Site-Einstellungen, um dieses Formular zu übersetzen.",
+        "pickLocale": "Wähle oben eine Sprache, um Übersetzungen hinzuzufügen oder zu bearbeiten."
+      },
+      "fields": {
+        "name": "Name",
+        "slug": "Slug",
+        "description": "Beschreibung",
+        "active": "Aktiv",
+        "consentRequired": "Zustimmungs-Checkbox verlangen",
+        "consentText": "Zustimmungstext",
+        "botProtection": "Bot-Schutz",
+        "storageMode": "Speichermodus",
+        "storageModeHelp": "Queryable ermöglicht Suche über Submission-Daten; Simple speichert kompakter.",
+        "retentionDays": "Aufbewahrung (Tage)",
+        "retentionDaysHelp": "Leer lassen, um Einsendungen unbegrenzt zu speichern. Positive Zahl löscht nach N Tagen.",
+        "placeholder": "Der Field-Builder folgt in der nächsten Phase (#587 Teil 5)."
+      },
+      "botProtection": {
+        "none": "Keiner",
+        "mandatory": "Verpflichtend"
+      },
+      "storageMode": {
+        "simple": "Einfach",
+        "queryable": "Durchsuchbar"
+      },
+      "messages": {
+        "saved": "Formular gespeichert."
+      },
+      "viewSubmissions": "Einsendungen"
+    },
+    "submissions": {
+      "title": "Einsendungen",
+      "backToForm": "Zurück zum Formular",
+      "loadError": "Einsendungen konnten nicht geladen werden.",
+      "exportCsv": {
+        "btn": "CSV exportieren",
+        "help": "Aktuelle Seite als CSV herunterladen"
+      },
+      "filter": {
+        "all": "Alle",
+        "new": "Neu",
+        "in_review": "In Bearbeitung",
+        "resolved": "Erledigt",
+        "rejected": "Abgelehnt",
+        "archived": "Archiviert"
+      },
+      "status": {
+        "new": "Neu",
+        "in_review": "In Bearbeitung",
+        "resolved": "Erledigt",
+        "rejected": "Abgelehnt",
+        "archived": "Archiviert"
+      },
+      "columns": {
+        "referenceCode": "Referenz",
+        "status": "Status",
+        "preview": "Vorschau",
+        "createdAt": "Eingereicht"
+      },
+      "empty": {
+        "title": "Keine Einsendungen",
+        "descriptionAll": "Bisher hat niemand dieses Formular ausgefüllt.",
+        "descriptionFiltered": "Keine Einsendungen passen zum aktuellen Filter."
+      },
+      "detail": {
+        "referenceCode": "Referenzcode",
+        "status": "Status",
+        "data": "Eingereichte Daten",
+        "noData": "Diese Einsendung enthält keine Feldwerte.",
+        "notes": "Notizen",
+        "noNotes": "Noch keine Notizen.",
+        "addNote": "Notiz hinzufügen",
+        "addNoteBtn": "Hinzufügen",
+        "history": "Statusverlauf",
+        "initial": "erstellt",
+        "deleteBtn": "Einsendung löschen",
+        "close": "Schließen",
+        "noHistory": "Noch keine Statusänderungen."
+      },
+      "messages": {
+        "statusUpdated": "Status aktualisiert.",
+        "noteAdded": "Notiz hinzugefügt.",
+        "noteDeleted": "Notiz gelöscht.",
+        "deleted": "Einsendung gelöscht."
+      },
+      "deleteConfirm": {
+        "title": "Einsendung löschen?",
+        "body": "Soft-Delete der Einsendung. Sie erscheint nicht mehr im Eingang oder Self-Service.",
+        "confirm": "Löschen"
+      },
+      "transition": {
+        "in_review": "Prüfung starten",
+        "resolved": "Als erledigt markieren",
+        "rejected": "Ablehnen",
+        "archived": "Archivieren"
+      },
+      "actions": {
+        "menu": "Status ändern",
+        "none": "Keine weiteren Übergänge"
+      }
+    },
+    "templates": {
+      "title": "Formularvorlagen",
+      "subtitle": "Wiederverwendbare Feld-Presets für die Formularerstellung.",
+      "createButton": "Vorlage erstellen",
+      "backToForms": "Zurück zu Formularen",
+      "loadError": "Vorlagen konnten nicht geladen werden.",
+      "columns": {
+        "name": "Name",
+        "description": "Beschreibung",
+        "fields": "Felder",
+        "status": "Status"
+      },
+      "actions": {
+        "edit": "Bearbeiten",
+        "delete": "Löschen"
+      },
+      "fields": {
+        "name": "Name",
+        "description": "Beschreibung",
+        "icon": "Icon (Material-Symbol-Name)",
+        "iconHelp": "Optionale Material-Symbols-Ligatur, z.B. \"contact_mail\".",
+        "active": "Aktiv (im CreateFormWizard verfügbar)"
+      },
+      "dialog": {
+        "createTitle": "Vorlage erstellen",
+        "editTitle": "Vorlage bearbeiten"
+      },
+      "deleteConfirm": {
+        "title": "Vorlage löschen?",
+        "body": "Bereits erstellte Formulare bleiben unverändert — Vorlagen sind copy-on-create.",
+        "confirm": "Vorlage löschen"
+      },
+      "empty": {
+        "title": "Noch keine Vorlagen",
+        "description": "Vorlagen sind wiederverwendbare Feld-Presets. Erstelle eine, um die Formularerstellung zu beschleunigen.",
+        "cta": "Erste Vorlage anlegen"
+      },
+      "messages": {
+        "created": "Vorlage erstellt.",
+        "updated": "Vorlage aktualisiert.",
+        "deleted": "Vorlage gelöscht."
+      }
+    },
+    "wizard": {
+      "title": "Formular erstellen",
+      "btnCreate": "Formular erstellen",
+      "steps": {
+        "method": "Methode",
+        "details": "Details"
+      },
+      "method": {
+        "scratchTitle": "Neu beginnen",
+        "scratchDesc": "Erstelle ein leeres Formular und füge Felder einzeln hinzu.",
+        "templatesHeading": "Oder wähle eine Vorlage",
+        "templatesEmpty": "Noch keine Vorlagen. Speichere Felder als Vorlage aus einem bestehenden Formular zum Wiederverwenden."
+      },
+      "fields": {
+        "name": "Formularname",
+        "slug": "Slug",
+        "slugHelp": "URL-sicherer Bezeichner. Wird im öffentlichen Pfad /forms/<slug> verwendet."
+      }
+    }
+  },
+  "aiUsage": {
+    "title": "KI-Nutzung",
+    "subtitle": "KI-Aktivität pro Aufruf auf dieser Site. Näherungswerte für Tokens.",
+    "export": "CSV exportieren",
+    "exporting": "Exportiere…",
+    "empty": "Keine KI-Aktivität im gewählten Zeitraum.",
+    "ownOnlyNotice": "Es werden nur Ihre eigenen KI-Aufrufe angezeigt — Eigentümer und Admins sehen die gesamte Site.",
+    "recentCalls": "Aktuelle Aufrufe",
+    "filters": {
+      "from": "Von",
+      "to": "Bis",
+      "action": "Aktion",
+      "allActions": "Alle Aktionen",
+      "groupBy": "Gruppieren nach"
+    },
+    "groupBy": {
+      "action": "Aktion",
+      "provider": "Anbieter",
+      "user": "Benutzer"
+    },
+    "columns": {
+      "timestamp": "Zeit",
+      "action": "Aktion",
+      "provider": "Anbieter",
+      "model": "Modell",
+      "calls": "Aufrufe",
+      "inputTokens": "Eingabe-Tokens",
+      "outputTokens": "Ausgabe-Tokens"
+    },
+    "totals": {
+      "calls": "Aufrufe gesamt",
+      "inputTokens": "Eingabe-Tokens",
+      "outputTokens": "Ausgabe-Tokens"
+    },
+    "byGroup": {
+      "title": "Nutzung nach {{group}}"
+    }
+  },
+  "collections": {
+    "title": "Sammlungen",
+    "subtitle": "Benutzerdefinierte Inhaltstypen",
+    "newType": "Neue Sammlung",
+    "name": "Name",
+    "key": "Schlüssel",
+    "addField": "Feld hinzufügen",
+    "removeField": "Feld entfernen",
+    "fieldKey": "Feldschlüssel",
+    "fieldLabel": "Bezeichnung",
+    "fieldType": "Typ",
+    "required": "Pflichtfeld",
+    "localized": "Übersetzbar",
+    "titleField": "Titelfeld",
+    "isPii": "Personenbezogene Daten",
+    "dataCategory": "Datenkategorie",
+    "purpose": "Verarbeitungszweck",
+    "legalBasis": "Rechtsgrundlage",
+    "enumOptions": "Optionen (kommagetrennt)",
+    "retentionDays": "Aufbewahrung (Tage)",
+    "publiclyReadable": "Öffentlich lesbar",
+    "contentKind": "Routing",
+    "kindPage": "Seite (öffentliche URL)",
+    "kindData": "Nur Daten (API)",
+    "save": "Sammlung speichern",
+    "piiHelp": "Verschlüsselt gespeichert, aus öffentlicher API entfernt, im DSGVO-Verzeichnis enthalten.",
+    "entries": "Einträge",
+    "newEntry": "Neuer Eintrag",
+    "noEntries": "Noch keine Einträge",
+    "status": "Status",
+    "updated": "Aktualisiert",
+    "publish": "Veröffentlichen",
+    "unpublish": "Zurückziehen",
+    "deleteEntry": "Eintrag löschen",
+    "piiBadge": "PII",
+    "empty": "Noch keine Sammlungen definiert.",
+    "colFields": "Felder",
+    "colTitle": "Titel",
+    "colSlug": "Slug",
+    "emptyTitle": "Noch keine Collections",
+    "noEntriesDesc": "Erstellen Sie Ihren ersten Eintrag, um zu beginnen.",
+    "saveEntry": "Eintrag speichern",
+    "sectionDetails": "Details",
+    "sectionDetailsDesc": "Name, Schlüssel und Verhalten der Einträge.",
+    "sectionFields": "Felder",
+    "sectionFieldsDesc": "Definieren Sie die Daten jedes Eintrags. Genau ein Feld ist der Titel.",
+    "keyHelp": "Wird in API-Pfaden und URLs verwendet. Kleinbuchstaben, keine Leerzeichen.",
+    "keyLocked": "Der Schlüssel kann nach der Erstellung nicht geändert werden.",
+    "kindDataDesc": "Einträge werden nur über die API bereitgestellt – ideal für strukturierte Daten wie Teammitglieder, FAQs oder Referenzen.",
+    "kindPageDesc": "Jeder Eintrag erhält zusätzlich eine eigene öffentliche URL auf Ihrer Website – ideal für Inhalte wie Rezepte, Artikel oder Projekte.",
+    "retentionHelp": "Einträge nach so vielen Tagen automatisch löschen. Leer lassen, um sie dauerhaft zu behalten.",
+    "saveChanges": "Änderungen speichern",
+    "editHelp": "Das Umbenennen eines Feldschlüssels migriert dessen gespeicherte Werte. Das Entfernen eines Felds blendet es bei neuen Einträgen aus.",
+    "editStructure": "Struktur bearbeiten",
+    "structureSaved": "Collection-Struktur gespeichert.",
+    "openEntries": "Einträge öffnen",
+    "deleteType": "Collection löschen",
+    "deleteTypeConfirm": "Die Collection „{{name}}“ und ihre Struktur löschen? Einträge müssen zuerst entfernt werden.",
+    "typeDeleted": "Collection gelöscht.",
+    "allStatuses": "Alle Status",
+    "statusDraft": "Entwurf",
+    "statusPublished": "Veröffentlicht",
+    "entryPublished": "Eintrag veröffentlicht.",
+    "entryUnpublished": "Eintrag in Entwurf verschoben.",
+    "entryDeleted": "Eintrag gelöscht.",
+    "deleteEntryConfirm": "Den Eintrag „{{title}}“ löschen? Das kann nicht rückgängig gemacht werden.",
+    "perLanguage": "Pro Sprache · {{locale}}",
+    "dragToReorder": "Zum Neuordnen ziehen"
+  },
+  "imprint": {
+    "title": "Impressum",
+    "link": "Impressum",
+    "back": "Zurück zur Startseite",
+    "loadError": "Das Impressum lässt sich gerade nicht laden. Bitte versuch's später noch einmal.",
+    "unconfigured": "Für diese Instanz wurden keine Impressumsangaben hinterlegt.",
+    "operatorName": "Betreiber",
+    "address": "Anschrift",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "vat": "UID-Nummer",
+    "register": "Firmenbuch",
+    "responsible": "Verantwortlich für den Inhalt"
+  }
+}

@@ -1,0 +1,60 @@
+---
+import Base from "../layouts/Base.astro";
+import PageSection from "../components/PageSection.astro";
+import SeoHead from "../components/SeoHead.astro";
+import { fetchPageByRoute, fetchPageSections, fetchPageSectionLocalizations, fetchSite, getSiteUrl } from "../lib/api";
+import type { PageSectionResponse, SectionLocalizationResponse } from "../lib/api";
+import { buildSeoMeta } from "../lib/seo";
+import { localize } from "../lib/locale";
+
+const locale = Astro.locals.locale ?? { locale_id: '', code: 'en', name: 'English', direction: 'ltr' as const, is_default: true, is_active: true };
+const routeParam = Astro.params.route ?? "";
+const pageRoute = "/" + routeParam;
+
+// Skip static assets and reserved routes
+if (pageRoute.startsWith("/_astro/") || pageRoute.startsWith("/_image") || pageRoute.endsWith(".ico")) {
+  return new Response(null, { status: 404, statusText: "Not Found" });
+}
+const reserved = new Set(["/", "/blog", "/cv", "/rss", "/rss.xml", "/sitemap.xml"]);
+if (reserved.has(pageRoute) || pageRoute.startsWith("/legal/") || pageRoute.startsWith("/blog/")) {
+  return new Response(null, { status: 404, statusText: "Not Found" });
+}
+
+const page = await fetchPageByRoute(pageRoute).catch(() => null);
+if (!page || page.status !== "Published") {
+  return new Response(null, { status: 404, statusText: "Not Found" });
+}
+
+let sections: PageSectionResponse[] = [];
+let localizations: SectionLocalizationResponse[] = [];
+try {
+  sections = await fetchPageSections(page.id);
+  sections.sort((a, b) => a.display_order - b.display_order);
+  localizations = await fetchPageSectionLocalizations(page.id);
+} catch { /* ignore */ }
+
+const firstLoc = localize(
+  localizations.filter((l) => l.page_section_id === sections[0]?.id),
+  locale,
+);
+const title = firstLoc?.title ?? routeParam.replace(/-/g, " ") ?? "Page";
+
+const site = await fetchSite().catch(() => null);
+const siteName = site?.name ?? "My Site";
+const siteUrl = getSiteUrl();
+const seo = buildSeoMeta({ title: `${title} — ${siteName}`, description: firstLoc?.text?.slice(0, 160) ?? "", canonicalUrl: `${siteUrl}${pageRoute}/`, siteUrl, siteName });
+Astro.response.headers.set("Cache-Control", "public, max-age=300, s-maxage=600");
+---
+
+<Base title={title}>
+  <SeoHead seo={seo} slot="head" />
+  {sections.length > 0 ? (
+    <div class="max-w-prose mx-auto">
+      {sections.map((section) => (
+        <PageSection section={section} localizations={localizations} localeId={locale.locale_id} />
+      ))}
+    </div>
+  ) : (
+    <p class="text-zinc-500 dark:text-zinc-400">This page has no content yet.</p>
+  )}
+</Base>

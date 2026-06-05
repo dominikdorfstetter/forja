@@ -1,0 +1,4653 @@
+{
+  "common": {
+    "appName": "Forja",
+    "actions": {
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "delete": "Supprimer",
+      "edit": "Modifier",
+      "create": "Créer",
+      "add": "Ajouter",
+      "close": "Fermer",
+      "confirm": "Confirmer",
+      "back": "Retour",
+      "refresh": "Actualiser",
+      "search": "Rechercher",
+      "clear": "Effacer",
+      "view": "Voir",
+      "manage": "Gérer",
+      "submit": "Soumettre",
+      "saving": "Enregistrement...",
+      "loading": "Chargement...",
+      "deleting": "Suppression...",
+      "clone": "Cloner",
+      "upload": "Télécharger",
+      "selectFile": "Sélectionner un fichier",
+      "preview": "Aperçu",
+      "viewDetails": "Voir les détails",
+      "clickToCopy": "Cliquer pour copier",
+      "copied": "Copié !",
+      "next": "Suivant",
+      "copyLabel": "Copier {{value}} dans le presse-papiers",
+      "moveUp": "Monter",
+      "moveDown": "Descendre",
+      "open": "Ouvrir",
+      "more": "Plus",
+      "remove": "Supprimer",
+      "showSecret": "Afficher le secret",
+      "hideSecret": "Masquer le secret"
+    },
+    "status": {
+      "active": "Actif",
+      "inactive": "Inactif",
+      "draft": "Brouillon",
+      "published": "Publié",
+      "blocked": "Bloqué",
+      "expired": "Expiré",
+      "revoked": "Révoqué",
+      "healthy": "Opérationnel",
+      "degraded": "Dégradé",
+      "unhealthy": "Hors service",
+      "up": "En ligne",
+      "down": "Hors ligne",
+      "scheduled": "Planifié",
+      "inReview": "En révision",
+      "archived": "Archivé",
+      "maintenance": "Maintenance"
+    },
+    "search": {
+      "placeholder": "Rechercher par nom ou slug..."
+    },
+    "table": {
+      "actions": "Actions",
+      "name": "Nom",
+      "status": "Statut",
+      "created": "Créé",
+      "type": "Type",
+      "slug": "Slug",
+      "noData": "Aucune donnée",
+      "maintenance": "Maintenance",
+      "members": "Membres",
+      "storage": "Stockage",
+      "used": "Utilisé",
+      "usage": "Utilisation"
+    },
+    "confirm": {
+      "cannotBeUndone": "Cette action est irréversible.",
+      "areYouSure": "Êtes-vous sûr ?"
+    },
+    "confirmDialog": {
+      "typeToConfirm": "Tapez \"{{word}}\" pour confirmer"
+    },
+    "filters": {
+      "all": "Tous",
+      "status": "Statut",
+      "permission": "Permission",
+      "filterByType": "Filtrer par type"
+    },
+    "labels": {
+      "yes": "Oui",
+      "no": "Non",
+      "default": "Par défaut",
+      "global": "Global",
+      "site": "Site",
+      "child": "Enfant",
+      "featured": "En vedette",
+      "present": "Présent",
+      "never": "Jamais",
+      "none": "Aucun",
+      "untitled": "Sans titre",
+      "internal": "Interne",
+      "external": "Externe",
+      "page": "Page",
+      "blog": "Article de blog",
+      "cv": "CV",
+      "legal": "Juridique",
+      "legalDocuments": "Documents Juridiques",
+      "cookieConsent": "Consentement aux Cookies"
+    },
+    "errors": {
+      "loadFailed": "Échec du chargement des données",
+      "saveFailed": "Échec de l'enregistrement",
+      "deleteFailed": "Échec de la suppression",
+      "serverUnreachable": "Serveur inaccessible",
+      "required": "Ce champ est obligatoire"
+    },
+    "noSiteSelected": "Aucun site sélectionné",
+    "selectSitePrompt": "Sélectionnez un site dans la barre d'outils",
+    "selectSite": "Sélectionner un site...",
+    "noSiteOption": "Aucun site sélectionné",
+    "lockedByScope": "Verrouillé par la portée de la clé API",
+    "skipToMain": "Aller au contenu principal"
+  },
+  "scheduling": {
+    "publishAt": "Publier le",
+    "unpublishAt": "Dépublier le (optionnel)",
+    "scheduledFor": "Prévu pour le {{date}}",
+    "clearSchedule": "Effacer la planification",
+    "expiresAt": "Expire le {{date}}"
+  },
+  "layout": {
+    "sidebar": {
+      "dashboard": "Tableau de bord",
+      "content": "Contenu",
+      "blogs": "Articles de blog",
+      "pages": "Pages",
+      "media": "Médias",
+      "documents": "Documents",
+      "assets": "Ressources",
+      "structure": "Structure",
+      "navigation": "Navigation",
+      "taxonomy": "Taxonomie",
+      "site": "Site",
+      "socialLinks": "Liens sociaux",
+      "activity": "Activité",
+      "legal": "Juridique",
+      "cv": "CV",
+      "members": "Membres",
+      "invite": "Inviter",
+      "reviews": "Révisions",
+      "apiKeys": "Clés API",
+      "contentTemplates": "Modèles",
+      "redirects": "Redirections",
+      "webhooks": "Webhooks",
+      "settings": "Paramètres",
+      "aiSettings": "Paramètres IA",
+      "sites": "Sites",
+      "locales": "Langues",
+      "apiDocs": "Documentation API",
+      "myDrafts": "Mes brouillons",
+      "trash": "Corbeille",
+      "logout": "Déconnexion",
+      "leaveDemo": "Quitter la démo",
+      "analytics": "Analytique",
+      "administration": "Administration",
+      "portfolio": "Portfolio",
+      "cookieConsent": "Consentement aux Cookies",
+      "legalDocuments": "Documents Juridiques",
+      "forms": "Formulaires",
+      "collections": "Collections"
+    },
+    "toolbar": {
+      "toggleDrawer": "Basculer le tiroir",
+      "account": "Compte",
+      "profile": "Profil",
+      "theme": "Thème",
+      "language": "Langue",
+      "siteSelector": "Sélectionner un site",
+      "switchSite": "Changer de site",
+      "openSiteDetails": "Ouvrir les détails du site"
+    },
+    "accountMenu": {
+      "system": "Système",
+      "sites": "Gérer les sites",
+      "locales": "Langues",
+      "apiDocs": "Documentation API",
+      "preferences": "Préférences"
+    },
+    "demoBanner": {
+      "message": "Vous consultez une démo",
+      "signUp": "Inscrivez-vous pour créer votre propre site"
+    },
+    "demoInstance": "Ceci est une instance de démonstration à des fins de test uniquement. La base de données peut être réinitialisée et des fonctionnalités peuvent cesser de fonctionner sans préavis."
+  },
+  "login": {
+    "title": "Forja",
+    "subtitle": "Entrez votre clé API pour accéder au tableau de bord d'administration",
+    "apiKeyLabel": "Clé API",
+    "apiKeyPlaceholder": "dk_xxxxxxxx_xxxxxxxxxxxxxxxx",
+    "loginButton": "Se connecter",
+    "verifying": "Vérification...",
+    "success": "Connexion réussie",
+    "errors": {
+      "required": "La clé API est obligatoire",
+      "invalid": "Clé API invalide"
+    }
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "managing": "Gestion de {{name}}",
+    "selectSitePrompt": "Sélectionnez un site dans la barre d'outils pour voir les statistiques du contenu.",
+    "readOnlyNotice": "Vous avez un accès en <strong>lecture seule</strong>. Le contenu est visible mais ne peut pas être modifié.",
+    "badges": {
+      "aiEnabled": "IA activée"
+    },
+    "systemHealth": "État du système",
+    "overall": "Global : {{status}}",
+    "stats": {
+      "sites": "Sites",
+      "blogPosts": "Articles de blog",
+      "pages": "Pages",
+      "mediaFiles": "Fichiers médias",
+      "users": "Utilisateurs",
+      "apiKeys": "Clés API"
+    },
+    "recentPosts": "Articles de blog récents",
+    "publishedPosts": "Articles publiés",
+    "newPost": "Nouvel article",
+    "noPosts": "Aucun article de blog pour le moment.",
+    "noPostsCreate": "Aucun article de blog pour le moment. Créez votre premier article !",
+    "drafts": "Brouillons",
+    "viewAllDrafts": "Voir tout",
+    "noDrafts": "Aucun brouillon — tout le contenu est publié ou en cours de révision.",
+    "quickActions": "Actions rapides",
+    "byAuthor": "par {{author}}",
+    "requests": "{{count}} requêtes",
+    "apiKeysPanel": {
+      "active": "{{count}} actives",
+      "blocked": "{{count}} bloquées",
+      "expiringSoon": "{{count}} expire bientôt",
+      "expiresIn": "Expire dans {{days}}j",
+      "expired": "Expiré",
+      "monthlyQuota": "Quota mensuel : {{limit}} requêtes",
+      "resetsIn": "Réinitialisation dans {{days}}j",
+      "anomalyBlocked": "Anomalie bloquée",
+      "noKeys": "Aucune clé API configurée"
+    },
+    "yourSites": "Vos sites",
+    "noSites": "Aucun site trouvé",
+    "noSitesCreate": "Créez votre premier site pour commencer",
+    "permissions": {
+      "master": "Administrateur système",
+      "owner": "Propriétaire du site",
+      "admin": "Administrateur",
+      "write": "Écriture",
+      "readOnly": "Lecture seule"
+    },
+    "contentOverview": "Aperçu du contenu",
+    "chart": {
+      "noContent": "Aucun contenu pour le moment. Créez votre premier article de blog ou page."
+    },
+    "attention": {
+      "awaitingReview": "En attente de votre révision",
+      "draftsToFinish": "Brouillons à terminer",
+      "recentlyPublished": "Récemment publiés",
+      "noItemsReview": "Aucun élément en attente de révision.",
+      "noItemsDrafts": "Tout le contenu est publié ou en cours de révision.",
+      "noItemsPublished": "Aucun contenu publié pour le moment.",
+      "viewAll": "Voir tout"
+    },
+    "recentActivity": "Activité récente",
+    "recentActivityEmpty": "Aucune activité récente.",
+    "updatedAgo": "{{time}}",
+    "analytics": {
+      "pageViews": "Pages vues",
+      "totalViews": "Vues totales",
+      "uniqueVisitors": "Visiteurs uniques",
+      "noData": "Aucune donnée de pages vues",
+      "path": "Chemin",
+      "views": "Vues",
+      "visitors": "Visiteurs"
+    },
+    "workbench": {
+      "title": "Votre atelier",
+      "focus": {
+        "needsReview": "Nécessite votre révision",
+        "needsReviewHint_one": "{{count}} en attente d'approbation",
+        "needsReviewHint_other": "{{count}} en attente d'approbation",
+        "drafts": "Brouillons en cours",
+        "draftsHint_one": "{{count}} en cours",
+        "draftsHint_other": "{{count}} en cours",
+        "publishingSoon": "Publication imminente",
+        "scheduledHint_one": "{{count}} programmé",
+        "scheduledHint_other": "{{count}} programmés"
+      },
+      "feed": {
+        "filter": {
+          "attention": "Nécessite attention",
+          "drafts": "Brouillons",
+          "review": "Révision",
+          "scheduled": "Programmé"
+        },
+        "kinds": {
+          "needsReview": "À réviser",
+          "draft": "Brouillon",
+          "scheduled": "Programmé"
+        },
+        "action": {
+          "review": "Réviser",
+          "continue": "Continuer"
+        },
+        "loading": "Chargement…",
+        "empty": "Tout est à jour 🎉"
+      },
+      "health": {
+        "healthy": "Tous les systèmes sont sains",
+        "checking": "Vérification des services…",
+        "degraded": "Service dégradé",
+        "noServices": "Aucun service signalé"
+      },
+      "analytics": {
+        "totalViews_one": "{{count}} vue de page",
+        "totalViews_other": "{{count}} vues de page",
+        "vsLastWeek": "vs semaine dernière",
+        "noData": "Analytique indisponible"
+      }
+    }
+  },
+  "myDrafts": {
+    "title": "Mes brouillons",
+    "subtitle": "Tous les brouillons en un seul endroit",
+    "loading": "Chargement des brouillons...",
+    "table": {
+      "name": "Nom",
+      "type": "Type",
+      "lastModified": "Dernière modification"
+    },
+    "empty": {
+      "noSite": "Sélectionnez un site dans la barre d'outils pour voir les brouillons",
+      "title": "Aucun brouillon",
+      "description": "Tout votre contenu est publié ou programmé — rien en brouillon."
+    }
+  },
+  "trash": {
+    "title": "Corbeille",
+    "subtitle": "Contenu supprimé récemment — suppression automatique après 30 jours",
+    "empty": "La corbeille est vide",
+    "restore": "Restaurer",
+    "permanentDelete": "Supprimer définitivement",
+    "permanentDeleteConfirm": "Cette action est irréversible. Êtes-vous sûr ?",
+    "restored": "Élément restauré",
+    "deleted": "Élément définitivement supprimé",
+    "deletedAt": "Supprimé {{date}}",
+    "daysRemaining": "{{days}} jours avant la suppression automatique",
+    "columnDeleted": "Supprimé",
+    "columnAutoPurge": "Suppression auto.",
+    "emptyTrash": "Vider la corbeille",
+    "emptyTrashConfirm": "Supprimer définitivement les {{count}} éléments ? Cette action est irréversible.",
+    "type": {
+      "blog": "Blog",
+      "page": "Page",
+      "media": "Média",
+      "document": "Document",
+      "legal": "Document juridique",
+      "menu": "Menu de navigation",
+      "menu_item": "Élément de menu",
+      "social": "Lien social",
+      "project": "Projet",
+      "cv_entry": "Entrée de CV",
+      "skill": "Compétence"
+    }
+  },
+  "blogs": {
+    "title": "Articles de blog",
+    "createButton": "Créer un article",
+    "table": {
+      "slug": "Slug",
+      "author": "Auteur",
+      "status": "Statut",
+      "featured": "En vedette",
+      "published": "Publié",
+      "actions": "Actions",
+      "selectAll": "Sélectionner tous les blogs",
+      "selectRow": "Sélectionner le blog {{slug}}",
+      "caption": "Liste des articles de blog"
+    },
+    "viewDetail": "Voir le détail",
+    "empty": {
+      "title": "Aucun article de blog",
+      "description": "Les articles de blog sont l'épine dorsale de votre contenu. Rédigez des articles, tutoriels ou actualités — chacun avec des traductions, catégories et métadonnées SEO.",
+      "seedSamples": "Commencer avec des articles d'exemple"
+    },
+    "messages": {
+      "created": "Article créé — ouverture de l'éditeur",
+      "cloned": "Article cloné avec succès",
+      "sampleSeeded": "Articles de blog d'exemple créés"
+    },
+    "deleteDialog": {
+      "title": "Supprimer l'article",
+      "message": "Supprimer l'article \"{{slug}}\" ? Cette action est irréversible."
+    },
+    "publishDialog": {
+      "title": "Publier le blog ?",
+      "message": "\"{{slug}}\" sera visible publiquement."
+    },
+    "unpublishDialog": {
+      "title": "Dépublier le blog ?",
+      "message": "\"{{slug}}\" sera retiré de la vue publique et remis en brouillon."
+    },
+    "archiveDialog": {
+      "title": "Archiver le blog ?",
+      "message": "Cela archivera \"{{slug}}\" et le déplacera vers la vue d'archives."
+    },
+    "restoreDialog": {
+      "title": "Restaurer le blog ?",
+      "message": "Cela restaurera \"{{slug}}\" au statut de brouillon."
+    },
+    "moreActions": "Plus",
+    "wizard": {
+      "title": "Créer un blog",
+      "steps": {
+        "method": "Méthode",
+        "details": "Détails"
+      },
+      "methods": {
+        "scratch": "De zéro",
+        "scratchDesc": "Commencer avec un article de blog vierge",
+        "template": "Depuis un modèle",
+        "templateDesc": "Utiliser un modèle de contenu prédéfini",
+        "import": "Importer Markdown",
+        "importDesc": "Importer du contenu depuis un fichier .md",
+        "ai": "Assistant IA",
+        "aiDesc": "Générer un article de blog à partir d'une idée avec l'IA"
+      },
+      "fields": {
+        "slug": "Slug",
+        "slugHint": "Identifiant compatible URL (ex. mon-premier-article)",
+        "author": "Auteur",
+        "title": "Titre"
+      },
+      "creating": "Création...",
+      "create": "Créer le blog"
+    },
+    "picker": {
+      "label": "Sélectionner un article",
+      "placeholder": "Rechercher par slug...",
+      "empty": "Aucun article trouvé",
+      "loading": "Chargement des articles..."
+    },
+    "actions": {
+      "manageTemplates": "Gérer les modèles"
+    },
+    "list": {
+      "title": "Articles de blog",
+      "subtitle": "Gérez les articles de blog de vos sites",
+      "breadcrumb": "Articles de blog",
+      "loading": "Chargement des articles...",
+      "loadError": "Échec du chargement des articles",
+      "empty": {
+        "title": "Aucun article de blog",
+        "description": "Les articles de blog sont l'épine dorsale de votre contenu. Rédigez des articles, tutoriels ou actualités — chacun avec des traductions, catégories et métadonnées SEO.",
+        "noSite": "Sélectionnez un site dans la barre d'outils pour voir ses articles de blog"
+      },
+      "searchPlaceholder": "Rechercher par ID, slug ou auteur...",
+      "tabs": {
+        "active": "Actifs",
+        "archived": "Archivés"
+      },
+      "messages": {
+        "updated": "Article mis à jour",
+        "deleted": "Article supprimé"
+      }
+    }
+  },
+  "blogDetail": {
+    "title": "Détail de l'article",
+    "back": "Retour aux articles",
+    "loading": "Chargement de l'article...",
+    "notFound": "Article non trouvé",
+    "loadError": "Impossible de charger le blog",
+    "tabs": {
+      "content": "Contenu",
+      "preview": "Aperçu",
+      "seo": "SEO",
+      "settings": "Paramètres",
+      "attachments": "Pièces jointes",
+      "metadata": "Métadonnées",
+      "documents": "Documents"
+    },
+    "toolbar": {
+      "unsavedChanges": "Modifications non enregistrées"
+    },
+    "seo": {
+      "serpPreview": "Aperçu moteur de recherche",
+      "charCount": "{{current}}/{{max}}",
+      "socialPreview": "Aperçu réseaux sociaux",
+      "socialPreviewNoCover": "Ajoutez une image de couverture",
+      "socialPreviewApproximate": "Approximation ; le rendu réel varie selon la plateforme.",
+      "socialPreviewTitleWarning": "Le titre pourrait être tronqué lors du partage",
+      "socialPreviewDescriptionWarning": "La description pourrait être tronquée lors du partage"
+    },
+    "fields": {
+      "title": "Titre",
+      "subtitle": "Sous-titre",
+      "slug": "Slug",
+      "author": "Auteur",
+      "status": "Statut",
+      "locale": "Langue",
+      "excerpt": "Extrait",
+      "content": "Contenu",
+      "body": "Corps (Markdown)",
+      "coverImage": "URL de l'image de couverture",
+      "publishedDate": "Date de publication",
+      "featured": "En vedette",
+      "tags": "Étiquettes",
+      "categories": "Catégories",
+      "metaTitle": "Méta titre",
+      "metaDescription": "Méta description"
+    },
+    "metadata": {
+      "title": "Métadonnées du blog",
+      "slug": "Slug :",
+      "author": "Auteur :",
+      "status": "Statut :",
+      "published": "Publié :",
+      "readingTime": "Temps de lecture",
+      "manualOverride": "Remplacement manuel",
+      "autoCalculated": "Calculé automatiquement à partir du contenu",
+      "resetAuto": "Réinitialiser au calcul automatique",
+      "info": "Métadonnées",
+      "blogId": "ID du blog",
+      "contentId": "ID du contenu",
+      "publishedAt": "Publié le",
+      "createdAt": "Créé",
+      "updatedAt": "Dernière mise à jour"
+    },
+    "images": {
+      "title": "Images",
+      "coverImageId": "ID de l'image de couverture :",
+      "headerImageId": "ID de l'image d'en-tête :",
+      "selectImage": "Sélectionner une image",
+      "changeImage": "Modifier",
+      "removeImage": "Supprimer",
+      "noImage": "Aucune image sélectionnée"
+    },
+    "settings": {
+      "title": "Paramètres",
+      "featured": "En vedette",
+      "notFeatured": "Non en vedette",
+      "commentsOn": "Commentaires activés",
+      "commentsOff": "Commentaires désactivés"
+    },
+    "toc": "Table des matières",
+    "createTranslation": "Créer la traduction {{locale}}",
+    "noLocalesAlert": "Aucune locale active configurée. Allez dans <strong>Paramètres → Locales</strong> et créez au moins une locale active (par ex. « en ») pour commencer à écrire du contenu.",
+    "messages": {
+      "saved": "Article enregistré",
+      "saveFailed": "Échec de l'enregistrement de l'article"
+    },
+    "documents": {
+      "title": "Documents joints",
+      "attach": "Joindre un document",
+      "empty": "Aucun document joint",
+      "emptyDescription": "Joignez des documents à cet article de blog",
+      "detached": "Document détaché",
+      "attached": "Document joint"
+    },
+    "sections": {
+      "media": "Médias",
+      "seo": "SEO & Métadonnées",
+      "settings": "Paramètres",
+      "categoriesAndTags": "Catégories & Tags",
+      "attachments": "Pièces jointes",
+      "preview": "Aperçu"
+    },
+    "sidebar": {
+      "toggle": "Barre latérale",
+      "seo": "SEO",
+      "general": "Général",
+      "media": "Médias",
+      "relations": "Relations"
+    },
+    "ai": {
+      "generateSeo": "Générer le SEO",
+      "generateExcerpt": "Générer un extrait",
+      "translate": "Traduction IA",
+      "generating": "Génération...",
+      "writeContentFirst": "Rédigez d'abord du contenu",
+      "selectTargetLocale": "Langue cible",
+      "suggestTranslation": "Suggérer une traduction",
+      "applyTranslation": "Appliquer",
+      "refreshField": "Retraduire ce champ",
+      "translationPreview": "Aperçu de la traduction"
+    },
+    "tags": {
+      "empty": "Aucune étiquette assignée",
+      "assigned": "Étiquette assignée",
+      "removed": "Étiquette supprimée",
+      "assignFailed": "Échec de l'assignation de l'étiquette",
+      "removeFailed": "Échec de la suppression de l'étiquette",
+      "createFailed": "Échec de la création de l'étiquette",
+      "suggestTags": "Suggérer des étiquettes",
+      "suggesting": "Suggestion en cours...",
+      "suggestTitle": "Étiquettes suggérées",
+      "suggestSubtitle": "Choisissez les étiquettes à appliquer. Les étiquettes existantes sont réutilisées — les nouvelles sont marquées d'un +.",
+      "suggestPickHint": "Cliquez sur une puce pour la sélectionner ou la désélectionner.",
+      "suggestApply": "Appliquer {{count}} étiquette(s)",
+      "suggestEmpty": "Pas encore de suggestions.",
+      "suggestApplied": "Étiquettes appliquées",
+      "suggestApplyFailed": "Échec de l'application de l'étiquette {{slug}}",
+      "suggestTruncated": "Affichage des {{max}} meilleures suggestions."
+    }
+  },
+  "pages": {
+    "createButton": "Créer une page",
+    "table": {
+      "route": "Route",
+      "type": "Type",
+      "status": "Statut",
+      "inNav": "Dans la nav.",
+      "created": "Créé",
+      "actions": "Actions",
+      "selectAll": "Sélectionner toutes les pages",
+      "selectRow": "Sélectionner la page {{route}}",
+      "caption": "Liste des pages"
+    },
+    "viewDetails": "Voir les détails",
+    "messages": {
+      "created": "Page créée",
+      "cloned": "Page clonée avec succès"
+    },
+    "deleteDialog": {
+      "title": "Supprimer la page",
+      "message": "Supprimer la page \"{{route}}\" ? Cette action est irréversible."
+    },
+    "publishDialog": {
+      "title": "Publier la page ?",
+      "message": "\"{{route}}\" sera visible publiquement."
+    },
+    "unpublishDialog": {
+      "title": "Dépublier la page ?",
+      "message": "\"{{route}}\" sera retirée de la vue publique et remise en brouillon."
+    },
+    "archiveDialog": {
+      "title": "Archiver la page ?",
+      "message": "Cela archivera \"{{route}}\" et la déplacera vers la vue d'archives."
+    },
+    "restoreDialog": {
+      "title": "Restaurer la page ?",
+      "message": "Cela restaurera \"{{route}}\" au statut de brouillon."
+    },
+    "wizard": {
+      "steps": {
+        "pageType": "Type de page",
+        "identity": "Identité",
+        "options": "Options"
+      },
+      "next": "Suivant",
+      "back": "Retour",
+      "createPage": "Créer la page",
+      "creating": "Création...",
+      "types": {
+        "static": "Statique",
+        "staticDesc": "Page de contenu standard",
+        "landing": "Landing",
+        "landingDesc": "Page marketing avec sections hero",
+        "contact": "Contact",
+        "contactDesc": "Formulaire de contact et informations",
+        "blogIndex": "Index du blog",
+        "blogIndexDesc": "Page de liste des articles",
+        "custom": "Personnalisée",
+        "customDesc": "Mise en page entièrement personnalisée"
+      },
+      "routeHint": "Chemin URL de la page (ex. /a-propos)",
+      "slugHint": "Identifiant URL, généré automatiquement à partir de la route",
+      "site": "Site",
+      "inNavigation": "Afficher dans la navigation"
+    },
+    "picker": {
+      "label": "Sélectionner une page",
+      "placeholder": "Rechercher par titre ou route...",
+      "empty": "Aucune page trouvée",
+      "loading": "Chargement des pages..."
+    },
+    "list": {
+      "title": "Pages",
+      "subtitle": "Gérez les pages de vos sites",
+      "breadcrumb": "Pages",
+      "loading": "Chargement des pages...",
+      "loadError": "Échec du chargement des pages",
+      "empty": {
+        "title": "Aucune page",
+        "description": "Les pages sont les éléments constitutifs de votre site. Créez des pages d'accueil, des sections À propos ou toute mise en page personnalisée avec des sections modulaires.",
+        "noSite": "Sélectionnez un site dans la barre d'outils pour voir ses pages"
+      },
+      "searchPlaceholder": "Rechercher par ID, route ou slug...",
+      "tabs": {
+        "active": "Actives",
+        "archived": "Archivées"
+      },
+      "messages": {
+        "updated": "Page mise à jour",
+        "deleted": "Page supprimée"
+      }
+    }
+  },
+  "pageDetail": {
+    "title": "Détail de la page",
+    "back": "Retour aux pages",
+    "loading": "Chargement de la page...",
+    "loadFailed": "Échec du chargement de la page",
+    "notFound": "Page non trouvée",
+    "pageInfo": "Informations de la page",
+    "parentPageId": "ID de la page parente",
+    "pageSubtitle": "Page {{type}}",
+    "metadata": "Métadonnées",
+    "contentId": "ID du contenu",
+    "template": "Modèle",
+    "sections": {
+      "title": "Sections",
+      "coverImage": "Image de couverture",
+      "add": "Ajouter une section",
+      "empty": "Aucune section pour le moment",
+      "emptyDescription": "Ajoutez des sections pour construire votre page",
+      "deleted": "Section supprimée",
+      "saved": "Section enregistrée",
+      "reordered": "Sections réordonnées",
+      "added": "Section ajoutée",
+      "untitled": "Sans titre",
+      "loadingSections": "Chargement des sections...",
+      "deleteTitle": "Supprimer la section",
+      "deleteMessage": "Supprimer cette section {{type}} ? Cette action est irréversible."
+    },
+    "table": {
+      "type": "Type",
+      "order": "Ordre",
+      "content": "Contenu",
+      "localizations": "Localisations",
+      "coverImage": "Image de couverture",
+      "ctaRoute": "Route CTA",
+      "actions": "Actions"
+    },
+    "dialog": {
+      "sectionType": "Type de section",
+      "displayOrder": "Ordre d'affichage",
+      "displayOrderRequired": "L'ordre d'affichage est requis",
+      "adding": "Ajout en cours..."
+    },
+    "fields": {
+      "route": "Route",
+      "title": "Titre",
+      "description": "Description",
+      "status": "Statut",
+      "pageType": "Type de page",
+      "inNavigation": "Dans la navigation",
+      "navTitle": "Titre de navigation",
+      "navOrder": "Ordre de navigation",
+      "metaTitle": "Titre méta",
+      "metaDescription": "Description méta",
+      "excerpt": "Extrait",
+      "slug": "Slug",
+      "id": "ID",
+      "published": "Publié",
+      "created": "Créé",
+      "updated": "Mis à jour"
+    },
+    "tabs": {
+      "info": "Infos",
+      "seo": "SEO",
+      "sections": "Sections"
+    },
+    "seo": {
+      "serpPreview": "Aperçu du moteur de recherche"
+    },
+    "toolbar": {},
+    "messages": {
+      "saved": "Page enregistrée",
+      "saveFailed": "Échec de l'enregistrement de la page",
+      "updated": "Page mise à jour"
+    }
+  },
+  "media": {
+    "title": "Médias",
+    "subtitle": "Gérez les fichiers médias de vos sites",
+    "registerButton": "Enregistrer un média",
+    "uploadButton": "Télécharger un fichier",
+    "folders": "Dossiers",
+    "searchPlaceholder": "Rechercher par nom de fichier, texte alternatif, légende, titre...",
+    "categories": {
+      "images": "Images",
+      "videos": "Vidéos",
+      "audio": "Audio",
+      "documents": "Documents"
+    },
+    "picker": {
+      "title": "Sélectionner une image",
+      "search": "Rechercher des images...",
+      "noResults": "Aucune image trouvée",
+      "select": "Sélectionner",
+      "clear": "Effacer la sélection"
+    },
+    "openUrl": "Ouvrir l'URL",
+    "copyUrl": "Copier l'URL publique",
+    "empty": {
+      "noSite": "Sélectionnez un site dans la barre d'outils pour voir ses fichiers médias",
+      "title": "Aucun média",
+      "description": "Téléchargez et gérez des images, vidéos et documents. Les fichiers média peuvent être attachés aux articles, pages et sections.",
+      "noMatch": "Aucun média correspondant",
+      "noMatchDescription": "Essayez d'ajuster votre recherche ou vos filtres",
+      "noFilesInFolder": "Aucun fichier dans ce dossier"
+    },
+    "loading": "Chargement des médias...",
+    "loadError": "Échec du chargement des médias",
+    "messages": {
+      "registered": "Média enregistré",
+      "deleted": "Média supprimé",
+      "moved": "Déplacé dans le dossier",
+      "folderCreated": "Dossier créé",
+      "folderRenamed": "Dossier renommé",
+      "folderDeleted": "Dossier supprimé"
+    },
+    "ai": {
+      "title": "Vision IA",
+      "generateAltText": "Générer le texte alternatif",
+      "generateTags": "Suggérer des tags",
+      "suggestTags": "Suggérer des tags",
+      "altTextGenerated": "Texte alternatif généré",
+      "tagsGenerated": "Tags générés",
+      "generationFailed": "Échec de la génération IA",
+      "suggestedTags": "Tags suggérés — cliquez pour ajouter :",
+      "generateCaption": "Générer une légende",
+      "generateTitle": "Générer un titre",
+      "fieldGenerated": "Contenu IA généré",
+      "translateFrom": "Traduire depuis {{locale}}",
+      "noSourceContent": "Aucun contenu dans la langue par défaut à traduire",
+      "translated": "Métadonnées traduites"
+    },
+    "deleteDialog": {
+      "title": "Supprimer le média",
+      "message": "Supprimer \"{{filename}}\" ? Cette action est irréversible.",
+      "forceDelete": "Forcer la suppression (même si utilisé)"
+    },
+    "deleteFolderDialog": {
+      "title": "Supprimer le dossier ?",
+      "message": "Ce dossier sera définitivement supprimé et ses fichiers seront déplacés au niveau racine."
+    },
+    "upload": {
+      "dragDrop": "Glissez-déposez des fichiers ici, ou cliquez pour parcourir",
+      "uploading": "Téléchargement en cours...",
+      "progress": "Téléchargement {{percent}}%",
+      "success": "Fichier téléchargé avec succès",
+      "tooLarge": "Le fichier dépasse la taille maximale de {{maxSize}}",
+      "invalidType": "Type de fichier non pris en charge"
+    },
+    "tabs": {
+      "tags": "Étiquettes",
+      "metadata": "Metadonnées",
+      "variants": "Variantes",
+      "usage": "Utilisation"
+    },
+    "tags": {
+      "save": "Enregistrer les tags",
+      "saved": "Tags enregistrés"
+    },
+    "variants": {
+      "none": "Aucune variante disponible"
+    },
+    "usage": {
+      "none": "Non référencé par aucun contenu"
+    }
+  },
+  "documents": {
+    "title": "Documents",
+    "subtitle": "Gérez les documents téléchargeables",
+    "createButton": "Ajouter un document",
+    "table": {
+      "title": "Titre",
+      "slug": "Slug",
+      "type": "Type",
+      "fileSize": "Taille du fichier",
+      "downloads": "Téléchargements",
+      "status": "Statut",
+      "created": "Créé",
+      "actions": "Actions"
+    },
+    "empty": {
+      "noSite": "Sélectionnez un site dans la barre d'outils pour voir ses documents",
+      "title": "Aucun document",
+      "description": "Gérez les fichiers téléchargeables comme les PDF, livres blancs ou guides. Les documents peuvent être liés aux articles et aux pages."
+    },
+    "loading": "Chargement des documents...",
+    "loadError": "Échec du chargement des documents",
+    "messages": {
+      "created": "Document créé",
+      "updated": "Document mis à jour",
+      "deleted": "Document supprimé"
+    },
+    "deleteDialog": {
+      "title": "Supprimer le document",
+      "message": "Supprimer le document \"{{title}}\" ? Cette action est irréversible."
+    },
+    "deleteFolderDialog": {
+      "title": "Supprimer le dossier ?",
+      "message": "Ce dossier sera définitivement supprimé et ses documents seront déplacés au niveau racine."
+    },
+    "copyUrl": "Copier l'URL publique",
+    "searchPlaceholder": "Rechercher par nom, fichier, URL ou type...",
+    "privacy": {
+      "action": "Confidentialité",
+      "enterPassword": "Entrer le mot de passe",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "incorrectPassword": "Mot de passe incorrect",
+      "download": "Télécharger",
+      "setTitle": "Définir la confidentialité du document",
+      "setDescription": "Protégez ce document avec un mot de passe. Les utilisateurs devront entrer le mot de passe pour le télécharger.",
+      "setButton": "Définir le mot de passe",
+      "setSuccess": "Confidentialité du document activée",
+      "removeTitle": "Supprimer la confidentialité du document",
+      "removeDescription": "Supprimez la protection par mot de passe de ce document. Entrez le mot de passe actuel ou utilisez la récupération administrateur.",
+      "removeButton": "Supprimer la confidentialité",
+      "removeSuccess": "Confidentialité du document supprimée",
+      "adminRecoveryNote": "En tant qu'administrateur, vous pouvez laisser le mot de passe vide pour supprimer la confidentialité sans le mot de passe original.",
+      "minLength": "Le mot de passe doit contenir au moins {{min}} caractères",
+      "mismatch": "Les mots de passe ne correspondent pas",
+      "generate": "Générer un mot de passe sécurisé",
+      "ttl": {
+        "label": "Fenêtre d'accès",
+        "never": "N'expire jamais",
+        "1h": "1 heure",
+        "6h": "6 heures",
+        "24h": "24 heures",
+        "7d": "7 jours",
+        "30d": "30 jours"
+      },
+      "expiringBadge": "EXPIRE BIENTÔT",
+      "expiredBadge": "EXPIRÉ",
+      "lockedBadge": "VERROUILLÉ",
+      "unlock": "Déverrouiller",
+      "unlockConfirm": "Déverrouiller ce document ? Toute personne disposant du mot de passe et du lien pourra tenter à nouveau d'accéder.",
+      "unlockSuccess": "Document déverrouillé",
+      "unlockError": "Impossible de déverrouiller le document",
+      "errors": {
+        "expired": "Ce document a expiré",
+        "locked": "Ce document est verrouillé",
+        "invalidTtl": "Expiration invalide — doit être dans le futur et au plus un an à l'avance",
+        "notLocked": "Le document n'est pas verrouillé"
+      },
+      "badge": "Privé",
+      "unlockTitle": "Déverrouiller le document"
+    }
+  },
+  "navigation": {
+    "title": "Navigation",
+    "subtitle": "Gérez les éléments de navigation de vos sites",
+    "addItem": "Ajouter un élément",
+    "table": {
+      "link": "Lien",
+      "type": "Type",
+      "icon": "Icône",
+      "newTab": "Nouvel onglet",
+      "actions": "Actions",
+      "languages": "Langues"
+    },
+    "empty": {
+      "noSite": "Sélectionnez un site dans la barre d'outils pour gérer sa navigation",
+      "title": "Aucun élément de navigation",
+      "description": "Définissez comment les visiteurs naviguent sur votre site. Créez des menus avec des liens vers des pages ou des URL externes, organisés en hiérarchie."
+    },
+    "loading": "Chargement de la navigation...",
+    "loadError": "Échec du chargement de la navigation",
+    "messages": {
+      "created": "Élément de navigation créé",
+      "updated": "Élément de navigation mis à jour",
+      "deleted": "Élément de navigation supprimé"
+    },
+    "deleteDialog": {
+      "title": "Supprimer l'élément de navigation",
+      "message": "Supprimer cet élément de navigation ? Cela supprimera également ses localisations."
+    },
+    "fields": {
+      "title": "Titre",
+      "parent": "Parent",
+      "parentHelp": "Sélectionnez un élément parent ou laissez à la racine",
+      "noParent": "Aucun (niveau racine)",
+      "titles": "Titres"
+    },
+    "wizard": {
+      "title": {
+        "create": "Ajouter un élément de navigation",
+        "edit": "Modifier l'élément de navigation"
+      },
+      "steps": {
+        "linkTarget": "Cible du lien",
+        "translations": "Traductions",
+        "options": "Options"
+      },
+      "validation": {
+        "pageRequired": "Veuillez sélectionner une page",
+        "urlRequired": "Veuillez saisir une URL",
+        "urlInvalid": "Veuillez saisir une URL valide",
+        "titleRequired": "Au moins un titre est requis"
+      },
+      "translationsHelp": "Saisissez un titre pour chaque langue. Au moins un titre est requis.",
+      "noLocales": "Aucune langue configurée pour ce site.",
+      "iconHelp": "Nom d'icône optionnel",
+      "blogHelp": "Le lien pointera vers /blog/{slug}",
+      "contentType": "Type de contenu",
+      "cvInfo": "Liera à votre page CV à /cv",
+      "externalHelp": "Toute URL — documents, fichiers, sites externes",
+      "legalDocType": "Document juridique",
+      "legalHelp": "Le lien pointera vers /legal/{slug}"
+    },
+    "tree": {
+      "expand": "Développer",
+      "collapse": "Réduire",
+      "childCount": "{{count}} éléments"
+    },
+    "row": {
+      "locales": "{{count}}/{{total}} langues",
+      "active": "Actif",
+      "inactive": "Inactif"
+    },
+    "menu": {
+      "inactive": "(inactif)"
+    },
+    "dragToReorder": "Glisser pour réorganiser",
+    "menus": {
+      "createTitle": "Créer un menu",
+      "editTitle": "Modifier le menu",
+      "addMenu": "Ajouter un menu",
+      "editMenu": "Paramètres du menu",
+      "deleteMenu": "Supprimer le menu",
+      "fields": {
+        "slug": "Slug",
+        "slugHelp": "ex. primary, footer, sidebar",
+        "description": "Description",
+        "maxDepth": "Profondeur max.",
+        "maxDepthHelp": "Profondeur d'imbrication maximale (1-10)",
+        "active": "Actif"
+      },
+      "messages": {
+        "created": "Menu créé",
+        "updated": "Menu mis à jour",
+        "deleted": "Menu supprimé"
+      },
+      "empty": {
+        "title": "Pas encore de menus",
+        "description": "Créez un menu de navigation pour commencer"
+      },
+      "deleteDialog": {
+        "title": "Supprimer le menu",
+        "message": "Ceci supprimera définitivement ce menu et tous ses éléments de navigation. Cette action est irréversible."
+      }
+    }
+  },
+  "socialLinks": {
+    "title": "Liens sociaux",
+    "subtitle": "Gérez les liens de réseaux sociaux de vos sites",
+    "addLink": "Ajouter un lien",
+    "table": {
+      "title": "Titre",
+      "url": "URL",
+      "icon": "Icône",
+      "actions": "Actions"
+    },
+    "empty": {
+      "noSite": "Sélectionnez un site dans la barre d'outils pour gérer ses liens sociaux",
+      "title": "Aucun lien social",
+      "description": "Ajoutez des liens vers vos profils de réseaux sociaux. Ils sont servis via l'API pour que votre frontend puisse les afficher partout."
+    },
+    "loading": "Chargement des liens sociaux...",
+    "loadError": "Échec du chargement des liens sociaux",
+    "messages": {
+      "created": "Lien social créé",
+      "updated": "Lien social mis à jour",
+      "deleted": "Lien social supprimé"
+    },
+    "deleteDialog": {
+      "title": "Supprimer le lien social",
+      "message": "Supprimer \"{{title}}\" ? Cette action est irréversible."
+    }
+  },
+  "taxonomy": {
+    "title": "Taxonomie",
+    "subtitle": "Gérez les tags et les catégories de vos sites",
+    "info": {
+      "tags": "Étiquettes plates, façon hashtags — plusieurs par article (ex. « rust », « tutoriel »). Idéales pour filtrer et pour les sujets transversaux.",
+      "categories": "Arborescence hiérarchique, ex. « Technologie › Web › React ». Un article appartient généralement à une seule."
+    },
+    "tags": {
+      "title": "Étiquettes",
+      "addTag": "Ajouter un tag",
+      "table": {
+        "slug": "Slug",
+        "scope": "Portée",
+        "created": "Créé",
+        "actions": "Actions"
+      },
+      "empty": {
+        "title": "Aucun tag",
+        "description": "Les tags sont des étiquettes plates pour les sujets transversaux — comme des hashtags. Attribuez plusieurs tags par article (ex. \"rust\", \"tutoriel\") pour que les visiteurs puissent filtrer et découvrir le contenu."
+      },
+      "loading": "Chargement des tags...",
+      "searchPlaceholder": "Rechercher des tags par slug...",
+      "messages": {
+        "created": "Tag créé",
+        "updated": "Tag mis à jour",
+        "deleted": "Tag supprimé"
+      },
+      "deleteDialog": {
+        "title": "Supprimer le tag",
+        "message": "Supprimer le tag \"{{slug}}\" ? Cela désactivera le tag."
+      }
+    },
+    "categories": {
+      "title": "Catégories",
+      "addCategory": "Ajouter une catégorie",
+      "table": {
+        "slug": "Slug",
+        "parent": "Parent",
+        "scope": "Portée",
+        "created": "Créé",
+        "actions": "Actions"
+      },
+      "empty": {
+        "title": "Aucune catégorie",
+        "description": "Les catégories créent une hiérarchie arborescente pour votre contenu. Groupez les articles connexes sous des branches comme \"Technologie > Développement Web\" pour une navigation structurée."
+      },
+      "loading": "Chargement des catégories...",
+      "searchPlaceholder": "Rechercher des catégories par slug...",
+      "messages": {
+        "created": "Catégorie créée",
+        "updated": "Catégorie mise à jour",
+        "deleted": "Catégorie supprimée"
+      },
+      "deleteDialog": {
+        "title": "Supprimer la catégorie",
+        "message": "Supprimer la catégorie \"{{slug}}\" ? Cela désactivera la catégorie."
+      }
+    },
+    "empty": {
+      "noSite": "Sélectionnez un site dans la barre d'outils pour gérer sa taxonomie"
+    }
+  },
+  "webhooks": {
+    "title": "Webhooks",
+    "subtitle": "Notifier les services externes lors de modifications de contenu",
+    "addWebhook": "Ajouter un webhook",
+    "searchPlaceholder": "Rechercher par URL...",
+    "allEvents": "Tous les événements",
+    "viewDeliveries": "Voir les livraisons",
+    "sendTest": "Envoyer un test",
+    "testSuccess": "Test livré — {{status}}",
+    "testFailed": "Échec de la livraison de test",
+    "table": {
+      "url": "URL",
+      "events": "Événements",
+      "status": "Statut",
+      "created": "Créé",
+      "actions": "Actions",
+      "successRate": "Succès (24h)"
+    },
+    "empty": {
+      "noSite": "Sélectionnez un site dans la barre d'outils pour gérer ses webhooks",
+      "title": "Aucun webhook",
+      "description": "Les webhooks notifient les services externes lorsque du contenu est créé, modifié ou supprimé."
+    },
+    "loading": "Chargement des webhooks...",
+    "messages": {
+      "created": "Webhook créé",
+      "updated": "Webhook mis à jour",
+      "deleted": "Webhook supprimé"
+    },
+    "deleteDialog": {
+      "title": "Supprimer le webhook",
+      "message": "Supprimer le webhook pour \"{{url}}\" ? Cette action est irréversible."
+    },
+    "deliveries": {
+      "title": "Journal de livraison",
+      "loading": "Chargement des livraisons...",
+      "empty": "Aucune livraison",
+      "emptyDescription": "Les livraisons apparaîtront ici après le déclenchement du webhook.",
+      "table": {
+        "event": "Événement",
+        "status": "Statut",
+        "attempt": "Tentative",
+        "timestamp": "Horodatage",
+        "error": "Erreur"
+      }
+    },
+    "templates": {
+      "title": "Choisir un modèle",
+      "custom": "Personnalisé",
+      "customDesc": "Configurer un webhook de zéro",
+      "vercel": "Vercel",
+      "vercelDesc": "Déclencher un déploiement Vercel lorsque le contenu change",
+      "netlify": "Netlify",
+      "netlifyDesc": "Déclencher un build Netlify lorsque le contenu change",
+      "cloudflare": "Cloudflare Pages",
+      "cloudflareDesc": "Déclencher un build Cloudflare Pages lorsque le contenu change",
+      "errors": {
+        "urlMismatch": "Cette URL ne semble pas être un hook de déploiement {{provider}}"
+      }
+    },
+    "analytics": {
+      "title": "Statistiques de livraison",
+      "viewAnalytics": "Voir les statistiques",
+      "window": {
+        "1h": "Dernière heure",
+        "24h": "Dernières 24 heures",
+        "7d": "7 derniers jours",
+        "30d": "30 derniers jours"
+      },
+      "cards": {
+        "total": "Total des livraisons",
+        "successRate": "Taux de réussite",
+        "pendingRetry": "Nouvelles tentatives en attente"
+      },
+      "byEvent": {
+        "title": "Par type d'événement",
+        "event": "Événement",
+        "total": "Total",
+        "successful": "Réussi",
+        "failed": "Échoué"
+      },
+      "errors": {
+        "fetchFailed": "Impossible de charger les statistiques de livraison"
+      }
+    }
+  },
+  "redirects": {
+    "title": "Redirections",
+    "subtitle": "Gérer les redirections d'URL pour vos sites",
+    "addRedirect": "Ajouter une redirection",
+    "searchPlaceholder": "Rechercher par chemin...",
+    "table": {
+      "sourcePath": "Chemin source",
+      "destination": "URL cible",
+      "type": "Type",
+      "status": "Statut",
+      "created": "Créé",
+      "actions": "Actions",
+      "permanent": "301 Permanent",
+      "temporary": "302 Temporaire",
+      "temporaryStrict": "307 Temporaire",
+      "permanentStrict": "308 Permanent"
+    },
+    "empty": {
+      "noSite": "Sélectionnez un site dans la barre d'outils pour gérer les redirections",
+      "title": "Aucune redirection",
+      "description": "Les redirections redirigent automatiquement les visiteurs et les moteurs de recherche d'une URL vers une autre. Utilisez-les après des restructurations, des changements de domaine ou pour corriger des liens cassés."
+    },
+    "loading": "Chargement des redirections...",
+    "messages": {
+      "created": "Redirection créée",
+      "updated": "Redirection mise à jour",
+      "deleted": "Redirection supprimée"
+    },
+    "deleteDialog": {
+      "title": "Supprimer la redirection",
+      "message": "Supprimer la redirection de \"{{source}}\" ? Cette action est irréversible."
+    }
+  },
+  "locales": {
+    "title": "Langues",
+    "subtitle": "Gérer les langues et paramètres régionaux du système",
+    "addLanguage": "Ajouter une langue",
+    "loading": "Chargement des langues...",
+    "columns": {
+      "code": "Code",
+      "name": "Nom",
+      "nativeName": "Nom natif",
+      "direction": "Direction",
+      "active": "Actif",
+      "created": "Créé",
+      "actions": "Actions"
+    },
+    "empty": {
+      "title": "Aucune langue",
+      "description": "Les langues permettent du contenu multilingue. Ajoutez les langues que vous souhaitez supporter — chaque contenu peut ensuite être traduit."
+    },
+    "messages": {
+      "created": "Langue créée",
+      "updated": "Langue mise à jour",
+      "deleted": "Langue supprimée"
+    },
+    "deleteDialog": {
+      "title": "Supprimer la langue",
+      "message": "Supprimer la langue \"{{code}}\" ? Cette action est irréversible."
+    },
+    "errors": {
+      "inUse": "Impossible de supprimer : la langue est assignée à un ou plusieurs sites"
+    },
+    "active": {
+      "title": "Langues actives",
+      "empty": "Aucune langue activée. Activez des langues depuis le catalogue ci-dessous."
+    },
+    "catalog": {
+      "title": "Langues disponibles",
+      "enable": "Activer"
+    },
+    "deactivate": {
+      "title": "Désactiver la langue ?",
+      "message": "{{name}} est actuellement utilisé(e) par {{count}} site(s). Le contenu existant et les traductions seront conservés, mais les propriétaires de sites ne pourront plus ajouter de nouveau contenu dans cette langue.",
+      "confirm": "Désactiver"
+    }
+  },
+  "members": {
+    "title": "Membres",
+    "subtitle": "Gérer les membres du site et leurs rôles",
+    "addMember": "Ajouter un membre",
+    "table": {
+      "name": "Nom",
+      "email": "E-mail",
+      "role": "Rôle",
+      "joined": "Inscription",
+      "actions": "Actions"
+    },
+    "roles": {
+      "owner": "Propriétaire",
+      "admin": "Administrateur",
+      "editor": "Éditeur",
+      "author": "Auteur",
+      "reviewer": "Réviseur",
+      "viewer": "Lecteur"
+    },
+    "roleDescriptions": {
+      "admin": "Accès complet à la gestion du site",
+      "editor": "Peut gérer tout le contenu et les auteurs",
+      "author": "Peut rédiger et modifier son propre contenu",
+      "reviewer": "Peut réviser le contenu soumis pour approbation",
+      "viewer": "Peut consulter le contenu (lecture seule)"
+    },
+    "empty": {
+      "noSite": "Sélectionnez un site dans la barre d'outils pour gérer ses membres",
+      "title": "Aucun membre d'équipe",
+      "description": "Invitez des collaborateurs pour gérer ce site. Attribuez des rôles comme Éditeur, Auteur ou Relecteur pour contrôler l'accès."
+    },
+    "loading": "Chargement des membres...",
+    "loadError": "Erreur lors du chargement des membres",
+    "messages": {
+      "added": "Membre ajouté",
+      "roleUpdated": "Rôle du membre mis à jour",
+      "removed": "Membre supprimé",
+      "ownershipTransferred": "Propriété transférée"
+    },
+    "addDialog": {
+      "title": "Ajouter un membre",
+      "searchPlaceholder": "Rechercher des utilisateurs Clerk...",
+      "selectRole": "Sélectionner un rôle",
+      "noResults": "Aucun utilisateur trouvé"
+    },
+    "removeDialog": {
+      "title": "Supprimer le membre",
+      "message": "Supprimer ce membre du site ? Il perdra tout accès."
+    },
+    "transferDialog": {
+      "title": "Transférer la propriété",
+      "message": "Transférer la propriété à {{name}} ? Vous serez rétrogradé en administrateur.",
+      "confirm": "Transférer la propriété"
+    },
+    "leaveSite": "Quitter le site",
+    "leaveConfirm": {
+      "title": "Quitter {{siteName}} ?",
+      "message": "Vous perdrez l'accès à tout le contenu de ce site. Cette action est irréversible.",
+      "confirm": "Quitter le site"
+    }
+  },
+  "apiKeys": {
+    "title": "Clés API",
+    "subtitle": "Gérez les clés API pour accéder au backend",
+    "createButton": "Créer une clé API",
+    "searchPlaceholder": "Rechercher par nom ou préfixe de clé...",
+    "filters": {
+      "allStatuses": "Tous les statuts",
+      "allPermissions": "Toutes les permissions"
+    },
+    "permissions": {
+      "Master": "Maître",
+      "Admin": "Administrateur",
+      "Write": "Écriture",
+      "Read": "Lecture"
+    },
+    "table": {
+      "name": "Nom",
+      "keyPrefix": "Préfixe de clé",
+      "site": "Site",
+      "permission": "Permission",
+      "status": "Statut",
+      "requests": "Requêtes",
+      "lastUsed": "Dernière utilisation",
+      "actions": "Actions"
+    },
+    "empty": {
+      "title": "Aucune clé API",
+      "description": "Les clés API permettent aux applications externes d'accéder à votre contenu. Créez des clés avec des niveaux de permission et des portées de site spécifiques.",
+      "filterHint": "Essayez de modifier vos filtres"
+    },
+    "loading": "Chargement des clés API...",
+    "loadError": "Échec du chargement des clés API",
+    "messages": {
+      "created": "Clé API créée",
+      "blocked": "Clé API bloquée",
+      "unblocked": "Clé API débloquée",
+      "revoked": "Clé API révoquée",
+      "deleted": "Clé API supprimée",
+      "updated": "Clé d'API mise à jour"
+    },
+    "blockDialog": {
+      "title": "Bloquer la clé API",
+      "reason": "Raison du blocage",
+      "reasonPlaceholder": "Pourquoi cette clé est-elle bloquée ?",
+      "reasonRequired": "Une raison est obligatoire"
+    },
+    "revokeDialog": {
+      "title": "Révoquer la clé API",
+      "message": "Êtes-vous sûr de vouloir révoquer \"{{name}}\" ? Cette action est permanente et irréversible.",
+      "confirmWord": "Révoquer"
+    },
+    "deleteDialog": {
+      "title": "Supprimer la clé API",
+      "message": "Êtes-vous sûr de vouloir supprimer définitivement \"{{name}}\" ?"
+    },
+    "createDialog": {
+      "title": "Créer une clé API",
+      "fields": {
+        "name": "Nom",
+        "permission": "Permission",
+        "site": "Site",
+        "user": "Utilisateur (optionnel)",
+        "noUser": "Aucun utilisateur",
+        "expiresAt": "Date d'expiration (optionnel)"
+      },
+      "created": {
+        "title": "Clé API créée",
+        "warning": "Copiez cette clé maintenant. Vous ne pourrez plus la voir !",
+        "copied": "Clé copiée dans le presse-papiers"
+      },
+      "quotas": {
+        "title": "Quotas d'utilisation",
+        "hint": "Nombre maximal de requêtes autorisées par période avant limitation de la clé.",
+        "hourly": "Par heure",
+        "daily": "Par jour",
+        "monthly": "Par mois"
+      }
+    },
+    "usageDialog": {
+      "title": "Utilisation de la clé API",
+      "subtitle": "Statistiques d'utilisation pour {{name}}",
+      "totalRequests": "Total des requêtes",
+      "recentRequests": "Requêtes récentes",
+      "endpoint": "Point de terminaison",
+      "method": "Méthode",
+      "statusCode": "Code de statut",
+      "timestamp": "Horodatage",
+      "noUsage": "Aucune donnée d'utilisation disponible",
+      "loadError": "Impossible de charger les données d'utilisation",
+      "quota": {
+        "hourly": "Horaire",
+        "daily": "Quotidien",
+        "monthly": "Mensuel",
+        "used": "{{used}} / {{limit}} utilisés",
+        "remaining": "{{remaining}} restants",
+        "resetsIn": "Réinitialisation dans {{time}}",
+        "exhausted": "Quota épuisé",
+        "unavailable": "Données de quota indisponibles"
+      },
+      "timeline": {
+        "title": "Utilisation quotidienne (30 derniers jours)",
+        "successful": "Réussies",
+        "failed": "Échouées",
+        "requests": "Requêtes"
+      },
+      "stats": {
+        "allTime": "Total des requêtes",
+        "lastUsed": "Dernière utilisation",
+        "rateLimitHits": "Limites de débit atteintes aujourd'hui"
+      }
+    },
+    "actionsMenu": {
+      "viewUsage": "Voir l'utilisation",
+      "block": "Bloquer",
+      "unblock": "Débloquer",
+      "revoke": "Révoquer",
+      "delete": "Supprimer",
+      "edit": "Modifier"
+    },
+    "editDialog": {
+      "title": "Modifier la clé d'API",
+      "fields": {
+        "description": "Description"
+      }
+    }
+  },
+  "cv": {
+    "title": "CV / Curriculum vitae",
+    "subtitle": "Gérez les entrées de CV et les compétences de vos sites",
+    "tabs": {
+      "entries": "Entrées",
+      "skills": "Compétences"
+    },
+    "entries": {
+      "addEntry": "Ajouter une entrée",
+      "searchPlaceholder": "Rechercher par entreprise ou lieu...",
+      "table": {
+        "company": "Entreprise",
+        "location": "Lieu",
+        "type": "Type",
+        "dates": "Dates",
+        "current": "En cours",
+        "order": "Ordre",
+        "actions": "Actions"
+      },
+      "empty": {
+        "title": "Aucune entrée CV",
+        "description": "Ajoutez votre expérience professionnelle, formation et autres jalons de carrière. Les entrées sont servies via l'API pour votre portfolio."
+      },
+      "loading": "Chargement des entrées de CV...",
+      "loadError": "Échec du chargement des entrées de CV",
+      "messages": {
+        "created": "Entrée de CV créée",
+        "updated": "Entrée de CV mise à jour",
+        "deleted": "Entrée de CV supprimée"
+      },
+      "deleteDialog": {
+        "title": "Supprimer l'entrée de CV",
+        "message": "Supprimer l'entrée \"{{company}}\" ? Cette action est irréversible."
+      }
+    },
+    "skills": {
+      "addSkill": "Ajouter une compétence",
+      "searchPlaceholder": "Rechercher par nom de compétence...",
+      "table": {
+        "name": "Nom",
+        "slug": "Slug",
+        "category": "Catégorie",
+        "proficiency": "Niveau de maîtrise",
+        "icon": "Icône",
+        "actions": "Actions"
+      },
+      "empty": {
+        "title": "Aucune compétence",
+        "description": "Listez vos compétences techniques et professionnelles avec des niveaux de maîtrise et des catégories pour votre portfolio."
+      },
+      "loading": "Chargement des compétences...",
+      "loadError": "Échec du chargement des compétences",
+      "messages": {
+        "created": "Compétence créée",
+        "updated": "Compétence mise à jour",
+        "deleted": "Compétence supprimée"
+      },
+      "deleteDialog": {
+        "title": "Supprimer la compétence",
+        "message": "Supprimer la compétence \"{{name}}\" ? Cette action est irréversible."
+      }
+    },
+    "empty": {
+      "noSite": "Sélectionnez un site dans la barre d'outils pour gérer ses données de CV"
+    }
+  },
+  "cookieConsent": {
+    "title": "Consentement aux Cookies",
+    "subtitle": "Gérer la configuration du consentement aux cookies pour votre site",
+    "loading": "Chargement du consentement aux cookies...",
+    "empty": {
+      "noSite": "Sélectionnez un site pour gérer le consentement aux cookies.",
+      "title": "Aucun consentement aux cookies configuré",
+      "description": "Créez un document de consentement aux cookies pour commencer."
+    },
+    "managementTitle": "Consentement aux Cookies Configuré",
+    "managementDescription": "Votre document de consentement aux cookies est configuré. Gérez les groupes et éléments depuis la page de détail.",
+    "manageGroups": "Gérer les Groupes et Éléments",
+    "createDocument": "Créer le Consentement aux Cookies",
+    "editContent": "Modifier le contenu",
+    "manageDocument": "Gérer le Document",
+    "messages": {
+      "created": "Document de consentement aux cookies créé"
+    }
+  },
+  "legal": {
+    "title": "Documents juridiques",
+    "subtitle": "Gérez les documents juridiques de vos sites",
+    "addDocument": "Ajouter un document",
+    "table": {
+      "cookieName": "Nom du cookie",
+      "type": "Type",
+      "created": "Créé",
+      "actions": "Actions",
+      "name": "Nom",
+      "status": "Statut",
+      "selectAll": "Sélectionner tous les documents",
+      "selectRow": "Sélectionner le document {{name}}"
+    },
+    "empty": {
+      "noSite": "Sélectionnez un site dans la barre d'outils pour gérer ses documents juridiques",
+      "title": "Aucun document juridique",
+      "description": "Gérez les consentements de cookies, politiques de confidentialité et autres exigences légales. Regroupez les éléments pour des bannières de consentement structurées."
+    },
+    "messages": {
+      "created": "Document juridique créé",
+      "published": "Document publié",
+      "unpublished": "Document dépublié",
+      "archived": "Document archivé"
+    },
+    "deleteDialog": {
+      "title": "Supprimer le document juridique",
+      "message": "Supprimer le document juridique \"{{cookieName}}\" ? Cela supprimera également ses groupes et ses éléments."
+    },
+    "publishDialog": {
+      "title": "Publier le document",
+      "message": "Êtes-vous sûr de vouloir publier \"{{name}}\" ?"
+    },
+    "unpublishDialog": {
+      "title": "Dépublier le document",
+      "message": "Êtes-vous sûr de vouloir dépublier \"{{name}}\" ?"
+    },
+    "archiveDialog": {
+      "title": "Archiver le document",
+      "message": "Êtes-vous sûr de vouloir archiver \"{{name}}\" ?"
+    },
+    "picker": {
+      "label": "Sélectionner un document juridique",
+      "placeholder": "Rechercher des documents juridiques...",
+      "empty": "Aucun document juridique trouvé",
+      "loading": "Chargement des documents juridiques..."
+    },
+    "documentTypes": {
+      "CookieConsent": "Consentement aux Cookies",
+      "PrivacyPolicy": "Politique de Confidentialité",
+      "TermsOfService": "Conditions d'Utilisation",
+      "Imprint": "Mentions Légales",
+      "Disclaimer": "Clause de Non-Responsabilité"
+    },
+    "tabs": {
+      "documents": "Documents",
+      "cookieConsent": "Consentement aux Cookies"
+    },
+    "wizard": {
+      "title": "Créer un document juridique",
+      "description": "Donnez un nom à votre document. Vous pourrez définir le type et modifier le contenu sur la page suivante.",
+      "steps": {
+        "type": "Choisir le type",
+        "details": "Détails du document"
+      },
+      "fields": {
+        "name": "Nom du document",
+        "nameHelper": "Un identifiant court pour ce document"
+      },
+      "typeOptions": {
+        "PrivacyPolicy": "Politique de confidentialité",
+        "PrivacyPolicyDesc": "Pratiques de confidentialité et de traitement des données de votre site",
+        "TermsOfService": "Conditions d'utilisation",
+        "TermsOfServiceDesc": "Règles et accords pour l'utilisation de votre service",
+        "Imprint": "Mentions légales",
+        "ImprintDesc": "Informations sur l'entité juridique et coordonnées",
+        "Disclaimer": "Avertissement",
+        "DisclaimerDesc": "Limitations de responsabilité et avis juridiques"
+      }
+    },
+    "filters": {
+      "status": "Statut"
+    },
+    "list": {
+      "title": "Documents juridiques",
+      "subtitle": "Gérez les documents juridiques de vos sites",
+      "breadcrumb": "Documents juridiques",
+      "loading": "Chargement des documents juridiques...",
+      "loadError": "Échec du chargement des documents juridiques",
+      "empty": {
+        "title": "Aucun document juridique",
+        "description": "Gérez les consentements de cookies, politiques de confidentialité et autres exigences légales. Regroupez les éléments pour des bannières de consentement structurées.",
+        "noSite": "Sélectionnez un site dans la barre d'outils pour gérer ses documents juridiques"
+      },
+      "searchPlaceholder": "Rechercher par nom de cookie...",
+      "tabs": {
+        "active": "Actif",
+        "archived": "Archivé"
+      },
+      "messages": {
+        "updated": "Document juridique mis à jour",
+        "deleted": "Document juridique supprimé"
+      }
+    }
+  },
+  "legalDetail": {
+    "title": "Détail du document juridique",
+    "back": "Retour aux documents juridiques",
+    "loading": "Chargement du document juridique...",
+    "notFound": "Document juridique non trouvé",
+    "editDocument": "Modifier le document",
+    "cookieName": "Nom du cookie",
+    "documentType": "Type de document",
+    "documentId": "ID du document",
+    "updatedMessage": "Document juridique mis à jour",
+    "loadGroupsFailed": "Échec du chargement des groupes",
+    "groups": {
+      "title": "Groupes de consentement",
+      "add": "Ajouter un groupe",
+      "empty": "Aucun groupe de consentement",
+      "emptyDescription": "Ajoutez des groupes de consentement à ce document",
+      "editGroup": "Modifier le groupe",
+      "deleteGroup": "Supprimer le groupe",
+      "deleteMessage": "Supprimer le groupe « {{name}} » ? Cela supprimera également tous les éléments de ce groupe.",
+      "loadingGroups": "Chargement des groupes...",
+      "order": "Ordre : {{order}}",
+      "required": "Obligatoire",
+      "optional": "Facultatif",
+      "enabled": "Activé",
+      "disabled": "Désactivé",
+      "messages": {
+        "created": "Groupe créé",
+        "updated": "Groupe mis à jour",
+        "deleted": "Groupe supprimé"
+      }
+    },
+    "items": {
+      "title": "Éléments",
+      "add": "Ajouter un élément",
+      "empty": "Aucun élément dans ce groupe",
+      "loadingItems": "Chargement des éléments...",
+      "deleteItem": "Supprimer l'élément",
+      "deleteMessage": "Supprimer l'élément « {{name}} » ? Cette action est irréversible.",
+      "messages": {
+        "created": "Élément créé",
+        "updated": "Élément mis à jour",
+        "deleted": "Élément supprimé"
+      }
+    },
+    "dialog": {
+      "editGroup": "Modifier le groupe",
+      "addGroup": "Ajouter un groupe",
+      "editItem": "Modifier l'élément",
+      "addItem": "Ajouter un élément",
+      "cookieName": "Nom du cookie",
+      "cookieNameRequired": "Le nom du cookie est requis",
+      "displayOrder": "Ordre d'affichage",
+      "required": "Obligatoire",
+      "defaultEnabled": "Activé par défaut"
+    },
+    "messages": {
+      "saved": "Document juridique enregistré",
+      "published": "Document juridique publié",
+      "unpublished": "Document juridique dépublié",
+      "loadFailed": "Échec du chargement du document juridique"
+    },
+    "toolbar": {},
+    "fields": {
+      "title": "Titre",
+      "intro": "Introduction",
+      "body": "Contenu",
+      "metaTitle": "Méta-titre",
+      "metaDescription": "Méta-description"
+    },
+    "seo": {
+      "title": "Paramètres SEO"
+    },
+    "archiveDialog": {
+      "title": "Archiver le document juridique",
+      "message": "Voulez-vous vraiment archiver « {{slug}} » ? Il ne sera plus visible publiquement."
+    },
+    "restoreDialog": {
+      "title": "Restaurer le document juridique",
+      "message": "Restaurer « {{slug}} » depuis les archives ?"
+    },
+    "versions": {
+      "title": "Historique des versions",
+      "noVersions": "Aucune version précédente",
+      "createNew": "Créer une nouvelle version",
+      "created": "Nouvelle version créée"
+    }
+  },
+  "sites": {
+    "title": "Sites",
+    "subtitle": "Gérez vos sites web et leur configuration",
+    "createButton": "Créer un site",
+    "empty": {
+      "title": "Aucun site pour le moment",
+      "description": "Les sites sont la fondation de votre CMS. Chaque site a son propre contenu, ses langues, sa navigation et ses paramètres."
+    },
+    "loading": "Chargement des sites...",
+    "loadError": "Échec du chargement des sites",
+    "messages": {
+      "created": "Site créé avec succès",
+      "updated": "Site mis à jour avec succès",
+      "deleted": "Site supprimé avec succès"
+    },
+    "deleteDialog": {
+      "title": "Supprimer le site",
+      "message": "Êtes-vous sûr de vouloir supprimer \"{{name}}\" ? Cette action est irréversible."
+    },
+    "card": {
+      "view": "Voir",
+      "edit": "Modifier",
+      "delete": "Supprimer"
+    },
+    "wizard": {
+      "title": "Créer un nouveau site",
+      "steps": {
+        "basics": "Fondamentaux",
+        "modules": "Modules",
+        "workflow": "Flux de travail",
+        "languages": "Langues"
+      },
+      "modulesDescription": "Choisissez les modules de contenu à activer. Vous pourrez les modifier plus tard dans les Paramètres.",
+      "modules": {
+        "blog": "Blog",
+        "blogDesc": "Publiez des articles, tutoriels et actualités",
+        "pages": "Pages",
+        "pagesDesc": "Créez des pages statiques avec des sections et des mises en page",
+        "cv": "CV",
+        "cvDesc": "Gérez expérience professionnelle, formation et compétences",
+        "legal": "Juridique",
+        "legalDesc": "Politique de confidentialité, conditions d'utilisation et documents juridiques",
+        "documents": "Documents",
+        "documentsDesc": "Téléchargez et gérez des fichiers téléchargeables",
+        "ai": "Assistant IA",
+        "aiDesc": "Génération SEO, extraits automatiques et suggestions de traduction",
+        "portfolio": "Portfolio",
+        "portfolioDesc": "Gérer les entrées de CV, compétences et projets",
+        "forms": "Formulaires",
+        "formsDesc": "Collectez les soumissions des visiteurs avec des champs personnalisés"
+      },
+      "workflowDescription": "Comment allez-vous gérer le contenu sur ce site ?",
+      "workflow": {
+        "solo": "Solo",
+        "soloDesc": "Vous êtes le seul auteur. Le contenu est publié quand vous cliquez sur Publier.",
+        "team": "Équipe",
+        "teamDesc": "Plusieurs auteurs collaborent. Active le flux de révision éditoriale."
+      },
+      "languagesDescription": "Sélectionnez les langues que votre site prendra en charge. Vous pourrez en ajouter d'autres plus tard."
+    },
+    "launcher": {
+      "title": "Choisir un site",
+      "subtitle": "Sélectionnez un site pour commencer"
+    }
+  },
+  "siteDetail": {
+    "title": "Détail du site",
+    "back": "Retour aux sites",
+    "loading": "Chargement du site...",
+    "loadFailed": "Échec du chargement du site",
+    "notFound": "Site non trouvé",
+    "siteInfo": "Informations du site",
+    "noDescription": "Aucune description",
+    "metadata": "Métadonnées",
+    "quickLinks": "Liens rapides",
+    "deleteSite": "Supprimer le site",
+    "fields": {
+      "name": "Nom",
+      "slug": "Slug",
+      "description": "Description",
+      "domain": "Domaine",
+      "active": "Actif",
+      "timezone": "Fuseau horaire",
+      "status": "Statut",
+      "id": "ID",
+      "created": "Créé",
+      "updated": "Mis à jour"
+    },
+    "messages": {
+      "updated": "Site mis à jour",
+      "deleted": "Site supprimé",
+      "quotaUpdated": "Quota de stockage mis à jour"
+    },
+    "openSettings": "Ouvrir les paramètres du site",
+    "stats": {
+      "content": "Contenu",
+      "members": "Membres actifs",
+      "membersHint": "Gérer l'équipe →",
+      "owner": "Propriétaire",
+      "ownerMissing": "Aucun propriétaire assigné",
+      "storage": "Stockage utilisé",
+      "storageOf": "{{used}} sur {{quota}}"
+    },
+    "sysadmin": {
+      "enabledHelp": "Lorsque désactivé, le site n'est pas accessible aux visiteurs et les admins ne peuvent pas y accéder depuis",
+      "enabledLabel": "Site activé",
+      "quotaHelp": "Stockage maximum utilisé par les médias et documents pour ce site.",
+      "quotaLabel": "Quota de stockage (Go)",
+      "quotaSave": "Mettre à jour le quota",
+      "subtitle": "Ces contrôles sont visibles uniquement par les administrateurs système.",
+      "title": "Contrôles administrateur système"
+    }
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subtitle": "Configuration du site et informations système",
+    "tabs": {
+      "siteSettings": "Paramètres du site",
+      "systemInfo": "Informations système",
+      "preferences": "Préférences",
+      "legal": "Juridique",
+      "apiKeys": "Clés API",
+      "modules": "Modules",
+      "ai": "Assistant IA"
+    },
+    "modules": {
+      "title": "Modules de contenu",
+      "description": "Activez ou désactivez les modules de contenu pour ce site. Les modules désactivés sont masqués de la barre latérale et leurs points d'accès API renvoient 403.",
+      "blog": "Blog",
+      "blogDesc": "Publiez des articles, tutoriels et actualités",
+      "pages": "Pages",
+      "pagesDesc": "Créez des pages statiques avec des sections et des mises en page",
+      "cv": "CV",
+      "cvDesc": "Gérez expérience professionnelle, formation et compétences",
+      "legal": "Juridique",
+      "legalDesc": "Politique de confidentialité, conditions d'utilisation et documents juridiques",
+      "documents": "Documents",
+      "documentsDesc": "Téléchargez et gérez des fichiers téléchargeables",
+      "ai": "Assistant IA",
+      "aiDesc": "Génération SEO, extraits automatiques et suggestions de traduction",
+      "portfolio": "Portfolio",
+      "portfolioDesc": "Gérer les entrées de CV, compétences et projets",
+      "forms": "Formulaires",
+      "formsDesc": "Collectez des soumissions structurées avec champs personnalisés, validation et self-service RGPD",
+      "collections": "Collections",
+      "collectionsDesc": "Types de contenu personnalisés avec contrôles RGPD intégrés."
+    },
+    "passwordPolicy": {
+      "title": "Politique de mot de passe des documents",
+      "description": "Configurer les exigences de mot de passe pour les documents protégés",
+      "minLength": "Longueur minimale du mot de passe",
+      "regex": "Modèle de mot de passe (Regex)",
+      "regexHelp": "Laisser vide pour aucune exigence de modèle"
+    },
+    "selectSiteAlert": "Sélectionnez un site dans l'en-tête pour gérer ses paramètres.",
+    "loadingSiteSettings": "Chargement des paramètres du site...",
+    "uploadLimits": {
+      "title": "Limites de téléchargement",
+      "maxDocumentSize": "Taille maximale des documents",
+      "maxMediaSize": "Taille maximale des médias"
+    },
+    "general": {
+      "title": "Général",
+      "contactEmail": "E-mail de contact",
+      "siteUrl": "URL du site",
+      "siteUrlHelper": "L'URL publique canonique de votre site (ex. https://example.com). Utilisée pour les sitemaps, les balises SEO et les liens de prévisualisation.",
+      "siteUrlPlaceholder": "https://exemple.com"
+    },
+    "advanced": {
+      "title": "Paramètres avancés",
+      "description": "Options de configuration pour les utilisateurs avancés et les flux de travail en équipe"
+    },
+    "featureToggles": {
+      "title": "Options de fonctionnalités",
+      "analytics": "Analytique",
+      "analyticsDescription": "Activer le suivi analytique du site",
+      "maintenanceMode": "Mode maintenance",
+      "maintenanceModeDescription": "Afficher la page de maintenance aux visiteurs",
+      "maintenanceModeActive": "Le mode maintenance est actif — votre site n'est pas accessible aux visiteurs.",
+      "turnOffMaintenance": "Désactiver",
+      "editorialWorkflow": "Flux éditorial",
+      "editorialWorkflowDescription": "Exiger une révision du contenu avant publication. Les auteurs soumettent pour révision, les réviseurs approuvent ou demandent des modifications."
+    },
+    "preview": {
+      "title": "Modèles de prévisualisation",
+      "description": "Configurer les URLs de serveur de développement pour la prévisualisation",
+      "name": "Nom du modèle",
+      "url": "URL de prévisualisation",
+      "add": "Ajouter un modèle",
+      "openPreview": "Ouvrir l'aperçu"
+    },
+    "saveButton": "Enregistrer les paramètres",
+    "messages": {
+      "saved": "Paramètres enregistrés",
+      "saveFailed": "Échec de l'enregistrement des paramètres"
+    },
+    "systemInfo": {
+      "serverHealth": "État du serveur",
+      "checkingHealth": "Vérification de l'état du serveur...",
+      "overallStatus": "Statut global :",
+      "service": "Service",
+      "status": "Statut",
+      "latency": "Latence",
+      "details": "Détails",
+      "autoRefresh": "Actualisation automatique toutes les 30 secondes",
+      "environments": "Environnements",
+      "loadingEnvironments": "Chargement des environnements...",
+      "noEnvironments": "Aucun environnement configuré",
+      "envName": "Nom",
+      "envDisplayName": "Nom d'affichage",
+      "envDefault": "Par défaut",
+      "envCreated": "Créé",
+      "locales": "Langues",
+      "loadingLocales": "Chargement des langues...",
+      "noLocales": "Aucune langue configurée",
+      "localeCode": "Code",
+      "localeName": "Nom",
+      "localeNativeName": "Nom natif",
+      "localeDirection": "Direction",
+      "localeActive": "Actif",
+      "localesMovedDescription": "Les langues sont désormais gérées sur leur propre page dédiée.",
+      "manageLocales": "Gérer les langues"
+    },
+    "preferences": {
+      "title": "Préférences",
+      "language": {
+        "title": "Langue",
+        "label": "Langue de l'administration",
+        "description": "Choisissez la langue d'affichage de l'interface d'administration"
+      },
+      "theme": {
+        "title": "Thème",
+        "label": "Thème de couleur",
+        "description": "Choisissez un thème de couleur pour l'interface d'administration"
+      },
+      "tableDisplay": {
+        "title": "Affichage du tableau",
+        "pageSizeLabel": "Lignes par page",
+        "pageSizeDescription": "Nombre par défaut de lignes dans les tableaux d'administration"
+      },
+      "accent": {
+        "title": "Couleur d'accent",
+        "label": "Accent",
+        "description": "Appliqué sur tous les thèmes ; les variantes Catppuccin utilisent des accents alignés sur leur palette",
+        "violet": "Violet",
+        "coral": "Corail",
+        "teal": "Sarcelle",
+        "amber": "Ambre"
+      },
+      "density": {
+        "title": "Densité",
+        "label": "Densité des lignes",
+        "description": "Le mode compact réduit les listes et les éléments de navigation",
+        "comfortable": "Confortable",
+        "compact": "Compact"
+      }
+    },
+    "robotsTxt": {
+      "title": "Configuration robots.txt",
+      "description": "Contrôlez l'accès des robots d'indexation à votre site. Les modifications sont immédiatement reflétées sur le point de terminaison robots.txt public.",
+      "userAgent": "User-Agent",
+      "userAgentPlaceholder": "ex. * ou Googlebot",
+      "directive": "Directive",
+      "path": "Chemin",
+      "pathPlaceholder": "ex. / ou /admin",
+      "addDirective": "Ajouter une directive",
+      "addUserAgent": "Ajouter un bloc User-Agent",
+      "removeBlock": "Supprimer le bloc",
+      "removeDirective": "Supprimer la directive",
+      "resetDefaults": "Réinitialiser",
+      "preview": "Aperçu",
+      "previewDescription": "Voici comment votre robots.txt apparaîtra aux robots :",
+      "allow": "Autoriser",
+      "disallow": "Interdire",
+      "sitemapNote": "La directive Sitemap est automatiquement ajoutée lorsqu'une URL de site est configurée.",
+      "quickAdd": "Ajout rapide :",
+      "emptyBlock": "Bloc vide",
+      "emptyBlockTooltip": "Ajouter un bloc user-agent vide",
+      "saved": "Règles robots.txt enregistrées avec succès",
+      "saveFailed": "Échec de l'enregistrement des règles robots.txt"
+    },
+    "seoDefaults": {
+      "title": "Valeurs SEO par défaut",
+      "description": "Définissez des valeurs de repli pour les méta-titres, descriptions et images Open Graph. Ces valeurs sont utilisées quand le contenu n'a pas de métadonnées SEO personnalisées.",
+      "titleTemplate": "Modèle de titre",
+      "titleTemplateHelper": "Utilisez {{title}} pour le titre du contenu et {{site_name}} pour le nom du site",
+      "titlePreview": "Aperçu",
+      "defaultDescription": "Méta-description par défaut",
+      "defaultDescriptionPlaceholder": "Une description concise de votre site pour les moteurs de recherche...",
+      "charsRecommended": "caractères recommandés",
+      "defaultOgImage": "Image Open Graph par défaut",
+      "selectImage": "Sélectionner une image",
+      "changeImage": "Changer l'image",
+      "clearImage": "Supprimer",
+      "ogImageHelper": "Image de repli quand le contenu n'a pas d'image de couverture. Recommandé : 1200×630 px.",
+      "resetDefaults": "Réinitialiser",
+      "saved": "Valeurs SEO par défaut enregistrées",
+      "saveFailed": "Échec de l'enregistrement des valeurs SEO"
+    },
+    "codeInjection": {
+      "warning": "Le code ajouté ici s'exécute sur votre site en production. N'ajoutez que des scripts provenant de sources fiables.",
+      "headTitle": "Injection de code Head",
+      "headDescription": "HTML, CSS ou JavaScript injecté dans la section <head>. Utilisez ceci pour les analytics, les balises de vérification ou les méta-tags personnalisés.",
+      "headPlaceholder": "<!-- ex. Google Analytics, vérification Search Console -->",
+      "footerTitle": "Injection de code Footer",
+      "footerDescription": "HTML ou JavaScript injecté avant la balise </body>. Utilisez ceci pour les widgets de chat, les pixels de suivi ou d'autres scripts.",
+      "footerPlaceholder": "<!-- ex. widget de chat, scripts de suivi -->",
+      "chars": "caractères",
+      "saved": "Injection de code enregistrée avec succès",
+      "saveFailed": "Échec de l'enregistrement de l'injection de code"
+    },
+    "favicon": {
+      "title": "Icône du site",
+      "description": "Téléversez une image source (512×512 px ou plus recommandé) pour générer un package favicon complet.",
+      "dropHere": "Glissez-déposez votre image ici",
+      "recommended": "PNG, JPEG, GIF ou WebP. 512×512 px ou plus recommandé.",
+      "selectFile": "Sélectionner un fichier",
+      "generating": "Génération en cours...",
+      "variants": "Variantes générées",
+      "colors": "Couleurs du thème",
+      "themeColor": "Couleur du thème",
+      "bgColor": "Couleur d'arrière-plan",
+      "snippet": "Extrait HTML",
+      "copySnippet": "Copier dans le presse-papiers",
+      "snippetCopied": "Extrait copié dans le presse-papiers",
+      "noFavicon": "Aucun package favicon généré. Téléversez une image source.",
+      "uploadSuccess": "Package favicon généré avec succès",
+      "uploadFailed": "Échec de la génération du package favicon",
+      "colorsSaved": "Couleurs du thème enregistrées",
+      "download": "Télécharger le package",
+      "downloadFailed": "Échec du téléchargement du package favicon",
+      "chooseFromMedia": "Choisir depuis la médiathèque",
+      "fileTooLarge": "Fichier trop volumineux (max {{maxMB}} Mo)"
+    }
+  },
+  "onboarding": {
+    "welcome": "Bienvenue sur Forja",
+    "subtitle": "Votre CMS headless pour la gestion de contenu multi-site et multilingue.",
+    "description": "Créez votre premier site pour commencer à gérer des pages, des articles de blog, des médias et plus encore — le tout via une API REST puissante.",
+    "features": {
+      "multiSite": "Multi-Site",
+      "multiSiteDesc": "Gérez plusieurs sites web depuis un seul tableau de bord avec des contenus et paramètres indépendants.",
+      "multilingual": "Multilingue",
+      "multilingualDesc": "Localisation intégrée avec prise en charge de toute langue et de la direction de texte RTL.",
+      "apiFirst": "API-First",
+      "apiFirstDesc": "Architecture headless avec une API REST complète. Diffusez votre contenu vers n'importe quel frontend."
+    },
+    "preferences": {
+      "title": "Vos préférences",
+      "description": "Définissez votre langue et votre thème préférés avant de commencer."
+    },
+    "createSite": "Créer votre premier site",
+    "stepPrefix": "Étape 1 sur 1",
+    "survey": {
+      "subtitle": "Configurons tout pour vous.",
+      "description": "Répondez à quelques questions rapides pour que nous puissions personnaliser votre expérience.",
+      "getStarted": "Commencer",
+      "skip": "Passer",
+      "finish": "Terminer et créer le site",
+      "userTypeTitle": "Qu'est-ce qui vous décrit le mieux ?",
+      "userTypeDescription": "Cela nous aide à adapter l'interface et les paramètres par défaut à vos besoins.",
+      "userTypes": {
+        "solo": "Créateur solo",
+        "soloDesc": "Je crée pour moi-même",
+        "team": "Petite équipe",
+        "teamDesc": "2 à 10 personnes en collaboration",
+        "agency": "Agence / Studio",
+        "agencyDesc": "Gestion de plusieurs sites clients"
+      },
+      "intentTitle": "Que souhaitez-vous créer ?",
+      "intentDescription": "Sélectionnez tout ce qui s'applique. Nous préconfigurerons les bons modules pour vous.",
+      "intents": {
+        "blog": "Blog / Newsletter",
+        "blogDesc": "Publier des articles, des actualités ou des newsletters",
+        "portfolio": "Portfolio / Vitrine",
+        "portfolioDesc": "Présenter des projets, des réalisations ou un CV",
+        "marketing": "Site marketing / Pages d'atterrissage",
+        "marketingDesc": "Pages produit, campagnes ou pages d'atterrissage",
+        "docs": "Documentation / Base de connaissances",
+        "docsDesc": "Documentation technique, guides ou articles d'aide",
+        "company": "Site d'entreprise",
+        "companyDesc": "Site corporate avec blog, pages et contenu juridique"
+      }
+    }
+  },
+  "setupChecklist": {
+    "title": "Premiers pas",
+    "description": "Complétez ces étapes pour configurer votre site et commencer à publier du contenu.",
+    "completeTitle": "Tout est prêt !",
+    "completeDescription": "Vous avez terminé toutes les étapes de configuration. Vous êtes prêt à publier !",
+    "progress": "{{completed}} sur {{total}} terminé(s)",
+    "dismiss": "Masquer la checklist",
+    "deleteSamples": "Supprimer tout le contenu d'exemple",
+    "steps": {
+      "create_site": "Créer votre site",
+      "edit_first_post": "Modifier votre premier article",
+      "preview_site": "Prévisualiser votre site",
+      "publish_first_post": "Publier votre premier article",
+      "customize_settings": "Personnaliser les paramètres du site",
+      "invite_team": "Inviter un membre de l'équipe",
+      "setup_workflow": "Configurer le flux éditorial",
+      "createSite": "Créer votre premier site",
+      "addLanguage": "Ajouter une langue",
+      "createPage": "Créer une page",
+      "writeBlog": "Écrire un article de blog",
+      "setupNav": "Configurer la navigation"
+    },
+    "descriptions": {
+      "create_site": "Votre site a été créé",
+      "edit_first_post": "Ouvrez un article et personnalisez-le",
+      "preview_site": "Voyez à quoi ressemble votre contenu pour les visiteurs",
+      "publish_first_post": "Mettez en ligne en un clic",
+      "customize_settings": "Nom, description et apparence",
+      "invite_team": "Ajoutez des collaborateurs à votre site",
+      "setup_workflow": "Activez le processus de révision et d'approbation"
+    },
+    "estimates": {
+      "done": "Terminé",
+      "30sec": "~30 sec",
+      "1min": "~1 min",
+      "2min": "~2 min"
+    }
+  },
+  "firstRunTip": {
+    "title": "Astuce rapide",
+    "description": "Commencez par modifier le titre, puis utilisez la touche / pour ajouter des titres, des images et plus encore. Quand vous êtes prêt, cliquez sur « Publier » dans la barre d'outils."
+  },
+  "firstPublish": {
+    "title": "Vous êtes en ligne !",
+    "description": "Votre premier article a été publié.",
+    "viewPost": "Voir votre article",
+    "writeAnother": "En écrire un autre"
+  },
+  "teamWorkflowPrompt": {
+    "message": "Votre site a maintenant plusieurs contributeurs. Activez la révision éditoriale pour que le contenu soit révisé avant publication.",
+    "enableButton": "Activer dans les Paramètres",
+    "dismissButton": "Ignorer"
+  },
+  "activity": {
+    "title": "Activité",
+    "subtitle": "Journal de toutes les modifications sur ce site",
+    "loading": "Chargement de l'activité...",
+    "empty": "Aucune activité",
+    "emptyDescription": "Les actions telles que la création, la mise à jour et la suppression de contenu apparaîtront ici.",
+    "noFilterResults": "Aucune activité correspondante",
+    "noFilterResultsDescription": "Aucune activité ne correspond aux filtres sélectionnés. Essayez de modifier ou de réinitialiser les filtres.",
+    "columns": {
+      "timestamp": "Horodatage",
+      "action": "Action",
+      "entityType": "Type d'entité",
+      "entityId": "ID de l'entité",
+      "userId": "Utilisateur",
+      "entity": "Entité"
+    },
+    "filters": {
+      "action": "Action",
+      "entityType": "Type d'entité",
+      "all": "Tout",
+      "last24h": "Dernières 24 heures",
+      "last30d": "30 derniers jours",
+      "last7d": "7 derniers jours",
+      "timeframe": "Période"
+    },
+    "actions": {
+      "Approve": "Approuvé",
+      "Archive": "Archivé",
+      "Create": "Créé",
+      "Delete": "Supprimé",
+      "Export": "Exporté",
+      "Login": "Connecté",
+      "Logout": "Déconnecté",
+      "OwnershipTransfer": "Propriété transférée",
+      "PermissionDenied": "Permission refusée",
+      "Publish": "Publié",
+      "Read": "Consulté",
+      "RequestChanges": "Modifications demandées",
+      "Restore": "Restauré",
+      "SettingsUpdate": "Paramètres mis à jour",
+      "SubmitReview": "Soumis pour révision",
+      "Unpublish": "Dépublié",
+      "Update": "Mis à jour"
+    },
+    "aiUsage": {
+      "label": "IA utilisée",
+      "last30d": "30 derniers jours",
+      "totalSuffix": "fois"
+    },
+    "entities": {
+      "ai_config": "Configuration IA",
+      "ai_generation": "Génération IA",
+      "api_key": "Clé API",
+      "blog": "Blog",
+      "category": "Catégorie",
+      "cv_entry": "Entrée CV",
+      "document": "Document",
+      "legal_document": "Document juridique",
+      "media": "Média",
+      "member": "Membre",
+      "navigation_item": "Élément de navigation",
+      "navigation_menu": "Menu de navigation",
+      "page": "Page",
+      "project": "Projet",
+      "site": "Site",
+      "site_settings": "Paramètres du site",
+      "skill": "Compétence",
+      "social_link": "Lien social",
+      "tag": "Étiquette",
+      "trash": "Corbeille"
+    }
+  },
+  "entityHistory": {
+    "title": "Historique",
+    "noHistory": "Aucun historique enregistré",
+    "events": "Événements",
+    "changes": "Modifications de champs",
+    "oldValue": "Ancien",
+    "newValue": "Nouveau",
+    "revert": "Restaurer",
+    "revertConfirmTitle": "Restaurer les modifications",
+    "revertConfirmMessage": "Restaurer les champs suivants à leurs valeurs précédentes ?",
+    "reverted": "Modifications restaurées",
+    "revertFailed": "Échec de la restauration"
+  },
+  "unsavedChanges": {
+    "title": "Modifications non enregistrées",
+    "message": "Vous avez des modifications non enregistrées. Abandonner et quitter ?",
+    "stay": "Rester",
+    "discard": "Abandonner",
+    "count_one": "{{count}} modification non enregistrée",
+    "count_other": "{{count}} modifications non enregistrées",
+    "viewChanges": "Afficher les champs modifiés",
+    "changedFields": "Champs modifiés",
+    "revertAll": "Tout rétablir",
+    "revertField": "Rétablir {{field}}"
+  },
+  "inlineEdit": {
+    "clickToEdit": "Cliquer pour modifier"
+  },
+  "notFound": {
+    "title": "404",
+    "subtitle": "Page non trouvée",
+    "goToDashboard": "Aller au tableau de bord"
+  },
+  "apiDocs": {
+    "title": "Documentation API",
+    "subtitle": "Documentation API interactive",
+    "adminTab": "API Admin",
+    "consumerTab": "API Publique",
+    "download": "Télécharger la spec"
+  },
+  "forms": {
+    "blog": {
+      "createTitle": "Créer un article",
+      "editTitle": "Modifier l'article",
+      "fields": {
+        "siteId": "Site",
+        "locale": "Langue",
+        "slug": "Slug",
+        "author": "Auteur",
+        "status": "Statut",
+        "featured": "Article en vedette",
+        "publishedDate": "Date de publication"
+      }
+    },
+    "page": {
+      "createTitle": "Créer une page",
+      "editTitle": "Modifier la page",
+      "fields": {
+        "siteId": "Site",
+        "route": "Route",
+        "pageType": "Type de page",
+        "status": "Statut",
+        "inNavigation": "Afficher dans la navigation",
+        "navTitle": "Titre de navigation",
+        "navOrder": "Ordre de navigation"
+      }
+    },
+    "site": {
+      "createTitle": "Créer un site",
+      "editTitle": "Modifier le site",
+      "fields": {
+        "name": "Nom",
+        "slug": "Slug",
+        "description": "Description",
+        "domain": "Domaine",
+        "active": "Actif",
+        "initialLanguages": "Langues initiales",
+        "initialLanguagesHelper": "Sélectionnez au moins une langue pour votre site",
+        "defaultLanguage": "Langue par défaut"
+      },
+      "validation": {
+        "minOneLocale": "Au moins une langue est requise",
+        "exactlyOneDefault": "Exactement une langue doit être définie par défaut"
+      }
+    },
+    "navigation": {
+      "createTitle": "Créer un élément de navigation",
+      "editTitle": "Modifier l'élément de navigation",
+      "fields": {
+        "type": "Type",
+        "page": "Page",
+        "externalUrl": "URL externe",
+        "icon": "Icône",
+        "openInNewTab": "Ouvrir dans un nouvel onglet",
+        "label": "Libellé",
+        "locale": "Langue",
+        "blog": "Article de blog"
+      }
+    },
+    "socialLink": {
+      "createTitle": "Créer un lien social",
+      "editTitle": "Modifier le lien social",
+      "fields": {
+        "title": "Titre",
+        "url": "URL",
+        "icon": "Icône",
+        "ariaLabel": "Libellé Aria"
+      }
+    },
+    "locale": {
+      "createTitle": "Ajouter une langue",
+      "editTitle": "Modifier la langue",
+      "fields": {
+        "code": "Code",
+        "name": "Nom",
+        "nativeName": "Nom natif",
+        "direction": "Direction",
+        "active": "Actif"
+      },
+      "validation": {
+        "codeFormat": "Format : en ou en-US"
+      }
+    },
+    "tag": {
+      "createTitle": "Créer un tag",
+      "editTitle": "Modifier le tag",
+      "fields": {
+        "slug": "Slug",
+        "global": "Global (partagé entre tous les sites)",
+        "slugHelper": "Identifiant URL — lettres minuscules, chiffres et tirets (ex. \"mon-tag\")",
+        "globalHelper": "Les tags globaux sont partagés entre tous les sites. Les tags spécifiques appartiennent uniquement au site actuel."
+      }
+    },
+    "category": {
+      "createTitle": "Créer une catégorie",
+      "editTitle": "Modifier la catégorie",
+      "fields": {
+        "slug": "Slug",
+        "parent": "Catégorie parente",
+        "noParent": "Aucune (niveau supérieur)",
+        "global": "Global (partagé entre tous les sites)",
+        "slugHelper": "Identifiant URL — lettres minuscules, chiffres et tirets (ex. \"developpement-web\")",
+        "globalHelper": "Les catégories globales sont partagées entre tous les sites. Les catégories spécifiques appartiennent uniquement au site actuel.",
+        "parentHelper": "Imbriquez cette catégorie sous un parent pour construire une hiérarchie (ex. Technologie > Développement Web)"
+      }
+    },
+    "cvEntry": {
+      "createTitle": "Créer une entrée de CV",
+      "editTitle": "Modifier l'entrée de CV",
+      "fields": {
+        "siteId": "Site",
+        "entryType": "Type d'entrée",
+        "company": "Entreprise / Organisation",
+        "location": "Lieu",
+        "startDate": "Date de début",
+        "endDate": "Date de fin",
+        "isCurrent": "En poste actuellement",
+        "displayOrder": "Ordre d'affichage",
+        "title": "Intitulé du poste",
+        "description": "Description",
+        "locale": "Langue"
+      }
+    },
+    "skill": {
+      "createTitle": "Créer une compétence",
+      "editTitle": "Modifier la compétence",
+      "fields": {
+        "siteId": "Site",
+        "name": "Nom",
+        "slug": "Slug",
+        "category": "Catégorie",
+        "proficiency": "Niveau de maîtrise",
+        "icon": "Icône",
+        "displayOrder": "Ordre d'affichage"
+      }
+    },
+    "legal": {
+      "createTitle": "Créer un document juridique",
+      "editTitle": "Modifier le document juridique",
+      "fields": {
+        "cookieName": "Nom du cookie",
+        "documentType": "Type de document"
+      }
+    },
+    "mediaUpload": {
+      "title": "Enregistrer un média",
+      "fields": {
+        "siteId": "Site",
+        "publicUrl": "URL publique",
+        "filename": "Nom du fichier",
+        "originalFilename": "Nom de fichier original",
+        "mimeType": "Type MIME",
+        "fileSize": "Taille du fichier (octets)",
+        "width": "Largeur (px)",
+        "height": "Hauteur (px)",
+        "altText": "Texte alternatif",
+        "caption": "Légende",
+        "title": "Titre",
+        "folder": "Dossier"
+      }
+    },
+    "mediaDetail": {
+      "title": "Détails du média",
+      "fileInfo": "Informations sur le fichier",
+      "fields": {
+        "filename": "Nom du fichier",
+        "originalFilename": "Nom de fichier original",
+        "mimeType": "Type MIME",
+        "fileSize": "Taille du fichier",
+        "dimensions": "Dimensions",
+        "publicUrl": "URL publique",
+        "altText": "Texte alternatif",
+        "caption": "Légende",
+        "title": "Titre",
+        "folder": "Dossier",
+        "noFolder": "Aucun dossier",
+        "created": "Créé",
+        "focalPoint": "Point focal"
+      },
+      "focalPoint": {
+        "instruction": "Cliquez sur l'image pour définir le point focal",
+        "reset": "Réinitialiser au centre",
+        "saved": "Point focal mis à jour"
+      },
+      "messages": {
+        "updated": "Média mis à jour",
+        "updateFailed": "Échec de la mise à jour du média"
+      }
+    },
+    "document": {
+      "createTitle": "Créer un document",
+      "editTitle": "Modifier le document",
+      "currentFile": "Fichier actuel",
+      "errors": {
+        "noFile": "Veuillez sélectionner un fichier à télécharger"
+      },
+      "fields": {
+        "siteId": "Site",
+        "title": "Titre",
+        "slug": "Slug",
+        "description": "Description",
+        "documentType": "Type de document",
+        "fileUrl": "URL du fichier",
+        "fileSize": "Taille du fichier (octets)",
+        "mimeType": "Type MIME",
+        "status": "Statut",
+        "sourceType": "Type de source",
+        "urlHelp": "URL complète du document ou de la ressource"
+      },
+      "source": {
+        "link": "Lien",
+        "upload": "Télécharger"
+      }
+    },
+    "webhook": {
+      "createTitle": "Créer un webhook",
+      "editTitle": "Modifier le webhook",
+      "fields": {
+        "url": "URL",
+        "urlHelper": "Le point de terminaison qui recevra les requêtes POST avec les données d'événement",
+        "description": "Description",
+        "events": "Événements",
+        "eventsHelper": "Laisser vide pour tous les événements",
+        "active": "Actif",
+        "debounce": "Fenêtre d'attente",
+        "debounceHelper": "Regrouper les événements dans cette fenêtre en une seule livraison (0 = immédiat)",
+        "debounceUnit": "secondes"
+      }
+    },
+    "contentTemplate": {
+      "createTitle": "Créer un modèle",
+      "editTitle": "Modifier le modèle",
+      "sections": {
+        "metadata": "Paramètres du modèle",
+        "content": "Contenu par défaut"
+      },
+      "fields": {
+        "name": "Nom",
+        "description": "Description",
+        "icon": "Icône",
+        "slugPrefix": "Préfixe slug",
+        "isFeatured": "Mis en avant par défaut",
+        "allowComments": "Commentaires par défaut",
+        "isActive": "Actif",
+        "title": "Titre",
+        "subtitle": "Sous-titre",
+        "excerpt": "Extrait",
+        "body": "Corps (Markdown)",
+        "metaTitle": "Titre meta",
+        "metaDescription": "Description meta"
+      }
+    },
+    "redirect": {
+      "createTitle": "Créer une redirection",
+      "editTitle": "Modifier la redirection",
+      "fields": {
+        "sourcePath": "Chemin source",
+        "sourcePathHelper": "Le chemin à rediriger (ex. /ancien-chemin)",
+        "destinationPath": "URL cible",
+        "destinationPathHelper": "L'URL de destination (ex. /nouveau-chemin ou https://example.com)",
+        "statusCode": "Type de redirection",
+        "permanent": "301 — Permanente",
+        "temporary": "302 — Temporaire",
+        "temporaryStrict": "307 — Temporaire (méthode préservée)",
+        "permanentStrict": "308 — Permanente (méthode préservée)",
+        "description": "Description",
+        "active": "Actif"
+      }
+    },
+    "section": {
+      "title": "Modifier la section",
+      "fields": {
+        "displayOrder": "Ordre d'affichage",
+        "settings": "Paramètres",
+        "buttonText": "Texte du bouton",
+        "ctaRoute": "Route d'appel à l'action",
+        "ctaHelperText": "Lien CTA optionnel",
+        "text": "Texte"
+      },
+      "localizedContent": "Contenu localisé",
+      "sectionConfiguration": "Configuration de la section",
+      "noActiveLocales": "Aucune langue active configurée",
+      "localeExists": "existe",
+      "sectionSaved": "Section enregistrée",
+      "ai": {
+        "generateContent": "Générer le contenu",
+        "generating": "Génération…",
+        "translate": "Traduction IA",
+        "suggestTranslation": "Suggérer une traduction",
+        "applyTranslation": "Appliquer",
+        "refreshField": "Retraduire ce champ",
+        "translateHint": "Traduire depuis la langue par défaut vers {{locale}} ({{code}}). Vérifiez avant d'appliquer.",
+        "noSourceContent": "Ajoutez d'abord du contenu dans la langue par défaut."
+      }
+    },
+    "undo": "Annuler",
+    "redo": "Rétablir",
+    "validation": {
+      "required": "Ce champ est obligatoire",
+      "minLength": "Minimum {{count}} caractères",
+      "maxLength": "Maximum {{count}} caractères",
+      "invalidEmail": "Adresse e-mail invalide",
+      "invalidUrl": "URL invalide",
+      "min": "La valeur minimale est {{value}}",
+      "max": "La valeur maximale est {{value}}"
+    },
+    "project": {
+      "createTitle": "Créer un projet",
+      "editTitle": "Modifier le projet",
+      "fields": {
+        "slug": "Slug",
+        "displayOrder": "Ordre d'\\''affichage",
+        "isFeatured": "En vedette",
+        "startDate": "Date de début",
+        "endDate": "Date de fin",
+        "isOngoing": "En cours",
+        "status": "Statut"
+      }
+    }
+  },
+  "shared": {
+    "autosave": {
+      "retryFailed": "La sauvegarde automatique a échoué après plusieurs tentatives. Essayez d'enregistrer manuellement avec Ctrl+S."
+    },
+    "confirmDialog": {
+      "defaultTitle": "Confirmer",
+      "defaultCancel": "Annuler",
+      "confirmationInput": "Texte de confirmation"
+    },
+    "loadingState": {
+      "defaultLabel": "Chargement..."
+    },
+    "emptyState": {
+      "defaultTitle": "Rien ici pour le moment"
+    },
+    "folderTree": {
+      "allFiles": "Tous les fichiers",
+      "newFolder": "Nouveau dossier",
+      "rename": "Renommer",
+      "delete": "Supprimer",
+      "createFolder": "Créer un dossier",
+      "folderName": "Nom du dossier",
+      "collapse": "Réduire {{name}}",
+      "expand": "Développer {{name}}"
+    },
+    "pageHeader": {},
+    "statusChip": {},
+    "errorBoundary": {
+      "title": "Une erreur est survenue",
+      "description": "Une erreur inattendue s'est produite sur cette page.",
+      "showDetails": "Afficher les détails",
+      "hideDetails": "Masquer les détails",
+      "tryAgain": "Réessayer",
+      "goToDashboard": "Aller au tableau de bord",
+      "reloadPage": "Recharger la page"
+    },
+    "navigationGuard": {
+      "title": "Modifications non enregistrées",
+      "message": "Vous avez des modifications non enregistrées. Êtes-vous sûr de vouloir quitter cette page ?",
+      "leave": "Quitter",
+      "stay": "Rester"
+    }
+  },
+  "imageCropper": {
+    "title": "Recadrer l'image",
+    "description": "Ajustez la zone de recadrage pour sélectionner la portion de l'image à utiliser.",
+    "zoom": "Zoom",
+    "cancel": "Annuler",
+    "apply": "Appliquer le recadrage"
+  },
+  "profile": {
+    "title": "Profil",
+    "subtitle": "Gérez votre compte, vos paramètres de sécurité et vos données",
+    "accountInfo": "Informations du compte",
+    "unknownUser": "Utilisateur inconnu",
+    "manageAccount": "Gérer le compte",
+    "security": "Sécurité et sessions",
+    "authMethod": "Méthode d'authentification",
+    "permissionLevel": "Niveau de permission",
+    "siteScope": "Portée du site",
+    "memberSince": "Membre depuis",
+    "lastSignIn": "Dernière connexion",
+    "dataPrivacy": "Données et confidentialité",
+    "dataPrivacyInfo": "Vous pouvez exporter toutes vos données stockées dans le CMS ou supprimer définitivement votre compte. Les données exportées comprennent votre profil, les journaux d'audit, les clés API et l'historique des modifications.",
+    "exportData": "Exporter mes données",
+    "exporting": "Exportation...",
+    "exportSuccess": "Données exportées avec succès",
+    "exportError": "Échec de l'exportation des données",
+    "deleteAccount": "Supprimer le compte",
+    "deleteAccountTitle": "Supprimer le compte",
+    "deleteAccountMessage": "Cette action est permanente et irréversible. Votre compte Clerk sera supprimé et toutes les données CMS associées seront anonymisées. Êtes-vous sûr de vouloir continuer ?",
+    "deleteAccountConfirm": "Supprimer mon compte",
+    "deleteSuccess": "Compte supprimé avec succès",
+    "deleteError": "Échec de la suppression du compte"
+  },
+  "siteLocales": {
+    "title": "Langues",
+    "addLanguage": "Ajouter une langue",
+    "columns": {
+      "language": "Langue",
+      "nativeName": "Nom natif",
+      "urlPrefix": "Préfixe URL",
+      "default": "Par défaut",
+      "active": "Actif",
+      "actions": "Actions"
+    },
+    "addDialog": {
+      "title": "Ajouter une langue",
+      "selectLanguage": "Sélectionner une langue",
+      "urlPrefix": "Préfixe URL",
+      "urlPrefixHelper": "ex. en, de, fr (utilisé dans les URL)",
+      "setAsDefault": "Définir comme langue par défaut"
+    },
+    "setDefault": "Définir par défaut",
+    "remove": "Supprimer",
+    "empty": "Aucune langue n'est encore attribuée à ce site.",
+    "tooltips": {
+      "cannotRemoveDefault": "Impossible de supprimer la langue par défaut",
+      "cannotRemoveLast": "Impossible de supprimer la dernière langue",
+      "alreadyDefault": "C'est déjà la langue par défaut"
+    },
+    "messages": {
+      "added": "Langue ajoutée",
+      "updated": "Langue mise à jour",
+      "removed": "Langue supprimée",
+      "defaultSet": "Langue par défaut mise à jour",
+      "addFailed": "Échec de l'ajout de la langue",
+      "updateFailed": "Échec de la mise à jour de la langue",
+      "removeFailed": "Échec de la suppression de la langue",
+      "defaultFailed": "Échec de la définition de la langue par défaut"
+    },
+    "removeDialog": {
+      "confirm": "Retirer",
+      "message": "{{name}} ({{code}}) sera retiré(e) de ce site. Le contenu dans cette langue",
+      "title": "Retirer la langue ?"
+    }
+  },
+  "commandPalette": {
+    "placeholder": "Rechercher des commandes...",
+    "noResults": "Aucun résultat trouvé",
+    "categories": {
+      "context": "Actions rapides",
+      "navigation": "Navigation",
+      "actions": "Actions",
+      "blogs": "Articles",
+      "pages": "Pages",
+      "sites": "Sites",
+      "media": "Médias"
+    },
+    "actions": {
+      "logout": "Déconnexion",
+      "leaveDemo": "Quitter la démo"
+    },
+    "contextActions": {
+      "createBlog": "Créer un blog",
+      "createPage": "Créer une page",
+      "uploadMedia": "Télécharger un média",
+      "createTemplate": "Créer un modèle",
+      "createTag": "Créer un tag",
+      "createCategory": "Créer une catégorie",
+      "addNavItem": "Ajouter un élément de navigation",
+      "addSocialLink": "Ajouter un lien social",
+      "createWebhook": "Créer un webhook",
+      "createRedirect": "Créer une redirection",
+      "addMember": "Ajouter un membre",
+      "addCvEntry": "Ajouter une entrée CV",
+      "addSkill": "Ajouter une compétence",
+      "createSite": "Créer un site",
+      "backToSites": "Retour à la liste des sites",
+      "addLanguage": "Ajouter une langue",
+      "addLegalDoc": "Ajouter un document juridique",
+      "backToLegal": "Retour aux documents juridiques",
+      "createApiKey": "Créer une clé API",
+      "backToBlogs": "Retour à la liste des blogs",
+      "backToPages": "Retour à la liste des pages"
+    },
+    "open": "Ouvrir la palette de commandes",
+    "searchLabel": "Rechercher des commandes",
+    "title": "Palette de commandes",
+    "resultCount": "{{count}} résultats disponibles",
+    "triggerPlaceholder": "Rechercher articles, pages, médias..."
+  },
+  "languages": {
+    "en": "English",
+    "de": "Deutsch",
+    "fr": "Français",
+    "es": "Español",
+    "it": "Italiano",
+    "pt": "Português",
+    "nl": "Nederlands",
+    "pl": "Polski",
+    "ar": "العربية"
+  },
+  "workflow": {
+    "submitForReview": "Soumettre pour révision",
+    "approve": "Approuver",
+    "requestChanges": "Demander des modifications",
+    "reviewComment": "Commentaire de révision",
+    "reviewCommentPlaceholder": "Décrivez les modifications nécessaires...",
+    "submittedForReview": "Contenu soumis pour révision",
+    "approved": "Contenu approuvé",
+    "changesRequested": "Modifications demandées",
+    "cannotPublish": "Le flux éditorial est activé. Soumettez le contenu pour révision afin de le publier.",
+    "publish": "Publier",
+    "unpublish": "Dépublier",
+    "archive": "Archiver",
+    "restore": "Restaurer",
+    "restoreAsDraft": "Restaurer comme brouillon"
+  },
+  "approveDialog": {
+    "title": "Approuver le contenu",
+    "message": "Choisissez comment publier ce contenu.",
+    "publishNow": "Publier maintenant",
+    "schedule": "Planifier",
+    "selectDate": "Sélectionner la date de publication"
+  },
+  "restoreDialog": {
+    "restore": "Restaurer",
+    "restoreAsDraft": "Restaurer comme brouillon"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "bell": "Notifications",
+    "bellWithCount": "Notifications, {{count}} non lues",
+    "empty": "Aucune notification pour le moment",
+    "markAllRead": "Tout marquer comme lu",
+    "viewAll": "Voir tout",
+    "pageTitle": "Notifications",
+    "pageSubtitle": "Consultez et gérez vos notifications",
+    "searchPlaceholder": "Rechercher des notifications...",
+    "columns": {
+      "type": "Type",
+      "title": "Titre",
+      "message": "Message",
+      "time": "Heure",
+      "status": "Statut"
+    },
+    "read": "Lu",
+    "unread": "Non lu",
+    "noSite": "Sélectionnez un site pour voir les notifications",
+    "types": {
+      "submitted": "Soumis pour révision",
+      "approved": "Approuvé",
+      "changesRequested": "Modifications demandées",
+      "system": "Système"
+    },
+    "actions": {
+      "confirmDeleteReadConfirm": "Supprimer {{count}}",
+      "confirmDeleteReadMessage": "{{count}} notification(s) déjà lue(s) sera/seront supprimée(s). Cette action est irréversible.",
+      "confirmDeleteReadTitle": "Supprimer toutes les notifications lues ?",
+      "delete": "Supprimer la notification",
+      "deleteRead": "Supprimer toutes les lues"
+    },
+    "filters": {
+      "all": "Toutes",
+      "read": "Lues",
+      "unread": "Non lues"
+    },
+    "messages": {
+      "deleted": "Notification supprimée",
+      "readCleared": "{{count}} notification(s) lue(s) effacée(s)"
+    }
+  },
+  "bulk": {
+    "toolbar": "Barre d'actions groupées",
+    "selectedCount": "{{count}} sélectionnés",
+    "publish": "Publier",
+    "unpublish": "Dépublier",
+    "archive": "Archiver",
+    "restore": "Restaurer",
+    "delete": "Supprimer",
+    "clearSelection": "Effacer la sélection",
+    "deleteDialog": {
+      "title": "Supprimer les éléments sélectionnés",
+      "message": "Supprimer {{count}} éléments sélectionnés ? Cette action est irréversible."
+    },
+    "publishDialog": {
+      "title": "Publier les éléments sélectionnés ?",
+      "message": "{{count}} élément(s) seront publiés et visibles publiquement."
+    },
+    "unpublishDialog": {
+      "title": "Dépublier les éléments sélectionnés ?",
+      "message": "{{count}} élément(s) seront dépubliés et remis en brouillon."
+    },
+    "archiveDialog": {
+      "title": "Archiver les éléments sélectionnés ?",
+      "message": "Cela archivera {{count}} élément(s) et les déplacera vers la vue d'archives."
+    },
+    "restoreDialog": {
+      "title": "Restaurer les éléments sélectionnés ?",
+      "message": "Cela restaurera {{count}} élément(s) au statut de brouillon."
+    },
+    "messages": {
+      "success": "{{count}} éléments mis à jour avec succès",
+      "partial": "{{succeeded}} réussis, {{failed}} échoués"
+    }
+  },
+  "contentTemplates": {
+    "title": "Modèles de blog",
+    "subtitle": "Gérer les modèles réutilisables pour les articles de blog",
+    "addTemplate": "Ajouter un modèle",
+    "table": {
+      "name": "Nom",
+      "description": "Description",
+      "icon": "Icône",
+      "active": "Actif",
+      "created": "Créé",
+      "actions": "Actions"
+    },
+    "empty": {
+      "noSite": "Sélectionnez un site dans la barre d'outils",
+      "title": "Aucun modèle",
+      "description": "Créez des modèles de contenu réutilisables pour accélérer la création d'articles."
+    },
+    "loading": "Chargement des modèles...",
+    "messages": {
+      "created": "Modèle créé",
+      "updated": "Modèle mis à jour",
+      "deleted": "Modèle supprimé"
+    },
+    "deleteDialog": {
+      "title": "Supprimer le modèle",
+      "message": "Supprimer le modèle \"{{name}}\" ? Cette action est irréversible."
+    },
+    "wizard": {
+      "title": "Créer un modèle",
+      "steps": {
+        "method": "Méthode",
+        "details": "Détails"
+      },
+      "methods": {
+        "scratch": "De zéro",
+        "scratchDesc": "Commencer avec un modèle vierge",
+        "template": "Depuis un modèle",
+        "templateDesc": "Utiliser un modèle intégré comme point de départ",
+        "import": "Importer Markdown",
+        "importDesc": "Importer du contenu depuis un fichier .md"
+      },
+      "slugPrefixHint": "Préfixe d'URL pour les blogs créés à partir de ce modèle"
+    },
+    "searchPlaceholder": "Rechercher des modèles par nom..."
+  },
+  "templates": {
+    "fromTemplate": "Depuis un modèle",
+    "dialogTitle": "Créer un blog à partir d'un modèle",
+    "dialogSubtitle": "Choisissez un modèle pour commencer avec une structure de contenu pré-remplie.",
+    "useTemplate": "Utiliser le modèle",
+    "searchPlaceholder": "Rechercher des modèles...",
+    "builtIn": "Intégré",
+    "custom": "Personnalisé",
+    "manageTemplates": "Gérer les modèles",
+    "noResults": "Aucun modèle ne correspond",
+    "page": "Page {{current}} sur {{total}}",
+    "tutorial": {
+      "name": "Tutoriel",
+      "description": "Guide étape par étape avec prérequis, étapes numérotées et lectures complémentaires."
+    },
+    "changelog": {
+      "name": "Changelog",
+      "description": "Notes de version avec fonctionnalités, corrections, changements majeurs et guide de migration."
+    },
+    "review": {
+      "name": "Avis",
+      "description": "Avis sur un produit ou outil avec fonctionnalités clés, avantages, inconvénients et verdict."
+    },
+    "announcement": {
+      "name": "Annonce",
+      "description": "Annonce avec signification, prochaines étapes et appel à l'action."
+    }
+  },
+  "markdownImport": {
+    "importButton": "Importer Markdown",
+    "dialogTitle": "Importer depuis Markdown",
+    "dialogSubtitle": "Téléchargez un fichier Markdown pour créer un nouvel article de blog. Le titre H1 deviendra le titre.",
+    "dropZone": "Glissez-déposez un fichier .md ici ou cliquez pour parcourir",
+    "dropZoneActive": "Déposez votre fichier ici",
+    "preview": "Aperçu",
+    "titleLabel": "Titre",
+    "excerptLabel": "Extrait",
+    "slugLabel": "Slug",
+    "bodyPreview": "Aperçu du contenu",
+    "back": "Retour",
+    "import": "Importer",
+    "importing": "Importation...",
+    "errors": {
+      "invalidExtension": "Seuls les fichiers .md et .markdown sont acceptés",
+      "emptyFile": "Le fichier est vide",
+      "noH1": "Le Markdown doit contenir exactement un titre H1 (# Titre)",
+      "multipleH1": "Le Markdown contient plusieurs titres H1. Utilisez-en un seul.",
+      "titleTooLong": "Le titre dépasse la longueur maximale de {{max}} caractères",
+      "bodyTooLong": "Le contenu dépasse la longueur maximale de {{max}} caractères",
+      "readFailed": "Impossible de lire le fichier"
+    }
+  },
+  "editor": {
+    "placeholder": "Tapez / pour insérer des blocs...",
+    "sectionPlaceholder": "Contenu de la section...",
+    "toolbar": {
+      "label": "Mise en forme du texte",
+      "linkDialog": {
+        "title": "Insérer un lien",
+        "urlLabel": "URL",
+        "insert": "Insérer",
+        "remove": "Supprimer le lien"
+      },
+      "bold": "Gras (Ctrl+B)",
+      "italic": "Italique (Ctrl+I)",
+      "underline": "Souligné (Ctrl+U)",
+      "strikethrough": "Barré",
+      "heading1": "Titre 1",
+      "heading2": "Titre 2",
+      "heading3": "Titre 3",
+      "blockquote": "Citation",
+      "bulletList": "Liste à puces",
+      "orderedList": "Liste numérotée",
+      "taskList": "Liste de tâches",
+      "horizontalRule": "Ligne horizontale",
+      "link": "Lien",
+      "image": "Image",
+      "codeBlock": "Bloc de code",
+      "insertTable": "Insérer un tableau",
+      "undo": "Annuler (Ctrl+Z)",
+      "redo": "Rétablir (Ctrl+Y)"
+    },
+    "commands": {
+      "paragraph": "Paragraphe",
+      "heading1": "Titre 1",
+      "heading2": "Titre 2",
+      "heading3": "Titre 3",
+      "bulletList": "Liste à puces",
+      "orderedList": "Liste numérotée",
+      "taskList": "Liste de tâches",
+      "blockquote": "Citation",
+      "codeBlock": "Bloc de code",
+      "horizontalRule": "Ligne horizontale",
+      "image": "Image",
+      "table": "Tableau",
+      "zen": "Mode Zen"
+    },
+    "zen": {
+      "enter": "Activer le mode zen",
+      "exit": "Quitter le mode zen",
+      "tooltip": "Écriture plein écran sans distractions"
+    },
+    "mediaPicker": {
+      "tabs": {
+        "gallery": "Galerie",
+        "upload": "Télécharger"
+      },
+      "upload": {
+        "dragDrop": "Glissez et déposez une image ici, ou cliquez pour parcourir",
+        "uploading": "Téléchargement en cours...",
+        "success": "Image téléchargée avec succès",
+        "invalidType": "Seuls les fichiers image sont acceptés (JPEG, PNG, GIF, WebP, AVIF, SVG)",
+        "tooLarge": "Le fichier dépasse la taille maximale autorisée"
+      }
+    }
+  },
+  "quickPost": {
+    "title": "Publication rapide",
+    "titlePlaceholder": "Titre de la publication...",
+    "bodyPlaceholder": "Commencez à écrire...",
+    "publish": "Publier",
+    "publishNow": "Publier maintenant",
+    "saveAsDraft": "Enregistrer comme brouillon",
+    "moreOptions": "Plus d'options",
+    "success": "Article de blog créé",
+    "dashboardButton": "Publication rapide",
+    "ai": {
+      "manualMode": "Écrire",
+      "aiMode": "Assistant IA",
+      "ideaTitle": "Sur quoi voulez-vous écrire ?",
+      "ideaPlaceholder": "Décrivez votre idée d'article, le sujet ou les points clés que vous souhaitez aborder...",
+      "generateOutline": "Générer un plan",
+      "generating": "Génération en cours...",
+      "titleLabel": "Titre",
+      "subtitleLabel": "Sous-titre",
+      "outlineLabel": "Plan",
+      "addPoint": "Ajouter un point",
+      "generatePost": "Générer l'article",
+      "startOver": "Recommencer",
+      "regenerateOutline": "Revenir en arrière et essayer une nouvelle idée",
+      "outlineError": "Impossible de générer le plan. Veuillez réessayer.",
+      "postError": "Impossible de générer l'article. Veuillez réessayer.",
+      "insertPoint": "Point d'insertion ci-dessous",
+      "languageNotice": "Le contenu sera généré en {{language}} (langue par défaut du site)",
+      "regenerateOutlineBtn": "Régénérer le plan"
+    }
+  },
+  "aiSettings": {
+    "title": "Paramètres IA",
+    "advanced": "Paramètres par défaut",
+    "advancedDescription": "Ces valeurs par défaut s'appliquent à toutes les tâches, sauf si elles sont remplacées ci-dessous.",
+    "fields": {
+      "providerPreset": "Fournisseur",
+      "providerName": "Nom du fournisseur",
+      "providerNameHelp": "Nom d'affichage pour cette configuration",
+      "baseUrl": "URL de base",
+      "baseUrlHelp": "Point d'accès API — rempli automatiquement lors de la sélection d'un fournisseur",
+      "apiKey": "Clé API",
+      "apiKeyHelp": "Clé API de votre fournisseur",
+      "apiKeyOptional": "Optionnel — ce fournisseur ne nécessite pas de clé API",
+      "apiKeyExisting": "Clé actuelle",
+      "model": "Modèle",
+      "modelHelp": "Saisissez un nom de modèle ou cliquez sur Actualiser pour découvrir les modèles disponibles",
+      "temperature": "Température",
+      "maxTokens": "Tokens max.",
+      "systemPromptsHelp": "Laisser vide pour les valeurs par défaut. Les prompts personnalisés remplacent entièrement les valeurs par défaut.",
+      "systemPromptSeo": "Prompt de génération SEO",
+      "systemPromptExcerpt": "Prompt de génération d'extrait",
+      "systemPromptTranslate": "Prompt de traduction",
+      "defaultPromptSeo": "Vous êtes un expert SEO. Générez un méta-titre optimisé SEO (max 60 caractères) et une méta-description (max 160 caractères) à partir du contenu fourni.",
+      "defaultPromptExcerpt": "Vous êtes un éditeur de contenu. Générez un extrait concis de 1-2 phrases résumant les points clés du contenu fourni.",
+      "defaultPromptTranslate": "Vous êtes un traducteur professionnel. Traduisez le contenu suivant dans la langue cible. Maintenez le ton, le style et le formatage markdown d'origine."
+    },
+    "taskConfigs": {
+      "title": "Configuration par tâche",
+      "description": "Remplacer le modèle, la température, le nombre max. de tokens ou le prompt système pour des tâches individuelles. Les champs vides héritent des valeurs par défaut ci-dessus.",
+      "custom": "Personnalisé",
+      "vision": "Vision",
+      "modelHelp": "Laisser vide pour utiliser le modèle par défaut",
+      "maxTokensHelp": "Laisser vide pour utiliser la valeur par défaut ({{default}})",
+      "systemPrompt": "Prompt système personnalisé",
+      "systemPromptPlaceholder": "Laisser vide pour utiliser le prompt par défaut"
+    },
+    "tasks": {
+      "seo": "Génération SEO",
+      "seoDesc": "Générer des méta-titres et descriptions à partir du contenu du blog.",
+      "excerpt": "Génération d'extrait",
+      "excerptDesc": "Créer des résumés concis des articles de blog.",
+      "translate": "Traduction",
+      "translateDesc": "Traduire le contenu dans d'autres langues.",
+      "draftOutline": "Plan de brouillon",
+      "draftOutlineDesc": "Générer un plan structuré pour un nouvel article.",
+      "draftPost": "Brouillon d'article",
+      "draftPostDesc": "Générer un brouillon complet à partir d'un plan ou d'un sujet.",
+      "autoTag": "Auto-tagging",
+      "autoTagDesc": "Suggérer automatiquement des tags pour le contenu ou les images.",
+      "altText": "Texte alternatif",
+      "altTextDesc": "Générer un texte alternatif descriptif pour les images (modèle vision)."
+    },
+    "actions": {
+      "save": "Enregistrer",
+      "testConnection": "Tester la connexion",
+      "remove": "Supprimer la configuration",
+      "discoverModels": "Découvrir les modèles disponibles",
+      "viewUsage": "Voir lutilisation"
+    },
+    "messages": {
+      "saved": "Configuration IA enregistrée",
+      "saveFailed": "Échec de l'enregistrement de la configuration IA",
+      "deleted": "Configuration IA supprimée",
+      "testFailed": "Échec du test de connexion",
+      "modelsFound": "{{count}} modèle(s) trouvé(s)",
+      "noModels": "Aucun modèle trouvé — vérifiez l'URL de base et la clé API",
+      "modelsFailed": "Impossible de découvrir les modèles — vérifiez l'URL de base et la clé API"
+    },
+    "deleteConfirm": {
+      "title": "Supprimer la configuration IA ?",
+      "message": "Cela désactivera les fonctionnalités IA pour ce site. Vous pourrez reconfigurer plus tard."
+    }
+  },
+  "help": {
+    "menu": {
+      "title": "Aide & Ressources",
+      "documentation": "Documentation",
+      "quickTour": "Visite rapide",
+      "keyboardShortcuts": "Raccourcis clavier",
+      "feedback": "Commentaires",
+      "version": "Forja v{{version}}"
+    },
+    "tour": {
+      "skip": "Passer la visite",
+      "next": "Suivant",
+      "done": "Terminé",
+      "stepOf": "{{current}} sur {{total}}",
+      "step1": "Voici votre tableau de bord — consultez l'activité de votre site en un coup d'œil",
+      "step2": "Gérez votre contenu, votre structure et vos paramètres depuis la barre latérale",
+      "step3": "Basculez entre vos sites ici",
+      "step4": "Appuyez sur {{shortcut}} pour naviguer rapidement n'importe où",
+      "step5": "Besoin d'aide ? Trouvez la documentation, les raccourcis et cette visite ici à tout moment"
+    },
+    "shortcuts": {
+      "title": "Raccourcis clavier",
+      "commandPalette": "Ouvrir la palette de commandes",
+      "save": "Enregistrer",
+      "undo": "Annuler",
+      "redo": "Rétablir",
+      "bold": "Gras",
+      "italic": "Italique",
+      "underline": "Souligné"
+    }
+  },
+  "errorCodes": {
+    "AUTH_MISSING_CREDENTIALS": {
+      "message": "Authentification requise",
+      "action": "Veuillez vous connecter pour continuer."
+    },
+    "AUTH_TOKEN_INVALID": {
+      "message": "Session expirée",
+      "action": "Veuillez vous reconnecter."
+    },
+    "AUTH_INSUFFICIENT_ROLE": {
+      "message": "Permissions insuffisantes",
+      "action": "Contactez un administrateur pour un accès élevé."
+    },
+    "AUTH_SITE_ACCESS_DENIED": {
+      "message": "Accès au site refusé",
+      "action": "Contactez le propriétaire du site pour obtenir l'accès."
+    },
+    "AUTH_API_KEY_INVALID": {
+      "message": "Clé API invalide",
+      "action": "Vérifiez la configuration de votre clé API."
+    },
+    "AUTH_ACCOUNT_SOLE_OWNER": {
+      "message": "Impossible de supprimer le compte",
+      "action": "Transférez d'abord la propriété du site."
+    },
+    "BLOG_SLUG_TAKEN": {
+      "message": "Slug de blog déjà utilisé",
+      "action": "Choisissez un slug différent."
+    },
+    "PAGE_SLUG_TAKEN": {
+      "message": "Slug de page déjà utilisé",
+      "action": "Choisissez un slug différent."
+    },
+    "SITE_SLUG_TAKEN": {
+      "message": "Slug de site déjà utilisé",
+      "action": "Choisissez un slug différent."
+    },
+    "TAG_SLUG_TAKEN": {
+      "message": "Slug de tag déjà utilisé",
+      "action": "Choisissez un slug différent."
+    },
+    "CATEGORY_SLUG_TAKEN": {
+      "message": "Slug de catégorie déjà utilisé",
+      "action": "Choisissez un slug différent."
+    },
+    "LOCALE_CODE_TAKEN": {
+      "message": "Code de langue déjà existant",
+      "action": "Utilisez un code de langue différent."
+    },
+    "RATE_LIMIT_EXCEEDED": {
+      "message": "Trop de requêtes",
+      "action": "Veuillez patienter un moment et réessayer."
+    },
+    "MEMBER_ALREADY_EXISTS": {
+      "message": "Membre déjà existant",
+      "action": "Cet utilisateur est déjà membre du site."
+    },
+    "MEMBER_CANNOT_REMOVE_OWNER": {
+      "message": "Impossible de retirer le propriétaire",
+      "action": "Transférez la propriété avant de retirer ce membre."
+    },
+    "MEDIA_UPLOAD_TOO_LARGE": {
+      "message": "Fichier trop volumineux",
+      "action": "Réduisez la taille du fichier ou ajustez les paramètres du site."
+    },
+    "MEDIA_UPLOAD_INVALID_TYPE": {
+      "message": "Type de fichier non supporté",
+      "action": "Vérifiez les types de fichiers autorisés."
+    },
+    "AI_NOT_CONFIGURED": {
+      "message": "IA non configurée",
+      "action": "Configurez un fournisseur d'IA dans les paramètres du site."
+    },
+    "AI_PROVIDER_UNAVAILABLE": {
+      "message": "Fournisseur d'IA indisponible",
+      "action": "Vérifiez votre configuration IA ou réessayez plus tard."
+    },
+    "WORKFLOW_REVIEW_REQUIRED": {
+      "message": "Révision requise",
+      "action": "Soumettez le contenu pour révision avant de publier."
+    },
+    "WORKFLOW_NO_PERMISSION": {
+      "message": "Permission de workflow refusée",
+      "action": "Vous n'avez pas la permission pour cette action de workflow."
+    },
+    "MODULE_NOT_ENABLED": {
+      "message": "Module non activé",
+      "action": "Activez ce module dans les paramètres du site."
+    },
+    "LOCALE_DELETE_IN_USE": {
+      "message": "Langue en cours d'utilisation",
+      "action": "Supprimez d'abord tout le contenu utilisant cette langue."
+    },
+    "SITE_LOCALE_LAST_LANGUAGE": {
+      "message": "Impossible de supprimer la dernière langue",
+      "action": "Les sites doivent avoir au moins une langue."
+    },
+    "REDIRECT_SAME_PATH": {
+      "message": "Boucle de redirection détectée",
+      "action": "Les chemins source et destination doivent être différents."
+    },
+    "LEGAL_PUBLISH_MISSING_TITLE": {
+      "message": "Titre requis pour la publication",
+      "action": "Ajoutez un titre à au moins une version linguistique."
+    },
+    "LEGAL_PUBLISH_MISSING_BODY": {
+      "message": "Contenu requis pour la publication",
+      "action": "Ajoutez du contenu à au moins une version linguistique."
+    },
+    "LEGAL_VERSION_SOURCE_DELETED": {
+      "message": "Document source supprimé",
+      "action": "Le document que vous essayez de versionner a été supprimé."
+    },
+    "patterns": {
+      "notFound": {
+        "message": "Ressource introuvable",
+        "action": "Elle a peut-être été supprimée ou déplacée."
+      },
+      "slugTaken": {
+        "message": "Slug déjà utilisé",
+        "action": "Choisissez un slug différent."
+      },
+      "accessDenied": {
+        "message": "Accès refusé",
+        "action": "Vous n'avez pas la permission pour cette action."
+      },
+      "auth": {
+        "message": "Erreur d'authentification",
+        "action": "Essayez de vous reconnecter."
+      },
+      "validation": {
+        "message": "Erreur de validation",
+        "action": "Vérifiez les champs du formulaire et réessayez."
+      },
+      "mediaUpload": {
+        "message": "Échec du téléversement",
+        "action": "Vérifiez le fichier et réessayez."
+      }
+    },
+    "SITE_SETTINGS_INVALID_ORIGIN": "Une ou plusieurs origines ont un format invalide. Chaque origine doit être schéma://hôte (ex. https://exemple.fr)."
+  },
+  "welcome": {
+    "tagline": "Le CMS open-source pour des sites rapides, sécurisés et multilingues",
+    "subtitle": "Gérez le contenu de plusieurs sites. Pas de cookies, pas de tracking, pas de compromis. Auto-hébergement gratuit, pour toujours.",
+    "taglineMain": "Le CMS axé sur la vie privée",
+    "taglineAccent": "construit en Rust",
+    "signIn": "S'inscrire maintenant",
+    "login": "Se connecter",
+    "register": "Auto-héberger",
+    "productPreview": "Un éditeur moderne que les équipes de contenu apprécient vraiment.",
+    "featureFast": "Ultra rapide",
+    "featureFastDesc": "Réponses API en moins de 10ms. Votre contenu se charge instantanément.",
+    "featureSecure": "Sécurisé par défaut",
+    "featureSecureDesc": "Accès basé sur les rôles, stockage chiffré, journaux d'audit. Dormez tranquille.",
+    "featureMultilingual": "Multilingue",
+    "featureMultilingualDesc": "11 langues, support RTL. Atteignez chaque audience.",
+    "featureApi": "API First",
+    "featureApiDesc": "API-first avec documentation interactive. Construisez n'importe quel frontend.",
+    "featureMultiSite": "Multi-Site",
+    "featureMultiSiteDesc": "Un tableau de bord, sites illimités. Parfait pour les agences.",
+    "featureStorage": "Stockage flexible",
+    "featureStorageDesc": "Stockez vos médias localement ou dans le cloud. À vous de choisir.",
+    "featureSeo": "SEO intégré",
+    "featureSeoDesc": "Sitemaps, balises meta et cartes sociales. Montez dans les classements.",
+    "whyForja": "Pourquoi choisir Forja ?",
+    "comparison": {
+      "traditional": "CMS traditionnel",
+      "forja": "Forja",
+      "monolithic": "Lié à un seul thème ou template",
+      "headless": "Utilisez n'importe quel frontend — Astro, Next.js, Hugo ou le vôtre",
+      "plugins": "Roulette des plugins : correctifs de sécurité, problèmes de compatibilité",
+      "builtIn": "Multi-site, i18n, SEO et IA intégrés — pas ajoutés après coup",
+      "sharedHosting": "Votre contenu sur le serveur de quelqu'un d'autre",
+      "selfHosted": "Votre serveur, vos données, vos règles",
+      "legacy": "Ralentit sous charge",
+      "fast": "Propulsé par Rust — reste rapide à toute échelle",
+      "eyebrow": "Pourquoi changer",
+      "lead": "Ce qu'un CMS traditionnel vous coûte, et ce que Forja vous rend."
+    },
+    "builtFor": "Conçu pour",
+    "useCases": {
+      "solo": "Créateurs solo",
+      "soloDesc": "Auto-hébergement gratuit. Écriture assistée par IA, SEO intégré. Pas de dépendance fournisseur.",
+      "teams": "Petites équipes",
+      "teamsDesc": "Accès basé sur les rôles pour votre équipe. Support multilingue et médiathèque partagée — sans tarifs entreprise.",
+      "agencies": "Agences",
+      "agenciesDesc": "Un tableau de bord pour tous les sites clients. Rôles par site, clonage de templates. Évoluez sans augmenter les coûts.",
+      "enterprise": "Entreprise",
+      "enterpriseDesc": "Auto-hébergement pour la souveraineté des données. Stockage chiffré, journaux d'audit, gestion des clés API. Déployez sur votre infrastructure.",
+      "eyebrow": "Pour qui",
+      "lead": "Du créateur solo à l'entreprise soumise à la conformité — Forja s'adapte à l'équipe."
+    },
+    "openSourceTrust": "100% open source. Auto-hébergez partout.",
+    "deployAnywhere": "Docker, Railway, Fly.io — votre infrastructure, votre choix.",
+    "openSource": "Open Source",
+    "docs": "Documentation",
+    "madeWith": "Construit avec Rust",
+    "madeInEu": "Conçu & construit dans l'UE",
+    "tryDemo": "Essayer la démo",
+    "demoDescription": "Explorez le tableau de bord sans inscription",
+    "badge": "Open Source — Licence AGPL",
+    "socialProof": {
+      "rust": "Construit avec Rust",
+      "react": "React 19",
+      "postgresql": "PostgreSQL",
+      "typescript": "TypeScript",
+      "gdpr": "Conforme RGPD"
+    },
+    "differentiators": {
+      "title": "Pourquoi Forja est différent",
+      "privacy": "Confidentialité intégrée",
+      "privacyDesc": "Pas de cookies. Pas de PII. Pas de pixels de suivi. Analytique intégrée, conforme au RGPD dès le premier jour. Pas ajoutée après coup.",
+      "performance": "Performance Rust",
+      "performanceDesc": "Un seul binaire. Démarre en millisecondes. Gère les pics de trafic qui font planter les CMS Node.js. Votre facture serveur reste légère.",
+      "multiTenant": "Multi-Locataire",
+      "multiTenantDesc": "Une instance, plusieurs sites. Parfait pour les agences gérant des sites clients. Chaque site obtient du contenu, des utilisateurs et des paramètres isolés.",
+      "developerFirst": "Priorité aux développeurs",
+      "developerFirstDesc": "SDK TypeScript typé. Documentation OpenAPI. Webhooks. API keys avec permissions granulaires. Intégrez avec n'importe quoi."
+    },
+    "featureAi": "Assistant de contenu IA",
+    "featureAiDesc": "Assistance à la rédaction par IA. Générez, affinez et traduisez du contenu.",
+    "featureScheduling": "Planification de contenu",
+    "featureSchedulingDesc": "Planifiez vos publications au bon moment. Anticipez.",
+    "featureLegal": "Documents juridiques",
+    "featureLegalDesc": "Gérez les politiques de confidentialité, les conditions d'utilisation et les pages juridiques.",
+    "featuresTitle": "Tout est intégré",
+    "libraries": {
+      "title": "Livrez plus vite avec les bibliothèques officielles",
+      "client": "@forjacms/client",
+      "clientDesc": "TypeScript SDK typé pour l'API de contenu. Fonctionne dans Node.js, les navigateurs et les runtimes edge.",
+      "analytics": "@forjacms/analytics",
+      "analyticsDesc": "Suivi des pages vues axé sur la vie privée. Pas de cookies, pas de PII. Conforme au GDPR par conception.",
+      "sections": "@forjacms/sections",
+      "sectionsDesc": "Web Components préconstruits pour les sections de page. Agnostique au framework, zéro CSS, hooks BEM.",
+      "sectionsReact": "@forjacms/sections-react",
+      "sectionsReactDesc": "Wrappers React pour les composants de section. Props typés, compatible SSR."
+    },
+    "quickStart": {
+      "title": "Auto-hébergement en 60 secondes"
+    },
+    "whatIs": {
+      "heading": "Qu'est-ce que Forja ?",
+      "lead": "Forja, c'est là où vivent les textes et les images de votre site. Écrivez-les une seule fois ici, et vos sites les affichent automatiquement — avec les données personnelles chiffrées et la paperasse de conformité prise en charge.",
+      "point1": "Écrivez votre contenu une fois et réutilisez-le sur tous vos sites.",
+      "point2": "Gardez les données personnelles de vos visiteurs chiffrées et privées par défaut.",
+      "point3": "Laissez le logiciel s'occuper de la paperasse liée à la confidentialité et à la conformité.",
+      "eyebrow": "En clair"
+    },
+    "hero": {
+      "eyebrow": "Open source · Confidentialité par conception",
+      "headline": "Un CMS conforme dès sa conception.",
+      "subline": "Forja garde votre contenu au même endroit et les données de vos visiteurs chiffrées — registre RGPD, effacement et journaux d'audit pris en charge. Hébergez le tout vous-même dans un seul binaire Rust.",
+      "ctaSignup": "S'inscrire",
+      "ctaDemo": "Essayer la démo",
+      "ctaSelfHost": "Auto-héberger sur GitHub"
+    },
+    "features": {
+      "title": "Ce que Forja fait aujourd'hui",
+      "compliance": {
+        "title": "Conformité par conception",
+        "items": [
+          "Chiffrement d'enveloppe des données personnelles, champ par champ",
+          "Export du registre RGPD (art. 30)",
+          "Effacement RGPD en un clic",
+          "Analytique sans cookies, respectueuse de la vie privée",
+          "Journal d'audit infalsifiable"
+        ]
+      },
+      "performance": {
+        "title": "Performance Rust",
+        "items": [
+          "Livré en un seul binaire",
+          "Démarrage à froid rapide",
+          "Reste rapide en charge"
+        ]
+      },
+      "multiSite": {
+        "title": "Multi-site",
+        "items": [
+          "Une instance, plusieurs sites",
+          "Configuration et rôles par site",
+          "Contenus et médias isolés"
+        ]
+      },
+      "developer": {
+        "title": "Pensé pour les développeurs",
+        "items": [
+          "SDK TypeScript typé",
+          "Spécification OpenAPI",
+          "Webhooks signés HMAC",
+          "Clés d'API avec quotas d'usage"
+        ]
+      },
+      "authoring": {
+        "title": "Rédaction",
+        "items": [
+          "Collections (types de contenu personnalisés)",
+          "Contenu en 11 langues",
+          "Publication programmée",
+          "Protection anti-bot ALTCHA",
+          "Médiathèque avec vision par IA"
+        ]
+      },
+      "eyebrow": "Ce que vous obtenez",
+      "lead": "Chaque fonctionnalité ci-dessous est disponible aujourd'hui — rien ici n'est une promesse."
+    },
+    "showcase": {
+      "heading": "Forja en action",
+      "lead": "D'un plan de travail épuré à un éditeur multilingue : l'espace où votre équipe travaille vraiment.",
+      "dashboardAlt": "Tableau de bord Forja montrant le plan de travail du contenu avec les compteurs de relecture, brouillons et publications, ainsi qu'une liste d'articles.",
+      "editorAlt": "Éditeur de contenu Forja avec onglets multilingues, barre d'outils de texte enrichi, sommaire et panneau SEO en direct.",
+      "eyebrow": "Visite du produit",
+      "dashboardCaption": "Le plan de travail : chaque brouillon, relecture et publication programmée au même endroit.",
+      "editorCaption": "L'éditeur : un contenu multilingue avec panneau SEO en direct, sans extensions."
+    }
+  },
+  "analytics": {
+    "title": "Analytique",
+    "subtitle": "Trafic, contenu populaire et sources de provenance de votre site",
+    "totalViews": "Vues totales",
+    "uniqueVisitors": "Visiteurs uniques",
+    "avgViewsPerDay": "Vues/jour (moy.)",
+    "topContent": "Contenu populaire",
+    "referrers": "Référents",
+    "noData": "Aucune donnée pour cette période",
+    "backToOverview": "Retour aux analytiques",
+    "viewAnalytics": "Voir les analytiques",
+    "pageDetail": "Détail de la page",
+    "notEnabled": "Les analytiques ne sont pas activées pour ce site. Activez-les dans les Paramètres.",
+    "dateRange": {
+      "7days": "7 jours",
+      "30days": "30 jours",
+      "90days": "90 jours",
+      "allTime": "Tout le temps",
+      "custom": "Personnalisé",
+      "apply": "Appliquer",
+      "end": "Date de fin",
+      "start": "Date de début"
+    },
+    "path": "Chemin",
+    "trend": "Tendance",
+    "views": "Vues",
+    "visitors": "Visiteurs"
+  },
+  "siteSettings": {
+    "title": "Paramètres du site",
+    "subtitle": "Configurer les paramètres et les fonctionnalités de votre site",
+    "nav": {
+      "overview": "Aperçu",
+      "content": "Contenu",
+      "modules": "Modules",
+      "ai": "Assistant IA",
+      "seo": "SEO",
+      "codeInjection": "Injection de code",
+      "favicon": "Icône du site",
+      "branding": "Image de marque",
+      "apiKeys": "Clés API",
+      "webhooks": "Webhooks",
+      "members": "Membres",
+      "dangerZone": "Zone dangereuse",
+      "forms": "Formulaires"
+    },
+    "storage": {
+      "title": "Stockage",
+      "usage": "{{used}} / {{total}} utilisés",
+      "quota": "Quota de stockage",
+      "quotaHelp": "Stockage maximum autorisé pour ce site (100 Mo – 1 To)",
+      "media": "Médias",
+      "documents": "Documents",
+      "quotaExceeded": "Quota de stockage dépassé. Libérez de l'espace ou contactez votre administrateur.",
+      "systemOverview": "Aperçu du stockage"
+    },
+    "cors": {
+      "title": "Origines autorisées",
+      "help": "Domaines autorisés à effectuer des requêtes API cross-origin vers ce site. Entrez une origine par ligne (ex. https://monblog.fr).",
+      "placeholder": "https://exemple.fr",
+      "invalidOrigin": "Format d’origine invalide. Utilisez schéma://hôte[:port] (ex. https://exemple.fr).",
+      "emptyHelp": "Aucune origine configurée — les requêtes cross-origin seront bloquées."
+    },
+    "sidebar": {
+      "label": "Navigation des paramètres",
+      "filterPlaceholder": "Filtrer le menu…",
+      "noMatches": "Aucune section ne correspond à « {{q}} »"
+    },
+    "groups": {
+      "configuration": "Configuration",
+      "discovery": "Découverte",
+      "integration": "Intégration",
+      "access": "Accès",
+      "danger": "Danger"
+    },
+    "overview": {
+      "title": "Vue d'ensemble",
+      "subtitle": "Identité et accès de base pour ce site.",
+      "slug": "Slug",
+      "groups": {
+        "identity": "Identité",
+        "status": "Statut"
+      }
+    },
+    "branding": {
+      "title": "Image de marque",
+      "subtitle": "Icône du site, favicons et couleurs de thème utilisés par les navigateurs et les PWA."
+    },
+    "content": {
+      "title": "Contenu",
+      "subtitle": "Limites de téléversement, mots de passe et construction des URL d'aperçu."
+    },
+    "modules": {
+      "title": "Modules",
+      "subtitle": "Activer ou désactiver les modules à l'échelle du site.",
+      "enabledCount": "{{enabled}} sur {{total}} activés"
+    },
+    "seo": {
+      "title": "SEO",
+      "subtitle": "Valeurs par défaut appliquées à l'ensemble du site. Chaque publication peut les remplacer."
+    },
+    "codeInjection": {
+      "title": "Injection de code",
+      "subtitle": "Injectez du HTML personnalisé dans la page. Uniquement depuis des sources fiables."
+    },
+    "ai": {
+      "title": "Assistant IA",
+      "subtitle": "Le fournisseur d'IA utilisé pour générer brouillons, réécritures et traductions."
+    },
+    "deletedSites": {
+      "title": "Sites récemment supprimés",
+      "subtitle": "Les sites supprimés peuvent être restaurés dans un délai de 30 jours avant leur suppression définitive.",
+      "entry": "Récemment supprimés",
+      "empty": "Aucun site récemment supprimé.",
+      "deletedOn": "Supprimé le {{date}}",
+      "expiresIn": "Expire dans {{days}} jours",
+      "restore": "Restaurer",
+      "restoreLabel": "Restaurer {{site}}",
+      "restored": "Site restauré.",
+      "expired": "Le délai de restauration de 30 jours de ce site a expiré."
+    },
+    "danger": {
+      "title": "Zone dangereuse",
+      "subtitle": "Actions destructrices qui affectent tous les utilisateurs de ce site. Vérifiez avant d'agir.",
+      "export": {
+        "title": "Exporter l'archive du site",
+        "description": "Téléchargez un zip contenant tout le contenu, les assets et les métadonnées de ce site. Non destructif.",
+        "action": "Exporter",
+        "inProgress": "Exportation…",
+        "ready": "Votre export est prêt à être téléchargé.",
+        "download": "Télécharger l’archive",
+        "failed": "L’export a échoué. Veuillez réessayer."
+      },
+      "transfer": {
+        "title": "Transférer la propriété",
+        "description": "Transférez ce site à un autre membre. Vous deviendrez Éditeur et perdrez l'accès à la facturation.",
+        "action": "Transférer",
+        "success": "Propriété transférée — vous êtes désormais Éditeur sur ce site.",
+        "notMember": "Cet utilisateur n'est plus membre de ce site.",
+        "pick": {
+          "title": "Transférer la propriété",
+          "body": "Choisissez un membre qui deviendra le nouveau propriétaire. Vous serez rétrogradé au rang d'Éditeur et perdrez l'accès à la facturation.",
+          "label": "Nouveau propriétaire",
+          "empty": "Il n'y a aucun autre membre à qui transférer la propriété. Invitez d'abord un membre.",
+          "continue": "Continuer"
+        },
+        "confirm": {
+          "title": "Transférer ce site ?",
+          "body": "La propriété de « {{site}} » sera transférée à {{member}}. Vous deviendrez Éditeur. Cette action est irréversible ici.",
+          "label": "Transférer la propriété"
+        }
+      },
+      "reset": {
+        "title": "Réinitialiser tout le contenu",
+        "description": "Supprimer chaque publication, page et asset. Les paramètres et membres sont conservés. Irréversible.",
+        "action": "Réinitialiser le contenu",
+        "confirm": {
+          "title": "Réinitialiser tout le contenu ?",
+          "body": "Chaque publication, page, document et asset de « {{site}} » sera déplacé vers la corbeille. Les paramètres et membres sont conservés et le site reste en place. Vous pouvez restaurer les éléments dans un délai de 30 jours avant leur suppression définitive.",
+          "label": "Réinitialiser le contenu"
+        },
+        "success": "Contenu réinitialisé — les publications, pages et assets ont été déplacés vers la corbeille. Vous pouvez les restaurer dans un délai de 30 jours."
+      },
+      "delete": {
+        "title": "Supprimer ce site",
+        "description": "Supprimer définitivement ce site, son contenu, ses membres et ses clés API. Cette action est définitive.",
+        "action": "Supprimer le site",
+        "confirm": {
+          "title": "Supprimer ce site ?",
+          "body": "« {{site}} » et tout son contenu, ses membres et ses clés API seront supprimés. Vous pouvez le restaurer dans un délai de 30 jours avant sa suppression définitive.",
+          "label": "Supprimer le site"
+        },
+        "gracePeriodNote": "Site supprimé — vous pouvez le restaurer dans un délai de 30 jours."
+      },
+      "confirm": {
+        "typeToConfirm": "Saisissez {{phrase}} pour confirmer",
+        "placeholder": "Saisir pour confirmer",
+        "cancel": "Annuler",
+        "mismatch": "Le texte ne correspond pas. Saisissez-le exactement pour continuer."
+      }
+    },
+    "forms": {
+      "title": "Formulaires",
+      "subtitle": "Paramètres globaux du site appliqués à chaque formulaire.",
+      "botProtection": {
+        "title": "Protection anti-bots",
+        "description": "Les formulaires en protection obligatoire n’acceptent les envois qu’une fois la vérification anti-bot réussie. ALTCHA auto-hébergé est l’option par défaut : sans inscription, sans appel tiers, conforme au RGPD. Vous pouvez passer à un fournisseur de captcha personnalisé si vous préférez.",
+        "loading": "Chargement des paramètres de protection anti-bots…",
+        "saved": "Protection anti-bots enregistrée.",
+        "saveFailed": "L'enregistrement de la protection anti-bots a échoué.",
+        "removed": "Protection anti-bots supprimée.",
+        "removeFailed": "La suppression de la protection anti-bots a échoué.",
+        "reconfigure": "Reconfigurer",
+        "remove": "Supprimer",
+        "reenterSecret": "Par sécurité, le secret n'est jamais relu. Saisissez-le à nouveau pour enregistrer toute modification.",
+        "statusConfigured": "Configuré",
+        "verifyUrlLabel": "URL de vérification",
+        "fields": {
+          "label": "Libellé du fournisseur",
+          "labelHelp": "Libellé en texte libre affiché dans l'admin (ex. « Turnstile »). Non utilisé pour choisir un fournisseur — c'est l'URL qui le fait.",
+          "verifyUrl": "URL de vérification",
+          "verifyUrlHelp": "Endpoint siteverify côté serveur du fournisseur. Forja y envoie `secret`+`response` à chaque soumission protégée.",
+          "secret": "Secret",
+          "secretHelp": "Secret par site fourni par votre prestataire captcha. Stocké chiffré."
+        },
+        "errors": {
+          "labelRequired": "Le libellé du fournisseur est requis.",
+          "urlRequired": "L'URL de vérification est requise.",
+          "urlInvalid": "L'URL de vérification n'est pas valide.",
+          "urlScheme": "L'URL de vérification doit utiliser http ou https.",
+          "secretRequired": "Le secret est requis (à saisir à chaque enregistrement)."
+        },
+        "deleteConfirm": {
+          "title": "Supprimer la protection anti-bots ?",
+          "body": "Les formulaires marqués comme obligatoires commenceront à rejeter les soumissions tant que vous ne reconfigurez pas un vérificateur."
+        },
+        "mode": {
+          "label": "Fournisseur",
+          "altcha": "ALTCHA (auto-hébergé)",
+          "altchaRecommended": "ALTCHA (auto-hébergé) — recommandé",
+          "remote": "Fournisseur de captcha personnalisé"
+        },
+        "altcha": {
+          "description": "Preuve de travail auto-hébergée. Aucun compte, aucune requête tierce, aucun cookie : les données du visiteur ne quittent jamais votre infrastructure. La clé de signature est générée et stockée chiffrée à l’enregistrement.",
+          "regenerateKey": "Régénérer la clé",
+          "keyRegenerated": "Clé ALTCHA régénérée.",
+          "keyRegenerateFailed": "Échec de la régénération de la clé.",
+          "regenConfirm": {
+            "title": "Régénérer la clé ALTCHA ?",
+            "body": "Une nouvelle clé de signature est générée immédiatement. Tout défi qu’un visiteur est en train de résoudre devient invalide et doit être récupéré à nouveau."
+          },
+          "challengeUrlLabel": "URL de défi du widget",
+          "challengeUrlHint": "Définissez le `challenge` de votre widget ALTCHA sur ce point de terminaison de votre hôte d'API public, en remplaçant <form-slug> par le slug de chaque formulaire."
+        },
+        "loadError": "Impossible de charger les réglages actuels de protection anti-bot. Vous pouvez quand même les configurer ci-dessous ; l'enregistrement écrasera ce qui est stocké."
+      }
+    },
+    "cache": {
+      "title": "Cache de réponses",
+      "description": "Lectures publiques mises en cache pour ce site. Vider force des données fraîches ; reconstruire préchauffe aussi les ressources courantes.",
+      "entryCount": "{{n}} entrées en cache",
+      "invalidate": "Invalider",
+      "rebuild": "Reconstruire",
+      "rebuildHelp": "Reconstruire vide le cache et préchauffe les ressources déterministes ; le reste se remplit à la demande.",
+      "invalidated": "Cache vidé ({{n}} entrées supprimées)",
+      "rebuilt": "Cache reconstruit ({{n}} vidées, {{warmed}} préchauffées)",
+      "actionFailed": "Action de cache échouée"
+    }
+  },
+  "system": {
+    "title": "Administration système",
+    "subtitle": "Gestion et configuration à l'échelle de l'instance",
+    "accessDenied": "Vous avez besoin d'un accès administrateur système pour voir cette page.",
+    "nav": {
+      "dashboard": "Aperçu",
+      "sites": "Sites",
+      "users": "Utilisateurs",
+      "languages": "Langues"
+    },
+    "dashboard": {
+      "title": "Aperçu système",
+      "sites": "Total des sites",
+      "health": "Santé du système",
+      "viewAll": "Voir tout",
+      "sitesRegistered_one": "{{count}} site enregistré",
+      "sitesRegistered_other": "{{count}} sites enregistrés",
+      "servicesMonitored_one": "{{count}} service surveillé",
+      "servicesMonitored_other": "{{count}} services surveillés",
+      "sitesLabel_one": "site enregistré",
+      "sitesLabel_other": "sites enregistrés",
+      "services": {
+        "database": "Base de données",
+        "cache": "Cache",
+        "idp": "IDP",
+        "storage": "Stockage"
+      },
+      "storage": {
+        "bucket": "Bucket : {{name}}",
+        "usedPercent": "{{percent}} % utilisé",
+        "freeBytes": "{{bytes}} libre",
+        "totalBytes": "{{bytes}} au total"
+      }
+    },
+    "sites": {
+      "title": "Tous les sites",
+      "subtitle": "Gérer tous les sites de l'instance"
+    },
+    "users": {
+      "title": "Utilisateurs",
+      "subtitle": "Gérer les utilisateurs et les actions de modération.",
+      "actions": {
+        "suspend": "Suspendre",
+        "ban": "Bannir",
+        "unsuspend": "Réactiver",
+        "delete": "Supprimer l'utilisateur"
+      },
+      "suspend": {
+        "title": "Suspendre l'utilisateur",
+        "reason": "Motif",
+        "duration": "Durée",
+        "until": "Suspendu jusqu'au",
+        "confirm": "Suspendre",
+        "pending": "Suspension...",
+        "success": "Utilisateur suspendu",
+        "error": "Échec de la suspension"
+      },
+      "ban": {
+        "title": "Bannir l'utilisateur",
+        "warning": "Cette action bannit définitivement l'utilisateur. Il ne pourra plus accéder à aucun site.",
+        "confirm": "Bannir définitivement",
+        "pending": "Bannissement...",
+        "success": "Utilisateur banni",
+        "error": "Échec du bannissement"
+      },
+      "unsuspend": {
+        "success": "Utilisateur réactivé",
+        "error": "Échec de la réactivation"
+      },
+      "delete": {
+        "title": "Supprimer l'utilisateur",
+        "warning": "Cette action est irréversible. Le compte utilisateur et toutes les données associées seront définitivement supprimés.",
+        "consequences": "Tous les accès aux sites seront supprimés et le contenu créé par cet utilisateur sera dissocié.",
+        "confirm": "Supprimer définitivement",
+        "pending": "Suppression...",
+        "success": "Utilisateur supprimé",
+        "error": "Échec de la suppression de l'utilisateur"
+      },
+      "joined": "Inscrit",
+      "lastSignIn": "Dernière connexion",
+      "activity": "Historique d'activité",
+      "noActivity": "Aucune activité enregistrée",
+      "loading": "Chargement de l'utilisateur...",
+      "loadingActivity": "Chargement de l'activité...",
+      "notFound": "Utilisateur introuvable",
+      "unknownUser": "Utilisateur inconnu",
+      "moderationReason": "Motif",
+      "columns": {
+        "user": "Utilisateur",
+        "email": "E-mail",
+        "status": "Statut",
+        "lastSignIn": "Dernière connexion",
+        "actions": "Actions"
+      },
+      "status": {
+        "active": "Actif",
+        "suspended": "Suspendu",
+        "banned": "Banni"
+      }
+    },
+    "cache": {
+      "title": "Cache de réponses (tous les sites)",
+      "totalEntries": "{{n}} entrées en cache sur tous les sites",
+      "invalidateAll": "Tout invalider",
+      "redisUnavailable": "Redis est indisponible — la mise en cache est désactivée."
+    }
+  },
+  "audit": {
+    "action": "Action",
+    "entityType": "Entité",
+    "ipAddress": "Adresse IP",
+    "timestamp": "Heure"
+  },
+  "portfolio": {
+    "pageTitle": "Portfolio",
+    "pageSubtitle": "CV, compétences et projets de votre site",
+    "tabs": {
+      "cv": "CV",
+      "projects": "Projets"
+    },
+    "projects": {
+      "addProject": "Ajouter un projet",
+      "searchPlaceholder": "Rechercher des projets...",
+      "empty": {
+        "title": "Aucun projet pour le moment",
+        "description": "Créez votre premier projet pour présenter votre travail"
+      },
+      "table": {
+        "slug": "Slug",
+        "status": "Statut",
+        "featured": "En vedette",
+        "dates": "Dates",
+        "ongoing": "En cours",
+        "displayOrder": "Ordre",
+        "actions": "Actions"
+      },
+      "messages": {
+        "created": "Projet créé avec succès",
+        "updated": "Projet mis à jour avec succès",
+        "deleted": "Projet supprimé avec succès"
+      },
+      "deleteDialog": {
+        "title": "Supprimer le projet",
+        "message": "Êtes-vous sûr de vouloir supprimer le projet \"{{slug}}\" ?"
+      },
+      "loading": "Chargement des projets...",
+      "loadError": "Erreur lors du chargement des projets"
+    }
+  },
+  "wizard": {
+    "project": {
+      "createTitle": "Créer un Projet",
+      "editTitle": "Modifier le Projet",
+      "steps": {
+        "basics": "Informations de base",
+        "content": "Contenu et Liens",
+        "relations": "Médias et Relations"
+      },
+      "fields": {
+        "title": "Titre",
+        "slug": "Slug",
+        "shortDescription": "Description courte",
+        "description": "Description",
+        "startDate": "Date de début",
+        "endDate": "Date de fin",
+        "isOngoing": "En cours",
+        "displayOrder": "Ordre d'affichage",
+        "isFeatured": "Mis en avant",
+        "status": "Statut",
+        "siteIds": "Sites",
+        "addImage": "Ajouter une image",
+        "coverImage": "Couverture",
+        "skills": "Compétences",
+        "cvEntries": "Entrées du CV",
+        "noSkillsAvailable": "Aucune compétence disponible",
+        "noCvEntriesAvailable": "Aucune entrée de CV disponible",
+        "images": "Images",
+        "linkIcon": "Icône",
+        "linkLabel": "Libellé",
+        "links": "Liens",
+        "linkType": "Type",
+        "linkUrl": "URL"
+      },
+      "discardDialog": {
+        "title": "Abandonner les modifications ?",
+        "message": "Vous avez des modifications non enregistrées. Êtes-vous sûr de vouloir les abandonner ?",
+        "discard": "Abandonner",
+        "keepEditing": "Continuer à modifier"
+      },
+      "addImage": "Ajouter une image",
+      "addLink": "Ajouter un lien",
+      "cover": "Couverture",
+      "discardConfirm": "Abandonner",
+      "discardMessage": "Vous avez des modifications non enregistrées. Voulez-vous vraiment les abandonner ?",
+      "discardTitle": "Abandonner les modifications ?",
+      "searchCvEntries": "Rechercher des entrées CV...",
+      "searchSkills": "Rechercher des compétences...",
+      "setCover": "Définir comme couverture",
+      "siteNote": "Ce projet appartient au site actuellement sélectionné."
+    },
+    "cvEntry": {
+      "createTitle": "Créer une entrée de CV",
+      "editTitle": "Modifier l'entrée de CV",
+      "steps": {
+        "company": "Entreprise",
+        "timeline": "Chronologie",
+        "content": "Contenu",
+        "skills": "Compétences"
+      },
+      "fields": {
+        "company": "Entreprise",
+        "companyUrl": "URL de l'entreprise",
+        "companyLogo": "Logo de l'entreprise",
+        "selectLogo": "Sélectionner le logo",
+        "location": "Lieu",
+        "entryType": "Type d'entrée",
+        "startDate": "Date de début",
+        "endDate": "Date de fin",
+        "isCurrent": "Poste actuel",
+        "status": "Statut",
+        "siteIds": "Sites",
+        "position": "Intitulé du poste",
+        "description": "Description",
+        "achievements": "Réalisations",
+        "addAchievement": "Ajouter une réalisation",
+        "skills": "Compétences",
+        "displayOrder": "Ordre d'affichage",
+        "noSkillsAvailable": "Aucune compétence disponible"
+      },
+      "discardDialog": {
+        "title": "Abandonner les modifications ?",
+        "message": "Vous avez des modifications non enregistrées. Êtes-vous sûr de vouloir les abandonner ?",
+        "discard": "Abandonner",
+        "keepEditing": "Continuer à modifier"
+      },
+      "achievementPlaceholder": "Réalisation...",
+      "addAchievement": "Ajouter une réalisation",
+      "changeLogo": "Changer le logo",
+      "discardConfirm": "Abandonner",
+      "discardMessage": "Vous avez des modifications non enregistrées. Voulez-vous vraiment les abandonner ?",
+      "discardTitle": "Abandonner les modifications ?",
+      "searchSkills": "Rechercher des compétences...",
+      "selectLogo": "Sélectionner un logo",
+      "siteNote": "Cette entrée appartient au site actuellement sélectionné."
+    },
+    "links": {
+      "title": "Liens",
+      "addLink": "Ajouter un lien",
+      "label": "Libellé",
+      "url": "URL",
+      "linkType": "Type",
+      "icon": "Icône",
+      "types": {
+        "Source": "Code source",
+        "Demo": "Démo",
+        "Documentation": "Documentation",
+        "Website": "Site web",
+        "Other": "Autre"
+      }
+    }
+  },
+  "listPage": {
+    "pagination": {
+      "rowsPerPage": "Lignes par page:",
+      "of": "{{from}}–{{to}} sur {{total}}",
+      "previous": "Page précédente",
+      "next": "Page suivante"
+    },
+    "actions": {
+      "label": "Actions"
+    },
+    "empty": {
+      "default": "Rien ici pour le moment."
+    },
+    "selectAll": "Sélectionner toutes les lignes",
+    "selectRow": "Sélectionner la ligne"
+  },
+  "sectionEditor": {
+    "addSection": "Ajouter une section",
+    "columns": "Colonnes",
+    "dragToReorder": "Glisser pour réorganiser",
+    "fullWidth": "Pleine largeur",
+    "items": {
+      "count": "{{label}}s ({{count}})",
+      "faq": {
+        "answer": "Réponse",
+        "label": "Question",
+        "question": "Question"
+      },
+      "feature": {
+        "description": "Description",
+        "icon": "Icône (emoji ou nom)",
+        "label": "Fonctionnalité",
+        "title": "Titre"
+      },
+      "gallery": {
+        "alt": "Texte alternatif",
+        "caption": "Légende",
+        "image": "Image",
+        "label": "Image"
+      },
+      "itemNumber": "{{label}} {{number}}",
+      "logoCloud": {
+        "companyName": "Nom de l'entreprise",
+        "label": "Logo",
+        "link": "Lien (optionnel)",
+        "logo": "Logo"
+      },
+      "pricing": {
+        "buttonLink": "Lien du bouton",
+        "buttonText": "Texte du bouton",
+        "description": "Description",
+        "features": "Fonctionnalités (une par ligne)",
+        "label": "Offre",
+        "period": "Période",
+        "planName": "Nom de l'offre",
+        "price": "Prix"
+      },
+      "stat": {
+        "label": "Statistique",
+        "statLabel": "Étiquette",
+        "value": "Valeur"
+      },
+      "team": {
+        "bio": "Bio",
+        "label": "Membre",
+        "name": "Nom",
+        "photo": "Photo",
+        "role": "Rôle"
+      },
+      "testimonial": {
+        "author": "Auteur",
+        "avatar": "Avatar",
+        "label": "Témoignage",
+        "quote": "Citation",
+        "role": "Rôle / Entreprise"
+      },
+      "timeline": {
+        "date": "Date",
+        "description": "Description",
+        "label": "Événement",
+        "title": "Titre"
+      }
+    },
+    "layout": "Mise en page",
+    "nColumns": "{{n}} colonnes",
+    "provider": "Fournisseur",
+    "settings": {
+      "contact": {
+        "formFields": "Champs du formulaire",
+        "formFieldsHint": "Noms de champs séparés par des virgules",
+        "showMap": "Afficher la carte",
+        "title": "Paramètres de contact"
+      },
+      "cta": {
+        "banner": "Bannière",
+        "card": "Carte",
+        "floating": "Flottant",
+        "title": "Paramètres CTA"
+      },
+      "custom": {
+        "jsonHint": "Paramètres JSON bruts",
+        "title": "Paramètres personnalisés (JSON)"
+      },
+      "divider": {
+        "dots": "Points",
+        "line": "Ligne",
+        "showLabel": "Afficher l'étiquette",
+        "space": "Espace",
+        "title": "Paramètres du séparateur"
+      },
+      "faq": {
+        "accordion": "Accordéon (pliable)",
+        "title": "Paramètres FAQ"
+      },
+      "features": {
+        "title": "Paramètres des fonctionnalités"
+      },
+      "gallery": {
+        "showCaptions": "Afficher les légendes",
+        "title": "Paramètres de la galerie"
+      },
+      "hero": {
+        "gradient": "Dégradé",
+        "gradientHint": "Chaîne CSS de dégradé",
+        "title": "Paramètres du hero"
+      },
+      "logoCloud": {
+        "grayscale": "Niveaux de gris",
+        "title": "Paramètres des logos"
+      },
+      "newsletter": {
+        "customProvider": "Personnalisé",
+        "generic": "Générique",
+        "mailchimp": "Mailchimp",
+        "showName": "Afficher le champ nom",
+        "title": "Paramètres de la newsletter"
+      },
+      "pricing": {
+        "showToggle": "Afficher le bouton Mensuel/Annuel",
+        "title": "Paramètres des tarifs"
+      },
+      "stats": {
+        "cardStyle": "Carte",
+        "inlineStyle": "En ligne",
+        "title": "Paramètres des statistiques"
+      },
+      "team": {
+        "showBio": "Afficher la bio",
+        "showRole": "Afficher le rôle",
+        "title": "Paramètres de l'équipe"
+      },
+      "testimonials": {
+        "carousel": "Carrousel",
+        "grid": "Grille",
+        "showAvatar": "Afficher l'avatar",
+        "title": "Paramètres des témoignages"
+      },
+      "text": {
+        "alignment": "Alignement",
+        "center": "Centré",
+        "default": "Par défaut",
+        "left": "Gauche",
+        "narrow": "Étroit",
+        "title": "Paramètres du texte",
+        "wide": "Large",
+        "width": "Largeur"
+      },
+      "timeline": {
+        "horizontal": "Horizontal",
+        "showDates": "Afficher les dates",
+        "title": "Paramètres de la chronologie",
+        "vertical": "Vertical"
+      },
+      "video": {
+        "aspectRatio": "Ratio d'aspect",
+        "autoplay": "Lecture automatique",
+        "selfHosted": "Auto-hébergé",
+        "title": "Paramètres vidéo",
+        "vimeo": "Vimeo",
+        "youtube": "YouTube"
+      }
+    },
+    "style": "Style",
+    "typeNames": {
+      "Contact": "Contact",
+      "Cta": "Appel à l'action",
+      "Custom": "Personnalisé",
+      "Divider": "Séparateur",
+      "Faq": "FAQ",
+      "Features": "Fonctionnalités",
+      "Gallery": "Galerie",
+      "Hero": "Hero",
+      "LogoCloud": "Logos",
+      "Newsletter": "Newsletter",
+      "Pricing": "Tarifs",
+      "Stats": "Statistiques",
+      "Team": "Équipe",
+      "Testimonials": "Témoignages",
+      "Text": "Texte",
+      "Timeline": "Chronologie",
+      "Video": "Vidéo"
+    },
+    "types": {
+      "Contact": "Formulaire de contact",
+      "Cta": "Bloc d'appel à l'action",
+      "Custom": "Section personnalisée",
+      "Divider": "Séparateur visuel",
+      "Faq": "Accordéon FAQ",
+      "Features": "Grille de fonctionnalités",
+      "Gallery": "Galerie d'images",
+      "Hero": "Bannière pleine largeur avec titre",
+      "LogoCloud": "Logos partenaires/clients",
+      "Newsletter": "Abonnement par email",
+      "Pricing": "Tableau des tarifs",
+      "Stats": "Affichage des métriques clés",
+      "Team": "Cartes des membres de l'équipe",
+      "Testimonials": "Témoignages clients",
+      "Text": "Bloc de texte enrichi",
+      "Timeline": "Événements chronologiques",
+      "Video": "Intégration vidéo"
+    }
+  },
+  "formsModule": {
+    "list": {
+      "title": "Formulaires",
+      "subtitle": "Gérez les formulaires — champs, validation, conservation.",
+      "createButton": "Créer un formulaire",
+      "manageTemplates": "Gérer les modèles",
+      "searchPlaceholder": "Rechercher des formulaires…",
+      "columns": {
+        "name": "Nom",
+        "slug": "Slug",
+        "fields": "Champs",
+        "status": "Statut",
+        "submissions": "Soumissions",
+        "createdAt": "Créé"
+      },
+      "status": {
+        "active": "Actif",
+        "inactive": "Inactif"
+      },
+      "empty": {
+        "title": "Aucun formulaire pour l'instant",
+        "description": "Créez un formulaire pour commencer à recevoir des soumissions depuis votre site.",
+        "cta": "Créez votre premier formulaire"
+      },
+      "actions": {
+        "edit": "Modifier",
+        "delete": "Supprimer",
+        "submissions": "Soumissions",
+        "toggleActive": "Basculer actif"
+      },
+      "loadError": "Échec du chargement des formulaires.",
+      "messages": {
+        "deleted": "Formulaire supprimé.",
+        "activated": "Formulaire activé.",
+        "deactivated": "Formulaire désactivé.",
+        "created": "Formulaire créé."
+      },
+      "deleteConfirm": {
+        "title": "Supprimer le formulaire ?",
+        "body": "Le formulaire sera caché aux visiteurs et n'acceptera plus de soumissions. Les soumissions existantes sont conservées.",
+        "confirm": "Supprimer le formulaire"
+      }
+    },
+    "builder": {
+      "heading": "Champs",
+      "addField": "Ajouter un champ",
+      "empty": "Aucun champ pour l'instant. Cliquez sur \"Ajouter un champ\" pour choisir un type.",
+      "drag": "Glissez pour réorganiser",
+      "moveUp": "Monter",
+      "moveDown": "Descendre",
+      "delete": "Supprimer le champ",
+      "fieldIndex": "Champ {{n}}",
+      "field": {
+        "label": "Libellé",
+        "placeholder": "Espace réservé",
+        "helpText": "Texte d'aide",
+        "required": "Requis",
+        "minLength": "Longueur min.",
+        "maxLength": "Longueur max.",
+        "min": "Min",
+        "max": "Max",
+        "pattern": "Motif regex",
+        "patternHelp": "Expression régulière optionnelle — l'entrée doit correspondre avant l'envoi.",
+        "options": "Options",
+        "addOption": "Ajouter une option",
+        "optionsEmpty": "Aucune option pour l'instant — ajoutez-en une pour rendre ce champ utile.",
+        "optionKey": "Clé",
+        "optionLabel": "Libellé"
+      }
+    },
+    "fieldType": {
+      "text": "Texte",
+      "textarea": "Texte long",
+      "email": "E-mail",
+      "number": "Nombre",
+      "select": "Liste déroulante",
+      "radio": "Bouton radio",
+      "checkbox": "Case à cocher",
+      "date": "Date",
+      "custom": "Personnalisé"
+    },
+    "locale": {
+      "heading": "Traductions pour {{name}}",
+      "help": "Laissez un champ vide pour utiliser le texte de la langue par défaut. Les libellés de champ restent la clé technique (données de soumission).",
+      "name": "Nom du formulaire",
+      "description": "Description",
+      "consentText": "Texte de consentement",
+      "consentHelp": "Utilisé uniquement quand le formulaire exige un consentement.",
+      "fieldsHeading": "Traductions des champs",
+      "technicalKey": "clé :",
+      "displayLabel": "Libellé visible",
+      "placeholder": "Espace réservé",
+      "helpText": "Texte d'aide",
+      "translateAll": "Traduire depuis la langue par défaut",
+      "translatingAll": "Traduction…",
+      "translateOne": "Traduire depuis la langue par défaut avec l'IA"
+    },
+    "detail": {
+      "tabs": {
+        "settings": "Paramètres",
+        "fields": "Champs",
+        "translations": "Traductions"
+      },
+      "localePicker": "Langue :",
+      "translations": {
+        "noLocales": "Activez d'autres langues dans les paramètres du site pour traduire ce formulaire.",
+        "pickLocale": "Choisissez une langue ci-dessus pour ajouter ou modifier des traductions."
+      },
+      "fields": {
+        "name": "Nom",
+        "slug": "Slug",
+        "description": "Description",
+        "active": "Actif",
+        "consentRequired": "Exiger une case de consentement",
+        "consentText": "Texte de consentement",
+        "botProtection": "Protection anti-bot",
+        "storageMode": "Mode de stockage",
+        "storageModeHelp": "Queryable permet la recherche sur les données de soumission côté admin ; Simple stocke de manière compacte.",
+        "retentionDays": "Conservation (jours)",
+        "retentionDaysHelp": "Laissez vide pour conserver les soumissions indéfiniment. Un entier positif supprime automatiquement après N jours.",
+        "placeholder": "L'éditeur de champs arrive dans la prochaine tranche (#587 partie 5)."
+      },
+      "botProtection": {
+        "none": "Aucune",
+        "mandatory": "Obligatoire"
+      },
+      "storageMode": {
+        "simple": "Simple",
+        "queryable": "Interrogeable"
+      },
+      "messages": {
+        "saved": "Formulaire enregistré."
+      },
+      "viewSubmissions": "Soumissions"
+    },
+    "submissions": {
+      "title": "Soumissions",
+      "backToForm": "Retour au formulaire",
+      "loadError": "Échec du chargement des soumissions.",
+      "exportCsv": {
+        "btn": "Exporter en CSV",
+        "help": "Télécharger la page visible au format CSV"
+      },
+      "filter": {
+        "all": "Toutes",
+        "new": "Nouveau",
+        "in_review": "En revue",
+        "resolved": "Résolu",
+        "rejected": "Rejeté",
+        "archived": "Archivé"
+      },
+      "status": {
+        "new": "Nouveau",
+        "in_review": "En revue",
+        "resolved": "Résolu",
+        "rejected": "Rejeté",
+        "archived": "Archivé"
+      },
+      "columns": {
+        "referenceCode": "Référence",
+        "status": "Statut",
+        "preview": "Aperçu",
+        "createdAt": "Envoyé"
+      },
+      "empty": {
+        "title": "Aucune soumission",
+        "descriptionAll": "Personne n'a encore envoyé ce formulaire.",
+        "descriptionFiltered": "Aucune soumission ne correspond au filtre actuel."
+      },
+      "detail": {
+        "referenceCode": "Code de référence",
+        "status": "Statut",
+        "data": "Données soumises",
+        "noData": "Cette soumission ne contient aucune valeur de champ.",
+        "notes": "Notes",
+        "noNotes": "Aucune note pour l'instant.",
+        "addNote": "Ajouter une note",
+        "addNoteBtn": "Ajouter",
+        "history": "Historique des statuts",
+        "initial": "créé",
+        "deleteBtn": "Supprimer la soumission",
+        "close": "Fermer",
+        "noHistory": "Aucun changement de statut pour le moment."
+      },
+      "messages": {
+        "statusUpdated": "Statut mis à jour.",
+        "noteAdded": "Note ajoutée.",
+        "noteDeleted": "Note supprimée.",
+        "deleted": "Soumission supprimée."
+      },
+      "deleteConfirm": {
+        "title": "Supprimer la soumission ?",
+        "body": "Suppression logique de la soumission. Elle n'apparaîtra plus dans la boîte de réception ni dans les recherches en self-service.",
+        "confirm": "Supprimer"
+      },
+      "transition": {
+        "in_review": "Démarrer l’examen",
+        "resolved": "Marquer comme résolu",
+        "rejected": "Rejeter",
+        "archived": "Archiver"
+      },
+      "actions": {
+        "menu": "Changer le statut",
+        "none": "Aucune autre transition"
+      }
+    },
+    "templates": {
+      "title": "Modèles de formulaire",
+      "subtitle": "Préréglages de champs réutilisables lors de la création d'un formulaire.",
+      "createButton": "Créer un modèle",
+      "backToForms": "Retour aux formulaires",
+      "loadError": "Échec du chargement des modèles.",
+      "columns": {
+        "name": "Nom",
+        "description": "Description",
+        "fields": "Champs",
+        "status": "Statut"
+      },
+      "actions": {
+        "edit": "Modifier",
+        "delete": "Supprimer"
+      },
+      "fields": {
+        "name": "Nom",
+        "description": "Description",
+        "icon": "Icône (nom Material Symbol)",
+        "iconHelp": "Ligature Material Symbols optionnelle, ex. \"contact_mail\".",
+        "active": "Actif (proposé dans CreateFormWizard)"
+      },
+      "dialog": {
+        "createTitle": "Créer un modèle",
+        "editTitle": "Modifier le modèle"
+      },
+      "deleteConfirm": {
+        "title": "Supprimer le modèle ?",
+        "body": "Les formulaires déjà créés à partir de ce modèle ne sont pas affectés — les modèles fonctionnent par copie à la création.",
+        "confirm": "Supprimer le modèle"
+      },
+      "empty": {
+        "title": "Aucun modèle pour l'instant",
+        "description": "Les modèles sont des préréglages de champs réutilisables. Créez-en un pour accélérer la création de formulaires.",
+        "cta": "Créez votre premier modèle"
+      },
+      "messages": {
+        "created": "Modèle créé.",
+        "updated": "Modèle mis à jour.",
+        "deleted": "Modèle supprimé."
+      }
+    },
+    "wizard": {
+      "title": "Créer un formulaire",
+      "btnCreate": "Créer le formulaire",
+      "steps": {
+        "method": "Méthode",
+        "details": "Détails"
+      },
+      "method": {
+        "scratchTitle": "Partir de zéro",
+        "scratchDesc": "Créez un formulaire vide et ajoutez les champs un par un.",
+        "templatesHeading": "Ou choisissez un modèle",
+        "templatesEmpty": "Aucun modèle pour l'instant. Enregistrez des champs comme modèle depuis n'importe quel formulaire pour les réutiliser."
+      },
+      "fields": {
+        "name": "Nom du formulaire",
+        "slug": "Slug",
+        "slugHelp": "Identifiant sûr pour les URL. Utilisé dans le chemin public : /forms/<slug>"
+      }
+    }
+  },
+  "aiUsage": {
+    "title": "Utilisation IA",
+    "subtitle": "Activité IA par appel sur ce site. Décomptes de tokens approximatifs.",
+    "export": "Exporter CSV",
+    "exporting": "Export en cours…",
+    "empty": "Aucune activité IA dans la plage sélectionnée.",
+    "ownOnlyNotice": "Affichage de vos propres appels IA uniquement — propriétaires et administrateurs voient toute la site.",
+    "recentCalls": "Appels récents",
+    "filters": {
+      "from": "Du",
+      "to": "Au",
+      "action": "Action",
+      "allActions": "Toutes les actions",
+      "groupBy": "Regrouper par"
+    },
+    "groupBy": {
+      "action": "Action",
+      "provider": "Fournisseur",
+      "user": "Utilisateur"
+    },
+    "columns": {
+      "timestamp": "Heure",
+      "action": "Action",
+      "provider": "Fournisseur",
+      "model": "Modèle",
+      "calls": "Appels",
+      "inputTokens": "Tokens entrée",
+      "outputTokens": "Tokens sortie"
+    },
+    "totals": {
+      "calls": "Total des appels",
+      "inputTokens": "Tokens entrée",
+      "outputTokens": "Tokens sortie"
+    },
+    "byGroup": {
+      "title": "Utilisation par {{group}}"
+    }
+  },
+  "collections": {
+    "title": "Collections",
+    "subtitle": "Types de contenu personnalisés",
+    "newType": "Nouvelle collection",
+    "name": "Nom",
+    "key": "Clé",
+    "addField": "Ajouter un champ",
+    "removeField": "Supprimer le champ",
+    "fieldKey": "Clé du champ",
+    "fieldLabel": "Libellé",
+    "fieldType": "Type",
+    "required": "Obligatoire",
+    "localized": "Traduisible",
+    "titleField": "Champ titre",
+    "isPii": "Données personnelles",
+    "dataCategory": "Catégorie de données",
+    "purpose": "Finalité du traitement",
+    "legalBasis": "Base légale",
+    "enumOptions": "Options (séparées par des virgules)",
+    "retentionDays": "Conservation (jours)",
+    "publiclyReadable": "Lisible publiquement",
+    "contentKind": "Routage",
+    "kindPage": "Page (URL publique)",
+    "kindData": "Données seules (API)",
+    "save": "Enregistrer la collection",
+    "piiHelp": "Chiffré au repos, retiré de l’API publique, inclus dans votre registre RGPD.",
+    "entries": "Entrées",
+    "newEntry": "Nouvelle entrée",
+    "noEntries": "Aucune entrée",
+    "status": "Statut",
+    "updated": "Mis à jour",
+    "publish": "Publier",
+    "unpublish": "Dépublier",
+    "deleteEntry": "Supprimer l’entrée",
+    "piiBadge": "DCP",
+    "empty": "Aucune collection définie.",
+    "colFields": "Champs",
+    "colTitle": "Titre",
+    "colSlug": "Slug",
+    "emptyTitle": "Aucune collection",
+    "noEntriesDesc": "Créez votre première entrée pour commencer.",
+    "saveEntry": "Enregistrer l'entrée",
+    "sectionDetails": "Détails",
+    "sectionDetailsDesc": "Nom, clé et comportement des entrées.",
+    "sectionFields": "Champs",
+    "sectionFieldsDesc": "Définissez les données de chaque entrée. Exactement un champ est le titre.",
+    "keyHelp": "Utilisée dans les chemins d'API et les URL. Minuscules, sans espaces.",
+    "keyLocked": "La clé ne peut pas être modifiée après la création.",
+    "kindDataDesc": "Les entrées sont diffusées uniquement via l'API — idéal pour des données structurées comme les membres de l'équipe, les FAQ ou les témoignages.",
+    "kindPageDesc": "Chaque entrée obtient aussi sa propre URL publique sur votre site — idéal pour du contenu comme des recettes, des articles ou des projets.",
+    "retentionHelp": "Supprimer automatiquement les entrées après ce nombre de jours. Laisser vide pour les conserver indéfiniment.",
+    "saveChanges": "Enregistrer les modifications",
+    "editHelp": "Renommer la clé d'un champ migre ses valeurs stockées. Supprimer un champ le masque dans les nouvelles entrées.",
+    "editStructure": "Modifier la structure",
+    "structureSaved": "Structure de la collection enregistrée.",
+    "openEntries": "Ouvrir les entrées",
+    "deleteType": "Supprimer la collection",
+    "deleteTypeConfirm": "Supprimer la collection « {{name}} » et sa structure ? Les entrées doivent d’abord être supprimées.",
+    "typeDeleted": "Collection supprimée.",
+    "allStatuses": "Tous les statuts",
+    "statusDraft": "Brouillon",
+    "statusPublished": "Publié",
+    "entryPublished": "Entrée publiée.",
+    "entryUnpublished": "Entrée repassée en brouillon.",
+    "entryDeleted": "Entrée supprimée.",
+    "deleteEntryConfirm": "Supprimer l’entrée « {{title}} » ? Cette action est irréversible.",
+    "perLanguage": "Par langue · {{locale}}",
+    "dragToReorder": "Glisser pour réordonner"
+  },
+  "imprint": {
+    "title": "Mentions légales",
+    "link": "Mentions légales",
+    "back": "Retour à l'accueil",
+    "loadError": "Impossible de charger les mentions légales pour le moment. Veuillez réessayer plus tard.",
+    "unconfigured": "Aucune mention légale n'a été configurée pour cette instance.",
+    "operatorName": "Exploitant",
+    "address": "Adresse",
+    "email": "E-mail",
+    "phone": "Téléphone",
+    "vat": "N° de TVA",
+    "register": "Registre du commerce",
+    "responsible": "Responsable du contenu"
+  }
+}

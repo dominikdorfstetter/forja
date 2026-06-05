@@ -1,0 +1,29 @@
+# Railway config for the `forja-preview` service (the public Astro
+# template-blog that consumes the prod backend at cms.dorfstetter.at).
+#
+# Why this file exists separate from the root railway.toml:
+# The root railway.toml (added in PR #733) targets the backend Dockerfile
+# at the repo root. Without a per-service override the Astro preview
+# service would also try to build the backend, then panic at startup
+# because it has no DATABASE_URL — that's exactly the regression that
+# took down forja-preview after #733 merged.
+#
+# Required dashboard setting:
+#   Railway → forja-preview → Settings → Config-as-code → Config file path
+#     → templates/astro-blog/railway.toml
+# The build context stays at the repo root so the Astro Dockerfile's
+# COPY libs/{analytics,client,sections} paths keep working.
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "templates/astro-blog/Dockerfile"
+
+[deploy]
+# Astro serves the homepage at `/`. The Node adapter has no `/health`
+# endpoint; a successful `/` GET is the closest proof-of-life signal.
+healthcheckPath = "/"
+healthcheckTimeout = 30
+overlapSeconds = 30
+drainingSeconds = 30
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10

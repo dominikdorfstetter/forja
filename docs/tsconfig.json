@@ -1,0 +1,10 @@
+{
+  "extends": "@docusaurus/tsconfig",
+  "compilerOptions": {
+    // @docusaurus/tsconfig still sets the (TS6.0-deprecated) `baseUrl`, and we
+    // re-root it here so `@site/*` resolves to the docs dir. Silence the TS6.0
+    // deprecation-as-error until Docusaurus ships a baseUrl-free base config.
+    "ignoreDeprecations": "6.0",
+    "baseUrl": "."
+  }
+}

@@ -1,0 +1,35 @@
+---
+// Generic renderer for a custom-type ("Collection", #801) entry. Reads the
+// public schema + entry.data and renders fields by type — no per-type code.
+// richtext is rendered as Markdown; everything else as text.
+import type { PublicCollectionEntry, PublicCollectionSchema } from "@forjacms/client";
+import { renderMarkdown } from "../lib/markdown";
+import { entryDisplayFields, entryTitle } from "../lib/collections";
+
+interface Props {
+  schema: PublicCollectionSchema;
+  entry: PublicCollectionEntry;
+}
+
+const { schema, entry } = Astro.props;
+const title = entryTitle(schema, entry);
+const fields = entryDisplayFields(schema, entry);
+---
+
+<article class="collection-entry" data-testid="collection-entry">
+  <h1>{title}</h1>
+  <dl>
+    {
+      fields.map((f) => (
+        <div class="collection-entry__field" data-field={f.key}>
+          <dt>{f.label}</dt>
+          {f.isRichtext ? (
+            <dd set:html={renderMarkdown(f.value)} />
+          ) : (
+            <dd>{f.value}</dd>
+          )}
+        </div>
+      ))
+    }
+  </dl>
+</article>

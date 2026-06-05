@@ -1,0 +1,313 @@
+---
+import Base from "../../layouts/Base.astro";
+import SeoHead from "../../components/SeoHead.astro";
+import FormField from "../../components/forms/FormField.astro";
+import {
+  fetchPublicForm,
+  fetchSite,
+  getApiBaseUrl,
+  getSiteDomain,
+  getSiteUrl,
+  type PublicFormDefinition,
+} from "../../lib/api";
+import { buildSeoMeta } from "../../lib/seo";
+
+const slug = Astro.params.slug;
+if (!slug) {
+  return new Response("Form not found", { status: 404 });
+}
+
+// Resolve locale from `?locale=` query (or fall through to no locale,
+// which makes the backend return canonical/default-locale strings).
+const locale = new URL(Astro.request.url).searchParams.get("locale") ?? undefined;
+
+let form: PublicFormDefinition | null = null;
+let loadError: string | null = null;
+try {
+  form = await fetchPublicForm(slug, locale);
+} catch (e) {
+  loadError = e instanceof Error ? e.message : "Unable to load form";
+}
+
+const apiBaseUrl = getApiBaseUrl();
+const siteDomain = getSiteDomain() ?? "";
+const siteUrl = getSiteUrl();
+const site = await fetchSite().catch(() => null);
+const siteName = site?.name ?? "My Site";
+
+const seo = buildSeoMeta({
+  title: form?.name ?? "Form",
+  description: form?.description ?? "",
+  canonicalUrl: `${siteUrl}/forms/${slug}`,
+  siteUrl,
+  siteName,
+});
+
+// Cache the form definition for 5 minutes — it changes rarely.
+Astro.response.headers.set("Cache-Control", "public, max-age=300");
+---
+
+<Base title={form?.name ?? "Form"} description={form?.description ?? ""}>
+  <SeoHead seo={seo} slot="head" />
+
+  <section class="max-w-2xl mx-auto px-4 py-12">
+    {loadError && (
+      <div class="rounded-md bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 p-4 text-red-800 dark:text-red-200">
+        <p class="font-medium">Form unavailable</p>
+        <p class="text-sm mt-1">{loadError}</p>
+      </div>
+    )}
+
+    {form && (
+      <>
+        <header class="mb-8">
+          <h1 class="text-3xl font-bold text-zinc-900 dark:text-zinc-50">{form.name}</h1>
+          {form.description && (
+            <p class="mt-2 text-zinc-600 dark:text-zinc-400">{form.description}</p>
+          )}
+        </header>
+
+        <form
+          id="forja-form"
+          data-form-slug={form.slug}
+          data-form-id={form.id}
+          data-api-base={apiBaseUrl}
+          data-site-domain={siteDomain}
+          data-bot-protection={form.bot_protection}
+          data-consent-required={form.consent_required ? "true" : "false"}
+          novalidate
+          class="space-y-5"
+          aria-describedby="forja-form-error"
+        >
+          {form.fields.map((field) => (
+            <FormField field={field} />
+          ))}
+
+          {form.consent_required && (
+            <div class="forja-form-field rounded-md bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 p-4">
+              <label class="flex items-start gap-3 text-sm cursor-pointer">
+                <input
+                  type="checkbox"
+                  id="forja-consent"
+                  name="__consent"
+                  required
+                  class="mt-0.5 text-violet-600 focus:ring-violet-500"
+                />
+                <span class="text-zinc-700 dark:text-zinc-300">
+                  {form.consent_text ?? "I agree to the terms."}
+                </span>
+              </label>
+              <p id="forja-consent-error" class="forja-form-field__error hidden mt-1 text-sm text-red-600 dark:text-red-400" role="alert"></p>
+            </div>
+          )}
+
+          {form.bot_protection === "mandatory" && (
+            <div data-bot-protection-slot class="rounded-md bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 p-3 text-sm text-amber-800 dark:text-amber-200">
+              Bot protection placeholder — wire a reCAPTCHA / Turnstile widget here
+              and set <code>data-bot-protection-token</code> on the form element
+              with the resulting token before submit.
+            </div>
+          )}
+
+          <p id="forja-form-error" class="hidden text-sm text-red-600 dark:text-red-400" role="alert"></p>
+
+          <button
+            type="submit"
+            id="forja-form-submit"
+            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-md bg-violet-600 hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2.5 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
+          >
+            <span data-submit-label>Submit</span>
+            <svg data-submit-spinner class="hidden animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25" />
+              <path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
+            </svg>
+          </button>
+        </form>
+
+        <div id="forja-form-success" class="hidden mt-6 rounded-md bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 p-5" role="status" aria-live="polite">
+          <p class="font-medium text-emerald-900 dark:text-emerald-100">Thank you!</p>
+          <p class="text-sm text-emerald-800 dark:text-emerald-200 mt-1">
+            Your submission has been received. Your reference code is:
+          </p>
+          <p class="mt-2 font-mono text-lg text-emerald-900 dark:text-emerald-100" data-reference-code></p>
+          <p class="text-xs text-emerald-700 dark:text-emerald-300 mt-3">
+            Save this code — you can use it on the
+            <a href="/forms/lookup" class="underline">self-service page</a>
+            to view or delete your submission.
+          </p>
+        </div>
+      </>
+    )}
+  </section>
+</Base>
+
+<script>
+  type SubmitResponse = { submission_id: string; reference_code: string };
+  type ValidationErrorBag = { errors?: Array<{ field: string; message: string }> } & {
+    errors?: Record<string, string>;
+  };
+
+  const form = document.getElementById("forja-form") as HTMLFormElement | null;
+  const submitBtn = document.getElementById("forja-form-submit") as HTMLButtonElement | null;
+  const submitLabel = form?.querySelector("[data-submit-label]") as HTMLElement | null;
+  const submitSpinner = form?.querySelector("[data-submit-spinner]") as HTMLElement | null;
+  const successPanel = document.getElementById("forja-form-success");
+  const refCodeEl = successPanel?.querySelector("[data-reference-code]") as HTMLElement | null;
+  const formError = document.getElementById("forja-form-error");
+
+  if (form && submitBtn) {
+    const slug = form.dataset.formSlug!;
+    const apiBase = form.dataset.apiBase!;
+    const siteDomain = form.dataset.siteDomain;
+    const consentRequired = form.dataset.consentRequired === "true";
+    const botProtection = form.dataset.botProtection;
+
+    function setFieldError(label: string, msg: string | null) {
+      const wrapper = form!.querySelector<HTMLElement>(`.forja-form-field[data-field-label="${CSS.escape(label)}"]`);
+      const err = wrapper?.querySelector<HTMLElement>(".forja-form-field__error");
+      if (!err) return;
+      if (msg) {
+        err.textContent = msg;
+        err.classList.remove("hidden");
+      } else {
+        err.textContent = "";
+        err.classList.add("hidden");
+      }
+    }
+
+    function clearAllFieldErrors() {
+      form!
+        .querySelectorAll<HTMLElement>(".forja-form-field__error")
+        .forEach((el) => {
+          el.textContent = "";
+          el.classList.add("hidden");
+        });
+      if (formError) {
+        formError.textContent = "";
+        formError.classList.add("hidden");
+      }
+    }
+
+    function collectData(): Record<string, unknown> {
+      const data: Record<string, unknown> = {};
+      form!.querySelectorAll<HTMLElement>(".forja-form-field").forEach((wrap) => {
+        const label = wrap.dataset.fieldLabel!;
+        const type = wrap.dataset.fieldType!;
+        if (type === "checkbox") {
+          const inputs = wrap.querySelectorAll<HTMLInputElement>("input[type=checkbox]");
+          if (inputs.length === 1 && !inputs[0].value) {
+            // Single bool checkbox.
+            data[label] = inputs[0].checked;
+          } else {
+            const selected: string[] = [];
+            inputs.forEach((i) => {
+              if (i.checked) selected.push(i.value);
+            });
+            data[label] = selected;
+          }
+        } else if (type === "radio") {
+          const sel = wrap.querySelector<HTMLInputElement>("input[type=radio]:checked");
+          if (sel) data[label] = sel.value;
+        } else if (type === "number") {
+          const el = wrap.querySelector<HTMLInputElement>("input[type=number]");
+          const v = el?.value ?? "";
+          data[label] = v === "" ? null : Number(v);
+        } else {
+          const el = wrap.querySelector<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(
+            "input, textarea, select",
+          );
+          data[label] = el ? el.value : "";
+        }
+      });
+      return data;
+    }
+
+    function setSubmitting(submitting: boolean) {
+      submitBtn!.disabled = submitting;
+      if (submitLabel) submitLabel.textContent = submitting ? "Submitting…" : "Submit";
+      submitSpinner?.classList.toggle("hidden", !submitting);
+    }
+
+    form.addEventListener("submit", async (ev) => {
+      ev.preventDefault();
+      clearAllFieldErrors();
+
+      // Consent handling — checkbox is outside the field array.
+      let consentGiven = false;
+      if (consentRequired) {
+        const cb = document.getElementById("forja-consent") as HTMLInputElement | null;
+        consentGiven = !!cb?.checked;
+        if (!consentGiven) {
+          const err = document.getElementById("forja-consent-error");
+          if (err) {
+            err.textContent = "Consent is required to submit this form.";
+            err.classList.remove("hidden");
+          }
+          return;
+        }
+      }
+
+      const botToken = botProtection === "mandatory" ? form.dataset.botProtectionToken : undefined;
+      if (botProtection === "mandatory" && !botToken) {
+        if (formError) {
+          formError.textContent = "Bot protection token missing. Please complete the challenge.";
+          formError.classList.remove("hidden");
+        }
+        return;
+      }
+
+      setSubmitting(true);
+      try {
+        const res = await fetch(`${apiBase}/public/forms/${encodeURIComponent(slug)}/submit`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(siteDomain ? { "X-Site-Domain": siteDomain } : {}),
+          },
+          body: JSON.stringify({
+            data: collectData(),
+            consent_given: consentGiven,
+            bot_protection_token: botToken,
+          }),
+        });
+
+        if (res.status === 201) {
+          const body = (await res.json()) as SubmitResponse;
+          form.classList.add("hidden");
+          successPanel?.classList.remove("hidden");
+          if (refCodeEl) refCodeEl.textContent = body.reference_code;
+          return;
+        }
+
+        // Error: try to surface field-level errors when present.
+        const body = (await res.json().catch(() => ({}))) as ValidationErrorBag;
+        const errors = body.errors;
+        let handled = false;
+        if (Array.isArray(errors)) {
+          for (const e of errors) {
+            if (e.field && e.message) {
+              setFieldError(e.field, e.message);
+              handled = true;
+            }
+          }
+        } else if (errors && typeof errors === "object") {
+          for (const [field, message] of Object.entries(errors)) {
+            setFieldError(field, typeof message === "string" ? message : String(message));
+            handled = true;
+          }
+        }
+        if (!handled && formError) {
+          formError.textContent = `Submission failed (status ${res.status}). Please try again.`;
+          formError.classList.remove("hidden");
+        }
+      } catch (e) {
+        if (formError) {
+          formError.textContent = "Network error — please check your connection and try again.";
+          formError.classList.remove("hidden");
+        }
+      } finally {
+        setSubmitting(false);
+      }
+    });
+  }
+</script>

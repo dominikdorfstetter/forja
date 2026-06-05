@@ -1,0 +1,60 @@
+---
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  baseUrl: string;
+  /** Use ?page=N query params instead of /page/N/ path segments. */
+  useQueryParam?: boolean;
+}
+
+const { currentPage, totalPages, baseUrl, useQueryParam = false } = Astro.props;
+
+if (totalPages <= 1) return;
+
+function pageUrl(page: number): string {
+  if (page === 1) return `${baseUrl}/`;
+  if (useQueryParam) return `${baseUrl}/?page=${page}`;
+  return `${baseUrl}/page/${page}/`;
+}
+
+// Build page number array with ellipsis
+function pageNumbers(): (number | "...")[] {
+  const pages: (number | "...")[] = [];
+  if (totalPages <= 7) {
+    for (let i = 1; i <= totalPages; i++) pages.push(i);
+    return pages;
+  }
+  pages.push(1);
+  if (currentPage > 3) pages.push("...");
+  const start = Math.max(2, currentPage - 1);
+  const end = Math.min(totalPages - 1, currentPage + 1);
+  for (let i = start; i <= end; i++) pages.push(i);
+  if (currentPage < totalPages - 2) pages.push("...");
+  pages.push(totalPages);
+  return pages;
+}
+---
+
+<nav class="flex items-center justify-center gap-1.5 mt-10 flex-wrap" aria-label="Page navigation">
+  {currentPage > 1 && (
+    <a href={pageUrl(currentPage - 1)} class="inline-flex items-center px-3 py-1.5 text-sm text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg no-underline hover:no-underline transition-colors" aria-label="Previous page">
+      &larr; Prev
+    </a>
+  )}
+
+  {pageNumbers().map((p) =>
+    p === "..." ? (
+      <span class="px-2 text-sm text-zinc-400 dark:text-zinc-500">&hellip;</span>
+    ) : p === currentPage ? (
+      <span class="inline-flex items-center justify-center min-w-[2rem] h-8 px-2 text-sm font-semibold bg-violet-500 text-white rounded-lg" aria-current="page">{p}</span>
+    ) : (
+      <a href={pageUrl(p)} class="inline-flex items-center justify-center min-w-[2rem] h-8 px-2 text-sm text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg no-underline hover:no-underline transition-colors">{p}</a>
+    )
+  )}
+
+  {currentPage < totalPages && (
+    <a href={pageUrl(currentPage + 1)} class="inline-flex items-center px-3 py-1.5 text-sm text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg no-underline hover:no-underline transition-colors" aria-label="Next page">
+      Next &rarr;
+    </a>
+  )}
+</nav>

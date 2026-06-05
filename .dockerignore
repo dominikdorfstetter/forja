@@ -1,0 +1,27 @@
+.git
+.github
+.claude
+.idea
+.vscode
+.serena
+.superpowers
+docs
+templates
+!templates/astro-blog
+libs
+!libs/analytics
+!libs/client
+!libs/sections
+
+# Build artifacts
+backend/target
+admin/node_modules
+admin/dist
+templates/*/node_modules
+libs/*/node_modules
+
+# Misc
+*.md
+*.png
+*.csv
+bad_output.png

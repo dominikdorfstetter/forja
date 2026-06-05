@@ -1,0 +1,23 @@
+# validated-extractor-exemptions.txt
+#
+# Request-body DTOs that are intentionally NOT routed through the ValidatedJson
+# seam (see scripts/check-validated-extractor.sh, issue #828). The gate fails
+# CI on any request DTO that is neither a ValidatedDto nor listed here.
+#
+# Format: one entry per line, `TypeName # reason`. The reason is mandatory —
+# a bare type name is a hard error. Keep this list short and justified: prefer
+# migrating a DTO onto ValidatedDto over exempting it. An exemption is only
+# appropriate when the DTO carries no validatable fields and the handler does
+# no body validation of its own.
+
+# Last re-audited 2026-05-31 (#880). CustomEntryRequest was migrated onto the
+# seam (#879); the three below were confirmed to stay exempt. Two are
+# structurally trivial; the third is security-load-bearing — see the per-entry
+# notes before "fixing" any of them.
+
+# --- Validated by type / structurally trivial bodies ---
+UpdateMemberRoleRequest # sole field is a SiteRole enum; serde rejects unknown variants at deserialize time, so there is no field-level rule left to enforce
+BulkDeleteNotificationsRequest # body is a Vec<Uuid>; serde rejects non-UUIDs, and an empty list is a harmless no-op (deletes nothing) — a "non-empty" rule would only change behaviour, not safety
+
+# --- Exempt for security: validating at the boundary would be a regression ---
+LookupSubmissionRequest # anti-enumeration: a malformed reference_code must collapse to the same 404 as a well-formed-but-unknown one. A boundary validator would 422 on malformed and 404 on not-found, leaking which codes are well-formed. See docs/adr/0005-lookup-submission-anti-enumeration-exemption.md

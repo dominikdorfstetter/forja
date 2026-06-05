@@ -1,0 +1,77 @@
+{
+  "name": "@forjacms/client",
+  "version": "1.0.0",
+  "description": "Typed TypeScript SDK for the Forja CMS content API",
+  "author": "Dominik Dorfstetter <dominik@dorfstetter.at>",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.cts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./angular": {
+      "import": {
+        "types": "./dist/angular/index.d.mts",
+        "default": "./dist/angular/index.mjs"
+      },
+      "require": {
+        "types": "./dist/angular/index.d.cts",
+        "default": "./dist/angular/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown src/index.ts src/angular/index.ts --format cjs,esm --dts --minify",
+    "dev": "tsdown src/index.ts src/angular/index.ts --format cjs,esm --dts --watch",
+    "test": "vitest run --coverage",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": [
+    "forja",
+    "cms",
+    "sdk",
+    "typescript",
+    "content-api",
+    "angular"
+  ],
+  "license": "AGPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dominikdorfstetter/forja.git",
+    "directory": "libs/client"
+  },
+  "homepage": "https://github.com/dominikdorfstetter/forja/tree/main/libs/client#readme",
+  "bugs": "https://github.com/dominikdorfstetter/forja/issues",
+  "peerDependencies": {
+    "@angular/core": ">=17.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@angular/core": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@angular/core": "^22.0.0",
+    "@vitest/coverage-v8": "^4.0.18",
+    "rxjs": "^7.8.2",
+    "tsdown": "^0.22.2",
+    "typescript": "^6.0.3",
+    "vitest": "^4.0.18",
+    "zone.js": "^0.16.2"
+  },
+  "overrides": {
+    "typescript": "^6.0.3"
+  }
+}

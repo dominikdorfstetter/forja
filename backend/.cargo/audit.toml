@@ -1,0 +1,34 @@
+# cargo-audit configuration
+# https://github.com/rustsec/rustsec/tree/main/cargo-audit
+
+[advisories]
+ignore = [
+    # RUSTSEC-2023-0071: rsa crate Marvin Attack (timing sidechannel)
+    # No upstream fix available. Used for ActivityPub federation HTTP signatures.
+    # Risk mitigated: we only use RSA for signing, not PKCS#1 v1.5 decryption.
+    "RUSTSEC-2023-0071",
+
+    # RUSTSEC-2024-0436: paste (unmaintained)
+    # Transitive dep via image → ravif → rav1e (AVIF encoder). Locked by upstream.
+    "RUSTSEC-2024-0436",
+
+    # RUSTSEC-2025-0134: rustls-pemfile (unmaintained)
+    # Transitive dep via rocket_http. Locked by Rocket 0.5.1.
+    "RUSTSEC-2025-0134",
+
+    # RUSTSEC-2026-0049: rustls-webpki CRL Distribution Point matching bug
+    # Only affects rustls-webpki 0.101.7 via rustls 0.21. Locked by Rocket 0.5.1
+    # and aws-smithy-http-client. Fixed in >=0.103.10 (our 0.103 dep is updated).
+    "RUSTSEC-2026-0049",
+
+    # RUSTSEC-2026-0098: rustls-webpki name-constraint bypass for URI names.
+    # Only affects rustls-webpki 0.101.7 via rustls 0.21 (pulled in by Rocket
+    # 0.5.1 + legacy aws-smithy-http-client path). Active rustls-webpki 0.103
+    # path has been updated to the patched 0.103.12.
+    # Rocket TLS is disabled on Railway (edge TLS); legacy AWS path is dormant.
+    "RUSTSEC-2026-0098",
+
+    # RUSTSEC-2026-0099: rustls-webpki name-constraint bypass for wildcard names.
+    # Same root cause + mitigation as RUSTSEC-2026-0098.
+    "RUSTSEC-2026-0099",
+]

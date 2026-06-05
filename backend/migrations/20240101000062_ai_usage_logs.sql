@@ -1,0 +1,12 @@
+-- Migration: AI Usage Log — REPLACED BY 20240101000063
+--
+-- The original version of this file (in the unmerged feat/ai-usage-log
+-- branch) referenced `users(id)` for a foreign key on `actor_id`. The
+-- `users` table was dropped in migration 20240101000020 when Forja
+-- delegated identity to Clerk, so the migration failed before any
+-- database could apply it.
+--
+-- Per the project rule "never edit migrations", the corrected table is
+-- defined in 20240101000063_ai_usage_logs.sql. This file is kept as a
+-- harmless no-op so the migration number is not silently recycled.
+SELECT 1;
