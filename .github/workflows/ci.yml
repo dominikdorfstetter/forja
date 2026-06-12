@@ -218,28 +218,12 @@ jobs:
 
       - name: React Doctor
         if: github.event_name == 'pull_request'
-        id: doctor
-        uses: millionco/react-doctor@main
-        # Informational only — the follow-up "Check health score" step warns
-        # but never fails. The action's internal `npx react-doctor@latest`
-        # invocation has bitten us with breaking minor-version drift, so the
-        # step itself is marked non-fatal too.
-        continue-on-error: true
-        with:
-          directory: admin
-          diff: main
-          verbose: true
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Check health score
-        if: github.event_name == 'pull_request'
-        env:
-          SCORE: ${{ steps.doctor.outputs.score }}
-        run: |
-          echo "React Doctor score: $SCORE"
-          if [ "$SCORE" -lt 50 ]; then
-            echo "::warning::React health score is below threshold: $SCORE/100"
-          fi
+        # Runs the version-pinned react-doctor devDependency instead of the
+        # millionco/react-doctor marketplace action: the action tracks @main
+        # and has repeatedly broken on input-schema/CLI drift (invalid
+        # 'diff'/'verbose'/'github-token' inputs, internal arg errors).
+        # Informational only — a finding warns, never fails the job.
+        run: npm run react-doctor || echo "::warning::React Doctor reported issues — run 'npm run react-doctor:verbose' locally"
 
       - name: Run tests
         run: npm test
