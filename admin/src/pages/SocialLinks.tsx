@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Box,
@@ -27,7 +27,6 @@ import {
 import {
   SortableContext,
   verticalListSortingStrategy,
-  arrayMove,
 } from '@dnd-kit/sortable';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { createSocialLink, deleteSocialLink, getSocialLinks, reorderSocialLinks, updateSocialLink } from '@/services/social';
@@ -35,6 +34,7 @@ import type { SocialLink, CreateSocialLinkRequest, UpdateSocialLinkRequest, Reor
 import { useSiteContext } from '@/store/SiteContext';
 import { useAuth } from '@/store/AuthContext';
 import { useListPageState } from '@/hooks/useListPageState';
+import { useReorderableList } from '@/hooks/useReorderableList';
 import { useCrudMutations } from '@/hooks/useCrudMutations';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import PageHeader from '@/components/shared/PageHeader';
@@ -57,7 +57,6 @@ export default function SocialLinksPage() {
     openCreate, closeForm, openEdit, closeEdit, openDelete, closeDelete,
   } = useListPageState<SocialLink>();
 
-  const [orderedLinks, setOrderedLinks] = useState<SocialLink[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
 
   // Command palette action listener
@@ -75,11 +74,7 @@ export default function SocialLinksPage() {
     enabled: !!selectedSiteId,
   });
 
-  const prevLinksRef = useRef<SocialLink[] | undefined>(undefined);
-  if (links && links !== prevLinksRef.current) {
-    setOrderedLinks(links);
-  }
-  prevLinksRef.current = links;
+  const { orderedItems: orderedLinks, reorder, resetOrder } = useReorderableList(links);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -110,6 +105,7 @@ export default function SocialLinksPage() {
     mutationFn: (items: ReorderItem[]) => reorderSocialLinks(selectedSiteId, items),
     onError: (err) => {
       showError(err);
+      resetOrder();
       queryClient.invalidateQueries({ queryKey: ['social-links'] });
     },
   });
@@ -123,18 +119,14 @@ export default function SocialLinksPage() {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
 
-    setOrderedLinks((prev) => {
-      const oldIndex = prev.findIndex((l) => l.id === active.id);
-      const newIndex = prev.findIndex((l) => l.id === over.id);
-      const reordered = arrayMove(prev, oldIndex, newIndex);
-      const items: ReorderItem[] = reordered.map((link, index) => ({
-        id: link.id,
-        display_order: index,
-      }));
-      reorderMutation.mutate(items);
-      return reordered;
-    });
-  }, [reorderMutation]);
+    const reordered = reorder(active.id as string, over.id as string);
+    if (!reordered) return;
+    const items: ReorderItem[] = reordered.map((link, index) => ({
+      id: link.id,
+      display_order: index,
+    }));
+    reorderMutation.mutate(items);
+  }, [reorder, reorderMutation]);
 
   const activeLink = activeId ? orderedLinks.find((l) => l.id === activeId) : null;
 
@@ -157,7 +149,7 @@ export default function SocialLinksPage() {
         <LoadingState label={t('socialLinks.loading')} />
       ) : error ? (
         <Alert severity="error">{t('socialLinks.loadError')}</Alert>
-      ) : !orderedLinks || orderedLinks.length === 0 ? (
+      ) : orderedLinks.length === 0 ? (
         <EmptyState icon={<ShareIcon sx={{ fontSize: 64 }} />} title={t('socialLinks.empty.title')} description={t('socialLinks.empty.description')} action={{ label: t('socialLinks.addLink'), onClick: openCreate }} />
       ) : (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
