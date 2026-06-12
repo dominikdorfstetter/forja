@@ -9,6 +9,7 @@ import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
 import { updateSiteSettings } from '@/services/sites';
 import type { StorageUsageResponse } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 function formatBytes(bytes: number): string {
   if (bytes === 0) return '0 B';
@@ -46,8 +47,8 @@ export default function StorageSection({ siteId, storageUsage, isMaster }: Stora
     mutationFn: (quota: number) =>
       updateSiteSettings(siteId, { storage_quota_bytes: quota }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['site-settings', siteId] });
-      queryClient.invalidateQueries({ queryKey: ['storage-usage', siteId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.siteSettings(siteId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.storageUsage(siteId) });
       enqueueSnackbar(t('settings.messages.saved'), { variant: 'success' });
     },
     onError: () => {

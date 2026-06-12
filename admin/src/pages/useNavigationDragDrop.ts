@@ -11,6 +11,7 @@ import { reorderMenuItems, reorderNavigationItems } from '@/services/navigation'
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import type { NavigationItem, NavigationMenu, ReorderTreeItem } from '@/types/api';
 import { flattenItemsWithDepth } from '@/pages/NavigationReducer';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface UseNavigationDragDropArgs {
   selectedSiteId: string;
@@ -43,7 +44,7 @@ export function useNavigationDragDrop({
     },
     onError: (error) => {
       showError(error);
-      queryClient.invalidateQueries({ queryKey: ['navigation-items'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.navigationItems() });
     },
   });
 

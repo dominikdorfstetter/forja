@@ -20,6 +20,7 @@ import {
 } from '@/components/shared/listPageV2';
 import { M3Button, M3IconButton } from '@/components/design-system';
 import type { SiteOverviewEntry } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface DeletingSite {
   id: string;
@@ -79,15 +80,15 @@ export default function SystemSitesPage() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const { data: overview, isLoading } = useQuery({
-    queryKey: ['sites-overview'],
+    queryKey: queryKeys.sitesOverview(),
     queryFn: () => getSitesOverview(),
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteSite(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['sites-overview'] });
-      queryClient.invalidateQueries({ queryKey: ['sites'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.sitesOverview() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.sites() });
       setDeletingSite(null);
       enqueueSnackbar(t('sites.messages.deleted'), { variant: 'success' });
     },

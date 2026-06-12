@@ -18,6 +18,7 @@ import {
   type DataTableV2Column,
   type ActionMenuItem,
 } from '@/components/shared/listPageV2';
+import { queryKeys } from '@/lib/queryKeys';
 
 function formatTimestamp(ts?: number | null): string {
   if (!ts) return '—';
@@ -68,14 +69,14 @@ export default function ClerkUsersPage() {
   const [dialog, setDialog] = useState<{ kind: 'suspend' | 'ban' | 'delete'; user: ClerkUser } | null>(null);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['clerk-users', page, rowsPerPage],
+    queryKey: queryKeys.clerkUsers(page, rowsPerPage),
     queryFn: () => getClerkUsers({ limit: rowsPerPage, offset: (page - 1) * rowsPerPage }),
   });
 
   const unsuspendMutation = useMutation({
     mutationFn: (userId: string) => unsuspendUser(userId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['clerk-users'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.clerkUsers() });
       enqueueSnackbar(t('system.users.unsuspend.success'), { variant: 'success' });
     },
     onError: () => enqueueSnackbar(t('system.users.unsuspend.error'), { variant: 'error' }),
@@ -84,7 +85,7 @@ export default function ClerkUsersPage() {
   const deleteMutation = useMutation({
     mutationFn: (userId: string) => deleteBannedUser(userId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['clerk-users'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.clerkUsers() });
       enqueueSnackbar(t('system.users.delete.success'), { variant: 'success' });
       setDialog(null);
     },

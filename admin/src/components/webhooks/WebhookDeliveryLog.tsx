@@ -18,6 +18,7 @@ import EmptyState from '@/components/shared/EmptyState';
 import { useTranslation } from 'react-i18next';
 import FormDialog from '@/components/shared/FormDialog';
 import { M3Button } from '@/components/design-system';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface WebhookDeliveryLogProps {
   open: boolean;
@@ -32,7 +33,7 @@ export default function WebhookDeliveryLog({ open, webhookId, onClose }: Webhook
   const [pageSize, setPageSize] = useState(10);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['webhook-deliveries', webhookId, page, pageSize],
+    queryKey: queryKeys.webhookDeliveries(webhookId, page, pageSize),
     queryFn: () => getWebhookDeliveries(webhookId!, { page, page_size: pageSize }),
     enabled: !!webhookId && open,
   });

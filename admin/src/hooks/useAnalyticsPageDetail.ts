@@ -5,6 +5,7 @@ import { useSiteContextData } from '@/hooks/useSiteContextData';
 import type { DateRangeValue } from '@/pages/Analytics/components/DateRangeBar';
 import { presetToDays } from '@/pages/Analytics/components/DateRangeBar';
 import type { AnalyticsPageDetailParams } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 function toISODate(date: Date): string {
   return date.toISOString().split('T')[0];
@@ -28,7 +29,7 @@ export function useAnalyticsPageDetail(path: string, range: DateRangeValue) {
   const params = buildParams(path, range);
 
   const { data: detail, isLoading, error } = useQuery({
-    queryKey: ['analytics-page-detail', selectedSiteId, params],
+    queryKey: queryKeys.analyticsPageDetail(selectedSiteId, params),
     queryFn: () => getAnalyticsPageDetail(selectedSiteId!, params),
     enabled: !!selectedSiteId && !!path && analyticsEnabled,
   });

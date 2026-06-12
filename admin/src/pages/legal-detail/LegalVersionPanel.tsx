@@ -6,6 +6,7 @@ import { getLegalVersions } from '@/services/legal';
 import { useLocalizedFormat } from '@/utils/dateFnsLocale';
 import StatusChip from '@/components/shared/StatusChip';
 import type { LegalVersionResponse } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface LegalVersionPanelProps {
   documentId: string;
@@ -18,7 +19,7 @@ export default function LegalVersionPanel({ documentId, currentVersion }: LegalV
   const navigate = useNavigate();
 
   const { data: versions, isLoading } = useQuery({
-    queryKey: ['legal-versions', documentId],
+    queryKey: queryKeys.legalVersions(documentId),
     queryFn: () => getLegalVersions(documentId),
     enabled: !!documentId,
   });

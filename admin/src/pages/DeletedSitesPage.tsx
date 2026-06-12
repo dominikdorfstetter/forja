@@ -11,6 +11,7 @@ import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
 import { ForjaBrandMark, M3Button } from '@/components/design-system';
 import type { ProblemDetails, Site } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 const GRACE_DAYS = 30;
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -42,7 +43,7 @@ export default function DeletedSitesPage() {
   const { showError, showSuccess, enqueueSnackbar } = useErrorSnackbar();
 
   const { data, isLoading } = useQuery({
-    queryKey: ['sites', 'deleted'],
+    queryKey: queryKeys.sitesDeleted(),
     queryFn: () => getDeletedSites(),
   });
 
@@ -52,14 +53,14 @@ export default function DeletedSitesPage() {
     mutationFn: (id: string) => restoreSite(id),
     onSuccess: () => {
       showSuccess(t('siteSettings.deletedSites.restored'));
-      queryClient.invalidateQueries({ queryKey: ['sites'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.sites() });
     },
     onError: (err: unknown) => {
       if (isProblem(err) && err.status === 410) {
         enqueueSnackbar(t('siteSettings.deletedSites.expired'), {
           variant: 'error',
         });
-        queryClient.invalidateQueries({ queryKey: ['sites', 'deleted'] });
+        queryClient.invalidateQueries({ queryKey: queryKeys.sitesDeleted() });
         return;
       }
       showError(err);

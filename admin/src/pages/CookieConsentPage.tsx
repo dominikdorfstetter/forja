@@ -62,6 +62,7 @@ import EmptyState from '@/components/shared/EmptyState';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import StatusChip from '@/components/shared/StatusChip';
 import { Icon, M3Button, M3IconButton } from '@/components/design-system';
+import { queryKeys } from '@/lib/queryKeys';
 
 // --- Group form dialog ---
 
@@ -303,7 +304,7 @@ function GroupItemsSection({ groupId }: GroupItemsSectionProps) {
   );
 
   const { data: items, isLoading } = useQuery({
-    queryKey: ['legalItems', groupId],
+    queryKey: queryKeys.legalItems(groupId),
     queryFn: () => getLegalItems(groupId),
     enabled: !!groupId,
   });
@@ -313,7 +314,7 @@ function GroupItemsSection({ groupId }: GroupItemsSectionProps) {
   const createItemMutation = useMutation({
     mutationFn: (data: CreateLegalItemRequest) => createLegalItem(groupId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['legalItems', groupId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.legalItems(groupId) });
       setItemFormOpen(false);
       showSuccess(t('legalDetail.items.messages.created'));
     },
@@ -323,7 +324,7 @@ function GroupItemsSection({ groupId }: GroupItemsSectionProps) {
   const updateItemMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateLegalItemRequest }) => updateLegalItem(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['legalItems', groupId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.legalItems(groupId) });
       setEditingItem(null);
       showSuccess(t('legalDetail.items.messages.updated'));
     },
@@ -333,7 +334,7 @@ function GroupItemsSection({ groupId }: GroupItemsSectionProps) {
   const deleteItemMutation = useMutation({
     mutationFn: (id: string) => deleteLegalItem(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['legalItems', groupId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.legalItems(groupId) });
       setDeletingItem(null);
       showSuccess(t('legalDetail.items.messages.deleted'));
     },
@@ -348,12 +349,12 @@ function GroupItemsSection({ groupId }: GroupItemsSectionProps) {
         ),
       ),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['legalItems', groupId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.legalItems(groupId) });
     },
     onError: (error) => {
       showError(error);
       resetOrder();
-      queryClient.invalidateQueries({ queryKey: ['legalItems', groupId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.legalItems(groupId) });
     },
   });
 
@@ -553,7 +554,7 @@ export default function CookieConsentPage({ embedded = false }: CookieConsentPag
 
   // Fetch cookie consent document
   const { data: cookieDoc, isLoading: docLoading, error: docError } = useQuery({
-    queryKey: ['legal-cookie-consent', selectedSiteId],
+    queryKey: queryKeys.legalCookieConsent(selectedSiteId),
     queryFn: async () => {
       const result = await getLegalDocuments(selectedSiteId!, { page: 1, page_size: 100 });
       return result.data.find((d) => d.document_type === 'CookieConsent') ?? null;
@@ -563,7 +564,7 @@ export default function CookieConsentPage({ embedded = false }: CookieConsentPag
 
   // Fetch groups for the document
   const { data: groups, isLoading: groupsLoading, error: groupsError } = useQuery({
-    queryKey: ['legalGroups', cookieDoc?.id],
+    queryKey: queryKeys.legalGroups(cookieDoc?.id),
     queryFn: () => getLegalGroups(cookieDoc!.id),
     enabled: !!cookieDoc?.id,
   });
@@ -577,7 +578,7 @@ export default function CookieConsentPage({ embedded = false }: CookieConsentPag
       site_ids: [selectedSiteId!],
     }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['legal-cookie-consent', selectedSiteId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.legalCookieConsent(selectedSiteId) });
       showSuccess(t('cookieConsent.messages.created'));
     },
     onError: (error) => showError(error),
@@ -587,7 +588,7 @@ export default function CookieConsentPage({ embedded = false }: CookieConsentPag
   const publishMutation = useMutation({
     mutationFn: () => updateLegalDocument(cookieDoc!.id, { status: 'Published' }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['legal-cookie-consent', selectedSiteId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.legalCookieConsent(selectedSiteId) });
       showSuccess(t('legal.messages.published'));
     },
     onError: (error) => showError(error),
@@ -596,7 +597,7 @@ export default function CookieConsentPage({ embedded = false }: CookieConsentPag
   const unpublishMutation = useMutation({
     mutationFn: () => updateLegalDocument(cookieDoc!.id, { status: 'Draft' }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['legal-cookie-consent', selectedSiteId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.legalCookieConsent(selectedSiteId) });
       showSuccess(t('legal.messages.unpublished'));
     },
     onError: (error) => showError(error),
@@ -606,7 +607,7 @@ export default function CookieConsentPage({ embedded = false }: CookieConsentPag
   const createGroupMutation = useMutation({
     mutationFn: (data: CreateLegalGroupRequest) => createLegalGroup(cookieDoc!.id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['legalGroups', cookieDoc?.id] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.legalGroups(cookieDoc?.id) });
       dialogDispatch({ type: 'CLOSE_GROUP_FORM' });
       showSuccess(t('legalDetail.groups.messages.created'));
     },
@@ -617,7 +618,7 @@ export default function CookieConsentPage({ embedded = false }: CookieConsentPag
     mutationFn: ({ groupId, data }: { groupId: string; data: UpdateLegalGroupRequest }) =>
       updateLegalGroup(groupId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['legalGroups', cookieDoc?.id] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.legalGroups(cookieDoc?.id) });
       dialogDispatch({ type: 'SET_EDITING_GROUP', payload: null });
       showSuccess(t('legalDetail.groups.messages.updated'));
     },
@@ -627,7 +628,7 @@ export default function CookieConsentPage({ embedded = false }: CookieConsentPag
   const deleteGroupMutation = useMutation({
     mutationFn: (groupId: string) => deleteLegalGroup(groupId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['legalGroups', cookieDoc?.id] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.legalGroups(cookieDoc?.id) });
       dialogDispatch({ type: 'SET_DELETING_GROUP', payload: null });
       showSuccess(t('legalDetail.groups.messages.deleted'));
     },
@@ -644,7 +645,7 @@ export default function CookieConsentPage({ embedded = false }: CookieConsentPag
     await Promise.all(
       reordered.map((g, i) => updateLegalGroup(g.id, { display_order: i }))
     );
-    queryClient.invalidateQueries({ queryKey: ['legalGroups', cookieDoc?.id] });
+    queryClient.invalidateQueries({ queryKey: queryKeys.legalGroups(cookieDoc?.id) });
   };
 
   // No site selected

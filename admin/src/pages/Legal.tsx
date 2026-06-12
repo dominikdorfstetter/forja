@@ -25,6 +25,7 @@ import CookieConsentPage from '@/pages/CookieConsentPage';
 import EntityListPage, { ContentEntityDialogs } from '@/components/shared/entityListPage';
 import type { EntityListAdapter } from '@/components/shared/entityListPage';
 import { buildLegalChipFilters, buildLegalColumns } from '@/pages/LegalTableConfig';
+import { queryKeys } from '@/lib/queryKeys';
 
 /**
  * Run individual legal mutations in parallel; map the result into the harness's
@@ -77,17 +78,17 @@ const legalAdapter: EntityListAdapter<LegalDocumentResponse> = {
       sort_by: params.sort_by,
       sort_dir: params.sort_dir,
     }),
-  listQueryKey: (siteId, params) => [
-    'legal',
-    siteId,
-    params.page,
-    params.page_size,
-    params.search ?? '',
-    params.status ?? '',
-    params.exclude_status ?? '',
-    params.sort_by ?? '',
-    params.sort_dir ?? '',
-  ],
+  listQueryKey: (siteId, params) =>
+    queryKeys.legal(
+      siteId,
+      params.page,
+      params.page_size,
+      params.search ?? '',
+      params.status ?? '',
+      params.exclude_status ?? '',
+      params.sort_by ?? '',
+      params.sort_dir ?? '',
+    ),
   getItemId: (doc) => doc.id,
   updateEntity: (id, data) => updateLegalDocument(id, data),
   deleteEntity: (id) => deleteLegalDocument(id),

@@ -5,6 +5,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
 import { banUser } from '@/services/clerkUsers';
 import FormDialog from '@/components/shared/FormDialog';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface Props {
   open: boolean;
@@ -22,7 +23,7 @@ export default function BanUserDialog({ open, onClose, userId, userName }: Props
   const mutation = useMutation({
     mutationFn: () => banUser(userId, { reason }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['clerk-users'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.clerkUsers() });
       enqueueSnackbar(t('system.users.ban.success'), { variant: 'warning' });
       setReason('');
       onClose();

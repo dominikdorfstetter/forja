@@ -27,19 +27,13 @@ import type {
   CustomEntryRequest,
   UpdateCustomTypeRequest,
 } from '@/types/customTypes';
-
-const typesKey = (siteId: string) => ['custom-types', siteId] as const;
-const typeKey = (siteId: string, key: string) => ['custom-type', siteId, key] as const;
-const entriesKey = (siteId: string, key: string, params?: EntryListParams) =>
-  ['custom-entries', siteId, key, params ?? {}] as const;
-const entryKey = (siteId: string, key: string, id: string) =>
-  ['custom-entry', siteId, key, id] as const;
+import { queryKeys } from '@/lib/queryKeys';
 
 // ── Types (schema) ───────────────────────────────────────────────────────────
 
 export function useCustomTypes(siteId: string | null | undefined) {
   return useQuery({
-    queryKey: typesKey(siteId ?? ''),
+    queryKey: queryKeys.customTypes(siteId ?? ''),
     queryFn: () => listCustomTypes(siteId as string),
     enabled: !!siteId,
   });
@@ -47,7 +41,7 @@ export function useCustomTypes(siteId: string | null | undefined) {
 
 export function useCustomType(siteId: string | null | undefined, key: string | null | undefined) {
   return useQuery({
-    queryKey: typeKey(siteId ?? '', key ?? ''),
+    queryKey: queryKeys.customType(siteId ?? '', key ?? ''),
     queryFn: () => getCustomType(siteId as string, key as string),
     enabled: !!siteId && !!key,
   });
@@ -57,7 +51,7 @@ export function useCreateCustomType(siteId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (data: CreateCustomTypeRequest) => createCustomType(siteId, data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: typesKey(siteId) }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.customTypes(siteId) }),
   });
 }
 
@@ -66,8 +60,8 @@ export function useUpdateCustomType(siteId: string, key: string) {
   return useMutation({
     mutationFn: (data: UpdateCustomTypeRequest) => updateCustomType(siteId, key, data),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: typesKey(siteId) });
-      qc.invalidateQueries({ queryKey: typeKey(siteId, key) });
+      qc.invalidateQueries({ queryKey: queryKeys.customTypes(siteId) });
+      qc.invalidateQueries({ queryKey: queryKeys.customType(siteId, key) });
     },
   });
 }
@@ -77,7 +71,7 @@ export function useDeleteCustomType(siteId: string) {
   return useMutation({
     mutationFn: ({ key, force }: { key: string; force?: boolean }) =>
       deleteCustomType(siteId, key, force),
-    onSuccess: () => qc.invalidateQueries({ queryKey: typesKey(siteId) }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.customTypes(siteId) }),
   });
 }
 
@@ -85,7 +79,7 @@ export function useDeleteCustomType(siteId: string) {
 
 export function useCustomEntries(siteId: string, key: string, params?: EntryListParams) {
   return useQuery({
-    queryKey: entriesKey(siteId, key, params),
+    queryKey: queryKeys.customEntries(siteId, key, params ?? {}),
     queryFn: () => listEntries(siteId, key, params),
     enabled: !!siteId && !!key,
   });
@@ -93,7 +87,7 @@ export function useCustomEntries(siteId: string, key: string, params?: EntryList
 
 export function useCustomEntry(siteId: string, key: string, id: string | null | undefined) {
   return useQuery({
-    queryKey: entryKey(siteId, key, id ?? ''),
+    queryKey: queryKeys.customEntry(siteId, key, id ?? ''),
     queryFn: () => getEntry(siteId, key, id as string),
     enabled: !!siteId && !!key && !!id,
   });
@@ -104,8 +98,8 @@ export function useCustomEntry(siteId: string, key: string, id: string | null | 
 export function useCustomEntryMutations(siteId: string, key: string) {
   const qc = useQueryClient();
   const invalidate = (id?: string) => {
-    qc.invalidateQueries({ queryKey: ['custom-entries', siteId, key] });
-    if (id) qc.invalidateQueries({ queryKey: entryKey(siteId, key, id) });
+    qc.invalidateQueries({ queryKey: queryKeys.customEntries(siteId, key) });
+    if (id) qc.invalidateQueries({ queryKey: queryKeys.customEntry(siteId, key, id) });
   };
   return {
     create: useMutation({
@@ -140,7 +134,7 @@ export function useCustomEntryMutations(siteId: string, key: string) {
 
 export function useRopa(siteId: string | null | undefined) {
   return useQuery({
-    queryKey: ['ropa', siteId],
+    queryKey: queryKeys.ropa(siteId),
     queryFn: () => getRopa(siteId as string),
     enabled: !!siteId,
   });

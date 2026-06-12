@@ -16,6 +16,7 @@ import { requiredString, slugField, optionalString, siteIdsField, formResolver} 
 import type { SkillResponse, CreateSkillRequest, SkillCategory } from '@/types/api';
 import { useTranslation } from 'react-i18next';
 import FormDialog from '@/components/shared/FormDialog';
+import { queryKeys } from '@/lib/queryKeys';
 
 const skillSchema = z.object({
   name: requiredString(100),
@@ -56,7 +57,7 @@ export default function SkillFormDialog({ open, skill, onSubmit, onClose, loadin
     mode: 'onChange',
   });
 
-  const { data: sites } = useQuery({ queryKey: ['sites'], queryFn: () => getSites() });
+  const { data: sites } = useQuery({ queryKey: queryKeys.sites(), queryFn: () => getSites() });
 
   const prevOpenRef = useRef(false);
   if (open && !prevOpenRef.current) {

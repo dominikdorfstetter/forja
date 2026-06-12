@@ -27,6 +27,7 @@ import { useBulkSelection } from '@/hooks/useBulkSelection';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { useSiteContextData } from '@/hooks/useSiteContextData';
 import { useLocalizedFormat } from '@/utils/dateFnsLocale';
+import { queryKeys } from '@/lib/queryKeys';
 import type {
   EntityListPageProps,
   ListQueryParams,
@@ -218,15 +219,20 @@ export default function EntityListPage<TItem, TStatusCounts = void>({
     [page, pageSize, debouncedSearch, isArchived, ui.statusFilter, ui.sortBy, ui.sortDir, extraQueryParams],
   );
 
+  const listQueryKey = useMemo(
+    () => [...adapter.listQueryKey(selectedSiteId, queryParams), ...(extraQueryDeps ?? [])],
+    [adapter, selectedSiteId, queryParams, extraQueryDeps],
+  );
+
   const { data: listData, isLoading, error } = useQuery({
-    queryKey: [...adapter.listQueryKey(selectedSiteId, queryParams), ...(extraQueryDeps ?? [])],
+    queryKey: listQueryKey,
     queryFn: () => adapter.fetchList(selectedSiteId, queryParams),
     enabled: !!selectedSiteId,
     placeholderData: keepPreviousData,
   });
 
   const { data: statusCounts } = useQuery({
-    queryKey: adapter.statusCountsQueryKey?.(selectedSiteId) ?? [`__no-counts-${adapter.entityKey}`],
+    queryKey: adapter.statusCountsQueryKey?.(selectedSiteId) ?? queryKeys.entityListNoCounts(adapter.entityKey),
     queryFn: () => adapter.fetchStatusCounts!(selectedSiteId),
     enabled: !!selectedSiteId && !!adapter.fetchStatusCounts,
     placeholderData: keepPreviousData,
@@ -281,8 +287,8 @@ export default function EntityListPage<TItem, TStatusCounts = void>({
     mutationFn: ({ id, status }: { id: string; status: ContentStatus }) =>
       adapter.updateEntity(id, { status }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKeyRoot] });
-      adapter.bulkExtraInvalidations?.forEach((key) =>
+      queryClient.invalidateQueries({ queryKey: queryKeys.entityList(queryKeyRoot, selectedSiteId) });
+      adapter.bulkExtraInvalidations?.(selectedSiteId).forEach((key) =>
         queryClient.invalidateQueries({ queryKey: key }),
       );
       if (adapter.statusCountsQueryKey) {
@@ -296,8 +302,8 @@ export default function EntityListPage<TItem, TStatusCounts = void>({
   const deleteMutation = useMutation({
     mutationFn: (id: string) => adapter.deleteEntity(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [queryKeyRoot] });
-      adapter.bulkExtraInvalidations?.forEach((key) =>
+      queryClient.invalidateQueries({ queryKey: queryKeys.entityList(queryKeyRoot, selectedSiteId) });
+      adapter.bulkExtraInvalidations?.(selectedSiteId).forEach((key) =>
         queryClient.invalidateQueries({ queryKey: key }),
       );
       if (adapter.statusCountsQueryKey) {
@@ -312,8 +318,8 @@ export default function EntityListPage<TItem, TStatusCounts = void>({
   const bulkMutation = useMutation({
     mutationFn: (request: BulkContentRequest) => adapter.bulkAction(selectedSiteId, request),
     onSuccess: (resp) => {
-      queryClient.invalidateQueries({ queryKey: [queryKeyRoot] });
-      adapter.bulkExtraInvalidations?.forEach((key) =>
+      queryClient.invalidateQueries({ queryKey: queryKeys.entityList(queryKeyRoot, selectedSiteId) });
+      adapter.bulkExtraInvalidations?.(selectedSiteId).forEach((key) =>
         queryClient.invalidateQueries({ queryKey: key }),
       );
       if (adapter.statusCountsQueryKey) {

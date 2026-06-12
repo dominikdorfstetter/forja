@@ -23,6 +23,7 @@ import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import ProjectWizardBasicsStep from './ProjectWizardBasicsStep';
 import ProjectWizardContentStep from './ProjectWizardContentStep';
 import ProjectWizardRelationsStep from './ProjectWizardRelationsStep';
+import { queryKeys } from '@/lib/queryKeys';
 
 // ── Schema ────────────────────────────────────────────────────────────
 
@@ -139,13 +140,13 @@ export default function ProjectWizard({
   const [ui, uiDispatch] = useReducer(uiReducer, initialUiState);
 
   const { data: siteLocales = [] } = useQuery({
-    queryKey: ['site-locales', selectedSiteId],
+    queryKey: queryKeys.siteLocales(selectedSiteId),
     queryFn: () => getSiteLocales(selectedSiteId),
     enabled: open && !!selectedSiteId,
   });
 
   const { data: projectDetail } = useQuery({
-    queryKey: ['project-detail', project?.id],
+    queryKey: queryKeys.projectDetail(project?.id),
     queryFn: () => getProject(project!.id),
     enabled: open && !!project,
   });

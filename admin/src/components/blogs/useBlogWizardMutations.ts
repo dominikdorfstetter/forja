@@ -7,6 +7,7 @@ import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import { slugify } from '@/utils/slugify';
 import type { MarkdownParseResult } from '@/utils/markdownImport';
 import type { ContentTemplate, SiteLocaleResponse } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface ScratchFormData {
   title: string;
@@ -38,7 +39,7 @@ export function useBlogWizardMutations({ siteLocales, onClose, onCreated, getAiS
   const { showError, showSuccess } = useErrorSnackbar();
 
   const onMutationSuccess = (blog: { id: string }) => {
-    queryClient.invalidateQueries({ queryKey: ['blogs'] });
+    queryClient.invalidateQueries({ queryKey: queryKeys.blogs(selectedSiteId) });
     showSuccess(t('blogs.messages.created'));
     onClose();
     onCreated(blog.id);

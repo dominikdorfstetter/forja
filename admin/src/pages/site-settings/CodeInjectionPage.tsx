@@ -14,6 +14,7 @@ import {
   Field,
 } from '@/components/design-system';
 import { useFormSaveBar } from '@/hooks/useFormSaveBar';
+import { queryKeys } from '@/lib/queryKeys';
 
 const MAX_CHARS = 10_000;
 
@@ -28,7 +29,7 @@ export default function CodeInjectionPage() {
   const [isDirty, setIsDirty] = useState(false);
 
   const { data: settings, isLoading } = useQuery({
-    queryKey: ['site-settings', selectedSiteId],
+    queryKey: queryKeys.siteSettings(selectedSiteId),
     queryFn: () => getSiteSettings(selectedSiteId),
     enabled: !!selectedSiteId,
   });
@@ -45,7 +46,7 @@ export default function CodeInjectionPage() {
     mutationFn: (data: { code_injection_head: string; code_injection_footer: string }) =>
       updateSiteSettings(selectedSiteId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['site-settings', selectedSiteId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.siteSettings(selectedSiteId) });
       setIsDirty(false);
       enqueueSnackbar(t('settings.codeInjection.saved'), { variant: 'success' });
     },

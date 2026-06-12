@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { getLegalDocuments } from '@/services/legal';
 import { useSiteContext } from '@/store/SiteContext';
 import type { LegalDocumentResponse } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface LegalPickerProps {
   value: string;
@@ -45,7 +46,7 @@ export default function LegalPicker({
   }, [inputValue]);
 
   const { data: legalData, isLoading } = useQuery({
-    queryKey: ['legal-picker', siteId, debouncedSearch],
+    queryKey: queryKeys.legalPicker(siteId, debouncedSearch),
     queryFn: () => getLegalDocuments(siteId, {
       search: debouncedSearch || undefined,
       page_size: 50,

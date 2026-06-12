@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { startSiteExport, getSiteExportJob } from '@/services/sites';
 import type { SiteExportJob, SiteExportStatus } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 /** Poll cadence while a job is still queued/running. */
 const POLL_INTERVAL_MS = 2500;
@@ -39,7 +40,7 @@ export function useSiteExport(siteId: string): UseSiteExportResult {
   });
 
   const poll = useQuery({
-    queryKey: ['site-export', siteId, jobId],
+    queryKey: queryKeys.siteExport(siteId, jobId),
     queryFn: () => getSiteExportJob(siteId, jobId as string),
     enabled: jobId != null,
     refetchInterval: (query) =>

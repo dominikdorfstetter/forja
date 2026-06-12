@@ -10,6 +10,17 @@ vi.mock('@/store/AuthContext', () => ({
   })),
 }));
 
+vi.mock('@/store/SiteContext', () => ({
+  useSiteContext: () => ({
+    selectedSiteId: 'site-1',
+    setSelectedSiteId: vi.fn(),
+    selectedSite: null,
+    sites: [],
+    isLoading: false,
+  }),
+  SiteProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+
 describe('HistoryDrawer', () => {
   beforeEach(() => {
     vi.mocked(getEntityAuditLogs).mockResolvedValue([]);

@@ -21,6 +21,7 @@ import { useSiteContext } from '@/store/SiteContext';
 import { useAuth } from '@/store/AuthContext';
 import type { Category, CreateCategoryRequest } from '@/types/api';
 import { useTranslation } from 'react-i18next';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface BlogCategoryCardProps {
   contentId: string;
@@ -40,7 +41,7 @@ export default function BlogCategoryCard({ contentId, categories }: BlogCategory
 
   // All categories for the site (for autocomplete)
   const { data: siteCategoriesData } = useQuery({
-    queryKey: ['categories', selectedSiteId],
+    queryKey: queryKeys.categories(selectedSiteId),
     queryFn: () => getCategories(selectedSiteId),
     enabled: !!selectedSiteId,
   });
@@ -51,8 +52,8 @@ export default function BlogCategoryCard({ contentId, categories }: BlogCategory
   const availableCategories = siteCategories.filter((c) => !assignedIds.has(c.id));
 
   const invalidate = () => {
-    queryClient.invalidateQueries({ queryKey: ['blog-detail'] });
-    queryClient.invalidateQueries({ queryKey: ['categories'] });
+    queryClient.invalidateQueries({ queryKey: queryKeys.blogDetail(contentId) });
+    queryClient.invalidateQueries({ queryKey: queryKeys.categories(selectedSiteId) });
   };
 
   const assignMutation = useMutation({
@@ -81,7 +82,7 @@ export default function BlogCategoryCard({ contentId, categories }: BlogCategory
       // The category now exists at the site level even before assignment,
       // so invalidate the categories query directly instead of relying on
       // the downstream assignMutation (which may be delayed or fail).
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.categories(selectedSiteId) });
       assignMutation.mutate(created.id);
       setCreateOpen(false);
       setNewSlug('');

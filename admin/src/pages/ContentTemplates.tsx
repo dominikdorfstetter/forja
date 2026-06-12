@@ -30,6 +30,7 @@ import {
 import { Icon, M3Button } from '@/components/design-system';
 import ContentTemplateFormDialog from '@/components/content-templates/ContentTemplateFormDialog';
 import CreateTemplateWizard from '@/components/content-templates/CreateTemplateWizard';
+import { queryKeys } from '@/lib/queryKeys';
 
 /**
  * Template `icon` values were written before the admin adopted Material
@@ -116,15 +117,7 @@ export default function ContentTemplatesPage() {
   }, [openCreate]);
 
   const { data, isLoading } = useQuery({
-    queryKey: [
-      'content-templates',
-      selectedSiteId,
-      page,
-      pageSize,
-      debouncedSearch,
-      sortBy,
-      sortDir,
-    ],
+    queryKey: queryKeys.contentTemplates(selectedSiteId, page, pageSize, debouncedSearch, sortBy, sortDir),
     queryFn: () =>
       getContentTemplates(selectedSiteId, {
         page,

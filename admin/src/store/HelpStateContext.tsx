@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/store/AuthContext';
 import { getHelpState, resetHelpState, updateHelpState } from '@/services/auth';
 import type { HelpStateResponse, UpdateHelpStateRequest } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 function getDefaultHelpState(): HelpStateResponse {
   return {
@@ -33,7 +34,7 @@ export function HelpStateProvider({ children }: { children: ReactNode }) {
   const [tourActive, setTourActive] = useState(false);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['helpState'],
+    queryKey: queryKeys.helpState(),
     queryFn: () => getHelpState(),
     enabled: !!clerkUserId,
     staleTime: 1000 * 60 * 10,
@@ -42,14 +43,14 @@ export function HelpStateProvider({ children }: { children: ReactNode }) {
   const mutation = useMutation({
     mutationFn: (req: UpdateHelpStateRequest) => updateHelpState(req),
     onSuccess: (updated) => {
-      queryClient.setQueryData(['helpState'], updated);
+      queryClient.setQueryData(queryKeys.helpState(), updated);
     },
   });
 
   const resetMutation = useMutation({
     mutationFn: () => resetHelpState(),
     onSuccess: (updated) => {
-      queryClient.setQueryData(['helpState'], updated);
+      queryClient.setQueryData(queryKeys.helpState(), updated);
     },
   });
 
@@ -63,13 +64,13 @@ export function HelpStateProvider({ children }: { children: ReactNode }) {
     setTourActive(false);
     const previous = queryClient.getQueryData<HelpStateResponse>(['helpState']);
     if (previous) {
-      queryClient.setQueryData(['helpState'], { ...previous, tour_completed: true });
+      queryClient.setQueryData(queryKeys.helpState(), { ...previous, tour_completed: true });
     }
     try {
       await mutation.mutateAsync({ tour_completed: true });
     } catch {
       if (previous) {
-        queryClient.setQueryData(['helpState'], previous);
+        queryClient.setQueryData(queryKeys.helpState(), previous);
       }
     }
   }, [mutation, queryClient]);
@@ -86,7 +87,7 @@ export function HelpStateProvider({ children }: { children: ReactNode }) {
   const dismissHotspot = useCallback(async (id: string) => {
     const previous = queryClient.getQueryData<HelpStateResponse>(['helpState']);
     if (previous && !previous.hotspots_seen.includes(id)) {
-      queryClient.setQueryData(['helpState'], {
+      queryClient.setQueryData(queryKeys.helpState(), {
         ...previous,
         hotspots_seen: [...previous.hotspots_seen, id],
       });
@@ -95,7 +96,7 @@ export function HelpStateProvider({ children }: { children: ReactNode }) {
       await mutation.mutateAsync({ dismiss_hotspot: id });
     } catch {
       if (previous) {
-        queryClient.setQueryData(['helpState'], previous);
+        queryClient.setQueryData(queryKeys.helpState(), previous);
       }
     }
   }, [mutation, queryClient]);
@@ -103,7 +104,7 @@ export function HelpStateProvider({ children }: { children: ReactNode }) {
   const dismissFieldHelp = useCallback(async (id: string) => {
     const previous = queryClient.getQueryData<HelpStateResponse>(['helpState']);
     if (previous && !previous.field_help_seen.includes(id)) {
-      queryClient.setQueryData(['helpState'], {
+      queryClient.setQueryData(queryKeys.helpState(), {
         ...previous,
         field_help_seen: [...previous.field_help_seen, id],
       });
@@ -112,7 +113,7 @@ export function HelpStateProvider({ children }: { children: ReactNode }) {
       await mutation.mutateAsync({ dismiss_field_help: id });
     } catch {
       if (previous) {
-        queryClient.setQueryData(['helpState'], previous);
+        queryClient.setQueryData(queryKeys.helpState(), previous);
       }
     }
   }, [mutation, queryClient]);

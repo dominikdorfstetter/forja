@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { getClerkUser, getUserAuditLogs } from '@/services/clerkUsers';
 import LoadingState from '@/components/shared/LoadingState';
 import PageHeader from '@/components/shared/PageHeader';
+import { queryKeys } from '@/lib/queryKeys';
 
 export default function UserDetailPage() {
   const { t } = useTranslation();
@@ -20,13 +21,13 @@ export default function UserDetailPage() {
   const [auditPageSize, setAuditPageSize] = useState(20);
 
   const { data: user, isLoading: isUserLoading } = useQuery({
-    queryKey: ['clerk-user', id],
+    queryKey: queryKeys.clerkUser(id),
     queryFn: () => getClerkUser(id!),
     enabled: !!id,
   });
 
   const { data: auditData, isLoading: isAuditLoading } = useQuery({
-    queryKey: ['user-audit', id, auditPage, auditPageSize],
+    queryKey: queryKeys.userAudit(id, auditPage, auditPageSize),
     queryFn: () =>
       getUserAuditLogs(id!, {
         page: auditPage + 1,

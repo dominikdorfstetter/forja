@@ -12,6 +12,7 @@ import SocialPreview from '@/pages/blog-detail/SocialPreview';
 import SeoFieldsEditor from '@/components/locale-aware/SeoFieldsEditor';
 import { useAiAssist } from '@/hooks/useAiAssist';
 import { useSiteContext } from '@/store/SiteContext';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface ActiveLocale {
   id: string;
@@ -77,7 +78,7 @@ export default function PageSeoTab({ control, watch, setValue, onSnapshot, route
 
   // Fetch all page localizations
   const { data: localizations } = useQuery({
-    queryKey: ['page-localizations', pageId],
+    queryKey: queryKeys.pageLocalizations(pageId),
     queryFn: () => getPageLocalizations(pageId),
     enabled: !!pageId,
   });
@@ -148,7 +149,7 @@ export default function PageSeoTab({ control, watch, setValue, onSnapshot, route
             createPageLocalization(pageId, { locale_id: localeId, title: '-', ...values })
           }
           updateLocalization={(locId, values) => updatePageLocalization(locId, values)}
-          invalidateKey={['page-localizations', pageId]}
+          invalidateKey={queryKeys.pageLocalizations(pageId)}
           placeholders={{
             meta_title: watch('meta_title') || '',
             meta_description: watch('meta_description') || '',

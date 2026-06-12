@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { updateSiteSettings } from '@/services/sites';
 import { useSiteContext } from '@/store/SiteContext';
 import { useSiteContextData } from '@/hooks/useSiteContextData';
+import { queryKeys } from '@/lib/queryKeys';
 
 export default function TeamWorkflowPrompt() {
   const { t } = useTranslation();
@@ -20,7 +21,7 @@ export default function TeamWorkflowPrompt() {
         team_features_prompt_dismissed: true,
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['siteContext', selectedSiteId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.siteContext(selectedSiteId) });
     },
   });
 

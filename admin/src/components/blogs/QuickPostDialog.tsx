@@ -38,6 +38,7 @@ import { useSiteContext } from '@/store/SiteContext';
 import { useAiAssist } from '@/hooks/useAiAssist';
 import { useQuickPostPublish } from './useQuickPostPublish';
 import type { RegenerateField } from './BlogWizardAiStep';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface QuickPostDialogProps {
   open: boolean;
@@ -130,7 +131,7 @@ export default function QuickPostDialog({ open, onClose }: QuickPostDialogProps)
   const { selectedSiteId } = useSiteContext();
   const { isConfigured: aiAvailable, generate: aiGenerate, isGenerating } = useAiAssist();
   const { data: siteLocales } = useQuery({
-    queryKey: ['site-locales', selectedSiteId],
+    queryKey: queryKeys.siteLocales(selectedSiteId),
     queryFn: () => getSiteLocales(selectedSiteId),
     enabled: !!selectedSiteId,
   });

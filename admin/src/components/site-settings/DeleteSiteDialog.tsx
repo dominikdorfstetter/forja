@@ -5,6 +5,7 @@ import { deleteSite } from '@/services/sites';
 import { useSiteContext } from '@/store/SiteContext';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import { DangerConfirmDialog } from '@/components/design-system';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface DeleteSiteDialogProps {
   open: boolean;
@@ -35,7 +36,7 @@ export default function DeleteSiteDialog({
     mutationFn: () => deleteSite(selectedSiteId),
     onSuccess: () => {
       showSuccess(t('siteSettings.danger.delete.gracePeriodNote'));
-      queryClient.invalidateQueries({ queryKey: ['sites'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.sites() });
       navigate('/sites');
       onClose();
     },

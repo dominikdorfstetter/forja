@@ -24,6 +24,7 @@ import type {
   WorkflowFlags,
   WorkflowHandlers,
 } from './types';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface UIState {
   activeLocaleTab: number;
@@ -112,7 +113,7 @@ export default function ContentDetailPage<TDetail, TFormData extends FieldValues
   });
 
   const { data: siteLocales } = useQuery({
-    queryKey: ['site-locales', selectedSiteId],
+    queryKey: queryKeys.siteLocales(selectedSiteId),
     queryFn: () => getSiteLocales(selectedSiteId),
     enabled: !!selectedSiteId,
   });

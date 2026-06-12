@@ -19,6 +19,7 @@ import { useSiteContext } from '@/store/SiteContext';
 import { M3Button, M3IconButton } from '@/components/design-system';
 import { m3MenuPaperSx } from '@/components/layout/m3MenuSx';
 import type { NotificationResponse, NotificationType } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 const POLL_INTERVAL = 30_000;
 
@@ -47,14 +48,14 @@ export default function NotificationBell() {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
   const { data: unreadData } = useQuery({
-    queryKey: ['notifications-unread', selectedSiteId],
+    queryKey: queryKeys.notificationsUnread(selectedSiteId),
     queryFn: () => getUnreadCount(selectedSiteId!),
     enabled: !!selectedSiteId,
     refetchInterval: POLL_INTERVAL,
   });
 
   const { data: notificationsData } = useQuery({
-    queryKey: ['notifications', selectedSiteId],
+    queryKey: queryKeys.notifications(selectedSiteId),
     queryFn: () => getNotifications(selectedSiteId!, { page_size: 20 }),
     enabled: !!selectedSiteId && !!anchorEl,
   });
@@ -62,16 +63,16 @@ export default function NotificationBell() {
   const markReadMutation = useMutation({
     mutationFn: (id: string) => markNotificationRead(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications-unread', selectedSiteId] });
-      queryClient.invalidateQueries({ queryKey: ['notifications', selectedSiteId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.notificationsUnread(selectedSiteId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.notifications(selectedSiteId) });
     },
   });
 
   const markAllReadMutation = useMutation({
     mutationFn: () => markAllNotificationsRead(selectedSiteId!),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications-unread', selectedSiteId] });
-      queryClient.invalidateQueries({ queryKey: ['notifications', selectedSiteId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.notificationsUnread(selectedSiteId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.notifications(selectedSiteId) });
     },
   });
 

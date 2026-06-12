@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getSiteContext } from '@/services/sites';
 import { useSiteContext } from '@/store/SiteContext';
 import type { SiteContextResponse } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 const DEFAULT_MODULES = {
   blog: true,
@@ -39,7 +40,7 @@ export function useSiteContextData() {
   const { selectedSiteId } = useSiteContext();
 
   const query = useQuery({
-    queryKey: ['siteContext', selectedSiteId],
+    queryKey: queryKeys.siteContext(selectedSiteId),
     queryFn: () => getSiteContext(selectedSiteId),
     enabled: !!selectedSiteId,
     staleTime: 30_000,

@@ -18,6 +18,7 @@ import type {
   SubmissionListItem,
   SubmissionStatusCounts,
 } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 type Filter = FormSubmissionStatus | 'all';
 const FILTERS: Filter[] = ['all', 'new', 'in_review', 'resolved', 'rejected', 'archived'];
@@ -59,19 +60,19 @@ export default function FormSubmissionsPage() {
   const pageSize = 20;
 
   const { data: form } = useQuery({
-    queryKey: ['form', formId],
+    queryKey: queryKeys.form(formId),
     queryFn: () => getForm(formId),
     enabled: !!formId,
   });
 
   const { data: counts } = useQuery({
-    queryKey: ['submission-status-counts', formId],
+    queryKey: queryKeys.submissionStatusCounts(formId),
     queryFn: () => getSubmissionStatusCounts(formId),
     enabled: !!formId,
   });
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['submissions', formId, filter, page, pageSize],
+    queryKey: queryKeys.submissions(formId, filter, page, pageSize),
     queryFn: () =>
       getSubmissions(formId, {
         page,

@@ -5,6 +5,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
 import { suspendUser } from '@/services/clerkUsers';
 import FormDialog from '@/components/shared/FormDialog';
+import { queryKeys } from '@/lib/queryKeys';
 
 const DURATION_PRESETS = [
   { label: '24h', hours: 24 },
@@ -30,7 +31,7 @@ export default function SuspendUserDialog({ open, onClose, userId, userName }: P
   const mutation = useMutation({
     mutationFn: () => suspendUser(userId, { reason, duration_hours: durationHours }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['clerk-users'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.clerkUsers() });
       enqueueSnackbar(t('system.users.suspend.success'), { variant: 'success' });
       setReason('');
       onClose();
