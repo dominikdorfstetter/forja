@@ -3,6 +3,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 // The global test setup (src/test/setup.ts) auto-mocks the whole service
 // modules. Un-mock them here so the REAL factory-backed implementations
 // load, and mock only the http layer the factory calls through.
+vi.unmock('@/services/contentService');
 vi.unmock('@/services/blogs');
 vi.unmock('@/services/cv');
 vi.unmock('@/services/projects');
