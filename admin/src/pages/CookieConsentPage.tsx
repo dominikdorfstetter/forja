@@ -1,4 +1,4 @@
-import { useCallback, useReducer, useRef, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useReducer, useState, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router';
 import {
   Box,
@@ -37,7 +37,6 @@ import {
 import {
   SortableContext,
   verticalListSortingStrategy,
-  arrayMove,
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -46,6 +45,7 @@ import { useTranslation } from 'react-i18next';
 import { useForm, Controller } from 'react-hook-form';
 import { createLegalDocument, createLegalGroup, createLegalItem, deleteLegalGroup, deleteLegalItem, getLegalDocuments, getLegalGroups, getLegalItems, updateLegalDocument, updateLegalGroup, updateLegalItem } from '@/services/legal';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
+import { useReorderableList } from '@/hooks/useReorderableList';
 import type {
   LegalGroupResponse,
   CreateLegalGroupRequest,
@@ -86,15 +86,14 @@ function GroupFormDialog({ open, group, nextOrder, onSubmit, onClose, loading }:
     defaultValues: { cookie_name: '', is_required: false, default_enabled: false },
   });
 
-  const prevOpenRef = useRef(false);
-  if (open && !prevOpenRef.current) {
+  useEffect(() => {
+    if (!open) return;
     reset(group ? {
       cookie_name: group.cookie_name,
       is_required: group.is_required,
       default_enabled: group.default_enabled,
     } : { cookie_name: '', is_required: false, default_enabled: false });
-  }
-  prevOpenRef.current = open;
+  }, [open, group, reset]);
 
   const onFormSubmit = (data: GroupFormData) => {
     onSubmit({
@@ -170,14 +169,13 @@ function ItemFormDialog({ open, item, itemCount, onSubmit, onClose, loading }: I
     defaultValues: { cookie_name: '', is_required: false },
   });
 
-  const prevOpenRef = useRef(false);
-  if (open && !prevOpenRef.current) {
+  useEffect(() => {
+    if (!open) return;
     reset(item ? {
       cookie_name: item.cookie_name,
       is_required: item.is_required,
     } : { cookie_name: '', is_required: false });
-  }
-  prevOpenRef.current = open;
+  }, [open, item, reset]);
 
   const onFormSubmit = (data: ItemFormData) => {
     onSubmit({
@@ -299,7 +297,6 @@ function GroupItemsSection({ groupId }: GroupItemsSectionProps) {
   const [itemFormOpen, setItemFormOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<LegalItemResponse | null>(null);
   const [deletingItem, setDeletingItem] = useState<LegalItemResponse | null>(null);
-  const [orderedItems, setOrderedItems] = useState<LegalItemResponse[]>([]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -311,11 +308,7 @@ function GroupItemsSection({ groupId }: GroupItemsSectionProps) {
     enabled: !!groupId,
   });
 
-  const prevItemsRef = useRef<LegalItemResponse[] | undefined>(undefined);
-  if (items && items !== prevItemsRef.current) {
-    setOrderedItems(items);
-  }
-  prevItemsRef.current = items;
+  const { orderedItems, reorder, resetOrder } = useReorderableList(items);
 
   const createItemMutation = useMutation({
     mutationFn: (data: CreateLegalItemRequest) => createLegalItem(groupId, data),
@@ -359,6 +352,7 @@ function GroupItemsSection({ groupId }: GroupItemsSectionProps) {
     },
     onError: (error) => {
       showError(error);
+      resetOrder();
       queryClient.invalidateQueries({ queryKey: ['legalItems', groupId] });
     },
   });
@@ -367,14 +361,9 @@ function GroupItemsSection({ groupId }: GroupItemsSectionProps) {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
 
-    setOrderedItems((prev) => {
-      const oldIndex = prev.findIndex((i) => i.id === active.id);
-      const newIndex = prev.findIndex((i) => i.id === over.id);
-      const reordered = arrayMove(prev, oldIndex, newIndex);
-      reorderMutation.mutate(reordered);
-      return reordered;
-    });
-  }, [reorderMutation]);
+    const reordered = reorder(active.id as string, over.id as string);
+    if (reordered) reorderMutation.mutate(reordered);
+  }, [reorder, reorderMutation]);
 
   return (
     <Box data-testid={`cookie-group-items.${groupId}`}>
