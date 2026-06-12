@@ -10,12 +10,12 @@ use crate::dto::auth::{
 use crate::dto::help_state::{HelpStateResponse, UpdateHelpStateRequest};
 use crate::dto::notification::NotificationResponse;
 use crate::dto::onboarding::{CompleteOnboardingRequest, OnboardingResponse};
-use crate::dto::site_membership::{MembershipSummary, MembershipWithSite};
+use crate::dto::site_membership::MembershipSummary;
 use crate::dto::user_preferences::{UpdateUserPreferencesRequest, UserPreferencesResponse};
 use crate::errors::codes;
 use crate::guards::actor::{Actor, ActorKind};
 use crate::models::api_key::ApiKeyPermission;
-use crate::models::audit::{AuditLog, ChangeHistory};
+use crate::models::audit::AuditLog;
 use crate::models::notification::Notification;
 use crate::models::site_membership::SiteMembership;
 use crate::models::user_preferences::UserPreferences;
@@ -27,22 +27,11 @@ use chrono::{DateTime, Utc};
 use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 
-const MEMBERSHIP_QUERY: &str = r#"
-    SELECT sm.site_id, s.name AS site_name, s.slug AS site_slug, sm.role
-    FROM site_memberships sm
-    JOIN sites s ON s.id = sm.site_id AND s.is_deleted = FALSE
-    WHERE sm.clerk_user_id = $1
-    ORDER BY s.name ASC
-"#;
-
 async fn fetch_memberships(
     state: &AppState,
     clerk_user_id: &str,
 ) -> Result<Vec<MembershipSummary>, crate::errors::ApiError> {
-    let rows: Vec<MembershipWithSite> = sqlx::query_as(MEMBERSHIP_QUERY)
-        .bind(clerk_user_id)
-        .fetch_all(&state.db)
-        .await?;
+    let rows = SiteMembership::find_summaries_for_user(&state.db, clerk_user_id).await?;
 
     if rows.is_empty() && state.settings.demo_mode {
         // Only auto-join if the user explicitly opted in via preferences.
@@ -56,16 +45,15 @@ async fn fetch_memberships(
             if let Ok(demo_site) =
                 crate::models::site::Site::find_by_slug(&state.db, "john-forja").await
             {
-                let existing = sqlx::query_scalar::<_, i64>(
-                    "SELECT COUNT(*) FROM site_memberships WHERE clerk_user_id = $1 AND site_id = $2",
+                let existing = SiteMembership::find_by_clerk_user_and_site(
+                    &state.db,
+                    clerk_user_id,
+                    demo_site.id,
                 )
-                .bind(clerk_user_id)
-                .bind(demo_site.id)
-                .fetch_one(&state.db)
                 .await
-                .unwrap_or(0);
+                .unwrap_or(None);
 
-                if existing == 0 {
+                if existing.is_none() {
                     match SiteMembership::create(
                         &state.db,
                         clerk_user_id,
@@ -80,10 +68,8 @@ async fn fetch_memberships(
                                 "Demo mode: auto-joined user {} to demo site",
                                 clerk_user_id
                             );
-                            let new_rows: Vec<MembershipWithSite> =
-                                sqlx::query_as(MEMBERSHIP_QUERY)
-                                    .bind(clerk_user_id)
-                                    .fetch_all(&state.db)
+                            let new_rows =
+                                SiteMembership::find_summaries_for_user(&state.db, clerk_user_id)
                                     .await?;
                             return Ok(new_rows.into_iter().map(MembershipSummary::from).collect());
                         }
@@ -294,56 +280,26 @@ async fn export_user_data(
         .map(AuditLogResponse::from)
         .collect();
 
-    let api_keys: Vec<ExportApiKeyRecord> = sqlx::query_as::<
-        _,
-        (
-            uuid::Uuid,
-            String,
-            crate::models::api_key::ApiKeyPermission,
-            Option<uuid::Uuid>,
-            crate::models::api_key::ApiKeyStatus,
-            DateTime<Utc>,
-        ),
-    >(
-        r#"
-        SELECT id, name, permission, site_id, status, created_at
-        FROM api_keys
-        WHERE user_id = $1 OR created_by = $1
-        ORDER BY created_at DESC
-        "#,
-    )
-    .bind(auth.id)
-    .fetch_all(&state.db)
-    .await?
-    .into_iter()
-    .map(
-        |(id, name, permission, site_id, status, created_at)| ExportApiKeyRecord {
-            id,
-            name,
-            permission,
-            site_id,
-            status: format!("{:?}", status),
-            created_at,
-        },
-    )
-    .collect();
+    let api_keys: Vec<ExportApiKeyRecord> =
+        crate::repos::user_data_repo::api_keys_for_user(&state.db, auth.id)
+            .await?
+            .into_iter()
+            .map(|row| ExportApiKeyRecord {
+                id: row.id,
+                name: row.name,
+                permission: row.permission,
+                site_id: row.site_id,
+                status: format!("{:?}", row.status),
+                created_at: row.created_at,
+            })
+            .collect();
 
-    let change_history: Vec<ChangeHistoryResponse> = sqlx::query_as::<_, ChangeHistory>(
-        r#"
-        SELECT id, site_id, entity_type, entity_id, field_name,
-               old_value, new_value, changed_by, changed_at
-        FROM change_history
-        WHERE changed_by = $1
-        ORDER BY changed_at DESC
-        LIMIT 1000
-        "#,
-    )
-    .bind(auth.id)
-    .fetch_all(&state.db)
-    .await?
-    .into_iter()
-    .map(ChangeHistoryResponse::from)
-    .collect();
+    let change_history: Vec<ChangeHistoryResponse> =
+        crate::repos::user_data_repo::change_history_for_user(&state.db, auth.id, 1000)
+            .await?
+            .into_iter()
+            .map(ChangeHistoryResponse::from)
+            .collect();
 
     let (preferences, notifications, onboarding, help_state, authored_content) = match &auth.kind {
         ActorKind::Clerk { clerk_user_id } => {
@@ -352,42 +308,24 @@ async fn export_user_data(
             let onb = Some(OnboardingResponse::from_json(&effective));
             let help = Some(HelpStateResponse::from_json(&effective));
 
-            let notifs: Vec<NotificationResponse> = sqlx::query_as::<_, Notification>(
-                r#"SELECT * FROM notifications
-                       WHERE recipient_clerk_id = $1
-                       ORDER BY created_at DESC LIMIT 1000"#,
-            )
-            .bind(clerk_user_id)
-            .fetch_all(&state.db)
-            .await
-            .unwrap_or_default()
-            .into_iter()
-            .map(NotificationResponse::from)
-            .collect();
+            let notifs: Vec<NotificationResponse> =
+                Notification::find_recent_for_recipient(&state.db, clerk_user_id, 1000)
+                    .await
+                    .unwrap_or_default()
+                    .into_iter()
+                    .map(NotificationResponse::from)
+                    .collect();
 
-            let authored = sqlx::query_as::<_, (i64, i64, i64, i64)>(
-                    r#"
-                    SELECT
-                        COALESCE((SELECT COUNT(*) FROM contents WHERE created_by = $1 AND is_deleted = FALSE
-                            AND entity_type_id = (SELECT id FROM entity_types WHERE name = 'blog')), 0),
-                        COALESCE((SELECT COUNT(*) FROM contents WHERE created_by = $1 AND is_deleted = FALSE
-                            AND entity_type_id = (SELECT id FROM entity_types WHERE name = 'page')), 0),
-                        COALESCE((SELECT COUNT(*) FROM contents WHERE created_by = $1 AND is_deleted = FALSE
-                            AND entity_type_id = (SELECT id FROM entity_types WHERE name = 'document')), 0),
-                        COALESCE((SELECT COUNT(*) FROM contents WHERE created_by = $1 AND is_deleted = FALSE
-                            AND entity_type_id = (SELECT id FROM entity_types WHERE name = 'legal')), 0)
-                    "#,
-                )
-                .bind(clerk_user_id)
-                .fetch_one(&state.db)
-                .await
-                .ok()
-                .map(|(blogs, pages, documents, legal_docs)| AuthoredContentSummary {
-                    blogs,
-                    pages,
-                    documents,
-                    legal_docs,
-                });
+            let authored =
+                crate::repos::user_data_repo::authored_content_counts(&state.db, clerk_user_id)
+                    .await
+                    .ok()
+                    .map(|counts| AuthoredContentSummary {
+                        blogs: counts.blogs,
+                        pages: counts.pages,
+                        documents: counts.documents,
+                        legal_docs: counts.legal_docs,
+                    });
 
             (prefs, Some(notifs), onb, help, authored)
         }
@@ -641,19 +579,12 @@ async fn get_guest_token(
     // Hash with Argon2id (the current algorithm), not SHA-256
     let key_hash = crate::models::api_key::ApiKey::hash_key(demo_key);
 
-    sqlx::query(
-        r#"INSERT INTO api_keys (key_hash, key_prefix, name, description, permission, site_id, status,
-            rate_limit_per_second, rate_limit_per_minute, rate_limit_per_hour, rate_limit_per_day, hash_version)
-        VALUES ($1, $2, $3, $4, 'read', $5, 'active', 10, 100, 1000, 10000, $6)
-        ON CONFLICT (key_hash) DO NOTHING"#,
+    crate::models::api_key::ApiKey::upsert_demo_guest_key(
+        &state.db,
+        &key_hash,
+        key_prefix,
+        demo_site.id,
     )
-    .bind(&key_hash)
-    .bind(key_prefix)
-    .bind("Demo Guest Key")
-    .bind("Read-only guest access for demo site — auto-created by demo mode")
-    .bind(demo_site.id)
-    .bind(2i16) // HASH_VERSION_ARGON2
-    .execute(&state.db)
     .await?;
 
     Ok(Json(GuestTokenResponse {
@@ -715,33 +646,9 @@ async fn delete_account(
 
     SiteMembership::delete_all_for_clerk_user(&state.db, &clerk_user_id).await?;
 
-    sqlx::query("DELETE FROM system_admins WHERE clerk_user_id = $1")
-        .bind(&clerk_user_id)
-        .execute(&state.db)
-        .await?;
-
     UserPreferences::delete(&state.db, &clerk_user_id).await?;
 
-    let user_uuid = auth.id;
-
-    sqlx::query("UPDATE api_keys SET user_id = NULL WHERE user_id = $1")
-        .bind(user_uuid)
-        .execute(&state.db)
-        .await?;
-
-    sqlx::query("UPDATE api_keys SET created_by = NULL WHERE created_by = $1")
-        .bind(user_uuid)
-        .execute(&state.db)
-        .await?;
-
-    sqlx::query("UPDATE audit_logs SET user_id = NULL WHERE user_id = $1")
-        .bind(user_uuid)
-        .execute(&state.db)
-        .await?;
-
-    sqlx::query("UPDATE change_history SET changed_by = NULL WHERE changed_by = $1")
-        .bind(user_uuid)
-        .execute(&state.db)
+    crate::repos::user_data_repo::anonymize_user_records(&state.db, &clerk_user_id, auth.id)
         .await?;
 
     Ok(StatusCode::NO_CONTENT)

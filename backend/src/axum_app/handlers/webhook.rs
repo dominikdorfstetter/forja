@@ -480,13 +480,9 @@ async fn get_webhook_stats(
         )
         .collect();
 
-    let pending_retry: (i64,) = sqlx::query_as(
-        "SELECT COUNT(*) FROM webhook_retry_queue WHERE webhook_id = $1 AND status IN ('pending', 'retrying')",
-    )
-    .bind(id)
-    .fetch_one(&state.db)
-    .await
-    .unwrap_or((0,));
+    let pending_retry = WebhookDelivery::pending_retry_count(&state.db, id)
+        .await
+        .unwrap_or(0);
 
     let success_rate = if total > 0 {
         (successful as f64 / total as f64) * 100.0
@@ -500,7 +496,7 @@ async fn get_webhook_stats(
         total_deliveries: total,
         successful,
         failed,
-        pending_retry: pending_retry.0,
+        pending_retry,
         success_rate,
         last_delivery_at,
         by_event,

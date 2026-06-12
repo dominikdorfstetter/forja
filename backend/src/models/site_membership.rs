@@ -125,6 +125,49 @@ impl SiteMembership {
         Ok(membership)
     }
 
+    /// Find a membership by its ID, scoped to a site (cross-site ids miss)
+    pub async fn find_by_id_and_site(
+        pool: &PgPool,
+        membership_id: Uuid,
+        site_id: Uuid,
+    ) -> Result<Option<Self>, ApiError> {
+        let membership = sqlx::query_as::<_, Self>(
+            r#"
+            SELECT id, clerk_user_id, site_id, role, invited_by, created_at, updated_at
+            FROM site_memberships
+            WHERE id = $1 AND site_id = $2
+            "#,
+        )
+        .bind(membership_id)
+        .bind(site_id)
+        .fetch_optional(pool)
+        .await?;
+
+        Ok(membership)
+    }
+
+    /// Memberships for a Clerk user joined with site name/slug, for the
+    /// auth profile and "my memberships" endpoints. Excludes deleted sites.
+    pub async fn find_summaries_for_user(
+        pool: &PgPool,
+        clerk_user_id: &str,
+    ) -> Result<Vec<crate::dto::site_membership::MembershipWithSite>, ApiError> {
+        let rows = sqlx::query_as(
+            r#"
+            SELECT sm.site_id, s.name AS site_name, s.slug AS site_slug, sm.role
+            FROM site_memberships sm
+            JOIN sites s ON s.id = sm.site_id AND s.is_deleted = FALSE
+            WHERE sm.clerk_user_id = $1
+            ORDER BY s.name ASC
+            "#,
+        )
+        .bind(clerk_user_id)
+        .fetch_all(pool)
+        .await?;
+
+        Ok(rows)
+    }
+
     /// Find all memberships for a Clerk user
     pub async fn find_all_for_clerk_user(
         pool: &PgPool,
