@@ -3,6 +3,8 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import * as http from '../http';
 import { createContentService } from '../contentService';
 
+// The global setup mocks the factory module; this file tests the REAL one.
+vi.unmock('../contentService');
 vi.mock('../http', () => ({ apiRequest: vi.fn() }));
 
 const apiRequest = vi.mocked(http.apiRequest);
