@@ -108,10 +108,11 @@ async fn get_site_settings(
     request_body(content = UpdateSiteSettingsRequest, description = "Settings to update"),
     responses(
         (status = 200, description = "Updated site settings", body = SiteSettingsResponse),
-        (status = 400, description = "Validation error", body = ProblemDetails),
+        (status = 400, description = "Malformed request body", body = ProblemDetails),
         (status = 401, description = "Unauthorized", body = ProblemDetails),
         (status = 403, description = "Forbidden", body = ProblemDetails),
-        (status = 404, description = "Site not found", body = ProblemDetails)
+        (status = 404, description = "Site not found", body = ProblemDetails),
+        (status = 422, description = "Validation failed (e.g. data_retention_days outside 30–3650)", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]

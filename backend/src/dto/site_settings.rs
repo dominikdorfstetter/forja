@@ -8,17 +8,19 @@ use crate::dto::validated::ValidatedDto;
 
 use crate::models::site_settings::{
     KEY_ALLOWED_ORIGINS, KEY_ANALYTICS_ENABLED, KEY_BACKGROUND_COLOR, KEY_CODE_INJECTION_FOOTER,
-    KEY_CODE_INJECTION_HEAD, KEY_CONTACT_EMAIL, KEY_DOCUMENT_PASSWORD_MIN_LENGTH,
-    KEY_DOCUMENT_PASSWORD_REGEX, KEY_EDITORIAL_WORKFLOW_ENABLED, KEY_MAINTENANCE_MODE,
-    KEY_MAX_DOCUMENT_FILE_SIZE, KEY_MAX_MEDIA_FILE_SIZE, KEY_MODULE_AI_ENABLED,
-    KEY_MODULE_BLOG_ENABLED, KEY_MODULE_COLLECTIONS_ENABLED, KEY_MODULE_DOCUMENTS_ENABLED,
-    KEY_MODULE_FORMS_ENABLED, KEY_MODULE_LEGAL_ENABLED, KEY_MODULE_PAGES_ENABLED,
-    KEY_MODULE_PORTFOLIO_ENABLED, KEY_PREVIEW_TEMPLATES, KEY_ROBOTS_TXT_RULES,
-    KEY_SEO_DEFAULT_DESCRIPTION, KEY_SEO_DEFAULT_OG_IMAGE_ID, KEY_SEO_TITLE_TEMPLATE,
-    KEY_STORAGE_QUOTA_BYTES, KEY_TEAM_FEATURES_PROMPT_DISMISSED, KEY_THEME_COLOR,
+    KEY_CODE_INJECTION_HEAD, KEY_CONTACT_EMAIL, KEY_DATA_RETENTION_DAYS,
+    KEY_DOCUMENT_PASSWORD_MIN_LENGTH, KEY_DOCUMENT_PASSWORD_REGEX, KEY_EDITORIAL_WORKFLOW_ENABLED,
+    KEY_MAINTENANCE_MODE, KEY_MAX_DOCUMENT_FILE_SIZE, KEY_MAX_MEDIA_FILE_SIZE,
+    KEY_MODULE_AI_ENABLED, KEY_MODULE_BLOG_ENABLED, KEY_MODULE_COLLECTIONS_ENABLED,
+    KEY_MODULE_DOCUMENTS_ENABLED, KEY_MODULE_FORMS_ENABLED, KEY_MODULE_LEGAL_ENABLED,
+    KEY_MODULE_PAGES_ENABLED, KEY_MODULE_PORTFOLIO_ENABLED, KEY_PREVIEW_TEMPLATES,
+    KEY_ROBOTS_TXT_RULES, KEY_SEO_DEFAULT_DESCRIPTION, KEY_SEO_DEFAULT_OG_IMAGE_ID,
+    KEY_SEO_TITLE_TEMPLATE, KEY_STORAGE_QUOTA_BYTES, KEY_TEAM_FEATURES_PROMPT_DISMISSED,
+    KEY_THEME_COLOR,
 };
 use crate::utils::validation::{
-    validate_allowed_origins, validate_email, validate_storage_quota_bytes,
+    validate_allowed_origins, validate_data_retention_days, validate_email,
+    validate_storage_quota_bytes,
 };
 
 /// Storage usage for a single site.
@@ -195,6 +197,11 @@ pub struct SiteSettingsResponse {
     // CORS allowed origins
     /// List of allowed origins for cross-origin requests (e.g. ["https://myblog.com"])
     pub allowed_origins: Vec<String>,
+    // GDPR data retention (#19)
+    /// Days audit logs / change history are retained before the purge worker
+    /// deletes them (null = retention purge disabled)
+    #[schema(example = 365)]
+    pub data_retention_days: Option<i64>,
 }
 
 impl SiteSettingsResponse {
@@ -325,6 +332,7 @@ impl SiteSettingsResponse {
                 .get(KEY_ALLOWED_ORIGINS)
                 .and_then(|v| serde_json::from_value::<Vec<String>>(v.clone()).ok())
                 .unwrap_or_default(),
+            data_retention_days: map.get(KEY_DATA_RETENTION_DAYS).and_then(|v| v.as_i64()),
         }
     }
 }
@@ -428,6 +436,12 @@ pub struct UpdateSiteSettingsRequest {
     /// Allowed origins for per-site CORS (e.g. ["https://myblog.com"])
     #[validate(custom(function = "validate_allowed_origins"))]
     pub allowed_origins: Option<Vec<String>>,
+
+    /// GDPR data retention in days for audit logs / change history (30–3650;
+    /// JSON null disables the retention purge, absent = no change)
+    #[validate(custom(function = "validate_data_retention_days"))]
+    #[schema(example = 365)]
+    pub data_retention_days: Option<serde_json::Value>,
 }
 
 impl UpdateSiteSettingsRequest {
@@ -527,6 +541,9 @@ impl UpdateSiteSettingsRequest {
         if let Some(ref v) = self.allowed_origins {
             out.push((KEY_ALLOWED_ORIGINS, serde_json::json!(v), false));
         }
+        if let Some(ref v) = self.data_retention_days {
+            out.push((KEY_DATA_RETENTION_DAYS, v.clone(), false));
+        }
 
         out
     }
@@ -610,6 +627,7 @@ mod tests {
             code_injection_footer: None,
             storage_quota_bytes: None,
             allowed_origins: None,
+            data_retention_days: None,
         };
         assert!(req.validate().is_ok());
     }
@@ -647,6 +665,7 @@ mod tests {
             code_injection_footer: None,
             storage_quota_bytes: None,
             allowed_origins: None,
+            data_retention_days: None,
         };
         assert!(req.validate().is_err());
     }
@@ -684,6 +703,7 @@ mod tests {
             code_injection_footer: None,
             storage_quota_bytes: None,
             allowed_origins: None,
+            data_retention_days: None,
         };
         assert!(req.validate().is_err());
     }
@@ -721,6 +741,7 @@ mod tests {
             code_injection_footer: None,
             storage_quota_bytes: None,
             allowed_origins: None,
+            data_retention_days: None,
         };
         assert!(req.validate().is_err());
     }
@@ -758,6 +779,7 @@ mod tests {
             code_injection_footer: None,
             storage_quota_bytes: None,
             allowed_origins: None,
+            data_retention_days: None,
         };
         assert!(req.validate().is_ok());
     }
@@ -795,6 +817,7 @@ mod tests {
             code_injection_footer: None,
             storage_quota_bytes: None,
             allowed_origins: None,
+            data_retention_days: None,
         };
         assert!(req.validate().is_err());
     }
@@ -832,6 +855,7 @@ mod tests {
             code_injection_footer: None,
             storage_quota_bytes: None,
             allowed_origins: None,
+            data_retention_days: None,
         };
         assert!(req.validate().is_ok());
     }
@@ -870,6 +894,7 @@ mod tests {
             code_injection_footer: None,
             storage_quota_bytes: None,
             allowed_origins: None,
+            data_retention_days: None,
         };
         assert!(req.validate().is_ok());
     }
@@ -906,6 +931,7 @@ mod tests {
             code_injection_footer: None,
             storage_quota_bytes: None,
             allowed_origins: None,
+            data_retention_days: None,
         };
         let vec = req.to_settings_vec();
         assert_eq!(vec.len(), 3);
@@ -950,6 +976,7 @@ mod tests {
             code_injection_footer: "".to_string(),
             storage_quota_bytes: 1_073_741_824,
             allowed_origins: vec![],
+            data_retention_days: None,
         };
         let json = serde_json::to_string(&resp).unwrap();
         assert!(json.contains("\"max_document_file_size\":10485760"));
@@ -991,6 +1018,7 @@ mod tests {
                 "https://example.com".to_string(),
                 "http://localhost:3000".to_string(),
             ]),
+            data_retention_days: None,
         };
         assert!(req.validate().is_ok());
     }
@@ -1030,8 +1058,81 @@ mod tests {
                 "https://example.com".to_string(),
                 "https://example.com/path".to_string(), // invalid: has path
             ]),
+            data_retention_days: None,
         };
         assert!(req.validate().is_err());
+    }
+
+    /// All-`None` request for tests that exercise a single field.
+    fn empty_update_request() -> UpdateSiteSettingsRequest {
+        serde_json::from_str("{}").expect("all fields are optional")
+    }
+
+    #[test]
+    fn test_update_request_data_retention_days_accepts_bounds_and_null() {
+        for value in [
+            serde_json::Value::Null,
+            serde_json::json!(30),
+            serde_json::json!(365),
+            serde_json::json!(3650),
+        ] {
+            let req = UpdateSiteSettingsRequest {
+                data_retention_days: Some(value.clone()),
+                ..empty_update_request()
+            };
+            assert!(req.validate().is_ok(), "{value} must be accepted");
+        }
+    }
+
+    #[test]
+    fn test_update_request_data_retention_days_rejects_out_of_range() {
+        for value in [
+            serde_json::json!(29),
+            serde_json::json!(3651),
+            serde_json::json!(0),
+            serde_json::json!(-1),
+            serde_json::json!("90"),
+        ] {
+            let req = UpdateSiteSettingsRequest {
+                data_retention_days: Some(value.clone()),
+                ..empty_update_request()
+            };
+            assert!(req.validate().is_err(), "{value} must be rejected");
+        }
+    }
+
+    #[test]
+    fn test_update_request_data_retention_days_round_trips_to_settings_vec() {
+        let req = UpdateSiteSettingsRequest {
+            data_retention_days: Some(serde_json::json!(90)),
+            ..empty_update_request()
+        };
+        let vec = req.to_settings_vec();
+        assert_eq!(vec.len(), 1);
+        assert_eq!(vec[0].0, "data_retention_days");
+        assert_eq!(vec[0].1, serde_json::json!(90));
+
+        // Explicit null is forwarded (disables retention), absent is omitted.
+        let req = UpdateSiteSettingsRequest {
+            data_retention_days: Some(serde_json::Value::Null),
+            ..empty_update_request()
+        };
+        assert_eq!(req.to_settings_vec().len(), 1);
+        assert!(empty_update_request().to_settings_vec().is_empty());
+    }
+
+    #[test]
+    fn test_from_map_data_retention_days() {
+        let mut map = crate::models::site_settings::defaults();
+        assert_eq!(
+            SiteSettingsResponse::from_map(&map).data_retention_days,
+            None
+        );
+        map.insert("data_retention_days".into(), serde_json::json!(180));
+        assert_eq!(
+            SiteSettingsResponse::from_map(&map).data_retention_days,
+            Some(180)
+        );
     }
 
     #[test]

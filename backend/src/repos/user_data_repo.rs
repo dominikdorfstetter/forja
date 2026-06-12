@@ -1,10 +1,15 @@
 //! GDPR user-data queries: the export row queries and account-erasure
 //! statements that span user-referencing tables (api_keys, audit_logs,
-//! change_history, contents, system_admins). Extracted from the auth and
-//! clerk_user handlers so the SQL lives behind one tested seam.
+//! change_history, contents, notifications, site_memberships, sites,
+//! system_admins). Extracted from the auth and clerk_user handlers so the
+//! SQL lives behind one tested seam.
+//!
+//! The erasure statements implement the `anonymize_on_erasure` contract
+//! declared per field in `models::builtin_pii` (#19); the registry's RoPA
+//! claims are only true because these statements run on account deletion.
 
 use chrono::{DateTime, Utc};
-use sqlx::PgPool;
+use sqlx::{PgConnection, PgPool};
 use uuid::Uuid;
 
 use crate::models::api_key::{ApiKeyPermission, ApiKeyStatus};
@@ -101,7 +106,8 @@ pub async fn authored_content_counts(
 }
 
 /// Account deletion: drop system-admin status and null every reference to
-/// the user across api_keys, audit_logs and change_history, atomically.
+/// the user across api_keys, audit_logs, change_history, authored contents,
+/// membership invites, site provenance and notifications, atomically.
 pub async fn anonymize_user_records(
     pool: &PgPool,
     clerk_user_id: &str,
@@ -130,17 +136,60 @@ pub async fn anonymize_user_records(
         .execute(&mut *tx)
         .await?;
 
+    // Built-in identity fields keyed by Clerk id (#19): authored content,
+    // invitation attribution, site provenance, notification identities.
+    anonymize_authored_content_on(&mut tx, clerk_user_id).await?;
+    sqlx::query("UPDATE site_memberships SET invited_by = NULL WHERE invited_by = $1")
+        .bind(clerk_user_id)
+        .execute(&mut *tx)
+        .await?;
+    sqlx::query("UPDATE sites SET created_by = NULL WHERE created_by = $1")
+        .bind(clerk_user_id)
+        .execute(&mut *tx)
+        .await?;
+    // The user's own inbox carries their identity as the row's purpose —
+    // delete it; on other users' notifications only the actor is anonymized.
+    sqlx::query("DELETE FROM notifications WHERE recipient_clerk_id = $1")
+        .bind(clerk_user_id)
+        .execute(&mut *tx)
+        .await?;
+    sqlx::query("UPDATE notifications SET actor_clerk_id = NULL WHERE actor_clerk_id = $1")
+        .bind(clerk_user_id)
+        .execute(&mut *tx)
+        .await?;
+
     tx.commit().await
 }
 
-/// Detach a Clerk user from all content they authored (banned-user purge).
+/// Null the erased user's identity on every contents identity column
+/// (created_by / updated_by / deleted_by) in one pass, leaving other users'
+/// attribution untouched. Shared by account deletion (inside its
+/// transaction) and the banned-user purge.
+async fn anonymize_authored_content_on(
+    conn: &mut PgConnection,
+    clerk_user_id: &str,
+) -> Result<(), sqlx::Error> {
+    sqlx::query(
+        r#"
+        UPDATE contents SET
+            created_by = CASE WHEN created_by = $1 THEN NULL ELSE created_by END,
+            updated_by = CASE WHEN updated_by = $1 THEN NULL ELSE updated_by END,
+            deleted_by = CASE WHEN deleted_by = $1 THEN NULL ELSE deleted_by END
+        WHERE created_by = $1 OR updated_by = $1 OR deleted_by = $1
+        "#,
+    )
+    .bind(clerk_user_id)
+    .execute(conn)
+    .await
+    .map(|_| ())
+}
+
+/// Detach a Clerk user from all content they authored, edited or deleted
+/// (banned-user purge).
 pub async fn anonymize_authored_content(
     pool: &PgPool,
     clerk_user_id: &str,
 ) -> Result<(), sqlx::Error> {
-    sqlx::query("UPDATE contents SET created_by = NULL WHERE created_by = $1")
-        .bind(clerk_user_id)
-        .execute(pool)
-        .await
-        .map(|_| ())
+    let mut conn = pool.acquire().await?;
+    anonymize_authored_content_on(&mut conn, clerk_user_id).await
 }

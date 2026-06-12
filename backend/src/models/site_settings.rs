@@ -14,6 +14,11 @@ pub const KEY_MAX_MEDIA_FILE_SIZE: &str = "max_media_file_size";
 pub const KEY_ANALYTICS_ENABLED: &str = "analytics_enabled";
 pub const KEY_ANALYTICS_RETENTION_DAYS: &str = "analytics_retention_days";
 pub const KEY_AUDIT_LOG_RETENTION_DAYS: &str = "audit_log_retention_days";
+pub const KEY_DATA_RETENTION_DAYS: &str = "data_retention_days";
+
+/// Bounds for [`KEY_DATA_RETENTION_DAYS`] (#19): 30 days .. 10 years.
+pub const DATA_RETENTION_MIN_DAYS: i64 = 30;
+pub const DATA_RETENTION_MAX_DAYS: i64 = 3650;
 pub const KEY_MAINTENANCE_MODE: &str = "maintenance_mode";
 pub const KEY_CONTACT_EMAIL: &str = "contact_email";
 pub const KEY_EDITORIAL_WORKFLOW_ENABLED: &str = "editorial_workflow_enabled";
@@ -69,6 +74,8 @@ pub fn defaults() -> HashMap<String, serde_json::Value> {
     m.insert(KEY_ANALYTICS_ENABLED.into(), serde_json::json!(false));
     m.insert(KEY_ANALYTICS_RETENTION_DAYS.into(), serde_json::json!(90));
     m.insert(KEY_AUDIT_LOG_RETENTION_DAYS.into(), serde_json::json!(365));
+    // GDPR data retention (#19): null = retention purge disabled.
+    m.insert(KEY_DATA_RETENTION_DAYS.into(), serde_json::Value::Null);
     m.insert(KEY_MAINTENANCE_MODE.into(), serde_json::json!(false));
     m.insert(KEY_CONTACT_EMAIL.into(), serde_json::json!(""));
     m.insert(
@@ -227,6 +234,20 @@ impl SiteSetting {
         Ok(defaults().remove(key).unwrap_or(serde_json::Value::Null))
     }
 
+    /// Typed accessor for the GDPR data-retention setting (#19).
+    ///
+    /// `None` means the retention purge is disabled for this site — either the
+    /// setting was never written or it was explicitly set to `null`. Writes go
+    /// through the validated settings endpoint, which enforces
+    /// [`DATA_RETENTION_MIN_DAYS`]`..=`[`DATA_RETENTION_MAX_DAYS`].
+    pub async fn data_retention_days(
+        pool: &PgPool,
+        site_id: Uuid,
+    ) -> Result<Option<i32>, ApiError> {
+        let value = Self::get_value(pool, site_id, KEY_DATA_RETENTION_DAYS).await?;
+        Ok(value.as_i64().and_then(|days| i32::try_from(days).ok()))
+    }
+
     /// Multi-key lookup in a single round-trip. Returns every requested key,
     /// falling back to its known default (or `Null`) when the row is absent —
     /// same per-key semantics as [`get_value`](Self::get_value), but one query
@@ -271,7 +292,8 @@ mod tests {
     #[test]
     fn test_defaults_contains_all_keys() {
         let d = defaults();
-        assert_eq!(d.len(), 30);
+        assert_eq!(d.len(), 31);
+        assert!(d.contains_key(KEY_DATA_RETENTION_DAYS));
         assert!(d.contains_key(KEY_MAX_DOCUMENT_FILE_SIZE));
         assert!(d.contains_key(KEY_MAX_MEDIA_FILE_SIZE));
         assert!(d.contains_key(KEY_ANALYTICS_ENABLED));
@@ -312,6 +334,7 @@ mod tests {
         assert_eq!(d[KEY_ANALYTICS_ENABLED], serde_json::json!(false));
         assert_eq!(d[KEY_ANALYTICS_RETENTION_DAYS], serde_json::json!(90));
         assert_eq!(d[KEY_AUDIT_LOG_RETENTION_DAYS], serde_json::json!(365));
+        assert_eq!(d[KEY_DATA_RETENTION_DAYS], serde_json::Value::Null);
         assert_eq!(d[KEY_MAINTENANCE_MODE], serde_json::json!(false));
         assert_eq!(d[KEY_CONTACT_EMAIL], serde_json::json!(""));
         assert_eq!(d[KEY_EDITORIAL_WORKFLOW_ENABLED], serde_json::json!(false));

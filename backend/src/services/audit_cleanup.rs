@@ -4,6 +4,13 @@
 //! audit log + change history entries older than each site's configured
 //! retention period.
 //!
+//! Two settings govern a site's effective retention (#19):
+//! - `audit_log_retention_days` — operational override of the system default.
+//! - `data_retention_days` — the GDPR retention policy (null = not configured).
+//!   When set, it caps the effective retention: identity-bearing audit rows
+//!   must not outlive the declared retention period, so the *shorter* of the
+//!   two windows wins.
+//!
 //! Uses the same fairing pattern as `PublishScheduler`.
 
 use chrono::{Duration, Utc};
@@ -47,8 +54,11 @@ impl AuditCleanupWorker {
 }
 
 /// Run cleanup for all sites and system-level entries.
+///
+/// Public so the retention tracer test (`tests/gdpr_builtin_pii_test.rs`)
+/// can drive a tick directly instead of waiting on the daily interval.
 #[tracing::instrument(name = "audit_cleanup_tick", skip_all)]
-async fn run_cleanup(pool: &PgPool, system_default_days: u32) {
+pub async fn run_cleanup(pool: &PgPool, system_default_days: u32) {
     tracing::info!(worker = "audit_cleanup", "run starting");
 
     let sites = match Site::find_all(pool).await {
@@ -125,13 +135,30 @@ async fn run_cleanup(pool: &PgPool, system_default_days: u32) {
     report.finish();
 }
 
-/// Get the retention period for a site, falling back to the system default.
+/// Get the effective retention period for a site.
+///
+/// Starts from `audit_log_retention_days` (falling back to the system
+/// default) and, when the site has a GDPR `data_retention_days` policy (#19),
+/// caps the window to it — retention rows must not outlive the declared
+/// policy, while a policy longer than the audit window never extends it.
 async fn get_retention_days(pool: &PgPool, site_id: uuid::Uuid, system_default: u32) -> u32 {
-    match SiteSetting::get_value(pool, site_id, KEY_AUDIT_LOG_RETENTION_DAYS).await {
+    let audit_days = match SiteSetting::get_value(pool, site_id, KEY_AUDIT_LOG_RETENTION_DAYS).await
+    {
         Ok(val) => val
             .as_u64()
             .map(|v| v.max(1) as u32)
             .unwrap_or(system_default),
         Err(_) => system_default,
+    };
+
+    let policy_days = SiteSetting::data_retention_days(pool, site_id)
+        .await
+        .ok()
+        .flatten()
+        .and_then(|days| u32::try_from(days).ok());
+
+    match policy_days {
+        Some(policy_days) => audit_days.min(policy_days.max(1)),
+        None => audit_days,
     }
 }
