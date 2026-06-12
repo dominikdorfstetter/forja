@@ -27,6 +27,7 @@ import {
 } from '@/components/shared/listPageV2';
 import { Icon } from '@/components/design-system';
 import type { AuditAction, AuditLogEntry } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 /**
  * Same namespace the backend uses (RFC 4122 DNS namespace) to derive
@@ -191,17 +192,7 @@ export default function ActivityLogPage() {
   const fromDate = timeframeFrom(timeframe);
 
   const { data, isLoading } = useQuery({
-    queryKey: [
-      'audit-logs',
-      selectedSiteId,
-      page,
-      pageSize,
-      sortBy,
-      sortDir,
-      actionFilter,
-      entityFilter,
-      timeframe,
-    ],
+    queryKey: queryKeys.auditLogs(selectedSiteId, page, pageSize, sortBy, sortDir, actionFilter, entityFilter, timeframe),
     queryFn: () =>
       getAuditLogs(selectedSiteId, {
         page,
@@ -216,12 +207,12 @@ export default function ActivityLogPage() {
   });
 
   const { data: clerkUsers } = useQuery({
-    queryKey: ['clerk-users'],
+    queryKey: queryKeys.clerkUsers(),
     queryFn: () => getClerkUsers({ limit: 200 }),
   });
 
   const { data: aiUsage } = useQuery({
-    queryKey: ['audit-ai-usage', selectedSiteId],
+    queryKey: queryKeys.auditAiUsage(selectedSiteId),
     queryFn: () => getAuditAiUsage(selectedSiteId),
     enabled: !!selectedSiteId,
   });

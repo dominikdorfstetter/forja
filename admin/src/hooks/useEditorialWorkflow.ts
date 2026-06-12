@@ -4,6 +4,7 @@ import { getSiteSettings } from '@/services/sites';
 import { useSiteContext } from '@/store/SiteContext';
 import { usePermissions } from '@/hooks/usePermissions';
 import type { ContentStatus } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface WorkflowActions {
   workflowEnabled: boolean;
@@ -22,7 +23,7 @@ export function useEditorialWorkflow(currentStatus: ContentStatus): WorkflowActi
   const { selectedSiteId } = useSiteContext();
 
   const { data: settings } = useQuery({
-    queryKey: ['site-settings', selectedSiteId],
+    queryKey: queryKeys.siteSettings(selectedSiteId),
     queryFn: () => getSiteSettings(selectedSiteId),
     enabled: !!selectedSiteId,
     staleTime: 5 * 60 * 1000,

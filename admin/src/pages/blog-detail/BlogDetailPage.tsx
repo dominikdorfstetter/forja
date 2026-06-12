@@ -16,13 +16,14 @@ import BlogEditorContent from './BlogEditorContent';
 import BlogTranslateDialog, { type TranslationPreview } from './BlogTranslateDialog';
 import BlogDetailDialogs from './BlogDetailDialogs';
 import { buildBlogUpdates, buildLocalizationData } from './blogDetailSaveUtils';
+import { queryKeys } from '@/lib/queryKeys';
 
 const FIRST_RUN_TIP_KEY = 'forja_editor_tip_dismissed';
 
 const blogAdapter: ContentDetailAdapter<BlogDetailResponse, BlogContentFormData, ContentLocalizationResponse> = {
   entityKey: 'blog',
   fetchDetail: (id) => getBlogDetail(id),
-  detailQueryKey: (id) => ['blog-detail', id],
+  detailQueryKey: (id) => queryKeys.blogDetail(id),
   invalidateOnSave: [['blogs']],
   getLocalizations: (d) => d?.localizations ?? [],
   getLocalizationLocaleId: (l) => l.locale_id,

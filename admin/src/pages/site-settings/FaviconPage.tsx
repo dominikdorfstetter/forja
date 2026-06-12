@@ -22,6 +22,7 @@ import {
   M3Button,
 } from '@/components/design-system';
 import { useFormSaveBar } from '@/hooks/useFormSaveBar';
+import { queryKeys } from '@/lib/queryKeys';
 
 export default function FaviconPage() {
   const { t } = useTranslation();
@@ -37,13 +38,13 @@ export default function FaviconPage() {
   const [originalFile, setOriginalFile] = useState<File | null>(null);
 
   const { data: settings, isLoading: isSettingsLoading } = useQuery({
-    queryKey: ['site-settings', selectedSiteId],
+    queryKey: queryKeys.siteSettings(selectedSiteId),
     queryFn: () => getSiteSettings(selectedSiteId),
     enabled: !!selectedSiteId,
   });
 
   const { data: site } = useQuery({
-    queryKey: ['site', selectedSiteId],
+    queryKey: queryKeys.site(selectedSiteId),
     queryFn: () => getSite(selectedSiteId),
     enabled: !!selectedSiteId,
   });
@@ -60,7 +61,7 @@ export default function FaviconPage() {
   }
 
   const { data: favicon, isLoading: isFaviconLoading } = useQuery({
-    queryKey: ['favicon', selectedSiteId],
+    queryKey: queryKeys.favicon(selectedSiteId),
     queryFn: () => getFavicon(selectedSiteId),
     enabled: !!selectedSiteId && !!site?.favicon_url,
     retry: false,
@@ -69,8 +70,8 @@ export default function FaviconPage() {
   const uploadMutation = useMutation({
     mutationFn: (file: File) => uploadFavicon(selectedSiteId, file),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['favicon', selectedSiteId] });
-      queryClient.invalidateQueries({ queryKey: ['site', selectedSiteId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.favicon(selectedSiteId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.site(selectedSiteId) });
       enqueueSnackbar(t('settings.favicon.uploadSuccess'), { variant: 'success' });
     },
     onError: (error: unknown) => {
@@ -90,8 +91,8 @@ export default function FaviconPage() {
     mutationFn: (data: { theme_color: string; background_color: string }) =>
       updateSiteSettings(selectedSiteId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['site-settings', selectedSiteId] });
-      queryClient.invalidateQueries({ queryKey: ['favicon', selectedSiteId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.siteSettings(selectedSiteId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.favicon(selectedSiteId) });
       setColorsDirty(false);
       enqueueSnackbar(t('settings.favicon.colorsSaved'), { variant: 'success' });
     },

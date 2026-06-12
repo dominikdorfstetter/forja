@@ -28,6 +28,7 @@ import {
   type ActionMenuItem,
 } from '@/components/shared/listPageV2';
 import { M3Button } from '@/components/design-system';
+import { queryKeys } from '@/lib/queryKeys';
 
 function RedirectRowActions({
   redirect,
@@ -105,7 +106,7 @@ export default function RedirectsPage() {
   }, [openCreate]);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['redirects', selectedSiteId, page, pageSize, debouncedSearch, sortBy, sortDir],
+    queryKey: queryKeys.redirects(selectedSiteId, page, pageSize, debouncedSearch, sortBy, sortDir),
     queryFn: () =>
       getRedirects(selectedSiteId, {
         page,

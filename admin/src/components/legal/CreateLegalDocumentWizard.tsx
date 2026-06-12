@@ -7,6 +7,7 @@ import { createLegalDocument } from '@/services/legal';
 import { useSiteContext } from '@/store/SiteContext';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import FormDialog from '@/components/shared/FormDialog';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface CreateLegalDocumentWizardProps {
   open: boolean;
@@ -45,7 +46,7 @@ export default function CreateLegalDocumentWizard({ open, onClose }: CreateLegal
         site_ids: [selectedSiteId!],
       }),
     onSuccess: (doc) => {
-      queryClient.invalidateQueries({ queryKey: ['legal'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.legal(selectedSiteId) });
       showSuccess(t('legal.messages.created'));
       handleClose();
       navigate(`/legal/${doc.id}`);

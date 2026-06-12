@@ -81,8 +81,11 @@ export interface EntityListAdapter<TItem, TStatusCounts = void> {
   listQueryKey: (siteId: string, params: ListQueryParams) => QueryKey;
   fetchStatusCounts?: (siteId: string) => Promise<TStatusCounts>;
   statusCountsQueryKey?: (siteId: string) => QueryKey;
-  /** Extra query keys to invalidate after mutations (e.g. ['trash-count']). */
-  bulkExtraInvalidations?: readonly QueryKey[];
+  /**
+   * Extra query keys to invalidate after mutations, scoped to the active site
+   * (e.g. `(siteId) => [queryKeys.trashCount(siteId)]`).
+   */
+  bulkExtraInvalidations?: (siteId: string) => readonly QueryKey[];
 
   /** Item shape. */
   getItemId: (item: TItem) => string;

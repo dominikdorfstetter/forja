@@ -26,6 +26,7 @@ import {
   ToggleField,
 } from '@/components/design-system';
 import { useFormSaveBar } from '@/hooks/useFormSaveBar';
+import { queryKeys } from '@/lib/queryKeys';
 
 const DEMO_BANNER_KEY = 'demoBannerDismissed';
 
@@ -60,19 +61,19 @@ export default function OverviewPage() {
   };
 
   const { data: site, isLoading: isSiteLoading } = useQuery({
-    queryKey: ['site', selectedSiteId],
+    queryKey: queryKeys.site(selectedSiteId),
     queryFn: () => getSite(selectedSiteId),
     enabled: !!selectedSiteId,
   });
 
   const { data: settings, isLoading: isSettingsLoading } = useQuery({
-    queryKey: ['site-settings', selectedSiteId],
+    queryKey: queryKeys.siteSettings(selectedSiteId),
     queryFn: () => getSiteSettings(selectedSiteId),
     enabled: !!selectedSiteId,
   });
 
   const { data: storageUsage } = useQuery({
-    queryKey: ['storage-usage', selectedSiteId],
+    queryKey: queryKeys.storageUsage(selectedSiteId),
     queryFn: () => getStorageUsage(selectedSiteId),
     enabled: !!selectedSiteId,
   });
@@ -101,7 +102,7 @@ export default function OverviewPage() {
     mutationFn: (data: { contact_email?: string; maintenance_mode?: boolean }) =>
       updateSiteSettings(selectedSiteId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['site-settings', selectedSiteId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.siteSettings(selectedSiteId) });
     },
   });
 
@@ -109,8 +110,8 @@ export default function OverviewPage() {
     mutationFn: (data: { base_url?: string }) =>
       updateSite(selectedSiteId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['site', selectedSiteId] });
-      queryClient.invalidateQueries({ queryKey: ['sites'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.site(selectedSiteId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.sites() });
     },
   });
 

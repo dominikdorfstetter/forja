@@ -23,6 +23,7 @@ import TagsSection from '@/components/taxonomy/TagsSection';
 import CategoriesSection from '@/components/taxonomy/CategoriesSection';
 import { useListPageState } from '@/hooks/useListPageState';
 import { useCrudMutations } from '@/hooks/useCrudMutations';
+import { queryKeys } from '@/lib/queryKeys';
 
 export default function TaxonomyPage() {
   const { t } = useTranslation();
@@ -66,7 +67,7 @@ export default function TaxonomyPage() {
   }, [openTagCreate, openCatCreate]);
 
   const { data: tagsData, isLoading: tagsLoading } = useQuery({
-    queryKey: ['tags', selectedSiteId, tagPage, tagPageSize, tagDebouncedSearch, tagSortBy, tagSortDir],
+    queryKey: queryKeys.tags(selectedSiteId, tagPage, tagPageSize, tagDebouncedSearch, tagSortBy, tagSortDir),
     queryFn: () => getTags(selectedSiteId, {
       page: tagPage,
       page_size: tagPageSize,
@@ -79,7 +80,7 @@ export default function TaxonomyPage() {
   const tags = tagsData?.data;
 
   const { data: categoriesData, isLoading: catsLoading } = useQuery({
-    queryKey: ['categories', selectedSiteId, catPage, catPageSize, catDebouncedSearch, catSortBy, catSortDir],
+    queryKey: queryKeys.categories(selectedSiteId, catPage, catPageSize, catDebouncedSearch, catSortBy, catSortDir),
     queryFn: () => getCategories(selectedSiteId, {
       page: catPage,
       page_size: catPageSize,

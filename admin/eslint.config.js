@@ -12,6 +12,12 @@ const forjaPlugin = {
   },
 };
 
+const noInlineQueryKeyArrays = {
+  selector: 'Property[key.name="queryKey"] > ArrayExpression',
+  message:
+    'Use queryKeys factory from @/lib/queryKeys — inline queryKey arrays are forbidden (issue #18)',
+};
+
 export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
@@ -56,11 +62,19 @@ export default tseslint.config(
     },
   },
   {
+    files: ['src/**/*.{ts,tsx}'],
+    ignores: ['src/**/__tests__/**', 'src/**/*.test.{ts,tsx}', 'src/lib/queryKeys.ts'],
+    rules: {
+      'no-restricted-syntax': ['error', noInlineQueryKeyArrays],
+    },
+  },
+  {
     files: ['src/components/editor/**/*.{ts,tsx}'],
     ignores: ['src/components/editor/**/__tests__/**'],
     rules: {
       'no-restricted-syntax': [
         'error',
+        noInlineQueryKeyArrays,
         {
           selector:
             "CallExpression[callee.object.name='window'][callee.property.name='dispatchEvent']",

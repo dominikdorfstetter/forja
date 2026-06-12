@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { getBlogs } from '@/services/blogs';
 import { useSiteContext } from '@/store/SiteContext';
 import type { BlogListItem } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface BlogPickerProps {
   value: string;
@@ -45,7 +46,7 @@ export default function BlogPicker({
   }, [inputValue]);
 
   const { data: blogsData, isLoading } = useQuery({
-    queryKey: ['blogs-picker', siteId, debouncedSearch],
+    queryKey: queryKeys.blogsPicker(siteId, debouncedSearch),
     queryFn: () => getBlogs(siteId, {
       search: debouncedSearch || undefined,
       page_size: 20,

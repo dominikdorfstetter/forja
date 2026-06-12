@@ -15,6 +15,7 @@ import {
   M3Button,
 } from '@/components/design-system';
 import { useFormSaveBar } from '@/hooks/useFormSaveBar';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface RuleWithId extends RobotsTxtRule {
   _id: number;
@@ -108,7 +109,7 @@ export default function RobotsTxtEditor({ settings, baseUrl }: RobotsTxtEditorPr
     mutationFn: (data: { robots_txt_rules: RobotsTxtRule[] }) =>
       updateSiteSettings(selectedSiteId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['site-settings', selectedSiteId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.siteSettings(selectedSiteId) });
       setIsDirty(false);
       enqueueSnackbar(t('settings.robotsTxt.saved'), { variant: 'success' });
     },

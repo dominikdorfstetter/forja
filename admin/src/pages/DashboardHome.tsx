@@ -25,6 +25,7 @@ import {
   AnalyticsStrip,
   type WorkbenchFilter,
 } from '@/components/dashboard/workbench';
+import { queryKeys } from '@/lib/queryKeys';
 
 // ---------------------------------------------------------------------------
 // Reducer
@@ -97,7 +98,7 @@ export default function DashboardHome() {
 
   // Onboarding progress (per-site checklist state from backend)
   const { data: onboardingProgress } = useQuery({
-    queryKey: ['onboardingProgress', selectedSiteId],
+    queryKey: queryKeys.onboardingProgress(selectedSiteId),
     queryFn: () => getOnboardingProgress(selectedSiteId),
     enabled: hasSite,
   });
@@ -106,7 +107,7 @@ export default function DashboardHome() {
     mutationFn: (stepKey: string) =>
       completeOnboardingStep(selectedSiteId, { step_key: stepKey }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['onboardingProgress', selectedSiteId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.onboardingProgress(selectedSiteId) });
     },
     onError: showError,
   });
@@ -114,14 +115,14 @@ export default function DashboardHome() {
   const deleteSamplesMutation = useMutation({
     mutationFn: () => deleteSampleContent(selectedSiteId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['dashboard-blogs', selectedSiteId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboardBlogs(selectedSiteId) });
     },
     onError: showError,
   });
 
   // Fetch onboarding state (only when user has no sites)
   const { data: onboarding, isLoading: onboardingLoading } = useQuery({
-    queryKey: ['onboarding'],
+    queryKey: queryKeys.onboarding(),
     queryFn: () => getOnboarding(),
     enabled: hasNoSites,
   });
@@ -130,7 +131,7 @@ export default function DashboardHome() {
     mutationFn: ({ userType, intents }: { userType: UserType; intents: ContentIntent[] }) =>
       completeOnboarding({ user_type: userType, intents }),
     onSuccess: (_, { userType, intents }) => {
-      queryClient.invalidateQueries({ queryKey: ['onboarding'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.onboarding() });
       const defaults = computeWizardDefaults(userType, intents);
       uiDispatch({ type: 'OPEN_WIZARD_WITH_DEFAULTS', payload: defaults });
     },

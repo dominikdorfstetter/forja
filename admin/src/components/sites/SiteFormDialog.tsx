@@ -22,6 +22,7 @@ import { useFormHistory } from '@/hooks/useFormHistory';
 import { slugify } from '@/utils/slugify';
 import FormDialog from '@/components/shared/FormDialog';
 import { M3Button } from '@/components/design-system';
+import { queryKeys } from '@/lib/queryKeys';
 
 const siteSchema = z.object({
   name: requiredString(200),
@@ -116,7 +117,7 @@ export default function SiteFormDialog({ open, site, onSubmit, onClose, loading 
   const [localeError, setLocaleError] = useState<string | null>(null);
 
   const { data: allLocales = [] } = useQuery({
-    queryKey: ['locales'],
+    queryKey: queryKeys.locales(),
     queryFn: () => getLocales(),
     enabled: open && isCreateMode,
   });

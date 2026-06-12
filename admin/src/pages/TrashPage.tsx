@@ -21,6 +21,7 @@ import {
   Pagination,
 } from '@/components/shared/listPageV2';
 import { M3Button, Icon } from '@/components/design-system';
+import { queryKeys } from '@/lib/queryKeys';
 
 const TYPE_ICONS: Record<string, string> = {
   blog: 'article',
@@ -137,7 +138,7 @@ export default function TrashPage() {
   }
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['trash', selectedSiteId, page, pageSize],
+    queryKey: queryKeys.trash(selectedSiteId, page, pageSize),
     queryFn: () => getTrash(selectedSiteId, page, pageSize),
     enabled: !!selectedSiteId,
     placeholderData: keepPreviousData,
@@ -152,19 +153,19 @@ export default function TrashPage() {
   }, []);
 
   const invalidateTrash = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ['trash', selectedSiteId] });
-    queryClient.invalidateQueries({ queryKey: ['trash-count', selectedSiteId] });
-    queryClient.invalidateQueries({ queryKey: ['blogs'] });
-    queryClient.invalidateQueries({ queryKey: ['pages'] });
-    queryClient.invalidateQueries({ queryKey: ['media'] });
-    queryClient.invalidateQueries({ queryKey: ['documents'] });
-    queryClient.invalidateQueries({ queryKey: ['legal'] });
-    queryClient.invalidateQueries({ queryKey: ['social-links'] });
-    queryClient.invalidateQueries({ queryKey: ['navigation-menus'] });
-    queryClient.invalidateQueries({ queryKey: ['navigation-items'] });
-    queryClient.invalidateQueries({ queryKey: ['projects'] });
-    queryClient.invalidateQueries({ queryKey: ['cv-entries'] });
-    queryClient.invalidateQueries({ queryKey: ['skills'] });
+    queryClient.invalidateQueries({ queryKey: queryKeys.trash(selectedSiteId) });
+    queryClient.invalidateQueries({ queryKey: queryKeys.trashCount(selectedSiteId) });
+    queryClient.invalidateQueries({ queryKey: queryKeys.blogs(selectedSiteId) });
+    queryClient.invalidateQueries({ queryKey: queryKeys.pages(selectedSiteId) });
+    queryClient.invalidateQueries({ queryKey: queryKeys.media(selectedSiteId) });
+    queryClient.invalidateQueries({ queryKey: queryKeys.documents(selectedSiteId) });
+    queryClient.invalidateQueries({ queryKey: queryKeys.legal(selectedSiteId) });
+    queryClient.invalidateQueries({ queryKey: queryKeys.socialLinks(selectedSiteId) });
+    queryClient.invalidateQueries({ queryKey: queryKeys.navigationMenus(selectedSiteId) });
+    queryClient.invalidateQueries({ queryKey: queryKeys.navigationItems() });
+    queryClient.invalidateQueries({ queryKey: queryKeys.projects(selectedSiteId) });
+    queryClient.invalidateQueries({ queryKey: queryKeys.cvEntries(selectedSiteId) });
+    queryClient.invalidateQueries({ queryKey: queryKeys.skills(selectedSiteId) });
   }, [queryClient, selectedSiteId]);
 
   const restoreMutation = useMutation({

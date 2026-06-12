@@ -11,6 +11,7 @@ import type {
 import { createDocumentWithLocalizations, updateDocumentWithLocalizations } from '@/pages/documentMutationFns';
 import type { UIAction } from '@/pages/DocumentsReducer';
 import type { useBulkSelection } from '@/hooks/useBulkSelection';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface UseDocumentMutationsArgs {
   selectedSiteId: string;
@@ -27,33 +28,33 @@ export function useDocumentMutations({ selectedSiteId, dispatch, detailMap, bulk
   const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
 
   const invalidateDocuments = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ['documents'] });
-    queryClient.invalidateQueries({ queryKey: ['document-details'] });
-  }, [queryClient]);
+    queryClient.invalidateQueries({ queryKey: queryKeys.documents(selectedSiteId) });
+    queryClient.invalidateQueries({ queryKey: queryKeys.documentDetails() });
+  }, [queryClient, selectedSiteId]);
 
   const invalidateTrash = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ['trash-count'] });
-    queryClient.invalidateQueries({ queryKey: ['trash'] });
-  }, [queryClient]);
+    queryClient.invalidateQueries({ queryKey: queryKeys.trashCount(selectedSiteId) });
+    queryClient.invalidateQueries({ queryKey: queryKeys.trash(selectedSiteId) });
+  }, [queryClient, selectedSiteId]);
 
   // Folder mutations
   const createFolderMutation = useMutation({
     mutationFn: ({ name, parentId }: { name: string; parentId?: string }) =>
       createDocumentFolder(selectedSiteId, { name, parent_id: parentId, display_order: 0 }),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['document-folders'] }); showSuccess(t('media.messages.folderCreated')); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: queryKeys.documentFolders(selectedSiteId) }); showSuccess(t('media.messages.folderCreated')); },
     onError: (error) => showError(error),
   });
 
   const renameFolderMutation = useMutation({
     mutationFn: ({ id, name }: { id: string; name: string }) => updateDocumentFolder(id, { name }),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['document-folders'] }); showSuccess(t('media.messages.folderRenamed')); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: queryKeys.documentFolders(selectedSiteId) }); showSuccess(t('media.messages.folderRenamed')); },
     onError: (error) => showError(error),
   });
 
   const deleteFolderMutation = useMutation({
     mutationFn: (id: string) => deleteDocumentFolder(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['document-folders'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.documentFolders(selectedSiteId) });
       dispatch({ type: 'setSelectedFolder', id: null });
       showSuccess(t('media.messages.folderDeleted'));
     },
@@ -103,7 +104,7 @@ export function useDocumentMutations({ selectedSiteId, dispatch, detailMap, bulk
   const moveToFolderMutation = useMutation({
     mutationFn: ({ id, folder_id }: { id: string; folder_id: string | undefined }) =>
       updateDocument(id, { folder_id }),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['documents'] }); showSuccess(t('media.messages.moved')); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: queryKeys.documents(selectedSiteId) }); showSuccess(t('media.messages.moved')); },
     onError: (error) => showError(error),
   });
 

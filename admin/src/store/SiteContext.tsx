@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getSites } from '@/services/sites';
 import type { Site } from '@/types/api';
 import { useAuth, notifySelectedSiteChanged } from '@/store/AuthContext';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface SiteContextValue {
   selectedSiteId: string;
@@ -26,7 +27,7 @@ export function SiteProvider({ children }: { children: ReactNode }) {
   const isClerkUser = memberships.length > 0 || isSystemAdmin;
 
   const { data: allSites, isLoading } = useQuery({
-    queryKey: ['sites'],
+    queryKey: queryKeys.sites(),
     queryFn: () => getSites(),
     enabled: isAuthenticated,
   });

@@ -9,6 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { getWebhookStats } from '@/services/webhooks';
 import LoadingState from '@/components/shared/LoadingState';
+import { queryKeys } from '@/lib/queryKeys';
 
 type StatsWindow = '1h' | '24h' | '7d' | '30d';
 
@@ -29,7 +30,7 @@ export default function WebhookAnalytics({ open, webhookId, onClose }: WebhookAn
   const [window, setWindow] = useState<StatsWindow>('24h');
 
   const { data: stats, isLoading } = useQuery({
-    queryKey: ['webhook-stats', webhookId, window],
+    queryKey: queryKeys.webhookStats(webhookId, window),
     queryFn: () => getWebhookStats(webhookId!, window),
     enabled: open && !!webhookId,
   });

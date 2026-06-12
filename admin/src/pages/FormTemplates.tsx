@@ -17,6 +17,7 @@ import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import { M3Button, Icon } from '@/components/design-system';
 import FormTemplateDialog from '@/components/forms/FormTemplateDialog';
 import type { FormTemplateResponse } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 function StatusPill({ active, activeLabel, inactiveLabel }: { active: boolean; activeLabel: string; inactiveLabel: string }) {
   return (
@@ -61,7 +62,7 @@ export default function FormTemplatesPage() {
   const [deleting, setDeleting] = useState<FormTemplateResponse | null>(null);
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['form-templates', selectedSiteId],
+    queryKey: queryKeys.formTemplates(selectedSiteId),
     queryFn: () => getFormTemplates(selectedSiteId, { page_size: 100 }),
     enabled: !!selectedSiteId,
   });
@@ -71,7 +72,7 @@ export default function FormTemplatesPage() {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteFormTemplate(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['form-templates'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.formTemplates(selectedSiteId) });
       showSuccess(t('formsModule.templates.messages.deleted', 'Template deleted.'));
       setDeleting(null);
     },

@@ -47,3 +47,20 @@ No `.env` — config is fetched from the backend at runtime (`GET /api/v1/config
 - **Path alias**: `@/` → `admin/src/`.
 - **Tests are the agent's eyes** — write/keep them green; `src/test/setup.ts`
   globally mocks Clerk, matchMedia, and the API.
+
+## Query-key convention (issue #18)
+
+- **Never write inline `queryKey: [...]` arrays** — lint-enforced
+  (`no-restricted-syntax`). All keys come from the typed factory
+  [`src/lib/queryKeys.ts`](src/lib/queryKeys.ts).
+- **Every multi-site resource key includes its `siteId`** via the factory
+  (`queryKeys.blogs(selectedSiteId)`), including invalidations — a mutation on
+  site A must never nuke site B's cache. TanStack matches by prefix, so the
+  base call (`queryKeys.blogs(siteId)`) invalidates all paginated/filtered
+  variants of that site's resource.
+- **Global keys** (`sites`, `locales`, `profile`, ...) live only in the GLOBAL
+  section of the factory; entity-scoped keys (form, page, menu, ...) take the
+  parent entity's UUID.
+- Adding a resource? Add one method in the right section of `queryKeys.ts`,
+  keep the key's string prefix stable, and put filters/pagination in trailing
+  variadic args.

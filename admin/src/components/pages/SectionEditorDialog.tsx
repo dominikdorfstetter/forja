@@ -38,6 +38,7 @@ import { useSectionEditorSave } from './useSectionEditorSave';
 import { useAiAssist } from '@/hooks/useAiAssist';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import TranslateIcon from '@mui/icons-material/Translate';
+import { queryKeys } from '@/lib/queryKeys';
 
 /** Page-level context the dialog forwards to the AI Generate-Content action. */
 export interface SectionPageContext {
@@ -121,13 +122,13 @@ export default function SectionEditorDialog({ open, section, onClose, embedded, 
   });
 
   const { data: siteLocalesRaw } = useQuery({
-    queryKey: ['site-locales', selectedSiteId],
+    queryKey: queryKeys.siteLocales(selectedSiteId),
     queryFn: () => getSiteLocales(selectedSiteId),
     enabled: !!selectedSiteId,
   });
 
   const { data: localizations } = useQuery({
-    queryKey: ['section-localizations', section?.id],
+    queryKey: queryKeys.sectionLocalizations(section?.id),
     queryFn: () => getSectionLocalizations(section!.id),
     enabled: !!section,
   });
@@ -344,7 +345,7 @@ export default function SectionEditorDialog({ open, section, onClose, embedded, 
         // already surfaced by the save hook
       }
     }
-    if (section) queryClient.invalidateQueries({ queryKey: ['section-localizations', section.id] });
+    if (section) queryClient.invalidateQueries({ queryKey: queryKeys.sectionLocalizations(section.id) });
     onClose();
   }, [isDirty, section, handleSave, queryClient, onClose]);
 

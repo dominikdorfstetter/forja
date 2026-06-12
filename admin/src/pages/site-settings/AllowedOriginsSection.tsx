@@ -8,6 +8,7 @@ import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
 import { updateSiteSettings } from '@/services/sites';
 import type { SiteSettingsResponse } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 const ORIGIN_REGEX = /^https?:\/\/[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)*(:\d{1,5})?$/;
 
@@ -48,7 +49,7 @@ export default function AllowedOriginsSection({ siteId, settings }: AllowedOrigi
     mutationFn: (origins: string[]) =>
       updateSiteSettings(siteId, { allowed_origins: origins }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['site-settings', siteId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.siteSettings(siteId) });
       enqueueSnackbar(t('settings.messages.saved'), { variant: 'success' });
     },
     onError: () => {

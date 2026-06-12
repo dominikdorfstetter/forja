@@ -19,6 +19,7 @@ import type {
   FormTemplateResponse,
   UpdateFormTemplateRequest,
 } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface FormTemplateDialogProps {
   open: boolean;
@@ -72,7 +73,7 @@ export default function FormTemplateDialog({
     mutationFn: (payload: CreateFormTemplateRequest) =>
       createFormTemplate(selectedSiteId, payload),
     onSuccess: (saved) => {
-      queryClient.invalidateQueries({ queryKey: ['form-templates'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.formTemplates(selectedSiteId) });
       showSuccess(t('formsModule.templates.messages.created', 'Template created.'));
       onSaved?.(saved);
       onClose();
@@ -84,7 +85,7 @@ export default function FormTemplateDialog({
     mutationFn: ({ id, payload }: { id: string; payload: UpdateFormTemplateRequest }) =>
       updateFormTemplate(id, payload),
     onSuccess: (saved) => {
-      queryClient.invalidateQueries({ queryKey: ['form-templates'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.formTemplates(selectedSiteId) });
       showSuccess(t('formsModule.templates.messages.updated', 'Template updated.'));
       onSaved?.(saved);
       onClose();

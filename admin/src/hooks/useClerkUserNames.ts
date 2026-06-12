@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getClerkUsers } from '@/services/clerkUsers';
+import { queryKeys } from '@/lib/queryKeys';
 
 /**
  * Resolves a raw Clerk user id (e.g. `user_2abc…`, as stored in
@@ -13,7 +14,7 @@ import { getClerkUsers } from '@/services/clerkUsers';
  */
 export function useClerkUserNames() {
   const { data } = useQuery({
-    queryKey: ['clerk-users'],
+    queryKey: queryKeys.clerkUsers(),
     queryFn: () => getClerkUsers({ limit: 200 }),
     retry: false,
   });

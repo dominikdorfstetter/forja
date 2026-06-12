@@ -20,6 +20,7 @@ import { M3Button } from '@/components/design-system';
 import LoadingState from '@/components/shared/LoadingState';
 import { CollectionEntryForm } from './CollectionEntryForm';
 import { CollectionsBreadcrumb } from './CollectionsBreadcrumb';
+import { queryKeys } from '@/lib/queryKeys';
 
 export default function CollectionEntryEditPage() {
   const { t } = useTranslation();
@@ -37,7 +38,7 @@ export default function CollectionEntryEditPage() {
     isNew ? undefined : entryId,
   );
   const { data: siteLocales } = useQuery({
-    queryKey: ['site-locales', siteId],
+    queryKey: queryKeys.siteLocales(siteId),
     queryFn: () => getSiteLocales(siteId),
     enabled: !!siteId,
   });

@@ -25,6 +25,7 @@ import { PAGE_TYPE_CONFIG } from './pageTypeConfig';
 import { wizardSchema, type WizardFormData } from './createPageWizardSchema';
 import type { CreatePageRequest, PageType } from '@/types/api';
 import { formResolver } from '@/utils/validation';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface CreatePageWizardProps {
   open: boolean;
@@ -60,7 +61,7 @@ export default function CreatePageWizard({ open, onSubmit, onClose, loading }: C
     mode: 'onChange',
   });
 
-  const { data: sites } = useQuery({ queryKey: ['sites'], queryFn: () => getSites() });
+  const { data: sites } = useQuery({ queryKey: queryKeys.sites(), queryFn: () => getSites() });
 
   const selectedPageType = watch('page_type');
   const isInNavigation = watch('is_in_navigation');

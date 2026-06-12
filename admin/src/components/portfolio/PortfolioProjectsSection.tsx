@@ -38,6 +38,7 @@ import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
 import SortableProjectRow from './SortableProjectRow';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface PaginationMeta {
   total_items: number;
@@ -117,7 +118,7 @@ export default function PortfolioProjectsSection({
     mutationFn: (items: ReorderItem[]) => reorderProjects(siteId, items),
     onError: (err) => {
       showError(err);
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.projects(siteId) });
     },
   });
 

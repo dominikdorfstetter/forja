@@ -16,6 +16,7 @@ import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import { slugify } from '@/utils/slugify';
 import { M3Button, Icon } from '@/components/design-system';
 import type { FormTemplateResponse } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface CreateFormWizardProps {
   open: boolean;
@@ -62,7 +63,7 @@ export default function CreateFormWizard({ open, onClose, onCreated }: CreateFor
 
 
   const { data: templatesData, isLoading: templatesLoading } = useQuery({
-    queryKey: ['form-templates', selectedSiteId],
+    queryKey: queryKeys.formTemplates(selectedSiteId),
     queryFn: () => getFormTemplates(selectedSiteId, { page_size: 100 }),
     enabled: open && !!selectedSiteId,
   });
@@ -79,7 +80,7 @@ export default function CreateFormWizard({ open, onClose, onCreated }: CreateFor
         template_id: method === 'template' && templateId ? templateId : undefined,
       }),
     onSuccess: (form) => {
-      queryClient.invalidateQueries({ queryKey: ['forms'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.forms(selectedSiteId) });
       showSuccess(t('formsModule.list.messages.created', 'Form created.'));
       onCreated(form.id);
       onClose();

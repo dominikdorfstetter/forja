@@ -8,6 +8,7 @@ import { useSiteContext } from '@/store/SiteContext';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import { slugify } from '@/utils/slugify';
 import type { ContentStatus } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface PostData {
   title: string;
@@ -33,7 +34,7 @@ export function useQuickPostPublish({ open, getPostData, onClose }: UseQuickPost
   const { selectedSiteId } = useSiteContext();
 
   const { data: siteLocales } = useQuery({
-    queryKey: ['site-locales', selectedSiteId],
+    queryKey: queryKeys.siteLocales(selectedSiteId),
     queryFn: () => getSiteLocales(selectedSiteId),
     enabled: open && !!selectedSiteId,
   });
@@ -68,7 +69,7 @@ export function useQuickPostPublish({ open, getPostData, onClose }: UseQuickPost
       return blog;
     },
     onSuccess: (blog) => {
-      queryClient.invalidateQueries({ queryKey: ['blogs'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.blogs(selectedSiteId) });
       showSuccess(t('quickPost.success'));
       onClose();
       navigate(`/blogs/${blog.id}`);

@@ -37,6 +37,7 @@ import {
   FilterSelect,
 } from '@/components/shared/listPageV2';
 import { SectionHead, M3Button } from '@/components/design-system';
+import { queryKeys } from '@/lib/queryKeys';
 
 const STATUS_OPTIONS: (ApiKeyStatus | '')[] = ['', 'Active', 'Blocked', 'Expired', 'Revoked'];
 const PERMISSION_OPTIONS: (ApiKeyPermission | '')[] = ['', 'Admin', 'Write', 'Read'];
@@ -177,13 +178,12 @@ export default function ApiKeysPage() {
   }, []);
 
   const { data: sites } = useQuery({
-    queryKey: ['sites'],
+    queryKey: queryKeys.sites(),
     queryFn: () => getSites(),
   });
 
   const { data: apiKeysData, isLoading, error } = useQuery({
-    queryKey: [
-      'apiKeys',
+    queryKey: queryKeys.apiKeys(
       ui.statusFilter,
       ui.permissionFilter,
       debouncedSearch,
@@ -192,7 +192,7 @@ export default function ApiKeysPage() {
       selectedSiteId,
       ui.sortBy,
       ui.sortDir,
-    ],
+    ),
     queryFn: () =>
       getApiKeys({
         status: ui.statusFilter || undefined,
@@ -215,7 +215,7 @@ export default function ApiKeysPage() {
     mutationFn: ({ id, reason }: { id: string; reason: string }) =>
       blockApiKey(id, reason),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['apiKeys'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.apiKeys() });
       dispatch({ type: 'closeBlock' });
       showSuccess(t('apiKeys.messages.blocked'));
     },
@@ -227,7 +227,7 @@ export default function ApiKeysPage() {
   const unblockMutation = useMutation({
     mutationFn: (id: string) => unblockApiKey(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['apiKeys'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.apiKeys() });
       showSuccess(t('apiKeys.messages.unblocked'));
     },
     onError: (error) => {
@@ -238,7 +238,7 @@ export default function ApiKeysPage() {
   const revokeMutation = useMutation({
     mutationFn: (id: string) => revokeApiKey(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['apiKeys'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.apiKeys() });
       dispatch({ type: 'closeRevoke' });
       showSuccess(t('apiKeys.messages.revoked'));
     },
@@ -250,7 +250,7 @@ export default function ApiKeysPage() {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteApiKey(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['apiKeys'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.apiKeys() });
       dispatch({ type: 'closeDelete' });
       showSuccess(t('apiKeys.messages.deleted'));
     },
@@ -261,7 +261,7 @@ export default function ApiKeysPage() {
 
   const handleCreateKey = async (data: CreateApiKeyRequest) => {
     const result = await createApiKey(data);
-    queryClient.invalidateQueries({ queryKey: ['apiKeys'] });
+    queryClient.invalidateQueries({ queryKey: queryKeys.apiKeys() });
     return result;
   };
 
@@ -269,7 +269,7 @@ export default function ApiKeysPage() {
     mutationFn: ({ id, data }: { id: string; data: UpdateApiKeyRequest }) =>
       updateApiKey(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['apiKeys'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.apiKeys() });
       dispatch({ type: 'closeEdit' });
       showSuccess(t('apiKeys.messages.updated'));
     },

@@ -47,6 +47,7 @@ import { SidebarSiteSwitcher } from '@/components/layout/SidebarSiteSwitcher';
 import SidebarUserFooter from '@/components/layout/SidebarUserFooter';
 import { buildWorkspaceSections, buildAdminSections } from '@/components/layout/navConfig';
 import GlobalSaveBar from '@/components/layout/GlobalSaveBar';
+import { queryKeys } from '@/lib/queryKeys';
 
 const drawerWidth = 240;
 const collapsedWidth = 64;
@@ -134,13 +135,13 @@ export default function Layout() {
   const { guardedNavigate } = useNavigationGuardContext();
   const { modules, context } = useSiteContextData();
   const { data: trashCount } = useQuery({
-    queryKey: ['trash-count', selectedSiteId],
+    queryKey: queryKeys.trashCount(selectedSiteId),
     queryFn: () => getTrashCount(selectedSiteId),
     enabled: !!selectedSiteId && isAdmin,
     refetchInterval: 60_000,
   });
   const { data: siteSettings } = useQuery({
-    queryKey: ['site-settings', selectedSiteId],
+    queryKey: queryKeys.siteSettings(selectedSiteId),
     queryFn: () => getSiteSettings(selectedSiteId),
     enabled: !!selectedSiteId,
   });
@@ -151,8 +152,8 @@ export default function Layout() {
   const leaveSiteMutation = useMutation({
     mutationFn: () => leaveSite(selectedSiteId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['members'] });
-      queryClient.invalidateQueries({ queryKey: ['sites'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.members(selectedSiteId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.sites() });
       setLeaveDialogOpen(false);
       navigate('/sites');
     },
@@ -160,7 +161,7 @@ export default function Layout() {
 
   const handleTurnOffMaintenance = useCallback(async () => {
     await updateSiteSettings(selectedSiteId, { maintenance_mode: false });
-    queryClient.invalidateQueries({ queryKey: ['site-settings', selectedSiteId] });
+    queryClient.invalidateQueries({ queryKey: queryKeys.siteSettings(selectedSiteId) });
   }, [selectedSiteId, queryClient]);
 
   // Redirect to launcher if no site is selected (and not site-scoped)

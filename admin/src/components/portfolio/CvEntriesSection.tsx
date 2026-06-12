@@ -38,6 +38,7 @@ import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
 import SortableCvEntryRow from './SortableCvEntryRow';
+import { queryKeys } from '@/lib/queryKeys';
 
 const ENTRY_TYPES: CvEntryType[] = ['Work', 'Education', 'Volunteer', 'Certification', 'Project'];
 
@@ -115,7 +116,7 @@ export default function CvEntriesSection({
     mutationFn: (items: ReorderItem[]) => reorderCvEntries(siteId, items),
     onError: (err) => {
       showError(err);
-      queryClient.invalidateQueries({ queryKey: ['cv-entries'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.cvEntries(siteId) });
     },
   });
 

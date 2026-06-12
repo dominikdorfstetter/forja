@@ -26,6 +26,7 @@ import { useSiteContextData } from '@/hooks/useSiteContextData';
 import { SectionHead } from '@/components/design-system';
 import type { AiUsageGroupBy } from '@/types/api';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
+import { queryKeys } from '@/lib/queryKeys';
 
 /**
  * Available filter values for `action`. Mirrors backend `AiAction` serde names.
@@ -95,7 +96,7 @@ export default function AiUsagePage() {
   const [exporting, setExporting] = useState(false);
 
   const usageQuery = useQuery({
-    queryKey: ['ai-usage', selectedSiteId, fromIso, toIso, actionFilter, groupBy],
+    queryKey: queryKeys.aiUsage(selectedSiteId, fromIso, toIso, actionFilter, groupBy),
     queryFn: () =>
       getAiUsage(selectedSiteId, {
         from: fromIso,

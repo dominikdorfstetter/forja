@@ -17,6 +17,7 @@ import AiTaskConfigs from './AiTaskConfigs';
 import { SectionHead, M3Button } from '@/components/design-system';
 import { useFormSaveBar } from '@/hooks/useFormSaveBar';
 import { formResolver } from '@/utils/validation';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface ProviderPreset {
   key: string;
@@ -85,7 +86,7 @@ export default function AiSettingsPage() {
   const [extraDirty, setExtraDirty] = useState(false);
 
   const configQuery = useQuery({
-    queryKey: ['ai-config', selectedSiteId],
+    queryKey: queryKeys.aiConfig(selectedSiteId),
     queryFn: () => getAiConfig(selectedSiteId),
     enabled: !!selectedSiteId,
     retry: false,
@@ -177,7 +178,7 @@ export default function AiSettingsPage() {
     mutationFn: (data: CreateAiConfigRequest) =>
       upsertAiConfig(selectedSiteId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['ai-config', selectedSiteId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.aiConfig(selectedSiteId) });
       enqueueSnackbar(t('aiSettings.messages.saved'), { variant: 'success' });
       setExtraDirty(false);
     },
@@ -189,7 +190,7 @@ export default function AiSettingsPage() {
   const deleteMutation = useMutation({
     mutationFn: () => deleteAiConfig(selectedSiteId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['ai-config', selectedSiteId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.aiConfig(selectedSiteId) });
       reset(buildFormDefaults());
       setSelectedPreset('');
       setDiscoveredModels([]);

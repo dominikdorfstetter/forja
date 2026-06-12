@@ -9,6 +9,7 @@ import { DataTableV2, type DataTableV2Column } from '@/components/shared/listPag
 import { Icon, M3IconButton } from '@/components/design-system';
 import GlobalCacheSection from '@/components/cache/GlobalCacheSection';
 import type { HealthResponse, SiteStorageSummary } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 type HealthService = HealthResponse['services'][number];
 
@@ -168,19 +169,19 @@ export default function SystemDashboardPage() {
   const { t } = useTranslation();
 
   const { data: health, isLoading: healthLoading, error: healthError, refetch: refetchHealth } = useQuery({
-    queryKey: ['health'],
+    queryKey: queryKeys.health(),
     queryFn: () => getHealth(),
     retry: false,
     refetchInterval: 30_000,
   });
 
   const { data: sites, isLoading: sitesLoading } = useQuery({
-    queryKey: ['sites'],
+    queryKey: queryKeys.sites(),
     queryFn: () => getSites(),
   });
 
   const { data: storageOverview } = useQuery({
-    queryKey: ['system-storage-overview'],
+    queryKey: queryKeys.systemStorageOverview(),
     queryFn: () => getSystemStorageOverview(),
   });
 

@@ -22,6 +22,7 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getMedia, uploadMediaFile } from '@/services/media';
 import { useTranslation } from 'react-i18next';
+import { queryKeys } from '@/lib/queryKeys';
 
 const ACCEPTED_IMAGE_TYPES = [
   'image/jpeg',
@@ -62,7 +63,7 @@ export default function MediaPickerDialog({
   const [uploadError, setUploadError] = useState<string | null>(null);
 
   const { data: mediaData, isLoading } = useQuery({
-    queryKey: ['media-picker', siteId],
+    queryKey: queryKeys.mediaPicker(siteId),
     queryFn: () => getMedia(siteId, { mime_category: 'image', page_size: 50 }),
     enabled: open && !!siteId,
   });
@@ -117,7 +118,7 @@ export default function MediaPickerDialog({
       try {
         const media = await uploadMediaFile(file, [siteId]);
         // Invalidate gallery query so the new image appears
-        await queryClient.invalidateQueries({ queryKey: ['media-picker', siteId] });
+        await queryClient.invalidateQueries({ queryKey: queryKeys.mediaPicker(siteId) });
         // Auto-select the uploaded image and switch to gallery
         setSelected(media.id);
         setActiveTab(0);
