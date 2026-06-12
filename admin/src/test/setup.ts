@@ -578,8 +578,66 @@ vi.mock('@/services/botProtection', () => ({
 
 vi.mock('@/services/http', () => ({
   setClerkTokenGetter: vi.fn(),
-  apiClient: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn() },
+  // The real apiClient is an axios instance, i.e. callable — mirror that.
+  apiClient: Object.assign(vi.fn(), {
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    delete: vi.fn(),
+    request: vi.fn(),
+  }),
   apiRequest: vi.fn(),
+}));
+
+vi.mock('@/services/cache', () => ({
+  getSiteCacheStats: vi.fn(),
+  invalidateSiteCache: vi.fn(),
+  rebuildSiteCache: vi.fn(),
+  getGlobalCacheStats: vi.fn(),
+  invalidateAllCache: vi.fn(),
+}));
+
+// Services like legal.ts re-export factory methods at module scope
+// (`export const getLegalDocuments = svc.list`), so the mocked factory must
+// return the full ContentService surface or automocked consumers break.
+vi.mock('@/services/contentService', () => ({
+  createContentService: vi.fn(() => ({
+    list: vi.fn(),
+    detail: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    remove: vi.fn(),
+    bulk: vi.fn(),
+    review: vi.fn(),
+    getLocalizations: vi.fn(),
+    createLocalization: vi.fn(),
+    updateLocalization: vi.fn(),
+    deleteLocalization: vi.fn(),
+  })),
+}));
+
+vi.mock('@/services/imprint', () => ({
+  getImprint: vi.fn(),
+}));
+
+vi.mock('@/services/customTypes', () => ({
+  listCustomTypes: vi.fn().mockResolvedValue([]),
+  getCustomType: vi.fn(),
+  createCustomType: vi.fn(),
+  updateCustomType: vi.fn(),
+  deleteCustomType: vi.fn(),
+  listEntries: vi.fn().mockResolvedValue({
+    data: [],
+    meta: { page: 1, page_size: 10, total_items: 0, total_pages: 0 },
+  }),
+  getEntry: vi.fn(),
+  createEntry: vi.fn(),
+  updateEntry: vi.fn(),
+  deleteEntry: vi.fn(),
+  publishEntry: vi.fn(),
+  unpublishEntry: vi.fn(),
+  eraseEntryPii: vi.fn(),
+  getRopa: vi.fn(),
 }));
 
 // Mock window.scrollTo
