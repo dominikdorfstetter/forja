@@ -219,6 +219,15 @@ impl UserModeration {
 
         Ok(rows)
     }
+
+    /// Remove a user's moderation record entirely (banned-user purge).
+    pub async fn delete_for_user(pool: &PgPool, clerk_user_id: &str) -> Result<(), ApiError> {
+        sqlx::query("DELETE FROM user_moderation WHERE clerk_user_id = $1")
+            .bind(clerk_user_id)
+            .execute(pool)
+            .await?;
+        Ok(())
+    }
 }
 
 #[cfg(test)]

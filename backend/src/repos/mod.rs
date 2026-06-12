@@ -14,3 +14,9 @@ pub mod legal_repo;
 pub mod page_repo;
 pub mod project_repo;
 pub mod trash_repo;
+pub mod user_data_repo;
+
+/// Liveness probe for the health endpoint — round-trips one query.
+pub async fn ping(pool: &sqlx::PgPool) -> Result<(), sqlx::Error> {
+    sqlx::query("SELECT 1").fetch_one(pool).await.map(|_| ())
+}

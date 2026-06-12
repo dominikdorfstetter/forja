@@ -430,6 +430,17 @@ impl WebhookDelivery {
         .await?;
         Ok(rows)
     }
+
+    /// Deliveries currently waiting in the retry queue for a webhook.
+    pub async fn pending_retry_count(pool: &PgPool, webhook_id: Uuid) -> Result<i64, ApiError> {
+        let count: i64 = sqlx::query_scalar(
+            "SELECT COUNT(*) FROM webhook_retry_queue WHERE webhook_id = $1 AND status IN ('pending', 'retrying')",
+        )
+        .bind(webhook_id)
+        .fetch_one(pool)
+        .await?;
+        Ok(count)
+    }
 }
 
 // ---------------------------------------------------------------------------

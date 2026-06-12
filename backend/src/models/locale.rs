@@ -113,8 +113,8 @@ impl Locale {
         Ok(locale)
     }
 
-    /// Find locale by code
-    pub async fn find_by_code(pool: &PgPool, code: &str) -> Result<Self, ApiError> {
+    /// Find locale by code; `Ok(None)` when the code is unknown.
+    pub async fn find_by_code_opt(pool: &PgPool, code: &str) -> Result<Option<Self>, ApiError> {
         let locale = sqlx::query_as::<_, Self>(
             r#"
             SELECT id, code, name, native_name, direction, is_active, created_at
@@ -124,14 +124,18 @@ impl Locale {
         )
         .bind(code)
         .fetch_optional(pool)
-        .await?
-        .ok_or_else(|| {
+        .await?;
+
+        Ok(locale)
+    }
+
+    /// Find locale by code
+    pub async fn find_by_code(pool: &PgPool, code: &str) -> Result<Self, ApiError> {
+        Self::find_by_code_opt(pool, code).await?.ok_or_else(|| {
             ApiError::not_found(format!("Locale with code '{}' not found", code))
                 .with_code(codes::ENTITY_NOT_FOUND)
                 .with_entity_type("locale")
-        })?;
-
-        Ok(locale)
+        })
     }
 
     /// Resolve a locale identifier — a UUID *or* a code like `"de"` — to its id.

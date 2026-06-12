@@ -23,7 +23,7 @@ use crate::AppState;
 async fn collect_health_response(state: &AppState) -> (StatusCode, HealthResponse) {
     let db_fut = async {
         let start = Instant::now();
-        let db_check = sqlx::query("SELECT 1").fetch_one(&state.db).await;
+        let db_check = crate::repos::ping(&state.db).await;
         let latency = start.elapsed().as_millis() as u64;
         match db_check {
             Ok(_) => (

@@ -3,8 +3,8 @@
 //! membership list, and self-leave.
 
 use crate::dto::site_membership::{
-    AddSiteMemberRequest, MembershipSummary, MembershipWithSite, SiteMembershipResponse,
-    TransferOwnershipRequest, UpdateMemberRoleRequest,
+    AddSiteMemberRequest, MembershipSummary, SiteMembershipResponse, TransferOwnershipRequest,
+    UpdateMemberRoleRequest,
 };
 use crate::dto::validated::ValidatedJson;
 use crate::errors::{codes, ApiError};
@@ -264,10 +264,8 @@ async fn remove_site_member(
     )
     .await?;
 
-    let memberships = SiteMembership::find_all_for_site(&state.db, site_id).await?;
-    let target = memberships
-        .iter()
-        .find(|m| m.id == member_id)
+    let target = SiteMembership::find_by_id_and_site(&state.db, member_id, site_id)
+        .await?
         .ok_or_else(|| {
             ApiError::not_found("Membership not found on this site")
                 .with_code(codes::RESOURCE_NOT_FOUND)
@@ -367,18 +365,7 @@ async fn get_my_memberships(
             .with_code(codes::BAD_REQUEST)
     })?;
 
-    let rows: Vec<MembershipWithSite> = sqlx::query_as(
-        r#"
-        SELECT sm.site_id, s.name AS site_name, s.slug AS site_slug, sm.role
-        FROM site_memberships sm
-        JOIN sites s ON s.id = sm.site_id AND s.is_deleted = FALSE
-        WHERE sm.clerk_user_id = $1
-        ORDER BY s.name ASC
-        "#,
-    )
-    .bind(clerk_user_id)
-    .fetch_all(&state.db)
-    .await?;
+    let rows = SiteMembership::find_summaries_for_user(&state.db, clerk_user_id).await?;
 
     Ok(Json(
         rows.into_iter().map(MembershipSummary::from).collect(),
