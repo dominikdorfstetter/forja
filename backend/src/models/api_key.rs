@@ -151,6 +151,31 @@ impl ApiKey {
             .to_string()
     }
 
+    /// Idempotently register the demo-mode guest key (read-only, demo site).
+    /// No-op when a key with the same hash already exists.
+    pub async fn upsert_demo_guest_key(
+        pool: &PgPool,
+        key_hash: &str,
+        key_prefix: &str,
+        site_id: Uuid,
+    ) -> Result<(), sqlx::Error> {
+        sqlx::query(
+            r#"INSERT INTO api_keys (key_hash, key_prefix, name, description, permission, site_id, status,
+                rate_limit_per_second, rate_limit_per_minute, rate_limit_per_hour, rate_limit_per_day, hash_version)
+            VALUES ($1, $2, $3, $4, 'read', $5, 'active', 10, 100, 1000, 10000, $6)
+            ON CONFLICT (key_hash) DO NOTHING"#,
+        )
+        .bind(key_hash)
+        .bind(key_prefix)
+        .bind("Demo Guest Key")
+        .bind("Read-only guest access for demo site — auto-created by demo mode")
+        .bind(site_id)
+        .bind(HASH_VERSION_ARGON2)
+        .execute(pool)
+        .await
+        .map(|_| ())
+    }
+
     /// Hash an API key using SHA-256 (legacy, for backward-compatible verification only).
     fn hash_key_sha256(key: &str) -> String {
         let mut hasher = Sha256::new();

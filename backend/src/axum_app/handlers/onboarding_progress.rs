@@ -16,6 +16,7 @@ use crate::errors::{codes, ApiError, ProblemDetails};
 use crate::guards::actor::Actor;
 use crate::guards::auth_guard::{ReadKey, WriteKey};
 use crate::models::onboarding_progress::OnboardingProgress;
+use crate::models::site_membership::SiteMembership;
 use crate::services::permission_service::{Permission, PermissionService};
 use crate::AppState;
 
@@ -105,11 +106,7 @@ async fn build_progress_response(
 ) -> Result<OnboardingProgressResponse, ApiError> {
     let steps = OnboardingProgress::find_for_user_site(&state.db, clerk_user_id, site_id).await?;
 
-    let member_count: i64 =
-        sqlx::query_scalar("SELECT COUNT(*) FROM site_memberships WHERE site_id = $1")
-            .bind(site_id)
-            .fetch_one(&state.db)
-            .await?;
+    let member_count = SiteMembership::count_for_site(&state.db, site_id).await?;
 
     let total_steps = if member_count >= 2 {
         BASE_STEPS + TEAM_STEPS

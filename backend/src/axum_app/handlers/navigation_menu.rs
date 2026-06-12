@@ -351,16 +351,12 @@ async fn get_navigation_tree(
     )
     .await?;
     let locale_id = if let Some(code) = q.locale {
-        let locale = sqlx::query_as::<_, crate::models::locale::Locale>(
-            "SELECT * FROM locales WHERE code = $1",
-        )
-        .bind(&code)
-        .fetch_optional(&state.db)
-        .await?
-        .ok_or_else(|| {
-            ApiError::bad_request(format!("Locale '{}' not found", code))
-                .with_code(codes::BAD_REQUEST)
-        })?;
+        let locale = crate::models::locale::Locale::find_by_code_opt(&state.db, &code)
+            .await?
+            .ok_or_else(|| {
+                ApiError::bad_request(format!("Locale '{}' not found", code))
+                    .with_code(codes::BAD_REQUEST)
+            })?;
         Some(locale.id)
     } else {
         None

@@ -347,4 +347,22 @@ impl Notification {
                     .with_entity_type("notification")
             })
     }
+
+    /// Most recent notifications for a recipient across all sites (GDPR export).
+    pub async fn find_recent_for_recipient(
+        pool: &PgPool,
+        recipient_clerk_id: &str,
+        limit: i64,
+    ) -> Result<Vec<Self>, ApiError> {
+        let rows = sqlx::query_as::<_, Self>(
+            r#"SELECT * FROM notifications
+               WHERE recipient_clerk_id = $1
+               ORDER BY created_at DESC LIMIT $2"#,
+        )
+        .bind(recipient_clerk_id)
+        .bind(limit)
+        .fetch_all(pool)
+        .await?;
+        Ok(rows)
+    }
 }

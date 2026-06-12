@@ -1,0 +1,146 @@
+//! GDPR user-data queries: the export row queries and account-erasure
+//! statements that span user-referencing tables (api_keys, audit_logs,
+//! change_history, contents, system_admins). Extracted from the auth and
+//! clerk_user handlers so the SQL lives behind one tested seam.
+
+use chrono::{DateTime, Utc};
+use sqlx::PgPool;
+use uuid::Uuid;
+
+use crate::models::api_key::{ApiKeyPermission, ApiKeyStatus};
+use crate::models::audit::ChangeHistory;
+
+/// Row shape for the API-key section of a GDPR export.
+#[derive(Debug, sqlx::FromRow)]
+pub struct ApiKeyExportRow {
+    pub id: Uuid,
+    pub name: String,
+    pub permission: ApiKeyPermission,
+    pub site_id: Option<Uuid>,
+    pub status: ApiKeyStatus,
+    pub created_at: DateTime<Utc>,
+}
+
+/// Non-deleted content rows authored by a user, by entity type.
+#[derive(Debug)]
+pub struct AuthoredContentCounts {
+    pub blogs: i64,
+    pub pages: i64,
+    pub documents: i64,
+    pub legal_docs: i64,
+}
+
+/// API keys the user owns or created, newest first.
+pub async fn api_keys_for_user(
+    pool: &PgPool,
+    user_id: Uuid,
+) -> Result<Vec<ApiKeyExportRow>, sqlx::Error> {
+    sqlx::query_as(
+        r#"
+        SELECT id, name, permission, site_id, status, created_at
+        FROM api_keys
+        WHERE user_id = $1 OR created_by = $1
+        ORDER BY created_at DESC
+        "#,
+    )
+    .bind(user_id)
+    .fetch_all(pool)
+    .await
+}
+
+/// Most recent change-history rows authored by the user.
+pub async fn change_history_for_user(
+    pool: &PgPool,
+    user_id: Uuid,
+    limit: i64,
+) -> Result<Vec<ChangeHistory>, sqlx::Error> {
+    sqlx::query_as(
+        r#"
+        SELECT id, site_id, entity_type, entity_id, field_name,
+               old_value, new_value, changed_by, changed_at
+        FROM change_history
+        WHERE changed_by = $1
+        ORDER BY changed_at DESC
+        LIMIT $2
+        "#,
+    )
+    .bind(user_id)
+    .bind(limit)
+    .fetch_all(pool)
+    .await
+}
+
+/// Count non-deleted content authored by a Clerk user, per entity type.
+pub async fn authored_content_counts(
+    pool: &PgPool,
+    clerk_user_id: &str,
+) -> Result<AuthoredContentCounts, sqlx::Error> {
+    let (blogs, pages, documents, legal_docs): (i64, i64, i64, i64) = sqlx::query_as(
+        r#"
+        SELECT
+            COALESCE((SELECT COUNT(*) FROM contents WHERE created_by = $1 AND is_deleted = FALSE
+                AND entity_type_id = (SELECT id FROM entity_types WHERE name = 'blog')), 0),
+            COALESCE((SELECT COUNT(*) FROM contents WHERE created_by = $1 AND is_deleted = FALSE
+                AND entity_type_id = (SELECT id FROM entity_types WHERE name = 'page')), 0),
+            COALESCE((SELECT COUNT(*) FROM contents WHERE created_by = $1 AND is_deleted = FALSE
+                AND entity_type_id = (SELECT id FROM entity_types WHERE name = 'document')), 0),
+            COALESCE((SELECT COUNT(*) FROM contents WHERE created_by = $1 AND is_deleted = FALSE
+                AND entity_type_id = (SELECT id FROM entity_types WHERE name = 'legal')), 0)
+        "#,
+    )
+    .bind(clerk_user_id)
+    .fetch_one(pool)
+    .await?;
+
+    Ok(AuthoredContentCounts {
+        blogs,
+        pages,
+        documents,
+        legal_docs,
+    })
+}
+
+/// Account deletion: drop system-admin status and null every reference to
+/// the user across api_keys, audit_logs and change_history, atomically.
+pub async fn anonymize_user_records(
+    pool: &PgPool,
+    clerk_user_id: &str,
+    user_id: Uuid,
+) -> Result<(), sqlx::Error> {
+    let mut tx = pool.begin().await?;
+
+    sqlx::query("DELETE FROM system_admins WHERE clerk_user_id = $1")
+        .bind(clerk_user_id)
+        .execute(&mut *tx)
+        .await?;
+    sqlx::query("UPDATE api_keys SET user_id = NULL WHERE user_id = $1")
+        .bind(user_id)
+        .execute(&mut *tx)
+        .await?;
+    sqlx::query("UPDATE api_keys SET created_by = NULL WHERE created_by = $1")
+        .bind(user_id)
+        .execute(&mut *tx)
+        .await?;
+    sqlx::query("UPDATE audit_logs SET user_id = NULL WHERE user_id = $1")
+        .bind(user_id)
+        .execute(&mut *tx)
+        .await?;
+    sqlx::query("UPDATE change_history SET changed_by = NULL WHERE changed_by = $1")
+        .bind(user_id)
+        .execute(&mut *tx)
+        .await?;
+
+    tx.commit().await
+}
+
+/// Detach a Clerk user from all content they authored (banned-user purge).
+pub async fn anonymize_authored_content(
+    pool: &PgPool,
+    clerk_user_id: &str,
+) -> Result<(), sqlx::Error> {
+    sqlx::query("UPDATE contents SET created_by = NULL WHERE created_by = $1")
+        .bind(clerk_user_id)
+        .execute(pool)
+        .await
+        .map(|_| ())
+}

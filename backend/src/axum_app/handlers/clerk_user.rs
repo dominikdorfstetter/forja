@@ -449,14 +449,8 @@ async fn delete_banned_user(
     }
 
     SiteMembership::delete_all_for_clerk_user(&state.db, &clerk_user_id).await?;
-    sqlx::query("UPDATE content SET created_by = NULL WHERE created_by = $1")
-        .bind(&clerk_user_id)
-        .execute(&state.db)
-        .await?;
-    sqlx::query("DELETE FROM user_moderation WHERE clerk_user_id = $1")
-        .bind(&clerk_user_id)
-        .execute(&state.db)
-        .await?;
+    crate::repos::user_data_repo::anonymize_authored_content(&state.db, &clerk_user_id).await?;
+    UserModeration::delete_for_user(&state.db, &clerk_user_id).await?;
 
     if let Some(clerk) = state.clerk_service.as_ref() {
         clerk.delete_user(&clerk_user_id).await?;
