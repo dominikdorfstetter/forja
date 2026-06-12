@@ -3044,7 +3044,18 @@
     "deleteAccountMessage": "هذا الإجراء دائم ولا يمكن التراجع عنه. سيتم حذف حساب Clerk الخاص بك وستتم إخفاء هوية جميع بيانات نظام إدارة المحتوى المرتبطة. هل أنت متأكد من المتابعة؟",
     "deleteAccountConfirm": "حذف حسابي",
     "deleteSuccess": "تم حذف الحساب بنجاح",
-    "deleteError": "فشل حذف الحساب"
+    "deleteError": "فشل حذف الحساب",
+    "piiInventory": {
+      "title": "ما الذي نخزنه عنك",
+      "description": "كل حقل يحمل هوية يعالجه Forja عنك — الغرض، والأساس القانوني، وما يحدث عند المحو، وعدد سجلاتك الحالية.",
+      "colField": "الحقل",
+      "colPurpose": "الغرض",
+      "colLegalBasis": "الأساس القانوني",
+      "colRecords": "سجلاتك",
+      "colErasure": "عند المحو",
+      "anonymizeOnErasure": "يُزال عند حذف حسابك",
+      "retentionPurged": "يُحذف تلقائيًا بواسطة تنظيف الاحتفاظ"
+    }
   },
   "siteLocales": {
     "title": "اللغات",

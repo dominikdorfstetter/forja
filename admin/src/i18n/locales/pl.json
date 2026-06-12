@@ -3042,7 +3042,18 @@
     "deleteAccountMessage": "Ta operacja jest trwała i nie można jej cofnąć. Twoje konto Clerk zostanie usunięte, a wszystkie powiązane dane CMS zostaną zanonimizowane. Czy na pewno chcesz kontynuować?",
     "deleteAccountConfirm": "Usuń moje konto",
     "deleteSuccess": "Konto usunięte pomyślnie",
-    "deleteError": "Nie udało się usunąć konta"
+    "deleteError": "Nie udało się usunąć konta",
+    "piiInventory": {
+      "title": "Co przechowujemy na Pana/Pani temat",
+      "description": "Każde pole identyfikujące przetwarzane przez Forja — cel, podstawa prawna, co dzieje się przy usunięciu oraz ile Pana/Pani rekordów obecnie istnieje.",
+      "colField": "Pole",
+      "colPurpose": "Cel",
+      "colLegalBasis": "Podstawa prawna",
+      "colRecords": "Pana/Pani rekordy",
+      "colErasure": "Przy usunięciu",
+      "anonymizeOnErasure": "Usuwane przy usunięciu konta",
+      "retentionPurged": "Usuwane automatycznie przez czyszczenie retencyjne"
+    }
   },
   "siteLocales": {
     "title": "Języki",

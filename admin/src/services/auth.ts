@@ -3,6 +3,7 @@ import type {
   GuestTokenResponse,
   ProfileResponse,
   UserDataExportResponse,
+  PiiInventoryResponse,
   UserPreferencesResponse,
   UpdateUserPreferencesRequest,
   OnboardingResponse,
@@ -17,6 +18,7 @@ export const getAuthMe = () => apiRequest<AuthInfo>('GET', '/auth/me');
 export const getGuestToken = () => apiRequest<GuestTokenResponse>('GET', '/auth/guest');
 export const getProfile = () => apiRequest<ProfileResponse>('GET', '/auth/profile');
 export const exportUserData = () => apiRequest<UserDataExportResponse>('GET', '/auth/export');
+export const getPiiInventory = () => apiRequest<PiiInventoryResponse>('GET', '/auth/pii-inventory');
 export const deleteAccount = () => apiRequest<void>('DELETE', '/auth/account');
 
 export const getUserPreferences = () => apiRequest<UserPreferencesResponse>('GET', '/auth/preferences');

@@ -46,6 +46,7 @@ pub mod notification;
 pub mod onboarding;
 pub mod onboarding_progress;
 pub mod page;
+pub mod pii_inventory;
 pub mod project;
 pub mod redirect;
 pub mod review;

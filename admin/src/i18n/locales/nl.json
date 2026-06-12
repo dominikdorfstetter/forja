@@ -3040,7 +3040,18 @@
     "deleteAccountMessage": "Deze actie is permanent en kan niet ongedaan worden gemaakt. Uw Clerk-account wordt verwijderd en alle bijbehorende CMS-gegevens worden geanonimiseerd. Weet u zeker dat u wilt doorgaan?",
     "deleteAccountConfirm": "Mijn account verwijderen",
     "deleteSuccess": "Account succesvol verwijderd",
-    "deleteError": "Account verwijderen mislukt"
+    "deleteError": "Account verwijderen mislukt",
+    "piiInventory": {
+      "title": "Wat we over u opslaan",
+      "description": "Elk identiteitsgebonden veld dat Forja over u verwerkt — doel, rechtsgrondslag, wat er bij wissing gebeurt en hoeveel van uw records er momenteel bestaan.",
+      "colField": "Veld",
+      "colPurpose": "Doel",
+      "colLegalBasis": "Rechtsgrondslag",
+      "colRecords": "Uw records",
+      "colErasure": "Bij wissing",
+      "anonymizeOnErasure": "Verwijderd wanneer u uw account verwijdert",
+      "retentionPurged": "Automatisch verwijderd door de bewaartermijn-opschoning"
+    }
   },
   "siteLocales": {
     "title": "Talen",

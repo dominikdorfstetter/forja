@@ -12,6 +12,12 @@ import {
   Alert,
   Dialog,
   DialogContent,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Tooltip,
 } from '@mui/material';
 import DownloadIcon from '@mui/icons-material/Download';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
@@ -23,7 +29,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
-import { deleteAccount, exportUserData, getProfile } from '@/services/auth';
+import { deleteAccount, exportUserData, getPiiInventory, getProfile } from '@/services/auth';
 import { useAuth } from '@/store/AuthContext';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
@@ -49,6 +55,19 @@ export default function ProfilePage() {
     queryKey: queryKeys.profile(),
     queryFn: () => getProfile(),
   });
+
+  // GDPR Art. 15 transparency view — non-fatal: export/deletion stay
+  // available if the inventory fails to load.
+  const { data: piiInventory } = useQuery({
+    queryKey: queryKeys.piiInventory(),
+    queryFn: () => getPiiInventory(),
+    retry: false,
+  });
+
+  const erasureLabel = (behavior: string) =>
+    behavior === 'retention_purged'
+      ? t('profile.piiInventory.retentionPurged')
+      : t('profile.piiInventory.anonymizeOnErasure');
 
   const exportMutation = useMutation({
     mutationFn: () => exportUserData(),
@@ -211,6 +230,63 @@ export default function ProfilePage() {
             <Alert severity="info" sx={{ mb: 3 }}>
               {t('profile.dataPrivacyInfo')}
             </Alert>
+            {piiInventory && piiInventory.entities.length > 0 && (
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="subtitle2" gutterBottom>
+                  {t('profile.piiInventory.title')}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+                  {t('profile.piiInventory.description')}
+                </Typography>
+                <Table size="small" data-testid="pii-inventory.table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell scope="col">{t('profile.piiInventory.colField')}</TableCell>
+                      <TableCell scope="col">{t('profile.piiInventory.colPurpose')}</TableCell>
+                      <TableCell scope="col">{t('profile.piiInventory.colLegalBasis')}</TableCell>
+                      <TableCell scope="col" align="right">
+                        {t('profile.piiInventory.colRecords')}
+                      </TableCell>
+                      <TableCell scope="col">{t('profile.piiInventory.colErasure')}</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {piiInventory.entities.flatMap((entity) =>
+                      entity.fields.map((field) => (
+                        <TableRow key={`${entity.table}.${field.field}`}>
+                          <TableCell>
+                            <Tooltip title={entity.description}>
+                              <Typography
+                                component="span"
+                                sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}
+                              >
+                                {entity.table}.{field.field}
+                              </Typography>
+                            </Tooltip>
+                          </TableCell>
+                          <TableCell>{field.purpose}</TableCell>
+                          <TableCell>
+                            <Typography variant="body2" color="text.secondary" component="span">
+                              {field.legal_basis}
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="right">
+                            {field.record_count ?? '—'}
+                          </TableCell>
+                          <TableCell>
+                            <Chip
+                              size="small"
+                              variant="outlined"
+                              label={erasureLabel(field.retention_behavior)}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      )),
+                    )}
+                  </TableBody>
+                </Table>
+              </Box>
+            )}
             <Stack direction="row" spacing={2}>
               <Button
                 variant="outlined"
