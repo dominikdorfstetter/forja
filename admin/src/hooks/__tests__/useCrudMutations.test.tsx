@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act, waitFor, screen } from '@testing-library/react';
 import { type ReactNode, createElement } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SnackbarProvider } from 'notistack';
@@ -95,6 +95,69 @@ describe('useCrudMutations', () => {
     });
 
     expect(receivedArg).toBe('item-1');
+  });
+
+  it('update mutation passes id and data to the service fn and shows the success message', async () => {
+    const mutationFn = vi.fn().mockResolvedValue({ id: '1' });
+    const onSuccess = vi.fn();
+
+    const { result } = renderHook(
+      () =>
+        useCrudMutations<never, { name: string }>({
+          queryKey: 'items',
+          update: {
+            mutationFn,
+            successMessage: 'Updated!',
+            onSuccess,
+          },
+        }),
+      { wrapper },
+    );
+
+    await act(async () => {
+      result.current.updateMutation.mutate({ id: 'item-1', data: { name: 'renamed' } });
+    });
+
+    await waitFor(() => {
+      expect(result.current.updateMutation.isSuccess).toBe(true);
+    });
+    expect(mutationFn).toHaveBeenCalledWith(
+      { id: 'item-1', data: { name: 'renamed' } },
+      expect.anything(),
+    );
+    expect(onSuccess).toHaveBeenCalled();
+    // Success snackbar is user-visible feedback
+    expect(screen.getByText('Updated!')).toBeInTheDocument();
+  });
+
+  it('surfaces a failed mutation as an error snackbar without invalidating or firing onSuccess', async () => {
+    const mutationFn = vi.fn().mockRejectedValue(new Error('Create exploded'));
+    const onSuccess = vi.fn();
+    const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
+
+    const { result } = renderHook(
+      () =>
+        useCrudMutations<{ name: string }, never>({
+          queryKey: 'items',
+          create: {
+            mutationFn,
+            successMessage: 'Created!',
+            onSuccess,
+          },
+        }),
+      { wrapper },
+    );
+
+    await act(async () => {
+      result.current.createMutation.mutate({ name: 'doomed' });
+    });
+
+    await waitFor(() => {
+      expect(result.current.createMutation.isError).toBe(true);
+    });
+    expect(screen.getByText('Create exploded')).toBeInTheDocument();
+    expect(onSuccess).not.toHaveBeenCalled();
+    expect(invalidateSpy).not.toHaveBeenCalled();
   });
 
   it('invalidates additional query keys', async () => {

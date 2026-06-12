@@ -1,10 +1,14 @@
 import { describe, it, expect, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { MemoryRouter } from 'react-router';
+import { MemoryRouter, Routes, Route } from 'react-router';
 import type { ReactNode } from 'react';
 import { SaveBarProvider, useSaveBar } from '@/store/SaveBarContext';
-import { NavigationGuardProvider } from '@/store/NavigationGuardContext';
+import {
+  NavigationGuardProvider,
+  useNavigationGuardContext,
+} from '@/store/NavigationGuardContext';
 import { useFormSaveBar, countDirtyFields } from '@/hooks/useFormSaveBar';
+import { renderWithProviders, screen, userEvent } from '@/test/test-utils';
 
 function wrapper({ children }: { children: ReactNode }) {
   return (
@@ -99,5 +103,78 @@ describe('useFormSaveBar', () => {
     );
     expect(result.current.bar.activeEntry?.id).toBe('f4');
     expect(result.current.bar.activeEntry?.saving).toBe(true);
+  });
+});
+
+// ---- End-to-end behavior through the global bar and the navigation guard ----
+
+function FormHarness({
+  isDirty,
+  onSave,
+  guardNavigation,
+}: {
+  isDirty: boolean;
+  onSave?: () => void;
+  guardNavigation?: boolean;
+}) {
+  useFormSaveBar({
+    id: 'harness-form',
+    isDirty,
+    onSave: onSave ?? vi.fn(),
+    guardNavigation,
+    saveTestId: 'harness.btn.save',
+  });
+  const { guardedNavigate } = useNavigationGuardContext();
+  return <button onClick={() => guardedNavigate('/elsewhere')}>go elsewhere</button>;
+}
+
+function harnessRoutes(props: React.ComponentProps<typeof FormHarness>) {
+  return (
+    <Routes>
+      <Route path="/" element={<FormHarness {...props} />} />
+      <Route path="/elsewhere" element={<div>arrived elsewhere</div>} />
+    </Routes>
+  );
+}
+
+describe('useFormSaveBar through the global save bar', () => {
+  it('clicking Save in the bar invokes the form save handler', async () => {
+    const user = userEvent.setup();
+    const onSave = vi.fn();
+    renderWithProviders(harnessRoutes({ isDirty: true, onSave }));
+
+    await user.click(screen.getByTestId('harness.btn.save'));
+    expect(onSave).toHaveBeenCalledOnce();
+  });
+
+  it('blocks navigation while dirty and proceeds once the user confirms leaving', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(harnessRoutes({ isDirty: true }));
+
+    await user.click(screen.getByRole('button', { name: 'go elsewhere' }));
+    expect(screen.getByText('Unsaved changes')).toBeInTheDocument();
+    expect(screen.queryByText('arrived elsewhere')).not.toBeInTheDocument();
+
+    await user.click(screen.getByTestId('confirm-dialog-confirm'));
+    expect(screen.getByText('arrived elsewhere')).toBeInTheDocument();
+  });
+
+  it('navigates freely once the form is clean again (saved or reset)', async () => {
+    const user = userEvent.setup();
+    const { rerender } = renderWithProviders(harnessRoutes({ isDirty: true }));
+
+    rerender(harnessRoutes({ isDirty: false }));
+    await user.click(screen.getByRole('button', { name: 'go elsewhere' }));
+
+    expect(screen.queryByText('Unsaved changes')).not.toBeInTheDocument();
+    expect(screen.getByText('arrived elsewhere')).toBeInTheDocument();
+  });
+
+  it('never blocks navigation when guardNavigation is disabled', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(harnessRoutes({ isDirty: true, guardNavigation: false }));
+
+    await user.click(screen.getByRole('button', { name: 'go elsewhere' }));
+    expect(screen.getByText('arrived elsewhere')).toBeInTheDocument();
   });
 });
