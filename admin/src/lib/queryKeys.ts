@@ -34,6 +34,7 @@ export const queryKeys = {
   locales: () => ['locales'] as const,
   localesAll: () => ['locales', 'all'] as const,
   profile: () => ['profile'] as const,
+  piiInventory: () => ['pii-inventory'] as const,
   userPreferences: () => ['userPreferences'] as const,
   helpState: () => ['helpState'] as const,
   auth: () => ['auth'] as const,

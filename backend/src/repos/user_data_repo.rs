@@ -193,3 +193,62 @@ pub async fn anonymize_authored_content(
     let mut conn = pool.acquire().await?;
     anonymize_authored_content_on(&mut conn, clerk_user_id).await
 }
+
+/// Live record count for one identity-bearing field of the builtin PII
+/// registry, for a specific user.
+#[derive(Debug, sqlx::FromRow)]
+pub struct PiiFieldCount {
+    pub table: String,
+    pub field: String,
+    pub record_count: i64,
+}
+
+/// How many rows currently carry the user's identity, per registry field
+/// (`models::builtin_pii::REGISTRY`). One row per (table, field); the
+/// identifier each field is matched on mirrors the erasure statements in
+/// [`anonymize_user_records`] — Clerk id for TEXT identity columns, the
+/// actor UUID for audit/key columns. A registry field missing here fails
+/// `tests/pii_inventory_test.rs`'s completeness guard.
+pub async fn pii_record_counts(
+    pool: &PgPool,
+    clerk_user_id: &str,
+    user_id: Uuid,
+) -> Result<Vec<PiiFieldCount>, sqlx::Error> {
+    sqlx::query_as(
+        r#"
+        SELECT 'contents' AS "table", 'created_by' AS field,
+               COUNT(*)::BIGINT AS record_count FROM contents WHERE created_by = $1
+        UNION ALL
+        SELECT 'contents', 'updated_by', COUNT(*)::BIGINT FROM contents WHERE updated_by = $1
+        UNION ALL
+        SELECT 'contents', 'deleted_by', COUNT(*)::BIGINT FROM contents WHERE deleted_by = $1
+        UNION ALL
+        SELECT 'site_memberships', 'clerk_user_id', COUNT(*)::BIGINT
+            FROM site_memberships WHERE clerk_user_id = $1
+        UNION ALL
+        SELECT 'site_memberships', 'invited_by', COUNT(*)::BIGINT
+            FROM site_memberships WHERE invited_by = $1
+        UNION ALL
+        SELECT 'audit_logs', 'user_id', COUNT(*)::BIGINT FROM audit_logs WHERE user_id = $2
+        UNION ALL
+        SELECT 'change_history', 'changed_by', COUNT(*)::BIGINT
+            FROM change_history WHERE changed_by = $2
+        UNION ALL
+        SELECT 'notifications', 'recipient_clerk_id', COUNT(*)::BIGINT
+            FROM notifications WHERE recipient_clerk_id = $1
+        UNION ALL
+        SELECT 'notifications', 'actor_clerk_id', COUNT(*)::BIGINT
+            FROM notifications WHERE actor_clerk_id = $1
+        UNION ALL
+        SELECT 'api_keys', 'user_id', COUNT(*)::BIGINT FROM api_keys WHERE user_id = $2
+        UNION ALL
+        SELECT 'api_keys', 'created_by', COUNT(*)::BIGINT FROM api_keys WHERE created_by = $2
+        UNION ALL
+        SELECT 'sites', 'created_by', COUNT(*)::BIGINT FROM sites WHERE created_by = $1
+        "#,
+    )
+    .bind(clerk_user_id)
+    .bind(user_id)
+    .fetch_all(pool)
+    .await
+}

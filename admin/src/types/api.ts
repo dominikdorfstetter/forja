@@ -486,6 +486,9 @@ export type RevertChangesResponse = components['schemas']['RevertChangesResponse
 export type ProfileResponse = components['schemas']['ProfileResponse'];
 
 export type UserDataExportResponse = components['schemas']['UserDataExportResponse'];
+export type PiiInventoryResponse = components['schemas']['PiiInventoryResponse'];
+export type PiiInventoryEntity = components['schemas']['PiiInventoryEntity'];
+export type PiiInventoryField = components['schemas']['PiiInventoryField'];
 
 // Notifications
 export type NotificationType = 'content_submitted' | 'content_approved' | 'changes_requested' | (string & {});

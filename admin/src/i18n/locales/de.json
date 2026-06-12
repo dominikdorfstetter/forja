@@ -3309,7 +3309,18 @@
     "deleteAccountMessage": "Diese Aktion ist dauerhaft und kann nicht rückgängig gemacht werden. Ihr Clerk-Konto wird gelöscht und alle zugehörigen CMS-Daten werden anonymisiert. Möchten Sie wirklich fortfahren?",
     "deleteAccountConfirm": "Mein Konto löschen",
     "deleteSuccess": "Konto erfolgreich gelöscht",
-    "deleteError": "Konto konnte nicht gelöscht werden"
+    "deleteError": "Konto konnte nicht gelöscht werden",
+    "piiInventory": {
+      "title": "Was wir über Sie speichern",
+      "description": "Jedes identitätsbezogene Feld, das Forja zu Ihrer Person verarbeitet — Zweck, Rechtsgrundlage, was bei der Löschung geschieht und wie viele Ihrer Datensätze aktuell existieren.",
+      "colField": "Feld",
+      "colPurpose": "Zweck",
+      "colLegalBasis": "Rechtsgrundlage",
+      "colRecords": "Ihre Datensätze",
+      "colErasure": "Bei Löschung",
+      "anonymizeOnErasure": "Wird beim Löschen Ihres Kontos entfernt",
+      "retentionPurged": "Wird durch die Aufbewahrungsbereinigung automatisch gelöscht"
+    }
   },
   "siteLocales": {
     "title": "Sprachen",

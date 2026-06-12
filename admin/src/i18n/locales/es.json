@@ -3040,7 +3040,18 @@
     "deleteAccountMessage": "Esta acción es permanente y no se puede deshacer. Su cuenta de Clerk será eliminada y todos los datos asociados del CMS serán anonimizados. ¿Está seguro de que desea continuar?",
     "deleteAccountConfirm": "Eliminar mi cuenta",
     "deleteSuccess": "Cuenta eliminada correctamente",
-    "deleteError": "Error al eliminar la cuenta"
+    "deleteError": "Error al eliminar la cuenta",
+    "piiInventory": {
+      "title": "Qué almacenamos sobre usted",
+      "description": "Cada campo identificativo que Forja procesa sobre usted: su finalidad, base jurídica, qué ocurre al suprimirlo y cuántos de sus registros existen actualmente.",
+      "colField": "Campo",
+      "colPurpose": "Finalidad",
+      "colLegalBasis": "Base jurídica",
+      "colRecords": "Sus registros",
+      "colErasure": "Al suprimir",
+      "anonymizeOnErasure": "Se elimina al borrar su cuenta",
+      "retentionPurged": "Se elimina automáticamente por la purga de retención"
+    }
   },
   "siteLocales": {
     "title": "Idiomas",

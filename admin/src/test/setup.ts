@@ -34,6 +34,7 @@ vi.mock('@clerk/clerk-react', () => ({
     redirectToSignIn: vi.fn(),
   }),
   ClerkProvider: ({ children }: { children: React.ReactNode }) => children,
+  UserProfile: () => null,
 }));
 
 // Mock AuthContext (useAuth is used by many components for permission checks)
@@ -124,6 +125,7 @@ vi.mock('@/services/auth', () => ({
   }),
   getProfile: vi.fn(),
   exportUserData: vi.fn(),
+  getPiiInventory: vi.fn(),
   deleteAccount: vi.fn(),
   getUserPreferences: vi.fn(),
   updateUserPreferences: vi.fn(),

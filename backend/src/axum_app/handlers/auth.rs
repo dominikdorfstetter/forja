@@ -10,6 +10,7 @@ use crate::dto::auth::{
 use crate::dto::help_state::{HelpStateResponse, UpdateHelpStateRequest};
 use crate::dto::notification::NotificationResponse;
 use crate::dto::onboarding::{CompleteOnboardingRequest, OnboardingResponse};
+use crate::dto::pii_inventory::{PiiInventoryEntity, PiiInventoryField, PiiInventoryResponse};
 use crate::dto::site_membership::MembershipSummary;
 use crate::dto::user_preferences::{UpdateUserPreferencesRequest, UserPreferencesResponse};
 use crate::errors::codes;
@@ -236,6 +237,63 @@ async fn get_profile(
         memberships,
         is_system_admin,
     )))
+}
+
+#[utoipa::path(
+    get,
+    path = "/auth/pii-inventory",
+    tag = "Auth",
+    operation_id = "get_pii_inventory",
+    description = "GDPR Art. 15 transparency view: every identity-bearing field Forja's built-in entities process, with purpose, lawful basis, erasure behavior, and the caller's live record count per field (counts are null for non-Clerk actors)",
+    security(("api_key" = []), ("bearer_auth" = [])),
+    responses(
+        (status = 200, description = "PII inventory", body = PiiInventoryResponse),
+        (status = 401, description = "Missing or invalid credentials")
+    )
+)]
+async fn get_pii_inventory(
+    State(state): State<AppState>,
+    auth: Actor,
+) -> Result<Json<PiiInventoryResponse>, crate::errors::ApiError> {
+    let counts = match &auth.kind {
+        ActorKind::Clerk { clerk_user_id } => Some(
+            crate::repos::user_data_repo::pii_record_counts(&state.db, clerk_user_id, auth.id)
+                .await?,
+        ),
+        ActorKind::ApiKey { .. } | ActorKind::Preview { .. } => None,
+    };
+
+    let count_for = |table: &str, field: &str| -> Option<i64> {
+        counts
+            .as_ref()?
+            .iter()
+            .find(|c| c.table == table && c.field == field)
+            .map(|c| c.record_count)
+    };
+
+    let entities = crate::models::builtin_pii::REGISTRY
+        .iter()
+        .map(|entity| PiiInventoryEntity {
+            table: entity.table.to_string(),
+            description: entity.description.to_string(),
+            fields: entity
+                .fields
+                .iter()
+                .map(|field| PiiInventoryField {
+                    field: field.field.to_string(),
+                    purpose: field.purpose.to_string(),
+                    legal_basis: field.legal_basis.to_string(),
+                    retention_behavior: field.retention_behavior.as_str().to_string(),
+                    record_count: count_for(entity.table, field.field),
+                })
+                .collect(),
+        })
+        .collect();
+
+    Ok(Json(PiiInventoryResponse {
+        generated_at: Utc::now(),
+        entities,
+    }))
 }
 
 #[utoipa::path(
@@ -732,6 +790,7 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(get_me))
         .routes(routes!(get_profile))
         .routes(routes!(export_user_data))
+        .routes(routes!(get_pii_inventory))
         .routes(routes!(get_preferences, update_preferences))
         .routes(routes!(get_onboarding, complete_onboarding))
         .routes(routes!(get_help_state, update_help_state))

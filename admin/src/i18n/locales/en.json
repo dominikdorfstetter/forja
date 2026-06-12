@@ -3520,7 +3520,18 @@
     "deleteAccountMessage": "This action is permanent and cannot be undone. Your Clerk account will be deleted and all associated CMS data will be anonymized. Are you sure you want to proceed?",
     "deleteAccountConfirm": "Delete My Account",
     "deleteSuccess": "Account deleted successfully",
-    "deleteError": "Failed to delete account"
+    "deleteError": "Failed to delete account",
+    "piiInventory": {
+      "title": "What we store about you",
+      "description": "Every identity-bearing field Forja processes for you — its purpose, legal basis, what happens on erasure, and how many of your records currently exist.",
+      "colField": "Field",
+      "colPurpose": "Purpose",
+      "colLegalBasis": "Legal basis",
+      "colRecords": "Your records",
+      "colErasure": "On erasure",
+      "anonymizeOnErasure": "Removed when you delete your account",
+      "retentionPurged": "Auto-deleted by the retention purge"
+    }
   },
   "siteLocales": {
     "title": "Languages",

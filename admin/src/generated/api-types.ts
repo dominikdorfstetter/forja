@@ -451,6 +451,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/pii-inventory": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description GDPR Art. 15 transparency view: every identity-bearing field Forja's built-in entities process, with purpose, lawful basis, erasure behavior, and the caller's live record count per field (counts are null for non-Clerk actors) */
+        get: operations["get_pii_inventory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/preferences": {
         parameters: {
             query?: never;
@@ -7776,6 +7793,34 @@ export interface components {
              */
             total_pages: number;
         };
+        PiiInventoryEntity: {
+            description: string;
+            fields: components["schemas"]["PiiInventoryField"][];
+            table: string;
+        };
+        PiiInventoryField: {
+            field: string;
+            /** @description GDPR Art. 6(1) lawful basis. */
+            legal_basis: string;
+            /** @description Why the identity is processed. */
+            purpose: string;
+            /**
+             * Format: int64
+             * @description Rows currently carrying the caller's identity in this field.
+             *     NULL for non-Clerk actors (API keys are not a person on record).
+             */
+            record_count?: number | null;
+            /**
+             * @description `anonymize_on_erasure` or `retention_purged`.
+             * @example anonymize_on_erasure
+             */
+            retention_behavior: string;
+        };
+        PiiInventoryResponse: {
+            entities: components["schemas"]["PiiInventoryEntity"][];
+            /** Format: date-time */
+            generated_at: string;
+        };
         /** @description A preview template entry (name + URL of a dev server) */
         PreviewTemplate: {
             /**
@@ -11599,6 +11644,33 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Missing or invalid credentials */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    get_pii_inventory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description PII inventory */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PiiInventoryResponse"];
+                };
             };
             /** @description Missing or invalid credentials */
             401: {

@@ -2712,7 +2712,18 @@
     "deleteAccountMessage": "Cette action est permanente et irréversible. Votre compte Clerk sera supprimé et toutes les données CMS associées seront anonymisées. Êtes-vous sûr de vouloir continuer ?",
     "deleteAccountConfirm": "Supprimer mon compte",
     "deleteSuccess": "Compte supprimé avec succès",
-    "deleteError": "Échec de la suppression du compte"
+    "deleteError": "Échec de la suppression du compte",
+    "piiInventory": {
+      "title": "Ce que nous conservons à votre sujet",
+      "description": "Chaque champ identifiant que Forja traite vous concernant : sa finalité, sa base juridique, ce qu'il advient lors de l'effacement et le nombre actuel de vos enregistrements.",
+      "colField": "Champ",
+      "colPurpose": "Finalité",
+      "colLegalBasis": "Base juridique",
+      "colRecords": "Vos enregistrements",
+      "colErasure": "À l'effacement",
+      "anonymizeOnErasure": "Supprimé lors de la suppression de votre compte",
+      "retentionPurged": "Supprimé automatiquement par la purge de rétention"
+    }
   },
   "siteLocales": {
     "title": "Langues",

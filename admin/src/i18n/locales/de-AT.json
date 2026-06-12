@@ -3040,7 +3040,18 @@
     "deleteAccountMessage": "De Aktion is dauerhaft und kaun ned rückgängig gmocht werdn. Dei Clerk-Konto werd glescht und olle zuag'hörigen CMS-Datn werdn anonymisiert. Wüst du wirklich weitamochn?",
     "deleteAccountConfirm": "Mei Konto leschn",
     "deleteSuccess": "Konto erfolgreich glescht",
-    "deleteError": "Konto hot ned glescht werdn kenna"
+    "deleteError": "Konto hot ned glescht werdn kenna",
+    "piiInventory": {
+      "title": "Was wir über Sie speichern",
+      "description": "Jedes identitätsbezogene Feld, das Forja zu Ihrer Person verarbeitet — Zweck, Rechtsgrundlage, was bei der Löschung geschieht und wie viele Ihrer Datensätze aktuell existieren.",
+      "colField": "Feld",
+      "colPurpose": "Zweck",
+      "colLegalBasis": "Rechtsgrundlage",
+      "colRecords": "Ihre Datensätze",
+      "colErasure": "Bei Löschung",
+      "anonymizeOnErasure": "Wird beim Löschen Ihres Kontos entfernt",
+      "retentionPurged": "Wird durch die Aufbewahrungsbereinigung automatisch gelöscht"
+    }
   },
   "siteLocales": {
     "title": "Sprochn",
