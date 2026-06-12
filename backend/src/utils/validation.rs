@@ -384,6 +384,34 @@ pub fn validate_allowed_origins(origins: &[String]) -> Result<(), ValidationErro
     Ok(())
 }
 
+/// Validate the GDPR `data_retention_days` setting (#19).
+///
+/// Accepts JSON `null` (retention disabled) or an integer between
+/// [`DATA_RETENTION_MIN_DAYS`] and [`DATA_RETENTION_MAX_DAYS`] days.
+///
+/// [`DATA_RETENTION_MIN_DAYS`]: crate::models::site_settings::DATA_RETENTION_MIN_DAYS
+/// [`DATA_RETENTION_MAX_DAYS`]: crate::models::site_settings::DATA_RETENTION_MAX_DAYS
+pub fn validate_data_retention_days(value: &serde_json::Value) -> Result<(), ValidationError> {
+    use crate::models::site_settings::{DATA_RETENTION_MAX_DAYS, DATA_RETENTION_MIN_DAYS};
+
+    if value.is_null() {
+        return Ok(());
+    }
+    match value.as_i64() {
+        Some(days) if (DATA_RETENTION_MIN_DAYS..=DATA_RETENTION_MAX_DAYS).contains(&days) => Ok(()),
+        _ => {
+            let mut err = ValidationError::new("invalid_data_retention_days");
+            err.message = Some(
+                format!(
+                    "data_retention_days must be null or an integer between {DATA_RETENTION_MIN_DAYS} and {DATA_RETENTION_MAX_DAYS}"
+                )
+                .into(),
+            );
+            Err(err)
+        }
+    }
+}
+
 /// Validate storage quota in bytes (100 MB – 1 TB).
 pub fn validate_storage_quota_bytes(value: i64) -> Result<(), ValidationError> {
     const MIN: i64 = 104_857_600; // 100 MB
@@ -566,6 +594,25 @@ mod tests {
         assert!(super::validate_storage_quota_bytes(1_099_511_627_776).is_ok()); // 1 TB
         assert!(super::validate_storage_quota_bytes(1_099_511_627_777).is_err());
         // over 1 TB
+    }
+
+    #[test]
+    fn test_validate_data_retention_days() {
+        use serde_json::json;
+        // null disables retention
+        assert!(super::validate_data_retention_days(&serde_json::Value::Null).is_ok());
+        // bounds are inclusive: 30..=3650
+        assert!(super::validate_data_retention_days(&json!(30)).is_ok());
+        assert!(super::validate_data_retention_days(&json!(365)).is_ok());
+        assert!(super::validate_data_retention_days(&json!(3650)).is_ok());
+        assert!(super::validate_data_retention_days(&json!(29)).is_err());
+        assert!(super::validate_data_retention_days(&json!(3651)).is_err());
+        assert!(super::validate_data_retention_days(&json!(0)).is_err());
+        assert!(super::validate_data_retention_days(&json!(-30)).is_err());
+        // wrong JSON types are rejected
+        assert!(super::validate_data_retention_days(&json!("90")).is_err());
+        assert!(super::validate_data_retention_days(&json!(90.5)).is_err());
+        assert!(super::validate_data_retention_days(&json!(true)).is_err());
     }
 
     #[test]

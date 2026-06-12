@@ -7,11 +7,38 @@
 use sqlx::{PgPool, Row};
 use uuid::Uuid;
 
-use crate::dto::ropa::{RopaFieldEntry, RopaReport, RopaTypeEntry};
+use crate::dto::ropa::{
+    RopaBuiltinEntity, RopaBuiltinField, RopaFieldEntry, RopaReport, RopaTypeEntry,
+};
 use crate::errors::ApiError;
+use crate::models::builtin_pii;
+use crate::models::site_settings::SiteSetting;
+
+/// Render the static built-in PII registry into RoPA entries (#19).
+fn builtin_entities() -> Vec<RopaBuiltinEntity> {
+    builtin_pii::REGISTRY
+        .iter()
+        .map(|entity| RopaBuiltinEntity {
+            table: entity.table.to_string(),
+            description: entity.description.to_string(),
+            fields: entity
+                .fields
+                .iter()
+                .map(|f| RopaBuiltinField {
+                    field: f.field.to_string(),
+                    purpose: f.purpose.to_string(),
+                    legal_basis: f.legal_basis.to_string(),
+                    retention_behavior: f.retention_behavior.as_str().to_string(),
+                })
+                .collect(),
+        })
+        .collect()
+}
 
 /// Build the RoPA for a site: every custom type that has at least one PII
-/// field, with that field's data-protection contract + a live record count.
+/// field, with that field's data-protection contract + a live record count,
+/// plus the built-in entities' classifications and the site's data-retention
+/// policy (#19).
 pub async fn generate(pool: &PgPool, site_id: Uuid) -> Result<RopaReport, ApiError> {
     let types = sqlx::query(
         "SELECT id, entity_type_id, key::text AS key, name, retention_days, is_publicly_readable
@@ -71,5 +98,7 @@ pub async fn generate(pool: &PgPool, site_id: Uuid) -> Result<RopaReport, ApiErr
         site_id,
         generated_at: chrono::Utc::now(),
         processing_activities: activities,
+        builtin_entities: builtin_entities(),
+        data_retention_days: SiteSetting::data_retention_days(pool, site_id).await?,
     })
 }

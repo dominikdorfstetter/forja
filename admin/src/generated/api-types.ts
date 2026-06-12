@@ -8326,6 +8326,29 @@ export interface components {
              */
             user_agent: string;
         };
+        /**
+         * @description A built-in Forja table that processes personal data (#19). Rendered from
+         *     the static registry in `models::builtin_pii` — built-ins meet the same
+         *     classification bar as custom types.
+         */
+        RopaBuiltinEntity: {
+            description: string;
+            fields: components["schemas"]["RopaBuiltinField"][];
+            table: string;
+        };
+        /** @description One identity-bearing column on a built-in table (#19). */
+        RopaBuiltinField: {
+            field: string;
+            /** @description GDPR Art. 6(1) lawful basis. */
+            legal_basis: string;
+            /** @description Purpose of processing (RoPA wording). */
+            purpose: string;
+            /**
+             * @description `anonymize_on_erasure` or `retention_purged`.
+             * @example anonymize_on_erasure
+             */
+            retention_behavior: string;
+        };
         RopaFieldEntry: {
             data_category?: string | null;
             key: string;
@@ -8334,6 +8357,14 @@ export interface components {
             processing_purpose?: string | null;
         };
         RopaReport: {
+            /** @description Built-in entities' identity-bearing fields (#19). */
+            builtin_entities: components["schemas"]["RopaBuiltinEntity"][];
+            /**
+             * Format: int32
+             * @description The site's `data_retention_days` setting governing the audit-log /
+             *     change-history purge. NULL = retention purge disabled for this site.
+             */
+            data_retention_days?: number | null;
             /** Format: date-time */
             generated_at: string;
             /** @description One entry per custom type that processes personal data. */
@@ -8826,6 +8857,13 @@ export interface components {
             code_injection_head: string;
             /** @example  */
             contact_email: string;
+            /**
+             * Format: int64
+             * @description Days audit logs / change history are retained before the purge worker
+             *     deletes them (null = retention purge disabled)
+             * @example 365
+             */
+            data_retention_days?: number | null;
             /**
              * Format: int64
              * @example 8
@@ -9888,6 +9926,11 @@ export interface components {
             code_injection_head?: string | null;
             /** @example admin@example.com */
             contact_email?: string | null;
+            /**
+             * @description GDPR data retention in days for audit logs / change history (30–3650;
+             *     JSON null disables the retention purge, absent = no change)
+             */
+            data_retention_days?: unknown;
             /**
              * Format: int64
              * @description Minimum password length for document encryption (4–128)
@@ -24952,7 +24995,7 @@ export interface operations {
                     "application/json": components["schemas"]["SiteSettingsResponse"];
                 };
             };
-            /** @description Validation error */
+            /** @description Malformed request body */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -24981,6 +25024,15 @@ export interface operations {
             };
             /** @description Site not found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Validation failed (e.g. data_retention_days outside 30–3650) */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };

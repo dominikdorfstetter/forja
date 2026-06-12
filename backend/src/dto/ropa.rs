@@ -32,10 +32,38 @@ pub struct RopaTypeEntry {
     pub pii_fields: Vec<RopaFieldEntry>,
 }
 
+/// One identity-bearing column on a built-in table (#19).
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+pub struct RopaBuiltinField {
+    pub field: String,
+    /// Purpose of processing (RoPA wording).
+    pub purpose: String,
+    /// GDPR Art. 6(1) lawful basis.
+    pub legal_basis: String,
+    /// `anonymize_on_erasure` or `retention_purged`.
+    #[schema(example = "anonymize_on_erasure")]
+    pub retention_behavior: String,
+}
+
+/// A built-in Forja table that processes personal data (#19). Rendered from
+/// the static registry in `models::builtin_pii` — built-ins meet the same
+/// classification bar as custom types.
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+pub struct RopaBuiltinEntity {
+    pub table: String,
+    pub description: String,
+    pub fields: Vec<RopaBuiltinField>,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct RopaReport {
     pub site_id: Uuid,
     pub generated_at: DateTime<Utc>,
     /// One entry per custom type that processes personal data.
     pub processing_activities: Vec<RopaTypeEntry>,
+    /// Built-in entities' identity-bearing fields (#19).
+    pub builtin_entities: Vec<RopaBuiltinEntity>,
+    /// The site's `data_retention_days` setting governing the audit-log /
+    /// change-history purge. NULL = retention purge disabled for this site.
+    pub data_retention_days: Option<i32>,
 }

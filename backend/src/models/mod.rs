@@ -8,6 +8,7 @@ pub mod analytics;
 pub mod api_key;
 pub mod audit;
 pub mod blog;
+pub mod builtin_pii;
 pub mod content;
 pub mod content_template;
 pub mod custom_entry;
