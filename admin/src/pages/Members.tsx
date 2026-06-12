@@ -33,6 +33,7 @@ import {
   type ActionMenuItem,
 } from '@/components/shared/listPageV2';
 import { SectionHead, M3Button } from '@/components/design-system';
+import { queryKeys } from '@/lib/queryKeys';
 
 const ROLES: SiteRole[] = ['owner', 'admin', 'editor', 'author', 'reviewer', 'viewer'];
 
@@ -187,13 +188,13 @@ export default function MembersPage() {
   }, []);
 
   const { data: clerkUsers } = useQuery({
-    queryKey: ['clerkUsers'],
+    queryKey: queryKeys.clerkUserNames(),
     queryFn: () => getClerkUsers({ limit: 100 }),
     enabled: ui.addOpen,
   });
 
   const { data: members, isLoading, error } = useQuery({
-    queryKey: ['members', selectedSiteId],
+    queryKey: queryKeys.members(selectedSiteId),
     queryFn: () => getSiteMembers(selectedSiteId),
     enabled: !!selectedSiteId,
   });
@@ -206,7 +207,7 @@ export default function MembersPage() {
       }),
     onSuccess: () => {
       showSuccess(t('members.messages.added'));
-      queryClient.invalidateQueries({ queryKey: ['members', selectedSiteId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.members(selectedSiteId) });
       dispatch({ type: 'resetAddForm' });
     },
     onError: (err) => {
@@ -219,7 +220,7 @@ export default function MembersPage() {
       updateMemberRole(selectedSiteId, memberId, { role }),
     onSuccess: () => {
       showSuccess(t('members.messages.roleUpdated'));
-      queryClient.invalidateQueries({ queryKey: ['members', selectedSiteId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.members(selectedSiteId) });
     },
     onError: (err) => {
       showError(err);
@@ -230,7 +231,7 @@ export default function MembersPage() {
     mutationFn: (memberId: string) => removeSiteMember(selectedSiteId, memberId),
     onSuccess: () => {
       showSuccess(t('members.messages.removed'));
-      queryClient.invalidateQueries({ queryKey: ['members', selectedSiteId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.members(selectedSiteId) });
       dispatch({ type: 'closeRemove' });
     },
     onError: (err) => {
@@ -245,8 +246,8 @@ export default function MembersPage() {
       }),
     onSuccess: () => {
       showSuccess(t('members.messages.ownershipTransferred'));
-      queryClient.invalidateQueries({ queryKey: ['members', selectedSiteId] });
-      queryClient.invalidateQueries({ queryKey: ['auth'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.members(selectedSiteId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.auth() });
       dispatch({ type: 'closeTransfer' });
     },
     onError: (err) => {
@@ -257,8 +258,8 @@ export default function MembersPage() {
   const leaveMutation = useMutation({
     mutationFn: () => leaveSite(selectedSiteId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['members'] });
-      queryClient.invalidateQueries({ queryKey: ['sites'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.members(selectedSiteId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.sites() });
       navigate('/sites');
     },
     onError: (err) => {

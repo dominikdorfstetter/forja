@@ -31,6 +31,7 @@ import { useSiteContext } from '@/store/SiteContext';
 import FocalPointPicker from './FocalPointPicker';
 import AiVisionActions from './AiVisionActions';
 import TagInput from './TagInput';
+import { queryKeys } from '@/lib/queryKeys';
 
 const EMPTY_METADATA: MediaMetadataResponse[] = [];
 const EMPTY_TAGS: string[] = [];
@@ -55,7 +56,7 @@ export default function MediaDetailDialog({ open, media, folders, onClose }: Med
   const { selectedSiteId } = useSiteContext();
 
   const { data: siteSettings } = useQuery<SiteSettingsResponse>({
-    queryKey: ['site-settings', selectedSiteId],
+    queryKey: queryKeys.siteSettings(selectedSiteId),
     queryFn: () => getSiteSettings(selectedSiteId),
     enabled: !!selectedSiteId,
   });
@@ -74,7 +75,7 @@ export default function MediaDetailDialog({ open, media, folders, onClose }: Med
   const [localeTabIndex, setLocaleTabIndex] = useState(0);
 
   const { data: siteLocalesRaw = [] } = useQuery({
-    queryKey: ['site-locales', selectedSiteId],
+    queryKey: queryKeys.siteLocales(selectedSiteId),
     queryFn: () => getSiteLocales(selectedSiteId),
     enabled: !!selectedSiteId,
   });
@@ -88,32 +89,32 @@ export default function MediaDetailDialog({ open, media, folders, onClose }: Med
   ) ?? locales[0];
 
   const { data: metadata = EMPTY_METADATA } = useQuery({
-    queryKey: ['media-metadata', media?.id],
+    queryKey: queryKeys.mediaMetadata(media?.id),
     queryFn: () => getMediaMetadata(media!.id),
     enabled: !!media?.id,
   });
 
   const { data: mediaTags = EMPTY_TAGS } = useQuery<string[]>({
-    queryKey: ['media-tags', media?.id],
+    queryKey: queryKeys.mediaTags(media?.id),
     queryFn: () => getMediaTags(media!.id).then((r) => r.tags),
     enabled: !!media?.id,
   });
 
   const { data: siteTagsData } = useQuery({
-    queryKey: ['site-tags', selectedSiteId],
+    queryKey: queryKeys.siteTags(selectedSiteId),
     queryFn: () => getSiteTags(selectedSiteId).then((r) => r.tags),
     enabled: !!selectedSiteId,
   });
   const siteTags: SiteTagItem[] = siteTagsData ?? [];
 
   const { data: mediaDetail } = useQuery({
-    queryKey: ['media-detail', media?.id],
+    queryKey: queryKeys.mediaDetail(media?.id),
     queryFn: () => getMediaById(media!.id),
     enabled: !!media?.id,
   });
 
   const { data: mediaUsage } = useQuery({
-    queryKey: ['media-usage', media?.id],
+    queryKey: queryKeys.mediaUsage(media?.id),
     queryFn: () => getMediaUsage(media!.id),
     enabled: !!media?.id,
   });
@@ -136,7 +137,7 @@ export default function MediaDetailDialog({ open, media, folders, onClose }: Med
     mutationFn: (folderId: string | null) =>
       updateMedia(media!.id, { folder_id: folderId || undefined }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['media'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.media(selectedSiteId) });
       enqueueSnackbar('Folder updated', { variant: 'success' });
     },
   });
@@ -145,7 +146,7 @@ export default function MediaDetailDialog({ open, media, folders, onClose }: Med
     mutationFn: ({ focalX, focalY }: { focalX: number; focalY: number }) =>
       updateMedia(media!.id, { focal_x: focalX, focal_y: focalY }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['media'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.media(selectedSiteId) });
       enqueueSnackbar(t('forms.mediaDetail.focalPoint.saved'), { variant: 'success' });
     },
   });
@@ -159,7 +160,7 @@ export default function MediaDetailDialog({ open, media, folders, onClose }: Med
         title: data.title || undefined,
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['media-metadata', media?.id] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.mediaMetadata(media?.id) });
       enqueueSnackbar('Metadata saved', { variant: 'success' });
     },
   });
@@ -172,7 +173,7 @@ export default function MediaDetailDialog({ open, media, folders, onClose }: Med
         title: data.title || undefined,
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['media-metadata', media?.id] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.mediaMetadata(media?.id) });
       enqueueSnackbar('Metadata updated', { variant: 'success' });
     },
   });
@@ -180,7 +181,7 @@ export default function MediaDetailDialog({ open, media, folders, onClose }: Med
   const deleteMetaMutation = useMutation({
     mutationFn: (id: string) => deleteMediaMetadata(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['media-metadata', media?.id] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.mediaMetadata(media?.id) });
       enqueueSnackbar('Metadata removed', { variant: 'success' });
     },
   });
@@ -188,9 +189,9 @@ export default function MediaDetailDialog({ open, media, folders, onClose }: Med
   const saveTagsMutation = useMutation({
     mutationFn: (tags: string[]) => updateMediaTags(media!.id, tags),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['media-tags', media?.id] });
-      queryClient.invalidateQueries({ queryKey: ['media'] });
-      queryClient.invalidateQueries({ queryKey: ['site-tags'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.mediaTags(media?.id) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.media(selectedSiteId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.siteTags(selectedSiteId) });
     },
   });
 

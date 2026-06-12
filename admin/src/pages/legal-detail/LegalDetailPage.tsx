@@ -13,11 +13,12 @@ import LegalEditorContent from './LegalEditorContent';
 import LegalDetailDialogs from './LegalDetailDialogs';
 import LegalVersionPanel from './LegalVersionPanel';
 import { buildLegalUpdates, buildLocalizationData } from './legalDetailSaveUtils';
+import { queryKeys } from '@/lib/queryKeys';
 
 const legalAdapter: ContentDetailAdapter<LegalDocumentFullDetailResponse, LegalContentFormData, ContentLocalizationResponse> = {
   entityKey: 'legal',
   fetchDetail: (id) => getLegalDocumentDetail(id),
-  detailQueryKey: (id) => ['legal-detail', id],
+  detailQueryKey: (id) => queryKeys.legalDetail(id),
   invalidateOnSave: [['legal']],
   getLocalizations: (d) => d?.localizations ?? [],
   getLocalizationLocaleId: (l) => l.locale_id,

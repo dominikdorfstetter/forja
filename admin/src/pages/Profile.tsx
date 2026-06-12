@@ -28,6 +28,7 @@ import { useAuth } from '@/store/AuthContext';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
+import { queryKeys } from '@/lib/queryKeys';
 
 const PERMISSION_COLORS: Record<string, 'error' | 'warning' | 'info' | 'success'> = {
   Master: 'error',
@@ -45,7 +46,7 @@ export default function ProfilePage() {
   const [clerkProfileOpen, setClerkProfileOpen] = useState(false);
 
   const { data: profile, isLoading } = useQuery({
-    queryKey: ['profile'],
+    queryKey: queryKeys.profile(),
     queryFn: () => getProfile(),
   });
 

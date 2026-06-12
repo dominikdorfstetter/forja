@@ -44,6 +44,7 @@ import MediaFilterChips from '@/components/media/MediaFilterChips';
 import MediaTagFilter from '@/components/media/MediaTagFilter';
 import { useBulkSelection } from '@/hooks/useBulkSelection';
 import { useMediaMutations } from '@/pages/useMediaMutations';
+import { queryKeys } from '@/lib/queryKeys';
 
 // --- Reducer ---
 
@@ -201,20 +202,20 @@ export default function MediaPage() {
   if (state.filterTags.length > 0) queryParams.tags = state.filterTags.join(',');
 
   const { data: mediaData, isLoading, error } = useQuery({
-    queryKey: ['media', selectedSiteId, state.debouncedSearch, state.mimeCategory, state.selectedFolderId, state.filterTags, state.page, state.pageSize],
+    queryKey: queryKeys.media(selectedSiteId, state.debouncedSearch, state.mimeCategory, state.selectedFolderId, state.filterTags, state.page, state.pageSize),
     queryFn: () => getMedia(selectedSiteId, queryParams),
     enabled: !!selectedSiteId,
   });
 
   const { data: mediaCategoryCounts } = useQuery({
-    queryKey: ['media-category-counts', selectedSiteId],
+    queryKey: queryKeys.mediaCategoryCounts(selectedSiteId),
     queryFn: () => getMediaCategoryCounts(selectedSiteId),
     enabled: !!selectedSiteId,
     placeholderData: (prev) => prev,
   });
 
   const { data: siteTagsData, isLoading: siteTagsLoading } = useQuery({
-    queryKey: ['site-tags', selectedSiteId],
+    queryKey: queryKeys.siteTags(selectedSiteId),
     queryFn: () => getSiteTags(selectedSiteId, { limit: 10 }),
     enabled: !!selectedSiteId,
     // Keep the previous tag list visible while a refetch runs so the
@@ -225,7 +226,7 @@ export default function MediaPage() {
   });
 
   const { data: folders = [] } = useQuery({
-    queryKey: ['media-folders', selectedSiteId],
+    queryKey: queryKeys.mediaFolders(selectedSiteId),
     queryFn: () => getMediaFolders(selectedSiteId),
     enabled: !!selectedSiteId,
   });

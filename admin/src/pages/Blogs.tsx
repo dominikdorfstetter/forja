@@ -17,6 +17,7 @@ import { M3Button } from '@/components/design-system';
 import EntityListPage, { ContentEntityDialogs } from '@/components/shared/entityListPage';
 import type { EntityListAdapter } from '@/components/shared/entityListPage';
 import { buildBlogsColumns, buildBlogsChipFilters } from '@/pages/BlogsTableConfig';
+import { queryKeys } from '@/lib/queryKeys';
 
 const blogsAdapter: EntityListAdapter<BlogListItem, Awaited<ReturnType<typeof getBlogStatusCounts>>> = {
   entityKey: 'blog',
@@ -32,20 +33,24 @@ const blogsAdapter: EntityListAdapter<BlogListItem, Awaited<ReturnType<typeof ge
       sort_dir: params.sort_dir,
       exclude_status: params.exclude_status,
     }),
-  listQueryKey: (siteId, params) => [
-    'blogs',
-    siteId,
-    params.page,
-    params.page_size,
-    params.search ?? '',
-    params.status ?? '',
-    params.sort_by ?? '',
-    params.sort_dir ?? '',
-    params.exclude_status ?? '',
-  ],
+  listQueryKey: (siteId, params) =>
+    queryKeys.blogs(
+      siteId,
+      params.page,
+      params.page_size,
+      params.search ?? '',
+      params.status ?? '',
+      params.sort_by ?? '',
+      params.sort_dir ?? '',
+      params.exclude_status ?? '',
+    ),
   fetchStatusCounts: (siteId) => getBlogStatusCounts(siteId),
-  statusCountsQueryKey: (siteId) => ['blogs-status-counts', siteId],
-  bulkExtraInvalidations: [['trash-count'], ['trash'], ['blogs-status-counts']],
+  statusCountsQueryKey: (siteId) => queryKeys.blogsStatusCounts(siteId),
+  bulkExtraInvalidations: (siteId) => [
+    queryKeys.trashCount(siteId),
+    queryKeys.trash(siteId),
+    queryKeys.blogsStatusCounts(siteId),
+  ],
   getItemId: (item) => item.id,
   updateEntity: (id, data) => updateBlog(id, data),
   deleteEntity: (id) => deleteBlog(id),
@@ -71,13 +76,13 @@ export default function BlogsPage() {
 
   // CreateBlogWizard data — owned here, not the shared component.
   const { data: siteLocales } = useQuery({
-    queryKey: ['siteLocales', selectedSiteId],
+    queryKey: queryKeys.siteLocalesOverview(selectedSiteId),
     queryFn: () => getSiteLocales(selectedSiteId),
     enabled: !!selectedSiteId,
   });
 
   const { data: siteTemplatesData, isLoading: siteTemplatesLoading } = useQuery({
-    queryKey: ['content-templates', selectedSiteId],
+    queryKey: queryKeys.contentTemplates(selectedSiteId),
     queryFn: () => getContentTemplates(selectedSiteId, { page_size: 100 }),
     enabled: !!selectedSiteId,
   });
@@ -85,8 +90,8 @@ export default function BlogsPage() {
   const cloneMutation = useMutation({
     mutationFn: (id: string) => cloneBlog(id),
     onSuccess: (blog) => {
-      queryClient.invalidateQueries({ queryKey: ['blogs'] });
-      queryClient.invalidateQueries({ queryKey: ['blogs-status-counts'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.blogs(selectedSiteId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.blogsStatusCounts(selectedSiteId) });
       showSuccess(t('blogs.messages.cloned'));
       navigate(`/blogs/${blog.id}`);
     },
@@ -96,8 +101,8 @@ export default function BlogsPage() {
   const seedMutation = useMutation({
     mutationFn: () => seedSampleContent(selectedSiteId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['blogs'] });
-      queryClient.invalidateQueries({ queryKey: ['blogs-status-counts'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.blogs(selectedSiteId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.blogsStatusCounts(selectedSiteId) });
       showSuccess(t('blogs.messages.sampleSeeded'));
     },
     onError: showError,

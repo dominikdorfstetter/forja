@@ -17,6 +17,7 @@ import {
   M3Button,
 } from '@/components/design-system';
 import { useFormSaveBar } from '@/hooks/useFormSaveBar';
+import { queryKeys } from '@/lib/queryKeys';
 
 const DEFAULT_TITLE_TEMPLATE = '{{title}} | {{site_name}}';
 const DESCRIPTION_MAX_LENGTH = 160;
@@ -68,7 +69,7 @@ export default function SeoDefaultsEditor({ settings, siteName }: SeoDefaultsEdi
       seo_default_og_image_id: string | null;
     }) => updateSiteSettings(selectedSiteId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['site-settings', selectedSiteId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.siteSettings(selectedSiteId) });
       // Mark clean so the global save bar dismisses. We can't rely on the
       // ref-equality hydration block below because React Query's structural
       // sharing may return the same settings object after refetch.

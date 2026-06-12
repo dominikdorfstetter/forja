@@ -12,6 +12,7 @@ import { getPage, getPages } from '@/services/pages';
 import { useSiteContext } from '@/store/SiteContext';
 import PageTypeChip from '@/components/shared/PageTypeChip';
 import type { PageListItem, PageResponse } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface PagePickerProps {
   value: string;
@@ -60,7 +61,7 @@ export default function PagePicker({
 
   // Fetch pages matching search
   const { data: pagesData, isLoading } = useQuery({
-    queryKey: ['pages-picker', siteId, debouncedSearch],
+    queryKey: queryKeys.pagesPicker(siteId, debouncedSearch),
     queryFn: () => getPages(siteId, {
       search: debouncedSearch || undefined,
       page_size: 20,
@@ -74,7 +75,7 @@ export default function PagePicker({
   // When editing, fetch the selected page if it's not in the results
   const needsSingleFetch = !!value && !pages.find((p) => p.id === value);
   const { data: singlePage } = useQuery({
-    queryKey: ['page', value],
+    queryKey: queryKeys.page(value),
     queryFn: () => getPage(value),
     enabled: needsSingleFetch,
     staleTime: 60_000,

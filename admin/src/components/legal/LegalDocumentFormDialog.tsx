@@ -17,6 +17,7 @@ import { requiredString, siteIdsField, formResolver} from '@/utils/validation';
 import { CONTENT_STATUSES } from '@/utils/enumValues';
 import type { LegalDocumentResponse, CreateLegalDocumentRequest, LegalDocType } from '@/types/api';
 import { useTranslation } from 'react-i18next';
+import { queryKeys } from '@/lib/queryKeys';
 
 const legalDocSchema = z.object({
   cookie_name: requiredString(100).regex(/^[a-z0-9_]+$/, 'Only lowercase letters, numbers, and underscores'),
@@ -44,7 +45,7 @@ export default function LegalDocumentFormDialog({ open, siteId: _siteId, documen
     mode: 'onChange',
   });
 
-  const { data: sites } = useQuery({ queryKey: ['sites'], queryFn: () => getSites() });
+  const { data: sites } = useQuery({ queryKey: queryKeys.sites(), queryFn: () => getSites() });
 
   const prevOpenRef = useRef(false);
   if (open && !prevOpenRef.current) {

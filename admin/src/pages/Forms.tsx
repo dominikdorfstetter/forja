@@ -12,6 +12,7 @@ import EmptyState from '@/components/shared/EmptyState';
 import { M3Button } from '@/components/design-system';
 import CreateFormWizard from '@/components/forms/CreateFormWizard';
 import type { FormListItem } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 function StatusPill({ active, activeLabel, inactiveLabel }: { active: boolean; activeLabel: string; inactiveLabel: string }) {
   return (
@@ -50,7 +51,7 @@ export default function FormsPage() {
   const pageSize = 10;
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['forms', selectedSiteId, page, pageSize],
+    queryKey: queryKeys.forms(selectedSiteId, page, pageSize),
     queryFn: () => getForms(selectedSiteId, { page, page_size: pageSize }),
     enabled: !!selectedSiteId,
   });

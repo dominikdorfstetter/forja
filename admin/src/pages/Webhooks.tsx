@@ -30,6 +30,7 @@ import {
   type ActionMenuItem,
 } from '@/components/shared/listPageV2';
 import { SectionHead, M3Button } from '@/components/design-system';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface WebhookRowActionsProps {
   webhook: Webhook;
@@ -145,7 +146,7 @@ export default function WebhooksPage() {
   }, [openCreate]);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['webhooks', selectedSiteId, page, pageSize, debouncedSearch, sortBy, sortDir],
+    queryKey: queryKeys.webhooks(selectedSiteId, page, pageSize, debouncedSearch, sortBy, sortDir),
     queryFn: () =>
       getWebhooks(selectedSiteId, {
         page,

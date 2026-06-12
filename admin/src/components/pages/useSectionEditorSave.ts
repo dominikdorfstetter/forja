@@ -6,6 +6,7 @@ import type {
   UpdatePageSectionRequest,
   UpsertSectionLocalizationRequest,
 } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface LocaleFormData {
   title: string;
@@ -28,7 +29,7 @@ export function useSectionEditorSave({ sectionId, pageId }: UseSectionEditorSave
     mutationFn: (data: UpsertSectionLocalizationRequest) =>
       upsertSectionLocalization(sectionId!, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['page-section-localizations'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.pageSectionLocalizations(pageId) });
     },
     onError: (error) => showError(error),
   });
@@ -37,7 +38,7 @@ export function useSectionEditorSave({ sectionId, pageId }: UseSectionEditorSave
     mutationFn: (data: UpdatePageSectionRequest) =>
       updatePageSection(sectionId!, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['page-sections', pageId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.pageSections(pageId) });
     },
     onError: (error) => showError(error),
   });

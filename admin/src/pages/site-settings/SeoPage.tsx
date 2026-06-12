@@ -7,19 +7,20 @@ import { useSiteContext } from '@/store/SiteContext';
 import SeoDefaultsEditor from './SeoDefaultsEditor';
 import RobotsTxtEditor from './RobotsTxtEditor';
 import { SectionHead } from '@/components/design-system';
+import { queryKeys } from '@/lib/queryKeys';
 
 export default function SeoPage() {
   const { t } = useTranslation();
   const { selectedSiteId } = useSiteContext();
 
   const { data: site } = useQuery({
-    queryKey: ['site', selectedSiteId],
+    queryKey: queryKeys.site(selectedSiteId),
     queryFn: () => getSite(selectedSiteId),
     enabled: !!selectedSiteId,
   });
 
   const { data: settings, isLoading } = useQuery({
-    queryKey: ['site-settings', selectedSiteId],
+    queryKey: queryKeys.siteSettings(selectedSiteId),
     queryFn: () => getSiteSettings(selectedSiteId),
     enabled: !!selectedSiteId,
   });

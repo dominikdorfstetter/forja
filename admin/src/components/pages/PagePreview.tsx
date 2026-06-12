@@ -5,6 +5,7 @@ import { getSiteLocales } from '@/services/siteLocales';
 import type { PageSectionResponse, SectionLocalizationResponse } from '@/types/api';
 import { useSiteContext } from '@/store/SiteContext';
 import SectionPreview from './SectionPreview';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface PagePreviewProps {
   sections: PageSectionResponse[];
@@ -15,7 +16,7 @@ export default function PagePreview({ sections, localizations }: PagePreviewProp
   const { selectedSiteId } = useSiteContext();
 
   const { data: siteLocalesRaw } = useQuery({
-    queryKey: ['site-locales', selectedSiteId],
+    queryKey: queryKeys.siteLocales(selectedSiteId),
     queryFn: () => getSiteLocales(selectedSiteId),
     enabled: !!selectedSiteId,
   });

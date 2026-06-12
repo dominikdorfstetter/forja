@@ -11,6 +11,7 @@ import InlineEditField from '@/components/shared/InlineEditField';
 import { updateBlog } from '@/services/blogs';
 import { useAiAssist } from '@/hooks/useAiAssist';
 import { useSiteContext } from '@/store/SiteContext';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface BlogSeoTabProps {
   control: Control<BlogContentFormData>;
@@ -95,7 +96,7 @@ export default function BlogSeoTab({
         locale={{ id: 'default', code: 'default' }}
         createLocalization={async () => undefined}
         updateLocalization={async () => undefined}
-        invalidateKey={['blog-detail', blogId]}
+        invalidateKey={queryKeys.blogDetail(blogId)}
       />
       <Box sx={{ mb: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -106,7 +107,7 @@ export default function BlogSeoTab({
             disabled={!canWrite}
             onSave={async (newSlug) => {
               await updateBlog(blogId, { slug: newSlug });
-              queryClient.invalidateQueries({ queryKey: ['blog-detail', blogId] });
+              queryClient.invalidateQueries({ queryKey: queryKeys.blogDetail(blogId) });
             }}
           />
         </Box>

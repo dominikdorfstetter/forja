@@ -6,6 +6,7 @@ import { useThemeMode } from '@/theme/ThemeContext';
 import { getUserPreferences, updateUserPreferences } from '@/services/auth';
 import type { UserPreferencesResponse, UpdateUserPreferencesRequest } from '@/types/api';
 import type { ThemeId } from '@/theme/createAppTheme';
+import { queryKeys } from '@/lib/queryKeys';
 
 function getDefaultPreferences(): UserPreferencesResponse {
   return {
@@ -31,7 +32,7 @@ export function UserPreferencesProvider({ children }: { children: ReactNode }) {
   const { setThemeId } = useThemeMode();
 
   const { data, isLoading } = useQuery({
-    queryKey: ['userPreferences'],
+    queryKey: queryKeys.userPreferences(),
     queryFn: () => getUserPreferences(),
     enabled: !!clerkUserId,
     staleTime: 1000 * 60 * 10, // 10 minutes
@@ -54,7 +55,7 @@ export function UserPreferencesProvider({ children }: { children: ReactNode }) {
   const mutation = useMutation({
     mutationFn: (req: UpdateUserPreferencesRequest) => updateUserPreferences(req),
     onSuccess: (updated) => {
-      queryClient.setQueryData(['userPreferences'], updated);
+      queryClient.setQueryData(queryKeys.userPreferences(), updated);
     },
   });
 
@@ -72,7 +73,7 @@ export function UserPreferencesProvider({ children }: { children: ReactNode }) {
       // Optimistic update
       const previous = queryClient.getQueryData<UserPreferencesResponse>(['userPreferences']);
       if (previous) {
-        queryClient.setQueryData(['userPreferences'], {
+        queryClient.setQueryData(queryKeys.userPreferences(), {
           ...previous,
           ...Object.fromEntries(
             Object.entries(req).filter(([, v]) => v !== undefined),
@@ -84,7 +85,7 @@ export function UserPreferencesProvider({ children }: { children: ReactNode }) {
       } catch {
         // Revert on error
         if (previous) {
-          queryClient.setQueryData(['userPreferences'], previous);
+          queryClient.setQueryData(queryKeys.userPreferences(), previous);
           // Revert i18n/theme too
           if (req.language) {
             i18n.changeLanguage(previous.language);

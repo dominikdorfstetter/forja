@@ -21,6 +21,7 @@ import PageEditorToolbar from './PageEditorToolbar';
 import PageDetailTabContent from './PageDetailTabContent';
 import PageDetailDialogs from './PageDetailDialogs';
 import { buildPageUpdates, buildSeoLocalizationData, hasSeoChanges } from './pageDetailSaveUtils';
+import { queryKeys } from '@/lib/queryKeys';
 
 type PageDetail = PageResponse & { localizations: ContentLocalizationResponse[] };
 
@@ -33,7 +34,7 @@ const pageAdapter: ContentDetailAdapter<PageDetail, PageDetailFormData, ContentL
     ]);
     return { ...page, localizations: localizations ?? [] };
   },
-  detailQueryKey: (id) => ['page-with-localizations', id],
+  detailQueryKey: (id) => queryKeys.pageWithLocalizations(id),
   invalidateOnSave: [['pages']],
   getLocalizations: (d) => d?.localizations ?? [],
   getLocalizationLocaleId: (l) => l.locale_id,
@@ -104,13 +105,13 @@ function PageEditor({
   const pageId = detail.id;
 
   const { data: sections, isLoading: sectionsLoading } = useQuery({
-    queryKey: ['page-sections', pageId],
+    queryKey: queryKeys.pageSections(pageId),
     queryFn: () => getPageSections(pageId),
     enabled: !!pageId,
   });
 
   const { data: sectionLocalizations } = useQuery({
-    queryKey: ['page-section-localizations', pageId],
+    queryKey: queryKeys.pageSectionLocalizations(pageId),
     queryFn: () => getPageSectionLocalizations(pageId),
     enabled: !!pageId,
   });
@@ -118,7 +119,7 @@ function PageEditor({
   const createSectionMutation = useMutation({
     mutationFn: (data: CreatePageSectionRequest) => createPageSection(pageId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['page-sections', pageId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.pageSections(pageId) });
       showSuccess(t('pageDetail.sections.added'));
     },
     onError: (err) => showError(err),
@@ -127,8 +128,8 @@ function PageEditor({
   const deleteSectionMutation = useMutation({
     mutationFn: (sectionId: string) => deletePageSection(sectionId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['page-sections', pageId] });
-      queryClient.invalidateQueries({ queryKey: ['page-section-localizations', pageId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.pageSections(pageId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.pageSectionLocalizations(pageId) });
       showSuccess(t('pageDetail.sections.deleted'));
     },
     onError: (err) => showError(err),
@@ -138,7 +139,7 @@ function PageEditor({
     mutationFn: (items: ReorderItem[]) => reorderPageSections(pageId, items),
     onError: (err) => {
       showError(err);
-      queryClient.invalidateQueries({ queryKey: ['page-sections', pageId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.pageSections(pageId) });
     },
   });
 
@@ -162,8 +163,8 @@ function PageEditor({
       onDeleteSection={(sectionId) => deleteSectionMutation.mutate(sectionId)}
       onReorderSections={(items) => reorderSectionsMutation.mutate(items)}
       onSectionEditorClose={() => {
-        queryClient.invalidateQueries({ queryKey: ['page-section-localizations', pageId] });
-        queryClient.invalidateQueries({ queryKey: ['page-sections', pageId] });
+        queryClient.invalidateQueries({ queryKey: queryKeys.pageSectionLocalizations(pageId) });
+        queryClient.invalidateQueries({ queryKey: queryKeys.pageSections(pageId) });
       }}
       createLoading={createSectionMutation.isPending}
       deleteLoading={deleteSectionMutation.isPending}

@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
 import { getGlobalCacheStats, invalidateAllCache } from '@/services/cache';
+import { queryKeys } from '@/lib/queryKeys';
 
 /**
  * Overall response-cache panel for system admins: total entries, a per-site
@@ -15,14 +16,14 @@ export default function GlobalCacheSection() {
   const { enqueueSnackbar } = useSnackbar();
 
   const { data: stats, isLoading } = useQuery({
-    queryKey: ['global-cache'],
+    queryKey: queryKeys.globalCache(),
     queryFn: () => getGlobalCacheStats(),
   });
 
   const invalidateMutation = useMutation({
     mutationFn: () => invalidateAllCache(),
     onSuccess: (res) => {
-      queryClient.invalidateQueries({ queryKey: ['global-cache'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.globalCache() });
       enqueueSnackbar(t('siteSettings.cache.invalidated', { n: res.invalidated }), {
         variant: 'success',
       });

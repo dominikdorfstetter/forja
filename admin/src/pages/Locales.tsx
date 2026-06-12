@@ -18,6 +18,7 @@ import { useAuth } from '@/store/AuthContext';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
+import { queryKeys } from '@/lib/queryKeys';
 
 export default function LocalesPage() {
   const { t, i18n } = useTranslation();
@@ -50,7 +51,7 @@ export default function LocalesPage() {
   );
 
   const { data: locales, isLoading } = useQuery({
-    queryKey: ['locales', 'all'],
+    queryKey: queryKeys.localesAll(),
     queryFn: () => getLocales(true),
   });
 
@@ -58,7 +59,7 @@ export default function LocalesPage() {
     mutationFn: ({ id, is_active }: { id: string; is_active: boolean }) =>
       updateLocale(id, { is_active }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['locales'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.locales() });
       enqueueSnackbar(t('locales.messages.updated'), { variant: 'success' });
       setDeactivating(null);
     },

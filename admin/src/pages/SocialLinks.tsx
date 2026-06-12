@@ -44,6 +44,7 @@ import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import SocialLinkFormDialog from '@/components/social/SocialLinkFormDialog';
 import SortableSocialRow from '@/components/social/SortableSocialRow';
 import { useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/queryKeys';
 
 export default function SocialLinksPage() {
   const { t } = useTranslation();
@@ -69,7 +70,7 @@ export default function SocialLinksPage() {
   }, [openCreate]);
 
   const { data: links, isLoading, error } = useQuery({
-    queryKey: ['social-links', selectedSiteId],
+    queryKey: queryKeys.socialLinks(selectedSiteId),
     queryFn: () => getSocialLinks(selectedSiteId),
     enabled: !!selectedSiteId,
   });
@@ -106,7 +107,7 @@ export default function SocialLinksPage() {
     onError: (err) => {
       showError(err);
       resetOrder();
-      queryClient.invalidateQueries({ queryKey: ['social-links'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.socialLinks(selectedSiteId) });
     },
   });
 

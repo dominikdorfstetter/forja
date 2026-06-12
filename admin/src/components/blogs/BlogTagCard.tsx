@@ -25,6 +25,7 @@ import { useReadOnly } from '@/hooks/useReadOnly';
 import { useAiAssist } from '@/hooks/useAiAssist';
 import type { Tag, CreateTagRequest } from '@/types/api';
 import { useTranslation } from 'react-i18next';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface BlogTagCardProps {
   contentId: string;
@@ -74,7 +75,7 @@ export default function BlogTagCard({
   const showSuggestButton = aiAvailable && ai.isConfigured;
 
   const { data: siteTagsData } = useQuery({
-    queryKey: ['tags', selectedSiteId],
+    queryKey: queryKeys.tags(selectedSiteId),
     queryFn: () => getTags(selectedSiteId),
     enabled: !!selectedSiteId,
   });
@@ -84,8 +85,8 @@ export default function BlogTagCard({
   const availableTags = siteTags.filter((tag) => !assignedIds.has(tag.id));
 
   const invalidate = () => {
-    queryClient.invalidateQueries({ queryKey: ['blog-detail'] });
-    queryClient.invalidateQueries({ queryKey: ['tags'] });
+    queryClient.invalidateQueries({ queryKey: queryKeys.blogDetail(contentId) });
+    queryClient.invalidateQueries({ queryKey: queryKeys.tags(selectedSiteId) });
   };
 
   const assignMutation = useMutation({
@@ -112,7 +113,7 @@ export default function BlogTagCard({
   const createMutation = useMutation({
     mutationFn: (data: CreateTagRequest) => createTag(data),
     onSuccess: (created) => {
-      queryClient.invalidateQueries({ queryKey: ['tags'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.tags(selectedSiteId) });
       assignMutation.mutate(created.id);
       setCreateOpen(false);
       setNewSlug('');

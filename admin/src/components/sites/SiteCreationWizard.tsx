@@ -17,6 +17,7 @@ import SiteWizardBasicsStep from './SiteWizardBasicsStep';
 import SiteWizardModulesStep from './SiteWizardModulesStep';
 import SiteWizardWorkflowStep from './SiteWizardWorkflowStep';
 import SiteWizardLanguagesStep from './SiteWizardLanguagesStep';
+import { queryKeys } from '@/lib/queryKeys';
 
 const STEP_KEYS = [
   'sites.wizard.steps.basics',
@@ -106,7 +107,7 @@ export default function SiteCreationWizard({
   const [ui, uiDispatch] = useReducer(uiReducer, initialUiState);
 
   const { data: allLocales = [] } = useQuery({
-    queryKey: ['locales'],
+    queryKey: queryKeys.locales(),
     queryFn: () => getLocales(),
     enabled: open,
   });
@@ -193,8 +194,8 @@ export default function SiteCreationWizard({
     },
     onSuccess: async (site) => {
       await refreshAuth();
-      queryClient.invalidateQueries({ queryKey: ['sites'] });
-      queryClient.invalidateQueries({ queryKey: ['siteContext', site.id] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.sites() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.siteContext(site.id) });
       setSelectedSiteId(site.id);
       showSuccess(t('sites.messages.created'));
       onClose();

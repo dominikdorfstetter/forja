@@ -5,6 +5,7 @@ import type { UseFormWatch, UseFormSetValue } from 'react-hook-form';
 import { getSkills } from '@/services/skills';
 import type { SkillResponse } from '@/types/api';
 import type { CvEntryWizardFormData } from './CvEntryWizard';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface CvEntryWizardSkillsStepProps {
   watch: UseFormWatch<CvEntryWizardFormData>;
@@ -21,7 +22,7 @@ export default function CvEntryWizardSkillsStep({
   const skillIds: string[] = watch('skill_ids') ?? [];
 
   const { data: skillsData } = useQuery({
-    queryKey: ['skills', siteId, 'all'],
+    queryKey: queryKeys.skills(siteId, 'all'),
     queryFn: () => getSkills(siteId, { page_size: 200 }),
     enabled: !!siteId,
   });

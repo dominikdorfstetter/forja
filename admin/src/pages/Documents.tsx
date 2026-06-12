@@ -37,6 +37,7 @@ import { createDocumentHandlers } from '@/pages/documentHandlers';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import { useBulkSelection } from '@/hooks/useBulkSelection';
 import { useDocumentMutations } from '@/pages/useDocumentMutations';
+import { queryKeys } from '@/lib/queryKeys';
 
 function DocumentsPage({ embedded = false }: { embedded?: boolean }) {
   const { t } = useTranslation();
@@ -52,13 +53,13 @@ function DocumentsPage({ embedded = false }: { embedded?: boolean }) {
   // ------ Data Queries ------
 
   const { data: folders, isLoading: foldersLoading } = useQuery({
-    queryKey: ['document-folders', selectedSiteId],
+    queryKey: queryKeys.documentFolders(selectedSiteId),
     queryFn: () => getDocumentFolders(selectedSiteId),
     enabled: !!selectedSiteId,
   });
 
   const { data: documentsData, isLoading: documentsLoading } = useQuery({
-    queryKey: ['documents', selectedSiteId, ui.page, ui.pageSize, ui.selectedFolderId],
+    queryKey: queryKeys.documents(selectedSiteId, ui.page, ui.pageSize, ui.selectedFolderId),
     queryFn: () => getDocuments(selectedSiteId, {
       page: ui.page,
       page_size: ui.pageSize,
@@ -70,7 +71,7 @@ function DocumentsPage({ embedded = false }: { embedded?: boolean }) {
   const documents: DocumentListItem[] | undefined = documentsData?.data;
 
   const { data: siteSettings } = useQuery({
-    queryKey: ['site-settings', selectedSiteId],
+    queryKey: queryKeys.siteSettings(selectedSiteId),
     queryFn: () => getSiteSettings(selectedSiteId),
     enabled: !!selectedSiteId,
   });
@@ -81,7 +82,7 @@ function DocumentsPage({ embedded = false }: { embedded?: boolean }) {
   }), [siteSettings]);
 
   const { data: siteLocalesRaw = [] } = useQuery({
-    queryKey: ['site-locales', selectedSiteId],
+    queryKey: queryKeys.siteLocales(selectedSiteId),
     queryFn: () => getSiteLocales(selectedSiteId),
     enabled: !!selectedSiteId,
   });
@@ -91,7 +92,7 @@ function DocumentsPage({ embedded = false }: { embedded?: boolean }) {
     .map((sl) => ({ id: sl.locale_id, code: sl.code, name: sl.name, native_name: sl.native_name, direction: sl.direction, is_active: sl.is_active, created_at: sl.created_at, site_count: 0 }));
 
   const documentDetailQueries = useQuery({
-    queryKey: ['document-details', documents?.map((d) => d.id)],
+    queryKey: queryKeys.documentDetails(documents?.map((d) => d.id)),
     queryFn: async () => {
       if (!documents || documents.length === 0) return [];
       return Promise.all(documents.map((d) => getDocument(d.id)));
@@ -159,8 +160,8 @@ function DocumentsPage({ embedded = false }: { embedded?: boolean }) {
   };
 
   const handlePrivacySuccess = () => {
-    queryClient.invalidateQueries({ queryKey: ['documents'] });
-    queryClient.invalidateQueries({ queryKey: ['document-details'] });
+    queryClient.invalidateQueries({ queryKey: queryKeys.documents(selectedSiteId) });
+    queryClient.invalidateQueries({ queryKey: queryKeys.documentDetails() });
   };
 
   const handleUnlock = (doc: DocumentListItem) => {
@@ -170,8 +171,8 @@ function DocumentsPage({ embedded = false }: { embedded?: boolean }) {
   const unlockMutation = useMutation({
     mutationFn: (id: string) => unlockDocumentAccess(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['documents'] });
-      queryClient.invalidateQueries({ queryKey: ['document-details'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.documents(selectedSiteId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.documentDetails() });
       dispatch({ type: 'closeUnlock' });
     },
     onError: (error) => showError(error),

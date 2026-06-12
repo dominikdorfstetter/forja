@@ -59,7 +59,7 @@ function buildAdapter(overrides: Partial<EntityListAdapter<FakeItem>> = {}): Ent
     i18nNamespace: 'blogs',
     fetchList: vi.fn(async () => paginated),
     listQueryKey: (siteId, params) => ['fake-list', siteId, params.page, params.page_size, params.search ?? '', params.status ?? '', params.exclude_status ?? '', params.sort_by ?? '', params.sort_dir ?? ''],
-    bulkExtraInvalidations: [],
+    bulkExtraInvalidations: () => [],
     getItemId: (item) => item.id,
     updateEntity: vi.fn(async () => ({})),
     deleteEntity: vi.fn(async () => ({})),
@@ -291,7 +291,7 @@ describe('EntityListPage harness widening', () => {
     await user.click(await screen.findByTestId('confirm-publish'));
 
     await waitFor(() => {
-      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['legal'] });
+      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['legal', 'site-1'] });
     });
   });
 
@@ -346,7 +346,7 @@ describe('EntityListPage harness widening', () => {
     await user.click(await screen.findByTestId('confirm-publish'));
 
     await waitFor(() => {
-      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['fakes'] });
+      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['fakes', 'site-1'] });
     });
   });
 

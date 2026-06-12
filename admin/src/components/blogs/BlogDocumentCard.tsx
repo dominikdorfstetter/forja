@@ -24,6 +24,7 @@ import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import type { BlogDocumentResponse } from '@/types/api';
 import DocumentPickerDialog from './DocumentPickerDialog';
 import { useTranslation } from 'react-i18next';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface BlogDocumentCardProps {
   blogId: string;
@@ -50,7 +51,7 @@ export default function BlogDocumentCard({ blogId, documents }: BlogDocumentCard
   const [pickerOpen, setPickerOpen] = useState(false);
 
   const invalidate = () => {
-    queryClient.invalidateQueries({ queryKey: ['blog-detail'] });
+    queryClient.invalidateQueries({ queryKey: queryKeys.blogDetail(blogId) });
   };
 
   const assignMutation = useMutation({

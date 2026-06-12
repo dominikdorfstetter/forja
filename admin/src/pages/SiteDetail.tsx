@@ -29,6 +29,7 @@ import EntityHistoryPanel from '@/components/shared/EntityHistoryPanel';
 import InlineEditField from '@/components/shared/InlineEditField';
 import CopyableId from '@/components/shared/CopyableId';
 import { M3Button, Icon } from '@/components/design-system';
+import { queryKeys } from '@/lib/queryKeys';
 
 const GB = 1024 ** 3;
 
@@ -188,25 +189,25 @@ export default function SiteDetailPage() {
   const { isAdmin, isMaster } = useAuth();
 
   const { data: site, isLoading, error } = useQuery({
-    queryKey: ['site', id],
+    queryKey: queryKeys.site(id),
     queryFn: () => getSite(id!),
     enabled: !!id,
   });
 
   const { data: members = [] } = useQuery({
-    queryKey: ['site', id, 'members'],
+    queryKey: queryKeys.siteMembers(id),
     queryFn: () => getSiteMembers(id!),
     enabled: !!id,
   });
 
   const { data: storage } = useQuery({
-    queryKey: ['site', id, 'storage'],
+    queryKey: queryKeys.siteStorage(id),
     queryFn: () => getStorageUsage(id!),
     enabled: !!id,
   });
 
   const { data: settings } = useQuery({
-    queryKey: ['site', id, 'settings'],
+    queryKey: queryKeys.siteDetailSettings(id),
     queryFn: () => getSiteSettings(id!),
     enabled: !!id && isMaster,
   });
@@ -222,8 +223,8 @@ export default function SiteDetailPage() {
   const updateSiteMutation = useMutation({
     mutationFn: (data: { is_active?: boolean }) => updateSite(id!, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['site', id] });
-      queryClient.invalidateQueries({ queryKey: ['sites'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.site(id) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.sites() });
       showSuccess(t('siteDetail.messages.updated'));
     },
     onError: showError,
@@ -233,8 +234,8 @@ export default function SiteDetailPage() {
     mutationFn: (quotaBytes: number) =>
       updateSiteSettings(id!, { storage_quota_bytes: quotaBytes }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['site', id, 'settings'] });
-      queryClient.invalidateQueries({ queryKey: ['site', id, 'storage'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.siteDetailSettings(id) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.siteStorage(id) });
       showSuccess(t('siteDetail.messages.quotaUpdated'));
     },
     onError: showError,
@@ -370,8 +371,8 @@ export default function SiteDetailPage() {
                   disabled={!isAdmin}
                   onSave={async (newName) => {
                     await updateSite(id!, { name: newName });
-                    queryClient.invalidateQueries({ queryKey: ['site', id] });
-                    queryClient.invalidateQueries({ queryKey: ['sites'] });
+                    queryClient.invalidateQueries({ queryKey: queryKeys.site(id) });
+                    queryClient.invalidateQueries({ queryKey: queryKeys.sites() });
                   }}
                 />
               </Grid>
@@ -393,8 +394,8 @@ export default function SiteDetailPage() {
                   disabled={!isAdmin}
                   onSave={async (newDescription) => {
                     await updateSite(id!, { description: newDescription });
-                    queryClient.invalidateQueries({ queryKey: ['site', id] });
-                    queryClient.invalidateQueries({ queryKey: ['sites'] });
+                    queryClient.invalidateQueries({ queryKey: queryKeys.site(id) });
+                    queryClient.invalidateQueries({ queryKey: queryKeys.sites() });
                   }}
                 />
               </Grid>

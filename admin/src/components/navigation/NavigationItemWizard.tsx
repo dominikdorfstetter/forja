@@ -30,6 +30,7 @@ import type {
   NavigationItemLocalizationInput,
   Locale,
 } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 type LinkType = 'page' | 'blog' | 'cv' | 'legal' | 'external';
 
@@ -106,7 +107,7 @@ export default function NavigationItemWizard({
 
   // --- Fetch existing localizations when editing ---
   const { data: existingLocalizations } = useQuery({
-    queryKey: ['navigation-localizations', item?.id],
+    queryKey: queryKeys.navigationLocalizations(item?.id),
     queryFn: () => getNavigationItemLocalizations(item!.id),
     enabled: !!item?.id && open,
   });

@@ -22,6 +22,7 @@ import { useClerkUserNames } from '@/hooks/useClerkUserNames';
 import { useSubmissionStatusMutation } from '@/hooks/useSubmissionStatusMutation';
 import { nextStatuses } from '@/utils/submissionStatus';
 import type { SubmissionStatusLogEntry } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface SubmissionDetailDrawerProps {
   submissionId: string | null;
@@ -52,7 +53,7 @@ export default function SubmissionDetailDrawer({
   const open = !!submissionId;
 
   const { data: submission, isLoading } = useQuery({
-    queryKey: ['submission', submissionId],
+    queryKey: queryKeys.submission(submissionId),
     queryFn: () => getSubmission(submissionId!),
     enabled: open,
   });
@@ -68,7 +69,7 @@ export default function SubmissionDetailDrawer({
   const noteAddMutation = useMutation({
     mutationFn: (body: string) => createSubmissionNote(submissionId!, { body }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['submission', submissionId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.submission(submissionId) });
       setNoteBody('');
       showSuccess(t('formsModule.submissions.messages.noteAdded', 'Note added.'));
     },
@@ -78,7 +79,7 @@ export default function SubmissionDetailDrawer({
   const noteDeleteMutation = useMutation({
     mutationFn: (noteId: string) => deleteSubmissionNote(submissionId!, noteId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['submission', submissionId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.submission(submissionId) });
       showSuccess(t('formsModule.submissions.messages.noteDeleted', 'Note deleted.'));
     },
     onError: showError,
@@ -88,8 +89,8 @@ export default function SubmissionDetailDrawer({
     mutationFn: () => deleteSubmission(submissionId!),
     onSuccess: () => {
       if (submission) {
-        queryClient.invalidateQueries({ queryKey: ['submissions', submission.form_id] });
-        queryClient.invalidateQueries({ queryKey: ['submission-status-counts', submission.form_id] });
+        queryClient.invalidateQueries({ queryKey: queryKeys.submissions(submission.form_id) });
+        queryClient.invalidateQueries({ queryKey: queryKeys.submissionStatusCounts(submission.form_id) });
       }
       showSuccess(t('formsModule.submissions.messages.deleted', 'Submission deleted.'));
       onDeleted?.();

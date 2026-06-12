@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { getImprint } from '@/services/imprint';
 import type { ImprintResponse } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 /**
  * Fetch the public imprint config. Shared by the Welcome footer (to decide
@@ -9,7 +10,7 @@ import type { ImprintResponse } from '@/types/api';
  */
 export function useImprint() {
   return useQuery<ImprintResponse>({
-    queryKey: ['imprint'],
+    queryKey: queryKeys.imprint(),
     queryFn: getImprint,
     staleTime: 1000 * 60 * 60, // 1h — operator details change only on redeploy
   });

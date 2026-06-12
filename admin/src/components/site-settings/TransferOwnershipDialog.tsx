@@ -14,6 +14,7 @@ import { useAuth } from '@/store/AuthContext';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import { DangerConfirmDialog, Icon, M3Button } from '@/components/design-system';
 import type { ProblemDetails, SiteMembership } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface TransferOwnershipDialogProps {
   open: boolean;
@@ -56,7 +57,7 @@ export default function TransferOwnershipDialog({
   }, [open]);
 
   const { data: members = [] } = useQuery({
-    queryKey: ['members', selectedSiteId],
+    queryKey: queryKeys.members(selectedSiteId),
     queryFn: () => getSiteMembers(selectedSiteId),
     enabled: open && !!selectedSiteId,
   });
@@ -70,8 +71,8 @@ export default function TransferOwnershipDialog({
     onSuccess: async () => {
       showSuccess(t('siteSettings.danger.transfer.success'));
       await refreshAuth();
-      queryClient.invalidateQueries({ queryKey: ['members', selectedSiteId] });
-      queryClient.invalidateQueries({ queryKey: ['sites'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.members(selectedSiteId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.sites() });
       onClose();
     },
     onError: (err: unknown) => {

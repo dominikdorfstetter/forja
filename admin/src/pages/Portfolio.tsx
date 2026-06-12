@@ -38,6 +38,7 @@ import PortfolioProjectsSection from '@/components/portfolio/PortfolioProjectsSe
 import ProjectWizard from '@/components/portfolio/ProjectWizard';
 import { useListPageState } from '@/hooks/useListPageState';
 import { useCrudMutations } from '@/hooks/useCrudMutations';
+import { queryKeys } from '@/lib/queryKeys';
 
 // URL tab slug → tab index. Lets users deep-link to a specific tab and
 // keeps the breadcrumb in sync with the active view. The slug is stable
@@ -115,7 +116,7 @@ export default function PortfolioPage() {
 
   // Queries
   const { data: entriesData, isLoading: entriesLoading, error: entriesError } = useQuery({
-    queryKey: ['cv-entries', selectedSiteId, entryTypeFilter, entryDebouncedSearch, entryPage, entryPageSize, entrySortBy, entrySortDir],
+    queryKey: queryKeys.cvEntries(selectedSiteId, entryTypeFilter, entryDebouncedSearch, entryPage, entryPageSize, entrySortBy, entrySortDir),
     queryFn: () => getCvEntries(selectedSiteId, {
       entry_type: entryTypeFilter ? entryTypeFilter.toLowerCase() : undefined,
       search: entryDebouncedSearch || undefined,
@@ -129,7 +130,7 @@ export default function PortfolioPage() {
   const entries = entriesData?.data;
 
   const { data: skillsData, isLoading: skillsLoading, error: skillsError } = useQuery({
-    queryKey: ['skills', selectedSiteId, skillDebouncedSearch, skillPage, skillPageSize, skillSortBy, skillSortDir],
+    queryKey: queryKeys.skills(selectedSiteId, skillDebouncedSearch, skillPage, skillPageSize, skillSortBy, skillSortDir),
     queryFn: () => getSkills(selectedSiteId, { search: skillDebouncedSearch || undefined, page: skillPage, page_size: skillPageSize, sort_by: skillSortBy || undefined, sort_dir: skillSortBy ? skillSortDir : undefined }),
     enabled: !!selectedSiteId,
   });
@@ -177,7 +178,7 @@ export default function PortfolioPage() {
 
   // Projects query
   const { data: projectsData, isLoading: projectsLoading, error: projectsError } = useQuery({
-    queryKey: ['projects', selectedSiteId, projectDebouncedSearch, projectPage, projectPageSize, projectSortBy, projectSortDir],
+    queryKey: queryKeys.projects(selectedSiteId, projectDebouncedSearch, projectPage, projectPageSize, projectSortBy, projectSortDir),
     queryFn: () => getProjects(selectedSiteId, {
       search: projectDebouncedSearch || undefined,
       page: projectPage,

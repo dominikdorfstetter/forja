@@ -9,6 +9,7 @@ import { getMedia } from '@/services/media';
 import { getPages } from '@/services/pages';
 import type { BlogListItem, PageListItem, MediaListItem } from '@/types/api';
 import type { ReactNode } from 'react';
+import { queryKeys } from '@/lib/queryKeys';
 
 export interface Command {
   id: string;
@@ -119,21 +120,21 @@ export function useCommandPalette(
   const shouldSearch = open && debouncedQuery.length >= 2 && !!selectedSiteId;
 
   const { data: blogsData } = useQuery({
-    queryKey: ['cmd-search-blogs', selectedSiteId, debouncedQuery],
+    queryKey: queryKeys.cmdSearchBlogs(selectedSiteId, debouncedQuery),
     queryFn: () => getBlogs(selectedSiteId, { search: debouncedQuery, page_size: 5 }),
     enabled: shouldSearch,
     staleTime: 30_000,
   });
 
   const { data: pagesData } = useQuery({
-    queryKey: ['cmd-search-pages', selectedSiteId, debouncedQuery],
+    queryKey: queryKeys.cmdSearchPages(selectedSiteId, debouncedQuery),
     queryFn: () => getPages(selectedSiteId, { search: debouncedQuery, page_size: 5 }),
     enabled: shouldSearch,
     staleTime: 30_000,
   });
 
   const { data: mediaData } = useQuery({
-    queryKey: ['cmd-search-media', selectedSiteId, debouncedQuery],
+    queryKey: queryKeys.cmdSearchMedia(selectedSiteId, debouncedQuery),
     queryFn: () => getMedia(selectedSiteId, { search: debouncedQuery, page_size: 5 }),
     enabled: shouldSearch,
     staleTime: 30_000,

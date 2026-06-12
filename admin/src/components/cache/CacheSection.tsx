@@ -4,6 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
 import { getSiteCacheStats, invalidateSiteCache, rebuildSiteCache } from '@/services/cache';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface CacheSectionProps {
   siteId: string;
@@ -20,11 +21,11 @@ export default function CacheSection({ siteId }: CacheSectionProps) {
   const { enqueueSnackbar } = useSnackbar();
 
   const { data: stats, isLoading } = useQuery({
-    queryKey: ['site-cache', siteId],
+    queryKey: queryKeys.siteCache(siteId),
     queryFn: () => getSiteCacheStats(siteId),
   });
 
-  const refresh = () => queryClient.invalidateQueries({ queryKey: ['site-cache', siteId] });
+  const refresh = () => queryClient.invalidateQueries({ queryKey: queryKeys.siteCache(siteId) });
 
   const invalidateMutation = useMutation({
     mutationFn: () => invalidateSiteCache(siteId),

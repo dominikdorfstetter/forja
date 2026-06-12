@@ -52,6 +52,8 @@ import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import LegalDocumentFormDialog from '@/components/legal/LegalDocumentFormDialog';
 import CopyableId from '@/components/shared/CopyableId';
 import { M3Button } from '@/components/design-system';
+import { queryKeys } from '@/lib/queryKeys';
+import { useSiteContext } from '@/store/SiteContext';
 
 // --- Group form dialog (inline) ---
 
@@ -195,26 +197,26 @@ function GroupItemsSection({ groupId }: GroupItemsSectionProps) {
   const [deletingItem, setDeletingItem] = useState<LegalItemResponse | null>(null);
 
   const { data: items, isLoading } = useQuery({
-    queryKey: ['legalItems', groupId],
+    queryKey: queryKeys.legalItems(groupId),
     queryFn: () => getLegalItems(groupId),
     enabled: !!groupId,
   });
 
   const createItemMutation = useMutation({
     mutationFn: (data: CreateLegalItemRequest) => createLegalItem(groupId, data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['legalItems', groupId] }); setItemFormOpen(false); showSuccess(t('legalDetail.items.messages.created')); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: queryKeys.legalItems(groupId) }); setItemFormOpen(false); showSuccess(t('legalDetail.items.messages.created')); },
     onError: (error) => showError(error),
   });
 
   const updateItemMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateLegalItemRequest }) => updateLegalItem(id, data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['legalItems', groupId] }); setEditingItem(null); showSuccess(t('legalDetail.items.messages.updated')); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: queryKeys.legalItems(groupId) }); setEditingItem(null); showSuccess(t('legalDetail.items.messages.updated')); },
     onError: (error) => showError(error),
   });
 
   const deleteItemMutation = useMutation({
     mutationFn: (id: string) => deleteLegalItem(id),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['legalItems', groupId] }); setDeletingItem(null); showSuccess(t('legalDetail.items.messages.deleted')); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: queryKeys.legalItems(groupId) }); setDeletingItem(null); showSuccess(t('legalDetail.items.messages.deleted')); },
     onError: (error) => showError(error),
   });
 
@@ -310,6 +312,7 @@ function detailDialogReducer(state: DetailDialogState, action: DetailDialogActio
 export default function LegalDocumentDetailPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
+  const { selectedSiteId } = useSiteContext();
   const queryClient = useQueryClient();
   const { showError, showSuccess } = useErrorSnackbar();
 
@@ -318,7 +321,7 @@ export default function LegalDocumentDetailPage() {
 
   // Fetch groups for this document
   const { data: groups, isLoading: groupsLoading, error: groupsError } = useQuery({
-    queryKey: ['legalGroups', id],
+    queryKey: queryKeys.legalGroups(id),
     queryFn: () => getLegalGroups(id!),
     enabled: !!id,
   });
@@ -326,7 +329,7 @@ export default function LegalDocumentDetailPage() {
   // We need to fetch the document info. Since there is no getDocument(id) endpoint,
   // we derive the info from the groups query or store it from navigation state.
   // For simplicity, we use the legal documents list from all sites.
-  const { data: sites } = useQuery({ queryKey: ['sites'], queryFn: () => getSites() });
+  const { data: sites } = useQuery({ queryKey: queryKeys.sites(), queryFn: () => getSites() });
 
   // Try to find the document across all sites
   const [document, setDocument] = useState<{ cookie_name: string; document_type: LegalDocType } | null>(null);
@@ -357,7 +360,7 @@ export default function LegalDocumentDetailPage() {
   const updateDocMutation = useMutation({
     mutationFn: (data: UpdateLegalDocumentRequest) => updateLegalDocument(id!, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['legal'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.legal(selectedSiteId) });
       dialogDispatch({ type: 'CLOSE_EDIT_DOC' });
       showSuccess(t('legalDetail.updatedMessage'));
       // Refresh document info
@@ -375,19 +378,19 @@ export default function LegalDocumentDetailPage() {
 
   const createGroupMutation = useMutation({
     mutationFn: (data: CreateLegalGroupRequest) => createLegalGroup(id!, data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['legalGroups', id] }); dialogDispatch({ type: 'CLOSE_GROUP_FORM' }); showSuccess(t('legalDetail.groups.messages.created')); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: queryKeys.legalGroups(id) }); dialogDispatch({ type: 'CLOSE_GROUP_FORM' }); showSuccess(t('legalDetail.groups.messages.created')); },
     onError: (error) => showError(error),
   });
 
   const updateGroupMutation = useMutation({
     mutationFn: ({ groupId, data }: { groupId: string; data: UpdateLegalGroupRequest }) => updateLegalGroup(groupId, data),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['legalGroups', id] }); dialogDispatch({ type: 'SET_EDITING_GROUP', payload: null }); showSuccess(t('legalDetail.groups.messages.updated')); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: queryKeys.legalGroups(id) }); dialogDispatch({ type: 'SET_EDITING_GROUP', payload: null }); showSuccess(t('legalDetail.groups.messages.updated')); },
     onError: (error) => showError(error),
   });
 
   const deleteGroupMutation = useMutation({
     mutationFn: (groupId: string) => deleteLegalGroup(groupId),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['legalGroups', id] }); dialogDispatch({ type: 'SET_DELETING_GROUP', payload: null }); showSuccess(t('legalDetail.groups.messages.deleted')); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: queryKeys.legalGroups(id) }); dialogDispatch({ type: 'SET_DELETING_GROUP', payload: null }); showSuccess(t('legalDetail.groups.messages.deleted')); },
     onError: (error) => showError(error),
   });
 

@@ -32,6 +32,7 @@ import type {
   FormFieldResponse,
   FormLocalizationInput,
 } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 function fieldsFromResponse(fields: FormFieldResponse[]): FormFieldInput[] {
   return fields.map((f) => ({
@@ -150,7 +151,7 @@ export default function FormDetailPage() {
   const { selectedSiteId } = useSiteContext();
 
   const { data: siteLocales = [] } = useQuery({
-    queryKey: ['site-locales', selectedSiteId],
+    queryKey: queryKeys.siteLocales(selectedSiteId),
     queryFn: () => getSiteLocales(selectedSiteId),
     enabled: !!selectedSiteId,
   });
@@ -164,7 +165,7 @@ export default function FormDetailPage() {
   );
 
   const { data: form, isLoading } = useQuery({
-    queryKey: ['form', formId],
+    queryKey: queryKeys.form(formId),
     queryFn: () => getForm(formId),
     enabled: !!formId,
   });
@@ -187,8 +188,8 @@ export default function FormDetailPage() {
   const updateMutation = useMutation({
     mutationFn: (payload: UpdateFormRequest) => updateForm(formId, payload),
     onSuccess: (updated) => {
-      queryClient.setQueryData(['form', formId], updated);
-      queryClient.invalidateQueries({ queryKey: ['forms'] });
+      queryClient.setQueryData(queryKeys.form(formId), updated);
+      queryClient.invalidateQueries({ queryKey: queryKeys.forms(selectedSiteId) });
       const snap = toSettings(updated);
       setSettings(snap);
       setOriginal(snap);
@@ -206,7 +207,7 @@ export default function FormDetailPage() {
   const deleteMutation = useMutation({
     mutationFn: () => deleteForm(formId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['forms'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.forms(selectedSiteId) });
       showSuccess(t('formsModule.list.messages.deleted'));
       navigate('/forms');
     },

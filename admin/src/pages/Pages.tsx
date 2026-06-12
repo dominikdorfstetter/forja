@@ -17,6 +17,8 @@ import { M3Button } from '@/components/design-system';
 import EntityListPage, { ContentEntityDialogs } from '@/components/shared/entityListPage';
 import type { EntityListAdapter } from '@/components/shared/entityListPage';
 import { buildPagesColumns, buildPagesStatusChipFilters } from '@/pages/PagesTableConfig';
+import { queryKeys } from '@/lib/queryKeys';
+import { useSiteContext } from '@/store/SiteContext';
 
 const TYPE_OPTIONS = ['Static', 'Landing', 'Contact', 'BlogIndex', 'Custom'] as const;
 
@@ -35,21 +37,25 @@ const pagesAdapter: EntityListAdapter<PageListItem, Awaited<ReturnType<typeof ge
       sort_dir: params.sort_dir,
       exclude_status: params.exclude_status,
     }),
-  listQueryKey: (siteId, params) => [
-    'pages',
-    siteId,
-    params.page,
-    params.page_size,
-    params.search ?? '',
-    params.status ?? '',
-    params.page_type ?? '',
-    params.sort_by ?? '',
-    params.sort_dir ?? '',
-    params.exclude_status ?? '',
-  ],
+  listQueryKey: (siteId, params) =>
+    queryKeys.pages(
+      siteId,
+      params.page,
+      params.page_size,
+      params.search ?? '',
+      params.status ?? '',
+      params.page_type ?? '',
+      params.sort_by ?? '',
+      params.sort_dir ?? '',
+      params.exclude_status ?? '',
+    ),
   fetchStatusCounts: (siteId) => getPageStatusCounts(siteId),
-  statusCountsQueryKey: (siteId) => ['pages-status-counts', siteId],
-  bulkExtraInvalidations: [['trash-count'], ['trash'], ['pages-status-counts']],
+  statusCountsQueryKey: (siteId) => queryKeys.pagesStatusCounts(siteId),
+  bulkExtraInvalidations: (siteId) => [
+    queryKeys.trashCount(siteId),
+    queryKeys.trash(siteId),
+    queryKeys.pagesStatusCounts(siteId),
+  ],
   getItemId: (item) => item.id,
   updateEntity: (id, data) => updatePage(id, data),
   deleteEntity: (id) => deletePage(id),
@@ -67,6 +73,7 @@ export default function PagesPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const { selectedSiteId } = useSiteContext();
   const { showError, enqueueSnackbar } = useErrorSnackbar();
 
   const [typeFilter, setTypeFilter] = useState('');
@@ -74,8 +81,8 @@ export default function PagesPage() {
   const createMutation = useMutation({
     mutationFn: (data: CreatePageRequest) => createPage(data),
     onSuccess: (result: PageResponse) => {
-      queryClient.invalidateQueries({ queryKey: ['pages'] });
-      queryClient.invalidateQueries({ queryKey: ['pages-status-counts'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.pages(selectedSiteId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.pagesStatusCounts(selectedSiteId) });
       enqueueSnackbar(t('pages.messages.created'), { variant: 'success' });
       navigate(`/pages/${result.id}`);
     },
@@ -85,8 +92,8 @@ export default function PagesPage() {
   const cloneMutation = useMutation({
     mutationFn: (id: string) => clonePage(id),
     onSuccess: (pg) => {
-      queryClient.invalidateQueries({ queryKey: ['pages'] });
-      queryClient.invalidateQueries({ queryKey: ['pages-status-counts'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.pages(selectedSiteId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.pagesStatusCounts(selectedSiteId) });
       enqueueSnackbar(t('pages.messages.cloned'), { variant: 'success' });
       navigate(`/pages/${pg.id}`);
     },

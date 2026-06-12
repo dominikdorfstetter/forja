@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { createMediaFolder, deleteMedia, deleteMediaFolder, updateMedia, updateMediaFolder, uploadMediaFile } from '@/services/media';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import type { useBulkSelection } from '@/hooks/useBulkSelection';
+import { queryKeys } from '@/lib/queryKeys';
 
 /** Action types shared with Media page reducer */
 type MediaDispatchAction =
@@ -26,16 +27,16 @@ export function useMediaMutations({ selectedSiteId, selectedFolderId, dispatch, 
   const [bulkDeleteConfirmOpen, setBulkDeleteConfirmOpen] = useState(false);
 
   const invalidateTrash = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ['trash-count'] });
-    queryClient.invalidateQueries({ queryKey: ['trash'] });
-  }, [queryClient]);
+    queryClient.invalidateQueries({ queryKey: queryKeys.trashCount(selectedSiteId) });
+    queryClient.invalidateQueries({ queryKey: queryKeys.trash(selectedSiteId) });
+  }, [queryClient, selectedSiteId]);
 
   const uploadMutation = useMutation({
     mutationFn: ({ file, isGlobal }: { file: File; isGlobal: boolean }) =>
       uploadMediaFile(file, [selectedSiteId], selectedFolderId ?? undefined, isGlobal),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['media'] });
-      queryClient.invalidateQueries({ queryKey: ['media-category-counts'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.media(selectedSiteId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.mediaCategoryCounts(selectedSiteId) });
       dispatch({ type: 'SET_UPLOAD_OPEN', payload: false });
       showSuccess(t('media.upload.success'));
     },
@@ -45,8 +46,8 @@ export function useMediaMutations({ selectedSiteId, selectedFolderId, dispatch, 
   const deleteMutation = useMutation({
     mutationFn: ({ id, force }: { id: string; force?: boolean }) => deleteMedia(id, force),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['media'] });
-      queryClient.invalidateQueries({ queryKey: ['media-category-counts'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.media(selectedSiteId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.mediaCategoryCounts(selectedSiteId) });
       invalidateTrash();
       dispatch({ type: 'SET_DELETING_FILE', payload: null });
       showSuccess(t('media.messages.deleted'));
@@ -57,27 +58,27 @@ export function useMediaMutations({ selectedSiteId, selectedFolderId, dispatch, 
   const moveToFolderMutation = useMutation({
     mutationFn: ({ id, folder_id }: { id: string; folder_id: string | undefined }) =>
       updateMedia(id, { folder_id }),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['media'] }); showSuccess(t('media.messages.moved')); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: queryKeys.media(selectedSiteId) }); showSuccess(t('media.messages.moved')); },
     onError: (error) => showError(error),
   });
 
   const createFolderMutation = useMutation({
     mutationFn: (name: string) => createMediaFolder(selectedSiteId, { name, display_order: 0 }),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['media-folders'] }); showSuccess(t('media.messages.folderCreated')); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: queryKeys.mediaFolders(selectedSiteId) }); showSuccess(t('media.messages.folderCreated')); },
     onError: (error) => showError(error),
   });
 
   const renameFolderMutation = useMutation({
     mutationFn: ({ id, name }: { id: string; name: string }) => updateMediaFolder(id, { name }),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['media-folders'] }); showSuccess(t('media.messages.folderRenamed')); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: queryKeys.mediaFolders(selectedSiteId) }); showSuccess(t('media.messages.folderRenamed')); },
     onError: (error) => showError(error),
   });
 
   const deleteFolderMutation = useMutation({
     mutationFn: (id: string) => deleteMediaFolder(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['media-folders'] });
-      queryClient.invalidateQueries({ queryKey: ['media'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.mediaFolders(selectedSiteId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.media(selectedSiteId) });
       if (selectedFolderId) dispatch({ type: 'SET_SELECTED_FOLDER', payload: null });
       showSuccess(t('media.messages.folderDeleted'));
     },
@@ -89,8 +90,8 @@ export function useMediaMutations({ selectedSiteId, selectedFolderId, dispatch, 
     try {
       const ids = Array.from(bulk.selectedIds);
       await Promise.all(ids.map((id) => deleteMedia(id)));
-      queryClient.invalidateQueries({ queryKey: ['media'] });
-      queryClient.invalidateQueries({ queryKey: ['media-category-counts'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.media(selectedSiteId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.mediaCategoryCounts(selectedSiteId) });
       invalidateTrash();
       showSuccess(t('bulk.messages.success', { count: ids.length }));
       bulk.clear();
@@ -100,7 +101,7 @@ export function useMediaMutations({ selectedSiteId, selectedFolderId, dispatch, 
       setBulkDeleting(false);
       setBulkDeleteConfirmOpen(false);
     }
-  }, [bulk, queryClient, invalidateTrash, showSuccess, showError, t]);
+  }, [bulk, queryClient, selectedSiteId, invalidateTrash, showSuccess, showError, t]);
 
   return {
     uploadMutation,

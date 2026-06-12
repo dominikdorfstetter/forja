@@ -14,6 +14,7 @@ import SiteAdvancedSettings from '@/pages/settings/SiteAdvancedSettings';
 import { formResolver } from '@/utils/validation';
 import { SectionHead } from '@/components/design-system';
 import { useFormSaveBar } from '@/hooks/useFormSaveBar';
+import { queryKeys } from '@/lib/queryKeys';
 
 const schema = z.object({
   max_document_file_size_mb: z.number().min(1, 'Min 1 MB').max(100, 'Max 100 MB'),
@@ -41,13 +42,13 @@ export default function ContentPage() {
   const [previewTemplatesDirty, setPreviewTemplatesDirty] = useState(false);
 
   const { data: settings, isLoading } = useQuery({
-    queryKey: ['site-settings', selectedSiteId],
+    queryKey: queryKeys.siteSettings(selectedSiteId),
     queryFn: () => getSiteSettings(selectedSiteId),
     enabled: !!selectedSiteId,
   });
 
   const { data: members } = useQuery({
-    queryKey: ['members', selectedSiteId],
+    queryKey: queryKeys.members(selectedSiteId),
     queryFn: () => getSiteMembers(selectedSiteId),
     enabled: !!selectedSiteId,
   });
@@ -89,7 +90,7 @@ export default function ContentPage() {
     mutationFn: (data: UpdateSiteSettingsRequest) =>
       updateSiteSettings(selectedSiteId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['site-settings', selectedSiteId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.siteSettings(selectedSiteId) });
       enqueueSnackbar(t('settings.messages.saved'), { variant: 'success' });
     },
     onError: () => {

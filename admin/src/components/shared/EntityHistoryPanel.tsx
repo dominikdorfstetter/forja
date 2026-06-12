@@ -20,7 +20,33 @@ import { useSnackbar } from 'notistack';
 import { useLocalizedFormat } from '@/utils/dateFnsLocale';
 import { getEntityAuditLogs, getEntityChangeHistory, revertChanges } from '@/services/audit';
 import { useAuth } from '@/store/AuthContext';
+import { useSiteContext } from '@/store/SiteContext';
 import type { AuditAction, ChangeHistoryEntry } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
+
+/**
+ * Scoped replacement for the historical broad `[entityType]` invalidation:
+ * refresh the reverted entity's own detail queries (and, for legal, the
+ * active site's list) without touching other sites' caches.
+ */
+function detailRefreshKeys(
+  entityType: string,
+  entityId: string,
+  siteId: string | undefined,
+): readonly (readonly unknown[])[] {
+  switch (entityType) {
+    case 'site':
+      return [queryKeys.site(entityId)];
+    case 'blog':
+      return [queryKeys.blogDetail(entityId)];
+    case 'page':
+      return [queryKeys.pageWithLocalizations(entityId), queryKeys.page(entityId)];
+    case 'legal':
+      return [queryKeys.legalDetail(entityId), queryKeys.legal(siteId)];
+    default:
+      return [queryKeys.entityList(entityType, siteId)];
+  }
+}
 
 const ACTION_COLORS: Record<AuditAction, 'success' | 'info' | 'warning' | 'error' | 'default'> = {
   Create: 'success',
@@ -97,6 +123,7 @@ export default function EntityHistoryPanel({ entityType, entityId }: EntityHisto
   const { t } = useTranslation();
   const fmt = useLocalizedFormat();
   const { isAdmin, isMaster } = useAuth();
+  const { selectedSiteId } = useSiteContext();
   const queryClient = useQueryClient();
   const { enqueueSnackbar } = useSnackbar();
   const canRevert = isAdmin || isMaster;
@@ -104,13 +131,13 @@ export default function EntityHistoryPanel({ entityType, entityId }: EntityHisto
   const [revertGroup, setRevertGroup] = useState<ChangeGroup | null>(null);
 
   const { data: auditLogs, isLoading: logsLoading } = useQuery({
-    queryKey: ['entity-audit', entityType, entityId],
+    queryKey: queryKeys.entityAudit(entityType, entityId),
     queryFn: () => getEntityAuditLogs(entityType, entityId),
     enabled: !!entityId,
   });
 
   const { data: changeHistory, isLoading: historyLoading } = useQuery({
-    queryKey: ['entity-history', entityType, entityId],
+    queryKey: queryKeys.entityHistory(entityType, entityId),
     queryFn: () => getEntityChangeHistory(entityType, entityId),
     enabled: !!entityId,
   });
@@ -121,10 +148,12 @@ export default function EntityHistoryPanel({ entityType, entityId }: EntityHisto
       enqueueSnackbar(t('entityHistory.reverted'), { variant: 'success' });
       setRevertGroup(null);
       // Invalidate both history and entity queries so the page refreshes
-      queryClient.invalidateQueries({ queryKey: ['entity-audit', entityType, entityId] });
-      queryClient.invalidateQueries({ queryKey: ['entity-history', entityType, entityId] });
-      // Broad invalidation to refresh the entity detail page
-      queryClient.invalidateQueries({ queryKey: [entityType] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.entityAudit(entityType, entityId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.entityHistory(entityType, entityId) });
+      // Refresh the entity detail page, scoped to this entity/site
+      detailRefreshKeys(entityType, entityId, selectedSiteId).forEach((key) =>
+        queryClient.invalidateQueries({ queryKey: key }),
+      );
     },
     onError: () => {
       enqueueSnackbar(t('entityHistory.revertFailed'), { variant: 'error' });

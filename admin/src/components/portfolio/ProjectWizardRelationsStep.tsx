@@ -23,6 +23,7 @@ import { getSkills } from '@/services/skills';
 import type { ProjectMediaRequest, SkillResponse, CvEntryResponse } from '@/types/api';
 import MediaPickerDialog from '@/components/media/MediaPickerDialog';
 import type { ProjectWizardFormData } from './ProjectWizard';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface ProjectWizardRelationsStepProps {
   watch: UseFormWatch<ProjectWizardFormData>;
@@ -47,14 +48,14 @@ export default function ProjectWizardRelationsStep({
   const cvEntryIds: string[] = watch('cv_entry_ids') ?? [];
 
   const { data: skillsData } = useQuery({
-    queryKey: ['skills', siteId, 'all'],
+    queryKey: queryKeys.skills(siteId, 'all'),
     queryFn: () => getSkills(siteId, { page_size: 200 }),
     enabled: !!siteId,
   });
   const allSkills: SkillResponse[] = skillsData?.data ?? [];
 
   const { data: entriesData } = useQuery({
-    queryKey: ['cv-entries', siteId, 'all'],
+    queryKey: queryKeys.cvEntries(siteId, 'all'),
     queryFn: () => getCvEntries(siteId, { page_size: 200 }),
     enabled: !!siteId,
   });

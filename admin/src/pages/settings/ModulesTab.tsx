@@ -13,6 +13,7 @@ import {
   Icon,
 } from '@/components/design-system';
 import { useFormSaveBar } from '@/hooks/useFormSaveBar';
+import { queryKeys } from '@/lib/queryKeys';
 
 type ModuleDef = {
   readonly key:
@@ -52,7 +53,7 @@ export default function ModulesTab() {
   const { enqueueSnackbar } = useSnackbar();
 
   const { data: settings, isLoading } = useQuery({
-    queryKey: ['site-settings', selectedSiteId],
+    queryKey: queryKeys.siteSettings(selectedSiteId),
     queryFn: () => getSiteSettings(selectedSiteId),
     enabled: !!selectedSiteId,
   });
@@ -88,8 +89,8 @@ export default function ModulesTab() {
     mutationFn: (data: UpdateSiteSettingsRequest) =>
       updateSiteSettings(selectedSiteId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['site-settings', selectedSiteId] });
-      queryClient.invalidateQueries({ queryKey: ['siteContext', selectedSiteId] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.siteSettings(selectedSiteId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.siteContext(selectedSiteId) });
       enqueueSnackbar(t('settings.messages.saved'), { variant: 'success' });
       // No `setDirty(false)` needed: the query invalidation triggers a
       // re-seed of `modules` from the new `settings`, which makes the

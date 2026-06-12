@@ -22,6 +22,7 @@ import { getDocument, getDocuments } from '@/services/documents';
 import { useSiteContext } from '@/store/SiteContext';
 import type { DocumentListItem, DocumentResponse } from '@/types/api';
 import { useTranslation } from 'react-i18next';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface DocumentPickerDialogProps {
   open: boolean;
@@ -43,7 +44,7 @@ export default function DocumentPickerDialog({
 
   // Fetch the document list for the site
   const { data: documentListData, isLoading: isListLoading } = useQuery({
-    queryKey: ['documents', selectedSiteId],
+    queryKey: queryKeys.documents(selectedSiteId),
     queryFn: () => getDocuments(selectedSiteId),
     enabled: open && !!selectedSiteId,
   });
@@ -56,7 +57,7 @@ export default function DocumentPickerDialog({
 
   // Fetch details (with localizations) for available documents
   const { data: documentDetails = [], isLoading: isDetailsLoading } = useQuery({
-    queryKey: ['document-details', availableDocuments.map((d) => d.id)],
+    queryKey: queryKeys.documentDetails(availableDocuments.map((d) => d.id)),
     queryFn: () =>
       Promise.all(availableDocuments.map((d) => getDocument(d.id))),
     enabled: open && availableDocuments.length > 0,

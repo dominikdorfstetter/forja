@@ -28,6 +28,7 @@ import CvEntryWizardCompanyStep from './CvEntryWizardCompanyStep';
 import CvEntryWizardTimelineStep from './CvEntryWizardTimelineStep';
 import CvEntryWizardContentStep from './CvEntryWizardContentStep';
 import CvEntryWizardSkillsStep from './CvEntryWizardSkillsStep';
+import { queryKeys } from '@/lib/queryKeys';
 
 // ── Schema ────────────────────────────────────────────────────────────
 
@@ -132,13 +133,13 @@ export default function CvEntryWizard({
   const [ui, uiDispatch] = useReducer(uiReducer, initialUiState);
 
   const { data: siteLocales = [] } = useQuery({
-    queryKey: ['site-locales', selectedSiteId],
+    queryKey: queryKeys.siteLocales(selectedSiteId),
     queryFn: () => getSiteLocales(selectedSiteId),
     enabled: open && !!selectedSiteId,
   });
 
   const { data: entryDetail } = useQuery({
-    queryKey: ['cv-entry-detail', entry?.id],
+    queryKey: queryKeys.cvEntryDetail(entry?.id),
     queryFn: () => getCvEntryDetail(entry!.id),
     enabled: open && !!entry,
   });

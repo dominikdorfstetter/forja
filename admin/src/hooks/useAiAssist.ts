@@ -8,6 +8,7 @@ import type {
   BlogTagContext,
   SectionContext,
 } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 export interface GenerateOptions {
   targetLocale?: string;
@@ -21,7 +22,7 @@ export function useAiAssist() {
   const moduleEnabled = modules.ai;
 
   const configQuery = useQuery({
-    queryKey: ['ai-config', selectedSiteId],
+    queryKey: queryKeys.aiConfig(selectedSiteId),
     queryFn: () => getAiConfig(selectedSiteId),
     // Only query if the AI module is enabled for this site
     enabled: !!selectedSiteId && moduleEnabled,

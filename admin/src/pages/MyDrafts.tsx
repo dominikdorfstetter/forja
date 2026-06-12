@@ -16,6 +16,7 @@ import {
   type DataTableV2Column,
 } from '@/components/shared/listPageV2';
 import { DocIcon, M3IconButton } from '@/components/design-system';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface DraftItem {
   id: string;
@@ -32,13 +33,13 @@ export default function MyDraftsPage() {
   const { selectedSiteId } = useSiteContext();
 
   const { data: blogsData, isLoading: blogsLoading } = useQuery({
-    queryKey: ['blogs', selectedSiteId, 'drafts'],
+    queryKey: queryKeys.blogs(selectedSiteId, 'drafts'),
     queryFn: () => getBlogs(selectedSiteId, { page: 1, page_size: 100 }),
     enabled: !!selectedSiteId,
   });
 
   const { data: pagesData, isLoading: pagesLoading } = useQuery({
-    queryKey: ['pages', selectedSiteId, 'drafts'],
+    queryKey: queryKeys.pages(selectedSiteId, 'drafts'),
     queryFn: () => getPages(selectedSiteId, { page: 1, page_size: 100 }),
     enabled: !!selectedSiteId,
   });

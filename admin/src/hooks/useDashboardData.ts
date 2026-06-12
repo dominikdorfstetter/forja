@@ -8,6 +8,7 @@ import { getSiteLocales } from '@/services/siteLocales';
 import { getSites } from '@/services/sites';
 import { useSiteContext } from '@/store/SiteContext';
 import type { ContentStatus, BlogListItem, PageListItem } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface DashboardData {
   // Totals
@@ -70,30 +71,30 @@ export function useDashboardData(): DashboardData {
   // --- Shared queries ---
 
   const { data: sitesData, isLoading: sitesLoading } = useQuery({
-    queryKey: ['sites'],
+    queryKey: queryKeys.sites(),
     queryFn: () => getSites(),
   });
 
   const { data: blogsData, isLoading: blogsLoading } = useQuery({
-    queryKey: ['dashboard-blogs', selectedSiteId],
+    queryKey: queryKeys.dashboardBlogs(selectedSiteId),
     queryFn: () => getBlogs(selectedSiteId!, { page: 1, page_size: 200, exclude_status: 'Archived' }),
     enabled: hasSite,
   });
 
   const { data: pagesData, isLoading: pagesLoading } = useQuery({
-    queryKey: ['dashboard-pages', selectedSiteId],
+    queryKey: queryKeys.dashboardPages(selectedSiteId),
     queryFn: () => getPages(selectedSiteId!, { page: 1, page_size: 200, exclude_status: 'Archived' }),
     enabled: hasSite,
   });
 
   const { data: mediaData, isLoading: mediaLoading } = useQuery({
-    queryKey: ['media', selectedSiteId],
+    queryKey: queryKeys.media(selectedSiteId),
     queryFn: () => getMedia(selectedSiteId!, { page: 1, page_size: 1 }),
     enabled: hasSite,
   });
 
   const { data: healthData, isLoading: healthLoading } = useQuery({
-    queryKey: ['health'],
+    queryKey: queryKeys.health(),
     queryFn: () => getHealth(),
     refetchInterval: 30_000,
   });
@@ -101,13 +102,13 @@ export function useDashboardData(): DashboardData {
   // --- Setup checklist queries ---
 
   const { data: siteLocales } = useQuery({
-    queryKey: ['siteLocales', selectedSiteId],
+    queryKey: queryKeys.siteLocalesOverview(selectedSiteId),
     queryFn: () => getSiteLocales(selectedSiteId!),
     enabled: hasSite,
   });
 
   const { data: navMenus } = useQuery({
-    queryKey: ['navigationMenus', selectedSiteId],
+    queryKey: queryKeys.navigationMenusOverview(selectedSiteId),
     queryFn: () => getNavigationMenus(selectedSiteId!),
     enabled: hasSite,
   });

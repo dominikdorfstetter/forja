@@ -25,6 +25,7 @@ import {
 } from '@/components/shared/listPageV2';
 import { Icon, M3Button, M3IconButton } from '@/components/design-system';
 import type { Locale, SiteLocaleResponse } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface SiteLocalesManagerProps {
   siteId: string;
@@ -84,12 +85,12 @@ export default function SiteLocalesManager({ siteId }: SiteLocalesManagerProps) 
   const [removingLocale, setRemovingLocale] = useState<SiteLocaleResponse | null>(null);
 
   const { data: siteLocales = [], isLoading: localesLoading } = useQuery({
-    queryKey: ['site-locales', siteId],
+    queryKey: queryKeys.siteLocales(siteId),
     queryFn: () => getSiteLocales(siteId),
   });
 
   const { data: allLocales = [] } = useQuery({
-    queryKey: ['locales'],
+    queryKey: queryKeys.locales(),
     queryFn: () => getLocales(),
   });
 
@@ -97,8 +98,8 @@ export default function SiteLocalesManager({ siteId }: SiteLocalesManagerProps) 
   const availableLocales = allLocales.filter((l) => !assignedLocaleIds.includes(l.id));
 
   const invalidateLocales = () => {
-    queryClient.invalidateQueries({ queryKey: ['site-locales', siteId] });
-    queryClient.invalidateQueries({ queryKey: ['site', siteId] });
+    queryClient.invalidateQueries({ queryKey: queryKeys.siteLocales(siteId) });
+    queryClient.invalidateQueries({ queryKey: queryKeys.site(siteId) });
   };
 
   const addMutation = useMutation({

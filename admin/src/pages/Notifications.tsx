@@ -27,6 +27,7 @@ import {
 } from '@/components/shared/listPageV2';
 import { Chip, M3Button, M3IconButton } from '@/components/design-system';
 import type { NotificationResponse, NotificationType } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 type ReadFilter = 'all' | 'unread' | 'read';
 
@@ -140,16 +141,7 @@ export default function NotificationsPage() {
     readFilter === 'all' ? undefined : readFilter === 'read';
 
   const { data, isLoading } = useQuery({
-    queryKey: [
-      'notifications',
-      selectedSiteId,
-      page,
-      pageSize,
-      debouncedSearch,
-      sortBy,
-      sortDir,
-      readFilter,
-    ],
+    queryKey: queryKeys.notifications(selectedSiteId, page, pageSize, debouncedSearch, sortBy, sortDir, readFilter),
     queryFn: () =>
       getNotifications(selectedSiteId!, {
         page,
@@ -164,16 +156,16 @@ export default function NotificationsPage() {
   });
 
   const { data: counts } = useQuery({
-    queryKey: ['notifications-status-counts', selectedSiteId],
+    queryKey: queryKeys.notificationsStatusCounts(selectedSiteId),
     queryFn: () => getNotificationStatusCounts(selectedSiteId!),
     enabled: !!selectedSiteId,
     placeholderData: keepPreviousData,
   });
 
   const invalidateAll = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: ['notifications', selectedSiteId] });
-    queryClient.invalidateQueries({ queryKey: ['notifications-unread', selectedSiteId] });
-    queryClient.invalidateQueries({ queryKey: ['notifications-status-counts', selectedSiteId] });
+    queryClient.invalidateQueries({ queryKey: queryKeys.notifications(selectedSiteId) });
+    queryClient.invalidateQueries({ queryKey: queryKeys.notificationsUnread(selectedSiteId) });
+    queryClient.invalidateQueries({ queryKey: queryKeys.notificationsStatusCounts(selectedSiteId) });
   }, [queryClient, selectedSiteId]);
 
   const markReadMutation = useMutation({

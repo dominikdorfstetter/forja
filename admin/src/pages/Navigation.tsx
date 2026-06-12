@@ -28,6 +28,7 @@ import NavigationDialogs from '@/pages/NavigationDialogs';
 import NavigationItemsTable from '@/pages/NavigationItemsTable';
 import { uiReducer, initialUIState, flattenItemsWithDepth, getParentIds } from '@/pages/NavigationReducer';
 import { useNavigationDragDrop } from '@/pages/useNavigationDragDrop';
+import { queryKeys } from '@/lib/queryKeys';
 
 export default function NavigationPage() {
   const { t } = useTranslation();
@@ -54,14 +55,14 @@ export default function NavigationPage() {
 
   // Fetch menus
   const { data: menus, isLoading: menusLoading } = useQuery({
-    queryKey: ['navigation-menus', selectedSiteId],
+    queryKey: queryKeys.navigationMenus(selectedSiteId),
     queryFn: () => getNavigationMenus(selectedSiteId),
     enabled: !!selectedSiteId,
   });
 
   // Fetch site-specific locales for title fields
   const { data: siteLocalesRaw } = useQuery({
-    queryKey: ['site-locales', selectedSiteId],
+    queryKey: queryKeys.siteLocales(selectedSiteId),
     queryFn: () => getSiteLocales(selectedSiteId),
     enabled: !!selectedSiteId,
   });
@@ -72,7 +73,7 @@ export default function NavigationPage() {
 
   // Fetch pages to resolve page UUIDs → routes
   const { data: pagesData } = useQuery({
-    queryKey: ['pages-for-nav', selectedSiteId],
+    queryKey: queryKeys.pagesForNav(selectedSiteId),
     queryFn: () => getPages(selectedSiteId, { page_size: 200 }),
     enabled: !!selectedSiteId,
     staleTime: 60_000,
@@ -88,7 +89,7 @@ export default function NavigationPage() {
 
   // Fetch items for selected menu
   const { data: items, isLoading: itemsLoading, error: itemsError } = useQuery({
-    queryKey: ['navigation-items', selectedMenu?.id],
+    queryKey: queryKeys.navigationItems(selectedMenu?.id),
     queryFn: () => getMenuItems(selectedMenu!.id),
     enabled: !!selectedMenu?.id,
   });
@@ -132,7 +133,7 @@ export default function NavigationPage() {
   const createMenuMutation = useMutation({
     mutationFn: (data: CreateNavigationMenuRequest) => createNavigationMenu(selectedSiteId, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['navigation-menus'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.navigationMenus(selectedSiteId) });
       dispatch({ type: 'closeMenuForm' });
       showSuccess(t('navigation.menus.messages.created', 'Menu created'));
       if (menus) dispatch({ type: 'setSelectedMenuIndex', value: menus.length });
@@ -143,7 +144,7 @@ export default function NavigationPage() {
   const updateMenuMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateNavigationMenuRequest }) => updateNavigationMenu(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['navigation-menus'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.navigationMenus(selectedSiteId) });
       dispatch({ type: 'setEditingMenu', menu: null });
       dispatch({ type: 'closeMenuForm' });
       showSuccess(t('navigation.menus.messages.updated', 'Menu updated'));
@@ -154,7 +155,7 @@ export default function NavigationPage() {
   const deleteMenuMutation = useMutation({
     mutationFn: (id: string) => deleteNavigationMenu(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['navigation-menus'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.navigationMenus(selectedSiteId) });
       dispatch({ type: 'closeDeleteMenu' });
       dispatch({ type: 'setSelectedMenuIndex', value: 0 });
       showSuccess(t('navigation.menus.messages.deleted', 'Menu deleted'));
@@ -171,8 +172,8 @@ export default function NavigationPage() {
       return createNavigationItem(selectedSiteId, data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['navigation-items'] });
-      queryClient.invalidateQueries({ queryKey: ['navigation-menus'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.navigationItems() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.navigationMenus(selectedSiteId) });
       dispatch({ type: 'closeItemForm' });
       showSuccess(t('navigation.messages.created'));
     },
@@ -182,7 +183,7 @@ export default function NavigationPage() {
   const updateItemMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateNavigationItemRequest }) => updateNavigationItem(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['navigation-items'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.navigationItems() });
       dispatch({ type: 'setEditingItem', item: null });
       showSuccess(t('navigation.messages.updated'));
     },
@@ -192,8 +193,8 @@ export default function NavigationPage() {
   const deleteItemMutation = useMutation({
     mutationFn: (id: string) => deleteNavigationItem(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['navigation-items'] });
-      queryClient.invalidateQueries({ queryKey: ['navigation-menus'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.navigationItems() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.navigationMenus(selectedSiteId) });
       dispatch({ type: 'closeDeleteItem' });
       showSuccess(t('navigation.messages.deleted'));
     },

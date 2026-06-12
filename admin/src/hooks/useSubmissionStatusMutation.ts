@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { updateSubmissionStatus } from '@/services/forms';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import type { FormSubmissionStatus } from '@/types/api';
+import { queryKeys } from '@/lib/queryKeys';
 
 interface StatusChange {
   submissionId: string;
@@ -25,10 +26,10 @@ export function useSubmissionStatusMutation(formId: string) {
     mutationFn: ({ submissionId, status }: StatusChange) =>
       updateSubmissionStatus(submissionId, { status }),
     onSuccess: (updated) => {
-      queryClient.setQueryData(['submission', updated.id], updated);
-      queryClient.invalidateQueries({ queryKey: ['submissions', formId] });
+      queryClient.setQueryData(queryKeys.submission(updated.id), updated);
+      queryClient.invalidateQueries({ queryKey: queryKeys.submissions(formId) });
       queryClient.invalidateQueries({
-        queryKey: ['submission-status-counts', formId],
+        queryKey: queryKeys.submissionStatusCounts(formId),
       });
       showSuccess(
         t('formsModule.submissions.messages.statusUpdated', 'Status updated.'),
