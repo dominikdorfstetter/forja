@@ -6,6 +6,7 @@
   "description": "End-to-end tests for Forja using Cucumber + Playwright",
   "scripts": {
     "test": "cucumber-js",
+    "test:critical": "cucumber-js -p critical",
     "test:dry": "cucumber-js --dry-run",
     "test:tags": "cucumber-js --tags",
     "setup-db": "./scripts/setup-test-db.sh",

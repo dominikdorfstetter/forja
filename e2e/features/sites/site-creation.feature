@@ -12,8 +12,10 @@ Feature: Site Creation
     And I complete the site creation wizard with:
       | field       | value          |
       | name        | E2E New Site   |
-      | slug        | e2e-new        |
       | description | Automated test |
+    # Creation keeps the currently selected site — the new site shows up
+    # in the launcher's site list.
+    And I navigate to "sites"
     Then I should see "E2E New Site"
     And I take a screenshot "sites/site-created"
 
@@ -22,9 +24,8 @@ Feature: Site Creation
     When I navigate to "sites"
     And I click "Create Site"
     And I complete the site creation wizard with:
-      | field | value          |
-      | name  | Admin Test     |
-      | slug  | admin-test     |
+      | field | value      |
+      | name  | Admin Test |
     Then I should see "Admin Test"
 
   Scenario: Site creation form validates required fields

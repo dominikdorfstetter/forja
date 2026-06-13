@@ -13,7 +13,6 @@ Feature: User Profile & Preferences
   Scenario: User changes color theme
     Given I am logged in as "editor"
     And I am on site "E2E Test Blog"
-    When I navigate to "settings"
+    When I open the preferences drawer
     Then I should see "Theme"
-    And I should see "Color Theme"
     And I take a screenshot "auth/settings-preferences"

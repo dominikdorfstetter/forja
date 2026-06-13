@@ -1,0 +1,195 @@
+name: e2e (reusable)
+
+# Reusable e2e runner shared by the PR gate (.github/workflows/ci.yml, the
+# @critical subset) and the nightly full-suite workflow. Builds the admin SPA
+# and backend, provisions a seeded Postgres, starts the backend (which serves
+# both the API and the SPA on one port), and runs Cucumber at the given profile.
+#
+# Requires these repository secrets (a Clerk *development* instance + its seven
+# pre-provisioned role accounts — see e2e/.env.example). Until they are
+# configured the job no-ops with a warning instead of failing every PR.
+#   E2E_CLERK_SECRET_KEY, E2E_CLERK_PUBLISHABLE_KEY
+#   E2E_{VIEWER,REVIEWER,AUTHOR,EDITOR,ADMIN,OWNER,SYSTEM_ADMIN}_{EMAIL,PASSWORD}
+
+on:
+  workflow_call:
+    inputs:
+      profile:
+        description: Cucumber profile to run (critical | default).
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    name: Run (${{ inputs.profile }})
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: forja
+          POSTGRES_PASSWORD: forja
+          POSTGRES_DB: forja
+        options: >-
+          --health-cmd "pg_isready -U forja"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    env:
+      DATABASE_URL: postgres://forja:forja@localhost:5432/forja_test
+      REDIS_URL: redis://localhost:6379
+      # The backend validates the e2e session JWTs, so it needs the same Clerk
+      # development instance the test runner signs in against.
+      CLERK_SECRET_KEY: ${{ secrets.E2E_CLERK_SECRET_KEY }}
+      CLERK_PUBLISHABLE_KEY: ${{ secrets.E2E_CLERK_PUBLISHABLE_KEY }}
+      # Test runner (mapped to CLERK_* inside e2e/support/config.ts).
+      E2E_CLERK_SECRET_KEY: ${{ secrets.E2E_CLERK_SECRET_KEY }}
+      E2E_CLERK_PUBLISHABLE_KEY: ${{ secrets.E2E_CLERK_PUBLISHABLE_KEY }}
+      E2E_VIEWER_EMAIL: ${{ secrets.E2E_VIEWER_EMAIL }}
+      E2E_VIEWER_PASSWORD: ${{ secrets.E2E_VIEWER_PASSWORD }}
+      E2E_REVIEWER_EMAIL: ${{ secrets.E2E_REVIEWER_EMAIL }}
+      E2E_REVIEWER_PASSWORD: ${{ secrets.E2E_REVIEWER_PASSWORD }}
+      E2E_AUTHOR_EMAIL: ${{ secrets.E2E_AUTHOR_EMAIL }}
+      E2E_AUTHOR_PASSWORD: ${{ secrets.E2E_AUTHOR_PASSWORD }}
+      E2E_EDITOR_EMAIL: ${{ secrets.E2E_EDITOR_EMAIL }}
+      E2E_EDITOR_PASSWORD: ${{ secrets.E2E_EDITOR_PASSWORD }}
+      E2E_ADMIN_EMAIL: ${{ secrets.E2E_ADMIN_EMAIL }}
+      E2E_ADMIN_PASSWORD: ${{ secrets.E2E_ADMIN_PASSWORD }}
+      E2E_OWNER_EMAIL: ${{ secrets.E2E_OWNER_EMAIL }}
+      E2E_OWNER_PASSWORD: ${{ secrets.E2E_OWNER_PASSWORD }}
+      E2E_SYSTEM_ADMIN_EMAIL: ${{ secrets.E2E_SYSTEM_ADMIN_EMAIL }}
+      E2E_SYSTEM_ADMIN_PASSWORD: ${{ secrets.E2E_SYSTEM_ADMIN_PASSWORD }}
+      # The backend serves the SPA at /dashboard and the API at /api on one
+      # origin, so both point at the single backend process.
+      E2E_BASE_URL: http://localhost:8000
+      E2E_API_URL: http://localhost:8000
+      E2E_HEADLESS: "true"
+
+    steps:
+      - name: Check e2e secrets are configured
+        id: guard
+        run: |
+          if [ -z "$E2E_CLERK_SECRET_KEY" ]; then
+            echo "::warning::e2e Clerk secrets are not configured — skipping the e2e run. See e2e/.env.example for the required repository secrets."
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v6
+        if: steps.guard.outputs.configured == 'true'
+
+      - name: Install Rust toolchain
+        if: steps.guard.outputs.configured == 'true'
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo registry & build
+        if: steps.guard.outputs.configured == 'true'
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            backend/target
+          key: ${{ runner.os }}-cargo-e2e-${{ hashFiles('backend/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-e2e-
+
+      - name: Setup Node.js
+        if: steps.guard.outputs.configured == 'true'
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            admin/package-lock.json
+            e2e/package-lock.json
+
+      - name: Build admin SPA into backend/static/dashboard
+        if: steps.guard.outputs.configured == 'true'
+        working-directory: admin
+        run: |
+          npm ci
+          npm run build
+
+      - name: Build backend binary
+        if: steps.guard.outputs.configured == 'true'
+        working-directory: backend
+        run: cargo build --bin forja
+
+      - name: Provision test database
+        if: steps.guard.outputs.configured == 'true'
+        run: |
+          psql "postgres://forja:forja@localhost:5432/forja" -c 'CREATE DATABASE forja_test;'
+          psql "$DATABASE_URL" -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
+          psql "$DATABASE_URL" -c 'CREATE EXTENSION IF NOT EXISTS "citext";'
+          psql "$DATABASE_URL" -c 'CREATE EXTENSION IF NOT EXISTS "pg_trgm";'
+
+      - name: Start backend (serves API + dashboard SPA on :8000)
+        if: steps.guard.outputs.configured == 'true'
+        working-directory: backend
+        env:
+          APP__HOST: 127.0.0.1
+          APP__PORT: "8000"
+          APP__ENVIRONMENT: test
+        run: |
+          # The backend runs its migrations on boot (src/main.rs), so the schema
+          # is ready by the time the health check below passes.
+          nohup ./target/debug/forja > "$GITHUB_WORKSPACE/backend-e2e.log" 2>&1 &
+          echo "started backend pid $!"
+
+      - name: Wait for backend health
+        if: steps.guard.outputs.configured == 'true'
+        run: |
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:8000/health > /dev/null; then
+              echo "backend is up"; exit 0
+            fi
+            sleep 2
+          done
+          echo "backend did not become healthy in time" >&2
+          tail -n 100 "$GITHUB_WORKSPACE/backend-e2e.log" || true
+          exit 1
+
+      - name: Seed test data
+        if: steps.guard.outputs.configured == 'true'
+        run: psql "$DATABASE_URL" -f e2e/scripts/seed-test-data.sql
+
+      - name: Install e2e dependencies + Playwright Chromium
+        if: steps.guard.outputs.configured == 'true'
+        working-directory: e2e
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Run Cucumber e2e (${{ inputs.profile }})
+        if: steps.guard.outputs.configured == 'true'
+        working-directory: e2e
+        run: npx cucumber-js -p ${{ inputs.profile }}
+
+      - name: Upload failure artifacts
+        if: failure() && steps.guard.outputs.configured == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-${{ inputs.profile }}-artifacts
+          path: |
+            backend-e2e.log
+            e2e/reports/
+            docs/screenshots/_failures/
+          if-no-files-found: ignore
+          retention-days: 7

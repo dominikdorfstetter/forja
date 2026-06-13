@@ -1,4 +1,4 @@
-@content @documents
+@content @documents @critical
 Feature: Document Management
   As a content creator
   I want to create and manage documents

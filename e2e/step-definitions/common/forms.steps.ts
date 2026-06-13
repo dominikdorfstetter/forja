@@ -134,15 +134,22 @@ When('I fill in the blog editor with:', async function (this: ForjaWorld, dataTa
   const rows = dataTable.rows();
   for (const [field, value] of rows) {
     if (field === 'title') {
-      const titleInput = this.page.locator('[data-testid="field-title"], [name="title"]').first();
+      // `field-title` sits on the MUI TextField root — target its inner input.
+      const titleInput = this.page
+        .locator('[data-testid="field-title"] input, input[data-testid="field-title"], [name="title"]')
+        .first();
       await titleInput.fill(value);
     } else if (field === 'content') {
       // Tiptap editor — click into it and type
-      const editor = this.page.locator('[data-testid="editor-content"] .tiptap, .ProseMirror').first();
+      const editor = this.page
+        .locator('[data-testid="forja-editor"] .ProseMirror, [data-testid="editor-content"] .tiptap, .ProseMirror')
+        .first();
       await editor.click();
       await editor.fill(value);
     } else if (field === 'slug') {
-      const slugInput = this.page.locator('[data-testid="field-slug"], [name="slug"]').first();
+      const slugInput = this.page
+        .locator('[data-testid="field-slug"] input, input[data-testid="field-slug"], [name="slug"]')
+        .first();
       await slugInput.fill(value);
     }
   }
