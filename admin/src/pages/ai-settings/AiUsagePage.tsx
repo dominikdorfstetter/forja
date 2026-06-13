@@ -95,7 +95,7 @@ export default function AiUsagePage() {
   const [groupBy, setGroupBy] = useState<AiUsageGroupBy>('action');
   const [exporting, setExporting] = useState(false);
 
-  const usageQuery = useQuery({
+  const { data: usageData, isLoading: usageLoading } = useQuery({
     queryKey: queryKeys.aiUsage(selectedSiteId, fromIso, toIso, actionFilter, groupBy),
     queryFn: () =>
       getAiUsage(selectedSiteId, {
@@ -108,7 +108,7 @@ export default function AiUsagePage() {
   });
 
   const totals = useMemo(() => {
-    const buckets = usageQuery.data?.buckets ?? [];
+    const buckets = usageData?.buckets ?? [];
     return buckets.reduce(
       (acc, b) => ({
         calls: acc.calls + b.call_count,
@@ -117,7 +117,7 @@ export default function AiUsagePage() {
       }),
       { calls: 0, input: 0, output: 0 },
     );
-  }, [usageQuery.data]);
+  }, [usageData]);
 
   const handleExport = async () => {
     setExporting(true);
@@ -145,7 +145,7 @@ export default function AiUsagePage() {
             size="small"
             startIcon={<DownloadIcon />}
             onClick={handleExport}
-            disabled={exporting || !usageQuery.data}
+            disabled={exporting || !usageData}
             data-testid="ai-usage.btn.export"
           >
             {exporting ? t('aiUsage.exporting') : t('aiUsage.export')}
@@ -153,7 +153,7 @@ export default function AiUsagePage() {
         )}
       </Box>
 
-      {usageQuery.data?.own_only && (
+      {usageData?.own_only && (
         <Alert severity="info" sx={{ mb: 2 }} data-testid="ai-usage.alert.own-only">
           {t('aiUsage.ownOnlyNotice')}
         </Alert>
@@ -255,7 +255,7 @@ export default function AiUsagePage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {usageQuery.data?.buckets.length === 0 && !usageQuery.isLoading && (
+            {usageData?.buckets.length === 0 && !usageLoading && (
               <TableRow>
                 <TableCell colSpan={4}>
                   <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
@@ -264,7 +264,7 @@ export default function AiUsagePage() {
                 </TableCell>
               </TableRow>
             )}
-            {usageQuery.data?.buckets.map((b) => (
+            {usageData?.buckets.map((b) => (
               <TableRow key={b.key} data-testid={`ai-usage.bucket.${b.key}`}>
                 <TableCell>{b.key}</TableCell>
                 <TableCell align="right">{b.call_count.toLocaleString()}</TableCell>
@@ -290,7 +290,7 @@ export default function AiUsagePage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {usageQuery.data?.items.length === 0 && !usageQuery.isLoading && (
+            {usageData?.items.length === 0 && !usageLoading && (
               <TableRow>
                 <TableCell colSpan={6}>
                   <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
@@ -299,7 +299,7 @@ export default function AiUsagePage() {
                 </TableCell>
               </TableRow>
             )}
-            {usageQuery.data?.items.map((item) => (
+            {usageData?.items.map((item) => (
               <TableRow key={item.id}>
                 <TableCell>{new Date(item.created_at).toLocaleString()}</TableCell>
                 <TableCell>{item.action}</TableCell>

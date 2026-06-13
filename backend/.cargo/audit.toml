@@ -31,4 +31,10 @@ ignore = [
     # RUSTSEC-2026-0099: rustls-webpki name-constraint bypass for wildcard names.
     # Same root cause + mitigation as RUSTSEC-2026-0098.
     "RUSTSEC-2026-0099",
+
+    # RUSTSEC-2026-0173: proc-macro-error2 (unmaintained)
+    # Transitive build-time-only dep via validator_derive → validator 0.20
+    # (already the latest validator release). No runtime impact; clears when
+    # validator drops the proc-macro-error2 dependency upstream.
+    "RUSTSEC-2026-0173",
 ]

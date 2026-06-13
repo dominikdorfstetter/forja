@@ -91,7 +91,7 @@ function DocumentsPage({ embedded = false }: { embedded?: boolean }) {
     .filter((sl) => sl.is_active)
     .map((sl) => ({ id: sl.locale_id, code: sl.code, name: sl.name, native_name: sl.native_name, direction: sl.direction, is_active: sl.is_active, created_at: sl.created_at, site_count: 0 }));
 
-  const documentDetailQueries = useQuery({
+  const { data: documentDetailsData, error: documentDetailsError } = useQuery({
     queryKey: queryKeys.documentDetails(documents?.map((d) => d.id)),
     queryFn: async () => {
       if (!documents || documents.length === 0) return [];
@@ -102,13 +102,13 @@ function DocumentsPage({ embedded = false }: { embedded?: boolean }) {
 
   const detailMap = useMemo(() => {
     const map = new Map<string, DocumentResponse>();
-    if (documentDetailQueries.data) {
-      for (const detail of documentDetailQueries.data) {
+    if (documentDetailsData) {
+      for (const detail of documentDetailsData) {
         map.set(detail.id, detail);
       }
     }
     return map;
-  }, [documentDetailQueries.data]);
+  }, [documentDetailsData]);
 
   // 300ms debounce for search input
   useEffect(() => {
@@ -238,7 +238,7 @@ function DocumentsPage({ embedded = false }: { embedded?: boolean }) {
               meta={documentsData?.meta}
               onPageChange={(p) => dispatch({ type: 'setPage', value: p })}
               onPageSizeChange={(pp) => dispatch({ type: 'setPageSize', value: pp })}
-              detailError={!!documentDetailQueries.error}
+              detailError={!!documentDetailsError}
               activeDoc={activeDoc}
               t={t}
               selectedIds={bulk.selectedIds}
