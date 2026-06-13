@@ -85,14 +85,14 @@ export default function AiSettingsPage() {
   const [systemPrompts, setSystemPrompts] = useState<Record<string, string>>({});
   const [extraDirty, setExtraDirty] = useState(false);
 
-  const configQuery = useQuery({
+  const { data: configData, isSuccess: configIsSuccess } = useQuery({
     queryKey: queryKeys.aiConfig(selectedSiteId),
     queryFn: () => getAiConfig(selectedSiteId),
     enabled: !!selectedSiteId,
     retry: false,
   });
 
-  const hasExistingConfig = configQuery.isSuccess && !!configQuery.data;
+  const hasExistingConfig = configIsSuccess && !!configData;
 
   const {
     control,
@@ -119,14 +119,14 @@ export default function AiSettingsPage() {
 
   // Load form defaults + task configs + system prompts from existing config
   useEffect(() => {
-    if (configQuery.data) {
-      reset(buildFormDefaults(configQuery.data));
-      setSelectedPreset(detectPresetKey(configQuery.data.base_url, configQuery.data.provider_name));
-      setTaskConfigs((configQuery.data.task_configs as Record<string, TaskConfig> | null | undefined) ?? {});
-      setSystemPrompts((configQuery.data.system_prompts as Record<string, string> | null | undefined) ?? {});
+    if (configData) {
+      reset(buildFormDefaults(configData));
+      setSelectedPreset(detectPresetKey(configData.base_url, configData.provider_name));
+      setTaskConfigs((configData.task_configs as Record<string, TaskConfig> | null | undefined) ?? {});
+      setSystemPrompts((configData.system_prompts as Record<string, string> | null | undefined) ?? {});
       setExtraDirty(false);
     }
-  }, [configQuery.data, reset]);
+  }, [configData, reset]);
 
   // Auto-load models when config is loaded
   const discoverModelsMutation = useMutation({
@@ -152,11 +152,11 @@ export default function AiSettingsPage() {
   });
 
   useEffect(() => {
-    if (configQuery.data && watchBaseUrl && watchProviderName) {
+    if (configData && watchBaseUrl && watchProviderName) {
       discoverModelsMutation.mutate();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [configQuery.data?.id]);
+  }, [configData?.id]);
 
   const handlePresetChange = useCallback(
     (presetKey: string) => {
@@ -232,11 +232,11 @@ export default function AiSettingsPage() {
   const canSave = isDirty || extraDirty;
 
   const discardChanges = useCallback(() => {
-    if (configQuery.data) {
-      reset(buildFormDefaults(configQuery.data));
-      setSelectedPreset(detectPresetKey(configQuery.data.base_url, configQuery.data.provider_name));
-      setTaskConfigs((configQuery.data.task_configs as Record<string, TaskConfig> | null | undefined) ?? {});
-      setSystemPrompts((configQuery.data.system_prompts as Record<string, string> | null | undefined) ?? {});
+    if (configData) {
+      reset(buildFormDefaults(configData));
+      setSelectedPreset(detectPresetKey(configData.base_url, configData.provider_name));
+      setTaskConfigs((configData.task_configs as Record<string, TaskConfig> | null | undefined) ?? {});
+      setSystemPrompts((configData.system_prompts as Record<string, string> | null | undefined) ?? {});
     } else {
       reset(buildFormDefaults());
       setSelectedPreset('');
@@ -244,7 +244,7 @@ export default function AiSettingsPage() {
       setSystemPrompts({});
     }
     setExtraDirty(false);
-  }, [configQuery.data, reset]);
+  }, [configData, reset]);
 
   useFormSaveBar({
     id: 'site-settings.ai',
@@ -310,7 +310,7 @@ export default function AiSettingsPage() {
             onPresetChange={handlePresetChange}
             requiresApiKey={requiresApiKey}
             hasExistingConfig={hasExistingConfig}
-            apiKeyMasked={configQuery.data?.api_key_masked}
+            apiKeyMasked={configData?.api_key_masked}
             discoveredModels={discoveredModels}
             modelsLoading={discoverModelsMutation.isPending}
           />

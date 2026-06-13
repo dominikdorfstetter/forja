@@ -14,15 +14,23 @@ export default defineConfig({
     __APP_VERSION__: JSON.stringify('test'),
   },
   resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-      '@components': path.resolve(__dirname, './src/components'),
-      '@pages': path.resolve(__dirname, './src/pages'),
-      '@services': path.resolve(__dirname, './src/services'),
-      '@utils': path.resolve(__dirname, './src/utils'),
-      '@types': path.resolve(__dirname, './src/types'),
-      '@hooks': path.resolve(__dirname, './src/hooks'),
-    },
+    alias: [
+      // react-transition-group 4.x ships no `exports` map, so MUI 9.1's bare
+      // subpath imports (`react-transition-group/Transition` etc.) can't be
+      // resolved by Node's ESM resolver under Vitest. Point them at the real
+      // ESM files. Must precede the path aliases below.
+      {
+        find: /^react-transition-group\/((?!cjs|esm).+)$/,
+        replacement: path.resolve(__dirname, 'node_modules/react-transition-group/esm/$1.js'),
+      },
+      { find: '@components', replacement: path.resolve(__dirname, './src/components') },
+      { find: '@pages', replacement: path.resolve(__dirname, './src/pages') },
+      { find: '@services', replacement: path.resolve(__dirname, './src/services') },
+      { find: '@utils', replacement: path.resolve(__dirname, './src/utils') },
+      { find: '@types', replacement: path.resolve(__dirname, './src/types') },
+      { find: '@hooks', replacement: path.resolve(__dirname, './src/hooks') },
+      { find: '@', replacement: path.resolve(__dirname, './src') },
+    ],
   },
   test: {
     globals: true,
@@ -43,11 +51,12 @@ export default defineConfig({
     },
     testTimeout: 30000,
     hookTimeout: 60000,
-    deps: {
-      optimizer: {
-        web: {
-          include: ['@mui/x-date-pickers'],
-        },
+    server: {
+      deps: {
+        // Route all @mui/* and react-transition-group through Vite's pipeline
+        // (not Node's ESM externalizer) so the resolve.alias above can fix
+        // MUI 9.1's bare react-transition-group subpath imports.
+        inline: [/@mui[\\/]/, /react-transition-group/],
       },
     },
   },
