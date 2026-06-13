@@ -77,9 +77,12 @@ export class ForjaWorld extends World {
     await this.page.goto(`${config.baseUrl}/dashboard/dashboard`, { waitUntil: 'domcontentloaded' });
 
     // Wait for the app to render authenticated content.
-    // Try the nav marker first; fall back to any meaningful content.
+    // Try the nav/launcher marker first; fall back to any meaningful content.
     try {
-      await this.page.waitForSelector('[data-testid="layout.nav.dashboard"]', { timeout: config.timeout });
+      await this.page.waitForSelector(
+        '[data-testid="layout.nav.dashboard"], [data-testid="site-launcher"]',
+        { timeout: config.timeout },
+      );
     } catch {
       // If the nav test-id is missing, wait for the page to at least finish loading
       await this.page.waitForLoadState('networkidle');

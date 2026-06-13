@@ -4,6 +4,14 @@
 -- Prerequisites: migrations must have run first (they create environments, entity_types, locales)
 
 -- ============================================
+-- Cleanup: remove artifacts created by previous e2e runs so scenarios
+-- that create data (site-creation.feature, …) stay idempotent.
+-- ============================================
+
+DELETE FROM sites WHERE slug IN ('e2e-new-site', 'admin-test', 'empty-state-site');
+DELETE FROM contents WHERE slug IN ('e2e-test-post');
+
+-- ============================================
 -- Test Site
 -- ============================================
 
@@ -24,6 +32,14 @@ VALUES (
 INSERT INTO site_locales (site_id, locale_id, is_default)
 SELECT 'a0000000-0000-0000-0000-000000000001', id, true
 FROM locales WHERE code = 'en'
+ON CONFLICT DO NOTHING;
+
+-- German as a secondary (non-default) locale, for the multilingual blog
+-- journey (blog-multilingual.feature). Default stays English, so the publish
+-- gate (default-locale-only) is unaffected.
+INSERT INTO site_locales (site_id, locale_id, is_default)
+SELECT 'a0000000-0000-0000-0000-000000000001', id, false
+FROM locales WHERE code = 'de'
 ON CONFLICT DO NOTHING;
 
 -- ============================================
@@ -58,6 +74,35 @@ ON CONFLICT (clerk_user_id) DO UPDATE SET
 INSERT INTO user_preferences (clerk_user_id, preferences) VALUES
   ('user_3AzkGj42TKFcAVvN91143qvimH0', '{}')
 ON CONFLICT (clerk_user_id) DO NOTHING;
+
+-- ============================================
+-- System admin grant (system-admin-privileges.feature)
+-- The account is deliberately NOT a member of the test site — its access
+-- comes solely from this grant.
+-- ============================================
+
+INSERT INTO system_admins (clerk_user_id, granted_by) VALUES
+  ('user_3AzkHUzguKUpw9H0lEAQ0rXAWXo', 'e2e-seed')
+ON CONFLICT (clerk_user_id) DO NOTHING;
+
+-- ============================================
+-- Read API key for the public published view (blog-publishing.feature).
+-- Plaintext (test-only, only valid against this seeded DB):
+--   dk_e2etest1_0123456789abcdef0123456789abcdef
+-- Stored with the legacy SHA-256 hash_version so the hash is deterministic.
+-- ============================================
+
+INSERT INTO api_keys (key_hash, key_prefix, name, description, permission, site_id, status, hash_version)
+VALUES (
+  'a9566a7cf488e29d7959b53826c7fe4a0fe38ed470feaf5be484fbbfd1a58648',
+  'dk_e2etest1',
+  'E2E Read Key',
+  'Deterministic read-only key for e2e public-view assertions',
+  'read',
+  'a0000000-0000-0000-0000-000000000001',
+  'active',
+  1
+) ON CONFLICT DO NOTHING;
 
 -- No pre-seeded content — blog posts, pages, documents, etc. are created
 -- organically by the e2e test scenarios (blog-publishing.feature, page-management.feature, etc.)

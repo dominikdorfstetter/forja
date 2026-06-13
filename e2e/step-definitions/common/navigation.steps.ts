@@ -45,34 +45,37 @@ When('I navigate to {string}', async function (this: ForjaWorld, pageName: strin
 
 Given('I am on site {string}', async function (this: ForjaWorld, siteName: string) {
   this.currentSiteName = siteName;
-
-  // Wait briefly for the layout to settle so the selector can appear
   await this.page.waitForLoadState('domcontentloaded');
 
-  const siteSelector = this.page.locator('[data-testid="layout.site-selector"]');
-
-  // Give the selector a moment to render (it may not exist if there is only one site)
-  const isSelectorVisible = await siteSelector
-    .waitFor({ state: 'visible', timeout: 5000 })
-    .then(() => true)
-    .catch(() => false);
-
-  if (isSelectorVisible) {
-    // Check whether the desired site is already selected
-    const currentText = await siteSelector.textContent();
-    if (currentText?.includes(siteName)) {
-      // Already on the right site — nothing to do
-      return;
-    }
-
-    await siteSelector.click();
-    await this.page
-      .locator('[data-testid="layout.site-option"]')
-      .filter({ hasText: siteName })
-      .click();
-    await this.page.waitForLoadState('networkidle');
+  // Fast path: the sidebar already shows the target site.
+  const sidebarName = this.page.locator('[data-testid="layout.site-name"]');
+  if (
+    (await sidebarName.isVisible().catch(() => false)) &&
+    (await sidebarName.textContent())?.includes(siteName)
+  ) {
+    return;
   }
-  // If the selector is not visible there is only one site — assume it matches
+
+  // Otherwise enter it from the launcher. With more than one site nothing
+  // auto-selects, so picking the card is the canonical way in; with a single
+  // site the launcher auto-redirects straight to its dashboard.
+  await this.page.goto(`${config.baseUrl}/dashboard/sites`, { waitUntil: 'domcontentloaded' });
+  const card = this.page
+    .locator('[data-testid^="site-card-"]')
+    .filter({ hasText: siteName })
+    .first();
+  const dashboardNav = this.page.locator('[data-testid="layout.nav.dashboard"]');
+
+  // Race: the launcher card (multi-site) or the dashboard (auto-entered).
+  await Promise.race([
+    card.waitFor({ state: 'visible', timeout: config.timeout }),
+    dashboardNav.waitFor({ state: 'visible', timeout: config.timeout }),
+  ]).catch(() => {});
+
+  if (await card.isVisible().catch(() => false)) {
+    await card.click();
+  }
+  await dashboardNav.waitFor({ state: 'visible', timeout: config.timeout });
 });
 
 When('I navigate to site {string}', async function (this: ForjaWorld, siteName: string) {
@@ -83,19 +86,22 @@ When('I navigate to site {string}', async function (this: ForjaWorld, siteName: 
 });
 
 Then('I should see the dashboard', async function (this: ForjaWorld) {
-  await this.page.waitForSelector('[data-testid="layout.nav.dashboard"]');
+  // system_admin has no site membership, so its post-login surface is the
+  // site launcher rather than a site dashboard.
+  await this.page.waitForSelector(
+    '[data-testid="layout.nav.dashboard"], [data-testid="site-launcher"]',
+  );
 });
 
 Then('I should be redirected to the login page', async function (this: ForjaWorld) {
-  // Unauthenticated users may land on /login, /sign-in, or a landing page
-  // The landing page has "Sign In" and "Create Account" buttons
+  // Unauthenticated users may land on /login, /sign-in, or the signed-out
+  // Welcome surface (whose hero offers "Log in" / "Sign up").
   await this.page.waitForLoadState('networkidle');
   const onLoginPage = this.page.url().includes('/login') || this.page.url().includes('/sign-in');
   if (onLoginPage) return;
 
-  // Check for landing page with sign-in option
-  const signInBtn = this.page.getByRole('button', { name: /sign in/i })
-    .or(this.page.getByRole('link', { name: /sign in/i }));
+  const signInBtn = this.page.getByRole('button', { name: /sign in|log in/i })
+    .or(this.page.getByRole('link', { name: /sign in|log in/i }));
   await signInBtn.first().waitFor({ state: 'visible', timeout: 10000 });
 });
 

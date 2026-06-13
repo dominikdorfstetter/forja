@@ -30,6 +30,7 @@ use crate::dto::document::BlogDocumentResponse;
 use crate::dto::review::{ReviewActionRequest, ReviewActionResponse};
 use crate::dto::taxonomy::{CategoryResponse, TagResponse};
 use crate::errors::{codes, ApiError, ProblemDetails};
+use crate::guards::actor::Actor;
 use crate::guards::auth_guard::{ReadKey, WriteKey};
 use crate::guards::module_guard::{BlogModule, ModuleGuard};
 use crate::models::blog::BlogWithContent;
@@ -692,20 +693,19 @@ async fn get_blog_localizations(
 async fn create_blog_localization(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
-    auth: WriteKey,
+    // Plain Actor: the lifecycle enforces `{resource}:create` per site,
+    // which (unlike `WriteKey`) admits Clerk users by their site role —
+    // the admin editor saves localized content through this route.
+    auth: Actor,
     crate::dto::validated::ValidatedJson(body): crate::dto::validated::ValidatedJson<
         CreateLocalizationRequest,
     >,
 ) -> Result<(StatusCode, Json<LocalizationResponse>), ApiError> {
     let body = body.into_inner();
     let blog = BlogRepo::find_by_id(&state.db, id).await?;
-    let localization = localization_lifecycle::create::<BlogLocalization>(
-        &state.db,
-        blog.content_id,
-        body,
-        &auth.0,
-    )
-    .await?;
+    let localization =
+        localization_lifecycle::create::<BlogLocalization>(&state.db, blog.content_id, body, &auth)
+            .await?;
 
     Ok((
         StatusCode::CREATED,
@@ -732,18 +732,14 @@ async fn create_blog_localization(
 async fn update_blog_localization(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
-    auth: WriteKey,
+    auth: Actor,
     crate::dto::validated::ValidatedJson(body): crate::dto::validated::ValidatedJson<
         UpdateLocalizationRequest,
     >,
 ) -> Result<Json<LocalizationResponse>, ApiError> {
-    let localization = localization_lifecycle::update::<BlogLocalization>(
-        &state.db,
-        id,
-        body.into_inner(),
-        &auth.0,
-    )
-    .await?;
+    let localization =
+        localization_lifecycle::update::<BlogLocalization>(&state.db, id, body.into_inner(), &auth)
+            .await?;
 
     Ok(Json(LocalizationResponse::from(localization)))
 }
@@ -766,9 +762,9 @@ async fn update_blog_localization(
 async fn delete_blog_localization(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
-    auth: WriteKey,
+    auth: Actor,
 ) -> Result<StatusCode, ApiError> {
-    localization_lifecycle::delete::<BlogLocalization>(&state.db, id, &auth.0).await?;
+    localization_lifecycle::delete::<BlogLocalization>(&state.db, id, &auth).await?;
     Ok(StatusCode::NO_CONTENT)
 }
 

@@ -1,4 +1,4 @@
-@auth
+@auth @critical
 Feature: Authentication
   As a user with a Clerk account
   I want to log into the Forja dashboard

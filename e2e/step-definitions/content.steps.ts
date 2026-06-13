@@ -1,5 +1,76 @@
 import { When, Then, Given } from '@cucumber/cucumber';
+import assert from 'node:assert/strict';
 import { ForjaWorld } from '../support/world';
+import { config } from '../support/config';
+
+// Fixed identifiers from scripts/seed-test-data.sql — the seeded test site
+// and the deterministic read-only API key for public-view assertions.
+const SEED_SITE_ID = 'a0000000-0000-0000-0000-000000000001';
+const SEED_READ_API_KEY = 'dk_e2etest1_0123456789abcdef0123456789abcdef';
+
+When(
+  'I create a blog post titled {string} from scratch',
+  async function (this: ForjaWorld, title: string) {
+    await this.page.locator('[data-testid="create-post"]').click();
+    const dialog = this.page.locator('[role="dialog"]', { hasText: 'Create Blog' });
+    await dialog.waitFor({ state: 'visible' });
+    await dialog.locator('text=From Scratch').click();
+    // Step 2: Details — slug auto-derives from the title, author is prefilled.
+    await dialog
+      .locator('[data-testid="create-blog-wizard.input.title"] input')
+      .fill(title);
+    await dialog.locator('[data-testid="create-blog-wizard.btn.create"]').click();
+    // Creation navigates to the editor page.
+    await this.page.locator('[data-testid="forja-editor"]').waitFor({ state: 'visible' });
+  },
+);
+
+When('I set the post title to {string}', async function (this: ForjaWorld, title: string) {
+  // The create wizard's title only seeds the slug — the localized title
+  // (which the publish gate requires for the default locale) is set here.
+  await this.page
+    .locator('[data-testid="field-title"] input, input[data-testid="field-title"]')
+    .first()
+    .fill(title);
+});
+
+When('I write {string} in the editor', async function (this: ForjaWorld, text: string) {
+  const editor = this.page.locator('[data-testid="forja-editor"] .ProseMirror').first();
+  await editor.click();
+  await editor.fill(text);
+});
+
+When('I publish the post', async function (this: ForjaWorld) {
+  await this.page.locator('[data-testid="publish-post"]').click();
+  // A confirmation dialog may ask to confirm the publication.
+  const confirm = this.page
+    .locator('[role="dialog"]')
+    .getByRole('button', { name: /publish|confirm/i })
+    .first();
+  if (await confirm.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await confirm.click();
+  }
+  await this.page.waitForLoadState('networkidle');
+});
+
+Then(
+  'the content API serves blog {string} with status {string}',
+  async function (slug: string, status: string) {
+    // The published view a client site sees: the content API read surface,
+    // authenticated with the seeded read-only key.
+    const res = await fetch(
+      `${config.apiUrl}/api/v1/sites/${SEED_SITE_ID}/blogs?status=${status}`,
+      { headers: { 'x-api-key': SEED_READ_API_KEY } },
+    );
+    assert.equal(res.status, 200, `content API returned ${res.status}`);
+    const body = (await res.json()) as { items?: Array<{ slug?: string }>; data?: Array<{ slug?: string }> };
+    const items = body.items ?? body.data ?? [];
+    assert.ok(
+      items.some((b) => b.slug === slug),
+      `blog "${slug}" not in the ${status} feed — got ${JSON.stringify(items.map((b) => b.slug))}`,
+    );
+  },
+);
 
 When('I save as draft', async function (this: ForjaWorld) {
   // Try multiple selectors — the button may say "Save Draft", "Save", or use a test-id
@@ -68,10 +139,11 @@ When('I open post {string}', async function (this: ForjaWorld, title: string) {
 // "I confirm the publication" is handled by the generic "I confirm the {word}" in forms.steps.ts
 
 When('I switch to locale {string}', async function (this: ForjaWorld, locale: string) {
-  const localeSelector = this.page.locator('[data-testid="locale-selector"]');
-  await localeSelector.click();
-  await this.page.locator(`[data-testid="locale-option-${locale}"]`).click();
-  await this.page.waitForLoadState('networkidle');
+  // Locales are MUI tabs labelled with the uppercased code (EN / DE / …).
+  await this.page
+    .getByRole('tab', { name: new RegExp(`^${locale}`, 'i') })
+    .first()
+    .click();
 });
 
 Then('the post status should be {string}', async function (this: ForjaWorld, status: string) {

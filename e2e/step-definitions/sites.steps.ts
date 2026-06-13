@@ -3,65 +3,36 @@ import { type DataTable } from '@cucumber/cucumber';
 import { ForjaWorld } from '../support/world';
 
 /**
- * Completes the multi-step site creation wizard.
- * The wizard has 4 steps: Basics → Modules → Workflow → Languages.
- * We fill the basics step and click "Next" through the remaining steps.
+ * Completes the multi-step site creation wizard
+ * (Basics → Modules → Workflow → Languages) via its site-wizard.* testids.
  */
 When('I complete the site creation wizard with:', async function (this: ForjaWorld, dataTable: DataTable) {
-  // Wait for the wizard dialog to appear
-  await this.page.locator('text=Create New Site').waitFor({ state: 'visible', timeout: 5000 });
+  const dialog = this.page.locator('[role="dialog"]', { hasText: 'Create New Site' });
+  await dialog.waitFor({ state: 'visible', timeout: 5000 });
 
-  // Step 1: Basics — fill in the form fields
-  const rows = dataTable.rows();
-  for (const [field, value] of rows) {
-    // Try MUI TextField by label first, then by name, then data-testid
-    const byLabel = this.page.getByLabel(new RegExp(field, 'i'));
-    if (await byLabel.isVisible().catch(() => false)) {
-      await byLabel.fill(value);
-      continue;
-    }
-    const byName = this.page.locator(`[name="${field}"]`);
-    if (await byName.isVisible().catch(() => false)) {
-      await byName.fill(value);
-      continue;
-    }
-    const byTestId = this.page.locator(`[data-testid="field-${field}"]`);
-    if (await byTestId.isVisible().catch(() => false)) {
-      await byTestId.fill(value);
-      continue;
-    }
+  // Step 1: Basics. The slug field is read-only (auto-derived from the
+  // name), so only name and description are fillable.
+  const fields = Object.fromEntries(dataTable.rows());
+  await dialog
+    .locator('[data-testid="site-wizard.input.name"] input')
+    .first()
+    .fill(fields.name);
+  if (fields.description) {
+    await dialog.locator('[name="description"]').first().fill(fields.description);
   }
 
-  // Steps 2-3: Click "Next" through Modules and Workflow
-  for (let step = 0; step < 2; step++) {
-    const nextBtn = this.page.getByRole('button', { name: /next/i });
-    if (await nextBtn.isVisible().catch(() => false)) {
-      await nextBtn.click();
-      await this.page.waitForTimeout(500);
-    }
+  // Modules and Workflow keep their defaults; Languages is the last step.
+  for (let step = 0; step < 3; step++) {
+    await dialog.locator('[data-testid="site-wizard.btn.next"]').click();
   }
 
-  // Step 4: Languages — select at least one language
-  // The dropdown says "Initial Languages" — click it and pick English
-  const langDropdown = this.page.getByLabel(/initial languages|languages/i);
-  if (await langDropdown.isVisible().catch(() => false)) {
-    await langDropdown.click();
-    // Select English from the dropdown options
-    const englishOption = this.page.getByRole('option', { name: /english/i });
-    if (await englishOption.waitFor({ state: 'visible', timeout: 3000 }).then(() => true).catch(() => false)) {
-      await englishOption.click();
-    }
-    // Close the dropdown by pressing Escape
-    await this.page.keyboard.press('Escape');
-    await this.page.waitForTimeout(300);
-  }
+  // Step 4: Languages — pick English, then Create.
+  await dialog.locator('[data-testid="site-wizard.locales"] input').first().click();
+  await this.page.getByRole('option', { name: /english/i }).first().click();
+  await this.page.keyboard.press('Escape');
 
-  // Click "Create"
-  const createBtn = this.page.getByRole('button', { name: /^create$/i });
-  if (await createBtn.isVisible().catch(() => false)) {
-    await createBtn.click();
-    await this.page.waitForLoadState('networkidle');
-  }
+  await dialog.getByRole('button', { name: /^create$/i }).click();
+  await this.page.waitForLoadState('networkidle');
 });
 
 When('I update the site name to {string}', async function (this: ForjaWorld, newName: string) {

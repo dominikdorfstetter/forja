@@ -1,0 +1,21 @@
+name: E2E Nightly
+
+# Runs the full Cucumber e2e suite (every feature, not just @critical) once a
+# day and on demand. The PR gate in ci.yml only runs the @critical subset to
+# keep PRs fast; this catches regressions in the broader suite.
+
+on:
+  schedule:
+    # 03:17 UTC daily — off the hour to avoid the top-of-hour scheduling spike.
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  full-suite:
+    uses: ./.github/workflows/e2e-reusable.yml
+    secrets: inherit
+    with:
+      profile: default

@@ -8,12 +8,12 @@ Feature: Multilingual Blog Content
     And I am on site "E2E Test Blog"
     And the site supports locales "en, de"
     When I navigate to "blogs"
-    And I open post "E2E Test Post"
+    And I open post "e2e-test-post"
     And I switch to locale "de"
     And I fill in the blog editor with:
       | field   | value                              |
       | title   | E2E Testbeitrag                    |
       | content | Dies ist ein automatisierter Test. |
     And I save the post
-    Then I should see "Post saved"
+    Then I should see "Blog saved"
     And I take a screenshot "content/blog-multilingual"

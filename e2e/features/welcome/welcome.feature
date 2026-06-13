@@ -14,8 +14,8 @@ Feature: Welcome page for signed-out visitors
   Background:
     Given I am a signed-out visitor on the Welcome page
 
-  Scenario: A non-technical visitor understands Forja and the page leads with the explainer
-    Then the "What is Forja?" explainer is the first content section
+  Scenario: A non-technical visitor understands Forja from the landing sections
+    Then the product preview leads and the "What is Forja?" explainer follows
     And I see the sign-up and self-host hero calls to action
     And I take a screenshot "welcome/welcome-landing"
 
