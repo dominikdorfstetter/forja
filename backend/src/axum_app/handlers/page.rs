@@ -25,6 +25,7 @@ use crate::dto::page::{
 use crate::dto::review::{ReviewActionRequest, ReviewActionResponse};
 use crate::dto::validated::ValidatedJson;
 use crate::errors::{codes, ApiError, ProblemDetails};
+use crate::guards::actor::Actor;
 use crate::guards::auth_guard::{ReadKey, WriteKey};
 use crate::guards::module_guard::{ModuleGuard, PagesModule};
 use crate::models::content::ContentLocalization;
@@ -775,7 +776,9 @@ async fn get_page_localizations(
 async fn create_page_localization(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
-    auth: WriteKey,
+    // Plain Actor: the lifecycle enforces `{resource}:create` per site,
+    // which (unlike `WriteKey`) admits Clerk users by their site role.
+    auth: Actor,
     ValidatedJson(body): ValidatedJson<CreateLocalizationRequest>,
 ) -> Result<(StatusCode, Json<LocalizationResponse>), ApiError> {
     let page = PageRepo::find_by_id(&state.db, id).await?;
@@ -783,7 +786,7 @@ async fn create_page_localization(
         &state.db,
         page.content_id,
         body.into_inner(),
-        &auth.0,
+        &auth,
     )
     .await?;
 
@@ -812,16 +815,12 @@ async fn create_page_localization(
 async fn update_page_localization(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
-    auth: WriteKey,
+    auth: Actor,
     ValidatedJson(body): ValidatedJson<UpdateLocalizationRequest>,
 ) -> Result<Json<LocalizationResponse>, ApiError> {
-    let localization = localization_lifecycle::update::<PageLocalization>(
-        &state.db,
-        id,
-        body.into_inner(),
-        &auth.0,
-    )
-    .await?;
+    let localization =
+        localization_lifecycle::update::<PageLocalization>(&state.db, id, body.into_inner(), &auth)
+            .await?;
 
     Ok(Json(LocalizationResponse::from(localization)))
 }
@@ -844,9 +843,9 @@ async fn update_page_localization(
 async fn delete_page_localization(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
-    auth: WriteKey,
+    auth: Actor,
 ) -> Result<StatusCode, ApiError> {
-    localization_lifecycle::delete::<PageLocalization>(&state.db, id, &auth.0).await?;
+    localization_lifecycle::delete::<PageLocalization>(&state.db, id, &auth).await?;
     Ok(StatusCode::NO_CONTENT)
 }
 

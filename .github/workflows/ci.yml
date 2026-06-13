@@ -27,6 +27,7 @@ jobs:
       analytics: ${{ steps.filter.outputs.analytics }}
       client: ${{ steps.filter.outputs.client }}
       astro-blog: ${{ steps.filter.outputs.astro-blog }}
+      e2e: ${{ steps.filter.outputs.e2e }}
     steps:
       - uses: actions/checkout@v6
 
@@ -46,6 +47,10 @@ jobs:
               - 'templates/astro-blog/**'
               - 'libs/client/**'
               - 'libs/sections/**'
+            e2e:
+              - 'e2e/**'
+              - 'backend/**'
+              - 'admin/**'
 
   backend:
     name: Backend (Rust)
@@ -317,17 +322,35 @@ jobs:
         working-directory: templates/astro-blog
         run: npx astro check
 
+  # End-to-end critical journeys (issue #17). Runs the @critical Cucumber subset
+  # (login, blog publish + public content-API view, document management) against
+  # a freshly built backend + admin. Skipped for fork PRs, which cannot read the
+  # Clerk secrets; the reusable workflow also no-ops gracefully until the
+  # secrets are configured (see e2e/.github/workflows/e2e-reusable.yml).
+  # The @critical profile retries a failed scenario once (cucumber.js) so a
+  # single flaky run does not block a PR, but a reproducible failure does.
+  e2e:
+    name: E2E critical journeys
+    needs: changes
+    if: >-
+      needs.changes.outputs.e2e == 'true'
+      && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository)
+    uses: ./.github/workflows/e2e-reusable.yml
+    secrets: inherit
+    with:
+      profile: critical
+
   # Docker build removed from CI — images are built on tagged releases via docker-publish.yml
 
   ci-pass:
     name: CI Pass
     if: always()
-    needs: [backend, admin, analytics, client, astro-blog]
+    needs: [backend, admin, analytics, client, astro-blog, e2e]
     runs-on: ubuntu-latest
     steps:
       - name: Check required jobs
         run: |
-          if [[ "${{ needs.backend.result }}" == "failure" || "${{ needs.admin.result }}" == "failure" || "${{ needs.analytics.result }}" == "failure" || "${{ needs.client.result }}" == "failure" || "${{ needs.astro-blog.result }}" == "failure" ]]; then
+          if [[ "${{ needs.backend.result }}" == "failure" || "${{ needs.admin.result }}" == "failure" || "${{ needs.analytics.result }}" == "failure" || "${{ needs.client.result }}" == "failure" || "${{ needs.astro-blog.result }}" == "failure" || "${{ needs.e2e.result }}" == "failure" ]]; then
             echo "One or more required jobs failed"
             exit 1
           fi

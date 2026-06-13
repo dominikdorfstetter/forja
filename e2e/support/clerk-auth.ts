@@ -4,6 +4,11 @@ import { type BrowserContext } from 'playwright';
 import { clerk, setupClerkTestingToken } from '@clerk/testing/playwright';
 import { config } from './config';
 
+// A logged-in user lands either on the dashboard (single-membership roles)
+// or on the site launcher (system_admin has no membership to auto-select).
+const LOGGED_IN_MARKER =
+  '[data-testid="layout.nav.dashboard"], [data-testid="site-launcher"]';
+
 /**
  * Authenticates as a given role using @clerk/testing's official helpers.
  *
@@ -38,7 +43,7 @@ export async function loginAs(
     const page = await context.newPage();
     await page.goto(`${config.baseUrl}/dashboard/dashboard`, { waitUntil: 'networkidle' });
     try {
-      await page.waitForSelector('[data-testid="layout.nav.dashboard"]', { timeout: 10000 });
+      await page.waitForSelector(LOGGED_IN_MARKER, { timeout: 10000 });
       await page.close();
       return;
     } catch {
@@ -67,7 +72,7 @@ export async function loginAs(
 
   // Navigate to dashboard and wait for it to load
   await page.goto(`${config.baseUrl}/dashboard/dashboard`, { waitUntil: 'networkidle' });
-  await page.waitForSelector('[data-testid="layout.nav.dashboard"]', { timeout: 15000 });
+  await page.waitForSelector(LOGGED_IN_MARKER, { timeout: 15000 });
 
   // Cache the auth state
   fs.mkdirSync(config.authStatesDir, { recursive: true });

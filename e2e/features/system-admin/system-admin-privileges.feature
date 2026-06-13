@@ -11,6 +11,8 @@ Feature: System Admin Privileges
 
   Scenario: System admin can see all users
     Given I am logged in as "system_admin"
+    # The layout requires a selected site even for global /system pages
+    And I navigate to site "E2E Test Blog"
     When I navigate to "clerk-users"
     Then I should see the full user list
     And I take a screenshot "system-admin/all-users"

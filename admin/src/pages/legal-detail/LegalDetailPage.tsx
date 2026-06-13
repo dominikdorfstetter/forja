@@ -40,8 +40,11 @@ const legalAdapter: ContentDetailAdapter<LegalDocumentFullDetailResponse, LegalC
   buildLocalizationData: (values) => buildLocalizationData(values),
   getLocTitleField: (values) => values.title || undefined,
   updateEntity: (id, data) => updateLegalDocument(id, data as Parameters<typeof updateLegalDocument>[1]),
-  createLocalization: (entityId, _localeId, data) =>
-    createLegalLocalization(entityId, data as unknown as Parameters<typeof createLegalLocalization>[1]),
+  createLocalization: (entityId, localeId, data) =>
+    createLegalLocalization(entityId, {
+      locale_id: localeId,
+      ...data,
+    } as unknown as Parameters<typeof createLegalLocalization>[1]),
   updateLocalization: (locId, data) =>
     updateLegalLocalization(locId, data as unknown as Parameters<typeof updateLegalLocalization>[1]),
   i18nNamespace: 'legalDetail',

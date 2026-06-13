@@ -51,8 +51,11 @@ const blogAdapter: ContentDetailAdapter<BlogDetailResponse, BlogContentFormData,
   buildLocalizationData: (values) => buildLocalizationData(values),
   getLocTitleField: (values) => values.title || undefined,
   updateEntity: (id, data) => updateBlog(id, data as unknown as Parameters<typeof updateBlog>[1]),
-  createLocalization: (entityId, _localeId, data) =>
-    createBlogLocalization(entityId, data as unknown as Parameters<typeof createBlogLocalization>[1]),
+  createLocalization: (entityId, localeId, data) =>
+    createBlogLocalization(entityId, {
+      locale_id: localeId,
+      ...data,
+    } as unknown as Parameters<typeof createBlogLocalization>[1]),
   updateLocalization: (locId, data) =>
     updateBlogLocalization(locId, data as unknown as Parameters<typeof updateBlogLocalization>[1]),
   reviewEntity: (id, data: ReviewActionRequest) => reviewBlog(id, data),

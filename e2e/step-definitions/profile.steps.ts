@@ -1,6 +1,16 @@
 import { When, Then } from '@cucumber/cucumber';
 import { ForjaWorld } from '../support/world';
 
+When('I open the preferences drawer', async function (this: ForjaWorld) {
+  // Appearance preferences (theme, language, density) live in a drawer
+  // behind the user account menu, not on a settings page.
+  await this.page.click('[data-testid="layout.btn.user-menu"]');
+  await this.page.click('[data-testid="layout.btn.preferences"]');
+  await this.page
+    .locator('[data-testid="preferences-drawer"]')
+    .waitFor({ state: 'visible' });
+});
+
 When('I toggle dark mode', async function (this: ForjaWorld) {
   const toggle = this.page.locator('[data-testid="dark-mode-toggle"]');
   await toggle.click();

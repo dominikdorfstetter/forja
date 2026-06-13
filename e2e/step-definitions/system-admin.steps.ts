@@ -18,3 +18,11 @@ Given('I have no site memberships', async function (this: ForjaWorld) {
 Given('I am on a site with no blog posts', async function (this: ForjaWorld) {
   // Precondition — navigate to a site that has no content
 });
+
+Given(
+  'a site {string} exists that I am not a member of',
+  async function (this: ForjaWorld, _siteName: string) {
+    // Precondition — seed data creates the site; the system_admin test
+    // account is intentionally not a member of it.
+  },
+);
