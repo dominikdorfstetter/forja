@@ -19,6 +19,7 @@ use crate::dto::legal::{
 use crate::dto::validated::ValidatedJson;
 use crate::errors::codes;
 use crate::errors::{ApiError, ProblemDetails};
+use crate::guards::actor::Actor;
 use crate::guards::auth_guard::{ReadKey, WriteKey};
 use crate::guards::module_guard::{LegalModule, ModuleGuard};
 use crate::models::audit::AuditAction;
@@ -863,7 +864,9 @@ async fn get_legal_localizations(
 async fn create_legal_localization(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
-    auth: WriteKey,
+    // Plain Actor: the lifecycle enforces `{resource}:create` per site,
+    // which (unlike `WriteKey`) admits Clerk users by their site role.
+    auth: Actor,
     ValidatedJson(body): ValidatedJson<CreateLocalizationRequest>,
 ) -> Result<(StatusCode, Json<LocalizationResponse>), ApiError> {
     let doc = LegalDocumentRepo::find_by_id(&state.db, id).await?;
@@ -874,7 +877,7 @@ async fn create_legal_localization(
         &state.db,
         content_id,
         body.into_inner(),
-        &auth.0,
+        &auth,
     )
     .await?;
 
@@ -903,14 +906,14 @@ async fn create_legal_localization(
 async fn update_legal_localization(
     State(state): State<AppState>,
     Path(loc_id): Path<Uuid>,
-    auth: WriteKey,
+    auth: Actor,
     ValidatedJson(body): ValidatedJson<UpdateLocalizationRequest>,
 ) -> Result<Json<LocalizationResponse>, ApiError> {
     let localization = localization_lifecycle::update::<LegalLocalization>(
         &state.db,
         loc_id,
         body.into_inner(),
-        &auth.0,
+        &auth,
     )
     .await?;
 

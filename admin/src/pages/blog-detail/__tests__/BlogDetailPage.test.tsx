@@ -1,7 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderWithProviders, screen, waitFor, userEvent } from '@/test/test-utils';
 import { fireEvent } from '@testing-library/react';
-import { getBlogDetail, updateBlog, updateBlogLocalization } from '@/services/blogs';
+import {
+  getBlogDetail,
+  updateBlog,
+  updateBlogLocalization,
+  createBlogLocalization,
+} from '@/services/blogs';
 import { getSiteLocales } from '@/services/siteLocales';
 import { getSiteSettings } from '@/services/sites';
 import type { BlogDetailResponse, SiteLocaleResponse } from '@/types/api';
@@ -140,5 +145,40 @@ describe('BlogDetailPage', () => {
       'loc-1',
       expect.objectContaining({ title: 'Edited Title' }),
     );
+  });
+
+  it('creating the first localization includes locale_id (regression: #17)', async () => {
+    // A brand-new post has no localization for the active locale yet, so the
+    // save takes the create branch. The backend requires `locale_id` — the
+    // adapter must thread the active locale's id through, not drop it.
+    const detailWithoutLocalization = {
+      ...mockDetail,
+      localizations: [],
+    } as never;
+    vi.mocked(getBlogDetail).mockResolvedValue(detailWithoutLocalization);
+    vi.mocked(getSiteLocales).mockResolvedValue([mockLocale]);
+    vi.mocked(updateBlog).mockResolvedValue({} as never);
+    vi.mocked(createBlogLocalization).mockResolvedValue({} as never);
+
+    renderWithProviders(<BlogDetailPage />);
+
+    await waitFor(() => {
+      expect(screen.getAllByLabelText('Undo (Ctrl+Z)').length).toBeGreaterThan(0);
+    });
+
+    const titleField = screen.getByTestId('field-title');
+    const input = titleField.querySelector('input')!;
+    fireEvent.change(input, { target: { value: 'First Title' } });
+    fireEvent.blur(input);
+
+    const user = userEvent.setup();
+    await user.click(screen.getByTestId('save-post'));
+
+    await waitFor(() => {
+      expect(createBlogLocalization).toHaveBeenCalledWith(
+        'blog-1',
+        expect.objectContaining({ locale_id: 'locale-1', title: 'First Title' }),
+      );
+    });
   });
 });

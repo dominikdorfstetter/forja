@@ -662,3 +662,101 @@ async fn legal_create_localization_via_lifecycle_uses_diverged_audit_and_webhook
         events
     );
 }
+
+// ── Clerk site-member access (#17 e2e finding) ─────────────────────────────
+//
+// The admin UI saves localized content with the user's Clerk session, not
+// an API key. The handlers used to pre-gate with `WriteKey`, which denies
+// every non-system-admin Clerk user before the lifecycle's per-site
+// permission check could run — so no site member could save a title/body
+// through the editor. These tests pin the intended semantics: membership
+// role decides, evaluated by the lifecycle itself.
+
+fn clerk_actor(clerk_user_id: &str) -> Actor {
+    let auth = AuthenticatedKey {
+        id: Uuid::new_v5(
+            &forja::guards::auth_guard::CLERK_UUID_NAMESPACE,
+            clerk_user_id.as_bytes(),
+        ),
+        permission: ApiKeyPermission::Read,
+        site_id: None,
+        auth_source: AuthSource::ClerkJwt {
+            clerk_user_id: clerk_user_id.to_string(),
+        },
+    };
+    Actor::from_authenticated(&auth).expect("actor from Clerk auth")
+}
+
+#[tokio::test]
+#[serial]
+async fn blog_localization_create_allows_clerk_member_with_editor_role() {
+    use forja::models::site_membership::{SiteMembership, SiteRole};
+
+    let pool = test_db_pool().await;
+    let site_id = create_test_site(&pool).await;
+    enable_module(&pool, site_id, "blog").await;
+
+    let seed_auth = build_test_auth(&pool, site_id, ApiKeyPermission::Write).await;
+    let blog = create_test_blog(&pool, site_id, &seed_auth).await;
+    let locale_id = seeded_locale_id(&pool, SEEDED_LOCALE_CODE).await;
+
+    let clerk_id = format!("clerk_loc_member_{}", &Uuid::new_v4().to_string()[..8]);
+    SiteMembership::create(&pool, &clerk_id, site_id, &SiteRole::Editor, None)
+        .await
+        .expect("create editor membership");
+    let actor = clerk_actor(&clerk_id);
+
+    let created = localization_lifecycle::create::<BlogLocalization>(
+        &pool,
+        blog.content_id,
+        make_localization_request(locale_id, "Editor-saved localization"),
+        &actor,
+    )
+    .await
+    .expect("clerk editor can create a localization");
+
+    let updated = localization_lifecycle::update::<BlogLocalization>(
+        &pool,
+        created.id,
+        UpdateLocalizationRequest {
+            title: Some("Editor-updated localization".to_string()),
+            subtitle: None,
+            excerpt: None,
+            body: Some("Updated body.".to_string()),
+            meta_title: None,
+            meta_description: None,
+            translation_status: None,
+        },
+        &actor,
+    )
+    .await
+    .expect("clerk editor can update a localization");
+    assert_eq!(updated.title, "Editor-updated localization");
+}
+
+#[tokio::test]
+#[serial]
+async fn blog_localization_create_denies_clerk_user_without_membership() {
+    let pool = test_db_pool().await;
+    let site_id = create_test_site(&pool).await;
+    enable_module(&pool, site_id, "blog").await;
+
+    let seed_auth = build_test_auth(&pool, site_id, ApiKeyPermission::Write).await;
+    let blog = create_test_blog(&pool, site_id, &seed_auth).await;
+    let locale_id = seeded_locale_id(&pool, SEEDED_LOCALE_CODE).await;
+
+    let actor = clerk_actor(&format!(
+        "clerk_loc_stranger_{}",
+        &Uuid::new_v4().to_string()[..8]
+    ));
+
+    let err = localization_lifecycle::create::<BlogLocalization>(
+        &pool,
+        blog.content_id,
+        make_localization_request(locale_id, "Should not exist"),
+        &actor,
+    )
+    .await
+    .expect_err("non-member clerk user must be denied");
+    assert_eq!(err.status().as_u16(), 403);
+}

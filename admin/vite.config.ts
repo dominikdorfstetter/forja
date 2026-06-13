@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -7,13 +7,33 @@ import { readFileSync } from 'fs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const pkg = JSON.parse(readFileSync(path.resolve(__dirname, 'package.json'), 'utf-8'));
 
+// The SPA router shows `/dashboard` (no trailing slash) after client-side
+// navigation, but Vite serves base `/dashboard/` strictly — reloading that
+// URL in dev would 404. Production serving handles this in the backend.
+function dashboardTrailingSlashRedirect(): Plugin {
+  return {
+    name: 'dashboard-trailing-slash-redirect',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        if (req.url === '/dashboard' || req.url?.startsWith('/dashboard?')) {
+          res.statusCode = 302;
+          res.setHeader('Location', req.url.replace('/dashboard', '/dashboard/'));
+          res.end();
+          return;
+        }
+        next();
+      });
+    },
+  };
+}
+
 // https://vitejs.dev/config/
 export default defineConfig({
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
   },
   base: '/dashboard/',
-  plugins: [react()],
+  plugins: [react(), dashboardTrailingSlashRedirect()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
