@@ -14,6 +14,19 @@ is the first release published as open source**, so the public version history
 begins at 2.0. The pre-release milestones below condense how the foundation came
 together; precise dates start at the first public release.
 
+## 2.0.3 — 2026-06-14
+
+A bug-fix release clearing the admin-UI backlog: density-aware tables, the global save-bar migration, and the last read-only enforcement gaps for viewer/guest roles.
+
+### Fixed
+
+- **Compact density now applies to every table.** The four drag-to-reorder tables (Portfolio CV + Projects, Navigation, Social Links) ignored Preferences → Density and stayed at a fixed height; they now track the toggle like every other table. Rows also grow to fit tall cell content — the Members inline role editor and the Sites name+slug and storage columns — instead of clipping it on Compact.
+- **A single Save control per content page.** Blog, page, and legal detail pages rendered two Save buttons firing the same save; the editor-toolbar duplicates are removed and the floating global save bar is now the one Save, with stable end-to-end hooks. Collection type and entry forms join the same global save system (unsaved-changes navigation guard + change count), and a dead, unrouted legal-detail page was deleted.
+
+### Security
+
+- **Read-only (viewer/guest) roles can no longer reach write actions that bypassed the UI guard.** Drag-to-reorder on media and document cards, and the Trash restore action, were ungated; all now require write permission. A viewer-walk end-to-end check asserts that no write controls are reachable across the content pages, complementing the existing API-side RBAC.
+
 ## 2.0.2 — 2026-06-14
 
 Hotfix for a login regression introduced in 2.0.1.
