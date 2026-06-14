@@ -17,6 +17,7 @@ import { queryKeys } from '@/lib/queryKeys';
 
 const legalAdapter: ContentDetailAdapter<LegalDocumentFullDetailResponse, LegalContentFormData, ContentLocalizationResponse> = {
   entityKey: 'legal',
+  saveTestId: 'save-document',
   fetchDetail: (id) => getLegalDocumentDetail(id),
   detailQueryKey: (id) => queryKeys.legalDetail(id),
   invalidateOnSave: [['legal']],
@@ -82,7 +83,7 @@ export default function LegalDetailPage() {
   return (
     <ContentDetailPage
       adapter={legalAdapter}
-      renderToolbar={({ watch, setValue, history, onSave, isSaving, canWrite, workflow, handlers, onToggleHistory, detail }) => (
+      renderToolbar={({ watch, setValue, history, isSaving, canWrite, workflow, handlers, onToggleHistory, detail }) => (
         <LegalEditorToolbar
           watch={watch}
           setValue={setValue}
@@ -91,7 +92,6 @@ export default function LegalDetailPage() {
           canRedo={history.canRedo}
           onUndo={history.undo}
           onRedo={history.redo}
-          onSave={onSave}
           onToggleHistory={onToggleHistory}
           isSaving={isSaving}
           canWrite={canWrite}

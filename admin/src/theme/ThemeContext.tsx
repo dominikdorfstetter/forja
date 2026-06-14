@@ -48,7 +48,7 @@ export type Density = 'comfortable' | 'compact';
 const VALID_ACCENTS: readonly Accent[] = ['violet', 'coral', 'teal', 'amber'];
 const VALID_DENSITIES: readonly Density[] = ['comfortable', 'compact'];
 
-interface ThemeModeContextValue {
+export interface ThemeModeContextValue {
   themeId: ThemeId;
   setThemeId: (id: ThemeId) => void;
   resolvedFlavor: Flavor;

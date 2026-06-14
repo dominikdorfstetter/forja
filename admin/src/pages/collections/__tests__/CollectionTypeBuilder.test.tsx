@@ -1,16 +1,28 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { renderWithProviders, screen, within, userEvent } from '@/test/test-utils';
 import { CollectionTypeBuilder } from '../CollectionTypeBuilder';
 import type { CreateCustomTypeRequest, CustomTypeResponse } from '@/types/customTypes';
 
-// Assertions target data-testid + payload shape, not translated copy.
+// Assertions target data-testid + payload shape, not translated copy. Save now
+// lives on the global save bar (#48), so these render through the app providers
+// (renderWithProviders mounts SaveBarProvider + GlobalSaveBar) and click the
+// bar's `save-type`. Create mode force-shows the bar; edit mode shows it on dirty.
 
 describe('CollectionTypeBuilder (tracer)', () => {
+  it('owns Save via the global save bar, not an in-form submit button (#48)', async () => {
+    renderWithProviders(<CollectionTypeBuilder onSubmit={vi.fn()} />);
+    // Create mode force-shows the bar; its Save carries the stable `save-type`.
+    const bar = await screen.findByTestId('global-save-bar');
+    expect(within(bar).getByTestId('save-type')).toBeInTheDocument();
+    // The form body no longer renders its own Save — exactly one Save, on the bar.
+    const builder = screen.getByTestId('collection-type-builder');
+    expect(within(builder).queryByTestId('save-type')).toBeNull();
+  });
+
   it('adds a PII field and emits a payload matching the entered values', async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
-    render(<CollectionTypeBuilder onSubmit={onSubmit} />);
+    renderWithProviders(<CollectionTypeBuilder onSubmit={onSubmit} />);
 
     // Type-level
     await user.type(screen.getByTestId('type-name'), 'Contact');
@@ -30,7 +42,7 @@ describe('CollectionTypeBuilder (tracer)', () => {
     await user.click(within(piiRow).getByTestId('field-pii'));
     await user.type(within(piiRow).getByTestId('field-legal-basis'), 'consent');
 
-    await user.click(screen.getByTestId('save-type'));
+    await user.click(await screen.findByTestId('save-type'));
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
     const payload = onSubmit.mock.calls[0][0] as CreateCustomTypeRequest;
@@ -53,7 +65,7 @@ describe('CollectionTypeBuilder (tracer)', () => {
   it('keeps exactly one title field when toggling another', async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
-    render(<CollectionTypeBuilder onSubmit={onSubmit} />);
+    renderWithProviders(<CollectionTypeBuilder onSubmit={onSubmit} />);
     await user.type(screen.getByTestId('type-name'), 'T');
     await user.type(screen.getByTestId('type-key'), 't');
 
@@ -66,7 +78,7 @@ describe('CollectionTypeBuilder (tracer)', () => {
 
     // Make the second row the title; the first should lose it.
     await user.click(within(rows[1]).getByTestId('field-title'));
-    await user.click(screen.getByTestId('save-type'));
+    await user.click(await screen.findByTestId('save-type'));
 
     const payload = onSubmit.mock.calls[0][0] as CreateCustomTypeRequest;
     const titles = payload.fields.filter((f) => f.is_title);
@@ -115,7 +127,7 @@ describe('CollectionTypeBuilder (tracer)', () => {
       ],
     };
 
-    render(<CollectionTypeBuilder mode="edit" initial={initial} onSubmit={onSubmit} />);
+    renderWithProviders(<CollectionTypeBuilder mode="edit" initial={initial} onSubmit={onSubmit} />);
 
     // Prefilled name + locked key.
     expect(screen.getByTestId('type-name')).toHaveValue('Recipe');
@@ -125,7 +137,7 @@ describe('CollectionTypeBuilder (tracer)', () => {
     const titleRow = screen.getAllByTestId('field-row')[0];
     await user.clear(within(titleRow).getByTestId('field-label'));
     await user.type(within(titleRow).getByTestId('field-label'), 'Recipe name');
-    await user.click(screen.getByTestId('save-type'));
+    await user.click(await screen.findByTestId('save-type'));
 
     const payload = onSubmit.mock.calls[0][0] as CreateCustomTypeRequest;
     expect(payload.name).toBe('Recipe');

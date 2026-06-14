@@ -7,7 +7,7 @@ import type { PreviewTemplate } from '@/types/api';
 import StatusChip from '@/components/shared/StatusChip';
 import SchedulePopover from '@/components/shared/SchedulePopover';
 import WorkflowActions from '@/components/shared/WorkflowActions';
-import { M3Button, M3IconButton } from '@/components/design-system';
+import { M3IconButton } from '@/components/design-system';
 import type { BlogContentFormData } from './blogDetailSchema';
 
 interface BlogEditorToolbarProps {
@@ -18,7 +18,6 @@ interface BlogEditorToolbarProps {
   canRedo: boolean;
   onUndo: () => void;
   onRedo: () => void;
-  onSave: () => void;
   onToggleHistory: () => void;
   isSaving: boolean;
   canWrite: boolean;
@@ -53,7 +52,6 @@ export default function BlogEditorToolbar({
   canRedo,
   onUndo,
   onRedo,
-  onSave,
   onToggleHistory,
   isSaving,
   canWrite,
@@ -249,16 +247,8 @@ export default function BlogEditorToolbar({
         onRestore={onRestore}
       />
 
-      <M3Button
-        size="sm"
-        variant="filled"
-        icon="save"
-        onClick={onSave}
-        disabled={isSaving || !canWrite}
-        data-testid="save-post"
-      >
-        {isSaving ? t('common.actions.saving') : t('common.actions.save')}
-      </M3Button>
+      {/* Save is owned by the global save bar (useFormSaveBar). The toolbar no
+          longer renders a duplicate Save — see #45/#46. */}
 
       {/* Schedule Popover */}
       <SchedulePopover

@@ -72,47 +72,39 @@ Then(
   },
 );
 
+/**
+ * Save through the global save bar — the single Save control for content
+ * detail pages (#45/#46). The bar appears only while the form is dirty, so we
+ * wait for it and click its stable, per-entity Save testid. Fails loudly if the
+ * bar (or its Save) is absent: no silent `button[type="submit"]` fallback, so a
+ * missing bar is a real failure, not a limp-through (#47).
+ */
+async function saveViaGlobalBar(world: ForjaWorld, saveTestId: string): Promise<void> {
+  const bar = world.page.locator('[data-testid="global-save-bar"]');
+  await bar.waitFor({ state: 'visible' });
+  await bar.locator(`[data-testid="${saveTestId}"]`).click();
+  await world.page.waitForLoadState('networkidle');
+}
+
 When('I save as draft', async function (this: ForjaWorld) {
-  // Try multiple selectors — the button may say "Save Draft", "Save", or use a test-id
-  const saveDraftByTestId = this.page.locator('[data-testid="save-draft"]');
-  if (await saveDraftByTestId.isVisible().catch(() => false)) {
-    await saveDraftByTestId.click();
-    await this.page.waitForLoadState('networkidle');
-    return;
-  }
-
-  const saveDraftBtn = this.page.getByRole('button', { name: /save\s*draft/i });
-  if (await saveDraftBtn.isVisible().catch(() => false)) {
-    await saveDraftBtn.click();
-    await this.page.waitForLoadState('networkidle');
-    return;
-  }
-
-  const saveBtn = this.page.getByRole('button', { name: /^save$/i });
-  if (await saveBtn.isVisible().catch(() => false)) {
-    await saveBtn.click();
-    await this.page.waitForLoadState('networkidle');
-    return;
-  }
-
-  // Last resort: submit button
-  await this.page.locator('button[type="submit"]').first().click();
+  // No dedicated "save draft" control exists — the global save bar is the single
+  // save, and an unpublished (Draft) form saved via the bar IS a draft.
+  const bar = this.page.locator('[data-testid="global-save-bar"]');
+  await bar.waitFor({ state: 'visible' });
+  await bar.getByRole('button', { name: /save/i }).click();
   await this.page.waitForLoadState('networkidle');
 });
 
 When('I save the post', async function (this: ForjaWorld) {
-  await this.page.click('[data-testid="save-post"], button[type="submit"]');
-  await this.page.waitForLoadState('networkidle');
+  await saveViaGlobalBar(this, 'save-post');
 });
 
 When('I save the page', async function (this: ForjaWorld) {
-  await this.page.click('[data-testid="save-page"], button[type="submit"]');
-  await this.page.waitForLoadState('networkidle');
+  await saveViaGlobalBar(this, 'save-page');
 });
 
 When('I save the document', async function (this: ForjaWorld) {
-  await this.page.click('[data-testid="save-document"], button[type="submit"]');
-  await this.page.waitForLoadState('networkidle');
+  await saveViaGlobalBar(this, 'save-document');
 });
 
 When('I open post {string}', async function (this: ForjaWorld, title: string) {

@@ -118,6 +118,16 @@ export interface ContentDetailAdapter<TDetail, TFormData extends FieldValues, TL
 
   /** Optional test id for the root box. */
   pageTestId?: string;
+
+  /**
+   * Stable test id for the global save bar's Save button. The bar is the single
+   * Save control for content detail pages (the toolbar no longer renders one),
+   * so this is the canonical hook e2e and intent target — reuse the historical
+   * names: `save-post` (blog), `save-page` (page), `save-document` (legal).
+   */
+  saveTestId?: string;
+  /** Stable test id for the global save bar's Discard button. */
+  discardTestId?: string;
 }
 
 export interface ToolbarSlotProps<TFormData extends FieldValues, TDetail> {
@@ -126,7 +136,6 @@ export interface ToolbarSlotProps<TFormData extends FieldValues, TDetail> {
   setValue: UseFormSetValue<TFormData>;
   getValues: UseFormGetValues<TFormData>;
   history: FormHistoryHandle;
-  onSave: () => void;
   isSaving: boolean;
   canWrite: boolean;
   workflow: WorkflowFlags;
