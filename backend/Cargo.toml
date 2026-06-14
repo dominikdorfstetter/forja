@@ -1,6 +1,6 @@
 [package]
 name = "forja"
-version = "2.0.0"
+version = "2.0.1"
 edition = "2021"
 authors = ["Forja Contributors"]
 description = "Forja - Multi-site CMS API built with Rust Axum"

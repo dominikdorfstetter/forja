@@ -80,15 +80,34 @@ bump_version() {
     echo -e "  ${GREEN}OK${NC} $file"
   done
 
-  # Update package-lock.json files by running npm install in affected dirs
-  # Update package-lock.json top-level version fields
+  # Sync Cargo.lock so the workspace member versions match the bumped
+  # Cargo.toml — otherwise the first `cargo` command in CI rewrites the lock
+  # and leaves the tree dirty. `cargo update --offline -w` rewrites only the
+  # workspace package versions, touching no registry deps.
+  if command -v cargo >/dev/null 2>&1; then
+    (cd "$REPO_ROOT/backend" && cargo update --offline -w >/dev/null 2>&1) \
+      && echo -e "  ${GREEN}OK${NC} backend/Cargo.lock" \
+      || echo -e "  ${YELLOW}SKIP${NC} backend/Cargo.lock (sync on next build)"
+  fi
+
+  # Update package-lock.json version fields. Both the top-level `version` AND
+  # `packages[""].version` must change — npm ci fails if they disagree with
+  # package.json, so seding only the top-level field (as this script used to)
+  # silently breaks every CI `npm ci`. Use node to set both and preserve npm's
+  # 2-space formatting.
   echo ""
   echo -e "${BOLD}Updating lock files...${NC}"
   for dir in admin docs libs/analytics libs/client libs/sections libs/sections-react e2e templates/astro-blog; do
     local lock="$REPO_ROOT/$dir/package-lock.json"
     if [[ -f "$lock" ]]; then
-      # Top-level "version" is within the first 5 lines
-      sed -i '' '1,5{s/"version": ".*"/"version": "'"$target"'"/;}' "$lock"
+      node -e '
+        const fs = require("fs");
+        const p = process.argv[1], v = process.argv[2];
+        const j = JSON.parse(fs.readFileSync(p, "utf8"));
+        j.version = v;
+        if (j.packages && j.packages[""]) j.packages[""].version = v;
+        fs.writeFileSync(p, JSON.stringify(j, null, 2) + "\n");
+      ' "$lock" "$target"
       echo -e "  ${GREEN}OK${NC} $dir/package-lock.json"
     fi
   done
