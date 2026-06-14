@@ -46,6 +46,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
+import { useFormSaveBar } from '@/hooks/useFormSaveBar';
 import { M3Button, SectionHead, SettingsCard } from '@/components/design-system';
 import type {
   CreateCustomTypeRequest,
@@ -314,22 +315,49 @@ export function CollectionTypeBuilder({
     }
   };
 
-  const submit = () => {
+  const buildRequest = (): CreateCustomTypeRequest => {
     const fields: CustomFieldInput[] = rows.map(({ _uid, enum_options, legal_basis, ...rest }, i) => ({
       ...rest,
       display_order: i,
       enum_options: rest.field_type === 'enum' ? (enum_options ?? []) : null,
       legal_basis: rest.is_pii ? legal_basis || null : null,
     }));
-    onSubmit({
+    return {
       key: key.trim(),
       name: name.trim(),
       retention_days: retentionDays ? Number(retentionDays) : null,
       is_publicly_readable: isPublic,
       content_kind: contentKind,
       fields,
-    });
+    };
   };
+  const submit = () => onSubmit(buildRequest());
+
+  // Drive the global save bar (#48) instead of an in-form submit button. Dirty
+  // is a fingerprint of the canonical payload vs. the baseline captured at mount
+  // (the initial/blank state). Create mode force-shows the bar — a fresh type
+  // has nothing "dirty" yet — while the nav guard still keys off real edits.
+  const [baseline] = useState(() => JSON.stringify(buildRequest()));
+  const isDirty = JSON.stringify(buildRequest()) !== baseline;
+
+  useFormSaveBar({
+    id: 'collection-type-builder',
+    isDirty,
+    saving: submitting,
+    forceVisible: !isEdit,
+    saveLabel: isEdit ? t('collections.saveChanges') : t('collections.save'),
+    saveTestId: 'save-type',
+    discardTestId: 'discard-type',
+    onSave: submit,
+    onDiscard: () => {
+      setName(initial?.name ?? '');
+      setKey(initial?.key ?? '');
+      setRetentionDays(initial?.retention_days != null ? String(initial.retention_days) : '');
+      setIsPublic(initial?.is_publicly_readable ?? false);
+      setContentKind(initial?.content_kind ?? 'data');
+      setRows(initial ? rowsFromType(initial) : [blankRow(true)]);
+    },
+  });
 
   return (
     <Box component="form" data-testid="collection-type-builder" onSubmit={(e) => { e.preventDefault(); submit(); }}>
@@ -437,16 +465,13 @@ export function CollectionTypeBuilder({
           </Box>
         </Box>
 
-        <Box>
-          <M3Button type="submit" size="md" loading={submitting} data-testid="save-type">
-            {isEdit ? t('collections.saveChanges') : t('collections.save')}
-          </M3Button>
-          {isEdit && (
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+        {isEdit && (
+          <Box>
+            <Typography variant="body2" color="text.secondary">
               {t('collections.editHelp')}
             </Typography>
-          )}
-        </Box>
+          </Box>
+        )}
       </Stack>
     </Box>
   );

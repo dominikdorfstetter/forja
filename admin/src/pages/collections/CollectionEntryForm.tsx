@@ -27,7 +27,7 @@ import {
 } from '@mui/material';
 import LanguageIcon from '@mui/icons-material/Language';
 
-import { M3Button } from '@/components/design-system';
+import { useFormSaveBar } from '@/hooks/useFormSaveBar';
 import type {
   CustomEntryRequest,
   CustomFieldResponse,
@@ -149,6 +149,8 @@ export interface CollectionEntryFormProps {
   initialLocalized?: Record<string, Record<string, unknown>>;
   onSubmit: (req: CustomEntryRequest) => void;
   submitting?: boolean;
+  /** Force the save bar visible — create flows have nothing "dirty" yet. */
+  forceVisible?: boolean;
 }
 
 export function CollectionEntryForm({
@@ -158,6 +160,7 @@ export function CollectionEntryForm({
   initialLocalized,
   onSubmit,
   submitting,
+  forceVisible,
 }: CollectionEntryFormProps) {
   const { t } = useTranslation();
   // One ordered flow — display_order matches the builder. Localized vs shared
@@ -185,17 +188,48 @@ export function CollectionEntryForm({
   const setValueFor = (f: CustomFieldResponse, v: unknown) =>
     f.localized ? setLocalizedValue(activeLocale, f.key, v) : setSharedValue(f.key, v);
 
-  const submit = () => {
-    // Drop redacted (null-from-server) PII values so we never overwrite them.
-    const clean = (obj: Record<string, unknown>) =>
-      Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== null && v !== REDACTED));
-    onSubmit({
-      shared: clean(shared),
-      localized: Object.fromEntries(
-        Object.entries(localized).map(([loc, vals]) => [loc, clean(vals)]),
-      ),
-    });
+  // Drop redacted (null-from-server) PII values so we never overwrite them.
+  const clean = (obj: Record<string, unknown>) =>
+    Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== null && v !== REDACTED));
+  const buildRequest = (
+    sh: Record<string, unknown>,
+    loc: Record<string, Record<string, unknown>>,
+  ): CustomEntryRequest => ({
+    shared: clean(sh),
+    localized: Object.fromEntries(Object.entries(loc).map(([l, vals]) => [l, clean(vals)])),
+  });
+  const submit = () => onSubmit(buildRequest(shared, localized));
+
+  // Drive the global save bar (#48). Dirty is a fingerprint of the canonical
+  // payload vs. the baseline captured at mount; empty locale buckets are
+  // normalised so a typed-then-cleared field doesn't read as a change.
+  const fingerprint = (
+    sh: Record<string, unknown>,
+    loc: Record<string, Record<string, unknown>>,
+  ) => {
+    const req = buildRequest(sh, loc);
+    const localized = Object.fromEntries(
+      Object.entries(req.localized).filter(([, v]) => Object.keys(v).length > 0),
+    );
+    return JSON.stringify({ shared: req.shared, localized });
   };
+  const [baseline] = useState(() => fingerprint(initialShared ?? {}, initialLocalized ?? {}));
+  const isDirty = fingerprint(shared, localized) !== baseline;
+
+  useFormSaveBar({
+    id: 'collection-entry-form',
+    isDirty,
+    saving: submitting,
+    forceVisible,
+    saveLabel: t('collections.saveEntry'),
+    saveTestId: 'save-entry',
+    discardTestId: 'discard-entry',
+    onSave: submit,
+    onDiscard: () => {
+      setShared(initialShared ?? {});
+      setLocalized(initialLocalized ?? {});
+    },
+  });
 
   const showLocaleHint = hasLocalized && locales.length > 1;
 
@@ -239,12 +273,6 @@ export function CollectionEntryForm({
           </Box>
         ))}
       </Stack>
-
-      <Box sx={{ mt: 3 }}>
-        <M3Button type="submit" size="md" loading={submitting} data-testid="save-entry">
-          {t('collections.saveEntry')}
-        </M3Button>
-      </Box>
     </Box>
   );
 }

@@ -133,6 +133,7 @@ export default function CollectionEntryEditPage() {
         initialLocalized={entry?.localized}
         onSubmit={onSubmit}
         submitting={mutations.create.isPending || mutations.update.isPending}
+        forceVisible={isNew}
       />
     </Box>
   );

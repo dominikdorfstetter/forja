@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { renderWithProviders, screen, userEvent } from '@/test/test-utils';
 import { CollectionEntryForm } from '../CollectionEntryForm';
 import type { CustomEntryRequest, CustomFieldResponse, CustomTypeResponse } from '@/types/customTypes';
 
@@ -58,7 +57,7 @@ const recipe = schema([
 
 describe('CollectionEntryForm (tracer)', () => {
   it('renders a control for each of the 7 field types', () => {
-    render(<CollectionEntryForm schema={recipe} locales={['en']} onSubmit={vi.fn()} />);
+    renderWithProviders(<CollectionEntryForm schema={recipe} locales={['en']} onSubmit={vi.fn()} />);
     for (const key of ['title', 'servings', 'agree', 'when', 'spice', 'photo', 'notes']) {
       expect(screen.getByTestId(`field-${key}`)).toBeInTheDocument();
     }
@@ -69,14 +68,14 @@ describe('CollectionEntryForm (tracer)', () => {
   it('fills shared + localized values and submits a matching payload', async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
-    render(<CollectionEntryForm schema={recipe} locales={['en']} onSubmit={onSubmit} />);
+    renderWithProviders(<CollectionEntryForm schema={recipe} locales={['en']} onSubmit={onSubmit} />);
 
     await user.type(screen.getByTestId('field-title'), 'Spaghetti');
     await user.type(screen.getByTestId('field-servings'), '4');
     await user.click(screen.getByTestId('field-agree'));
     await user.type(screen.getByTestId('field-notes'), 'Boil water');
 
-    await user.click(screen.getByTestId('save-entry'));
+    await user.click(await screen.findByTestId('save-entry'));
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
     const payload = onSubmit.mock.calls[0][0] as CustomEntryRequest;
@@ -93,7 +92,7 @@ describe('CollectionEntryForm (tracer)', () => {
       field({ key: 'title', label: 'Title', is_title: true, localized: true, display_order: 0 }),
       field({ key: 'description', label: 'Description', display_order: 1 }),
     ]);
-    render(<CollectionEntryForm schema={ordered} locales={['en', 'de']} onSubmit={vi.fn()} />);
+    renderWithProviders(<CollectionEntryForm schema={ordered} locales={['en', 'de']} onSubmit={vi.fn()} />);
 
     const controls = screen.getAllByTestId(/^field-/);
     expect(controls.map((el) => el.getAttribute('data-testid'))).toEqual([
@@ -107,8 +106,7 @@ describe('CollectionEntryForm (tracer)', () => {
       field({ key: 'title', label: 'Title', is_title: true }),
       field({ key: 'email', label: 'Email', is_pii: true }),
     ]);
-    render(
-      <CollectionEntryForm
+    renderWithProviders(<CollectionEntryForm
         schema={piiSchema}
         locales={['en']}
         initialShared={{ title: 'X', email: null }}
