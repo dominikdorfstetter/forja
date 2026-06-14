@@ -14,6 +14,37 @@ is the first release published as open source**, so the public version history
 begins at 2.0. The pre-release milestones below condense how the foundation came
 together; precise dates start at the first public release.
 
+## 2.0.1 — 2026-06-14
+
+A maintenance release: it completes the GDPR transparency surface, hardens the engineering foundation laid in 2.0.0, brings the end-to-end suite back online as a CI gate, and refreshes every dependency to clear all outstanding security advisories.
+
+### Added
+
+- **PII inventory on the Profile page.** A "what we store about you" view (GDPR Art. 15) backed by `GET /auth/pii-inventory`, listing each identity-bearing field with its purpose, legal basis, retention behaviour, and the caller's live record count.
+- **Built-in PII classification.** A registry declaring purpose, legal basis, and retention behaviour per identity field; it auto-generates the Records of Processing (RoPA) entries, drives a configurable data-retention cap, and is kept honest by account-erasure parity checks.
+- **End-to-end critical-journey CI gate.** The Cucumber/Playwright suite runs its `@critical` journeys — login, blog publish through to the public content-API view, and document management — on every pull request, with the full suite scheduled nightly. A failed scenario retries once before failing the check.
+
+### Changed
+
+- **Typed query-key factory.** Admin data fetching now routes through one centralized, lint-locked TanStack Query key factory with per-site cache invalidation, replacing ad-hoc inline keys.
+- **Zero inline SQL in handlers.** All database queries live in the repository/model layer; handlers stay thin.
+- **Broader behavioural test coverage** for previously untested hooks and shared components.
+- **Pinned React Doctor in CI** — the admin quality gate runs a version-pinned CLI instead of tracking an upstream marketplace action.
+- **Dependency refresh** across the whole monorepo to the latest compatible versions (MUI 9.1, Tiptap 3.26.1, jsonwebtoken 10, and patch/minor bumps throughout).
+
+### Fixed
+
+- **Site members could not save localized content.** The blog/page/legal localization endpoints gated on API-key permission tiers, so a signed-in editor was rejected before their site role was ever checked; authorization now resolves by site role.
+- **First localization save failed.** The admin dropped the locale id when creating a content localization, so the first save of any new post errored.
+- **Render-phase side effects** (ref writes and `setState` during render) removed from Social Links and the cookie-consent page.
+- **Test setup hardening** so service mocks cover every module, removing a class of flaky/false-negative admin tests.
+
+### Security
+
+- Cleared a **high-severity esbuild advisory** (GHSA-gv7w-rqvm-qjhr) by forcing the patched release in the Astro reference template, and a **moderate joi advisory** in the docs site.
+- jsonwebtoken upgraded to v10 with an explicit crypto provider.
+- `npm audit` and `cargo audit` are clean across every package.
+
 ## 2.0.0 — 2026-06-05
 
 The first open-source release of Forja: a multi-tenant, GDPR-first headless CMS with a
