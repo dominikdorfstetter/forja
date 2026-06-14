@@ -1,6 +1,6 @@
 [package]
 name = "forja"
-version = "2.0.1"
+version = "2.0.2"
 edition = "2021"
 authors = ["Forja Contributors"]
 description = "Forja - Multi-site CMS API built with Rust Axum"
@@ -78,11 +78,14 @@ aes-gcm = "0.10"
 argon2 = "0.5"
 bcrypt = "0.19.0"
 hmac = "0.13"
-# jsonwebtoken 10 made the crypto backend pluggable and ships no provider by
-# default — without one, all JWT sign/verify panics at runtime. aws_lc_rs is
-# already in the tree (rustls / aws-sdk) and covers HS256 (preview tokens) and
-# RS256 (Clerk JWKS verification).
-jsonwebtoken = { version = "10", features = ["aws_lc_rs"] }
+# Pinned to 9.x: jsonwebtoken 10 deserialises unknown JWT header parameters
+# into a flattened `extras: HashMap<String, String>` and rejects any
+# non-string value. Clerk session tokens carry an integer custom header field,
+# so `decode_header` failed for every real token under 10 — 401-ing all
+# authenticated requests (the 2.0.1 production outage). 9.x ignores unknown
+# header fields; see the regression test in guards::auth_guard. Revisit a v10
+# move only with a custom lenient header parse.
+jsonwebtoken = "9"
 reqwest = { version = "0.13", features = ["json", "rustls", "query", "charset", "http2"], default-features = false }
 
 # Redis (rate limiting)
