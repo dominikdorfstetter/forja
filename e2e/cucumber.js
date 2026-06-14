@@ -29,6 +29,9 @@ const orderedPaths = [
   'features/navigation/navigation-management.feature',
   'features/redirects/redirect-management.feature',
   'features/social-links/social-links.feature',
+  // 6. Read-only enforcement — a viewer browses the now-populated content pages
+  //    and must reach no write controls (#6). Runs after content/infra exist.
+  'features/auth/read-only-mode.feature',
   // 7. Analytics & activity (depend on prior actions having generated data)
   'features/analytics/analytics-dashboard.feature',
   'features/activity/activity-log.feature',

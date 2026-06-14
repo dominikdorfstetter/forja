@@ -70,12 +70,14 @@ function daysUntilPurge(deletedAt: string | null | undefined): number {
 function TrashRowActions({
   item,
   isAdmin,
+  canWrite,
   busy,
   onRestore,
   onDeleteOne,
 }: {
   item: TrashItem;
   isAdmin: boolean;
+  canWrite: boolean;
   busy: boolean;
   onRestore: (i: TrashItem) => void;
   onDeleteOne: (i: TrashItem) => void;
@@ -83,13 +85,19 @@ function TrashRowActions({
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
+  // Restore re-creates content on the site — a write, gated by canWrite (#6).
+  // Permanent delete stays admin-only.
   const items: ActionMenuItem[] = [
-    {
-      icon: 'restore',
-      label: t('trash.restore'),
-      disabled: busy,
-      onClick: () => onRestore(item),
-    },
+    ...(canWrite
+      ? [
+          {
+            icon: 'restore',
+            label: t('trash.restore'),
+            disabled: busy,
+            onClick: () => onRestore(item),
+          },
+        ]
+      : []),
     ...(isAdmin
       ? [
           {
@@ -101,6 +109,9 @@ function TrashRowActions({
         ]
       : []),
   ];
+
+  // Nothing actionable for read-only viewers — don't render an empty menu.
+  if (items.length === 0) return null;
 
   return (
     <div style={{ position: 'relative' }}>
@@ -119,7 +130,7 @@ export default function TrashPage() {
   const { t } = useTranslation();
   const fmt = useLocalizedFormat();
   const { selectedSiteId } = useSiteContext();
-  const { isAdmin } = useAuth();
+  const { isAdmin, canWrite } = useAuth();
   const queryClient = useQueryClient();
   const { showError, showSuccess } = useErrorSnackbar();
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -339,7 +350,7 @@ export default function TrashPage() {
         <EmptyState icon={<DeleteOutlineIcon sx={{ fontSize: 48 }} />} title={t('trash.empty')} />
       ) : (
         <>
-          {selected.size > 0 && (
+          {selected.size > 0 && canWrite && (
             <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
               <M3Button
                 variant="outlined"
@@ -379,6 +390,7 @@ export default function TrashPage() {
               <TrashRowActions
                 item={item}
                 isAdmin={isAdmin}
+                canWrite={canWrite}
                 busy={isBusy}
                 onRestore={(i) =>
                   restoreMutation.mutate([{ id: i.id, entityType: i.entity_type }])
