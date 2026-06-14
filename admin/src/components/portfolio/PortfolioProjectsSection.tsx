@@ -12,7 +12,7 @@ import {
   TableSortLabel,
   Typography,
 } from '@mui/material';
-import { Pagination, Toolbar, ToolbarSpacer, SearchField } from '@/components/shared/listPageV2';
+import { Pagination, Toolbar, ToolbarSpacer, SearchField, useTableDensity, sortableContentTableSx } from '@/components/shared/listPageV2';
 import FolderIcon from '@mui/icons-material/Folder';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import {
@@ -100,6 +100,7 @@ export default function PortfolioProjectsSection({
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { showError } = useErrorSnackbar();
+  const { size, rowHeight } = useTableDensity();
 
   const [orderedProjects, setOrderedProjects] = useState<ProjectResponse[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -178,40 +179,8 @@ export default function PortfolioProjectsSection({
       </Toolbar>
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-        <TableContainer
-          sx={{
-            borderRadius: '20px',
-            border: '1px solid var(--outline-variant)',
-            background: 'var(--surface-container-low)',
-            '& .MuiTableHead-root .MuiTableCell-root': {
-              fontSize: 11,
-              fontWeight: 600,
-              textTransform: 'uppercase',
-              letterSpacing: '1px',
-              color: 'var(--on-surface-variant)',
-              background: 'transparent',
-              borderBottom: '1px solid var(--outline-variant)',
-              height: 44,
-              py: 0,
-            },
-            '& .MuiTableBody-root .MuiTableCell-root': {
-              borderBottom: '1px solid var(--outline-variant)',
-              color: 'var(--on-surface)',
-              fontSize: 14,
-              background: 'transparent',
-            },
-            '& .MuiTableBody-root .MuiTableRow-root:last-of-type .MuiTableCell-root': {
-              borderBottom: 'none',
-            },
-            '& .MuiTableBody-root .MuiTableRow-root:hover .MuiTableCell-root': {
-              background: 'var(--surface-container)',
-            },
-            '& .MuiTableSortLabel-root, & .MuiTableSortLabel-active, & .MuiTableSortLabel-icon': {
-              color: 'inherit !important',
-            },
-          }}
-        >
-          <Table size="small">
+        <TableContainer data-density={size === 'small' ? 'compact' : 'comfortable'} sx={sortableContentTableSx(rowHeight)}>
+          <Table size={size}>
             <TableHead>
               <TableRow>
                 {canWrite && <TableCell scope="col" sx={{ width: 48, px: 1 }} />}

@@ -25,6 +25,7 @@ import { useTranslation } from 'react-i18next';
 import type { NavigationItem } from '@/types/api';
 import type { FlatItem } from '@/pages/NavigationReducer';
 import SortableNavigationRow from '@/components/navigation/SortableNavigationRow';
+import { useTableDensity } from '@/components/shared/listPageV2';
 
 interface NavigationItemsTableProps {
   flattenedItems: FlatItem[];
@@ -73,6 +74,7 @@ export default function NavigationItemsTable({
   onToggleExpand,
 }: NavigationItemsTableProps) {
   const { t } = useTranslation();
+  const { size, rowHeight } = useTableDensity();
   const activeItem = activeId ? orderedItems.find((i) => i.id === activeId) : null;
 
   return (
@@ -84,6 +86,7 @@ export default function NavigationItemsTable({
     >
       <TableContainer
         data-testid="nav-items-table"
+        data-density={size === 'small' ? 'compact' : 'comfortable'}
         sx={{
           bgcolor: 'var(--surface-container-low)',
           border: '1px solid var(--outline-variant)',
@@ -92,11 +95,12 @@ export default function NavigationItemsTable({
         }}
       >
         <Table
-          size="small"
+          size={size}
           sx={{
             '& td': {
               borderBottom: '1px solid var(--outline-variant)',
               color: 'var(--on-surface)',
+              height: rowHeight,
             },
             '& tbody tr': {
               transition: 'background 160ms cubic-bezier(0.2, 0, 0, 1)',

@@ -43,6 +43,7 @@ import EmptyState from '@/components/shared/EmptyState';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import SocialLinkFormDialog from '@/components/social/SocialLinkFormDialog';
 import SortableSocialRow from '@/components/social/SortableSocialRow';
+import { useTableDensity } from '@/components/shared/listPageV2';
 import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/queryKeys';
 
@@ -52,6 +53,7 @@ export default function SocialLinksPage() {
   const { selectedSiteId } = useSiteContext();
   const { canWrite, isAdmin } = useAuth();
   const { showError } = useErrorSnackbar();
+  const { size, rowHeight } = useTableDensity();
 
   const {
     formOpen, editing, deleting,
@@ -155,6 +157,7 @@ export default function SocialLinksPage() {
       ) : (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
           <TableContainer
+            data-density={size === 'small' ? 'compact' : 'comfortable'}
             sx={{
               bgcolor: 'var(--surface-container-low)',
               border: '1px solid var(--outline-variant)',
@@ -163,11 +166,12 @@ export default function SocialLinksPage() {
             }}
           >
             <Table
-              size="small"
+              size={size}
               sx={{
                 '& td': {
                   borderBottom: '1px solid var(--outline-variant)',
                   color: 'var(--on-surface)',
+                  height: rowHeight,
                 },
                 '& tbody tr': {
                   transition: 'background 160ms cubic-bezier(0.2, 0, 0, 1)',

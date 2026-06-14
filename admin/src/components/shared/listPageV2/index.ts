@@ -15,3 +15,6 @@ export type { RowActionBtnProps } from './RowActionBtn';
 export { ActionMenu } from './ActionMenu';
 export type { ActionMenuProps, ActionMenuItem } from './ActionMenu';
 export { pageTabsSx } from './pageTabsSx';
+export { useTableDensity } from './useTableDensity';
+export type { TableDensity } from './useTableDensity';
+export { sortableContentTableSx } from './sortableTableSx';

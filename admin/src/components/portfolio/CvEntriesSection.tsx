@@ -12,7 +12,7 @@ import {
   TableSortLabel,
   Typography,
 } from '@mui/material';
-import { Pagination, Toolbar, ToolbarSpacer, SearchField, FilterSelect } from '@/components/shared/listPageV2';
+import { Pagination, Toolbar, ToolbarSpacer, SearchField, FilterSelect, useTableDensity, sortableContentTableSx } from '@/components/shared/listPageV2';
 import WorkIcon from '@mui/icons-material/Work';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import {
@@ -98,6 +98,7 @@ export default function CvEntriesSection({
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { showError } = useErrorSnackbar();
+  const { size, rowHeight } = useTableDensity();
 
   const [orderedEntries, setOrderedEntries] = useState<CvEntryResponse[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -184,43 +185,8 @@ export default function CvEntriesSection({
       </Toolbar>
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-        <TableContainer
-          sx={{
-            borderRadius: '20px',
-            border: '1px solid var(--outline-variant)',
-            background: 'var(--surface-container-low)',
-            /* M3-styled MUI table chrome: header row picks up the same
-               uppercase/tracked typography DataTableV2 uses; cell dividers
-               use --outline-variant; default Paper backgrounds go transparent. */
-            '& .MuiTableHead-root .MuiTableCell-root': {
-              fontSize: 11,
-              fontWeight: 600,
-              textTransform: 'uppercase',
-              letterSpacing: '1px',
-              color: 'var(--on-surface-variant)',
-              background: 'transparent',
-              borderBottom: '1px solid var(--outline-variant)',
-              height: 44,
-              py: 0,
-            },
-            '& .MuiTableBody-root .MuiTableCell-root': {
-              borderBottom: '1px solid var(--outline-variant)',
-              color: 'var(--on-surface)',
-              fontSize: 14,
-              background: 'transparent',
-            },
-            '& .MuiTableBody-root .MuiTableRow-root:last-of-type .MuiTableCell-root': {
-              borderBottom: 'none',
-            },
-            '& .MuiTableBody-root .MuiTableRow-root:hover .MuiTableCell-root': {
-              background: 'var(--surface-container)',
-            },
-            '& .MuiTableSortLabel-root, & .MuiTableSortLabel-active, & .MuiTableSortLabel-icon': {
-              color: 'inherit !important',
-            },
-          }}
-        >
-          <Table size="small">
+        <TableContainer data-density={size === 'small' ? 'compact' : 'comfortable'} sx={sortableContentTableSx(rowHeight)}>
+          <Table size={size}>
             <TableHead>
               <TableRow>
                 {canWrite && <TableCell scope="col" sx={{ width: 48, px: 1 }} />}
