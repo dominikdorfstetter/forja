@@ -37,6 +37,14 @@ export interface DataTableV2Column<T> {
   sorted?: 'asc' | 'desc';
   /** Muted (secondary) text styling for this column. */
   muted?: boolean;
+  /**
+   * Opt out of the single-line contract: keep tall / multi-line content from
+   * clipping by dropping `nowrap` + `overflow: hidden` and letting the cell
+   * grow the row (e.g. an inline editor control, a two-line name+slug stack,
+   * or a progress bar above a byte-count label). Pairs with the row's
+   * `minHeight` so 40/52px stays the floor, not a hard ceiling.
+   */
+  multiline?: boolean;
 }
 
 export interface DataTableV2Props<T> {
@@ -217,7 +225,7 @@ export function DataTableV2<T>({
               gridTemplateColumns: gridCols,
               gap: 12,
               padding: '0 16px',
-              height: rowH,
+              minHeight: rowH,
               alignItems: 'center',
               borderBottom: i < loadingRows - 1 ? '1px solid var(--outline-variant)' : 'none',
             }}
@@ -260,7 +268,7 @@ export function DataTableV2<T>({
                 alignItems: 'center',
                 gap: 12,
                 padding: '0 16px',
-                height: rowH,
+                minHeight: rowH,
                 borderBottom: i < rows.length - 1 ? '1px solid var(--outline-variant)' : 'none',
                 background: isSelected ? 'var(--surface-container)' : 'transparent',
                 cursor: onRowClick ? 'pointer' : 'default',
@@ -299,9 +307,11 @@ export function DataTableV2<T>({
                       fontSize: c.muted ? 13 : 14,
                       color: c.muted ? 'var(--on-surface-variant)' : 'var(--on-surface)',
                       textAlign: c.align === 'right' ? 'right' : 'left',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
+                      // multiline cells grow the row instead of clipping; the
+                      // default stays tidy single-line ellipsis.
+                      ...(c.multiline
+                        ? { whiteSpace: 'normal', paddingTop: 6, paddingBottom: 6 }
+                        : { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }),
                     }}
                   >
                     {rawValue}

@@ -296,6 +296,7 @@ export default function MembersPage() {
       key: 'name',
       label: t('members.table.name'),
       width: '1.4fr',
+      multiline: true, // 32px avatar is tight in a 40px compact row
       render: (m) => (
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
           <Avatar src={m.image_url || undefined} sx={{ width: 32, height: 32 }}>
@@ -325,6 +326,7 @@ export default function MembersPage() {
       key: 'role',
       label: t('members.table.role'),
       width: '180px',
+      multiline: true, // inline <TextField select> (~40px) clips in a 40px compact row
       render: (m) => {
         if (canManageMembers && m.role !== 'owner') {
           return (

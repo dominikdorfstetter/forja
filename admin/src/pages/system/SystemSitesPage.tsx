@@ -114,6 +114,7 @@ export default function SystemSitesPage() {
       key: 'name',
       label: t('common.table.name'),
       width: 'minmax(200px, 2fr)',
+      multiline: true, // two-line name + slug stack overflows a 40px compact row
       render: (row) => (
         <Box>
           <Box component="span" sx={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--on-surface)' }}>
@@ -164,6 +165,7 @@ export default function SystemSitesPage() {
       key: 'storage',
       label: t('common.table.storage'),
       width: 'minmax(160px, 1fr)',
+      multiline: true, // progress bar stacked above the byte-count label overflows 40px
       render: (row) => {
         const pct = Math.min(row.storage_usage_percent, 100);
         const color =
