@@ -27,6 +27,7 @@ type PageDetail = PageResponse & { localizations: ContentLocalizationResponse[] 
 
 const pageAdapter: ContentDetailAdapter<PageDetail, PageDetailFormData, ContentLocalizationResponse> = {
   entityKey: 'page',
+  saveTestId: 'save-page',
   fetchDetail: async (id) => {
     const [page, localizations] = await Promise.all([
       getPage(id),
@@ -179,7 +180,7 @@ export default function PageDetailPage() {
   return (
     <ContentDetailPage
       adapter={pageAdapter}
-      renderToolbar={({ control, watch, setValue, history, onSave, isSaving, canWrite, workflow, handlers, onToggleHistory }) => (
+      renderToolbar={({ control, watch, setValue, history, isSaving, canWrite, workflow, handlers, onToggleHistory }) => (
         <PageEditorToolbar
           control={control}
           watch={watch}
@@ -189,7 +190,6 @@ export default function PageDetailPage() {
           canRedo={history.canRedo}
           onUndo={history.undo}
           onRedo={history.redo}
-          onSave={onSave}
           onToggleHistory={onToggleHistory}
           isSaving={isSaving}
           canWrite={canWrite}

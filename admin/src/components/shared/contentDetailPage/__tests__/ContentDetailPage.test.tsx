@@ -127,6 +127,7 @@ function buildAdapter(mocks: AdapterMocks): ContentDetailAdapter<FakeDetail, Fak
     getPreviewPath: (d) => `/fakes/${d.slug}`,
     multiLocaleTabs: true,
     pageTestId: 'fake-detail.page',
+    saveTestId: 'save-fake',
   };
 }
 
@@ -181,19 +182,14 @@ describe('ContentDetailPage tracer bullet', () => {
     renderWithProviders(
       <ContentDetailPage
         adapter={adapter}
-        renderToolbar={({ setValue, onSave }) => (
-          <div>
-            <button
-              type="button"
-              data-testid="set-body"
-              onClick={() => setValue('body', 'Edited body', { shouldDirty: true })}
-            >
-              Edit
-            </button>
-            <button type="button" data-testid="save-btn" onClick={onSave}>
-              Save
-            </button>
-          </div>
+        renderToolbar={({ setValue }) => (
+          <button
+            type="button"
+            data-testid="set-body"
+            onClick={() => setValue('body', 'Edited body', { shouldDirty: true })}
+          >
+            Edit
+          </button>
         )}
         renderEditor={() => <div data-testid="editor-slot" />}
         renderStandardDialogs={() => null}
@@ -201,12 +197,13 @@ describe('ContentDetailPage tracer bullet', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId('save-btn')).toBeInTheDocument();
+      expect(screen.getByTestId('set-body')).toBeInTheDocument();
     });
 
     const user = userEvent.setup();
     await user.click(screen.getByTestId('set-body'));
-    await user.click(screen.getByTestId('save-btn'));
+    // Save now lives only on the global save bar (#46) — drive it there.
+    await user.click(await screen.findByTestId('save-fake'));
 
     await waitFor(() => {
       expect(mocks.updateLocalization).toHaveBeenCalledWith(
@@ -232,24 +229,19 @@ describe('ContentDetailPage tracer bullet', () => {
     renderWithProviders(
       <ContentDetailPage
         adapter={adapter}
-        renderToolbar={({ setValue, onSave }) => (
-          <div>
-            <button
-              type="button"
-              data-testid="edit"
-              onClick={() => {
-                // Force the entity update to be non-empty (status change) AND
-                // a localization change in the same save.
-                setValue('status', 'Published', { shouldDirty: true });
-                setValue('body', 'Edited body', { shouldDirty: true });
-              }}
-            >
-              Edit
-            </button>
-            <button type="button" data-testid="save-btn" onClick={onSave}>
-              Save
-            </button>
-          </div>
+        renderToolbar={({ setValue }) => (
+          <button
+            type="button"
+            data-testid="edit"
+            onClick={() => {
+              // Force the entity update to be non-empty (status change) AND
+              // a localization change in the same save.
+              setValue('status', 'Published', { shouldDirty: true });
+              setValue('body', 'Edited body', { shouldDirty: true });
+            }}
+          >
+            Edit
+          </button>
         )}
         renderEditor={() => <div data-testid="editor-slot" />}
         renderStandardDialogs={() => null}
@@ -257,12 +249,12 @@ describe('ContentDetailPage tracer bullet', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId('save-btn')).toBeInTheDocument();
+      expect(screen.getByTestId('edit')).toBeInTheDocument();
     });
 
     const user = userEvent.setup();
     await user.click(screen.getByTestId('edit'));
-    await user.click(screen.getByTestId('save-btn'));
+    await user.click(await screen.findByTestId('save-fake'));
 
     // The entity update is attempted and rejects...
     await waitFor(() => {
@@ -275,6 +267,47 @@ describe('ContentDetailPage tracer bullet', () => {
         expect.objectContaining({ body: 'Edited body' }),
       );
     });
+  });
+
+  // #46: the single Save control is the global save bar's, carrying the
+  // adapter's stable saveTestId — the toolbar slot no longer receives onSave.
+  it('exposes the adapter saveTestId on the global save bar once dirty (not before)', async () => {
+    const mocks: AdapterMocks = {
+      fetchDetail: vi.fn().mockResolvedValue(mockDetail),
+      updateEntity: vi.fn().mockResolvedValue({}),
+      createLocalization: vi.fn(),
+      updateLocalization: vi.fn().mockResolvedValue({}),
+    };
+    const adapter = buildAdapter(mocks);
+    vi.mocked(getSiteLocales).mockResolvedValue([mockLocale]);
+
+    renderWithProviders(
+      <ContentDetailPage
+        adapter={adapter}
+        renderToolbar={({ setValue }) => (
+          <button
+            type="button"
+            data-testid="set-body"
+            onClick={() => setValue('body', 'Edited body', { shouldDirty: true })}
+          >
+            Edit
+          </button>
+        )}
+        renderEditor={() => <div data-testid="editor-slot" />}
+        renderStandardDialogs={() => null}
+      />,
+    );
+
+    await screen.findByTestId('set-body');
+    // Pristine: the bar (and its Save) is not shown.
+    expect(screen.queryByTestId('save-fake')).toBeNull();
+
+    const user = userEvent.setup();
+    await user.click(screen.getByTestId('set-body'));
+
+    // Dirty: exactly one Save, and it lives inside the global save bar.
+    const save = await screen.findByTestId('save-fake');
+    expect(screen.getByTestId('global-save-bar')).toContainElement(save);
   });
 
   it('renders loading state while detail is fetching', () => {

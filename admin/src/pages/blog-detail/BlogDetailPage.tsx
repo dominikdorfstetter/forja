@@ -22,6 +22,7 @@ const FIRST_RUN_TIP_KEY = 'forja_editor_tip_dismissed';
 
 const blogAdapter: ContentDetailAdapter<BlogDetailResponse, BlogContentFormData, ContentLocalizationResponse> = {
   entityKey: 'blog',
+  saveTestId: 'save-post',
   fetchDetail: (id) => getBlogDetail(id),
   detailQueryKey: (id) => queryKeys.blogDetail(id),
   invalidateOnSave: [['blogs']],
@@ -116,7 +117,7 @@ export default function BlogDetailPage() {
           />
         ) : null
       }
-      renderToolbar={({ control, watch, setValue, history, onSave, isSaving, canWrite, workflow, handlers, onToggleHistory }) => {
+      renderToolbar={({ control, watch, setValue, history, isSaving, canWrite, workflow, handlers, onToggleHistory }) => {
         const otherLocalesPresent = aiConfigured;
         return (
           <BlogEditorToolbar
@@ -127,7 +128,6 @@ export default function BlogDetailPage() {
             canRedo={history.canRedo}
             onUndo={history.undo}
             onRedo={history.redo}
-            onSave={onSave}
             onToggleHistory={onToggleHistory}
             isSaving={isSaving}
             canWrite={canWrite}

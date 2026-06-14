@@ -294,6 +294,8 @@ export default function ContentDetailPage<TDetail, TFormData extends FieldValues
     dirtyFields: formState.dirtyFields,
     revertField,
     changedFields,
+    saveTestId: adapter.saveTestId,
+    discardTestId: adapter.discardTestId,
   });
 
   // Sync form when detail loads or locale switches.
@@ -507,9 +509,6 @@ export default function ContentDetailPage<TDetail, TFormData extends FieldValues
             undo: () => formHistory.undo(),
             redo: () => formHistory.redo(),
             snapshot: () => formHistory.snapshot(),
-          },
-          onSave: () => {
-            void runSave();
           },
           isSaving,
           canWrite,

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import {
   Box,
-  Button,
   Chip,
   IconButton,
   Tooltip,
@@ -9,7 +8,6 @@ import {
 import UndoIcon from '@mui/icons-material/Undo';
 import RedoIcon from '@mui/icons-material/Redo';
 import HistoryIcon from '@mui/icons-material/History';
-import SaveIcon from '@mui/icons-material/Save';
 import ScheduleIcon from '@mui/icons-material/CalendarMonth';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { type UseFormWatch, type UseFormSetValue } from 'react-hook-form';
@@ -28,7 +26,6 @@ interface LegalEditorToolbarProps {
   canRedo: boolean;
   onUndo: () => void;
   onRedo: () => void;
-  onSave: () => void;
   onToggleHistory: () => void;
   isSaving: boolean;
   canWrite: boolean;
@@ -59,7 +56,6 @@ export default function LegalEditorToolbar({
   canRedo,
   onUndo,
   onRedo,
-  onSave,
   onToggleHistory,
   isSaving,
   canWrite,
@@ -207,16 +203,8 @@ export default function LegalEditorToolbar({
         onRestore={onRestore}
       />
 
-      <Button
-        variant="contained"
-        size="small"
-        startIcon={<SaveIcon />}
-        onClick={onSave}
-        disabled={isSaving || !canWrite}
-        data-testid="legal-detail.save"
-      >
-        {isSaving ? t('common.actions.saving') : t('common.actions.save')}
-      </Button>
+      {/* Save is owned by the global save bar (useFormSaveBar). The toolbar no
+          longer renders a duplicate Save — see #45/#46. */}
 
       {/* Schedule Popover */}
       <SchedulePopover

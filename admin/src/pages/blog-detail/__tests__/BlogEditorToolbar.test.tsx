@@ -12,7 +12,6 @@ vi.mock('@mui/x-date-pickers/DateTimePicker', () => ({
 
 interface WrapperProps {
   canWrite?: boolean;
-  onSave?: () => void;
   canUndo?: boolean;
   canRedo?: boolean;
   onUndo?: () => void;
@@ -30,7 +29,6 @@ interface WrapperProps {
 
 function ToolbarWrapper({
   canWrite = true,
-  onSave = vi.fn(),
   canUndo = true,
   canRedo = true,
   onUndo = vi.fn(),
@@ -75,7 +73,6 @@ function ToolbarWrapper({
         canRedo={canRedo}
         onUndo={onUndo}
         onRedo={onRedo}
-        onSave={onSave}
         onToggleHistory={vi.fn()}
         isSaving={false}
         canWrite={canWrite}
@@ -113,19 +110,15 @@ describe('BlogEditorToolbar', () => {
     expect(buttonByLabelRegex(/redo/i)).toBeDefined();
   });
 
-  it('calls onSave on save click', async () => {
-    const user = userEvent.setup();
-    const onSave = vi.fn();
-    renderWithProviders(<ToolbarWrapper onSave={onSave} />);
-    const saveBtn = screen.getByTestId('save-post');
-    expect(saveBtn).toBeDefined();
-    await user.click(saveBtn);
-    expect(onSave).toHaveBeenCalledOnce();
+  it('does not render its own Save button — the global save bar owns Save (#46)', () => {
+    renderWithProviders(<ToolbarWrapper />);
+    expect(screen.queryByTestId('save-post')).toBeNull();
   });
 
-  it('disables controls when canWrite=false', () => {
+  it('still renders status + edit tools (without a Save button) when canWrite=false', () => {
     renderWithProviders(<ToolbarWrapper canWrite={false} />);
-    expect(screen.getByTestId('save-post')).toBeDisabled();
+    expect(screen.getByText('Draft')).toBeInTheDocument();
+    expect(screen.queryByTestId('save-post')).toBeNull();
   });
 
   it('shows workflow submit button when canSubmitForReview is true and status is Draft', () => {
