@@ -6,6 +6,14 @@ Forja is a GDPR-first, multi-tenant headless CMS — a Rust (Axum) backend and a
 
 ## [Unreleased]
 
+## [2.0.2] — 2026-06-14
+
+Hotfix for a login regression introduced in 2.0.1.
+
+### Fixed
+
+- **Authenticated requests were rejected after login, locking everyone out of the dashboard.** The jsonwebtoken 9→10 upgrade in 2.0.1 changed JWT header parsing: v10 deserialises unknown header parameters into a flattened `extras: HashMap<String, String>` and rejects any non-string value. Clerk session tokens carry an integer custom header field, so `decode_header` failed for every real token and every `/api/v1/auth/*` call returned `401`. Pinned jsonwebtoken to 9.x (which ignores unknown header fields) and added a regression test that decodes a header with a non-string custom field, so a future bump cannot silently break login again.
+
 ## [2.0.1] — 2026-06-14
 
 A maintenance release: it completes the GDPR transparency surface, hardens the engineering foundation laid in 2.0.0, brings the end-to-end suite back online as a CI gate, and refreshes every dependency to clear all outstanding security advisories.
@@ -140,6 +148,7 @@ _The 0.x milestones below condense the early build-out; development then continu
 - The first Astro-based reference template.
 - Docker and Docker Compose for local development, and the initial CI pipeline.
 
-[Unreleased]: https://github.com/dominikdorfstetter/forja/compare/v2.0.1...HEAD
+[Unreleased]: https://github.com/dominikdorfstetter/forja/compare/v2.0.2...HEAD
+[2.0.2]: https://github.com/dominikdorfstetter/forja/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/dominikdorfstetter/forja/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/dominikdorfstetter/forja/releases/tag/v2.0.0

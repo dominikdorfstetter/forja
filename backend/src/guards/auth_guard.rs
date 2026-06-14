@@ -654,6 +654,35 @@ mod tests {
         assert!(v.iss.as_ref().unwrap().contains("iss-y"));
     }
 
+    // Regression: Clerk session JWTs carry custom header parameters that are
+    // not always strings (an integer timestamp here). jsonwebtoken 9 ignores
+    // unknown header fields, but 10 deserialises them into a flattened
+    // `extras: HashMap<String, String>` and rejects any non-string value
+    // ("invalid type: integer, expected a string"). That made `decode_header`
+    // fail for *every* real Clerk token, 401-ing every authenticated request
+    // and locking everyone out of the dashboard in production (2.0.1). This
+    // pins the lenient behaviour `validate_token` depends on, so a future
+    // jsonwebtoken bump can't silently regress login again.
+    #[test]
+    fn decode_header_tolerates_non_string_extra_header_fields() {
+        use base64::engine::general_purpose::URL_SAFE_NO_PAD;
+        use base64::Engine as _;
+
+        let header = r#"{"alg":"RS256","typ":"JWT","kid":"ins_2abc","custom_ts":1781422363}"#;
+        let payload = r#"{"sub":"user_123"}"#;
+        let token = format!(
+            "{}.{}.{}",
+            URL_SAFE_NO_PAD.encode(header),
+            URL_SAFE_NO_PAD.encode(payload),
+            URL_SAFE_NO_PAD.encode(b"signature"),
+        );
+
+        let decoded = jsonwebtoken::decode_header(&token)
+            .expect("decode_header must tolerate non-string custom header fields (Clerk tokens)");
+        assert_eq!(decoded.kid.as_deref(), Some("ins_2abc"));
+        assert_eq!(decoded.alg, jsonwebtoken::Algorithm::RS256);
+    }
+
     #[test]
     fn test_authenticated_key_can_manage_keys() {
         let key = AuthenticatedKey {
