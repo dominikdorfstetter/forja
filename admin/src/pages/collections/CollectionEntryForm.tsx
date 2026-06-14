@@ -36,6 +36,39 @@ import type {
 
 const REDACTED = '__redacted__';
 
+/** Drop redacted (null-from-server) PII values so we never overwrite them. */
+function cleanEntryValues(obj: Record<string, unknown>): Record<string, unknown> {
+  return Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== null && v !== REDACTED));
+}
+
+/** The canonical entry payload `onSubmit` would send. */
+function buildEntryRequest(
+  shared: Record<string, unknown>,
+  localized: Record<string, Record<string, unknown>>,
+): CustomEntryRequest {
+  return {
+    shared: cleanEntryValues(shared),
+    localized: Object.fromEntries(
+      Object.entries(localized).map(([l, vals]) => [l, cleanEntryValues(vals)]),
+    ),
+  };
+}
+
+/**
+ * Fingerprint of the canonical payload for dirty-tracking. Empty locale buckets
+ * are normalised away so a typed-then-cleared field doesn't read as a change.
+ */
+function entryFingerprint(
+  shared: Record<string, unknown>,
+  localized: Record<string, Record<string, unknown>>,
+): string {
+  const req = buildEntryRequest(shared, localized);
+  const nonEmptyLocalized = Object.fromEntries(
+    Object.entries(req.localized).filter(([, v]) => Object.keys(v).length > 0),
+  );
+  return JSON.stringify({ shared: req.shared, localized: nonEmptyLocalized });
+}
+
 interface FieldControlProps {
   field: CustomFieldResponse;
   value: unknown;
@@ -188,33 +221,12 @@ export function CollectionEntryForm({
   const setValueFor = (f: CustomFieldResponse, v: unknown) =>
     f.localized ? setLocalizedValue(activeLocale, f.key, v) : setSharedValue(f.key, v);
 
-  // Drop redacted (null-from-server) PII values so we never overwrite them.
-  const clean = (obj: Record<string, unknown>) =>
-    Object.fromEntries(Object.entries(obj).filter(([, v]) => v !== null && v !== REDACTED));
-  const buildRequest = (
-    sh: Record<string, unknown>,
-    loc: Record<string, Record<string, unknown>>,
-  ): CustomEntryRequest => ({
-    shared: clean(sh),
-    localized: Object.fromEntries(Object.entries(loc).map(([l, vals]) => [l, clean(vals)])),
-  });
-  const submit = () => onSubmit(buildRequest(shared, localized));
+  const submit = () => onSubmit(buildEntryRequest(shared, localized));
 
-  // Drive the global save bar (#48). Dirty is a fingerprint of the canonical
-  // payload vs. the baseline captured at mount; empty locale buckets are
-  // normalised so a typed-then-cleared field doesn't read as a change.
-  const fingerprint = (
-    sh: Record<string, unknown>,
-    loc: Record<string, Record<string, unknown>>,
-  ) => {
-    const req = buildRequest(sh, loc);
-    const localized = Object.fromEntries(
-      Object.entries(req.localized).filter(([, v]) => Object.keys(v).length > 0),
-    );
-    return JSON.stringify({ shared: req.shared, localized });
-  };
-  const [baseline] = useState(() => fingerprint(initialShared ?? {}, initialLocalized ?? {}));
-  const isDirty = fingerprint(shared, localized) !== baseline;
+  // Drive the global save bar (#48) — dirty compares the payload fingerprint to
+  // the baseline captured at mount.
+  const [baseline] = useState(() => entryFingerprint(initialShared ?? {}, initialLocalized ?? {}));
+  const isDirty = entryFingerprint(shared, localized) !== baseline;
 
   useFormSaveBar({
     id: 'collection-entry-form',
