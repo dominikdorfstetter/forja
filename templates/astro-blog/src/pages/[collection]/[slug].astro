@@ -3,41 +3,45 @@
 // `/{collection}/{slug}`. Built-in routes (e.g. /blog/x, /legal/x) are
 // static-prefixed and resolve first; this 2-dynamic-segment route is the
 // generic fallback for configured page collections. Data-only collections
-// never produce paths here.
+// never produce a page here.
+//
+// Server-rendered per request (output: 'server'): the entry is fetched by
+// params, NOT via getStaticPaths — which Astro ignores in SSR, leaving
+// Astro.props empty. The earlier getStaticPaths form rendered with undefined
+// entry/schema in server mode; this fetch-by-params form is the SSR-correct
+// equivalent, matching blog/[slug] and legal/[slug].
 import Base from "../../layouts/Base.astro";
 import SeoHead from "../../components/SeoHead.astro";
 import CollectionEntry from "../../components/CollectionEntry.astro";
-import { fetchSite, getSiteUrl } from "../../lib/api";
 import {
+  fetchSite,
+  getSiteUrl,
   fetchCollectionSchema,
-  fetchPublishedCollectionEntries,
+  fetchCollectionEntryBySlug,
 } from "../../lib/api";
 import {
-  buildCollectionStaticPaths,
   getPageCollectionKeys,
+  isPageCollection,
   entryTitle,
 } from "../../lib/collections";
 import { buildSeoMeta } from "../../lib/seo";
 
-export async function getStaticPaths() {
-  const keys = getPageCollectionKeys();
-  const collections = await Promise.all(
-    keys.map(async (typeKey) => {
-      const schema = await fetchCollectionSchema(typeKey).catch(() => null);
-      const entries = schema
-        ? await fetchPublishedCollectionEntries(typeKey).catch(() => [])
-        : [];
-      return { typeKey, schema, entries };
-    }),
-  );
-  return buildCollectionStaticPaths(collections);
+const locale = Astro.locals.locale ?? { locale_id: '', code: 'en', name: 'English', direction: 'ltr' as const, is_default: true, is_active: true };
+const { collection, slug } = Astro.params;
+
+if (!collection || !slug) return new Response(null, { status: 404, statusText: "Not Found" });
+
+// Only collections explicitly configured as routable page collections are
+// served here (preserves the previous getStaticPaths allowlist behaviour).
+if (!getPageCollectionKeys().includes(collection)) {
+  return new Response(null, { status: 404, statusText: "Not Found" });
 }
 
-const { entry, schema, typeKey } = Astro.props as {
-  entry: import("@forjacms/client").PublicCollectionEntry;
-  schema: import("@forjacms/client").PublicCollectionSchema;
-  typeKey: string;
-};
+const schema = await fetchCollectionSchema(collection).catch(() => null);
+if (!schema || !isPageCollection(schema)) return new Response(null, { status: 404, statusText: "Not Found" });
+
+const entry = await fetchCollectionEntryBySlug(collection, slug, locale.code).catch(() => null);
+if (!entry) return new Response(null, { status: 404, statusText: "Not Found" });
 
 const title = entryTitle(schema, entry);
 const site = await fetchSite().catch(() => null);
@@ -47,7 +51,7 @@ const siteUrl = getSiteUrl();
 const seo = buildSeoMeta({
   title: `${title} — ${siteName}`,
   description: `${title} for ${siteName}.`,
-  canonicalUrl: `${siteUrl}/${typeKey}/${entry.slug}/`,
+  canonicalUrl: `${siteUrl}/${collection}/${entry.slug}/`,
   siteUrl,
   siteName,
 });
