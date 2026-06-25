@@ -92,7 +92,7 @@ jobs:
             echo "configured=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         if: steps.guard.outputs.configured == 'true'
 
       - name: Install Rust toolchain

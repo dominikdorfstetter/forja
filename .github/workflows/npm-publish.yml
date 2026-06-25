@@ -23,7 +23,7 @@ jobs:
       run:
         working-directory: libs/analytics
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -60,7 +60,7 @@ jobs:
       run:
         working-directory: libs/client
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -100,7 +100,7 @@ jobs:
       run:
         working-directory: libs/sections
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -138,7 +138,7 @@ jobs:
       run:
         working-directory: libs/sections-react
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
