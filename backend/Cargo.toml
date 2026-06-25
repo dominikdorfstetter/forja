@@ -14,7 +14,7 @@ tempfile = "3"
 axum = { version = "0.8", features = ["json", "macros", "matched-path", "multipart", "original-uri", "query", "tokio"] }
 axum-server = { version = "0.8", features = ["tls-rustls"] }
 tower = "0.5"
-tower-http = { version = "0.6", features = ["cors", "set-header", "request-id", "trace", "limit", "compression-gzip", "fs"] }
+tower-http = { version = "0.7", features = ["cors", "set-header", "request-id", "trace", "limit", "compression-gzip", "fs"] }
 
 # Proc-macro sibling crate (see backend/macros/). Hosts #[derive(ValidatedDto)]
 # and any future Forja-internal derives. Lives in a Cargo workspace declared
