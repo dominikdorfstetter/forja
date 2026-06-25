@@ -1,25 +1,115 @@
 version: 2
 updates:
+  # ---- Frontend: admin SPA ----
   - package-ecosystem: "npm"
     directory: "/admin"
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 10
+    groups:
+      # Tiptap publishes ~17 packages that exact-pin each other's peers; they
+      # must move as one set or peer ranges break. Group them into a single PR.
+      tiptap:
+        patterns:
+          - "@tiptap/*"
     ignore:
       - dependency-name: "eslint"
         update-types: ["version-update:semver-major"]
       - dependency-name: "@eslint/js"
         update-types: ["version-update:semver-major"]
 
+  # ---- Frontend: published @forjacms/* libraries ----
+  - package-ecosystem: "npm"
+    directory: "/libs/analytics"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      dev-tooling:
+        dependency-type: "development"
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: "npm"
+    directory: "/libs/client"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      dev-tooling:
+        dependency-type: "development"
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: "npm"
+    directory: "/libs/sections"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      dev-tooling:
+        dependency-type: "development"
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: "npm"
+    directory: "/libs/sections-react"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      dev-tooling:
+        dependency-type: "development"
+        update-types: ["minor", "patch"]
+
+  # ---- Astro blog template ----
   - package-ecosystem: "npm"
     directory: "/templates/astro-blog"
     schedule:
       interval: "weekly"
 
+  # ---- Documentation site (Docusaurus) ----
+  - package-ecosystem: "npm"
+    directory: "/docs"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      docusaurus:
+        patterns:
+          - "@docusaurus/*"
+
+  # ---- End-to-end test suite ----
+  - package-ecosystem: "npm"
+    directory: "/e2e"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  # ---- Backend (Rust) ----
   - package-ecosystem: "cargo"
     directory: "/backend"
     schedule:
       interval: "weekly"
+    groups:
+      # The RustCrypto digest stack moves as a coordinated wave (digest 0.11
+      # etc.); group it so the transitive bumps land in one PR, not dozens.
+      rustcrypto:
+        patterns:
+          - "digest"
+          - "sha1"
+          - "sha2"
+          - "sha3"
+          - "hmac"
+          - "hkdf"
+          - "md-5"
+          - "block-buffer"
+          - "crypto-common"
+          - "cpufeatures"
+      # sqlx core + its sub-crates must move together (sqlx 0.9 is deferred
+      # until rustc 1.94; keeping them grouped avoids piecemeal sub-crate PRs).
+      sqlx:
+        patterns:
+          - "sqlx*"
 
+  # ---- GitHub Actions ----
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
