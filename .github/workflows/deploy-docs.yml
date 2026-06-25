@@ -50,6 +50,10 @@ jobs:
   deploy:
     name: Deploy to GitHub Pages
     needs: build
+    # Only publish from main (manual dispatch) or a v* release tag — never from an
+    # arbitrary branch a workflow_dispatch could target. Mirrors the github-pages
+    # environment's deployment-branch policy as a fail-fast, in-YAML guard.
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     environment:
       name: github-pages
