@@ -639,8 +639,11 @@ mod tests {
     }
 
     #[test]
+    #[serial_test::serial]
     fn resolve_burst_cap_falls_back_to_default() {
         // No override, or a non-positive one, uses the global default.
+        // `#[serial]` so it never races `test_burst_per_second_env_override`,
+        // which set_var's RATE_LIMIT_BURST_PER_SECOND process-wide.
         assert_eq!(
             RateLimiter::resolve_burst_cap(None),
             DEFAULT_BURST_PER_SECOND
