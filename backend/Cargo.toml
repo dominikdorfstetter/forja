@@ -137,7 +137,7 @@ bundle-admin = []
 tokio-test = "0.4.5"
 serial_test = "3.4.0"
 fake = { version = "5.1.0", features = ["derive"] }
-axum-test = "20"
+axum-test = "21"
 tower = { version = "0.5", features = ["util"] }
 altcha-lib-rs = { version = "0.3.3", default-features = false, features = ["json"] }
 
