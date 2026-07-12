@@ -5,7 +5,7 @@ All scripts source `_common.sh` for shared utilities and error handling.
 
 | Script | Purpose |
 |--------|---------|
-| `dev-start.sh` / `dev-stop.sh` / `dev-status.sh` | Manage Docker infra (Postgres, Redis, pgAdmin). |
+| `dev-start.sh` / `dev-stop.sh` / `dev-status.sh` | Manage Docker infra (Postgres, Redis, pgAdmin). `dev-start.sh --backend`/`--admin`/`--all` also starts the Rust backend and/or admin dev server. |
 | `dev-seed.sh` | Run migrations + seed the dev database. |
 | `dev-build.sh` | Build admin and/or backend. |
 | `dev-test.sh` | Run all tests + linting (the full local gate). |

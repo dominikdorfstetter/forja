@@ -15,6 +15,8 @@ Complete reference of all environment variables used by Forja. Variables are gro
 | `APP__PORT` | `8000` | No | Application port |
 | `APP__LOG_LEVEL` | `info` | No | tracing-subscriber filter: `error`, `warn`, `info`, `debug`, `trace` |
 | `APP__ENABLE_TRACING` | `true` | No | Toggle structured tracing output |
+| `LOG_FORMAT` | -- | No | Set to `json` to force JSON-formatted logs anywhere |
+| `RAILWAY_ENVIRONMENT` | -- | No | Set automatically by Railway; its mere presence switches logging to JSON format |
 | `PUBLIC_URL` | `http://localhost:8000` | Yes (production) | Public origin used to build absolute media URLs and the dashboard CSP. Must include scheme. |
 | `PORT` | -- | No | Some platforms (Railway) use this to detect the listening port. Forja itself reads `APP__PORT`; set both to the same value when deploying to platforms that probe `PORT`. |
 
@@ -25,16 +27,19 @@ Complete reference of all environment variables used by Forja. Variables are gro
 | `DATABASE_URL` | -- | **Yes** | PostgreSQL connection string, e.g., `postgres://user:pass@host:5432/dbname` |
 | `APP__DATABASE__MAX_CONNECTIONS` | `20` | No | Maximum number of connections in the pool |
 | `APP__DATABASE__MIN_CONNECTIONS` | `2` | No | Minimum number of connections in the pool |
+| `APP__DATABASE__CONNECT_TIMEOUT_SECONDS` | `5` | No | Maximum time (seconds) to wait when acquiring a new connection |
+| `APP__DATABASE__IDLE_TIMEOUT_SECONDS` | `600` | No | Time (seconds) before an idle connection is closed and removed from the pool |
 
 ## Redis & Rate Limiting
 
 | Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `REDIS_URL` | -- | **Yes** | Redis connection string, e.g., `redis://host:6379` |
+| `REDIS_URL` | `redis://127.0.0.1:6379` | **Yes** (production) | Redis connection string, e.g., `redis://host:6379`. Defaults to localhost for development. Effectively required in production: with the default fail-closed rate limiting, the service refuses to start when Redis is unreachable. |
 | `RATE_LIMIT_FAIL_MODE` | `closed` | No | Behavior when Redis is unavailable: `closed` rejects with 429 (security, default), `open` allows requests (availability). In `APP__ENVIRONMENT=production` the service refuses to start when Redis is unreachable and the mode is `closed`. |
 | `RATE_LIMIT_BURST_PER_SECOND` | `100` | No | Per-API-key burst ceiling (requests/second), enforced independently of each key's calendar quotas. Raise it for sites whose static builds fan out into highly-parallel request storms. Values ≤ 0 are ignored (default applies). |
 | `RESPONSE_CACHE_TTL_SECS` | `60` | No | Time-to-live (seconds) for the server-side response cache of public reads. Acts as a backstop behind explicit invalidation on content writes; lower it for fresher reads, raise it to absorb more build/crawl load. Caching is disabled entirely when `REDIS_URL` is unset. See [Cache](../admin-guide/cache.md). |
 | `TRUST_PROXY_HEADERS` | `false` | No | Trust `X-Forwarded-For` and `X-Real-IP` headers for real client IP extraction. **Enable only behind a trusted reverse proxy.** |
+| `PERMISSION_CACHE_TTL_SECS` | `300` | No | TTL (seconds) for cached permission lookups in Redis (5 minutes by default) |
 
 :::caution Rate Limiting Behind a Reverse Proxy
 If your Forja instance runs behind a reverse proxy (nginx, Caddy, HAProxy) on the same host, **you must set `TRUST_PROXY_HEADERS=true`**. Otherwise all requests appear to come from `127.0.0.1` and bypass IP-based rate limiting entirely.
@@ -60,6 +65,7 @@ The `closed` default closes a silent bypass: it prevents a Redis outage from let
 | Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
 | `CORS_ALLOWED_ORIGINS` | _empty_ | No (yes, if you have a cross-origin admin SPA or consumer site) | Comma-separated list of allowed origins, e.g. `https://admin.example.com,https://blog.example.com`. Empty means deny all cross-origin browser calls. Setting `*` in `APP__ENVIRONMENT=production` refuses to start — the wildcard is a dev-only affordance. |
+| `APP__SECURITY__CORS_ALLOWED_ORIGINS` | _empty_ | No | Alias for `CORS_ALLOWED_ORIGINS` using the prefixed config convention. Either name works — set one, not both. |
 
 :::caution CORS in production
 Set `CORS_ALLOWED_ORIGINS` to the exact origins your admin dashboard and any consumer-site frontends use. Leaving it empty denies all cross-origin browser calls (deny-all by default), and production rejects the wildcard (`*`) at startup, keeping CORS a strong defense-in-depth boundary for authenticated routes.
@@ -93,12 +99,26 @@ echo "${CLERK_PUBLISHABLE_KEY#pk_*_}" | base64 -d
 | Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
 | `STORAGE_PROVIDER` | `local` | No | Storage backend: `local` or `s3` |
+| `STORAGE_LOCAL_UPLOAD_DIR` | `./uploads` | No | Directory where uploaded files are written (local provider). Relative to the backend working directory. |
+| `STORAGE_LOCAL_BASE_URL` | `/uploads` | No | URL prefix under which uploaded files are served (local provider) |
 | `STORAGE_S3_BUCKET` | -- | If S3 | S3 bucket name |
 | `STORAGE_S3_REGION` | -- | If S3 | AWS region (e.g., `us-east-1`) |
 | `STORAGE_S3_PREFIX` | -- | No | Key prefix for all uploads (e.g., `media/`) |
 | `STORAGE_S3_ENDPOINT` | -- | No | Custom S3 endpoint for non-AWS providers (MinIO, R2, Spaces) |
 | `AWS_ACCESS_KEY_ID` | -- | If S3 | AWS access key (standard SDK chain) |
 | `AWS_SECRET_ACCESS_KEY` | -- | If S3 | AWS secret key (standard SDK chain) |
+
+## Preview Service
+
+| Variable | Default | Required | Description |
+|----------|---------|----------|-------------|
+| `APP__PREVIEW__BUILT_IN_TEMPLATES` | -- | No | Comma-separated name/url pairs for built-in preview templates. Format: `Name1\|URL1,Name2\|URL2`, e.g. `Blog\|http://preview:4321`. |
+
+## Webhooks
+
+| Variable | Default | Required | Description |
+|----------|---------|----------|-------------|
+| `WEBHOOK_DEAD_RETENTION_DAYS` | `30` | No | Retention (days) for dead webhook retry rows — deliveries that exhausted all retry attempts. Values ≤ 0 are ignored (default applies). |
 
 ## Application-Level Encryption
 
@@ -134,6 +154,32 @@ User downloads are never affected by key rotation — files are encrypted with t
 If you deploy behind a reverse proxy or a platform like Railway that handles TLS termination at the edge, you do not need to set these variables.
 :::
 
+## Advanced Security Tuning
+
+Request-size, rate-limit, and anomaly-detection knobs from the `APP__SECURITY__*` family. The defaults are sensible for most deployments — only change these when you have a concrete reason.
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `APP__SECURITY__MAX_BODY_SIZE` | `10485760` (10 MB) | Maximum request body size (bytes) |
+| `APP__SECURITY__MAX_JSON_SIZE` | `15728640` (15 MB) | Maximum JSON payload size (bytes) — sized to fit base64-encoded uploads up to 10 MB |
+| `APP__SECURITY__MAX_FORM_SIZE` | `10485760` (10 MB) | Maximum form payload size (bytes) |
+| `APP__SECURITY__MAX_FILE_SIZE` | `52428800` (50 MB) | Maximum file upload size (bytes) |
+| `APP__SECURITY__RATE_LIMIT_PER_SECOND` | `50` | IP-based rate limit: requests per second |
+| `APP__SECURITY__RATE_LIMIT_PER_MINUTE` | `500` | IP-based rate limit: requests per minute |
+| `APP__SECURITY__RATE_LIMIT_BURST` | `20` | IP-based rate limit: burst allowance |
+| `APP__SECURITY__MAX_JSON_DEPTH` | `10` | Maximum nesting depth accepted in JSON payloads |
+| `APP__SECURITY__MAX_ARRAY_ITEMS` | `1000` | Maximum array length accepted in JSON payloads |
+| `APP__SECURITY__REQUEST_TIMEOUT_SECONDS` | `30` | Per-request timeout (seconds) |
+| `APP__SECURITY__ANOMALY_DETECTION_ENABLED` | `true` | Enable anomaly detection for API keys |
+| `APP__SECURITY__ANOMALY_HOURLY_MULTIPLIER` | `5.0` | Flag keys whose hourly traffic exceeds this multiple of their baseline |
+| `APP__SECURITY__ANOMALY_DAILY_MULTIPLIER` | `3.0` | Flag keys whose daily traffic exceeds this multiple of their baseline |
+| `APP__SECURITY__ANOMALY_ERROR_RATE_THRESHOLD` | `0.5` | Error-rate ratio above which a key is flagged |
+| `APP__SECURITY__ANOMALY_MIN_REQUESTS` | `20` | Minimum requests before anomaly detection evaluates a key |
+| `APP__SECURITY__AUTH_RATE_LIMIT_MAX_FAILURES` | `5` | Failed auth attempts allowed within the window before throttling |
+| `APP__SECURITY__AUTH_RATE_LIMIT_WINDOW_SECONDS` | `900` | Window (seconds) for counting failed auth attempts |
+| `APP__SECURITY__AUTH_RATE_LIMIT_BAN_MAX_FAILURES` | `20` | Failed attempts within the ban window that trigger a temporary ban |
+| `APP__SECURITY__AUTH_RATE_LIMIT_BAN_WINDOW_SECONDS` | `3600` | Window (seconds) for the temporary auth ban |
+
 ## Demo Mode
 
 | Variable | Default | Required | Description |
@@ -158,7 +204,7 @@ Operator legal details served at runtime by `GET /api/v1/imprint` and shown on t
 
 | Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
-| `TEST_DATABASE_URL` | -- | For integration tests | PostgreSQL connection string for the test database |
+| `TEST_DATABASE_URL` | `postgres://forja:forja@localhost:5432/forja_test` | For integration tests | PostgreSQL connection string for the test database. Requires PostgreSQL 16+ — see [Testing](../developer/testing.md). |
 
 ## Admin Dashboard (Vite Build)
 
@@ -167,6 +213,7 @@ These variables are used at build time when compiling the React admin dashboard.
 | Variable | Default | Required | Description |
 |----------|---------|----------|-------------|
 | `VITE_CLERK_PUBLISHABLE_KEY` | -- | No | Clerk publishable key for the admin SPA |
+| `VITE_API_BASE_URL` | `/api/v1` | No | Backend API base URL baked into the admin bundle. The default same-origin path works when the backend serves the dashboard; override only for a split deployment. |
 
 ## Frontend Templates
 

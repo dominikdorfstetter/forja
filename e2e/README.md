@@ -4,7 +4,7 @@ End-to-end tests for Forja using [Cucumber](https://cucumber.io/) (Gherkin BDD) 
 
 ## Overview
 
-- **109 scenarios** across 15 feature areas
+- **~70 scenarios** (85 with outline expansions, 20 tagged `@skip`) across 16 feature areas
 - **7 roles** tested: Viewer, Reviewer, Author, Editor, Admin, Owner, System Admin
 - **Real Clerk authentication** — tests log in via the actual Clerk UI
 - **Documentation screenshots** — explicit `And I take a screenshot` steps output to `docs/screenshots/`
@@ -36,14 +36,23 @@ cd ../backend && cargo run                     # Backend on :8000
 cd ../admin && npm run dev                     # Admin on :3000
 
 # 4. Run tests
-npm test                                       # All tests
-npm test -- features/auth/login.feature        # Single feature
+npm test                                       # All tests (suite order)
+npm run test:critical                          # @critical subset (the CI PR gate)
+npx cucumber-js -p single features/auth/login.feature  # Single feature
 npm test -- --tags "@sites"                    # By tag
 E2E_HEADLESS=false npm test                    # Visible browser
 
 # Or use the convenience script (checks all services first):
 ./scripts/run-e2e.sh
 ```
+
+> **Note:** don't pass a feature path to plain `npm test` — the default profile's `paths` merge with CLI arguments, so it silently runs the whole suite. Use the `single` profile (`npx cucumber-js -p single <feature>`).
+
+## Execution Order
+
+`cucumber.js` runs features via a hand-ordered `orderedPaths` list — earlier scenarios create data that later ones verify (e.g. sites before members before content, read-only checks after content exists). New feature files must be slotted into that order or they won't run in the default/critical profiles.
+
+`npm run test:critical` runs only the journeys tagged `@critical`, in suite order, with `retry: 1` — this subset is the CI PR gate. In CI, the e2e workflow (`.github/workflows/e2e-reusable.yml`) no-ops with a warning unless the `E2E_CLERK_SECRET_KEY` repository secret is set.
 
 ## Project Structure
 
@@ -63,7 +72,8 @@ e2e/
 │   ├── activity/          # Activity log and notifications
 │   ├── social-links/      # Social media link configuration
 │   ├── system-admin/      # System admin privileges
-│   └── ui/                # Empty states, pagination, sorting, filtering
+│   ├── ui/                # Empty states, pagination, sorting, filtering
+│   └── welcome/           # Signed-out welcome page and Imprint
 ├── step-definitions/      # TypeScript step implementations
 │   └── common/            # Reusable steps (auth, nav, screenshots, forms)
 ├── support/               # Framework infrastructure
@@ -71,6 +81,7 @@ e2e/
 │   ├── hooks.ts           # Before/After lifecycle hooks
 │   ├── clerk-auth.ts      # Real Clerk login with session caching
 │   └── config.ts          # Environment variable loading
+├── auth-states/           # Cached Clerk sessions — one JSON per role (7)
 ├── fixtures/              # Test files (images, etc.)
 ├── scripts/               # Setup and run scripts
 ├── reports/               # Generated test reports (gitignored)
@@ -118,7 +129,13 @@ And I take a screenshot "content/my-new-post"
 Use tags for selective test runs:
 - `@auth`, `@sites`, `@members`, `@content`, `@api-keys`, `@media`
 - `@webhooks`, `@navigation`, `@redirects`
-- `@analytics`, `@activity`, `@social-links`, `@system-admin`, `@ui`
+- `@analytics`, `@activity`, `@social-links`, `@system-admin`, `@ui`, `@welcome`
+
+Special-purpose tags:
+- `@critical` — the PR-gate subset run by `npm run test:critical`
+- `@skip` — excluded by every profile (default, single, critical)
+- `@read-only` — viewer walk asserting no write controls are reachable
+- `@requires-imprint` / `@requires-no-imprint` — welcome scenarios gated on the backend's `IMPRINT_*` env (each asserts the running backend matches)
 
 ```bash
 npm test -- --tags "@auth"

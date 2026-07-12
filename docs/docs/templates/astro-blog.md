@@ -4,11 +4,11 @@ sidebar_position: 2
 
 # Astro Blog Template
 
-A server-rendered blog and portfolio site powered by [Astro 5](https://astro.build) and the Forja CMS backend. This template ships with Forja in the `templates/astro-blog/` directory.
+A server-rendered blog and portfolio site powered by [Astro 7](https://astro.build) and the Forja CMS backend. This template ships with Forja in the `templates/astro-blog/` directory.
 
 ## Tech Stack
 
-- **Framework**: Astro 5 with SSR (`output: 'server'`)
+- **Framework**: Astro 7 with SSR (`output: 'server'`)
 - **Adapter**: `@astrojs/node` (standalone mode)
 - **Markdown**: `marked` (GFM + line breaks)
 - **Styling**: Tailwind CSS v4 with dark mode via `data-theme` attribute

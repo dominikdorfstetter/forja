@@ -11,7 +11,7 @@ Multi-site CMS REST API built with Rust and Axum.
 - **Cache / Rate Limiting**: [Redis](https://redis.io/) 7
 - **Async Runtime**: Tokio
 - **Documentation**: Utoipa (OpenAPI / Swagger UI)
-- **Toolchain**: Rust 1.93+
+- **Toolchain**: Rust 1.97 (pinned via `rust-toolchain.toml`), edition 2024
 
 ## Features
 
@@ -32,7 +32,7 @@ Multi-site CMS REST API built with Rust and Axum.
 
 ### Prerequisites
 
-- Rust 1.93+ (install via [rustup](https://rustup.rs/))
+- Rust 1.97 (install via [rustup](https://rustup.rs/) — the version is pinned via `rust-toolchain.toml`, edition 2024)
 - PostgreSQL 16+
 - Redis 7+
 - SQLx CLI: `cargo install sqlx-cli`
@@ -62,6 +62,12 @@ API: `http://localhost:8000` · Swagger UI: `http://localhost:8000/api-docs`
 
 See the [Getting Started guide](https://forja-docs.dorfstetter.at/getting-started) for full setup instructions.
 
+## Environment Variables
+
+[`.env.example`](.env.example) is the complete reference for all supported variables. `DATABASE_URL` is the only strictly required one. Production additionally requires `DOCUMENT_ENCRYPTION_KEY` — plus `ENCRYPTION_KEY` if AI features are used, `CLERK_EXPECTED_AUDIENCE`/`CLERK_EXPECTED_ISSUER` if Clerk is enabled, and `REDIS_URL` when `RATE_LIMIT_FAIL_MODE=closed`.
+
+See the [environment variables reference](https://forja-docs.dorfstetter.at/docs/deployment/environment-variables) for full documentation.
+
 ## Authentication
 
 Forja supports dual authentication. Every protected endpoint accepts either method.
@@ -82,6 +88,10 @@ sqlx migrate run       # Run migrations
 sqlx migrate add NAME  # Create new migration
 cargo sqlx prepare     # Prepare offline mode for CI
 ```
+
+### Running tests
+
+Integration tests under `tests/` need a live PostgreSQL 16+ instance (a migration uses `NULLS NOT DISTINCT`, which fails on PG14), reachable via `TEST_DATABASE_URL` (default: `postgres://forja:forja@localhost:5432/forja_test`). The `postgres:16` container from `docker-compose.dev.yaml` works.
 
 ## Project Structure
 

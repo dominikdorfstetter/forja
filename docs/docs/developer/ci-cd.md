@@ -17,7 +17,7 @@ The CI configuration lives at `.github/workflows/ci.yml` and defines two paralle
 │  Backend (Rust) │    Admin (React)      │
 │                 │                       │
 │  1. Checkout    │  1. Checkout          │
-│  2. Rust setup  │  2. Node.js 20 setup  │
+│  2. Rust setup  │  2. Node.js 24 setup  │
 │  3. Cache deps  │  3. npm install       │
 │  4. Format check│  4. Type check        │
 │  5. Clippy lint │  5. ESLint            │
@@ -88,13 +88,13 @@ env:
 
 ## Admin Job
 
-The admin job runs on `ubuntu-latest` with Node.js 20.
+The admin job runs on `ubuntu-latest` with Node.js 24.
 
 ### Steps
 
 1. **Checkout** -- Uses `actions/checkout@v4`.
 
-2. **Setup Node.js** -- Uses `actions/setup-node@v4` with Node.js 20.
+2. **Setup Node.js** -- Uses `actions/setup-node@v4` with Node.js 24.
 
 3. **Install dependencies** -- `npm install` in the `admin/` directory.
 

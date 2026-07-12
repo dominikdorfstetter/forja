@@ -10,6 +10,19 @@ npm run build   # Stencil build (also regenerates React wrappers)
 npm test
 ```
 
+## Build Gotcha: `./define` vs. tests
+
+`npm run build` = `stencil build && node scripts/generate-define-all.js` — the
+second step generates `dist/define-all.js`, which backs the `./define` package
+export. `npm test` (`stencil-test`) rebuilds `dist/` **without** running the
+generator, so running tests after a build silently breaks the `./define` export
+until the next `npm run build`.
+
+Rules:
+- After running tests locally, rebuild before relying on (or publishing) `dist/`.
+- The test-then-build order in CI (`.github/workflows/npm-publish.yml`) is
+  load-bearing — do not reorder those steps.
+
 ## Conventions
 
 - `src/types.ts` defines the **`SectionType`** union — the canonical list of page

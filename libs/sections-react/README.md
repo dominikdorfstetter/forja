@@ -17,29 +17,42 @@ export default function LandingPage() {
   return (
     <>
       <ForjaHero
-        heading="Welcome"
-        subheading="Build something great"
-        primaryLabel="Get Started"
-        primaryHref="/signup"
+        sectionTitle="Welcome"
+        text="<p>Build something great</p>"
+        buttonText="Get Started"
+        buttonHref="/signup"
+        gradient
       />
-      <ForjaFeatures items={features} columns={3} />
-      <ForjaCta heading="Ready?" buttonLabel="Sign Up" buttonHref="/signup" />
+      <ForjaFeatures sectionTitle="Features" items={features} columns={3} />
+      <ForjaCta sectionTitle="Ready?" buttonText="Sign Up" buttonHref="/signup" />
     </>
   );
 }
 ```
 
+Props are the camelCase versions of the Web Component attributes — see the
+[component catalog](../sections/README.md#component-catalog) in `@forjacms/sections`
+for the full prop reference per component.
+
 ## Available Components
 
 All 24 `@forjacms/sections` Web Components are available as React components with typed props:
 
-`ForjaHero`, `ForjaFeatures`, `ForjaCta`, `ForjaGallery`, `ForjaTestimonials`, `ForjaPricing`, `ForjaFaq`, `ForjaContact`, `ForjaStats`, `ForjaTeam`, `ForjaTimeline`, `ForjaLogoCloud`, `ForjaNewsletter`, `ForjaVideo`, `ForjaDivider`, `ForjaText`, `ForjaPortfolio`, `ForjaTagCloud`, `ForjaProjects`, `ForjaBlog`, `ForjaLegal`, `ForjaNav`, `ForjaFooter`, `ForjaSectionRenderer`
+`ForjaHero`, `ForjaFeatures`, `ForjaCta`, `ForjaGallery`, `ForjaTestimonials`, `ForjaPricing`, `ForjaFaq`, `ForjaContact`, `ForjaStats`, `ForjaTeam`, `ForjaTimeline`, `ForjaLogoCloud`, `ForjaNewsletter`, `ForjaVideo`, `ForjaDivider`, `ForjaTextBlock`, `ForjaPortfolio`, `ForjaTagCloud`, `ForjaProjects`, `ForjaBlog`, `ForjaLegal`, `ForjaNav`, `ForjaFooter`, `ForjaSectionRenderer`
 
 ## Peer Dependencies
 
-- `@forjacms/sections` >= 1.2.4
-- `react` >= 18
-- `react-dom` >= 18
+- `@forjacms/sections` `^2.0.3`
+- `react` `^19.2.7`
+- `react-dom` `^19.2.7`
+
+> ⚠️ Never install `@forjacms/*` `1.8.4` or `1.8.5` — those releases were compromised in a supply-chain attack. Use `2.x` only.
+
+## TypeScript Source
+
+This package ships raw TypeScript source — `main` and `exports` point at
+`src/components.ts`, with no compiled output. Your bundler must compile TS
+from `node_modules` (Vite and Next.js do this out of the box).
 
 ## License
 

@@ -15,6 +15,33 @@ navigation guards, error snackbars, and other shared UI state.
 - `useRef<T>()` needs an explicit initial value under React 19 + strict TS
   (e.g. `useRef<T>(undefined)`).
 
+## Render purity (react-doctor 0.7 gate)
+
+Refs must **not** be written during render — react-doctor 0.7 flags it, and the
+100/100 gate fails. The sanctioned idioms (used across the codebase; reference
+shape: `src/components/api-keys/BlockKeyDialog.tsx`):
+
+1. **Reset-on-open dialogs** — track the previous `open` inside an effect:
+
+   ```tsx
+   const prevOpenRef = useRef(false);
+   useEffect(() => {
+     if (open && !prevOpenRef.current) {
+       reset(defaults);
+     }
+     prevOpenRef.current = open;
+   });
+   ```
+
+2. **Latest-value refs** — sync in an effect, not during render:
+   `useEffect(() => { stateRef.current = state; });`
+
+3. **Server-state sync** — wrap the prev-value compare + `setState` in an
+   effect.
+
+Copying the pre-2026-07 render-time versions of these patterns will fail the
+gate.
+
 ## Read-only / write-permission seam (`useReadOnly`)
 
 `useReadOnly()` is the **canonical** way a component reflects the current user's

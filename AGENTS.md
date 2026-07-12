@@ -24,12 +24,13 @@ entity, Site, Actor, publish lifecycle, validation seam).
 | [`backend/`](backend/AGENTS.md) | REST API — the system of record | Rust · Axum 0.8 · SQLx · PostgreSQL · Redis |
 | [`admin/`](admin/AGENTS.md) | Admin dashboard SPA | React 19 · MUI v9 · Vite · TanStack Query · Clerk |
 | [`libs/`](libs/AGENTS.md) | Shared TS packages (`@forjacms/*`) | analytics · client SDK · sections · sections-react |
-| [`templates/astro-blog/`](templates/astro-blog/AGENTS.md) | Reference public site | Astro 5 SSR |
+| [`templates/astro-blog/`](templates/astro-blog/AGENTS.md) | Reference public site | Astro 7 SSR |
 | [`e2e/`](e2e/AGENTS.md) | End-to-end BDD suite | Cucumber + Playwright |
 | [`docs/`](docs/AGENTS.md) | Documentation site | Docusaurus |
 | [`scripts/`](scripts/AGENTS.md) | Dev/release helper scripts | Bash |
 
-Other top-level files: `docker-compose.*.yaml` (local infra + prod), `Dockerfile`,
+Other top-level files: `docker-compose.dev.yaml`, `docker-compose.yml`,
+`docker-compose.prod.yml` (local infra + prod), `Dockerfile`,
 `railway.toml` (deploy), `rust-toolchain.toml` (Rust 1.97), `.nvmrc` (Node 24).
 
 ## Cross-cutting conventions
@@ -40,12 +41,18 @@ Other top-level files: `docker-compose.*.yaml` (local infra + prod), `Dockerfile
 - **Never edit an existing migration.** Add a new one. Migrations are
   irreversible and may already be applied in production.
 - **Soft-delete + Trash.** Blogs, pages, media, documents, legal, social links,
-  and navigation soft-delete to a 30-day Trash. (Portfolio/projects/forms/
-  collections currently soft-delete *without* a Trash entry — see open issues.)
+  navigation, portfolio projects, CV entries, and skills soft-delete to a 30-day
+  Trash (`backend/src/services/trash_service.rs`). (Forms and collections
+  currently soft-delete *without* a Trash entry — see open issues.)
 - **Validation seam.** Backend DTOs use a `ValidatedJson<T>` extractor; never the
   raw `Json<T>`. CI enforces this.
 - **OpenAPI is the contract.** Backend handlers are annotated with utoipa; the
-  admin's `src/generated/api-types.ts` is generated from that spec.
+  admin's `src/generated/api-types.ts` is generated from that spec. After *any*
+  utoipa/DTO change, run `npm run generate:openapi` in `admin/` and commit the
+  regenerated `admin/src/generated/api-types.ts` — or CI fails.
+- **Backend integration tests need PostgreSQL 16+** (a migration uses
+  `NULLS NOT DISTINCT`; PG14 fails). `TEST_DATABASE_URL` defaults to
+  `postgres://forja:forja@localhost:5432/forja_test`.
 - **Accessibility:** target WCAG 2.1 AA. **Test IDs:** add `data-testid` to UI
   for e2e; don't rely on CSS selectors.
 

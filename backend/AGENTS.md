@@ -8,7 +8,7 @@ database. Runs on `:8000`; Swagger UI at `/api-docs`.
 
 ```bash
 cargo run                     # start server (:8000)
-cargo test                    # tests (cargo test NAME for one)
+cargo test                    # tests (cargo test NAME for one) — tests/ need live PostgreSQL 16+ via TEST_DATABASE_URL (default postgres://forja:forja@localhost:5432/forja_test)
 cargo clippy -- -D warnings   # lint (warnings are errors)
 cargo fmt                     # format
 sqlx migrate run              # apply migrations
@@ -24,6 +24,7 @@ Request flow: **handler → model/repo → DTO**.
 |-----|------|
 | [`src/axum_app/handlers/`](src/axum_app/handlers/AGENTS.md) | Route handlers; `#[utoipa::path]` + `OpenApiRouter`. No SQL inline. |
 | `src/axum_app/middleware/` | Tower layers: security headers, CORS, rate-limit, usage tracking. |
+| `src/middleware/` | Cross-stack rate-limit internals (atomics, CORS resolution helpers). |
 | `src/axum_app/extractors.rs` | `FromRequestParts` impls — auth, `ModuleGuard`, `CurrentSite`. |
 | [`src/models/`](src/models/AGENTS.md) | Business logic + SQLx queries. |
 | [`src/repos/`](src/repos/AGENTS.md) | Data-access abstractions over SQLx. |

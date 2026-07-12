@@ -130,6 +130,80 @@ const privacy = await forja.legal.getBySlug('privacy-policy');
 const consent = await forja.legal.getCookieConsent();
 ```
 
+### Projects
+
+```typescript
+// Published portfolio projects (paginated)
+const projects = await forja.projects.listPublished({ page: 1 });
+
+// Single project by id or slug (returns null if not found)
+const project = await forja.projects.get('project-uuid');
+const bySlug = await forja.projects.getBySlug('my-project');
+```
+
+### Redirects
+
+```typescript
+// Path-based lookup for SSR middleware (returns null if no redirect)
+const redirect = await forja.redirects.lookup('/old-path');
+```
+
+### Site
+
+```typescript
+// Site metadata
+const site = await forja.site.get();
+
+// Configured locales (SiteLocaleResponse[], see below)
+const locales = await forja.site.listLocales();
+
+// Head/body code injection snippets
+const injection = await forja.site.getCodeInjection();
+```
+
+### Media
+
+```typescript
+// Media library (paginated)
+const media = await forja.media.list({ page: 1 });
+
+// Single media item (returns null if not found)
+const item = await forja.media.get('media-uuid');
+```
+
+### Social
+
+```typescript
+// Social media links (GitHub, LinkedIn, ...)
+const links = await forja.social.list();
+```
+
+### Forms
+
+```typescript
+// Form definition + ALTCHA challenge
+const form = await forja.forms.getForm('contact');
+const challenge = await forja.forms.getAltchaChallenge('contact');
+
+// Submit
+await forja.forms.submitForm('contact', payload);
+
+// GDPR self-service: look up / fetch / delete a submission by reference code
+const lookup = await forja.forms.lookupSubmission('ref-code');
+const submission = await forja.forms.getSubmission('ref-code');
+await forja.forms.deleteSubmission('ref-code');
+```
+
+### Collections (Custom Types)
+
+`collections(typeKey)` returns a resource scoped to a per-site custom type:
+
+```typescript
+const recipes = await forja.collections('recipe').published({ page: 1 });
+const one = await forja.collections('recipe').bySlug('spaghetti');
+const schema = await forja.collections('recipe').schema();
+```
+
 ## Site Locales
 
 `SiteLocaleResponse` is the canonical shape returned by every endpoint that
@@ -184,8 +258,6 @@ deliberate: assignment-rate-of-change is much lower than read-rate.
 - ❌ Expecting a top-level `id` (use the `(site_id, locale_id)` composite).
 - ❌ Treating `url_prefix` as required (it's nullable; the default locale typically has none).
 
-See [issue #742](https://github.com/dominikdorfstetter/forja/issues/742) for the canonical-contract discussion.
-
 ## Pagination
 
 All paginated responses include helpers for navigating pages:
@@ -209,10 +281,15 @@ for await (const page of page1) {
 
 The SDK throws typed errors for different failure scenarios:
 
+All errors extend `ForjaError`, so a single `instanceof ForjaError` check catches
+any SDK failure:
+
 ```typescript
 import {
+  ForjaError,
   ForjaAuthError,
   ForjaPermissionError,
+  ForjaNotFoundError,
   ForjaRateLimitError,
   ForjaValidationError,
   ForjaServerError,
@@ -233,7 +310,7 @@ try {
 }
 ```
 
-Methods that fetch a single resource by ID or slug return `null` instead of throwing on 404.
+A 404 maps to `ForjaNotFoundError` — but methods that fetch a single resource by ID or slug catch it and return `null` instead of throwing.
 
 ## Custom Fetch
 
@@ -271,7 +348,7 @@ function BlogList() {
 
 ### Angular (v17+)
 
-The `@forjacms/client/angular` subpath provides Angular DI integration and a signal-based resource helper.
+The `@forjacms/client/angular` subpath provides Angular DI integration and a signal-based resource helper. It requires the optional `@angular/core` peer dependency (`>=17`) — non-Angular consumers don't need it.
 
 **Setup:**
 
