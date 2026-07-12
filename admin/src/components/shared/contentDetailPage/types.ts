@@ -99,6 +99,21 @@ export interface ContentDetailAdapter<TDetail, TFormData extends FieldValues, TL
   updateLocalization: (locId: string, data: Record<string, unknown>) => Promise<unknown>;
   reviewEntity?: (id: string, data: ReviewActionRequest) => Promise<{ message: string }>;
 
+  /**
+   * Optional pre-save hook that can redirect a save to a different target
+   * entity. Legal uses this to transparently fork a new draft version when a
+   * *published* document is edited (auto-versioning, #140): editing published
+   * content never mutates the published record in place — it saves onto a new
+   * draft version instead. Returns the target entity id, the matching
+   * localization id for `localeId` on that target (if any), and an optional
+   * route to navigate to after the save completes. Return `null` to save
+   * against the current entity unchanged.
+   */
+  prepareSaveTarget?: (
+    detail: TDetail,
+    localeId: string,
+  ) => Promise<{ id: string; localizationId?: string; redirectPath?: string } | null>;
+
   /** i18n key namespace for default messages (e.g. `${ns}.messages.saved`). */
   i18nNamespace: string;
 

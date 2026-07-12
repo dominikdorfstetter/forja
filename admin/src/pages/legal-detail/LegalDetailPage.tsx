@@ -48,6 +48,17 @@ const legalAdapter: ContentDetailAdapter<LegalDocumentFullDetailResponse, LegalC
     } as unknown as Parameters<typeof createLegalLocalization>[1]),
   updateLocalization: (locId, data) =>
     updateLegalLocalization(locId, data as unknown as Parameters<typeof updateLegalLocalization>[1]),
+  // Auto-versioning (#140): editing a *published* legal document forks a new
+  // draft version and saves onto it, leaving the published record untouched.
+  // The forked version is a clone, so it already carries a localization for
+  // the current locale — resolve its id so the save updates the draft's text.
+  prepareSaveTarget: async (detail, localeId) => {
+    if (detail.status !== 'Published') return null;
+    const draft = await createLegalVersion(detail.id);
+    const draftDetail = await getLegalDocumentDetail(draft.id);
+    const loc = (draftDetail.localizations ?? []).find((l) => l.locale_id === localeId);
+    return { id: draft.id, localizationId: loc?.id, redirectPath: `/legal/${draft.id}` };
+  },
   i18nNamespace: 'legalDetail',
   getIcon: () => 'gavel',
   getTitle: (detail, t) => detail.slug || detail.cookie_name || t('legalDetail.title'),

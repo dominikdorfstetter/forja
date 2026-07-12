@@ -17,12 +17,13 @@ vi.mock('@/store/SiteContext', () => ({
   SiteProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
+const navigateSpy = vi.fn();
 vi.mock('react-router', async () => {
   const actual = await vi.importActual('react-router');
   return {
     ...actual,
     useParams: () => ({ id: 'fake-1' }),
-    useNavigate: () => vi.fn(),
+    useNavigate: () => navigateSpy,
   };
 });
 
@@ -211,6 +212,57 @@ describe('ContentDetailPage tracer bullet', () => {
         expect.objectContaining({ body: 'Edited body' }),
       );
     });
+  });
+
+  // #140: editing a published document forks a draft version — the save is
+  // routed onto the forked entity's localization and the user is navigated to
+  // the draft, never mutating the published record in place.
+  it('forks the save onto the draft version when prepareSaveTarget redirects', async () => {
+    const publishedDetail: FakeDetail = { ...mockDetail, status: 'Published' };
+    const prepareSaveTarget = vi
+      .fn()
+      .mockResolvedValue({ id: 'fake-2', localizationId: 'loc-2', redirectPath: '/fakes/fake-2' });
+    const mocks: AdapterMocks = {
+      fetchDetail: vi.fn().mockResolvedValue(publishedDetail),
+      updateEntity: vi.fn().mockResolvedValue({}),
+      createLocalization: vi.fn(),
+      updateLocalization: vi.fn().mockResolvedValue({}),
+    };
+    const adapter = { ...buildAdapter(mocks), prepareSaveTarget };
+    vi.mocked(getSiteLocales).mockResolvedValue([mockLocale]);
+
+    renderWithProviders(
+      <ContentDetailPage
+        adapter={adapter}
+        renderToolbar={({ setValue }) => (
+          <button
+            type="button"
+            data-testid="set-body"
+            onClick={() => setValue('body', 'New published edit', { shouldDirty: true })}
+          >
+            Edit
+          </button>
+        )}
+        renderEditor={() => <div data-testid="editor-slot" />}
+        renderStandardDialogs={() => null}
+      />,
+    );
+
+    await waitFor(() => expect(screen.getByTestId('set-body')).toBeInTheDocument());
+    const user = userEvent.setup();
+    await user.click(screen.getByTestId('set-body'));
+    await user.click(await screen.findByTestId('save-fake'));
+
+    await waitFor(() => {
+      // The edit landed on the forked draft's localization (loc-2), NOT the
+      // published record's localization (loc-1).
+      expect(mocks.updateLocalization).toHaveBeenCalledWith(
+        'loc-2',
+        expect.objectContaining({ body: 'New published edit' }),
+      );
+    });
+    expect(prepareSaveTarget).toHaveBeenCalledWith(publishedDetail, 'locale-1');
+    expect(navigateSpy).toHaveBeenCalledWith('/fakes/fake-2');
   });
 
   // #783: a rejected entity-status update must not abort the localization

@@ -147,6 +147,7 @@ pub const SITE_OWNER_CANNOT_LEAVE: &str = "SITE_OWNER_CANNOT_LEAVE";
 pub const LEGAL_PUBLISH_MISSING_TITLE: &str = "LEGAL_PUBLISH_MISSING_TITLE";
 pub const LEGAL_PUBLISH_MISSING_BODY: &str = "LEGAL_PUBLISH_MISSING_BODY";
 pub const LEGAL_VERSION_SOURCE_DELETED: &str = "LEGAL_VERSION_SOURCE_DELETED";
+pub const LEGAL_PUBLISHED_IMMUTABLE: &str = "LEGAL_PUBLISHED_IMMUTABLE";
 
 // ── CV / Portfolio ──────────────────────────────────────────────────────
 
@@ -720,6 +721,12 @@ pub const ALL: &[ErrorCodeDef] = &[
         domain: "legal",
         http_status: 404,
         description: "Cannot create a version from a deleted document",
+    },
+    ErrorCodeDef {
+        code: LEGAL_PUBLISHED_IMMUTABLE,
+        domain: "legal",
+        http_status: 409,
+        description: "A published legal document cannot be edited in place; create a new version",
     },
     // CV
     ErrorCodeDef {
