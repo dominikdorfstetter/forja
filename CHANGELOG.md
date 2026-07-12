@@ -6,6 +6,20 @@ Forja is a GDPR-first, multi-tenant headless CMS — a Rust (Axum) backend and a
 
 ## [Unreleased]
 
+## [2.0.6] — 2026-07-12
+
+GDPR data-subject-request tooling for operators, a rebuilt legal-document versioning flow, and two admin bug fixes.
+
+### Added
+
+- **Self-service and operator DSR tooling (GDPR Art. 17 & 20).** Account deletion now erases every identity-bearing built-in field — media uploads (`uploaded_by`), AI-usage attribution (`actor_id`), and moderation records join the existing content/membership/audit erasure, all in one transaction — so no attributable data survives a deletion. Self-service and the banned-user purge run the same erasure. The data export (`GET /auth/export`) gained `media` and `ai_usage` sections. System admins can now fulfil DSRs on behalf of a user: `GET /admin/users/{id}/export` and `DELETE /admin/users/{id}/account` (sole-owner-guarded, master/system-admin only), surfaced as "Export data (GDPR)" and "Delete account (GDPR)" actions on System → Users. Every DSR action — self and on-behalf, export and delete — writes an audit row (Art. 30).
+
+### Fixed
+
+- **Legal document versioning works end-to-end.** Creating a new version no longer produces an orphan: the version keeps the document's identity (cookie name) instead of a `_copy` rename, and the public by-slug resolver now returns the currently-published version of a chain — so publishing a new version supersedes the old one at the same URL while the old version is preserved. Editing a published legal document is now safe: the backend rejects in-place edits of published documents (`LEGAL_PUBLISHED_IMMUTABLE`), and the admin transparently forks a new draft version on edit, so the published record is never silently overwritten.
+- **Assets → Documents no longer crashes to the error boundary.** A document detail arriving without a localizations array threw during render (`Cannot read properties of undefined`) and blanked the entire page; a single non-conforming document now degrades to a filename fallback instead. The same guard was applied to the document edit dialog.
+- **Create Project wizard no longer dead-ends on the last step.** Clicking Create with an invalid field (most reproducibly, a non-Latin title that slugifies to an empty slug) silently did nothing; the wizard now renders an editable slug field, validates per step, and jumps back to the step that owns the first invalid field so the error is visible.
+
 ## [2.0.5] — 2026-07-12
 
 Completes the 2.0.4 release. The 2.0.4 publish was interrupted: `@forjacms/sections` failed its pre-publish test gate, and the `v2.0.4` tag was consumed by the immutable-releases protection while re-targeting the release, so it cannot be reissued. `@forjacms/client` and `@forjacms/analytics` 2.0.4 reached npm; 2.0.5 is the first complete release of the 2.0.4 changes across all packages.
@@ -185,7 +199,8 @@ _The 0.x milestones below condense the early build-out; development then continu
 - The first Astro-based reference template.
 - Docker and Docker Compose for local development, and the initial CI pipeline.
 
-[Unreleased]: https://github.com/dominikdorfstetter/forja/compare/v2.0.5...HEAD
+[Unreleased]: https://github.com/dominikdorfstetter/forja/compare/v2.0.6...HEAD
+[2.0.6]: https://github.com/dominikdorfstetter/forja/compare/v2.0.5...v2.0.6
 [2.0.5]: https://github.com/dominikdorfstetter/forja/compare/v2.0.3...v2.0.5
 [2.0.4]: https://github.com/dominikdorfstetter/forja/compare/v2.0.3...bea7e8a1646406f5c069bab2d648110be4aec05e
 [2.0.3]: https://github.com/dominikdorfstetter/forja/compare/v2.0.2...v2.0.3
