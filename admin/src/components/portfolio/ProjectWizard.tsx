@@ -124,9 +124,30 @@ interface ProjectWizardProps {
   loading: boolean;
 }
 
-const BASICS_FIELDS: (keyof ProjectWizardFormData)[] = [];
-const CONTENT_FIELDS: (keyof ProjectWizardFormData)[] = [];
-const STEP_FIELD_MAP: (keyof ProjectWizardFormData)[][] = [BASICS_FIELDS, CONTENT_FIELDS, []];
+const BASICS_FIELDS: (keyof ProjectWizardFormData)[] = [
+  'slug',
+  'start_date',
+  'end_date',
+  'display_order',
+  'status',
+];
+const CONTENT_FIELDS: (keyof ProjectWizardFormData)[] = ['short_descriptions', 'descriptions'];
+const RELATIONS_FIELDS: (keyof ProjectWizardFormData)[] = ['skill_ids', 'cv_entry_ids'];
+const STEP_FIELD_MAP: (keyof ProjectWizardFormData)[][] = [
+  BASICS_FIELDS,
+  CONTENT_FIELDS,
+  RELATIONS_FIELDS,
+];
+
+/// Which wizard step owns a given form field — so a validation failure on
+/// the final submit can jump the user back to the step where the offending
+/// field lives instead of silently doing nothing.
+const stepForField = (field: string): number => {
+  const index = STEP_FIELD_MAP.findIndex((fields) => fields.includes(field as keyof ProjectWizardFormData));
+  // `titles` is edited on the basics step but validated manually, not via the
+  // per-step map; fall back to the basics step for it and anything unmapped.
+  return index === -1 ? 0 : index;
+};
 
 export default function ProjectWizard({
   open,
@@ -247,7 +268,15 @@ export default function ProjectWizard({
       if (!valid) return;
     }
     if (ui.activeStep === STEP_KEYS.length - 1) {
-      handleSubmit(onFormSubmit)();
+      // Surface validation failures instead of silently doing nothing: jump to
+      // the step that owns the first invalid field so the user can see and fix
+      // it (e.g. an empty slug from a non-Latin title).
+      handleSubmit(onFormSubmit, (formErrors) => {
+        const firstField = Object.keys(formErrors)[0];
+        if (firstField) {
+          uiDispatch({ type: 'SET_STEP', value: stepForField(firstField) });
+        }
+      })();
       return;
     }
     uiDispatch({ type: 'SET_STEP', value: ui.activeStep + 1 });

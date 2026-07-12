@@ -3988,6 +3988,7 @@
         "linkType": "Type",
         "linkUrl": "URL"
       },
+      "slugHint": "Généré automatiquement à partir du titre ; modifiable si besoin. Minuscules, chiffres et tirets.",
       "discardDialog": {
         "title": "Abandonner les modifications ?",
         "message": "Vous avez des modifications non enregistrées. Êtes-vous sûr de vouloir les abandonner ?",

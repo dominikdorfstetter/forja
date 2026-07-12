@@ -3988,6 +3988,7 @@
         "linkType": "Type",
         "linkUrl": "URL"
       },
+      "slugHint": "Automatisch ingevuld op basis van de titel; pas aan indien nodig. Kleine letters, cijfers en koppeltekens.",
       "discardDialog": {
         "title": "Wijzigingen verwerpen?",
         "message": "U heeft niet-opgeslagen wijzigingen. Weet u zeker dat u deze wilt verwerpen?",

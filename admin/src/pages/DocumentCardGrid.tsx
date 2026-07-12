@@ -100,7 +100,11 @@ function formatUrlPreview(raw: string): string {
 
 export function getDocumentDisplayName(doc: DocumentListItem, detailMap: Map<string, DocumentResponse>): string {
   const detail = detailMap.get(doc.id);
-  if (detail && detail.localizations.length > 0) {
+  // Guard against a detail that arrives without a localizations array: the
+  // contract declares it non-null, but a non-conforming API response (older
+  // backend, legacy row) must degrade to the fallback name — not throw during
+  // render and blank the whole page (#138).
+  if (detail && detail.localizations && detail.localizations.length > 0) {
     return detail.localizations[0].name;
   }
   if (doc.has_file && doc.file_name) {

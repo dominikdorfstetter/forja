@@ -3988,6 +3988,7 @@
         "linkType": "Type",
         "linkUrl": "URL"
       },
+      "slugHint": "Preenchido automaticamente a partir do título; edite se necessário. Minúsculas, números e hífens.",
       "discardDialog": {
         "title": "Descartar Alterações?",
         "message": "Você tem alterações não salvas. Tem certeza de que deseja descartá-las?",

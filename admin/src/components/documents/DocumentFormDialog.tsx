@@ -195,7 +195,7 @@ export default function DocumentFormDialog({
         document_type: document.document_type,
         folder_id: document.folder_id ?? '',
         localizations: activeLocales.map((locale) => {
-          const existing = document.localizations.find((l) => l.locale_id === locale.id);
+          const existing = (document.localizations ?? []).find((l) => l.locale_id === locale.id);
           return {
             locale_id: locale.id,
             name: existing?.name ?? '',
