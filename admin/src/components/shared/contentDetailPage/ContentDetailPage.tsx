@@ -1,5 +1,5 @@
 import { useReducer, useCallback, useEffect, useMemo, useRef, type ReactNode } from 'react';
-import { useParams } from 'react-router';
+import { useParams, useNavigate } from 'react-router';
 import { Alert, Box, Chip, Tab, Tabs } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Trans, useTranslation } from 'react-i18next';
@@ -99,6 +99,7 @@ export default function ContentDetailPage<TDetail, TFormData extends FieldValues
   const { showError, showSuccess } = useErrorSnackbar();
   const { canWrite } = useAuth();
   const { selectedSiteId } = useSiteContext();
+  const navigate = useNavigate();
 
   const [ui, dispatch] = useReducer(uiReducer, initialUIState);
   const { templates: previewTemplates, openPreview } = usePreviewUrl();
@@ -204,7 +205,19 @@ export default function ContentDetailPage<TDetail, TFormData extends FieldValues
   const handleSave = useCallback(async () => {
     if (!detail || !currentLocale) return;
     const values = getValues();
-    const detailId = (detail as unknown as { id: string }).id;
+    const originalId = (detail as unknown as { id: string }).id;
+
+    // Optional fork-on-save: legal auto-versions a published document, so the
+    // save is routed onto a fresh draft version instead of mutating the
+    // published record (#140). `target` carries the new entity id, the
+    // matching localization id for the current locale, and where to navigate.
+    const target = adapter.prepareSaveTarget
+      ? await adapter.prepareSaveTarget(detail, currentLocale.id)
+      : null;
+    const detailId = target?.id ?? originalId;
+    const targetLocId = target
+      ? target.localizationId
+      : (currentLocalization as unknown as { id: string } | undefined)?.id;
 
     // Save the localization first. The entity-status update can be rejected
     // by the backend publish gate (e.g. missing locale coverage); persisting
@@ -221,8 +234,8 @@ export default function ContentDetailPage<TDetail, TFormData extends FieldValues
       const titleField = adapter.getLocTitleField?.(values);
       const dataWithTitle = titleField !== undefined ? { title: titleField, ...locData } : locData;
 
-      if (currentLocalization) {
-        await updateLocMutation.mutateAsync({ locId: (currentLocalization as unknown as { id: string }).id, data: dataWithTitle });
+      if (targetLocId) {
+        await updateLocMutation.mutateAsync({ locId: targetLocId, data: dataWithTitle });
       } else {
         await createLocMutation.mutateAsync({ entityId: detailId, localeId: currentLocale.id, data: dataWithTitle });
       }
@@ -235,6 +248,12 @@ export default function ContentDetailPage<TDetail, TFormData extends FieldValues
 
     reset(values);
     showSuccess(t(`${adapter.i18nNamespace}.messages.saved`));
+
+    // A forked save moved the user's edits onto a new draft version — take
+    // them there so subsequent edits continue on the draft, not the original.
+    if (target?.redirectPath) {
+      navigate(target.redirectPath);
+    }
   }, [
     adapter,
     detail,
@@ -244,6 +263,7 @@ export default function ContentDetailPage<TDetail, TFormData extends FieldValues
     reset,
     showSuccess,
     t,
+    navigate,
     updateEntityMutation,
     updateLocMutation,
     createLocMutation,
