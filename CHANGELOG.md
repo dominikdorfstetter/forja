@@ -6,6 +6,14 @@ Forja is a GDPR-first, multi-tenant headless CMS — a Rust (Axum) backend and a
 
 ## [Unreleased]
 
+## [2.0.5] — 2026-07-12
+
+Completes the 2.0.4 release. The 2.0.4 publish was interrupted: `@forjacms/sections` failed its pre-publish test gate, and the `v2.0.4` tag was consumed by the immutable-releases protection while re-targeting the release, so it cannot be reissued. `@forjacms/client` and `@forjacms/analytics` 2.0.4 reached npm; 2.0.5 is the first complete release of the 2.0.4 changes across all packages.
+
+### Fixed
+
+- **`@forjacms/sections` test suite under Vite 8.1.** Vite 8.1 stopped inheriting the root `oxc` transformer config into Vitest sub-projects, so Stencil's classic `h` JSX factory was no longer applied and every spec render failed ("The tag name provided (undefined) is not a valid name") — which blocked the package from publishing. The classic-JSX config is now set per project in `vitest.config.ts`; remove once `@stencil/vitest` applies it per project upstream.
+
 ## [2.0.4] — 2026-07-12
 
 A bug-fix release for the Legal Documents admin list, with matching client-SDK support for the new list filters and a broad dependency refresh under the hood.
@@ -177,8 +185,9 @@ _The 0.x milestones below condense the early build-out; development then continu
 - The first Astro-based reference template.
 - Docker and Docker Compose for local development, and the initial CI pipeline.
 
-[Unreleased]: https://github.com/dominikdorfstetter/forja/compare/v2.0.4...HEAD
-[2.0.4]: https://github.com/dominikdorfstetter/forja/compare/v2.0.3...v2.0.4
+[Unreleased]: https://github.com/dominikdorfstetter/forja/compare/v2.0.5...HEAD
+[2.0.5]: https://github.com/dominikdorfstetter/forja/compare/v2.0.3...v2.0.5
+[2.0.4]: https://github.com/dominikdorfstetter/forja/compare/v2.0.3...bea7e8a1646406f5c069bab2d648110be4aec05e
 [2.0.3]: https://github.com/dominikdorfstetter/forja/compare/v2.0.2...v2.0.3
 [2.0.2]: https://github.com/dominikdorfstetter/forja/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/dominikdorfstetter/forja/compare/v2.0.0...v2.0.1

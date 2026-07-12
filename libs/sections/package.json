@@ -1,6 +1,6 @@
 {
   "name": "@forjacms/sections",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "Framework-agnostic Web Components for rendering Forja page sections. Zero CSS — bring your own styles via BEM class hooks.",
   "author": "Dominik Dorfstetter <dominik@dorfstetter.at>",
   "type": "module",
