@@ -698,12 +698,7 @@ async fn delete_account(
 
     clerk.delete_user(&clerk_user_id).await?;
 
-    SiteMembership::delete_all_for_clerk_user(&state.db, &clerk_user_id).await?;
-
-    UserPreferences::delete(&state.db, &clerk_user_id).await?;
-
-    crate::repos::user_data_repo::anonymize_user_records(&state.db, &clerk_user_id, auth.id)
-        .await?;
+    crate::repos::user_data_repo::erase_user_records(&state.db, &clerk_user_id, auth.id).await?;
 
     Ok(StatusCode::NO_CONTENT)
 }

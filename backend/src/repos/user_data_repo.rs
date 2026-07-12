@@ -105,10 +105,14 @@ pub async fn authored_content_counts(
     })
 }
 
-/// Account deletion: drop system-admin status and null every reference to
-/// the user across api_keys, audit_logs, change_history, authored contents,
-/// membership invites, site provenance and notifications, atomically.
-pub async fn anonymize_user_records(
+/// Full account erasure (GDPR Art. 17): drop system-admin status, null every
+/// reference to the user across api_keys, audit_logs, change_history,
+/// authored contents, media uploads, AI usage, membership invites, site
+/// provenance, notifications and moderation actions, and delete the rows
+/// that exist only to describe the user (memberships, preferences, their
+/// own moderation record) — atomically. Shared by self-service deletion,
+/// admin-fulfilled DSRs and the banned-user purge.
+pub async fn erase_user_records(
     pool: &PgPool,
     clerk_user_id: &str,
     user_id: Uuid,
@@ -136,6 +140,17 @@ pub async fn anonymize_user_records(
         .execute(&mut *tx)
         .await?;
 
+    // Identity fields keyed by the actor UUID (#3): media uploads and AI
+    // usage attribution.
+    sqlx::query("UPDATE media_files SET uploaded_by = NULL WHERE uploaded_by = $1")
+        .bind(user_id)
+        .execute(&mut *tx)
+        .await?;
+    sqlx::query("UPDATE ai_usage_logs SET actor_id = NULL WHERE actor_id = $1")
+        .bind(user_id)
+        .execute(&mut *tx)
+        .await?;
+
     // Built-in identity fields keyed by Clerk id (#19): authored content,
     // invitation attribution, site provenance, notification identities.
     anonymize_authored_content_on(&mut tx, clerk_user_id).await?;
@@ -154,6 +169,25 @@ pub async fn anonymize_user_records(
         .execute(&mut *tx)
         .await?;
     sqlx::query("UPDATE notifications SET actor_clerk_id = NULL WHERE actor_clerk_id = $1")
+        .bind(clerk_user_id)
+        .execute(&mut *tx)
+        .await?;
+
+    // Rows whose purpose is the user themself go entirely; on other users'
+    // moderation rows only the acting-admin attribution is nulled (#3).
+    sqlx::query("DELETE FROM site_memberships WHERE clerk_user_id = $1")
+        .bind(clerk_user_id)
+        .execute(&mut *tx)
+        .await?;
+    sqlx::query("DELETE FROM user_preferences WHERE clerk_user_id = $1")
+        .bind(clerk_user_id)
+        .execute(&mut *tx)
+        .await?;
+    sqlx::query("DELETE FROM user_moderation WHERE clerk_user_id = $1")
+        .bind(clerk_user_id)
+        .execute(&mut *tx)
+        .await?;
+    sqlx::query("UPDATE user_moderation SET status_changed_by = NULL WHERE status_changed_by = $1")
         .bind(clerk_user_id)
         .execute(&mut *tx)
         .await?;
@@ -245,6 +279,18 @@ pub async fn pii_record_counts(
         SELECT 'api_keys', 'created_by', COUNT(*)::BIGINT FROM api_keys WHERE created_by = $2
         UNION ALL
         SELECT 'sites', 'created_by', COUNT(*)::BIGINT FROM sites WHERE created_by = $1
+        UNION ALL
+        SELECT 'media_files', 'uploaded_by', COUNT(*)::BIGINT
+            FROM media_files WHERE uploaded_by = $2
+        UNION ALL
+        SELECT 'ai_usage_logs', 'actor_id', COUNT(*)::BIGINT
+            FROM ai_usage_logs WHERE actor_id = $2
+        UNION ALL
+        SELECT 'user_moderation', 'clerk_user_id', COUNT(*)::BIGINT
+            FROM user_moderation WHERE clerk_user_id = $1
+        UNION ALL
+        SELECT 'user_moderation', 'status_changed_by', COUNT(*)::BIGINT
+            FROM user_moderation WHERE status_changed_by = $1
         "#,
     )
     .bind(clerk_user_id)

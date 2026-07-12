@@ -448,9 +448,13 @@ async fn delete_banned_user(
         );
     }
 
-    SiteMembership::delete_all_for_clerk_user(&state.db, &clerk_user_id).await?;
-    crate::repos::user_data_repo::anonymize_authored_content(&state.db, &clerk_user_id).await?;
-    UserModeration::delete_for_user(&state.db, &clerk_user_id).await?;
+    // Same full erasure as self-service deletion — the banned-user purge
+    // must not leave more identity behind than a voluntary one (#3).
+    let actor_uuid = uuid::Uuid::new_v5(
+        &crate::guards::auth_guard::CLERK_UUID_NAMESPACE,
+        clerk_user_id.as_bytes(),
+    );
+    crate::repos::user_data_repo::erase_user_records(&state.db, &clerk_user_id, actor_uuid).await?;
 
     if let Some(clerk) = state.clerk_service.as_ref() {
         clerk.delete_user(&clerk_user_id).await?;
