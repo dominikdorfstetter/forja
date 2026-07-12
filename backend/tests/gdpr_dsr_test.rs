@@ -128,6 +128,188 @@ async fn export_includes_media_and_ai_usage_sections() {
     assert_eq!(usage[0]["action"], "seo");
 }
 
+// ── On-behalf DSR fulfilment ─────────────────────────────────────────────
+
+fn clerk_actor_uuid(clerk_user_id: &str) -> Uuid {
+    Uuid::new_v5(
+        &forja::guards::auth_guard::CLERK_UUID_NAMESPACE,
+        clerk_user_id.as_bytes(),
+    )
+}
+
+async fn audit_rows_with_dsr_action(pool: &PgPool, action: &str, target: &str) -> i64 {
+    sqlx::query_scalar(
+        r#"
+        SELECT COUNT(*) FROM audit_logs
+        WHERE metadata->>'action' = $1 AND metadata->>'target' = $2
+        "#,
+    )
+    .bind(action)
+    .bind(target)
+    .fetch_one(pool)
+    .await
+    .expect("count dsr audit rows")
+}
+
+#[tokio::test]
+async fn admin_can_export_a_users_data_on_their_behalf() {
+    let ctx = common::test_context().await;
+    let site_id = common::create_test_site(&ctx.pool).await;
+    let master_key = common::create_test_api_key(
+        &ctx.pool,
+        site_id,
+        forja::models::api_key::ApiKeyPermission::Master,
+    )
+    .await;
+
+    let target = format!("clerk_target_{}", Uuid::new_v4());
+    SiteMembership::create(&ctx.pool, &target, site_id, &SiteRole::Editor, None)
+        .await
+        .expect("create target membership");
+    insert_media_uploaded_by(&ctx.pool, clerk_actor_uuid(&target)).await;
+    UserPreferences::upsert(&ctx.pool, &target, serde_json::json!({"language": "fr"}))
+        .await
+        .expect("upsert target preferences");
+
+    let response = ctx
+        .server
+        .get(&format!("/api/v1/admin/users/{target}/export"))
+        .add_header("x-api-key", master_key.as_str())
+        .await;
+    response.assert_status_ok();
+
+    let body: serde_json::Value = response.json();
+    assert_eq!(body["profile"]["id"], target.as_str());
+    assert_eq!(body["media"].as_array().expect("media").len(), 1);
+    assert_eq!(
+        body["memberships"].as_array().expect("memberships").len(),
+        1
+    );
+
+    assert_eq!(
+        audit_rows_with_dsr_action(&ctx.pool, "dsr_export", &target).await,
+        1,
+        "on-behalf export must leave an audit trail"
+    );
+}
+
+#[tokio::test]
+async fn non_admin_keys_cannot_use_dsr_endpoints() {
+    let ctx = common::test_context().await;
+    let site_id = common::create_test_site(&ctx.pool).await;
+    let write_key = common::create_test_api_key(
+        &ctx.pool,
+        site_id,
+        forja::models::api_key::ApiKeyPermission::Write,
+    )
+    .await;
+    let target = format!("clerk_target_{}", Uuid::new_v4());
+
+    let export = ctx
+        .server
+        .get(&format!("/api/v1/admin/users/{target}/export"))
+        .add_header("x-api-key", write_key.as_str())
+        .await;
+    export.assert_status_forbidden();
+
+    let delete = ctx
+        .server
+        .delete(&format!("/api/v1/admin/users/{target}/account"))
+        .add_header("x-api-key", write_key.as_str())
+        .await;
+    delete.assert_status_forbidden();
+}
+
+#[tokio::test]
+async fn dsr_delete_erases_the_target_and_writes_an_audit_trail() {
+    let ctx = common::test_context().await;
+    let site_id = common::create_test_site(&ctx.pool).await;
+    let master_key = common::create_test_api_key(
+        &ctx.pool,
+        site_id,
+        forja::models::api_key::ApiKeyPermission::Master,
+    )
+    .await;
+
+    let target = format!("clerk_target_{}", Uuid::new_v4());
+    SiteMembership::create(&ctx.pool, &target, site_id, &SiteRole::Viewer, None)
+        .await
+        .expect("create target membership");
+    let media_id = insert_media_uploaded_by(&ctx.pool, clerk_actor_uuid(&target)).await;
+    UserPreferences::upsert(&ctx.pool, &target, serde_json::json!({"language": "it"}))
+        .await
+        .expect("upsert target preferences");
+
+    let response = ctx
+        .server
+        .delete(&format!("/api/v1/admin/users/{target}/account"))
+        .add_header("x-api-key", master_key.as_str())
+        .await;
+    response.assert_status(axum::http::StatusCode::NO_CONTENT);
+
+    let memberships: i64 =
+        sqlx::query_scalar("SELECT COUNT(*) FROM site_memberships WHERE clerk_user_id = $1")
+            .bind(&target)
+            .fetch_one(&ctx.pool)
+            .await
+            .expect("count memberships");
+    assert_eq!(memberships, 0);
+
+    let preferences: i64 =
+        sqlx::query_scalar("SELECT COUNT(*) FROM user_preferences WHERE clerk_user_id = $1")
+            .bind(&target)
+            .fetch_one(&ctx.pool)
+            .await
+            .expect("count preferences");
+    assert_eq!(preferences, 0);
+
+    let uploaded_by: Option<Uuid> =
+        sqlx::query_scalar("SELECT uploaded_by FROM media_files WHERE id = $1")
+            .bind(media_id)
+            .fetch_one(&ctx.pool)
+            .await
+            .expect("fetch media");
+    assert_eq!(uploaded_by, None);
+
+    assert_eq!(
+        audit_rows_with_dsr_action(&ctx.pool, "dsr_delete", &target).await,
+        1,
+        "on-behalf deletion must leave an audit trail"
+    );
+}
+
+#[tokio::test]
+async fn dsr_delete_refuses_a_sole_site_owner() {
+    let ctx = common::test_context().await;
+    let site_id = common::create_test_site(&ctx.pool).await;
+    let master_key = common::create_test_api_key(
+        &ctx.pool,
+        site_id,
+        forja::models::api_key::ApiKeyPermission::Master,
+    )
+    .await;
+
+    let target = format!("clerk_owner_{}", Uuid::new_v4());
+    SiteMembership::create(&ctx.pool, &target, site_id, &SiteRole::Owner, None)
+        .await
+        .expect("create sole-owner membership");
+
+    let response = ctx
+        .server
+        .delete(&format!("/api/v1/admin/users/{target}/account"))
+        .add_header("x-api-key", master_key.as_str())
+        .await;
+    response.assert_status(axum::http::StatusCode::CONFLICT);
+
+    let memberships: i64 =
+        sqlx::query_scalar("SELECT COUNT(*) FROM site_memberships WHERE clerk_user_id = $1")
+            .bind(&target)
+            .fetch_one(&ctx.pool)
+            .await
+            .expect("count memberships");
+    assert_eq!(memberships, 1, "nothing may be erased on refusal");
+}
+
 // ── Erasure parity ───────────────────────────────────────────────────────
 
 #[tokio::test]

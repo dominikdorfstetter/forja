@@ -46,6 +46,7 @@ pub mod trash_cleanup;
 pub mod trash_service;
 pub mod url_validation;
 pub mod usage_aggregation;
+pub mod user_export;
 pub mod webhook_flush_worker;
 pub mod webhook_retry_worker;
 pub mod webhook_service;
