@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import {
   TextField,
   FormControlLabel,
@@ -41,15 +41,17 @@ export default function MenuFormDialog({ open, menu, onSubmitCreate, onSubmitUpd
   });
 
   const prevOpenRef = useRef(false);
-  if (open && !prevOpenRef.current) {
-    reset(menu ? {
-      slug: menu.slug,
-      description: menu.description || '',
-      max_depth: menu.max_depth,
-      is_active: menu.is_active,
-    } : { slug: '', description: '', max_depth: 3, is_active: true });
-  }
-  prevOpenRef.current = open;
+  useEffect(() => {
+    if (open && !prevOpenRef.current) {
+      reset(menu ? {
+        slug: menu.slug,
+        description: menu.description || '',
+        max_depth: menu.max_depth,
+        is_active: menu.is_active,
+      } : { slug: '', description: '', max_depth: 3, is_active: true });
+    }
+    prevOpenRef.current = open;
+  });
 
   const onFormSubmit = (data: MenuFormData) => {
     if (menu) {

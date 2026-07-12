@@ -189,10 +189,12 @@ export default function MediaPage() {
 
   // Reset page when search query changes
   const prevSearchRef = useRef(state.debouncedSearch);
-  if (prevSearchRef.current !== state.debouncedSearch) {
-    prevSearchRef.current = state.debouncedSearch;
-    dispatch({ type: 'SET_PAGE', payload: 1 });
-  }
+  useEffect(() => {
+    if (prevSearchRef.current !== state.debouncedSearch) {
+      prevSearchRef.current = state.debouncedSearch;
+      dispatch({ type: 'SET_PAGE', payload: 1 });
+    }
+  });
 
   // Build query params for server-side filtering
   const queryParams: Record<string, string | number> = { page: state.page, page_size: state.pageSize };

@@ -1,4 +1,4 @@
-import { useReducer, useRef } from 'react';
+import { useEffect, useReducer, useRef } from 'react';
 import { Step, StepLabel, Stepper } from '@mui/material';
 import FormDialog from '@/components/shared/FormDialog';
 import { M3Button } from '@/components/design-system';
@@ -136,18 +136,20 @@ export default function SiteCreationWizard({
 
   // Reset when dialog opens
   const prevOpenRef = useRef(false);
-  if (open && !prevOpenRef.current) {
-    uiDispatch({ type: 'RESET' });
-    reset({
-      name: '',
-      slug: '',
-      description: '',
-      timezone: 'UTC',
-      modules: defaultModules ?? { blog: true, pages: true, portfolio: false, legal: false, documents: false, forms: false, ai: false },
-      workflowMode: defaultWorkflowMode ?? 'solo',
-    });
-  }
-  prevOpenRef.current = open;
+  useEffect(() => {
+    if (open && !prevOpenRef.current) {
+      uiDispatch({ type: 'RESET' });
+      reset({
+        name: '',
+        slug: '',
+        description: '',
+        timezone: 'UTC',
+        modules: defaultModules ?? { blog: true, pages: true, portfolio: false, legal: false, documents: false, forms: false, ai: false },
+        workflowMode: defaultWorkflowMode ?? 'solo',
+      });
+    }
+    prevOpenRef.current = open;
+  });
 
   // Derive effective default locale from selection
   const effectiveDefaultLocaleId = (() => {

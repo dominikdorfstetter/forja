@@ -184,15 +184,17 @@ export default function SectionEditorDialog({ open, section, onClose, embedded, 
 
   // Initialize section metadata when dialog opens or section changes
   const prevSectionRef = useRef<{ open: boolean; sectionId: string | null }>({ open: false, sectionId: null });
-  const currentSectionKey = `${open}-${section?.id ?? null}`;
-  const prevSectionKey = `${prevSectionRef.current.open}-${prevSectionRef.current.sectionId}`;
-  if (currentSectionKey !== prevSectionKey) {
-    prevSectionRef.current = { open, sectionId: section?.id ?? null };
-    if (open && section) {
-      dispatch({ type: 'INIT_SECTION', coverImageId: section.cover_image_id || '', ctaRoute: section.call_to_action_route || '', settings: section.settings ? { ...section.settings } : {} });
-      dirtyLocalesRef.current.clear();
+  useEffect(() => {
+    const currentSectionKey = `${open}-${section?.id ?? null}`;
+    const prevSectionKey = `${prevSectionRef.current.open}-${prevSectionRef.current.sectionId}`;
+    if (currentSectionKey !== prevSectionKey) {
+      prevSectionRef.current = { open, sectionId: section?.id ?? null };
+      if (open && section) {
+        dispatch({ type: 'INIT_SECTION', coverImageId: section.cover_image_id || '', ctaRoute: section.call_to_action_route || '', settings: section.settings ? { ...section.settings } : {} });
+        dirtyLocalesRef.current.clear();
+      }
     }
-  }
+  });
 
   useEffect(() => {
     if (localizations && currentLocale) {

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Box } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
@@ -67,24 +67,26 @@ export default function ContentPage() {
   });
 
   const prevRef = useRef<typeof settings>(undefined);
-  if (settings && settings !== prevRef.current) {
-    prevRef.current = settings;
-    reset({
-      max_document_file_size_mb: Math.round(settings.max_document_file_size / BYTES_PER_MB),
-      max_media_file_size_mb: Math.round(settings.max_media_file_size / BYTES_PER_MB),
-      maintenance_mode: settings.maintenance_mode,
-      contact_email: settings.contact_email,
-      editorial_workflow_enabled: settings.editorial_workflow_enabled,
-      document_password_min_length: settings.document_password_min_length ?? 8,
-      document_password_regex: settings.document_password_regex ?? '',
-    });
-    setPreviewTemplates((settings.preview_templates ?? []).map(pt => ({
-      ...pt,
-      _id: templateIdCounter.current++,
-      is_builtin: pt.is_builtin ?? false,
-    })));
-    setPreviewTemplatesDirty(false);
-  }
+  useEffect(() => {
+    if (settings && settings !== prevRef.current) {
+      prevRef.current = settings;
+      reset({
+        max_document_file_size_mb: Math.round(settings.max_document_file_size / BYTES_PER_MB),
+        max_media_file_size_mb: Math.round(settings.max_media_file_size / BYTES_PER_MB),
+        maintenance_mode: settings.maintenance_mode,
+        contact_email: settings.contact_email,
+        editorial_workflow_enabled: settings.editorial_workflow_enabled,
+        document_password_min_length: settings.document_password_min_length ?? 8,
+        document_password_regex: settings.document_password_regex ?? '',
+      });
+      setPreviewTemplates((settings.preview_templates ?? []).map(pt => ({
+        ...pt,
+        _id: templateIdCounter.current++,
+        is_builtin: pt.is_builtin ?? false,
+      })));
+      setPreviewTemplatesDirty(false);
+    }
+  }, [settings, reset]);
 
   const mutation = useMutation({
     mutationFn: (data: UpdateSiteSettingsRequest) =>
@@ -157,7 +159,8 @@ export default function ContentPage() {
           memberCount={members?.length}
           previewTemplates={previewTemplates}
           onAddTemplate={() => {
-            setPreviewTemplates(prev => [...prev, { name: '', url: '', _id: templateIdCounter.current++, is_builtin: false }]);
+            const id = templateIdCounter.current++;
+            setPreviewTemplates(prev => [...prev, { name: '', url: '', _id: id, is_builtin: false }]);
             setPreviewTemplatesDirty(true);
           }}
           onRemoveTemplate={(index) => {

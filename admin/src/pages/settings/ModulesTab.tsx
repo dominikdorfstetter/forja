@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Alert, Box } from '@mui/material';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
@@ -70,20 +70,22 @@ export default function ModulesTab() {
     module_ai_enabled: false,
   });
   const prevSettingsRef = useRef<typeof settings>(undefined);
-  if (settings && settings !== prevSettingsRef.current) {
-    prevSettingsRef.current = settings;
-    setModules({
-      module_blog_enabled: settings.module_blog_enabled,
-      module_pages_enabled: settings.module_pages_enabled,
-      module_portfolio_enabled: settings.module_portfolio_enabled,
-      module_legal_enabled: settings.module_legal_enabled,
-      module_documents_enabled: settings.module_documents_enabled,
-      module_forms_enabled: settings.module_forms_enabled,
-      module_collections_enabled: settings.module_collections_enabled,
-      analytics_enabled: settings.analytics_enabled,
-      module_ai_enabled: settings.module_ai_enabled,
-    });
-  }
+  useEffect(() => {
+    if (settings && settings !== prevSettingsRef.current) {
+      prevSettingsRef.current = settings;
+      setModules({
+        module_blog_enabled: settings.module_blog_enabled,
+        module_pages_enabled: settings.module_pages_enabled,
+        module_portfolio_enabled: settings.module_portfolio_enabled,
+        module_legal_enabled: settings.module_legal_enabled,
+        module_documents_enabled: settings.module_documents_enabled,
+        module_forms_enabled: settings.module_forms_enabled,
+        module_collections_enabled: settings.module_collections_enabled,
+        analytics_enabled: settings.analytics_enabled,
+        module_ai_enabled: settings.module_ai_enabled,
+      });
+    }
+  }, [settings]);
 
   const mutation = useMutation({
     mutationFn: (data: UpdateSiteSettingsRequest) =>

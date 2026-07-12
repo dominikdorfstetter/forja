@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import {
   TextField,
   FormControlLabel,
@@ -56,18 +56,20 @@ export default function RedirectFormDialog({
   });
 
   const prevOpenRef = useRef(false);
-  if (open && !prevOpenRef.current) {
-    reset(redirect
-      ? {
-          source_path: redirect.source_path,
-          destination_path: redirect.destination_path,
-          status_code: redirect.status_code as RedirectStatusCode,
-          description: redirect.description || '',
-          is_active: redirect.is_active,
-        }
-      : { source_path: '', destination_path: '', status_code: 301, description: '', is_active: true });
-  }
-  prevOpenRef.current = open;
+  useEffect(() => {
+    if (open && !prevOpenRef.current) {
+      reset(redirect
+        ? {
+            source_path: redirect.source_path,
+            destination_path: redirect.destination_path,
+            status_code: redirect.status_code as RedirectStatusCode,
+            description: redirect.description || '',
+            is_active: redirect.is_active,
+          }
+        : { source_path: '', destination_path: '', status_code: 301, description: '', is_active: true });
+    }
+    prevOpenRef.current = open;
+  });
 
   const onFormSubmit = (data: RedirectFormData) => {
     if (redirect && onSubmitUpdate) {

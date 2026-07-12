@@ -123,27 +123,33 @@ export default function SiteFormDialog({ open, site, onSubmit, onClose, loading 
   });
 
   const prevOpenRef = useRef(false);
-  if (open && !prevOpenRef.current) {
-    clear();
-    reset(site ? {
-      name: site.name,
-      slug: site.slug,
-      description: site.description || '',
-      timezone: site.timezone,
-    } : {
-      name: '',
-      slug: '',
-      description: '',
-      timezone: 'UTC',
-    });
-    if (!site) {
-      setSelectedLocales([]);
-      setDefaultLocaleId(null);
-      setLocaleError(null);
+  useEffect(() => {
+    let snapshotTimer: ReturnType<typeof setTimeout> | undefined;
+    if (open && !prevOpenRef.current) {
+      clear();
+      reset(site ? {
+        name: site.name,
+        slug: site.slug,
+        description: site.description || '',
+        timezone: site.timezone,
+      } : {
+        name: '',
+        slug: '',
+        description: '',
+        timezone: 'UTC',
+      });
+      if (!site) {
+        setSelectedLocales([]);
+        setDefaultLocaleId(null);
+        setLocaleError(null);
+      }
+      snapshotTimer = setTimeout(() => snapshot(), 0);
     }
-    setTimeout(() => snapshot(), 0);
-  }
-  prevOpenRef.current = open;
+    prevOpenRef.current = open;
+    // Cleanup only fires on dep change (close) or unmount — the 0 ms snapshot
+    // timer has long fired by then, so this never cancels a pending snapshot.
+    return () => clearTimeout(snapshotTimer);
+  }, [open, site, clear, reset, snapshot]);
 
   const effectiveDefaultLocaleId = (() => {
     if (selectedLocales.length === 0) return null;

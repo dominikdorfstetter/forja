@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import {
   Alert,
   Box,
@@ -106,10 +106,12 @@ export default function PortfolioProjectsSection({
   const [activeId, setActiveId] = useState<string | null>(null);
 
   const prevProjectsRef = useRef<ProjectResponse[] | undefined>(undefined);
-  if (projects && projects !== prevProjectsRef.current) {
-    setOrderedProjects(projects);
-  }
-  prevProjectsRef.current = projects;
+  useEffect(() => {
+    if (projects && projects !== prevProjectsRef.current) {
+      setOrderedProjects(projects);
+    }
+    prevProjectsRef.current = projects;
+  }, [projects]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),

@@ -1,4 +1,4 @@
-import { useMemo, useReducer, useRef } from 'react';
+import { useEffect, useMemo, useReducer, useRef } from 'react';
 import {
   Button,
   Dialog,
@@ -234,12 +234,14 @@ export default function DocumentFormDialog({
 
   // Reset form when dialog opens
   const prevOpenRef = useRef(false);
-  if (open && !prevOpenRef.current) {
-    const defaults = buildDefaults;
-    reset(defaults);
-    formDispatch({ type: 'RESET', sourceType: defaults.source_type });
-  }
-  prevOpenRef.current = open;
+  useEffect(() => {
+    if (open && !prevOpenRef.current) {
+      const defaults = buildDefaults;
+      reset(defaults);
+      formDispatch({ type: 'RESET', sourceType: defaults.source_type });
+    }
+    prevOpenRef.current = open;
+  });
 
   const handleSourceTypeChange = (value: 'link' | 'upload') => {
     formDispatch({ type: 'SET_SOURCE_TYPE', value });

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import {
   Alert, Box, TextField, Button, IconButton, Tooltip,
@@ -85,18 +85,20 @@ export default function OverviewPage() {
 
   const prevSettingsRef = useRef<typeof settings>(undefined);
   const prevSiteRef = useRef<typeof site>(undefined);
-  if (
-    settings && site &&
-    (settings !== prevSettingsRef.current || site !== prevSiteRef.current)
-  ) {
-    prevSettingsRef.current = settings;
-    prevSiteRef.current = site;
-    reset({
-      base_url: site.base_url ?? '',
-      contact_email: settings.contact_email,
-      maintenance_mode: settings.maintenance_mode,
-    });
-  }
+  useEffect(() => {
+    if (
+      settings && site &&
+      (settings !== prevSettingsRef.current || site !== prevSiteRef.current)
+    ) {
+      prevSettingsRef.current = settings;
+      prevSiteRef.current = site;
+      reset({
+        base_url: site.base_url ?? '',
+        contact_email: settings.contact_email,
+        maintenance_mode: settings.maintenance_mode,
+      });
+    }
+  });
 
   const settingsMutation = useMutation({
     mutationFn: (data: { contact_email?: string; maintenance_mode?: boolean }) =>

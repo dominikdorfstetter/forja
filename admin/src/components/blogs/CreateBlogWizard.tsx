@@ -1,4 +1,4 @@
-import { useReducer, useRef, useState, useCallback } from 'react';
+import { useEffect, useReducer, useRef, useState, useCallback } from 'react';
 import {
   Box,
   Button,
@@ -162,7 +162,9 @@ export default function CreateBlogWizard({
   const [regeneratingField, setRegeneratingField] = useState<RegenerateField | null>(null);
   const outlineIdCounter = useRef(0);
   const stateRef = useRef(state);
-  stateRef.current = state;
+  useEffect(() => {
+    stateRef.current = state;
+  });
 
   const defaultLocale = siteLocales?.find((sl) => sl.is_default);
   const defaultLocaleCode = defaultLocale?.code ?? 'en';
@@ -178,12 +180,14 @@ export default function CreateBlogWizard({
   // Auto-sync slug from title when slug hasn't been manually edited
   const watchedTitle = watch('title');
   const prevTitle = useRef('');
-  if (watchedTitle !== prevTitle.current) {
-    prevTitle.current = watchedTitle;
-    if (!slugManuallyEdited.current && watchedTitle) {
-      setValue('slug', slugify(watchedTitle), { shouldValidate: true });
+  useEffect(() => {
+    if (watchedTitle !== prevTitle.current) {
+      prevTitle.current = watchedTitle;
+      if (!slugManuallyEdited.current && watchedTitle) {
+        setValue('slug', slugify(watchedTitle), { shouldValidate: true });
+      }
     }
-  }
+  });
 
   const { scratchMutation, templateMutation, importMutation, aiMutation, isCreating } =
     useBlogWizardMutations({
@@ -195,13 +199,15 @@ export default function CreateBlogWizard({
 
   // Reset when dialog opens
   const prevOpenRef = useRef(false);
-  if (open && !prevOpenRef.current) {
-    dispatch({ type: 'RESET' });
-    outlineIdCounter.current = 0;
-    setRegeneratingField(null);
-    resetForm({ title: '', slug: '', author: userFullName || '' });
-  }
-  prevOpenRef.current = open;
+  useEffect(() => {
+    if (open && !prevOpenRef.current) {
+      dispatch({ type: 'RESET' });
+      outlineIdCounter.current = 0;
+      setRegeneratingField(null);
+      resetForm({ title: '', slug: '', author: userFullName || '' });
+    }
+    prevOpenRef.current = open;
+  }, [open, resetForm, userFullName]);
 
   // --- AI handlers ---
   const handleAiGenerateOutline = async () => {

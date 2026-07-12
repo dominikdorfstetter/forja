@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import {
   TextField,
   FormControlLabel,
@@ -47,10 +47,12 @@ export default function TagFormDialog({
   });
 
   const prevOpenRef = useRef(false);
-  if (open && !prevOpenRef.current) {
-    reset(tag ? { slug: tag.slug, is_global: tag.is_global } : { slug: '', is_global: false });
-  }
-  prevOpenRef.current = open;
+  useEffect(() => {
+    if (open && !prevOpenRef.current) {
+      reset(tag ? { slug: tag.slug, is_global: tag.is_global } : { slug: '', is_global: false });
+    }
+    prevOpenRef.current = open;
+  });
 
   const onFormSubmit = (data: TagFormData) => {
     if (tag && onSubmitUpdate) {

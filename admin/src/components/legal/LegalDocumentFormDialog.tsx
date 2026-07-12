@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import {
   Button,
   Dialog,
@@ -48,15 +48,17 @@ export default function LegalDocumentFormDialog({ open, siteId: _siteId, documen
   const { data: sites } = useQuery({ queryKey: queryKeys.sites(), queryFn: () => getSites() });
 
   const prevOpenRef = useRef(false);
-  if (open && !prevOpenRef.current) {
-    reset(document ? {
-      cookie_name: document.cookie_name,
-      document_type: document.document_type,
-      status: 'Draft' as const,
-      site_ids: [],
-    } : { cookie_name: '', document_type: 'CookieConsent' as LegalDocType, status: 'Draft' as const, site_ids: [] });
-  }
-  prevOpenRef.current = open;
+  useEffect(() => {
+    if (open && !prevOpenRef.current) {
+      reset(document ? {
+        cookie_name: document.cookie_name,
+        document_type: document.document_type,
+        status: 'Draft' as const,
+        site_ids: [],
+      } : { cookie_name: '', document_type: 'CookieConsent' as LegalDocType, status: 'Draft' as const, site_ids: [] });
+    }
+    prevOpenRef.current = open;
+  });
 
   const onFormSubmit = (data: LegalDocFormData) => {
     onSubmit({

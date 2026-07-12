@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Box, Paper, Typography, Divider, TextField, Button,
 } from '@mui/material';
@@ -40,10 +40,12 @@ export default function AllowedOriginsSection({ siteId, settings }: AllowedOrigi
   const [originsError, setOriginsError] = useState<string | null>(null);
   const initRef = useRef(false);
 
-  if (!initRef.current) {
-    initRef.current = true;
-    setOriginsText(settings.allowed_origins.join('\n'));
-  }
+  useEffect(() => {
+    if (!initRef.current) {
+      initRef.current = true;
+      setOriginsText(settings.allowed_origins.join('\n'));
+    }
+  }, [settings.allowed_origins]);
 
   const mutation = useMutation({
     mutationFn: (origins: string[]) =>

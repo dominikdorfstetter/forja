@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import {
   TextField,
   FormControlLabel,
@@ -77,8 +77,9 @@ export default function ContentTemplateFormDialog({
   });
 
   const prevOpenRef = useRef(false);
-  if (open && !prevOpenRef.current) {
-    reset(template
+  useEffect(() => {
+    if (open && !prevOpenRef.current) {
+      reset(template
       ? {
           name: template.name,
           description: template.description || '',
@@ -100,8 +101,9 @@ export default function ContentTemplateFormDialog({
           title: '', subtitle: '', excerpt: '', body: '',
           meta_title: '', meta_description: '',
         });
-  }
-  prevOpenRef.current = open;
+    }
+    prevOpenRef.current = open;
+  });
 
   const onFormSubmit = (data: ContentTemplateFormData) => {
     if (template && onSubmitUpdate) {

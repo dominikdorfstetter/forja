@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Box, Paper, Typography, Divider, TextField, Button,
   LinearProgress, Stack, MenuItem,
@@ -57,10 +57,12 @@ export default function StorageSection({ siteId, storageUsage, isMaster }: Stora
   });
 
   const prevQuotaRef = useRef<number | null>(null);
-  if (prevQuotaRef.current !== storageUsage.quota_bytes) {
-    prevQuotaRef.current = storageUsage.quota_bytes;
-    setQuotaValue(storageUsage.quota_bytes);
-  }
+  useEffect(() => {
+    if (prevQuotaRef.current !== storageUsage.quota_bytes) {
+      prevQuotaRef.current = storageUsage.quota_bytes;
+      setQuotaValue(storageUsage.quota_bytes);
+    }
+  }, [storageUsage.quota_bytes]);
 
   return (
     <Paper sx={{ p: 3 }} data-testid="site-settings.storage-usage">

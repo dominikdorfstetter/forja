@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import {
   TextField,
   MenuItem,
@@ -51,12 +51,14 @@ export default function CategoryFormDialog({
   });
 
   const prevOpenRef = useRef(false);
-  if (open && !prevOpenRef.current) {
-    reset(category
-      ? { slug: category.slug, parent_id: category.parent_id || '', is_global: category.is_global }
-      : { slug: '', parent_id: '', is_global: false });
-  }
-  prevOpenRef.current = open;
+  useEffect(() => {
+    if (open && !prevOpenRef.current) {
+      reset(category
+        ? { slug: category.slug, parent_id: category.parent_id || '', is_global: category.is_global }
+        : { slug: '', parent_id: '', is_global: false });
+    }
+    prevOpenRef.current = open;
+  });
 
   const parentOptions = categories.filter((c) => !category || c.id !== category.id);
 

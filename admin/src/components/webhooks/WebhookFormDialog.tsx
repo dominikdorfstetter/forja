@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -82,13 +82,15 @@ export default function WebhookFormDialog({
   });
 
   const prevOpenRef = useRef(false);
-  if (open && !prevOpenRef.current) {
-    reset(webhook
-      ? { url: webhook.url, description: webhook.description || '', events: webhook.events, is_active: webhook.is_active, debounce_seconds: webhook.debounce_seconds ?? 0 }
-      : { url: '', description: '', events: [], is_active: true, debounce_seconds: 0 });
-    setSelectedTemplate(null);
-  }
-  prevOpenRef.current = open;
+  useEffect(() => {
+    if (open && !prevOpenRef.current) {
+      reset(webhook
+        ? { url: webhook.url, description: webhook.description || '', events: webhook.events, is_active: webhook.is_active, debounce_seconds: webhook.debounce_seconds ?? 0 }
+        : { url: '', description: '', events: [], is_active: true, debounce_seconds: 0 });
+      setSelectedTemplate(null);
+    }
+    prevOpenRef.current = open;
+  }, [open, reset, webhook]);
 
   const handleTemplateSelect = (template: WebhookTemplate | null) => {
     if (template) {

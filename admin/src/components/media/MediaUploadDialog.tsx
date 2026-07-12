@@ -85,10 +85,12 @@ export default function MediaUploadDialog({ open, onSubmit, onClose, loading }: 
 
   // Reset state when dialog opens
   const prevOpenRef = useRef(false);
-  if (open && !prevOpenRef.current) {
-    dispatch({ type: 'RESET' });
-  }
-  prevOpenRef.current = open;
+  useEffect(() => {
+    if (open && !prevOpenRef.current) {
+      dispatch({ type: 'RESET' });
+    }
+    prevOpenRef.current = open;
+  });
 
   // Derive image preview URL from selected file (with cleanup for object URLs)
   const preview = useMemo(
