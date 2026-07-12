@@ -17,6 +17,12 @@ const mockVersions: LegalVersionResponse[] = [
   { id: 'doc-2', version: 2, status: 'Draft', created_at: '2026-02-01T00:00:00Z' },
 ];
 
+// One live version at a time: v2 published, v1 superseded (archived).
+const supersededVersions: LegalVersionResponse[] = [
+  { id: 'doc-1', version: 1, status: 'Archived', created_at: '2026-01-01T00:00:00Z' },
+  { id: 'doc-2', version: 2, status: 'Published', created_at: '2026-02-01T00:00:00Z' },
+];
+
 beforeEach(() => {
   vi.clearAllMocks();
 });
@@ -41,6 +47,19 @@ describe('LegalVersionPanel', () => {
     const v2Chip = screen.getByText('v2');
     const listItemButton = v2Chip.closest('[class*="MuiListItemButton"]');
     expect(listItemButton).toHaveClass('Mui-selected');
+  });
+
+  it('marks the published version as Live and explains rollback', async () => {
+    vi.mocked(getLegalVersions).mockResolvedValue(supersededVersions);
+    renderWithProviders(<LegalVersionPanel documentId="doc-2" currentVersion={2} />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('legal-version-live.v2')).toBeInTheDocument();
+    });
+    // Only the published (live) version carries the Live marker.
+    expect(screen.queryByTestId('legal-version-live.v1')).not.toBeInTheDocument();
+    // The rollback hint is shown when there is more than one version.
+    expect(screen.getByText(/publish it to roll back/i)).toBeInTheDocument();
   });
 
   it('shows empty state message when no versions exist', async () => {

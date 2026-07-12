@@ -1589,7 +1589,8 @@
       "name": "Name",
       "status": "Status",
       "selectAll": "Olle Dokumente auswähln",
-      "selectRow": "Dokument {{name}} auswähln"
+      "selectRow": "Dokument {{name}} auswähln",
+      "versionTooltip": "Dieses Dokument hat mehrere Versionen"
     },
     "empty": {
       "noSite": "Wähl a Seitn aus da Leist'n, um de rechtlichen Dokumente z'verwoidn",
@@ -1766,7 +1767,9 @@
       "title": "Versionsverlauf",
       "noVersions": "Kane früheren Versionen",
       "createNew": "Neie Version erstellen",
-      "created": "Neie Version erstellt"
+      "created": "Neie Version erstellt",
+      "live": "Live",
+      "rollbackHint": "Die Live-Version wird öffentlich ausgeliefert. Öffne eine ältere Version und veröffentliche sie, um zurückzurollen — die aktuelle wird ersetzt."
     }
   },
   "sites": {

@@ -67,6 +67,58 @@ async fn new_version_preserves_cookie_name_and_bumps_version() {
     assert_eq!(v2.parent_version_id, Some(v1.id));
 }
 
+async fn status_of(pool: &sqlx::PgPool, content_id: Uuid) -> String {
+    sqlx::query_scalar("SELECT status::text FROM contents WHERE id = $1")
+        .bind(content_id)
+        .fetch_one(pool)
+        .await
+        .expect("fetch status")
+}
+
+#[tokio::test]
+#[serial]
+async fn publishing_a_version_supersedes_the_previously_published_one() {
+    let pool = test_db_pool().await;
+    let site_id = create_test_site(&pool).await;
+
+    let v1 = LegalDocumentRepo::create(
+        &mut pool.acquire().await.unwrap(),
+        CreateLegalDocumentRequest {
+            cookie_name: format!("imprint-{}", &Uuid::new_v4().to_string()[..8]),
+            document_type: LegalDocType::Imprint,
+            status: ContentStatus::Published,
+            site_ids: vec![site_id],
+        },
+        Some("test-user"),
+    )
+    .await
+    .expect("create v1");
+    let v2 = LegalDocumentRepo::create_new_version(&pool, v1.id, vec![site_id], Some("test-user"))
+        .await
+        .expect("create v2");
+
+    // Publish v2 → v1 is superseded (archived), leaving exactly one live version.
+    set_status(&pool, v2.content_id.unwrap(), "published").await;
+    let archived = LegalDocumentRepo::supersede_other_published_versions(&pool, v2.id)
+        .await
+        .expect("supersede on publish of v2");
+    assert_eq!(
+        archived, 1,
+        "exactly the previously-published v1 is superseded"
+    );
+    assert_eq!(status_of(&pool, v1.content_id.unwrap()).await, "archived");
+    assert_eq!(status_of(&pool, v2.content_id.unwrap()).await, "published");
+
+    // Roll back: publish v1 again → v2 is now superseded, v1 is live.
+    set_status(&pool, v1.content_id.unwrap(), "published").await;
+    let archived = LegalDocumentRepo::supersede_other_published_versions(&pool, v1.id)
+        .await
+        .expect("supersede on rollback to v1");
+    assert_eq!(archived, 1, "publishing v1 supersedes v2");
+    assert_eq!(status_of(&pool, v2.content_id.unwrap()).await, "archived");
+    assert_eq!(status_of(&pool, v1.content_id.unwrap()).await, "published");
+}
+
 #[tokio::test]
 #[serial]
 async fn is_published_reflects_content_status() {

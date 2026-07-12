@@ -24,11 +24,18 @@ export default function LegalVersionPanel({ documentId, currentVersion }: LegalV
     enabled: !!documentId,
   });
 
+  const hasMultiple = (versions?.length ?? 0) > 1;
+
   return (
     <Box>
-      <Typography variant="subtitle2" sx={{ mb: 1 }}>
+      <Typography variant="subtitle2" sx={{ mb: hasMultiple ? 0.5 : 1 }}>
         {t('legalDetail.versions.title')}
       </Typography>
+      {hasMultiple && (
+        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+          {t('legalDetail.versions.rollbackHint')}
+        </Typography>
+      )}
       {isLoading ? (
         <Typography variant="body2" color="text.secondary">
           {t('common.loading')}
@@ -38,25 +45,37 @@ export default function LegalVersionPanel({ documentId, currentVersion }: LegalV
           {t('legalDetail.versions.noVersions')}
         </Typography>
       ) : (
-        <List dense disablePadding>
-          {versions.map((v: LegalVersionResponse) => (
-            <ListItemButton
-              key={v.id}
-              selected={v.version === currentVersion}
-              onClick={() => navigate(`/legal/${v.id}`)}
-              sx={{ borderRadius: 1, mb: 0.5 }}
-            >
-              <ListItemText
-                primary={
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Chip label={`v${v.version}`} size="small" variant="outlined" />
-                    <StatusChip value={v.status} size="small" />
-                  </Box>
-                }
-                secondary={fmt(v.created_at, 'PPp')}
-              />
-            </ListItemButton>
-          ))}
+        <List dense disablePadding data-testid="legal-version-list">
+          {versions.map((v: LegalVersionResponse) => {
+            const isLive = v.status === 'Published';
+            return (
+              <ListItemButton
+                key={v.id}
+                selected={v.version === currentVersion}
+                onClick={() => navigate(`/legal/${v.id}`)}
+                sx={{ borderRadius: 1, mb: 0.5 }}
+                data-testid={`legal-version-item.v${v.version}`}
+              >
+                <ListItemText
+                  primary={
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Chip label={`v${v.version}`} size="small" variant="outlined" />
+                      <StatusChip value={v.status} size="small" />
+                      {isLive && (
+                        <Chip
+                          label={t('legalDetail.versions.live')}
+                          size="small"
+                          color="success"
+                          data-testid={`legal-version-live.v${v.version}`}
+                        />
+                      )}
+                    </Box>
+                  }
+                  secondary={fmt(v.created_at, 'PPp')}
+                />
+              </ListItemButton>
+            );
+          })}
         </List>
       )}
     </Box>

@@ -1589,7 +1589,8 @@
       "name": "Naam",
       "status": "Status",
       "selectAll": "Alle documenten selecteren",
-      "selectRow": "Document {{name}} selecteren"
+      "selectRow": "Document {{name}} selecteren",
+      "versionTooltip": "Dit document heeft meerdere versies"
     },
     "empty": {
       "noSite": "Selecteer een site in de werkbalk om de juridische documenten te beheren",
@@ -1766,7 +1767,9 @@
       "title": "Versiegeschiedenis",
       "noVersions": "Geen eerdere versies",
       "createNew": "Nieuwe versie maken",
-      "created": "Nieuwe versie aangemaakt"
+      "created": "Nieuwe versie aangemaakt",
+      "live": "Live",
+      "rollbackHint": "De live-versie wordt publiek getoond. Open een oudere versie en publiceer die om terug te rollen — de huidige wordt vervangen."
     }
   },
   "sites": {

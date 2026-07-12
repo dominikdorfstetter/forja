@@ -12,7 +12,25 @@ export function buildLegalColumns({ t, fmt, sortBy, sortDir }: ColumnsDeps): Dat
       width: 'minmax(200px, 2fr)',
       sorted: sortBy === 'cookie_name' ? sortDir : undefined,
       render: (doc) => (
-        <span style={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>{doc.cookie_name}</span>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>{doc.cookie_name}</span>
+          {doc.version > 1 && (
+            <span
+              data-testid="legal-version-badge"
+              title={t('legal.table.versionTooltip')}
+              style={{
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                padding: '1px 6px',
+                borderRadius: 999,
+                border: '1px solid var(--outline-variant)',
+                color: 'var(--on-surface-variant)',
+              }}
+            >
+              v{doc.version}
+            </span>
+          )}
+        </span>
       ),
     },
     {

@@ -1589,7 +1589,8 @@
       "name": "Nom",
       "status": "Statut",
       "selectAll": "Sélectionner tous les documents",
-      "selectRow": "Sélectionner le document {{name}}"
+      "selectRow": "Sélectionner le document {{name}}",
+      "versionTooltip": "Ce document a plusieurs versions"
     },
     "empty": {
       "noSite": "Sélectionnez un site dans la barre d'outils pour gérer ses documents juridiques",
@@ -1766,7 +1767,9 @@
       "title": "Historique des versions",
       "noVersions": "Aucune version précédente",
       "createNew": "Créer une nouvelle version",
-      "created": "Nouvelle version créée"
+      "created": "Nouvelle version créée",
+      "live": "En ligne",
+      "rollbackHint": "La version en ligne est celle diffusée publiquement. Ouvrez une version antérieure et publiez-la pour revenir en arrière — la version actuelle est remplacée."
     }
   },
   "sites": {
