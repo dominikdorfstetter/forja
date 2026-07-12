@@ -22731,6 +22731,12 @@ export interface operations {
                 sort_by?: string;
                 /** @description Sort direction: asc or desc (default: asc) */
                 sort_dir?: string;
+                /** @description Filter by content status: Draft, InReview, Scheduled, Published, Archived */
+                status?: string;
+                /** @description Exclude items with this status: Draft, InReview, Scheduled, Published, Archived (e.g. Archived) */
+                exclude_status?: string;
+                /** @description Exclude documents of this type: CookieConsent, PrivacyPolicy, TermsOfService, Imprint, Disclaimer (e.g. CookieConsent, which has its own UI) */
+                exclude_document_type?: string;
             };
             header?: never;
             path: {
@@ -22748,6 +22754,15 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Paginated"];
+                };
+            };
+            /** @description Invalid filter value */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
             /** @description Missing or invalid API key */

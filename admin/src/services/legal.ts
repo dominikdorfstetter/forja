@@ -11,15 +11,25 @@ import type {
   CreateLegalItemRequest,
   UpdateLegalItemRequest,
 } from '@/types/api';
+import type { ListQueryParams } from '@/types/api';
 import { apiRequest } from './http';
 import { createContentService } from './contentService';
+
+/** Admin list filters the legal endpoint supports on top of the base params. */
+export type LegalListParams = ListQueryParams & {
+  status?: string;
+  exclude_status?: string;
+  /** Hide one document type server-side (e.g. CookieConsent, which has its own tab). */
+  exclude_document_type?: string;
+};
 
 const svc = createContentService<
   LegalDocumentResponse,
   LegalDocumentFullDetailResponse,
   LegalDocumentResponse,
   CreateLegalDocumentRequest,
-  UpdateLegalDocumentRequest
+  UpdateLegalDocumentRequest,
+  LegalListParams
 >({ base: 'legal' });
 
 // Shared CRUD surface (ADR 0003 uniform routes). Legal re-exports the
