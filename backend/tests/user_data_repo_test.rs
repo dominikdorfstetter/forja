@@ -55,7 +55,7 @@ async fn anonymize_authored_content_nulls_created_by() {
 }
 
 #[tokio::test]
-async fn anonymize_user_records_clears_references_and_system_admin() {
+async fn erase_user_records_clears_references_and_system_admin() {
     let pool = common::test_db_pool().await;
     let site_id = common::create_test_site(&pool).await;
     let user_id = Uuid::new_v4();
@@ -86,7 +86,7 @@ async fn anonymize_user_records_clears_references_and_system_admin() {
         .await
         .expect("insert system admin");
 
-    user_data_repo::anonymize_user_records(&pool, &clerk_id, user_id)
+    user_data_repo::erase_user_records(&pool, &clerk_id, user_id)
         .await
         .expect("anonymize user records");
 

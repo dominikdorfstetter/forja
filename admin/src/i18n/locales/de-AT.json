@@ -1980,6 +1980,23 @@
         "active": "Aktiv",
         "suspended": "Gsperrt",
         "banned": "Bannt"
+      },
+      "dsr": {
+        "export": {
+          "label": "Daten exportieren (DSGVO)",
+          "success": "Benutzerdaten exportiert",
+          "error": "Benutzerdaten konnten nicht exportiert werden"
+        },
+        "delete": {
+          "label": "Konto löschen (DSGVO)",
+          "title": "Konto löschen (DSGVO)",
+          "warning": "Dies löscht das Konto der Person dauerhaft und entfernt alle ihr zugeordneten personenbezogenen Daten.",
+          "consequences": "Erstellte Inhalte bleiben ohne Zuordnung erhalten. Dies erfüllt einen DSGVO-Löschantrag und kann nicht rückgängig gemacht werden.",
+          "confirm": "Konto löschen",
+          "success": "Konto gelöscht und personenbezogene Daten entfernt",
+          "error": "Konto konnte nicht gelöscht werden",
+          "soleOwnerError": "Diese Person ist alleinige:r Eigentümer:in einer Site — zuerst die Eigentümerschaft übertragen"
+        }
       }
     },
     "cache": {

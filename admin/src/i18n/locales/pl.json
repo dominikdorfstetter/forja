@@ -1980,6 +1980,23 @@
         "active": "Aktywny",
         "suspended": "Zawieszony",
         "banned": "Zablokowany"
+      },
+      "dsr": {
+        "export": {
+          "label": "Eksportuj dane (RODO)",
+          "success": "Dane użytkownika wyeksportowane",
+          "error": "Nie udało się wyeksportować danych użytkownika"
+        },
+        "delete": {
+          "label": "Usuń konto (RODO)",
+          "title": "Usuń konto (RODO)",
+          "warning": "Ta operacja trwale usuwa konto użytkownika i kasuje wszystkie przypisane mu dane osobowe.",
+          "consequences": "Utworzone treści pozostaną dostępne bez przypisania autorstwa. Realizuje to żądanie usunięcia danych zgodnie z RODO i nie można tego cofnąć.",
+          "confirm": "Usuń konto",
+          "success": "Konto usunięte, dane osobowe skasowane",
+          "error": "Nie udało się usunąć konta",
+          "soleOwnerError": "Ten użytkownik jest jedynym właścicielem witryny — najpierw przenieś własność"
+        }
       }
     },
     "cache": {

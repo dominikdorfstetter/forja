@@ -1980,6 +1980,23 @@
         "active": "Ativo",
         "suspended": "Suspenso",
         "banned": "Banido"
+      },
+      "dsr": {
+        "export": {
+          "label": "Exportar dados (RGPD)",
+          "success": "Dados do utilizador exportados",
+          "error": "Falha ao exportar os dados do utilizador"
+        },
+        "delete": {
+          "label": "Eliminar conta (RGPD)",
+          "title": "Eliminar conta (RGPD)",
+          "warning": "Esta ação elimina permanentemente a conta do utilizador e apaga todos os dados pessoais que lhe são atribuídos.",
+          "consequences": "O conteúdo criado permanece disponível sem atribuição. Esta ação cumpre um pedido de apagamento do RGPD e não pode ser anulada.",
+          "confirm": "Eliminar conta",
+          "success": "Conta eliminada e dados pessoais apagados",
+          "error": "Falha ao eliminar a conta",
+          "soleOwnerError": "Este utilizador é o único proprietário de um site — transfira primeiro a propriedade"
+        }
       }
     },
     "cache": {

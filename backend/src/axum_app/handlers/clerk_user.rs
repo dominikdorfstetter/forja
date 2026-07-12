@@ -448,9 +448,13 @@ async fn delete_banned_user(
         );
     }
 
-    SiteMembership::delete_all_for_clerk_user(&state.db, &clerk_user_id).await?;
-    crate::repos::user_data_repo::anonymize_authored_content(&state.db, &clerk_user_id).await?;
-    UserModeration::delete_for_user(&state.db, &clerk_user_id).await?;
+    // Same full erasure as self-service deletion — the banned-user purge
+    // must not leave more identity behind than a voluntary one (#3).
+    let actor_uuid = uuid::Uuid::new_v5(
+        &crate::guards::auth_guard::CLERK_UUID_NAMESPACE,
+        clerk_user_id.as_bytes(),
+    );
+    crate::repos::user_data_repo::erase_user_records(&state.db, &clerk_user_id, actor_uuid).await?;
 
     if let Some(clerk) = state.clerk_service.as_ref() {
         clerk.delete_user(&clerk_user_id).await?;
@@ -474,6 +478,112 @@ async fn delete_banned_user(
     }))
 }
 
+/// System-admin gate for DSR fulfilment. Unlike `require_system_admin`
+/// (Clerk lookup only), this accepts a master API key too — the canonical
+/// `Actor::is_system_admin` seam — so headless operators can fulfil DSRs.
+async fn require_dsr_admin(state: &AppState, auth: &Actor) -> Result<(), ApiError> {
+    if auth.is_system_admin(&state.db).await? {
+        Ok(())
+    } else {
+        Err(ApiError::forbidden("System admin required").with_code(codes::AUTH_INSUFFICIENT_ROLE))
+    }
+}
+
+#[utoipa::path(
+    get,
+    path = "/admin/users/{clerk_user_id}/export",
+    tag = "Clerk Users",
+    operation_id = "export_user_data_on_behalf",
+    description = "Export all data associated with a user (GDPR Art. 20), fulfilled by a system admin on the user's behalf. Every call is audit-logged with actor and target.",
+    params(("clerk_user_id" = String, Path, description = "Clerk user ID of the data subject")),
+    responses(
+        (status = 200, description = "User data export", body = crate::dto::auth::UserDataExportResponse),
+        (status = 401, description = "Unauthorized"),
+        (status = 403, description = "Forbidden — system admin required")
+    ),
+    security(("api_key" = []), ("bearer_auth" = []))
+)]
+async fn export_user_data_on_behalf(
+    State(state): State<AppState>,
+    Path(clerk_user_id): Path<String>,
+    auth: Actor,
+) -> Result<Json<crate::dto::auth::UserDataExportResponse>, ApiError> {
+    require_dsr_admin(&state, &auth).await?;
+
+    let export =
+        crate::services::user_export::build_clerk_user_export(&state, &clerk_user_id).await?;
+
+    AuditedEntity::audit_only("user")
+        .mutate(AuditAction::Read, uuid::Uuid::nil())
+        .actor(auth.id)
+        .metadata(serde_json::json!({
+            "action": "dsr_export",
+            "target": clerk_user_id,
+            "on_behalf": true
+        }))
+        .execute(&state.db)
+        .await;
+
+    Ok(Json(export))
+}
+
+#[utoipa::path(
+    delete,
+    path = "/admin/users/{clerk_user_id}/account",
+    tag = "Clerk Users",
+    operation_id = "delete_user_account_on_behalf",
+    description = "Delete a user's account (GDPR Art. 17), fulfilled by a system admin on the user's behalf — same erasure as self-service deletion, no ban required. Refused while the user is the sole owner of a site. Audit-logged with actor and target.",
+    params(("clerk_user_id" = String, Path, description = "Clerk user ID of the data subject")),
+    responses(
+        (status = 204, description = "Account deleted"),
+        (status = 401, description = "Unauthorized"),
+        (status = 403, description = "Forbidden — system admin required"),
+        (status = 409, description = "User is sole owner of one or more sites")
+    ),
+    security(("api_key" = []), ("bearer_auth" = []))
+)]
+async fn delete_user_account_on_behalf(
+    State(state): State<AppState>,
+    Path(clerk_user_id): Path<String>,
+    auth: Actor,
+) -> Result<StatusCode, ApiError> {
+    require_dsr_admin(&state, &auth).await?;
+
+    if let Some(site_id) = SiteMembership::find_solely_owned_sites(&state.db, &clerk_user_id)
+        .await?
+        .first()
+    {
+        return Err(ApiError::conflict(format!(
+            "User is the sole owner of site {site_id}. Transfer ownership before deleting the account.",
+        ))
+        .with_code(codes::AUTH_ACCOUNT_SOLE_OWNER));
+    }
+
+    if let Some(clerk) = state.clerk_service.as_ref() {
+        clerk.delete_user(&clerk_user_id).await?;
+    }
+
+    let target_uuid = uuid::Uuid::new_v5(
+        &crate::guards::auth_guard::CLERK_UUID_NAMESPACE,
+        clerk_user_id.as_bytes(),
+    );
+    crate::repos::user_data_repo::erase_user_records(&state.db, &clerk_user_id, target_uuid)
+        .await?;
+
+    AuditedEntity::audit_only("user")
+        .mutate(AuditAction::Delete, uuid::Uuid::nil())
+        .actor(auth.id)
+        .metadata(serde_json::json!({
+            "action": "dsr_delete",
+            "target": clerk_user_id,
+            "on_behalf": true
+        }))
+        .execute(&state.db)
+        .await;
+
+    Ok(StatusCode::NO_CONTENT)
+}
+
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
         .routes(routes!(list_clerk_users))
@@ -483,4 +593,6 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(ban_user))
         .routes(routes!(unsuspend_user))
         .routes(routes!(delete_banned_user))
+        .routes(routes!(export_user_data_on_behalf))
+        .routes(routes!(delete_user_account_on_behalf))
 }
