@@ -14,6 +14,22 @@ is the first release published as open source**, so the public version history
 begins at 2.0. The pre-release milestones below condense how the foundation came
 together; precise dates start at the first public release.
 
+## 2.0.4 — 2026-07-12
+
+A bug-fix release for the Legal Documents admin list, with matching client-SDK support for the new list filters and a broad dependency refresh under the hood.
+
+### Fixed
+
+- **Legal document status filters, the Active/Archived tabs, and Archive now actually work.** The legal list endpoint ignored status filters entirely and the admin silently dropped them, so the status chips and tabs were decorative and archiving a document appeared to do nothing (the change persisted but stayed visible). The endpoint now supports `status`, `exclude_status`, and `exclude_document_type` — filtering the rows and the pagination count identically — and the documents table gained a Status column so changes are visible. CookieConsent documents are excluded server-side instead of being stripped client-side after pagination, which also fixes the off-by-one pagination totals ("1–4 of 4" while showing 3 rows).
+
+### Added
+
+- **`@forjacms/client`: legal list filters.** `forja.legal.list()` now accepts `status`, `excludeStatus`, and `excludeDocumentType`, and the legal list response type carries the document's `status`, `slug`, `version`, and publish window, matching what the API returns.
+
+### Changed
+
+- **Dependency refresh.** Backend on Rust 1.97 + edition 2024 and sqlx 0.9; monorepo npm packages batch-bumped (react-router 8, tower-http 0.7 on the backend, react-doctor 0.7.6); the Astro blog template migrated to Astro 7 with `@astrojs/node` 11 (Node ≥ 22.12). All audits clean.
+
 ## 2.0.3 — 2026-06-14
 
 A bug-fix release clearing the admin-UI backlog: density-aware tables, the global save-bar migration, and the last read-only enforcement gaps for viewer/guest roles.
