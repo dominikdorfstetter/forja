@@ -6,8 +6,8 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::dto::redirect::{CreateRedirectRequest, UpdateRedirectRequest};
-use crate::errors::codes;
 use crate::errors::ApiError;
+use crate::errors::codes;
 use crate::utils::list_params::ListParams;
 
 /// URL redirect model

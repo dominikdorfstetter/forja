@@ -15,10 +15,10 @@ use axum::response::{Json, Redirect};
 use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 
+use crate::AppState;
 use crate::dto::health::{HealthResponse, ServiceHealth, StorageHealth};
 use crate::errors::ProblemDetails;
 use crate::guards::auth_guard::AdminKey;
-use crate::AppState;
 
 async fn collect_health_response(state: &AppState) -> (StatusCode, HealthResponse) {
     let db_fut = async {

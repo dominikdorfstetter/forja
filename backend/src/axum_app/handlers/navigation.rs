@@ -27,9 +27,9 @@ use crate::services::audited_mutation::AuditedEntity;
 /// Navigation items audit and fire `navigation.*` webhooks.
 const NAVIGATION_ITEM: AuditedEntity =
     AuditedEntity::with_webhooks("navigation_item", "navigation");
+use crate::AppState;
 use crate::services::permission_service::{Permission, PermissionService};
 use crate::services::webhook_service;
-use crate::AppState;
 
 #[utoipa::path(
     get,

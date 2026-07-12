@@ -6,7 +6,7 @@
 //! raw text — unit-testable without a network call.
 
 use crate::dto::ai::{AiAction, AiGenerateResponse};
-use crate::errors::{codes, ApiError};
+use crate::errors::{ApiError, codes};
 
 pub(crate) fn extract_xml_field(s: &str, tag: &str) -> Option<String> {
     let open = format!("<{tag}>");
@@ -259,24 +259,24 @@ pub(crate) fn postprocess_response(
     }
 
     // Derive excerpt from body if missing
-    if resp.excerpt.as_ref().is_none_or(|e| e.trim().is_empty()) {
-        if let Some(ref body) = resp.body {
-            // Take the first non-heading, non-empty paragraph
-            let first_para = body
-                .split("\n\n")
-                .map(|p| p.trim())
-                .find(|p| !p.is_empty() && !p.starts_with('#'));
-            if let Some(para) = first_para {
-                // Truncate to ~200 chars at a sentence boundary
-                let excerpt = if para.len() <= 200 {
-                    para.to_string()
-                } else if let Some(end) = para[..200].rfind(". ") {
-                    format!("{}.", &para[..end])
-                } else {
-                    format!("{}...", &para[..197])
-                };
-                resp.excerpt = Some(excerpt);
-            }
+    if resp.excerpt.as_ref().is_none_or(|e| e.trim().is_empty())
+        && let Some(ref body) = resp.body
+    {
+        // Take the first non-heading, non-empty paragraph
+        let first_para = body
+            .split("\n\n")
+            .map(|p| p.trim())
+            .find(|p| !p.is_empty() && !p.starts_with('#'));
+        if let Some(para) = first_para {
+            // Truncate to ~200 chars at a sentence boundary
+            let excerpt = if para.len() <= 200 {
+                para.to_string()
+            } else if let Some(end) = para[..200].rfind(". ") {
+                format!("{}.", &para[..end])
+            } else {
+                format!("{}...", &para[..197])
+            };
+            resp.excerpt = Some(excerpt);
         }
     }
 
@@ -287,27 +287,27 @@ pub(crate) fn postprocess_response(
 /// Models frequently exceed the character limits specified in prompts,
 /// so this acts as a safety net for meta_title (60) and meta_description (160).
 pub(crate) fn truncate_seo_fields(resp: &mut AiGenerateResponse) {
-    if let Some(ref mut mt) = resp.meta_title {
-        if mt.len() > 60 {
-            // Try to break at a word boundary
-            let truncated = &mt[..60];
-            *mt = match truncated.rfind(' ') {
-                Some(pos) if pos > 40 => truncated[..pos].to_string(),
-                _ => truncated.to_string(),
-            };
-        }
+    if let Some(ref mut mt) = resp.meta_title
+        && mt.len() > 60
+    {
+        // Try to break at a word boundary
+        let truncated = &mt[..60];
+        *mt = match truncated.rfind(' ') {
+            Some(pos) if pos > 40 => truncated[..pos].to_string(),
+            _ => truncated.to_string(),
+        };
     }
-    if let Some(ref mut md) = resp.meta_description {
-        if md.len() > 160 {
-            let truncated = &md[..160];
-            *md = match truncated.rfind(". ") {
-                Some(pos) if pos > 100 => format!("{}.", &truncated[..pos]),
-                _ => match truncated.rfind(' ') {
-                    Some(pos) if pos > 120 => format!("{}...", &truncated[..pos]),
-                    _ => format!("{}...", &truncated[..157]),
-                },
-            };
-        }
+    if let Some(ref mut md) = resp.meta_description
+        && md.len() > 160
+    {
+        let truncated = &md[..160];
+        *md = match truncated.rfind(". ") {
+            Some(pos) if pos > 100 => format!("{}.", &truncated[..pos]),
+            _ => match truncated.rfind(' ') {
+                Some(pos) if pos > 120 => format!("{}...", &truncated[..pos]),
+                _ => format!("{}...", &truncated[..157]),
+            },
+        };
     }
 }
 

@@ -9,8 +9,8 @@ use crate::dto::media::{
     AddMediaMetadataRequest, MediaSearchParams, UpdateMediaMetadataRequest, UpdateMediaRequest,
     UploadMediaRequest,
 };
-use crate::errors::codes;
 use crate::errors::ApiError;
+use crate::errors::codes;
 use crate::utils::list_params::order_clause;
 
 /// Storage provider enum matching PostgreSQL
@@ -287,21 +287,21 @@ impl MediaFile {
         }
 
         // Tag filtering (AND logic): only show media matching ALL specified tags
-        if let Some(ref tags) = params.tags {
-            if !tags.is_empty() {
-                qb.push(
-                    " AND m.id IN (\
+        if let Some(ref tags) = params.tags
+            && !tags.is_empty()
+        {
+            qb.push(
+                " AND m.id IN (\
                        SELECT mt.media_file_id FROM media_tags mt \
                        WHERE mt.tag = ANY(",
-                );
-                qb.push_bind(tags.clone());
-                qb.push(
-                    ") GROUP BY mt.media_file_id \
+            );
+            qb.push_bind(tags.clone());
+            qb.push(
+                ") GROUP BY mt.media_file_id \
                      HAVING COUNT(DISTINCT mt.tag) = ",
-                );
-                qb.push_bind(tags.len() as i64);
-                qb.push(")");
-            }
+            );
+            qb.push_bind(tags.len() as i64);
+            qb.push(")");
         }
 
         let order_col = match sort_by.unwrap_or("created_at") {
@@ -371,21 +371,21 @@ impl MediaFile {
         }
 
         // Tag filtering (AND logic): only show media matching ALL specified tags
-        if let Some(ref tags) = params.tags {
-            if !tags.is_empty() {
-                qb.push(
-                    " AND m.id IN (\
+        if let Some(ref tags) = params.tags
+            && !tags.is_empty()
+        {
+            qb.push(
+                " AND m.id IN (\
                        SELECT mt.media_file_id FROM media_tags mt \
                        WHERE mt.tag = ANY(",
-                );
-                qb.push_bind(tags.clone());
-                qb.push(
-                    ") GROUP BY mt.media_file_id \
+            );
+            qb.push_bind(tags.clone());
+            qb.push(
+                ") GROUP BY mt.media_file_id \
                      HAVING COUNT(DISTINCT mt.tag) = ",
-                );
-                qb.push_bind(tags.len() as i64);
-                qb.push(")");
-            }
+            );
+            qb.push_bind(tags.len() as i64);
+            qb.push(")");
         }
 
         let row: (i64,) = qb.build_query_as().fetch_one(pool).await?;

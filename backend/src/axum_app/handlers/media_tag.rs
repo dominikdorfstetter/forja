@@ -14,6 +14,7 @@ use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 use uuid::Uuid;
 
+use crate::AppState;
 use crate::dto::media_tag::{MediaTagsResponse, SiteTagsResponse, UpdateMediaTagsRequest};
 use crate::dto::validated::ValidatedJson;
 use crate::errors::codes;
@@ -22,7 +23,6 @@ use crate::guards::auth_guard::{ReadKey, WriteKey};
 use crate::models::media::MediaFile;
 use crate::models::media_tag::MediaTag;
 use crate::services::permission_service::{Permission, PermissionService};
-use crate::AppState;
 
 #[derive(Debug, Deserialize)]
 struct SiteTagsQuery {

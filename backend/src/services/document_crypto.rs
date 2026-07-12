@@ -19,7 +19,7 @@
 //! [`decrypt_with_recovery`]: DocumentCrypto::decrypt_with_recovery
 
 use crate::config::SecurityConfig;
-use crate::errors::{codes, ApiError};
+use crate::errors::{ApiError, codes};
 use crate::models::document::DocumentEncryptionMeta;
 use crate::services::document_encryption;
 
@@ -114,33 +114,33 @@ impl DocumentCrypto {
         })?;
 
         // Current key first.
-        if let Some(current) = self.current_key {
-            if let Ok(plaintext) = document_encryption::decrypt_document_with_server_key(
+        if let Some(current) = self.current_key
+            && let Ok(plaintext) = document_encryption::decrypt_document_with_server_key(
                 ciphertext,
                 nonce,
                 encrypted_dek,
                 &current,
-            ) {
-                return Ok(Recovered {
-                    plaintext,
-                    rewrapped_dek: self.rewrap_for_rotation(meta),
-                });
-            }
+            )
+        {
+            return Ok(Recovered {
+                plaintext,
+                rewrapped_dek: self.rewrap_for_rotation(meta),
+            });
         }
 
         // Previous key fallback; rewrap to the current key for lazy rotation.
-        if let Some(old) = self.old_key {
-            if let Ok(plaintext) = document_encryption::decrypt_document_with_server_key(
+        if let Some(old) = self.old_key
+            && let Ok(plaintext) = document_encryption::decrypt_document_with_server_key(
                 ciphertext,
                 nonce,
                 encrypted_dek,
                 &old,
-            ) {
-                return Ok(Recovered {
-                    plaintext,
-                    rewrapped_dek: self.rewrap_for_rotation(meta),
-                });
-            }
+            )
+        {
+            return Ok(Recovered {
+                plaintext,
+                rewrapped_dek: self.rewrap_for_rotation(meta),
+            });
         }
 
         Err(ApiError::internal(

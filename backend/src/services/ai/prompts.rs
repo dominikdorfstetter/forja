@@ -9,12 +9,10 @@ use crate::dto::ai::{AiAction, BlogTagContext, SectionContext};
 // ── Default system prompts ───────────────────────────────────────
 
 // Content-only prompts (format instructions are appended separately via format_suffix)
-pub const DEFAULT_PROMPT_SEO: &str =
-    "You are an SEO expert. Generate an SEO-optimized meta title (max 60 characters) \
+pub const DEFAULT_PROMPT_SEO: &str = "You are an SEO expert. Generate an SEO-optimized meta title (max 60 characters) \
 and meta description (max 160 characters) from the provided blog content.";
 
-pub const DEFAULT_PROMPT_EXCERPT: &str =
-    "You are a content editor. Generate a concise 1-2 sentence excerpt that \
+pub const DEFAULT_PROMPT_EXCERPT: &str = "You are a content editor. Generate a concise 1-2 sentence excerpt that \
 summarizes the key points of the provided blog content.";
 
 pub(crate) const DEFAULT_PROMPT_TRANSLATE_PREFIX: &str =
@@ -26,26 +24,21 @@ pub(crate) const DEFAULT_PROMPT_TRANSLATE_SUFFIX: &str =
 pub(crate) const JSON_FORMAT_SEO: &str = "\nRespond with ONLY valid JSON in this exact format: \
 {\"meta_title\": \"...\", \"meta_description\": \"...\"}";
 
-pub(crate) const JSON_FORMAT_EXCERPT: &str =
-    "\nRespond with ONLY valid JSON in this exact format: \
+pub(crate) const JSON_FORMAT_EXCERPT: &str = "\nRespond with ONLY valid JSON in this exact format: \
 {\"excerpt\": \"...\"}";
 
-pub(crate) const JSON_FORMAT_TRANSLATE: &str =
-    "\nRespond with ONLY valid JSON in this exact format: \
+pub(crate) const JSON_FORMAT_TRANSLATE: &str = "\nRespond with ONLY valid JSON in this exact format: \
 {\"title\": \"...\", \"subtitle\": \"...\", \"excerpt\": \"...\", \
 \"body\": \"...\", \"meta_title\": \"...\", \"meta_description\": \"...\"}";
 
-pub(crate) const XML_FORMAT_SEO: &str =
-    "\nRespond using ONLY these XML tags, with no other text:\n\
+pub(crate) const XML_FORMAT_SEO: &str = "\nRespond using ONLY these XML tags, with no other text:\n\
 <meta_title>your meta title here</meta_title>\n\
 <meta_description>your meta description here</meta_description>";
 
-pub(crate) const XML_FORMAT_EXCERPT: &str =
-    "\nRespond using ONLY this XML tag, with no other text:\n\
+pub(crate) const XML_FORMAT_EXCERPT: &str = "\nRespond using ONLY this XML tag, with no other text:\n\
 <excerpt>your excerpt here</excerpt>";
 
-pub(crate) const XML_FORMAT_TRANSLATE: &str =
-    "\nRespond using ONLY these XML tags, with no other text:\n\
+pub(crate) const XML_FORMAT_TRANSLATE: &str = "\nRespond using ONLY these XML tags, with no other text:\n\
 <title>translated title</title>\n\
 <subtitle>translated subtitle</subtitle>\n\
 <excerpt>translated excerpt</excerpt>\n\
@@ -53,25 +46,21 @@ pub(crate) const XML_FORMAT_TRANSLATE: &str =
 <meta_title>translated meta title</meta_title>\n\
 <meta_description>translated meta description</meta_description>";
 
-pub(crate) const DEFAULT_PROMPT_DRAFT_OUTLINE: &str =
-    "You are a creative blog content strategist. Given a topic idea, generate a compelling blog \
+pub(crate) const DEFAULT_PROMPT_DRAFT_OUTLINE: &str = "You are a creative blog content strategist. Given a topic idea, generate a compelling blog \
 post title, subtitle, and a structured outline with 5-8 bullet points. Each bullet should be a \
 concise section heading or key point that could be expanded into a paragraph.";
 
-pub(crate) const JSON_FORMAT_DRAFT_OUTLINE: &str =
-    "\nRespond with ONLY valid JSON in this exact format: \
+pub(crate) const JSON_FORMAT_DRAFT_OUTLINE: &str = "\nRespond with ONLY valid JSON in this exact format: \
 {\"title\": \"...\", \"subtitle\": \"...\", \"outline\": [\"point 1\", \"point 2\", ...]}";
 
-pub(crate) const XML_FORMAT_DRAFT_OUTLINE: &str =
-    "\nRespond using ONLY these XML tags, with no other text:\n\
+pub(crate) const XML_FORMAT_DRAFT_OUTLINE: &str = "\nRespond using ONLY these XML tags, with no other text:\n\
 <title>blog post title</title>\n\
 <subtitle>blog post subtitle</subtitle>\n\
 <outline>first outline point</outline>\n\
 <outline>second outline point</outline>\n\
 <outline>...</outline>";
 
-pub(crate) const DEFAULT_PROMPT_DRAFT_POST: &str =
-    "You are a skilled blog writer who produces clean, minimal markdown.\n\
+pub(crate) const DEFAULT_PROMPT_DRAFT_POST: &str = "You are a skilled blog writer who produces clean, minimal markdown.\n\
 STRICT FORMATTING RULES — violating these is an error:\n\
 1. NEVER use # (h1). The highest heading allowed is ## (h2).\n\
 2. NEVER use **bold** or __bold__. Not for tool names, not for emphasis, not at all. Write everything in plain text.\n\
@@ -86,8 +75,7 @@ pub(crate) const JSON_FORMAT_DRAFT_POST: &str = "\nRespond with ONLY valid JSON 
 {\"body\": \"clean markdown with ## headings, no bold, no horizontal rules\", \"excerpt\": \"1-2 sentence summary\", \
 \"meta_title\": \"SEO title (max 60 chars)\", \"meta_description\": \"SEO description (max 160 chars)\"}";
 
-pub(crate) const XML_FORMAT_DRAFT_POST: &str =
-    "\nRespond using ONLY these XML tags, with no other text:\n\
+pub(crate) const XML_FORMAT_DRAFT_POST: &str = "\nRespond using ONLY these XML tags, with no other text:\n\
 <body>clean markdown with ## headings, no bold, no horizontal rules</body>\n\
 <excerpt>1-2 sentence summary</excerpt>\n\
 <meta_title>SEO title (max 60 chars)</meta_title>\n\
@@ -136,73 +124,107 @@ specific, concrete, and on-topic, not generic filler.";
 /// section type is unrecognised.
 pub(crate) fn section_type_guidance(section_type_lower: &str) -> &'static str {
     match section_type_lower {
-        "hero" => "Section type: HERO — the page's main introductory banner. \
+        "hero" => {
+            "Section type: HERO — the page's main introductory banner. \
             title = punchy headline (≤ 10 words), text = 1–2 sentence value proposition, \
-            button_text = primary call-to-action (2–4 words, e.g. 'Get started').",
-        "features" => "Section type: FEATURES — a feature/benefit overview. \
+            button_text = primary call-to-action (2–4 words, e.g. 'Get started')."
+        }
+        "features" => {
+            "Section type: FEATURES — a feature/benefit overview. \
             title = a short benefit-led heading (≤ 8 words), \
             text = 1–2 sentences framing what the features collectively deliver \
             (individual feature items live elsewhere — do not enumerate them), \
-            button_text = an optional learn-more CTA (or empty).",
-        "cta" => "Section type: CTA — a focused conversion block. \
+            button_text = an optional learn-more CTA (or empty)."
+        }
+        "cta" => {
+            "Section type: CTA — a focused conversion block. \
             title = action-oriented heading (≤ 8 words, often a question or imperative), \
             text = ONE short sentence reinforcing urgency or value, \
-            button_text = imperative verb phrase (2–4 words, e.g. 'Start free trial').",
-        "gallery" => "Section type: GALLERY — an image collection introduction. \
+            button_text = imperative verb phrase (2–4 words, e.g. 'Start free trial')."
+        }
+        "gallery" => {
+            "Section type: GALLERY — an image collection introduction. \
             title = a short heading framing the gallery, \
             text = 1 sentence describing what visitors will see, \
-            button_text = optional (e.g. 'See all').",
-        "testimonials" => "Section type: TESTIMONIALS — customer proof block. \
+            button_text = optional (e.g. 'See all')."
+        }
+        "testimonials" => {
+            "Section type: TESTIMONIALS — customer proof block. \
             title = a short heading (e.g. 'What our customers say'), \
             text = 1 sentence framing why the proof matters (do NOT invent quotes), \
-            button_text = optional (e.g. 'Read more stories').",
-        "pricing" => "Section type: PRICING — pricing overview block. \
+            button_text = optional (e.g. 'Read more stories')."
+        }
+        "pricing" => {
+            "Section type: PRICING — pricing overview block. \
             title = a short heading (e.g. 'Simple, transparent pricing'), \
             text = 1–2 sentences on the pricing principle (value, fairness, no surprises), \
-            button_text = optional (e.g. 'Compare plans').",
-        "faq" => "Section type: FAQ — frequently-asked-questions block. \
+            button_text = optional (e.g. 'Compare plans')."
+        }
+        "faq" => {
+            "Section type: FAQ — frequently-asked-questions block. \
             title = the FAQ heading (e.g. 'Frequently asked questions'), \
             text = ONE representative Q+A pair formatted as markdown: \
-            '**Q: …?**\\n\\nA: …'. button_text = optional (e.g. 'Contact us').",
-        "contact" => "Section type: CONTACT — get-in-touch block. \
+            '**Q: …?**\\n\\nA: …'. button_text = optional (e.g. 'Contact us')."
+        }
+        "contact" => {
+            "Section type: CONTACT — get-in-touch block. \
             title = welcoming heading (≤ 8 words), \
             text = 1–2 sentences inviting contact, \
-            button_text = imperative (e.g. 'Send a message').",
-        "stats" => "Section type: STATS — key-numbers block. \
+            button_text = imperative (e.g. 'Send a message')."
+        }
+        "stats" => {
+            "Section type: STATS — key-numbers block. \
             title = a short framing heading, \
             text = 1 sentence summarising the proof these numbers provide (do NOT invent specific figures), \
-            button_text = optional.",
-        "team" => "Section type: TEAM — the people behind the product. \
+            button_text = optional."
+        }
+        "team" => {
+            "Section type: TEAM — the people behind the product. \
             title = a short heading (e.g. 'Meet the team'), \
             text = 1–2 sentences on the team's character or expertise, \
-            button_text = optional (e.g. 'Join us').",
-        "timeline" => "Section type: TIMELINE — milestones / history. \
+            button_text = optional (e.g. 'Join us')."
+        }
+        "timeline" => {
+            "Section type: TIMELINE — milestones / history. \
             title = a short heading (e.g. 'Our journey'), \
             text = 1 sentence framing the timeline (do NOT enumerate milestones), \
-            button_text = optional.",
-        "logo_cloud" => "Section type: LOGO CLOUD — trusted-by logos. \
+            button_text = optional."
+        }
+        "logo_cloud" => {
+            "Section type: LOGO CLOUD — trusted-by logos. \
             title = a short heading (e.g. 'Trusted by teams at'), \
             text = optional 1 sentence framing the proof, \
-            button_text = optional.",
-        "newsletter" => "Section type: NEWSLETTER — email-signup block. \
+            button_text = optional."
+        }
+        "newsletter" => {
+            "Section type: NEWSLETTER — email-signup block. \
             title = short heading (e.g. 'Stay in the loop'), \
             text = 1 sentence on what subscribers receive and cadence, \
-            button_text = imperative (e.g. 'Subscribe').",
-        "video" => "Section type: VIDEO — featured-video block. \
+            button_text = imperative (e.g. 'Subscribe')."
+        }
+        "video" => {
+            "Section type: VIDEO — featured-video block. \
             title = short heading framing the video, \
             text = 1 sentence on what the viewer will learn, \
-            button_text = optional (e.g. 'Watch later').",
-        "divider" => "Section type: DIVIDER — visual break. \
+            button_text = optional (e.g. 'Watch later')."
+        }
+        "divider" => {
+            "Section type: DIVIDER — visual break. \
             title = empty or a single short transitional phrase, \
-            text = empty, button_text = empty.",
-        "text" => "Section type: TEXT — long-form prose block. \
+            text = empty, button_text = empty."
+        }
+        "text" => {
+            "Section type: TEXT — long-form prose block. \
             title = a section heading, \
             text = 2–4 short paragraphs of plain markdown prose appropriate to the page topic, \
-            button_text = optional.",
-        _ => "Section type: CUSTOM — a generic content block. \
+            button_text = optional."
+        }
+        _ => {
+            "Section type: CUSTOM — a generic content block. \
             title = a short heading appropriate to the page topic, \
             text = 1–3 sentences on a relevant angle, \
-            button_text = optional.",
+            button_text = optional."
+        }
     }
 }
 
@@ -230,15 +252,15 @@ pub(crate) fn default_section_content_prompt(ctx: &SectionContext) -> String {
     let guidance = section_type_guidance(&st_key);
 
     let mut page_context = String::new();
-    if let Some(ref title) = ctx.page_title {
-        if !title.trim().is_empty() {
-            page_context.push_str(&format!("\nPage title: {title}"));
-        }
+    if let Some(ref title) = ctx.page_title
+        && !title.trim().is_empty()
+    {
+        page_context.push_str(&format!("\nPage title: {title}"));
     }
-    if let Some(ref route) = ctx.page_route {
-        if !route.trim().is_empty() {
-            page_context.push_str(&format!("\nPage route: {route}"));
-        }
+    if let Some(ref route) = ctx.page_route
+        && !route.trim().is_empty()
+    {
+        page_context.push_str(&format!("\nPage route: {route}"));
     }
     if !ctx.existing_section_types.is_empty() {
         page_context.push_str(&format!(
@@ -250,13 +272,11 @@ pub(crate) fn default_section_content_prompt(ctx: &SectionContext) -> String {
     format!("{DEFAULT_PROMPT_SECTION_CONTENT_PREFIX}\n\n{guidance}{page_context}")
 }
 
-pub(crate) const JSON_FORMAT_SECTION_CONTENT: &str =
-    "\nRespond with ONLY valid JSON in this exact format: \
+pub(crate) const JSON_FORMAT_SECTION_CONTENT: &str = "\nRespond with ONLY valid JSON in this exact format: \
 {\"title\": \"...\", \"text\": \"...\", \"button_text\": \"...\"}. \
 Use an empty string for fields not applicable to this section type.";
 
-pub(crate) const XML_FORMAT_SECTION_CONTENT: &str =
-    "\nRespond using ONLY these XML tags, with no other text:\n\
+pub(crate) const XML_FORMAT_SECTION_CONTENT: &str = "\nRespond using ONLY these XML tags, with no other text:\n\
 <title>section title</title>\n\
 <text>section body text (markdown allowed)</text>\n\
 <button_text>CTA button label or empty</button_text>";
@@ -282,13 +302,11 @@ and the post is about Rust, return 'rust' (not 'Rust' or 'rust-lang'). \
 Only invent a new tag when no existing one fits. \
 Return at most 8 tags, ranked by relevance — the most central first.";
 
-pub(crate) const JSON_FORMAT_BLOG_TAGS: &str =
-    "\nRespond with ONLY valid JSON in this exact format: \
+pub(crate) const JSON_FORMAT_BLOG_TAGS: &str = "\nRespond with ONLY valid JSON in this exact format: \
 {\"tags\": [\"tag-one\", \"tag-two\", \"tag-three\"]}. \
 Use lowercase, hyphenated slug strings only.";
 
-pub(crate) const XML_FORMAT_BLOG_TAGS: &str =
-    "\nRespond using ONLY these XML tags, with no other text. \
+pub(crate) const XML_FORMAT_BLOG_TAGS: &str = "\nRespond using ONLY these XML tags, with no other text. \
 Repeat <tag>...</tag> once per suggestion:\n\
 <tag>tag-one</tag>\n\
 <tag>tag-two</tag>\n\
@@ -442,23 +460,39 @@ pub(crate) fn strip_format_instructions(prompt: &str) -> &str {
 pub(crate) fn field_translation_prompt(field_name: &str, locale: &str) -> String {
     let base = format!("Translate the following text to {locale}.");
     let constraint = match field_name {
-        "title" => "This is a TITLE. Output ONLY the translated title as plain text. \
-                    No markdown, no headings, no formatting, no quotes. Keep it concise (under 100 characters).",
-        "subtitle" => "This is a SUBTITLE. Output ONLY the translated subtitle as plain text. \
-                      No markdown, no headings, no formatting, no quotes. Keep it concise (under 150 characters).",
-        "excerpt" => "This is a short EXCERPT (summary). Output ONLY the translated excerpt as a single sentence. \
-                     No markdown, no headings, no formatting, no quotes. Maximum 2 sentences.",
-        "body" => "This is the BODY content. Maintain any markdown formatting from the original. \
-                  Output ONLY the translated text.",
-        "text" => "This is the localized TEXT of a page section. \
+        "title" => {
+            "This is a TITLE. Output ONLY the translated title as plain text. \
+                    No markdown, no headings, no formatting, no quotes. Keep it concise (under 100 characters)."
+        }
+        "subtitle" => {
+            "This is a SUBTITLE. Output ONLY the translated subtitle as plain text. \
+                      No markdown, no headings, no formatting, no quotes. Keep it concise (under 150 characters)."
+        }
+        "excerpt" => {
+            "This is a short EXCERPT (summary). Output ONLY the translated excerpt as a single sentence. \
+                     No markdown, no headings, no formatting, no quotes. Maximum 2 sentences."
+        }
+        "body" => {
+            "This is the BODY content. Maintain any markdown formatting from the original. \
+                  Output ONLY the translated text."
+        }
+        "text" => {
+            "This is the localized TEXT of a page section. \
                   Maintain any markdown formatting from the original. \
-                  Output ONLY the translated text — no preamble, no quotes.",
-        "button_text" => "This is a BUTTON / CTA label. Output ONLY the translated label as plain text. \
-                         No markdown, no quotes, no trailing punctuation. Keep it short (2–4 words).",
-        "meta_title" => "This is an SEO meta title. Output ONLY the translated title as plain text. \
-                        No markdown, no formatting, no quotes. Maximum 60 characters.",
-        "meta_description" => "This is an SEO meta description. Output ONLY the translated description as plain text. \
-                              No markdown, no formatting, no quotes. Maximum 160 characters.",
+                  Output ONLY the translated text — no preamble, no quotes."
+        }
+        "button_text" => {
+            "This is a BUTTON / CTA label. Output ONLY the translated label as plain text. \
+                         No markdown, no quotes, no trailing punctuation. Keep it short (2–4 words)."
+        }
+        "meta_title" => {
+            "This is an SEO meta title. Output ONLY the translated title as plain text. \
+                        No markdown, no formatting, no quotes. Maximum 60 characters."
+        }
+        "meta_description" => {
+            "This is an SEO meta description. Output ONLY the translated description as plain text. \
+                              No markdown, no formatting, no quotes. Maximum 160 characters."
+        }
         _ => "Output ONLY the translated text, nothing else.",
     };
     format!("{base} {constraint}")

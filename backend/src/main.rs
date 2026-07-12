@@ -20,7 +20,7 @@ use forja::{AppState, Settings};
 /// which lets Railway's edge proxy discard the stale upstream connections instead
 /// of holding them for a 5 s connect-timeout retry on the next request.
 async fn shutdown_signal() {
-    use tokio::signal::unix::{signal, SignalKind};
+    use tokio::signal::unix::{SignalKind, signal};
     let mut sigterm = signal(SignalKind::terminate()).expect("install SIGTERM handler");
     let mut sigint = signal(SignalKind::interrupt()).expect("install SIGINT handler");
     tokio::select! {
@@ -268,13 +268,13 @@ async fn main() {
         .bind(&proxy_prefix)
         .execute(&db_pool)
         .await;
-        if let Ok(result) = updated {
-            if result.rows_affected() > 0 {
-                tracing::info!(
-                    "Migrated {} media URLs to backend proxy",
-                    result.rows_affected()
-                );
-            }
+        if let Ok(result) = updated
+            && result.rows_affected() > 0
+        {
+            tracing::info!(
+                "Migrated {} media URLs to backend proxy",
+                result.rows_affected()
+            );
         }
     }
 

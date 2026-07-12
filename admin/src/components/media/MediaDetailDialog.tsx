@@ -120,10 +120,12 @@ export default function MediaDetailDialog({ open, media, folders, onClose }: Med
   });
 
   const prevOpenRef = useRef(false);
-  if (open && !prevOpenRef.current) {
-    setSelectedFolderId(media?.folder_id || '');
-  }
-  prevOpenRef.current = open;
+  useEffect(() => {
+    if (open && !prevOpenRef.current) {
+      setSelectedFolderId(media?.folder_id || '');
+    }
+    prevOpenRef.current = open;
+  }, [open, media?.folder_id]);
 
   useEffect(() => {
     const map: Record<string, { alt_text: string; caption: string; title: string }> = {};

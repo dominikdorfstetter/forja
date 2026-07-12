@@ -20,12 +20,12 @@ use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 use uuid::Uuid;
 
+use crate::AppState;
 use crate::dto::locale::{CreateLocaleRequest, LocaleResponse, UpdateLocaleRequest};
 use crate::dto::validated::ValidatedJson;
 use crate::errors::{ApiError, ProblemDetails};
 use crate::guards::auth_guard::{AdminKey, ReadKey};
 use crate::models::locale::Locale;
-use crate::AppState;
 
 /// Query parameter wrapper for `?include_inactive=true`. Defining the
 /// shape as a struct lets `axum::extract::Query` deserialize it; the

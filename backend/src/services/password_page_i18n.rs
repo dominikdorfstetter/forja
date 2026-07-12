@@ -183,10 +183,10 @@ fn parse_accept_language(header: &str) -> Vec<WeightedTag> {
             }
             let mut q = 1.0_f32;
             for param in iter {
-                if let Some(value) = param.strip_prefix("q=") {
-                    if let Ok(parsed) = value.parse::<f32>() {
-                        q = parsed;
-                    }
+                if let Some(value) = param.strip_prefix("q=")
+                    && let Ok(parsed) = value.parse::<f32>()
+                {
+                    q = parsed;
                 }
             }
             Some(WeightedTag {

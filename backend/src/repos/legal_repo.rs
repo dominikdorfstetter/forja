@@ -8,8 +8,8 @@ use crate::dto::legal::{
     CreateLegalDocumentRequest, CreateLegalGroupRequest, CreateLegalItemRequest,
     UpdateLegalDocumentRequest, UpdateLegalGroupRequest, UpdateLegalItemRequest,
 };
-use crate::errors::codes;
 use crate::errors::ApiError;
+use crate::errors::codes;
 use crate::models::content::{Content, ContentLocalization, ContentStatus};
 use crate::models::legal::{
     LegalDocType, LegalDocument, LegalDocumentLocalization, LegalDocumentWithContent, LegalGroup,

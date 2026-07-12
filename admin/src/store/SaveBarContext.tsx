@@ -124,10 +124,12 @@ export function useRegisterSaveBar(
   const discardRef = useRef(options.onDiscard);
   const revertFieldRef = useRef(options.onRevertField);
   const changedFieldsRef = useRef(options.changedFields);
-  saveRef.current = options.onSave;
-  discardRef.current = options.onDiscard;
-  revertFieldRef.current = options.onRevertField;
-  changedFieldsRef.current = options.changedFields;
+  useEffect(() => {
+    saveRef.current = options.onSave;
+    discardRef.current = options.onDiscard;
+    revertFieldRef.current = options.onRevertField;
+    changedFieldsRef.current = options.changedFields;
+  });
 
   const {
     visible,

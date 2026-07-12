@@ -3,6 +3,7 @@
 //! `/api/v1`. Establishes the per-site CRUD shape with `WriteKey` +
 //! `PermissionService::require`.
 
+use crate::AppState;
 use crate::dto::media_folder::{
     CreateMediaFolderRequest, MediaFolderResponse, UpdateMediaFolderRequest,
 };
@@ -11,7 +12,6 @@ use crate::errors::{ApiError, ProblemDetails};
 use crate::guards::auth_guard::{ReadKey, WriteKey};
 use crate::models::media_folder::MediaFolder;
 use crate::services::permission_service::{Permission, PermissionService};
-use crate::AppState;
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use axum::response::Json;

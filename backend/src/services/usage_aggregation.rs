@@ -8,11 +8,11 @@
 use sqlx::PgPool;
 use uuid::Uuid;
 
+use crate::AppState;
 use crate::models::api_key::ApiKeyUsageDaily;
 use crate::models::notification::Notification;
 use crate::services::worker_lock;
 use crate::services::worker_observability::TickReport;
-use crate::AppState;
 
 /// How often the worker runs (seconds).
 const POLL_INTERVAL_SECS: u64 = 300;

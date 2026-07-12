@@ -19,7 +19,7 @@ use crate::dto::redirect::{
     UpdateRedirectRequest,
 };
 use crate::dto::validated::ValidatedJson;
-use crate::errors::{codes, ApiError, ProblemDetails};
+use crate::errors::{ApiError, ProblemDetails, codes};
 use crate::guards::auth_guard::{ReadKey, WriteKey};
 use crate::models::audit::AuditAction;
 use crate::models::redirect::Redirect;
@@ -27,9 +27,9 @@ use crate::services::audited_mutation::AuditedEntity;
 
 /// Redirects audit their mutations without dispatching a webhook.
 const REDIRECT: AuditedEntity = AuditedEntity::audit_only("redirect");
+use crate::AppState;
 use crate::services::permission_service::{Permission, PermissionService};
 use crate::utils::list_params::ListParams;
-use crate::AppState;
 
 #[derive(Debug, Deserialize)]
 struct ListRedirectsQuery {

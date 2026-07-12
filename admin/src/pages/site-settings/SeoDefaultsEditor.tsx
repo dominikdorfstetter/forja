@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo, useCallback } from 'react';
+import { useState, useRef, useMemo, useCallback, useEffect } from 'react';
 import { Box, TextField } from '@mui/material';
 import ImageIcon from '@mui/icons-material/Image';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -54,13 +54,15 @@ export default function SeoDefaultsEditor({ settings, siteName }: SeoDefaultsEdi
   const ogImageUrl = useMediaUrl(defaultOgImageId);
 
   const prevSettingsRef = useRef<typeof settings>(undefined);
-  if (settings && settings !== prevSettingsRef.current) {
-    prevSettingsRef.current = settings;
-    setTitleTemplate(settings.seo_title_template ?? DEFAULT_TITLE_TEMPLATE);
-    setDefaultDescription(settings.seo_default_description ?? '');
-    setDefaultOgImageId(settings.seo_default_og_image_id ?? null);
-    setIsDirty(false);
-  }
+  useEffect(() => {
+    if (settings && settings !== prevSettingsRef.current) {
+      prevSettingsRef.current = settings;
+      setTitleTemplate(settings.seo_title_template ?? DEFAULT_TITLE_TEMPLATE);
+      setDefaultDescription(settings.seo_default_description ?? '');
+      setDefaultOgImageId(settings.seo_default_og_image_id ?? null);
+      setIsDirty(false);
+    }
+  }, [settings]);
 
   const mutation = useMutation({
     mutationFn: (data: {

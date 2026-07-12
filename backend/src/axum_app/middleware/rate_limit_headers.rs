@@ -23,8 +23,8 @@
 //! ran, since all three (Clerk JWT, API key, public) populate the same
 //! `RateLimitHeaderInfo` extension when Redis is configured.
 
-use std::sync::atomic::Ordering::Relaxed;
 use std::sync::Arc;
+use std::sync::atomic::Ordering::Relaxed;
 
 use axum::extract::Request;
 use axum::http::header::HeaderMap;

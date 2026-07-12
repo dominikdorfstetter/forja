@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useCallback } from 'react';
+import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import {
   Box,
   Step,
@@ -114,50 +114,54 @@ export default function NavigationItemWizard({
 
   // --- Reset form when dialog opens ---
   const prevOpenRef = useRef(false);
-  if (open && !prevOpenRef.current) {
-    if (item) {
-      const isBlogLink = item.external_url?.startsWith('/blog/') ?? false;
-      const isCvLink = item.external_url === '/cv';
-      const isLegalLink = item.external_url?.startsWith('/legal/') ?? false;
-      const detectedType: LinkType = isCvLink ? 'cv' : isBlogLink ? 'blog' : isLegalLink ? 'legal' : item.external_url ? 'external' : 'page';
-      setLinkType(detectedType);
-      setPageId(item.page_id || '');
-      setBlogSlug(isBlogLink ? item.external_url!.replace('/blog/', '') : '');
-      setLegalSlug(isLegalLink ? item.external_url!.replace('/legal/', '') : '');
-      setExternalUrl((isBlogLink || isCvLink || isLegalLink) ? '' : (item.external_url || ''));
-      setParentId(item.parent_id || '');
-      setIcon(item.icon || '');
-      setOpenInNewTab(item.open_in_new_tab);
-      setActiveStep(0);
-      setActiveLocaleTab(0);
-      // Titles will be loaded from existingLocalizations below
-    } else {
-      setLinkType(defaultLinkType);
-      setPageId('');
-      setBlogSlug('');
-      setLegalSlug('');
-      setExternalUrl('');
-      setParentId('');
-      setIcon('');
-      setOpenInNewTab(false);
-      setTitles({});
-      setActiveStep(0);
-      setActiveLocaleTab(0);
+  useEffect(() => {
+    if (open && !prevOpenRef.current) {
+      if (item) {
+        const isBlogLink = item.external_url?.startsWith('/blog/') ?? false;
+        const isCvLink = item.external_url === '/cv';
+        const isLegalLink = item.external_url?.startsWith('/legal/') ?? false;
+        const detectedType: LinkType = isCvLink ? 'cv' : isBlogLink ? 'blog' : isLegalLink ? 'legal' : item.external_url ? 'external' : 'page';
+        setLinkType(detectedType);
+        setPageId(item.page_id || '');
+        setBlogSlug(isBlogLink ? item.external_url!.replace('/blog/', '') : '');
+        setLegalSlug(isLegalLink ? item.external_url!.replace('/legal/', '') : '');
+        setExternalUrl((isBlogLink || isCvLink || isLegalLink) ? '' : (item.external_url || ''));
+        setParentId(item.parent_id || '');
+        setIcon(item.icon || '');
+        setOpenInNewTab(item.open_in_new_tab);
+        setActiveStep(0);
+        setActiveLocaleTab(0);
+        // Titles will be loaded from existingLocalizations below
+      } else {
+        setLinkType(defaultLinkType);
+        setPageId('');
+        setBlogSlug('');
+        setLegalSlug('');
+        setExternalUrl('');
+        setParentId('');
+        setIcon('');
+        setOpenInNewTab(false);
+        setTitles({});
+        setActiveStep(0);
+        setActiveLocaleTab(0);
+      }
     }
-  }
-  prevOpenRef.current = open;
+    prevOpenRef.current = open;
+  }, [open, item, defaultLinkType]);
 
   // Populate titles from fetched localizations (edit mode)
   const prevLocRef = useRef<string | undefined>(undefined);
   const locKey = existingLocalizations?.map((l) => `${l.locale_id}:${l.title}`).join(',');
-  if (locKey && locKey !== prevLocRef.current) {
-    const newTitles: Record<string, string> = {};
-    existingLocalizations?.forEach((l) => {
-      newTitles[l.locale_id] = l.title;
-    });
-    setTitles(newTitles);
-  }
-  prevLocRef.current = locKey;
+  useEffect(() => {
+    if (locKey && locKey !== prevLocRef.current) {
+      const newTitles: Record<string, string> = {};
+      existingLocalizations?.forEach((l) => {
+        newTitles[l.locale_id] = l.title;
+      });
+      setTitles(newTitles);
+    }
+    prevLocRef.current = locKey;
+  }, [locKey, existingLocalizations]);
 
   // --- Parent picker options ---
   const parentOptions = useMemo(() => {

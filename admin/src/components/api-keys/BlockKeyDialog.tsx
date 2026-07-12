@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { TextField } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -29,10 +29,12 @@ export default function BlockKeyDialog({ open, keyName: _keyName, onConfirm, onC
   });
 
   const prevOpenRef = useRef(false);
-  if (open && !prevOpenRef.current) {
-    reset({ reason: '' });
-  }
-  prevOpenRef.current = open;
+  useEffect(() => {
+    if (open && !prevOpenRef.current) {
+      reset({ reason: '' });
+    }
+    prevOpenRef.current = open;
+  });
 
   const onFormSubmit = (data: BlockKeyFormData) => {
     onConfirm(data.reason.trim());

@@ -13,7 +13,7 @@ use std::collections::HashSet;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::errors::{codes, ApiError};
+use crate::errors::{ApiError, codes};
 use crate::guards::actor::Actor;
 use crate::models::content::ContentStatus;
 use crate::models::site_membership::SiteRole;
@@ -357,12 +357,12 @@ impl PermissionService {
 
         // 3. Check :own scope
         let own_perm = Permission::scoped(&permission.resource, &permission.action, "own");
-        if permissions.contains(&own_perm) {
-            if let Some(ref creator) = ctx.created_by {
-                let current_user = auth.user_identifier();
-                if current_user == Some(creator.as_str()) {
-                    return Ok(true);
-                }
+        if permissions.contains(&own_perm)
+            && let Some(ref creator) = ctx.created_by
+        {
+            let current_user = auth.user_identifier();
+            if current_user == Some(creator.as_str()) {
+                return Ok(true);
             }
         }
 

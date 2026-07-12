@@ -25,8 +25,8 @@
 
 use sqlx::PgPool;
 
-use crate::services::worker_lock;
 use crate::AppState;
+use crate::services::worker_lock;
 
 /// Tick interval. Hourly per the #583 spec.
 const POLL_INTERVAL_SECS: u64 = 3_600;

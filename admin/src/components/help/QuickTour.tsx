@@ -48,10 +48,12 @@ export default function QuickTour({ active, onComplete }: QuickTourProps) {
 
   // Reset step when tour becomes active
   const prevActiveRef = useRef(false);
-  if (active && !prevActiveRef.current) {
-    setCurrentStep(0);
-  }
-  prevActiveRef.current = active;
+  useEffect(() => {
+    if (active && !prevActiveRef.current) {
+      setCurrentStep(0);
+    }
+    prevActiveRef.current = active;
+  }, [active]);
 
   if (!active || availableSteps.length === 0) return null;
 

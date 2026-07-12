@@ -11,7 +11,7 @@ use forja::dto::document::CreateDocumentRequest;
 use forja::repos::document_repo::DocumentRepo;
 use forja::services::document_encryption;
 
-use common::{create_test_site, test_context, TestContext};
+use common::{TestContext, create_test_site, test_context};
 
 const PASSWORD: &str = "correct-horse-battery-staple";
 

@@ -14,7 +14,7 @@ use uuid::Uuid;
 
 use crate::dto::custom_entry::{PublicEntry, PublicSchema, PublicSchemaField};
 use crate::dto::custom_type::CustomFieldResponse;
-use crate::errors::{codes, ApiError};
+use crate::errors::{ApiError, codes};
 use crate::models::custom_type::CustomType;
 
 struct PublicType {
@@ -116,14 +116,13 @@ async fn resolve_locale_id(
     site_id: Uuid,
     locale: Option<&str>,
 ) -> Result<(Uuid, String), ApiError> {
-    if let Some(code) = locale {
-        if let Some(row) = sqlx::query("SELECT id, code FROM locales WHERE code = $1")
+    if let Some(code) = locale
+        && let Some(row) = sqlx::query("SELECT id, code FROM locales WHERE code = $1")
             .bind(code)
             .fetch_optional(pool)
             .await?
-        {
-            return Ok((row.get("id"), row.get("code")));
-        }
+    {
+        return Ok((row.get("id"), row.get("code")));
     }
     let row = sqlx::query(
         "SELECT l.id, l.code FROM locales l

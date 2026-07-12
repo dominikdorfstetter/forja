@@ -12,11 +12,11 @@ use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 use uuid::Uuid;
 
+use crate::AppState;
 use crate::dto::environment::EnvironmentResponse;
 use crate::errors::{ApiError, ProblemDetails};
 use crate::guards::auth_guard::ReadKey;
 use crate::models::environment::Environment;
-use crate::AppState;
 
 #[utoipa::path(
     get,

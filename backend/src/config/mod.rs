@@ -16,8 +16,9 @@ pub use database::DatabaseConfig;
 pub use imprint::ImprintConfig;
 pub use preview::PreviewConfig;
 pub use security::{
-    require_document_encryption_key_in_production, require_non_wildcard_cors_in_production,
-    require_redis_when_fail_closed, validate_clerk_jwt_pinning, RateLimitFailMode, SecurityConfig,
+    RateLimitFailMode, SecurityConfig, require_document_encryption_key_in_production,
+    require_non_wildcard_cors_in_production, require_redis_when_fail_closed,
+    validate_clerk_jwt_pinning,
 };
 pub use settings::Settings;
 pub use storage::StorageConfig;

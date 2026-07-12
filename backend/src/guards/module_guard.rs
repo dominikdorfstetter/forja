@@ -8,8 +8,8 @@ use std::marker::PhantomData;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::errors::codes;
 use crate::errors::ApiError;
+use crate::errors::codes;
 use crate::models::site_settings::SiteSetting;
 
 /// Marker trait for content modules.
@@ -139,10 +139,10 @@ impl<M: ModuleMarker> Default for ModuleGuard<M> {
 fn extract_site_id_from_path(path: &str) -> Option<Uuid> {
     let segments: Vec<&str> = path.split('/').collect();
     for (i, seg) in segments.iter().enumerate() {
-        if *seg == "sites" {
-            if let Some(next) = segments.get(i + 1) {
-                return Uuid::parse_str(next).ok();
-            }
+        if *seg == "sites"
+            && let Some(next) = segments.get(i + 1)
+        {
+            return Uuid::parse_str(next).ok();
         }
     }
     None

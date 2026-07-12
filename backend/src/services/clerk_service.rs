@@ -2,8 +2,8 @@
 //!
 //! Wraps Clerk Backend API for listing/getting users.
 
-use crate::errors::codes;
 use crate::errors::ApiError;
+use crate::errors::codes;
 use serde::Deserialize;
 
 /// Clerk API service

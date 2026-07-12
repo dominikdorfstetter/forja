@@ -61,11 +61,11 @@ impl UserPreferences {
         .await?;
 
         let mut defaults = default_preferences();
-        if let Some((stored,)) = row {
-            if let (Some(base), Some(overlay)) = (defaults.as_object_mut(), stored.as_object()) {
-                for (k, v) in overlay {
-                    base.insert(k.clone(), v.clone());
-                }
+        if let Some((stored,)) = row
+            && let (Some(base), Some(overlay)) = (defaults.as_object_mut(), stored.as_object())
+        {
+            for (k, v) in overlay {
+                base.insert(k.clone(), v.clone());
             }
         }
 

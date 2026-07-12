@@ -24,10 +24,10 @@
 //! no request-time work, no async dependencies.
 
 use axum::extract::Request;
-use axum::http::header::{
-    HeaderMap, HeaderValue, CONTENT_SECURITY_POLICY, REFERRER_POLICY, STRICT_TRANSPORT_SECURITY,
-};
 use axum::http::HeaderName;
+use axum::http::header::{
+    CONTENT_SECURITY_POLICY, HeaderMap, HeaderValue, REFERRER_POLICY, STRICT_TRANSPORT_SECURITY,
+};
 use axum::middleware::Next;
 use axum::response::Response;
 
@@ -95,10 +95,10 @@ pub async fn layer(req: Request, next: Next) -> Response {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use axum::Router;
     use axum::body::Body;
     use axum::http::{Request, StatusCode};
     use axum::routing::get;
-    use axum::Router;
     use tower::ServiceExt;
 
     /// Trivial handler that returns 200 with no headers, so the middleware is

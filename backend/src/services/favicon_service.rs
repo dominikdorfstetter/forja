@@ -6,8 +6,8 @@
 use std::io::Cursor;
 use std::sync::Arc;
 
-use image::imageops::FilterType;
 use image::ImageReader;
+use image::imageops::FilterType;
 use uuid::Uuid;
 
 use crate::dto::favicon::FaviconVariant;

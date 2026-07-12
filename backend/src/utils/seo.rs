@@ -11,7 +11,7 @@ use crate::errors::ApiError;
 use crate::models::media::MediaFile;
 use crate::models::site::Site;
 use crate::models::site_settings::{
-    SiteSetting, KEY_SEO_DEFAULT_DESCRIPTION, KEY_SEO_DEFAULT_OG_IMAGE_ID, KEY_SEO_TITLE_TEMPLATE,
+    KEY_SEO_DEFAULT_DESCRIPTION, KEY_SEO_DEFAULT_OG_IMAGE_ID, KEY_SEO_TITLE_TEMPLATE, SiteSetting,
 };
 
 /// Apply title template and default description to localizations
@@ -61,25 +61,22 @@ pub async fn resolve_og_image_url(
     site_logo_url: Option<&str>,
 ) -> Option<String> {
     // 1. Cover image
-    if let Some(id) = cover_image_id {
-        if let Ok(media) = MediaFile::find_by_id(pool, id).await {
-            if let Some(url) = media.public_url {
-                return Some(url);
-            }
-        }
+    if let Some(id) = cover_image_id
+        && let Ok(media) = MediaFile::find_by_id(pool, id).await
+        && let Some(url) = media.public_url
+    {
+        return Some(url);
     }
 
     // 2. Default OG image from settings
-    if let Some(id_str) = default_og_image_id {
-        if let Ok(id) = Uuid::parse_str(id_str) {
-            if let Ok(media) = MediaFile::find_by_id(pool, id).await {
-                if let Some(url) = media.public_url {
-                    return Some(url);
-                }
-            }
-            // Stale UUID — degrade gracefully, don't return broken URL
-        }
+    if let Some(id_str) = default_og_image_id
+        && let Ok(id) = Uuid::parse_str(id_str)
+        && let Ok(media) = MediaFile::find_by_id(pool, id).await
+        && let Some(url) = media.public_url
+    {
+        return Some(url);
     }
+    // Stale UUID — degrade gracefully, don't return broken URL
 
     // 3. Site logo as last resort
     site_logo_url

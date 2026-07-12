@@ -7,9 +7,9 @@
 
 use sqlx::PgPool;
 
+use crate::AppState;
 use crate::models::custom_entry::CustomEntry;
 use crate::services::worker_lock;
-use crate::AppState;
 
 const POLL_INTERVAL_SECS: u64 = 3_600;
 

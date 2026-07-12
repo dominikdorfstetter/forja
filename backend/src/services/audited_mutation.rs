@@ -96,10 +96,10 @@ pub async fn execute(pool: &PgPool, mut event: MutationEvent) -> Option<Uuid> {
     }
 
     if let (Some(webhook_event), Some(site_id)) = (event.webhook_event.take(), event.site_id) {
-        if let Some(id) = audit_id {
-            if let Some(map) = event.webhook_payload.as_object_mut() {
-                map.insert("audit_id".to_string(), serde_json::json!(id.to_string()));
-            }
+        if let Some(id) = audit_id
+            && let Some(map) = event.webhook_payload.as_object_mut()
+        {
+            map.insert("audit_id".to_string(), serde_json::json!(id.to_string()));
         }
 
         webhook_service::dispatch(

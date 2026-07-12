@@ -8,8 +8,8 @@ use async_trait::async_trait;
 use std::sync::Arc;
 
 use crate::config::StorageConfig;
-use crate::errors::codes;
 use crate::errors::ApiError;
+use crate::errors::codes;
 
 /// Result of a storage backend health check
 pub struct StorageHealthInfo {

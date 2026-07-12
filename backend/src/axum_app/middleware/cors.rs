@@ -19,13 +19,13 @@
 //! response gets CORS headers grafted on after `next.run()`.
 
 use axum::extract::{Request, State};
-use axum::http::header::{HeaderMap, ACCESS_CONTROL_ALLOW_METHODS};
+use axum::http::header::{ACCESS_CONTROL_ALLOW_METHODS, HeaderMap};
 use axum::http::{HeaderName, HeaderValue, Method, StatusCode};
 use axum::middleware::Next;
 use axum::response::{IntoResponse, Response};
 
-use crate::middleware::cors;
 use crate::AppState;
+use crate::middleware::cors;
 
 const ACCESS_CONTROL_ALLOW_ORIGIN: HeaderName =
     HeaderName::from_static("access-control-allow-origin");

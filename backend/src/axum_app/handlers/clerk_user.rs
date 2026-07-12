@@ -12,19 +12,19 @@ use serde::Deserialize;
 use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 
+use crate::AppState;
 use crate::dto::clerk::{
     BanUserRequest, ClerkUserListResponse, ClerkUserResponse, ModerationActionResponse,
     SuspendUserRequest, UpdateClerkUserRoleRequest,
 };
 use crate::dto::validated::ValidatedJson;
-use crate::errors::{codes, ApiError, ProblemDetails};
+use crate::errors::{ApiError, ProblemDetails, codes};
 use crate::guards::actor::Actor;
 use crate::guards::auth_guard::AdminKey;
 use crate::models::audit::AuditAction;
 use crate::models::site_membership::SiteMembership;
 use crate::models::user_moderation::UserModeration;
 use crate::services::audited_mutation::AuditedEntity;
-use crate::AppState;
 
 /// Moderation status snapshot extracted from a `UserModeration` record.
 struct ModerationInfo {
@@ -382,13 +382,13 @@ async fn unsuspend_user(
 
     let moderation_records =
         UserModeration::find_by_user_ids(&state.db, std::slice::from_ref(&clerk_user_id)).await?;
-    if let Some(record) = moderation_records.first() {
-        if record.is_banned() {
-            return Err(ApiError::bad_request(
-                "Cannot unsuspend a banned user. Use delete instead.",
-            )
-            .with_code(codes::BAD_REQUEST));
-        }
+    if let Some(record) = moderation_records.first()
+        && record.is_banned()
+    {
+        return Err(
+            ApiError::bad_request("Cannot unsuspend a banned user. Use delete instead.")
+                .with_code(codes::BAD_REQUEST),
+        );
     }
 
     let admin_id = auth.0.user_identifier().unwrap_or("system").to_string();

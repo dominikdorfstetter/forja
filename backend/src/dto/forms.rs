@@ -378,13 +378,13 @@ impl UpsertSiteBotProtectionRequest {
     /// Per-mode field validation. Mirrors the #608 length/URL limits for
     /// remote mode and enforces that vendor fields are present there.
     pub fn validate_for_mode(&self) -> Result<(), crate::errors::ApiError> {
-        use crate::errors::{codes, ApiError};
+        use crate::errors::{ApiError, codes};
         let fail =
             |msg: &str| ApiError::bad_request(msg.to_string()).with_code(codes::VALIDATION_ERROR);
-        if let Some(label) = &self.provider_label {
-            if label.len() > 100 {
-                return Err(fail("provider_label must be ≤ 100 chars"));
-            }
+        if let Some(label) = &self.provider_label
+            && label.len() > 100
+        {
+            return Err(fail("provider_label must be ≤ 100 chars"));
         }
         match self.mode {
             BotProtectionMode::Remote => {
@@ -401,10 +401,10 @@ impl UpsertSiteBotProtectionRequest {
                 }
             }
             BotProtectionMode::Altcha => {
-                if let Some(secret) = &self.secret {
-                    if secret.len() > 500 {
-                        return Err(fail("secret must be ≤ 500 chars"));
-                    }
+                if let Some(secret) = &self.secret
+                    && secret.len() > 500
+                {
+                    return Err(fail("secret must be ≤ 500 chars"));
                 }
             }
         }

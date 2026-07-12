@@ -14,11 +14,11 @@
 //! served from port 8000 — both run during the migration. At cutover the
 //! Rocket spec is deleted and this becomes canonical.
 
+use axum::Router;
 use axum::extract::Request;
 use axum::http::HeaderName;
 use axum::middleware::Next;
 use axum::response::Response;
-use axum::Router;
 
 /// Mount prefix for the versioned JSON API. Single source of truth — anything
 /// that needs to reason about the live request path (router nesting, CORS
@@ -26,12 +26,13 @@ use axum::Router;
 /// the literal, so a future re-mount cannot silently desync them.
 pub const API_MOUNT_PREFIX: &str = "/api/v1";
 use tower_http::request_id::{MakeRequestUuid, PropagateRequestIdLayer, SetRequestIdLayer};
-use tracing::field::Empty;
 use tracing::Instrument;
+use tracing::field::Empty;
 use utoipa::OpenApi;
 use utoipa_axum::router::OpenApiRouter;
 use utoipa_swagger_ui::SwaggerUi;
 
+use crate::AppState;
 use crate::dto::ai::{
     AiConfigResponse, AiGenerateRequest, AiGenerateResponse, AiTestResponse, CreateAiConfigRequest,
     ListModelsRequest, ListModelsResponse,
@@ -178,7 +179,6 @@ use crate::errors::ProblemDetails;
 use crate::models::ai_usage::GroupBy as AiUsageGroupBy;
 use crate::models::locale::TextDirection;
 use crate::utils::pagination::PaginationMeta;
-use crate::AppState;
 
 pub mod authorized_content;
 pub mod extractors;

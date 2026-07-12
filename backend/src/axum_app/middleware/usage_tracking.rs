@@ -21,9 +21,9 @@ use axum::extract::{Request, State};
 use axum::middleware::Next;
 use axum::response::Response;
 
+use crate::AppState;
 use crate::middleware::usage_tracking::ApiKeyUsageContext;
 use crate::models::api_key::ApiKeyUsage;
-use crate::AppState;
 
 pub async fn layer(State(state): State<AppState>, mut req: Request, next: Next) -> Response {
     // Same pattern as rate_limit_headers: ensure the Arc lives across
@@ -83,20 +83,20 @@ pub async fn layer(State(state): State<AppState>, mut req: Request, next: Next) 
             );
         }
 
-        if status_code >= 400 {
-            if let Some(ref redis) = redis {
-                let now = chrono::Utc::now();
-                let error_key = format!("quota:{}:err_h:{}", api_key_id, now.format("%Y%m%d%H"));
-                let mut conn = redis.clone();
-                let count: Result<u32, _> =
-                    redis::AsyncCommands::incr(&mut conn, &error_key, 1u32).await;
-                if let Ok(1) = count {
-                    let _ = redis::cmd("EXPIRE")
-                        .arg(&error_key)
-                        .arg(7200i64)
-                        .query_async::<()>(&mut conn)
-                        .await;
-                }
+        if status_code >= 400
+            && let Some(ref redis) = redis
+        {
+            let now = chrono::Utc::now();
+            let error_key = format!("quota:{}:err_h:{}", api_key_id, now.format("%Y%m%d%H"));
+            let mut conn = redis.clone();
+            let count: Result<u32, _> =
+                redis::AsyncCommands::incr(&mut conn, &error_key, 1u32).await;
+            if let Ok(1) = count {
+                let _ = redis::cmd("EXPIRE")
+                    .arg(&error_key)
+                    .arg(7200i64)
+                    .query_async::<()>(&mut conn)
+                    .await;
             }
         }
     });

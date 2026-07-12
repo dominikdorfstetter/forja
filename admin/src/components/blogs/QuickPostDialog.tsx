@@ -1,4 +1,4 @@
-import { useCallback, useReducer, useRef, useState } from 'react';
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import {
   Alert,
   Box,
@@ -144,7 +144,9 @@ export default function QuickPostDialog({ open, onClose }: QuickPostDialogProps)
   const anchorRef = useRef<HTMLDivElement>(null);
   const outlineIdCounter = useRef(0);
   const stateRef = useRef(state);
-  stateRef.current = state;
+  useEffect(() => {
+    stateRef.current = state;
+  });
 
   const resetForm = useCallback(() => {
     dispatch({ type: 'RESET' });

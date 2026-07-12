@@ -2,12 +2,13 @@
 //! covering member CRUD, ownership transfer, the caller's own
 //! membership list, and self-leave.
 
+use crate::AppState;
 use crate::dto::site_membership::{
     AddSiteMemberRequest, MembershipSummary, SiteMembershipResponse, TransferOwnershipRequest,
     UpdateMemberRoleRequest,
 };
 use crate::dto::validated::ValidatedJson;
-use crate::errors::{codes, ApiError};
+use crate::errors::{ApiError, codes};
 use crate::guards::actor::Actor;
 use crate::models::audit::AuditAction;
 use crate::models::site_membership::{SiteMembership, SiteRole};
@@ -15,7 +16,6 @@ use crate::services::audited_mutation::AuditedEntity;
 use crate::services::permission_cache;
 use crate::services::permission_service::{Permission, PermissionService};
 use crate::services::site_membership_service;
-use crate::AppState;
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use axum::response::Json;
@@ -404,21 +404,19 @@ async fn leave_site(
     // If this is the demo site, mark the user as opted out so they
     // won't be re-joined on the next /auth/me call. Runtime/config concern —
     // stays in the handler, around (not inside) the audited mutation.
-    if state.settings.demo_mode {
-        if let Ok(demo_site) =
+    if state.settings.demo_mode
+        && let Ok(demo_site) =
             crate::models::site::Site::find_by_slug(&state.db, "john-forja").await
-        {
-            if demo_site.id == site_id {
-                let _ = crate::models::user_preferences::UserPreferences::upsert(
-                    &state.db,
-                    clerk_user_id,
-                    serde_json::json!({
-                        crate::models::user_preferences::KEY_DEMO_SITE_OPTED_IN: false
-                    }),
-                )
-                .await;
-            }
-        }
+        && demo_site.id == site_id
+    {
+        let _ = crate::models::user_preferences::UserPreferences::upsert(
+            &state.db,
+            clerk_user_id,
+            serde_json::json!({
+                crate::models::user_preferences::KEY_DEMO_SITE_OPTED_IN: false
+            }),
+        )
+        .await;
     }
 
     if let Some(ref mut redis) = state.redis.clone() {

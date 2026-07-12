@@ -6,8 +6,8 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::dto::media_folder::{CreateMediaFolderRequest, UpdateMediaFolderRequest};
-use crate::errors::codes;
 use crate::errors::ApiError;
+use crate::errors::codes;
 
 /// Media folder model
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]

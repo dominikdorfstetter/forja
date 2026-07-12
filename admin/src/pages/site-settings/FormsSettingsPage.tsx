@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import {
   Alert,
   Box,
@@ -116,15 +116,17 @@ function BotProtectionSection({ siteId }: BotProtectionSectionProps) {
   // When the loaded config changes, reset the form. The ref guard keeps us
   // from clobbering edits on background refetches.
   const prevConfigRef = useRef<SiteBotProtectionResponse | null | undefined>(undefined);
-  if (config !== prevConfigRef.current) {
-    prevConfigRef.current = config;
-    setMode(config?.mode ?? ALTCHA);
-    setProviderLabel(config?.provider_label ?? '');
-    setVerifyUrl(config?.verify_url ?? '');
-    setSecret('');
-    setEditing(!config); // unconfigured sites land straight into edit mode
-    setIsDirty(false);
-  }
+  useEffect(() => {
+    if (config !== prevConfigRef.current) {
+      prevConfigRef.current = config;
+      setMode(config?.mode ?? ALTCHA);
+      setProviderLabel(config?.provider_label ?? '');
+      setVerifyUrl(config?.verify_url ?? '');
+      setSecret('');
+      setEditing(!config); // unconfigured sites land straight into edit mode
+      setIsDirty(false);
+    }
+  }, [config]);
 
   const upsertMutation = useMutation({
     mutationFn: () =>

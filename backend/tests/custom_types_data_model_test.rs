@@ -175,7 +175,9 @@ async fn all_seven_field_types_are_representable() {
 
     assert_eq!(
         kinds,
-        vec!["text", "richtext", "number", "boolean", "date", "enum", "media", "text"]
+        vec![
+            "text", "richtext", "number", "boolean", "date", "enum", "media", "text"
+        ]
     );
 
     // The enum field kept its options; the PII field kept its legal basis.

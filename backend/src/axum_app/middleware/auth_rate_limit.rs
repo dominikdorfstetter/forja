@@ -7,14 +7,14 @@
 //! (record 401/403 failures). No-op when Redis is unavailable (fail-open).
 
 use axum::extract::{Request, State};
-use axum::http::{header, HeaderValue, StatusCode};
+use axum::http::{HeaderValue, StatusCode, header};
 use axum::middleware::Next;
 use axum::response::{IntoResponse, Response};
 
+use crate::AppState;
 use crate::errors::ProblemDetails;
 use crate::guards::auth_guard;
-use crate::middleware::auth_rate_limit::{is_auth_path, AuthRateLimiter};
-use crate::AppState;
+use crate::middleware::auth_rate_limit::{AuthRateLimiter, is_auth_path};
 
 fn rate_limited_response() -> Response {
     let body = ProblemDetails {

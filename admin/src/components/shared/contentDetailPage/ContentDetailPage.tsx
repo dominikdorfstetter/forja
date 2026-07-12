@@ -361,7 +361,7 @@ export default function ContentDetailPage<TDetail, TFormData extends FieldValues
   // listener bound once — re-subscribing on every `runSave` identity change is
   // pointless churn (equivalent to a stable Effect Event).
   const runSaveRef = useRef(runSave);
-  runSaveRef.current = runSave;
+  useEffect(() => { runSaveRef.current = runSave; });
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const mod = e.ctrlKey || e.metaKey;

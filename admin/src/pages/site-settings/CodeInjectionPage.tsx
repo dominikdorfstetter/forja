@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { Box, Alert } from '@mui/material';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -35,12 +35,14 @@ export default function CodeInjectionPage() {
   });
 
   const prevSettingsRef = useRef<typeof settings>(undefined);
-  if (settings && settings !== prevSettingsRef.current) {
-    prevSettingsRef.current = settings;
-    setHeadCode(settings.code_injection_head ?? '');
-    setFooterCode(settings.code_injection_footer ?? '');
-    setIsDirty(false);
-  }
+  useEffect(() => {
+    if (settings && settings !== prevSettingsRef.current) {
+      prevSettingsRef.current = settings;
+      setHeadCode(settings.code_injection_head ?? '');
+      setFooterCode(settings.code_injection_footer ?? '');
+      setIsDirty(false);
+    }
+  }, [settings]);
 
   const mutation = useMutation({
     mutationFn: (data: { code_injection_head: string; code_injection_footer: string }) =>

@@ -13,24 +13,24 @@ use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 use uuid::Uuid;
 
+use crate::AppState;
 use crate::axum_app::extractors::{ClientIp, UserAgent};
 use crate::dto::analytics::{
     AnalyticsMaintenanceResponse, AnalyticsPageDetailResponse, AnalyticsReportResponse,
     ReferrerItem, TopContentItem, TrackPageviewRequest, TrackPageviewResponse, TrendDataPoint,
 };
 use crate::dto::validated::ValidatedJson;
-use crate::errors::{codes, ApiError};
+use crate::errors::{ApiError, codes};
 use crate::guards::auth_guard::{AdminKey, ReadKey, WriteKey};
 use crate::models::analytics::{
-    compute_visitor_hash, extract_referrer_domain, AnalyticsPageview, ReferrerRow,
+    AnalyticsPageview, ReferrerRow, compute_visitor_hash, extract_referrer_domain,
 };
 use crate::models::audit::AuditAction;
 use crate::models::site_settings::{
-    SiteSetting, KEY_ANALYTICS_ENABLED, KEY_ANALYTICS_RETENTION_DAYS,
+    KEY_ANALYTICS_ENABLED, KEY_ANALYTICS_RETENTION_DAYS, SiteSetting,
 };
 use crate::services::audited_mutation::AuditedEntity;
 use crate::services::permission_service::{Permission, PermissionService};
-use crate::AppState;
 
 async fn require_analytics_enabled(pool: &sqlx::PgPool, site_id: Uuid) -> Result<(), ApiError> {
     let value = SiteSetting::get_value(pool, site_id, KEY_ANALYTICS_ENABLED).await?;

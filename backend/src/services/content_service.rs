@@ -4,8 +4,8 @@ use chrono::{DateTime, Utc};
 use sqlx::{PgConnection, PgPool};
 use uuid::Uuid;
 
-use crate::errors::codes;
 use crate::errors::ApiError;
+use crate::errors::codes;
 use crate::models::content::ContentStatus;
 
 pub struct ContentService;
@@ -53,13 +53,13 @@ impl ContentService {
         created_by: Option<&str>,
     ) -> Result<Uuid, ApiError> {
         // Validate scheduling window
-        if let (Some(start), Some(end)) = (publish_start, publish_end) {
-            if end <= start {
-                return Err(
-                    ApiError::bad_request("publish_end must be after publish_start")
-                        .with_code(codes::CONTENT_PUBLISH_DATE_INVALID),
-                );
-            }
+        if let (Some(start), Some(end)) = (publish_start, publish_end)
+            && end <= start
+        {
+            return Err(
+                ApiError::bad_request("publish_end must be after publish_start")
+                    .with_code(codes::CONTENT_PUBLISH_DATE_INVALID),
+            );
         }
 
         // Auto-status: if publish_start is in the future and status is Published, use Scheduled
@@ -145,13 +145,13 @@ impl ContentService {
         publish_end: Option<DateTime<Utc>>,
     ) -> Result<(), ApiError> {
         // Validate scheduling window
-        if let (Some(start), Some(end)) = (publish_start, publish_end) {
-            if end <= start {
-                return Err(
-                    ApiError::bad_request("publish_end must be after publish_start")
-                        .with_code(codes::CONTENT_PUBLISH_DATE_INVALID),
-                );
-            }
+        if let (Some(start), Some(end)) = (publish_start, publish_end)
+            && end <= start
+        {
+            return Err(
+                ApiError::bad_request("publish_end must be after publish_start")
+                    .with_code(codes::CONTENT_PUBLISH_DATE_INVALID),
+            );
         }
 
         // Validate status transition against the state machine

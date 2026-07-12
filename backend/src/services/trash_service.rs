@@ -20,7 +20,7 @@ use std::sync::Arc;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::errors::{codes, ApiError};
+use crate::errors::{ApiError, codes};
 use crate::guards::actor::Actor;
 use crate::models::audit::AuditAction;
 use crate::models::content::Content;

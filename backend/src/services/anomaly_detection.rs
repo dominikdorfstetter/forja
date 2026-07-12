@@ -15,11 +15,11 @@ use std::sync::Arc;
 use tokio::sync::Semaphore;
 use uuid::Uuid;
 
+use crate::AppState;
 use crate::config::SecurityConfig;
 use crate::models::api_key::{ApiKey, ApiKeyStatus, ApiKeyUsageDaily};
 use crate::services::audit_service;
 use crate::services::worker_lock;
-use crate::AppState;
 
 /// How often the worker runs (seconds).
 const POLL_INTERVAL_SECS: u64 = 60;
@@ -146,10 +146,10 @@ async fn scan_active_keys(
             .await?;
 
         for key in keys {
-            if let Some(uuid_str) = extract_key_id(&key) {
-                if let Ok(uuid) = Uuid::parse_str(uuid_str) {
-                    ids.insert(uuid);
-                }
+            if let Some(uuid_str) = extract_key_id(&key)
+                && let Ok(uuid) = Uuid::parse_str(uuid_str)
+            {
+                ids.insert(uuid);
             }
         }
     }

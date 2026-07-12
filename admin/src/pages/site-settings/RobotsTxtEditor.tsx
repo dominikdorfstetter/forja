@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo, useCallback } from 'react';
+import { useState, useRef, useMemo, useCallback, useEffect } from 'react';
 import {
   Box, IconButton, TextField, Select, MenuItem, Tooltip, Alert, Chip,
 } from '@mui/material';
@@ -94,16 +94,18 @@ export default function RobotsTxtEditor({ settings, baseUrl }: RobotsTxtEditorPr
   const [isDirty, setIsDirty] = useState(false);
 
   const prevSettingsRef = useRef<typeof settings>(undefined);
-  if (settings && settings !== prevSettingsRef.current) {
-    prevSettingsRef.current = settings;
-    setRules(
-      (settings.robots_txt_rules ?? DEFAULT_RULES).map((r) => ({
-        ...r,
-        _id: idCounter.current++,
-      })),
-    );
-    setIsDirty(false);
-  }
+  useEffect(() => {
+    if (settings && settings !== prevSettingsRef.current) {
+      prevSettingsRef.current = settings;
+      setRules(
+        (settings.robots_txt_rules ?? DEFAULT_RULES).map((r) => ({
+          ...r,
+          _id: idCounter.current++,
+        })),
+      );
+      setIsDirty(false);
+    }
+  }, [settings]);
 
   const mutation = useMutation({
     mutationFn: (data: { robots_txt_rules: RobotsTxtRule[] }) =>
@@ -127,9 +129,10 @@ export default function RobotsTxtEditor({ settings, baseUrl }: RobotsTxtEditorPr
   }, [rules, mutation]);
 
   const addBlock = useCallback(() => {
+    const id = idCounter.current++;
     setRules((prev) => [
       ...prev,
-      { _id: idCounter.current++, user_agent: '', rules: [{ directive: 'Allow', path: '/' }] },
+      { _id: id, user_agent: '', rules: [{ directive: 'Allow', path: '/' }] },
     ]);
     setIsDirty(true);
   }, []);

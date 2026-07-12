@@ -2,13 +2,14 @@
 //! tag and category CRUD plus content-attachment ops. Mounted under
 //! `/api/v1`.
 
+use crate::AppState;
 use crate::dto::taxonomy::{
     AssignCategoryRequest, AssignTagRequest, CategoryResponse, CategoryWithCountResponse,
     CreateCategoryRequest, CreateTagRequest, PaginatedCategories, PaginatedTags, TagResponse,
     UpdateCategoryRequest, UpdateTagRequest,
 };
 use crate::dto::validated::ValidatedJson;
-use crate::errors::{codes, ApiError, ProblemDetails};
+use crate::errors::{ApiError, ProblemDetails, codes};
 use crate::guards::actor::Actor;
 use crate::guards::auth_guard::{ReadKey, WriteKey};
 use crate::models::audit::AuditAction;
@@ -17,7 +18,6 @@ use crate::models::taxonomy::{Category, Tag};
 use crate::services::audited_mutation::AuditedEntity;
 use crate::services::permission_service::{Permission, PermissionService};
 use crate::utils::list_params::ListParams;
-use crate::AppState;
 use axum::extract::{Path, Query, State};
 use axum::http::StatusCode;
 use axum::response::Json;

@@ -23,8 +23,8 @@
 
 use serde::Deserialize;
 
-use crate::errors::codes;
 use crate::errors::ApiError;
+use crate::errors::codes;
 use crate::services::url_validation;
 
 const VERIFY_TIMEOUT_SECS: u64 = 5;
@@ -105,10 +105,11 @@ pub async fn perform_verify(
         let mut serializer = url::form_urlencoded::Serializer::new(String::new());
         serializer.append_pair("secret", secret);
         serializer.append_pair("response", token);
-        if let Some(ip) = remote_ip {
-            if !ip.is_empty() && ip != "unknown" {
-                serializer.append_pair("remoteip", ip);
-            }
+        if let Some(ip) = remote_ip
+            && !ip.is_empty()
+            && ip != "unknown"
+        {
+            serializer.append_pair("remoteip", ip);
         }
         serializer.finish()
     };

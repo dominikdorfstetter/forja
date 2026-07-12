@@ -8,8 +8,8 @@ use axum::response::Json;
 use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 
-use crate::dto::config::ConfigResponse;
 use crate::AppState;
+use crate::dto::config::ConfigResponse;
 
 #[utoipa::path(
     get,

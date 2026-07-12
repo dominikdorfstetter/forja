@@ -8,8 +8,8 @@
 //! than a separate code path.
 
 use axum::extract::{Path, Query, State};
-use axum::http::header::{CONTENT_DISPOSITION, CONTENT_TYPE};
 use axum::http::HeaderValue;
+use axum::http::header::{CONTENT_DISPOSITION, CONTENT_TYPE};
 use axum::response::Json;
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
@@ -17,13 +17,13 @@ use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 use uuid::Uuid;
 
+use crate::AppState;
 use crate::dto::ai_usage::AiUsageResponse;
 use crate::errors::codes;
 use crate::errors::{ApiError, ProblemDetails};
 use crate::guards::actor::Actor;
 use crate::models::ai_usage::{AiUsageFilters, AiUsageLog, GroupBy};
 use crate::models::site_membership::SiteRole;
-use crate::AppState;
 
 /// Cap on the number of raw rows returned in the JSON response. Aggregates
 /// see every row regardless; this is just the table preview.

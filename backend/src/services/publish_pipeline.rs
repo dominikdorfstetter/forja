@@ -159,43 +159,44 @@ pub async fn execute(pool: &PgPool, event: PublishEvent) -> Result<PublishResult
     )
     .await;
 
-    if let Some(transition) = &event.status_transition {
-        if transition.to == ContentStatus::InReview && transition.from != ContentStatus::InReview {
-            let slug = event
-                .slug
-                .clone()
-                .unwrap_or_else(|| event.entity_id.to_string());
-            notification_service::notify_content_submitted(
-                pool,
-                event.site_id,
-                event.entity_type,
-                event.entity_id,
-                &slug,
-                event.clerk_actor_id.as_deref(),
-            )
-            .await;
-        }
+    if let Some(transition) = &event.status_transition
+        && transition.to == ContentStatus::InReview
+        && transition.from != ContentStatus::InReview
+    {
+        let slug = event
+            .slug
+            .clone()
+            .unwrap_or_else(|| event.entity_id.to_string());
+        notification_service::notify_content_submitted(
+            pool,
+            event.site_id,
+            event.entity_type,
+            event.entity_id,
+            &slug,
+            event.clerk_actor_id.as_deref(),
+        )
+        .await;
     }
 
-    if let Some(transition) = &event.status_transition {
-        if transition.to == ContentStatus::Published && transition.from != ContentStatus::Published
-        {
-            let published_event = event
-                .webhook_published_event
-                .clone()
-                .unwrap_or_else(|| format!("{}.published", event.entity_type));
-            publish_hooks::on_content_published(
-                pool,
-                event.content_id,
-                event.site_id,
-                event.entity_type,
-                &published_event,
-                event.entity_id,
-                event.user_id,
-                None,
-            )
-            .await;
-        }
+    if let Some(transition) = &event.status_transition
+        && transition.to == ContentStatus::Published
+        && transition.from != ContentStatus::Published
+    {
+        let published_event = event
+            .webhook_published_event
+            .clone()
+            .unwrap_or_else(|| format!("{}.published", event.entity_type));
+        publish_hooks::on_content_published(
+            pool,
+            event.content_id,
+            event.site_id,
+            event.entity_type,
+            &published_event,
+            event.entity_id,
+            event.user_id,
+            None,
+        )
+        .await;
     }
 
     // Drop the site's cached public reads so edits show immediately rather

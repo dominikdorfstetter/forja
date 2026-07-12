@@ -12,17 +12,17 @@
 use std::sync::Arc;
 
 use axum_test::TestServer;
-use sqlx::postgres::PgPoolOptions;
 use sqlx::PgPool;
+use sqlx::postgres::PgPoolOptions;
 use tempfile::TempDir;
 use uuid::Uuid;
 
+use forja::AppState;
 use forja::config::{DatabaseConfig, SecurityConfig, Settings, StorageConfig};
 use forja::models::api_key::{ApiKeyPermission, CreateApiKeyResult};
 use forja::models::site::Site;
 use forja::models::site_settings::SiteSetting;
 use forja::services::storage::LocalStorage;
-use forja::AppState;
 
 /// Everything an integration test needs.
 pub struct TestContext {

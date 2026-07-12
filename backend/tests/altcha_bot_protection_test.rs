@@ -5,7 +5,7 @@
 
 mod common;
 
-use base64::{engine::general_purpose::STANDARD, Engine as _};
+use base64::{Engine as _, engine::general_purpose::STANDARD};
 use chrono::{Duration, Utc};
 use serde_json::json;
 use uuid::Uuid;
@@ -16,7 +16,7 @@ use forja::models::forms::Form;
 use forja::models::site_bot_protection::{ConsumedChallenge, SiteBotProtection, UpsertParams};
 use forja::models::site_settings::SiteSetting;
 
-use common::{create_test_api_key, create_test_site, test_context, test_db_pool, TestContext};
+use common::{TestContext, create_test_api_key, create_test_site, test_context, test_db_pool};
 
 /// A fixed 32-byte key — these tests only assert round-trip, not key handling.
 const KEY: [u8; 32] = [7u8; 32];

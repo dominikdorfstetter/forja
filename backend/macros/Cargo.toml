@@ -4,7 +4,7 @@ name = "forja-macros"
 # A breaking change in the macro is, by definition, a breaking change in the
 # host's compile output — so the two stay synced on every release.
 version = "2.0.3"
-edition = "2021"
+edition = "2024"
 description = "Internal proc-macros for Forja (ValidatedDto derive)."
 license = "AGPL-3.0-or-later"
 publish = false

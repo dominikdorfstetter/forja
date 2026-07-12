@@ -5,7 +5,7 @@
 
 mod common;
 
-use common::{create_test_api_key, create_test_site, test_context, TestContext};
+use common::{TestContext, create_test_api_key, create_test_site, test_context};
 use forja::dto::custom_type::{
     CreateCustomTypeRequest, CustomContentKind, CustomFieldInput, CustomFieldType,
 };

@@ -2,6 +2,7 @@
 //! document CRUD, consent groups + items, slug lookup, clone,
 //! versioning, and content localizations.
 
+use crate::AppState;
 use crate::axum_app::authorized_content::{
     AuthorizedContent, AuthorizedSite, Create, Delete, Read, Update,
 };
@@ -34,7 +35,6 @@ use crate::services::localization_lifecycle::{self, legal::LegalLocalization};
 use crate::services::permission_service::{Permission, PermissionService};
 use crate::utils::list_params::ListParams;
 use crate::utils::locale_resolver::{collapse_localizations, pick_one, resolve_ids_for_site};
-use crate::AppState;
 use axum::extract::{Path, Query, State};
 use axum::http::StatusCode;
 use axum::response::Json;

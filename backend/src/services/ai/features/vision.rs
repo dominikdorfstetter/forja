@@ -56,15 +56,14 @@ pub(crate) fn parse_vision_response(
     match action {
         AiAction::AutoTag => {
             // Try to find JSON array in the text
-            if let Some(start) = cleaned.find('[') {
-                if let Some(end) = cleaned.rfind(']') {
-                    if let Ok(arr) = serde_json::from_str::<Vec<String>>(&cleaned[start..=end]) {
-                        return Ok(AiGenerateResponse {
-                            tags: Some(arr),
-                            ..Default::default()
-                        });
-                    }
-                }
+            if let Some(start) = cleaned.find('[')
+                && let Some(end) = cleaned.rfind(']')
+                && let Ok(arr) = serde_json::from_str::<Vec<String>>(&cleaned[start..=end])
+            {
+                return Ok(AiGenerateResponse {
+                    tags: Some(arr),
+                    ..Default::default()
+                });
             }
             Ok(AiGenerateResponse {
                 tags: Some(
@@ -124,10 +123,10 @@ pub(crate) fn extract_json(s: &str) -> String {
     }
 
     // Last resort: find the first { and last } to extract embedded JSON
-    if let Some(start) = trimmed.find('{') {
-        if let Some(end) = trimmed.rfind('}') {
-            return trimmed[start..=end].to_string();
-        }
+    if let Some(start) = trimmed.find('{')
+        && let Some(end) = trimmed.rfind('}')
+    {
+        return trimmed[start..=end].to_string();
     }
 
     trimmed.to_string()

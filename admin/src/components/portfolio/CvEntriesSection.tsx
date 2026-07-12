@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import {
   Alert,
   Box,
@@ -104,10 +104,12 @@ export default function CvEntriesSection({
   const [activeId, setActiveId] = useState<string | null>(null);
 
   const prevEntriesRef = useRef<CvEntryResponse[] | undefined>(undefined);
-  if (entries && entries !== prevEntriesRef.current) {
-    setOrderedEntries(entries);
-  }
-  prevEntriesRef.current = entries;
+  useEffect(() => {
+    if (entries && entries !== prevEntriesRef.current) {
+      setOrderedEntries(entries);
+    }
+    prevEntriesRef.current = entries;
+  }, [entries]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),

@@ -6,8 +6,8 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::dto::locale::{CreateLocaleRequest, UpdateLocaleRequest};
-use crate::errors::codes;
 use crate::errors::ApiError;
+use crate::errors::codes;
 
 /// Text direction enum matching PostgreSQL
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::Type, PartialEq, utoipa::ToSchema)]

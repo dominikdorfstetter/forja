@@ -15,7 +15,7 @@ use forja::dto::custom_type::{
 use forja::models::custom_entry::CustomEntry;
 use forja::models::custom_type::CustomType;
 use forja::services::encryption::resolve_key;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use std::collections::HashMap;
 use uuid::Uuid;
 

@@ -359,12 +359,11 @@ pub fn validate_origin(origin: &str) -> Result<(), ValidationError> {
     if let Some(after_scheme) = origin
         .strip_prefix("https://")
         .or_else(|| origin.strip_prefix("http://"))
+        && after_scheme.contains('/')
     {
-        if after_scheme.contains('/') {
-            let mut err = ValidationError::new("invalid_origin");
-            err.message = Some("Origin must not contain a path".into());
-            return Err(err);
-        }
+        let mut err = ValidationError::new("invalid_origin");
+        err.message = Some("Origin must not contain a path".into());
+        return Err(err);
     }
 
     if !ORIGIN_REGEX.is_match(origin) {
@@ -656,15 +655,16 @@ mod tests {
     #[test]
     fn test_validate_allowed_origins() {
         assert!(validate_allowed_origins(&[]).is_ok());
-        assert!(validate_allowed_origins(&[
-            "https://example.com".to_string(),
-            "https://staging.example.com".to_string(),
-        ])
-        .is_ok());
-        assert!(validate_allowed_origins(&[
-            "https://example.com".to_string(),
-            "invalid".to_string(),
-        ])
-        .is_err());
+        assert!(
+            validate_allowed_origins(&[
+                "https://example.com".to_string(),
+                "https://staging.example.com".to_string(),
+            ])
+            .is_ok()
+        );
+        assert!(
+            validate_allowed_origins(&["https://example.com".to_string(), "invalid".to_string(),])
+                .is_err()
+        );
     }
 }

@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { TextField } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -35,16 +35,18 @@ export default function SocialLinkFormDialog({ open, siteId, link, onSubmit, onC
   });
 
   const prevOpenRef = useRef(false);
-  if (open && !prevOpenRef.current) {
-    reset(link ? {
-      title: link.title,
-      url: link.url,
-      icon: link.icon,
-      alt_text: link.alt_text || '',
-      display_order: link.display_order,
-    } : { title: '', url: '', icon: '', alt_text: '', display_order: 0 });
-  }
-  prevOpenRef.current = open;
+  useEffect(() => {
+    if (open && !prevOpenRef.current) {
+      reset(link ? {
+        title: link.title,
+        url: link.url,
+        icon: link.icon,
+        alt_text: link.alt_text || '',
+        display_order: link.display_order,
+      } : { title: '', url: '', icon: '', alt_text: '', display_order: 0 });
+    }
+    prevOpenRef.current = open;
+  });
 
   const onFormSubmit = (data: SocialLinkFormData) => {
     onSubmit({

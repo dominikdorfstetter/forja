@@ -1,6 +1,6 @@
 //! API Key model
 
-use argon2::password_hash::{rand_core::OsRng, SaltString};
+use argon2::password_hash::{SaltString, rand_core::OsRng};
 use argon2::{Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -12,8 +12,8 @@ use uuid::Uuid;
 
 use chrono::NaiveDate;
 
-use crate::errors::codes;
 use crate::errors::ApiError;
+use crate::errors::codes;
 use crate::middleware::rate_limit::QuotaLimits;
 use crate::utils::list_params::order_clause;
 
@@ -492,24 +492,24 @@ impl ApiKey {
         }
 
         // Check expiration
-        if let Some(expires_at) = key.expires_at {
-            if expires_at < Utc::now() {
-                // Update status to expired
-                let _ = sqlx::query("UPDATE api_keys SET status = 'expired' WHERE id = $1")
-                    .bind(key.id)
-                    .execute(pool)
-                    .await;
+        if let Some(expires_at) = key.expires_at
+            && expires_at < Utc::now()
+        {
+            // Update status to expired
+            let _ = sqlx::query("UPDATE api_keys SET status = 'expired' WHERE id = $1")
+                .bind(key.id)
+                .execute(pool)
+                .await;
 
-                return Ok(ApiKeyValidation {
-                    id: key.id,
-                    permission: key.permission,
-                    site_id: key.site_id,
-                    is_valid: false,
-                    reason: Some("API key has expired".to_string()),
-                    quota_limits: key_quotas,
-                    burst_limit: key.rate_limit_per_second,
-                });
-            }
+            return Ok(ApiKeyValidation {
+                id: key.id,
+                permission: key.permission,
+                site_id: key.site_id,
+                is_valid: false,
+                reason: Some("API key has expired".to_string()),
+                quota_limits: key_quotas,
+                burst_limit: key.rate_limit_per_second,
+            });
         }
 
         Ok(ApiKeyValidation {

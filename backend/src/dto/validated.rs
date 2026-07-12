@@ -15,8 +15,8 @@ use axum::response::Json;
 use serde::de::DeserializeOwned;
 use validator::Validate;
 
-use crate::errors::ApiError;
 use crate::AppState;
+use crate::errors::ApiError;
 
 /// Derives a trivial `ValidatedDto` impl for DTOs whose only validation is the
 /// field-level gate from `derive(Validate)`. See `backend/macros/src/lib.rs`.

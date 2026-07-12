@@ -2,6 +2,7 @@
 //! profile/preferences/onboarding/help-state plus GDPR data export, demo
 //! guest token, and account deletion.
 
+use crate::AppState;
 use crate::dto::audit::{AuditLogResponse, ChangeHistoryResponse};
 use crate::dto::auth::{
     AuthInfoResponse, AuthoredContentSummary, ExportApiKeyRecord, GuestTokenResponse,
@@ -20,7 +21,6 @@ use crate::models::audit::AuditLog;
 use crate::models::notification::Notification;
 use crate::models::site_membership::SiteMembership;
 use crate::models::user_preferences::UserPreferences;
-use crate::AppState;
 use axum::extract::State;
 use axum::http::StatusCode;
 use axum::response::Json;
@@ -42,41 +42,37 @@ async fn fetch_memberships(
             .and_then(|v| v.as_bool())
             .unwrap_or(false);
 
-        if opted_in {
-            if let Ok(demo_site) =
+        if opted_in
+            && let Ok(demo_site) =
                 crate::models::site::Site::find_by_slug(&state.db, "john-forja").await
-            {
-                let existing = SiteMembership::find_by_clerk_user_and_site(
+        {
+            let existing =
+                SiteMembership::find_by_clerk_user_and_site(&state.db, clerk_user_id, demo_site.id)
+                    .await
+                    .unwrap_or(None);
+
+            if existing.is_none() {
+                match SiteMembership::create(
                     &state.db,
                     clerk_user_id,
                     demo_site.id,
+                    &crate::models::site_membership::SiteRole::Viewer,
+                    None,
                 )
                 .await
-                .unwrap_or(None);
-
-                if existing.is_none() {
-                    match SiteMembership::create(
-                        &state.db,
-                        clerk_user_id,
-                        demo_site.id,
-                        &crate::models::site_membership::SiteRole::Viewer,
-                        None,
-                    )
-                    .await
-                    {
-                        Ok(_) => {
-                            tracing::info!(
-                                "Demo mode: auto-joined user {} to demo site",
-                                clerk_user_id
-                            );
-                            let new_rows =
-                                SiteMembership::find_summaries_for_user(&state.db, clerk_user_id)
-                                    .await?;
-                            return Ok(new_rows.into_iter().map(MembershipSummary::from).collect());
-                        }
-                        Err(e) => {
-                            tracing::warn!("Demo mode: failed to auto-join user: {}", e);
-                        }
+                {
+                    Ok(_) => {
+                        tracing::info!(
+                            "Demo mode: auto-joined user {} to demo site",
+                            clerk_user_id
+                        );
+                        let new_rows =
+                            SiteMembership::find_summaries_for_user(&state.db, clerk_user_id)
+                                .await?;
+                        return Ok(new_rows.into_iter().map(MembershipSummary::from).collect());
+                    }
+                    Err(e) => {
+                        tracing::warn!("Demo mode: failed to auto-join user: {}", e);
                     }
                 }
             }

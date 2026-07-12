@@ -13,7 +13,7 @@
 //! in Axum.
 
 use axum::extract::Request;
-use axum::http::{header, HeaderValue, StatusCode};
+use axum::http::{HeaderValue, StatusCode, header};
 use axum::response::{IntoResponse, Response};
 
 use crate::errors::ProblemDetails;

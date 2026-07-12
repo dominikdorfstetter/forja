@@ -18,24 +18,24 @@
 //! tuple-based `IntoResponse` shorthand: `([(HeaderName, HeaderValue); N], body)`.
 
 use axum::extract::{DefaultBodyLimit, Multipart, Path, State};
-use axum::http::header::{CACHE_CONTROL, CONTENT_DISPOSITION, CONTENT_TYPE};
 use axum::http::HeaderValue;
+use axum::http::header::{CACHE_CONTROL, CONTENT_DISPOSITION, CONTENT_TYPE};
 use axum::response::Json;
 use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 use uuid::Uuid;
 
+use crate::AppState;
 use crate::dto::favicon::{
-    ensure_absolute_url, render_head_snippet, FaviconResponse, FaviconVariant,
+    FaviconResponse, FaviconVariant, ensure_absolute_url, render_head_snippet,
 };
 use crate::dto::site::UpdateSiteRequest;
-use crate::errors::{codes, ApiError, ProblemDetails};
+use crate::errors::{ApiError, ProblemDetails, codes};
 use crate::guards::auth_guard::WriteKey;
 use crate::models::site::Site;
-use crate::models::site_settings::{SiteSetting, KEY_BACKGROUND_COLOR, KEY_THEME_COLOR};
+use crate::models::site_settings::{KEY_BACKGROUND_COLOR, KEY_THEME_COLOR, SiteSetting};
 use crate::services::favicon_service;
 use crate::services::permission_service::{Permission, PermissionService};
-use crate::AppState;
 
 const MAX_FAVICON_SIZE: usize = 10 * 1024 * 1024; // 10 MB
 const ALLOWED_MIME_TYPES: &[&str] = &["image/png", "image/jpeg", "image/gif", "image/webp"];

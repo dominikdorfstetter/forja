@@ -14,15 +14,15 @@
 //! fail-open behavior).
 
 use axum::extract::{Request, State};
-use axum::http::{header, HeaderValue, StatusCode};
+use axum::http::{HeaderValue, StatusCode, header};
 use axum::middleware::Next;
 use axum::response::{IntoResponse, Response};
 
+use crate::AppState;
 use crate::errors::ProblemDetails;
 use crate::guards::auth_guard;
 use crate::middleware::public_rate_limit::is_public_path;
 use crate::middleware::rate_limit::RateLimiter;
-use crate::AppState;
 
 fn rate_limited_response() -> Response {
     let body = ProblemDetails {

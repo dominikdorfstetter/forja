@@ -59,12 +59,12 @@ use uuid::Uuid;
 
 use crate::dto::validated::{Validated, ValidatedDto, ValidatedJson};
 
-use crate::errors::{codes, ApiError};
+use crate::AppState;
+use crate::errors::{ApiError, codes};
 use crate::guards::actor::Actor;
 use crate::guards::module_guard::{ModuleGuard, ModuleMarker};
 use crate::models::content::Content;
 use crate::services::permission_service::{Permission, PermissionService};
-use crate::AppState;
 
 // ── Action markers ───────────────────────────────────────────────────────
 

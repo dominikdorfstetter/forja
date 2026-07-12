@@ -1,4 +1,4 @@
-import { useReducer, useRef } from 'react';
+import { useEffect, useReducer, useRef } from 'react';
 import { Step, StepLabel, Stepper } from '@mui/material';
 import FormDialog from '@/components/shared/FormDialog';
 import { M3Button } from '@/components/design-system';
@@ -127,10 +127,12 @@ export default function CreateTemplateWizard({ open, onClose, onSubmit, loading 
 
   // Reset all state when dialog opens
   const prevOpenRef = useRef(false);
-  if (open && !prevOpenRef.current) {
-    dispatch({ type: 'RESET' });
-  }
-  prevOpenRef.current = open;
+  useEffect(() => {
+    if (open && !prevOpenRef.current) {
+      dispatch({ type: 'RESET' });
+    }
+    prevOpenRef.current = open;
+  });
 
   // --- Confirm handlers ---
   const handleScratchSubmit = () => {

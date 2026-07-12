@@ -77,19 +77,21 @@ export default function CreatePageWizard({ open, onSubmit, onClose, loading }: C
 
   // Reset when dialog opens
   const prevOpenRef = useRef(false);
-  if (open && !prevOpenRef.current) {
-    setActiveStep(0);
-    slugManuallyEdited.current = false;
-    reset({
-      page_type: 'Static' as PageType,
-      route: '',
-      slug: '',
-      site_ids: selectedSiteId ? [selectedSiteId] : [],
-      is_in_navigation: false,
-      navigation_order: '',
-    });
-  }
-  prevOpenRef.current = open;
+  useEffect(() => {
+    if (open && !prevOpenRef.current) {
+      setActiveStep(0);
+      slugManuallyEdited.current = false;
+      reset({
+        page_type: 'Static' as PageType,
+        route: '',
+        slug: '',
+        site_ids: selectedSiteId ? [selectedSiteId] : [],
+        is_in_navigation: false,
+        navigation_order: '',
+      });
+    }
+    prevOpenRef.current = open;
+  }, [open, reset, selectedSiteId]);
 
   const handleNext = async () => {
     const valid = await trigger(STEP_FIELDS[activeStep]);
