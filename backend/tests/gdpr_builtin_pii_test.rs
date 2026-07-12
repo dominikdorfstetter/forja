@@ -93,11 +93,13 @@ async fn insert_change_history(pool: &PgPool, site_id: Uuid, age_days: i64) -> U
 }
 
 async fn row_exists(pool: &PgPool, table: &str, id: Uuid) -> bool {
-    let count: i64 = sqlx::query_scalar(&format!("SELECT COUNT(*) FROM {table} WHERE id = $1"))
-        .bind(id)
-        .fetch_one(pool)
-        .await
-        .expect("count rows");
+    let count: i64 = sqlx::query_scalar(sqlx::AssertSqlSafe(format!(
+        "SELECT COUNT(*) FROM {table} WHERE id = $1"
+    )))
+    .bind(id)
+    .fetch_one(pool)
+    .await
+    .expect("count rows");
     count > 0
 }
 

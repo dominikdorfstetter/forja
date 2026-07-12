@@ -30,7 +30,7 @@ entity, Site, Actor, publish lifecycle, validation seam).
 | [`scripts/`](scripts/AGENTS.md) | Dev/release helper scripts | Bash |
 
 Other top-level files: `docker-compose.*.yaml` (local infra + prod), `Dockerfile`,
-`railway.toml` (deploy), `rust-toolchain.toml` (Rust 1.93), `.nvmrc` (Node 24).
+`railway.toml` (deploy), `rust-toolchain.toml` (Rust 1.97), `.nvmrc` (Node 24).
 
 ## Cross-cutting conventions
 

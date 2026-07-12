@@ -105,7 +105,7 @@ impl Notification {
             params.sort.order_clause(order_col)
         );
 
-        let rows = sqlx::query_as::<_, Notification>(&sql)
+        let rows = sqlx::query_as::<_, Notification>(sqlx::AssertSqlSafe(sql))
             .bind(clerk_id)
             .bind(site_id)
             .bind(limit)
@@ -145,7 +145,7 @@ impl Notification {
             params.sort.order_clause(order_col)
         );
 
-        let rows = sqlx::query_as::<_, Notification>(&sql)
+        let rows = sqlx::query_as::<_, Notification>(sqlx::AssertSqlSafe(sql))
             .bind(clerk_id)
             .bind(site_id)
             .bind(limit)
@@ -190,7 +190,7 @@ impl Notification {
              WHERE recipient_clerk_id = $1 AND site_id = $2{}",
             read_clause
         );
-        let row: (i64,) = sqlx::query_as(&sql)
+        let row: (i64,) = sqlx::query_as(sqlx::AssertSqlSafe(sql))
             .bind(clerk_id)
             .bind(site_id)
             .fetch_one(pool)

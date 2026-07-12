@@ -18,7 +18,7 @@ use forja::models::api_key::ApiKeyPermission;
 use common::{create_test_api_key, create_test_site, test_context, test_db_pool};
 
 async fn count_where(pool: &PgPool, sql: &str, id: Uuid) -> i64 {
-    sqlx::query_scalar::<_, i64>(sql)
+    sqlx::query_scalar::<_, i64>(sqlx::AssertSqlSafe(sql))
         .bind(id)
         .fetch_one(pool)
         .await

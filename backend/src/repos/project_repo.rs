@@ -140,7 +140,7 @@ impl ProjectRepo {
             PROJECT_WITH_CONTENT_COLUMNS,
         );
 
-        let project = sqlx::query_as::<_, ProjectWithContent>(&sql)
+        let project = sqlx::query_as::<_, ProjectWithContent>(sqlx::AssertSqlSafe(sql))
             .bind(id)
             .fetch_optional(executor)
             .await?
@@ -169,7 +169,7 @@ impl ProjectRepo {
             PROJECT_WITH_CONTENT_COLUMNS,
         );
 
-        let project = sqlx::query_as::<_, ProjectWithContent>(&sql)
+        let project = sqlx::query_as::<_, ProjectWithContent>(sqlx::AssertSqlSafe(sql))
             .bind(site_id)
             .bind(slug)
             .fetch_optional(pool)
@@ -228,7 +228,7 @@ impl ProjectRepo {
             params.sort.order_clause(order_col),
         );
 
-        let mut query = sqlx::query_as::<_, ProjectWithContent>(&sql)
+        let mut query = sqlx::query_as::<_, ProjectWithContent>(sqlx::AssertSqlSafe(sql))
             .bind(site_id)
             .bind(limit)
             .bind(offset);

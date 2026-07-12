@@ -185,7 +185,7 @@ impl DocumentRepo {
             where_clauses.join(" AND "),
         );
 
-        let mut query = sqlx::query_as::<_, (i64,)>(&sql).bind(site_id);
+        let mut query = sqlx::query_as::<_, (i64,)>(sqlx::AssertSqlSafe(sql)).bind(site_id);
 
         if let Some(s) = search {
             query = query.bind(s);
@@ -245,7 +245,7 @@ impl DocumentRepo {
             params.sort.order_clause(order_col),
         );
 
-        let mut query = sqlx::query_as::<_, Document>(&sql)
+        let mut query = sqlx::query_as::<_, Document>(sqlx::AssertSqlSafe(sql))
             .bind(site_id)
             .bind(limit)
             .bind(offset);

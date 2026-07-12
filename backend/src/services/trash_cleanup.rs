@@ -60,7 +60,11 @@ async fn purge_table(pool: &PgPool, table: &str, retention_days: i64) -> u64 {
         table
     );
 
-    match sqlx::query(&query).bind(cutoff).execute(pool).await {
+    match sqlx::query(sqlx::AssertSqlSafe(query))
+        .bind(cutoff)
+        .execute(pool)
+        .await
+    {
         Ok(result) => result.rows_affected(),
         Err(e) => {
             tracing::error!(worker = "trash_cleanup", table = %table, error = %e, "table purge failed");

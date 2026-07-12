@@ -144,7 +144,7 @@ impl AiUsageLog {
             where_clauses.join(" AND ")
         );
 
-        let mut q = sqlx::query_as::<_, Self>(&sql)
+        let mut q = sqlx::query_as::<_, Self>(sqlx::AssertSqlSafe(sql))
             .bind(site_id)
             .bind(limit)
             .bind(offset);
@@ -219,7 +219,7 @@ impl AiUsageLog {
             where_clauses.join(" AND ")
         );
 
-        let mut q = sqlx::query_as::<_, AiUsageBucket>(&sql).bind(site_id);
+        let mut q = sqlx::query_as::<_, AiUsageBucket>(sqlx::AssertSqlSafe(sql)).bind(site_id);
         if let Some(from) = filters.from_date {
             q = q.bind(from);
         }
