@@ -77,6 +77,57 @@ async fn insert_moderation_actioned_by(pool: &PgPool, actor_clerk_id: &str) -> U
     id
 }
 
+// ── Export completeness ──────────────────────────────────────────────────
+
+#[tokio::test]
+async fn export_includes_media_and_ai_usage_sections() {
+    let ctx = common::test_context().await;
+    let site_id = common::create_test_site(&ctx.pool).await;
+    let key = common::create_test_api_key(
+        &ctx.pool,
+        site_id,
+        forja::models::api_key::ApiKeyPermission::Read,
+    )
+    .await;
+
+    // Learn the actor UUID behind the key from the profile endpoint —
+    // media/AI attribution is keyed on it.
+    let profile = ctx
+        .server
+        .get("/api/v1/auth/profile")
+        .add_header("x-api-key", key.as_str())
+        .await;
+    profile.assert_status_ok();
+    let actor_id: Uuid = profile.json::<serde_json::Value>()["id"]
+        .as_str()
+        .expect("profile id")
+        .parse()
+        .expect("actor uuid");
+
+    insert_media_uploaded_by(&ctx.pool, actor_id).await;
+    insert_ai_usage_by(&ctx.pool, site_id, actor_id).await;
+
+    let response = ctx
+        .server
+        .get("/api/v1/auth/export")
+        .add_header("x-api-key", key.as_str())
+        .await;
+    response.assert_status_ok();
+
+    let body: serde_json::Value = response.json();
+    let media = body["media"].as_array().expect("media array in export");
+    assert_eq!(media.len(), 1);
+    assert_eq!(media[0]["filename"], "dsr.png");
+    assert_eq!(media[0]["mime_type"], "image/png");
+
+    let usage = body["ai_usage"]
+        .as_array()
+        .expect("ai_usage array in export");
+    assert_eq!(usage.len(), 1);
+    assert_eq!(usage[0]["provider"], "openai");
+    assert_eq!(usage[0]["action"], "seo");
+}
+
 // ── Erasure parity ───────────────────────────────────────────────────────
 
 #[tokio::test]

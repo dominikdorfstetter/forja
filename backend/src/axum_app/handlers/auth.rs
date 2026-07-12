@@ -5,8 +5,8 @@
 use crate::AppState;
 use crate::dto::audit::{AuditLogResponse, ChangeHistoryResponse};
 use crate::dto::auth::{
-    AuthInfoResponse, AuthoredContentSummary, ExportApiKeyRecord, GuestTokenResponse,
-    ProfileResponse, UserDataExportResponse,
+    AuthInfoResponse, AuthoredContentSummary, ExportAiUsageRecord, ExportApiKeyRecord,
+    ExportMediaRecord, GuestTokenResponse, ProfileResponse, UserDataExportResponse,
 };
 use crate::dto::help_state::{HelpStateResponse, UpdateHelpStateRequest};
 use crate::dto::notification::NotificationResponse;
@@ -355,6 +355,20 @@ async fn export_user_data(
             .map(ChangeHistoryResponse::from)
             .collect();
 
+    let media: Vec<ExportMediaRecord> =
+        crate::repos::user_data_repo::media_for_user(&state.db, auth.id)
+            .await?
+            .into_iter()
+            .map(ExportMediaRecord::from)
+            .collect();
+
+    let ai_usage: Vec<ExportAiUsageRecord> =
+        crate::repos::user_data_repo::ai_usage_for_user(&state.db, auth.id, 1000)
+            .await?
+            .into_iter()
+            .map(ExportAiUsageRecord::from)
+            .collect();
+
     let (preferences, notifications, onboarding, help_state, authored_content) = match &auth.kind {
         ActorKind::Clerk { clerk_user_id } => {
             let effective = UserPreferences::get_effective(&state.db, clerk_user_id).await?;
@@ -391,6 +405,8 @@ async fn export_user_data(
         audit_logs,
         api_keys,
         change_history,
+        media,
+        ai_usage,
         memberships,
         preferences,
         notifications,

@@ -105,6 +105,71 @@ pub async fn authored_content_counts(
     })
 }
 
+/// Row shape for the media section of a GDPR export.
+#[derive(Debug, sqlx::FromRow)]
+pub struct MediaExportRow {
+    pub id: Uuid,
+    pub filename: String,
+    pub original_filename: String,
+    pub mime_type: String,
+    pub file_size: i64,
+    pub public_url: Option<String>,
+    pub created_at: DateTime<Utc>,
+}
+
+/// Media files uploaded by the user, newest first.
+pub async fn media_for_user(
+    pool: &PgPool,
+    user_id: Uuid,
+) -> Result<Vec<MediaExportRow>, sqlx::Error> {
+    sqlx::query_as(
+        r#"
+        SELECT id, filename, original_filename, mime_type, file_size,
+               public_url, created_at
+        FROM media_files
+        WHERE uploaded_by = $1
+        ORDER BY created_at DESC
+        "#,
+    )
+    .bind(user_id)
+    .fetch_all(pool)
+    .await
+}
+
+/// Row shape for the AI-usage section of a GDPR export.
+#[derive(Debug, sqlx::FromRow)]
+pub struct AiUsageExportRow {
+    pub site_id: Uuid,
+    pub action: String,
+    pub provider: String,
+    pub model: String,
+    pub input_tokens: Option<i32>,
+    pub output_tokens: Option<i32>,
+    pub created_at: DateTime<Utc>,
+}
+
+/// Most recent AI requests attributed to the user.
+pub async fn ai_usage_for_user(
+    pool: &PgPool,
+    user_id: Uuid,
+    limit: i64,
+) -> Result<Vec<AiUsageExportRow>, sqlx::Error> {
+    sqlx::query_as(
+        r#"
+        SELECT site_id, action, provider, model, input_tokens, output_tokens,
+               created_at
+        FROM ai_usage_logs
+        WHERE actor_id = $1
+        ORDER BY created_at DESC
+        LIMIT $2
+        "#,
+    )
+    .bind(user_id)
+    .bind(limit)
+    .fetch_all(pool)
+    .await
+}
+
 /// Full account erasure (GDPR Art. 17): drop system-admin status, null every
 /// reference to the user across api_keys, audit_logs, change_history,
 /// authored contents, media uploads, AI usage, membership invites, site
