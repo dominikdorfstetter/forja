@@ -14,6 +14,14 @@ is the first release published as open source**, so the public version history
 begins at 2.0. The pre-release milestones below condense how the foundation came
 together; precise dates start at the first public release.
 
+## 2.0.5 — 2026-07-12
+
+Completes the 2.0.4 release. The 2.0.4 publish was interrupted: `@forjacms/sections` failed its pre-publish test gate, and the `v2.0.4` tag was consumed by the immutable-releases protection while re-targeting the release, so it cannot be reissued. `@forjacms/client` and `@forjacms/analytics` 2.0.4 reached npm; 2.0.5 is the first complete release of the 2.0.4 changes across all packages.
+
+### Fixed
+
+- **`@forjacms/sections` test suite under Vite 8.1.** Vite 8.1 stopped inheriting the root `oxc` transformer config into Vitest sub-projects, so Stencil's classic `h` JSX factory was no longer applied and every spec render failed ("The tag name provided (undefined) is not a valid name") — which blocked the package from publishing. The classic-JSX config is now set per project in `vitest.config.ts`; remove once `@stencil/vitest` applies it per project upstream.
+
 ## 2.0.4 — 2026-07-12
 
 A bug-fix release for the Legal Documents admin list, with matching client-SDK support for the new list filters and a broad dependency refresh under the hood.
