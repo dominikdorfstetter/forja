@@ -16,7 +16,7 @@ use chrono::{Datelike, Timelike, Utc};
 use redis::AsyncCommands;
 
 use crate::config::{RateLimitFailMode, SecurityConfig};
-use crate::errors::{codes, ApiError};
+use crate::errors::{ApiError, codes};
 
 // ── Burst / legacy rate limits ─────────────────────────────────────────
 
@@ -424,15 +424,14 @@ impl RateLimiter {
         };
 
         // Set TTL on first increment
-        if count == 1 {
-            if let Err(e) = redis::cmd("EXPIRE")
+        if count == 1
+            && let Err(e) = redis::cmd("EXPIRE")
                 .arg(key)
                 .arg(ttl_secs)
                 .query_async::<()>(redis)
                 .await
-            {
-                tracing::warn!(error = %e, key = %key, "Redis quota EXPIRE failed");
-            }
+        {
+            tracing::warn!(error = %e, key = %key, "Redis quota EXPIRE failed");
         }
 
         Ok(count)
@@ -577,15 +576,14 @@ impl RateLimiter {
                 }
             };
 
-            if count == 1 {
-                if let Err(e) = redis::cmd("EXPIRE")
+            if count == 1
+                && let Err(e) = redis::cmd("EXPIRE")
                     .arg(&key)
                     .arg(ttl)
                     .query_async::<()>(redis)
                     .await
-                {
-                    tracing::warn!(error = %e, key = %key, "Redis EXPIRE failed");
-                }
+            {
+                tracing::warn!(error = %e, key = %key, "Redis EXPIRE failed");
             }
 
             let remaining = window.limit.saturating_sub(count);
@@ -736,9 +734,11 @@ mod tests {
     #[test]
     #[serial_test::serial]
     fn test_burst_per_second_env_override() {
-        std::env::set_var("RATE_LIMIT_BURST_PER_SECOND", "5000");
+        // SAFETY: #[serial] test — no concurrent env reads or writes.
+        unsafe { std::env::set_var("RATE_LIMIT_BURST_PER_SECOND", "5000") };
         assert_eq!(burst_per_second(), 5000);
-        std::env::remove_var("RATE_LIMIT_BURST_PER_SECOND");
+        // SAFETY: #[serial] test — no concurrent env reads or writes.
+        unsafe { std::env::remove_var("RATE_LIMIT_BURST_PER_SECOND") };
         assert_eq!(burst_per_second(), DEFAULT_BURST_PER_SECOND);
     }
 
@@ -757,7 +757,7 @@ mod tests {
             .and_utc();
         let (window_id, reset_secs) = monthly_billing_cycle(now, created);
         assert_eq!(window_id, "20260315"); // Cycle started March 15
-                                           // Reset should be ~23.5 days (Apr 15 - Mar 22 12:00)
+        // Reset should be ~23.5 days (Apr 15 - Mar 22 12:00)
         let days = reset_secs as f64 / 86400.0;
         assert!(days > 23.0 && days < 24.0, "Expected ~23.5d, got {days}");
     }

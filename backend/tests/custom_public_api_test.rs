@@ -5,7 +5,7 @@
 
 mod common;
 
-use common::{create_test_api_key, create_test_site, test_context, TestContext};
+use common::{TestContext, create_test_api_key, create_test_site, test_context};
 use forja::dto::custom_entry::CustomEntryRequest;
 use forja::dto::custom_type::{
     CreateCustomTypeRequest, CustomContentKind, CustomFieldInput, CustomFieldType,
@@ -15,7 +15,7 @@ use forja::models::custom_entry::CustomEntry;
 use forja::models::custom_type::CustomType;
 use forja::models::site_settings::SiteSetting;
 use forja::services::encryption::resolve_key;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use std::collections::HashMap;
 use uuid::Uuid;
 

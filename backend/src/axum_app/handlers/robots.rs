@@ -7,16 +7,16 @@
 //! handler — the function is already pub and pure, no duplication needed.
 
 use axum::extract::{Path, State};
-use axum::http::header::{CACHE_CONTROL, CONTENT_TYPE};
 use axum::http::HeaderValue;
+use axum::http::header::{CACHE_CONTROL, CONTENT_TYPE};
 use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 
+use crate::AppState;
 use crate::dto::site_settings::{RobotsTxtDirective, RobotsTxtRule};
 use crate::errors::ApiError;
 use crate::models::site::Site;
-use crate::models::site_settings::{SiteSetting, KEY_ROBOTS_TXT_RULES};
-use crate::AppState;
+use crate::models::site_settings::{KEY_ROBOTS_TXT_RULES, SiteSetting};
 
 /// Render structured robots.txt rules into the standard text format.
 ///

@@ -6,8 +6,8 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::dto::site::{CreateSiteRequest, UpdateSiteRequest};
-use crate::errors::codes;
 use crate::errors::ApiError;
+use crate::errors::codes;
 
 /// Site (tenant/website) model
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
@@ -303,15 +303,15 @@ impl Site {
                 .ok_or_else(not_found)?;
 
         let cutoff = Utc::now() - chrono::TimeDelta::days(Self::SOFT_DELETE_RETENTION_DAYS);
-        if let Some(ts) = deleted_at {
-            if ts < cutoff {
-                return Err(ApiError::gone(format!(
-                    "Site {} can no longer be restored — the {}-day grace window has lapsed",
-                    id,
-                    Self::SOFT_DELETE_RETENTION_DAYS
-                ))
-                .with_code(codes::SITE_RESTORE_EXPIRED));
-            }
+        if let Some(ts) = deleted_at
+            && ts < cutoff
+        {
+            return Err(ApiError::gone(format!(
+                "Site {} can no longer be restored — the {}-day grace window has lapsed",
+                id,
+                Self::SOFT_DELETE_RETENTION_DAYS
+            ))
+            .with_code(codes::SITE_RESTORE_EXPIRED));
         }
 
         let site = sqlx::query_as::<_, Self>(

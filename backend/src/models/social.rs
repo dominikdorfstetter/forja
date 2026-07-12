@@ -6,8 +6,8 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::dto::social::{CreateSocialLinkRequest, UpdateSocialLinkRequest};
-use crate::errors::codes;
 use crate::errors::ApiError;
+use crate::errors::codes;
 
 /// Social link model
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]

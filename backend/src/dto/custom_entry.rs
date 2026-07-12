@@ -16,11 +16,11 @@ use serde_json::Value;
 use utoipa::ToSchema;
 use uuid::Uuid;
 
+use crate::AppState;
 use crate::dto::validated::{Validated, ValidatedDto, ValidationContext};
 use crate::errors::ApiError;
-use crate::models::custom_entry::{resolve_schema, ResolvedSchema};
+use crate::models::custom_entry::{ResolvedSchema, resolve_schema};
 use crate::models::custom_entry_validator::validate_entry;
-use crate::AppState;
 
 /// Request body for creating/updating an entry.
 #[derive(Debug, Clone, Default, Serialize, Deserialize, ToSchema)]

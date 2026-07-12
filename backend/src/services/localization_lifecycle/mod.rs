@@ -35,7 +35,7 @@ use uuid::Uuid;
 use crate::dto::content::{
     CreateLocalizationRequest, LocalizationResponse, UpdateLocalizationRequest,
 };
-use crate::errors::{codes, ApiError};
+use crate::errors::{ApiError, codes};
 use crate::guards::actor::Actor;
 use crate::guards::module_guard::ModuleGuard;
 use crate::models::audit::AuditAction;

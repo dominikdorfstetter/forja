@@ -5,8 +5,8 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::dto::ai::{AiAction, AiGenerateRequest, AiGenerateResponse};
-use crate::errors::codes;
 use crate::errors::ApiError;
+use crate::errors::codes;
 use crate::models::ai_config::SiteAiConfig;
 // Response parsing/post-processing lives in the ai::response_parser submodule
 // (issue #928). The orchestrator calls parse_ai_response + truncate_seo_fields;
@@ -14,13 +14,13 @@ use crate::models::ai_config::SiteAiConfig;
 use crate::services::ai::response_parser::{parse_ai_response, truncate_seo_fields};
 // Vision parsing + usage recording live in their own ai submodules (#929).
 use crate::services::ai::features::vision::{extract_json, parse_vision_response};
-use crate::services::ai::usage::{record_usage, UsageRecordCtx};
+use crate::services::ai::usage::{UsageRecordCtx, record_usage};
 // Prompt assembly + default prompts live in the ai::prompts submodule (#927).
 use crate::services::ai::prompts::{
-    append_language_instruction, default_blog_tags_prompt, default_content_prompt,
-    default_section_content_prompt, field_translation_prompt, format_suffix, normalise_blog_tags,
-    strip_format_instructions, DEFAULT_ALT_TEXT_PROMPT, DEFAULT_AUTO_TAG_PROMPT,
-    DEFAULT_IMAGE_CAPTION_PROMPT, DEFAULT_IMAGE_TITLE_PROMPT, MIN_BLOG_TAGS_WORDS,
+    DEFAULT_ALT_TEXT_PROMPT, DEFAULT_AUTO_TAG_PROMPT, DEFAULT_IMAGE_CAPTION_PROMPT,
+    DEFAULT_IMAGE_TITLE_PROMPT, MIN_BLOG_TAGS_WORDS, append_language_instruction,
+    default_blog_tags_prompt, default_content_prompt, default_section_content_prompt,
+    field_translation_prompt, format_suffix, normalise_blog_tags, strip_format_instructions,
 };
 use crate::services::encryption;
 
@@ -198,7 +198,7 @@ struct AnthropicContent {
 // client builder or skip the pin.
 mod transport {
     use super::is_local_provider;
-    use crate::errors::{codes, ApiError};
+    use crate::errors::{ApiError, codes};
     use crate::services::url_validation;
     use reqwest::{Method, RequestBuilder};
     use serde::de::DeserializeOwned;
@@ -335,14 +335,14 @@ mod transport {
 // the client builder or skip the SSRF pin. Wire-shaping lives in pure free
 // functions (`openai_chat_body` etc.) so it is unit-testable with no network.
 mod adapters {
-    use super::transport::{send_json, send_ok, PinnedClient, StatusPolicy};
+    use super::transport::{PinnedClient, StatusPolicy, send_json, send_ok};
     use super::{
-        detect_provider, is_gemini, is_ollama, token_usage_from_anthropic, AnthropicMessage,
-        AnthropicRequest, AnthropicResponse, ChatCompletionRequest, ChatCompletionResponse,
-        ChatMessage, OllamaTagsResponse, OpenAiModelsResponse, Provider, ResponseFormat,
-        TokenUsage, ANTHROPIC_MODELS, SANDWICH_REMINDER,
+        ANTHROPIC_MODELS, AnthropicMessage, AnthropicRequest, AnthropicResponse,
+        ChatCompletionRequest, ChatCompletionResponse, ChatMessage, OllamaTagsResponse,
+        OpenAiModelsResponse, Provider, ResponseFormat, SANDWICH_REMINDER, TokenUsage,
+        detect_provider, is_gemini, is_ollama, token_usage_from_anthropic,
     };
-    use crate::errors::{codes, ApiError};
+    use crate::errors::{ApiError, codes};
     use reqwest::{Method, RequestBuilder};
 
     // ── Call descriptors ─────────────────────────────────────────
@@ -1286,14 +1286,14 @@ async fn translate_single_field(
     // Strip any thinking tags or code fences the model might wrap the translation in
     let cleaned = extract_json(&raw);
     // If it looks like JSON (model ignored instructions), try to extract the value
-    if cleaned.starts_with('{') {
-        if let Ok(json) = serde_json::from_str::<serde_json::Value>(&cleaned) {
-            // Return the first string value found
-            if let Some(obj) = json.as_object() {
-                for (_, v) in obj {
-                    if let Some(s) = v.as_str() {
-                        return Ok((s.to_string(), usage));
-                    }
+    if cleaned.starts_with('{')
+        && let Ok(json) = serde_json::from_str::<serde_json::Value>(&cleaned)
+    {
+        // Return the first string value found
+        if let Some(obj) = json.as_object() {
+            for (_, v) in obj {
+                if let Some(s) = v.as_str() {
+                    return Ok((s.to_string(), usage));
                 }
             }
         }
@@ -1545,10 +1545,12 @@ mod tests {
         let parsed: serde_json::Value = serde_json::from_str(&sanitized).unwrap();
         assert_eq!(parsed["title"].as_str().unwrap(), "Hello");
         // After sanitization + parsing, literal newlines become actual \n characters
-        assert!(parsed["body"]
-            .as_str()
-            .unwrap()
-            .contains("Line one\nLine two"));
+        assert!(
+            parsed["body"]
+                .as_str()
+                .unwrap()
+                .contains("Line one\nLine two")
+        );
     }
 
     #[test]
@@ -2418,19 +2420,19 @@ mod tests {
 #[cfg(test)]
 mod seam_tests {
     use super::adapters::{
+        Anthropic, ChatCall, OllamaAdapter, OpenAiCompatible, Probe, ProviderAdapter, VisionCall,
         anthropic_chat_body, anthropic_chat_extract, anthropic_vision_body, openai_chat_body,
-        openai_chat_extract, openai_vision_body, openai_vision_extract, select_adapter, Anthropic,
-        ChatCall, OllamaAdapter, OpenAiCompatible, Probe, ProviderAdapter, VisionCall,
+        openai_chat_extract, openai_vision_body, openai_vision_extract, select_adapter,
     };
-    use super::transport::{send_json, send_ok, PinnedClient, StatusPolicy};
+    use super::transport::{PinnedClient, StatusPolicy, send_json, send_ok};
     use super::{
         AnthropicContent, AnthropicResponse, AnthropicUsage, ChatChoice, ChatCompletionResponse,
         ChatMessageResponse, OpenAiUsage,
     };
     use crate::errors::codes;
+    use axum::Router;
     use axum::http::StatusCode;
     use axum::routing::{get, post};
-    use axum::Router;
     use reqwest::Method;
     use serde_json::Value;
 
@@ -2628,10 +2630,12 @@ mod seam_tests {
             messages[1]["content"][1]["image_url"]["url"],
             "https://example.com/cat.png"
         );
-        assert!(messages[2]["content"]
-            .as_str()
-            .unwrap()
-            .contains("System reminder"));
+        assert!(
+            messages[2]["content"]
+                .as_str()
+                .unwrap()
+                .contains("System reminder")
+        );
     }
 
     #[test]
@@ -2793,12 +2797,14 @@ mod seam_tests {
             select_adapter("https://api.deepseek.com", "DeepSeek", String::new())
                 .supports_json_mode()
         );
-        assert!(select_adapter(
-            "https://dashscope-intl.aliyuncs.com/compatible-mode",
-            "Qwen",
-            String::new()
-        )
-        .supports_json_mode());
+        assert!(
+            select_adapter(
+                "https://dashscope-intl.aliyuncs.com/compatible-mode",
+                "Qwen",
+                String::new()
+            )
+            .supports_json_mode()
+        );
     }
 
     // ── #823 Anthropic shaping (pure) ────────────────────────────

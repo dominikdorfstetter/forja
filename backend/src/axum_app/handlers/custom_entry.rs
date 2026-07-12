@@ -21,11 +21,12 @@ use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 use uuid::Uuid;
 
+use crate::AppState;
 use crate::dto::custom_entry::{
     CustomEntryRequest, CustomEntryResponse, CustomEntrySummary, CustomTypeSchema,
 };
 use crate::dto::validated::ValidatedJson;
-use crate::errors::{codes, ApiError, ProblemDetails};
+use crate::errors::{ApiError, ProblemDetails, codes};
 use crate::guards::actor::Actor;
 use crate::guards::auth_guard::ReadKey;
 use crate::guards::module_guard::{CollectionsModule, ModuleGuard};
@@ -33,7 +34,6 @@ use crate::models::custom_entry::CustomEntry;
 use crate::services::encryption::resolve_key;
 use crate::services::permission_service::{Permission, PermissionService};
 use crate::utils::pagination::Paginated;
-use crate::AppState;
 
 type PaginatedEntries = Paginated<CustomEntrySummary>;
 

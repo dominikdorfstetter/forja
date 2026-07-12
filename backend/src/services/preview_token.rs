@@ -9,7 +9,7 @@ use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::errors::{codes, ApiError};
+use crate::errors::{ApiError, codes};
 
 /// Claims embedded in a preview token JWT.
 #[derive(Debug, Serialize, Deserialize)]

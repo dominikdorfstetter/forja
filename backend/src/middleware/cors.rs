@@ -9,7 +9,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::axum_app::API_MOUNT_PREFIX;
-use crate::models::site_settings::{SiteSetting, KEY_ALLOWED_ORIGINS};
+use crate::models::site_settings::{KEY_ALLOWED_ORIGINS, SiteSetting};
 
 /// Path prefixes that are public and allow any origin.
 const PUBLIC_PREFIXES: &[&str] = &["/health", "/.well-known/", "/nodeinfo/"];

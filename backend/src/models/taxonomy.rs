@@ -8,8 +8,8 @@ use uuid::Uuid;
 use crate::dto::taxonomy::{
     CreateCategoryRequest, CreateTagRequest, UpdateCategoryRequest, UpdateTagRequest,
 };
-use crate::errors::codes;
 use crate::errors::ApiError;
+use crate::errors::codes;
 use crate::utils::list_params::ListParams;
 
 /// Tag model

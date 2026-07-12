@@ -6,8 +6,8 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::dto::content_template::{CreateContentTemplateRequest, UpdateContentTemplateRequest};
-use crate::errors::codes;
 use crate::errors::ApiError;
+use crate::errors::codes;
 use crate::utils::list_params::ListParams;
 
 /// Content template model

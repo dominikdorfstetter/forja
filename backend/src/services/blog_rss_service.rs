@@ -14,7 +14,7 @@ use crate::errors::ApiError;
 use crate::models::content::ContentLocalization;
 use crate::models::site::Site;
 use crate::repos::blog_repo::BlogRepo;
-use crate::utils::excerpt::{compute_excerpt, DEFAULT_EXCERPT_LEN};
+use crate::utils::excerpt::{DEFAULT_EXCERPT_LEN, compute_excerpt};
 
 /// Maximum number of posts in the feed.
 const RSS_MAX_ITEMS: i64 = 50;

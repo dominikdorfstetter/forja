@@ -7,8 +7,8 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::errors::codes;
 use crate::errors::ApiError;
+use crate::errors::codes;
 use crate::models::locale::TextDirection;
 
 /// Site locale junction row

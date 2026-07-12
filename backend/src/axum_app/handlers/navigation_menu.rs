@@ -9,6 +9,7 @@ use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 use uuid::Uuid;
 
+use crate::AppState;
 use crate::dto::navigation::NavigationTree;
 use crate::dto::navigation_menu::{
     CreateNavigationMenuRequest, MenuLocalizationResponse, NavigationMenuResponse,
@@ -23,7 +24,6 @@ use crate::models::navigation::NavigationItem;
 use crate::models::navigation_menu::{NavigationMenu, NavigationMenuLocalization};
 use crate::services::audited_mutation::AuditedEntity;
 use crate::services::permission_service::{Permission, PermissionService};
-use crate::AppState;
 
 #[derive(Debug, Deserialize)]
 struct TreeQuery {

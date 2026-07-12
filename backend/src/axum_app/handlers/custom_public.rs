@@ -11,6 +11,7 @@ use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 use uuid::Uuid;
 
+use crate::AppState;
 use crate::axum_app::authorized_content::{AuthorizedSite, Read, SiteKind};
 use crate::dto::custom_entry::{PublicEntry, PublicSchema};
 use crate::errors::{ApiError, ProblemDetails};
@@ -18,7 +19,6 @@ use crate::guards::module_guard::CollectionsModule;
 use crate::models::custom_public;
 use crate::services::response_cache;
 use crate::utils::pagination::{Paginated, PaginationParams};
-use crate::AppState;
 
 /// Site-kind marker for the public collections API: gated by the Collections
 /// module, authorised by `custom_entry:read` (a Read API key qualifies).

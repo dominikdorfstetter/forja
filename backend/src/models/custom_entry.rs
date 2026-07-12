@@ -14,15 +14,15 @@
 
 use std::collections::HashMap;
 
-use base64::engine::general_purpose::STANDARD as BASE64;
 use base64::Engine;
-use serde_json::{json, Map, Value};
+use base64::engine::general_purpose::STANDARD as BASE64;
+use serde_json::{Map, Value, json};
 use sqlx::{PgPool, Row};
 use uuid::Uuid;
 
 use crate::dto::custom_entry::{CustomEntryRequest, CustomEntryResponse};
 use crate::dto::custom_type::CustomFieldResponse;
-use crate::errors::{codes, ApiError};
+use crate::errors::{ApiError, codes};
 use crate::models::custom_entry_validator::validate_entry;
 use crate::models::custom_type::CustomType;
 
@@ -803,20 +803,16 @@ impl CustomEntry {
                 Some(d) => build_revealed(&d, &fields_by_key, enc_key, reveal)?,
                 None => HashMap::new(),
             };
-            if title_localized {
-                if let Some(k) = &title_key {
-                    vals.insert(k.clone(), Value::from(title.clone()));
-                }
+            if title_localized && let Some(k) = &title_key {
+                vals.insert(k.clone(), Value::from(title.clone()));
             }
             if !vals.is_empty() {
                 localized.insert(code, vals);
             }
         }
         // Shared title: pick any localization's title (they share it).
-        if !title_localized {
-            if let (Some(k), Some(row)) = (&title_key, loc_rows.first()) {
-                shared.insert(k.clone(), Value::from(row.get::<String, _>("title")));
-            }
+        if !title_localized && let (Some(k), Some(row)) = (&title_key, loc_rows.first()) {
+            shared.insert(k.clone(), Value::from(row.get::<String, _>("title")));
         }
 
         Ok(CustomEntryResponse {

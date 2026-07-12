@@ -8,8 +8,8 @@ use uuid::Uuid;
 
 use sqlx::PgPool;
 
-use crate::errors::codes;
 use crate::errors::ApiError;
+use crate::errors::codes;
 use crate::models::api_key::ApiKeyPermission;
 use crate::models::site_membership::{SiteMembership, SiteRole};
 use crate::services::url_validation;
@@ -444,10 +444,10 @@ impl ClerkJwksState {
         // Check cache (15 minute TTL)
         {
             let cache = self.cache.read().await;
-            if let Some(ref cached) = *cache {
-                if cached.fetched_at.elapsed() < std::time::Duration::from_secs(900) {
-                    return Ok(cached.keys.clone());
-                }
+            if let Some(ref cached) = *cache
+                && cached.fetched_at.elapsed() < std::time::Duration::from_secs(900)
+            {
+                return Ok(cached.keys.clone());
             }
         }
 
@@ -665,8 +665,8 @@ mod tests {
     // jsonwebtoken bump can't silently regress login again.
     #[test]
     fn decode_header_tolerates_non_string_extra_header_fields() {
-        use base64::engine::general_purpose::URL_SAFE_NO_PAD;
         use base64::Engine as _;
+        use base64::engine::general_purpose::URL_SAFE_NO_PAD;
 
         let header = r#"{"alg":"RS256","typ":"JWT","kid":"ins_2abc","custom_ts":1781422363}"#;
         let payload = r#"{"sub":"user_123"}"#;

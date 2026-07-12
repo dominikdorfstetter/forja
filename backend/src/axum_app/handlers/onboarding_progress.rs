@@ -8,17 +8,17 @@ use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 use uuid::Uuid;
 
+use crate::AppState;
 use crate::dto::onboarding_progress::{
     CompleteStepRequest, OnboardingProgressResponse, OnboardingStepResponse,
 };
 use crate::dto::validated::ValidatedJson;
-use crate::errors::{codes, ApiError, ProblemDetails};
+use crate::errors::{ApiError, ProblemDetails, codes};
 use crate::guards::actor::Actor;
 use crate::guards::auth_guard::{ReadKey, WriteKey};
 use crate::models::onboarding_progress::OnboardingProgress;
 use crate::models::site_membership::SiteMembership;
 use crate::services::permission_service::{Permission, PermissionService};
-use crate::AppState;
 
 const BASE_STEPS: usize = 5;
 const TEAM_STEPS: usize = 2;

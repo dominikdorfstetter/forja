@@ -10,6 +10,7 @@ use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 use uuid::Uuid;
 
+use crate::AppState;
 use crate::dto::audit::{
     AiUsageCount, AuditLogResponse, ChangeHistoryResponse, PaginatedAuditLogs,
     RevertChangesRequest, RevertChangesResponse,
@@ -33,7 +34,6 @@ use crate::services::audit_service;
 use crate::services::audited_mutation::AuditedEntity;
 use crate::services::permission_service::{Permission, PermissionService};
 use crate::utils::list_params::ListParams;
-use crate::AppState;
 
 #[derive(Debug, Deserialize)]
 struct ListAuditQuery {

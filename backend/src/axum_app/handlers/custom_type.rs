@@ -15,17 +15,17 @@ use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 use uuid::Uuid;
 
+use crate::AppState;
 use crate::dto::custom_type::{
     CreateCustomTypeRequest, CustomTypeResponse, CustomTypeSummary, UpdateCustomTypeRequest,
 };
 use crate::dto::ropa::RopaReport;
-use crate::errors::{codes, ApiError, ProblemDetails};
+use crate::errors::{ApiError, ProblemDetails, codes};
 use crate::guards::actor::Actor;
 use crate::guards::auth_guard::ReadKey;
 use crate::guards::module_guard::{CollectionsModule, ModuleGuard};
 use crate::models::custom_type::CustomType;
 use crate::services::permission_service::{Permission, PermissionService};
-use crate::AppState;
 
 /// Authorize a custom-type action, mapping denial to ERR_CUSTOM_TYPE_FORBIDDEN.
 async fn authorize(

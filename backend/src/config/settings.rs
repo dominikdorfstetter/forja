@@ -345,6 +345,18 @@ mod tests {
     // matching cleanup blocks restore the env to its pre-test state so
     // they don't leak into other serial tests.
 
+    /// Apply an env-var value, removing the variable when `None`.
+    ///
+    /// SAFETY (edition 2024 makes `set_var`/`remove_var` unsafe): only
+    /// called from `#[serial]` tests via `with_cors_env`, so no other
+    /// thread reads or writes the environment concurrently.
+    fn apply_env(key: &str, value: Option<&str>) {
+        match value {
+            Some(v) => unsafe { std::env::set_var(key, v) },
+            None => unsafe { std::env::remove_var(key) },
+        }
+    }
+
     /// Helper: snapshot the two CORS env vars, run a closure with a fresh
     /// environment, then restore. Avoids leaking state into sibling tests
     /// that may run later in the same serial slot.
@@ -352,25 +364,16 @@ mod tests {
         let prev_short = std::env::var("CORS_ALLOWED_ORIGINS").ok();
         let prev_prefixed = std::env::var("APP__SECURITY__CORS_ALLOWED_ORIGINS").ok();
 
-        match short {
-            Some(v) => std::env::set_var("CORS_ALLOWED_ORIGINS", v),
-            None => std::env::remove_var("CORS_ALLOWED_ORIGINS"),
-        }
-        match prefixed {
-            Some(v) => std::env::set_var("APP__SECURITY__CORS_ALLOWED_ORIGINS", v),
-            None => std::env::remove_var("APP__SECURITY__CORS_ALLOWED_ORIGINS"),
-        }
+        apply_env("CORS_ALLOWED_ORIGINS", short);
+        apply_env("APP__SECURITY__CORS_ALLOWED_ORIGINS", prefixed);
 
         f();
 
-        match prev_short {
-            Some(v) => std::env::set_var("CORS_ALLOWED_ORIGINS", v),
-            None => std::env::remove_var("CORS_ALLOWED_ORIGINS"),
-        }
-        match prev_prefixed {
-            Some(v) => std::env::set_var("APP__SECURITY__CORS_ALLOWED_ORIGINS", v),
-            None => std::env::remove_var("APP__SECURITY__CORS_ALLOWED_ORIGINS"),
-        }
+        apply_env("CORS_ALLOWED_ORIGINS", prev_short.as_deref());
+        apply_env(
+            "APP__SECURITY__CORS_ALLOWED_ORIGINS",
+            prev_prefixed.as_deref(),
+        );
     }
 
     #[test]

@@ -13,7 +13,7 @@ use forja::dto::document::CreateDocumentRequest;
 use forja::repos::document_repo::DocumentRepo;
 use forja::services::document_encryption;
 
-use common::{create_test_api_key, create_test_site, test_context, TestContext};
+use common::{TestContext, create_test_api_key, create_test_site, test_context};
 
 async fn enable_documents_module(pool: &sqlx::PgPool, site_id: Uuid) {
     sqlx::query(

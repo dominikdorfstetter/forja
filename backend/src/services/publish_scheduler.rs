@@ -6,9 +6,9 @@
 use sqlx::PgPool;
 use uuid::Uuid;
 
+use crate::AppState;
 use crate::services::publish_hooks;
 use crate::services::worker_lock;
-use crate::AppState;
 
 /// How often the scheduler polls for due content (seconds).
 const POLL_INTERVAL_SECS: u64 = 60;

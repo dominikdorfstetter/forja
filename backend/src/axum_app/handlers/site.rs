@@ -4,7 +4,7 @@
 
 use axum::body::Body;
 use axum::extract::{Path, Query, State};
-use axum::http::{header, Response, StatusCode};
+use axum::http::{Response, StatusCode, header};
 use axum::response::Json;
 use chrono::Utc;
 use serde::Deserialize;
@@ -12,14 +12,14 @@ use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 use uuid::Uuid;
 
+use crate::AppState;
 use crate::dto::site::{
-    should_show_team_workflow_prompt, CreateSiteRequest, PreviewTokenResponse,
-    ResetContentResponse, SiteContextFeatures, SiteContextIntegration, SiteContextModules,
-    SiteContextResponse, SiteContextSuggestions, SiteExportJobResponse, SiteResponse,
-    UpdateSiteRequest,
+    CreateSiteRequest, PreviewTokenResponse, ResetContentResponse, SiteContextFeatures,
+    SiteContextIntegration, SiteContextModules, SiteContextResponse, SiteContextSuggestions,
+    SiteExportJobResponse, SiteResponse, UpdateSiteRequest, should_show_team_workflow_prompt,
 };
 use crate::dto::validated::ValidatedJson;
-use crate::errors::{codes, ApiError, ProblemDetails};
+use crate::errors::{ApiError, ProblemDetails, codes};
 use crate::guards::actor::Actor;
 use crate::guards::auth_guard::ReadKey;
 use crate::models::audit::AuditAction;
@@ -29,15 +29,14 @@ use crate::models::site_export::{SiteExportJob, SiteExportStatus};
 use crate::models::site_locale::SiteLocale;
 use crate::models::site_membership::{SiteMembership, SiteRole};
 use crate::models::site_settings::{
-    SiteSetting, KEY_BACKGROUND_COLOR, KEY_CODE_INJECTION_FOOTER, KEY_CODE_INJECTION_HEAD,
+    KEY_BACKGROUND_COLOR, KEY_CODE_INJECTION_FOOTER, KEY_CODE_INJECTION_HEAD,
     KEY_MODULE_AI_ENABLED, KEY_MODULE_BLOG_ENABLED, KEY_MODULE_COLLECTIONS_ENABLED,
     KEY_MODULE_DOCUMENTS_ENABLED, KEY_MODULE_FORMS_ENABLED, KEY_MODULE_LEGAL_ENABLED,
     KEY_MODULE_PAGES_ENABLED, KEY_MODULE_PORTFOLIO_ENABLED, KEY_SEO_DEFAULT_DESCRIPTION,
-    KEY_SEO_TITLE_TEMPLATE, KEY_THEME_COLOR,
+    KEY_SEO_TITLE_TEMPLATE, KEY_THEME_COLOR, SiteSetting,
 };
 use crate::services::audited_mutation::AuditedEntity;
 use crate::services::permission_service::{Permission, PermissionService};
-use crate::AppState;
 
 #[utoipa::path(
     get,

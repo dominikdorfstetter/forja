@@ -6,8 +6,8 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::dto::navigation_menu::{CreateNavigationMenuRequest, UpdateNavigationMenuRequest};
-use crate::errors::codes;
 use crate::errors::ApiError;
+use crate::errors::codes;
 
 /// Navigation menu container model
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
@@ -143,13 +143,13 @@ impl NavigationMenu {
         .fetch_one(pool)
         .await
         .map_err(|e| {
-            if let sqlx::Error::Database(ref db_err) = e {
-                if db_err.constraint() == Some("uq_navigation_menus_site_slug") {
-                    return ApiError::bad_request(format!(
-                        "Menu with slug '{}' already exists for this site",
-                        req.slug
-                    ));
-                }
+            if let sqlx::Error::Database(ref db_err) = e
+                && db_err.constraint() == Some("uq_navigation_menus_site_slug")
+            {
+                return ApiError::bad_request(format!(
+                    "Menu with slug '{}' already exists for this site",
+                    req.slug
+                ));
             }
             ApiError::from(e)
         })?;

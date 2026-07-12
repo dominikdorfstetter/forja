@@ -704,10 +704,12 @@ mod tests {
         };
         let result = request.validate();
         assert!(result.is_err());
-        assert!(result
-            .unwrap_err()
-            .field_errors()
-            .contains_key("proficiency_level"));
+        assert!(
+            result
+                .unwrap_err()
+                .field_errors()
+                .contains_key("proficiency_level")
+        );
     }
 
     #[test]
@@ -744,20 +746,24 @@ mod tests {
     fn test_create_skill_request_rejects_proficiency_above_five() {
         let result = skill_request_with_proficiency(6).validate();
         assert!(result.is_err());
-        assert!(result
-            .unwrap_err()
-            .field_errors()
-            .contains_key("proficiency_level"));
+        assert!(
+            result
+                .unwrap_err()
+                .field_errors()
+                .contains_key("proficiency_level")
+        );
     }
 
     #[test]
     fn test_create_skill_request_rejects_proficiency_below_one() {
         let result = skill_request_with_proficiency(0).validate();
         assert!(result.is_err());
-        assert!(result
-            .unwrap_err()
-            .field_errors()
-            .contains_key("proficiency_level"));
+        assert!(
+            result
+                .unwrap_err()
+                .field_errors()
+                .contains_key("proficiency_level")
+        );
     }
 
     #[test]

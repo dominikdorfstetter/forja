@@ -27,7 +27,7 @@
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::errors::{codes, ApiError};
+use crate::errors::{ApiError, codes};
 use crate::models::audit::AuditAction;
 use crate::models::site_membership::{SiteMembership, SiteRole};
 use crate::services::audited_mutation::{self, MutationEvent};

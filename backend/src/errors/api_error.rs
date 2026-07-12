@@ -655,9 +655,11 @@ mod tests {
     #[tokio::test]
     async fn into_response_non_rate_limited_omits_retry_after() {
         let response = ApiError::bad_request("Bad").into_response();
-        assert!(!response
-            .headers()
-            .contains_key(axum::http::header::RETRY_AFTER));
+        assert!(
+            !response
+                .headers()
+                .contains_key(axum::http::header::RETRY_AFTER)
+        );
     }
 
     #[tokio::test]

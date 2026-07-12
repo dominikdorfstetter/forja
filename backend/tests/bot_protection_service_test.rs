@@ -14,9 +14,9 @@
 //! gate by pointing at a localhost URL (always blocked) and asserting the
 //! same 503 + provider-error code.
 
+use axum::Router;
 use axum::extract::Form;
 use axum::routing::post;
-use axum::Router;
 use forja::services::bot_protection_service::{perform_verify, verify};
 use serde::Deserialize;
 use std::sync::Arc;

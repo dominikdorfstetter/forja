@@ -8,9 +8,9 @@
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::errors::{codes, ApiError};
+use crate::errors::{ApiError, codes};
 use crate::models::media::MediaFile;
-use crate::models::site_settings::{SiteSetting, KEY_STORAGE_QUOTA_BYTES};
+use crate::models::site_settings::{KEY_STORAGE_QUOTA_BYTES, SiteSetting};
 use crate::repos::document_repo::DocumentRepo;
 
 /// Default quota when a site has not configured one: 1 GiB.

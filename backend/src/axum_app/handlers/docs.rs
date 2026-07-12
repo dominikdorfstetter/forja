@@ -25,9 +25,9 @@ use axum::response::{IntoResponse, Redirect};
 use axum::routing::get;
 use axum::{Extension, Router};
 
+use crate::AppState;
 use crate::models::site_membership::SiteMembership;
 use crate::utils::csp::generate_nonce;
-use crate::AppState;
 
 const FORBIDDEN_HTML: &str = r#"<!DOCTYPE html>
 <html lang="en">
@@ -88,11 +88,7 @@ fn cookie_value<'h>(headers: &'h HeaderMap, name: &str) -> Option<&'h str> {
     raw.split(';').find_map(|pair| {
         let pair = pair.trim();
         let (k, v) = pair.split_once('=')?;
-        if k == name {
-            Some(v)
-        } else {
-            None
-        }
+        if k == name { Some(v) } else { None }
     })
 }
 

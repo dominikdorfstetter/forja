@@ -7,6 +7,7 @@
 //! demands one canonical name per branching position). Same with
 //! `/pages/sections/{id}/...`.
 
+use crate::AppState;
 use crate::axum_app::authorized_content::{
     AuthorizedContent, AuthorizedContentWithOwnership, AuthorizedJson, AuthorizedSite, Create,
     Delete, Read, Update,
@@ -24,7 +25,7 @@ use crate::dto::page::{
 };
 use crate::dto::review::{ReviewActionRequest, ReviewActionResponse};
 use crate::dto::validated::ValidatedJson;
-use crate::errors::{codes, ApiError, ProblemDetails};
+use crate::errors::{ApiError, ProblemDetails, codes};
 use crate::guards::actor::Actor;
 use crate::guards::auth_guard::{ReadKey, WriteKey};
 use crate::guards::module_guard::{ModuleGuard, PagesModule};
@@ -42,7 +43,6 @@ use crate::services::{
 use crate::utils::locale_resolver::collapse_localizations;
 use crate::utils::pagination::PaginationParams;
 use crate::utils::seo;
-use crate::AppState;
 use axum::extract::{Path, Query, State};
 use axum::http::StatusCode;
 use axum::response::Json;

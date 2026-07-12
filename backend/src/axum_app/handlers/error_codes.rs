@@ -6,9 +6,9 @@ use axum::response::Json;
 use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 
+use crate::AppState;
 use crate::dto::error_codes::{ErrorCodeCatalogResponse, ErrorCodeEntry};
 use crate::errors::codes;
-use crate::AppState;
 
 #[utoipa::path(
     get,

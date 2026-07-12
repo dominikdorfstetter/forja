@@ -9,8 +9,8 @@ use crate::dto::cv::{
     CreateCvEntryRequest, CreateSkillRequest, CvEntryLocalizationInput, UpdateCvEntryRequest,
     UpdateSkillRequest,
 };
-use crate::errors::codes;
 use crate::errors::ApiError;
+use crate::errors::codes;
 use crate::models::cv::{CvEntry, CvEntryLocalization, CvEntryType, Skill, SkillLocalization};
 use crate::repos::content_query::ContentQuery;
 use crate::services::content_service::ContentService;

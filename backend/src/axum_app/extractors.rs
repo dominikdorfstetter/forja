@@ -13,18 +13,18 @@ use axum::http::request::Parts;
 use axum::http::{HeaderMap, StatusCode};
 use uuid::Uuid;
 
-use crate::errors::{codes, ApiError};
+use crate::AppState;
+use crate::errors::{ApiError, codes};
 use crate::guards::actor::Actor;
 use crate::guards::auth_guard::{
-    self, AuthSource, AuthenticatedKey, RoleGate, RoleGated, API_KEY_HEADER, CLERK_UUID_NAMESPACE,
-    PREVIEW_TOKEN_HEADER,
+    self, API_KEY_HEADER, AuthSource, AuthenticatedKey, CLERK_UUID_NAMESPACE, PREVIEW_TOKEN_HEADER,
+    RoleGate, RoleGated,
 };
 use crate::guards::module_guard::{ModuleGuard, ModuleMarker};
 use crate::middleware::rate_limit::{QuotaHeaderInfo, RateLimitHeaderInfo, RateLimiter};
 use crate::middleware::usage_tracking::ApiKeyUsageContext;
 use crate::models::api_key::{ApiKey, ApiKeyPermission};
 use crate::models::site::Site;
-use crate::AppState;
 use std::marker::PhantomData;
 
 /// Wrapper around the requesting client's IP address.
@@ -126,13 +126,13 @@ impl FromRequestParts<AppState> for CurrentSite {
 
         // RawPathParams reads from request extensions non-destructively, so
         // it coexists with any Path<...> extractor the handler also declares.
-        if let Ok(params) = RawPathParams::from_request_parts(parts, &()).await {
-            if let Some(id) = site_id_from_path_params(params.iter()) {
-                return Site::find_by_id(&state.db, id)
-                    .await
-                    .map(CurrentSite)
-                    .map_err(|_| (StatusCode::NOT_FOUND, "site not found"));
-            }
+        if let Ok(params) = RawPathParams::from_request_parts(parts, &()).await
+            && let Some(id) = site_id_from_path_params(params.iter())
+        {
+            return Site::find_by_id(&state.db, id)
+                .await
+                .map(CurrentSite)
+                .map_err(|_| (StatusCode::NOT_FOUND, "site not found"));
         }
 
         Err((StatusCode::BAD_REQUEST, "site context required"))

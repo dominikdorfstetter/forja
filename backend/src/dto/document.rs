@@ -7,13 +7,13 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use validator::Validate;
 
+use crate::AppState;
 use crate::dto::validated::{Validated, ValidatedDto, ValidationContext};
 use crate::errors::ApiError;
 use crate::models::document::{BlogDocumentDetail, Document, DocumentFolder, DocumentLocalization};
 use crate::repos::document_repo::DocumentRepo;
 use crate::utils::pagination::Paginated;
 use crate::utils::validation::validate_url;
-use crate::AppState;
 
 // ============================================
 // FOLDER DTOs
@@ -148,10 +148,8 @@ impl CreateDocumentRequest {
             return Err("Cannot provide both 'url' and 'file_data'".to_string());
         }
 
-        if has_url {
-            if let Some(ref url) = self.url {
-                validate_url(url).map_err(|e| e.message.unwrap_or_default().to_string())?;
-            }
+        if has_url && let Some(ref url) = self.url {
+            validate_url(url).map_err(|e| e.message.unwrap_or_default().to_string())?;
         }
 
         if has_file {
@@ -306,10 +304,8 @@ impl UpdateDocumentRequest {
             return Err("Cannot provide both 'url' and 'file_data'".to_string());
         }
 
-        if has_url {
-            if let Some(ref url) = self.url {
-                validate_url(url).map_err(|e| e.message.unwrap_or_default().to_string())?;
-            }
+        if has_url && let Some(ref url) = self.url {
+            validate_url(url).map_err(|e| e.message.unwrap_or_default().to_string())?;
         }
 
         if has_file {

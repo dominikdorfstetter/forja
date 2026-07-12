@@ -14,7 +14,7 @@ use serde_json::Value;
 
 use crate::dto::custom_entry::CustomEntryRequest;
 use crate::dto::custom_type::{CustomFieldResponse, CustomFieldType};
-use crate::errors::{codes, ApiError};
+use crate::errors::{ApiError, codes};
 
 fn invalid(field: &str, msg: &str) -> ApiError {
     ApiError::validation(format!("Field '{field}': {msg}"))
@@ -34,15 +34,15 @@ fn validate_value(field: &CustomFieldResponse, value: &Value) -> Result<(), ApiE
                 .as_str()
                 .ok_or_else(|| invalid(&field.key, "expected a string"))?;
             let len = s.chars().count() as i64;
-            if let Some(min) = field.min_length {
-                if len < min as i64 {
-                    return Err(invalid(&field.key, "shorter than the minimum length"));
-                }
+            if let Some(min) = field.min_length
+                && len < min as i64
+            {
+                return Err(invalid(&field.key, "shorter than the minimum length"));
             }
-            if let Some(max) = field.max_length {
-                if len > max as i64 {
-                    return Err(invalid(&field.key, "longer than the maximum length"));
-                }
+            if let Some(max) = field.max_length
+                && len > max as i64
+            {
+                return Err(invalid(&field.key, "longer than the maximum length"));
             }
             if let Some(pattern) = &field.pattern {
                 // Compiled at schema-save time (#791); recompiled here is cheap
@@ -58,15 +58,15 @@ fn validate_value(field: &CustomFieldResponse, value: &Value) -> Result<(), ApiE
             let n = value
                 .as_f64()
                 .ok_or_else(|| invalid(&field.key, "expected a number"))?;
-            if let Some(min) = field.min {
-                if n < min {
-                    return Err(invalid(&field.key, "below the minimum"));
-                }
+            if let Some(min) = field.min
+                && n < min
+            {
+                return Err(invalid(&field.key, "below the minimum"));
             }
-            if let Some(max) = field.max {
-                if n > max {
-                    return Err(invalid(&field.key, "above the maximum"));
-                }
+            if let Some(max) = field.max
+                && n > max
+            {
+                return Err(invalid(&field.key, "above the maximum"));
             }
         }
         CustomFieldType::Boolean => {

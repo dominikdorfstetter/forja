@@ -22,8 +22,8 @@ use crate::services::audited_mutation::AuditedEntity;
 
 /// Social links audit their mutations without dispatching a webhook.
 const SOCIAL_LINK: AuditedEntity = AuditedEntity::audit_only("social_link");
-use crate::services::permission_service::{Permission, PermissionService};
 use crate::AppState;
+use crate::services::permission_service::{Permission, PermissionService};
 
 /// Site social links, cached (identical for every caller of the site).
 /// Shared by the list handler and the cache-rebuild warmer.

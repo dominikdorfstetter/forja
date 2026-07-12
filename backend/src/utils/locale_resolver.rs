@@ -36,15 +36,15 @@ pub fn resolve_localization<L, F>(
 where
     F: Fn(&L) -> Uuid,
 {
-    if let Some(req) = requested_id {
-        if let Some(hit) = localizations.iter().find(|l| locale_id_of(l) == req) {
-            return Some(hit);
-        }
+    if let Some(req) = requested_id
+        && let Some(hit) = localizations.iter().find(|l| locale_id_of(l) == req)
+    {
+        return Some(hit);
     }
-    if let Some(def) = site_default_id {
-        if let Some(hit) = localizations.iter().find(|l| locale_id_of(l) == def) {
-            return Some(hit);
-        }
+    if let Some(def) = site_default_id
+        && let Some(hit) = localizations.iter().find(|l| locale_id_of(l) == def)
+    {
+        return Some(hit);
     }
     localizations.first()
 }

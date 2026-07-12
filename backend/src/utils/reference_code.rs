@@ -20,7 +20,7 @@
 //! statistically improbable but the caller-side `generate_unique` helper
 //! retries up to N times.
 
-use rand::{rng, RngExt};
+use rand::{RngExt, rng};
 
 /// 28-character alphabet: uppercase A–Z minus I/O plus digits 2–9.
 /// Order is irrelevant for security — kept stable so callers (e.g. tests)

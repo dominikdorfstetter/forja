@@ -12,11 +12,11 @@
 //! returned `salt` via `models::site_bot_protection::ConsumedChallenge` to
 //! enforce single use (#768b).
 
-use altcha_lib_rs::{create_json_challenge, verify_solution, ChallengeOptions, Payload};
-use base64::{engine::general_purpose::STANDARD, Engine as _};
+use altcha_lib_rs::{ChallengeOptions, Payload, create_json_challenge, verify_solution};
+use base64::{Engine as _, engine::general_purpose::STANDARD};
 use chrono::{Duration, Utc};
 
-use crate::errors::{codes, ApiError};
+use crate::errors::{ApiError, codes};
 
 /// Build a fresh HMAC-signed challenge as the JSON the ALTCHA widget expects.
 ///
@@ -103,7 +103,7 @@ pub fn verify(payload_b64: &str, hmac_key: &str) -> Result<String, ApiError> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use altcha_lib_rs::{solve_challenge, Challenge};
+    use altcha_lib_rs::{Challenge, solve_challenge};
 
     const KEY: &str = "test-hmac-key-32-bytes-long-000000";
 

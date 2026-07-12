@@ -166,7 +166,7 @@ pub fn build_consumer_openapi(mut full: OpenApi) -> OpenApi {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::axum_app::{handlers, AxumApiDoc};
+    use crate::axum_app::{AxumApiDoc, handlers};
     use utoipa::OpenApi as _; // bring the derive trait into scope for `.openapi()`
     use utoipa_axum::router::OpenApiRouter;
 

@@ -7,9 +7,9 @@ use sqlx::PgPool;
 use std::sync::Arc;
 use tokio::sync::Semaphore;
 
+use crate::AppState;
 use crate::models::webhook::{Webhook, WebhookRetryJob};
 use crate::services::{encryption, webhook_service, worker_lock};
-use crate::AppState;
 
 /// How often the worker polls the queue (seconds).
 const POLL_INTERVAL_SECS: u64 = 15;

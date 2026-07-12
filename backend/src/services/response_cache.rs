@@ -16,7 +16,7 @@
 use std::sync::OnceLock;
 
 use redis::AsyncCommands;
-use serde::{de::DeserializeOwned, Serialize};
+use serde::{Serialize, de::DeserializeOwned};
 use uuid::Uuid;
 
 /// Redis key prefix (versioned so the format can change without stale reads).
@@ -69,20 +69,20 @@ where
 {
     if let Some(conn) = redis {
         let mut conn = conn.clone();
-        if let Ok(Some(json)) = conn.get::<_, Option<String>>(cache_key).await {
-            if let Ok(value) = serde_json::from_str::<T>(&json) {
-                return Ok(value);
-            }
+        if let Ok(Some(json)) = conn.get::<_, Option<String>>(cache_key).await
+            && let Ok(value) = serde_json::from_str::<T>(&json)
+        {
+            return Ok(value);
         }
     }
 
     let value = compute().await?;
 
-    if let Some(conn) = redis {
-        if let Ok(json) = serde_json::to_string(&value) {
-            let mut conn = conn.clone();
-            let _: Result<(), _> = conn.set_ex(cache_key, json, ttl_secs()).await;
-        }
+    if let Some(conn) = redis
+        && let Ok(json) = serde_json::to_string(&value)
+    {
+        let mut conn = conn.clone();
+        let _: Result<(), _> = conn.set_ex(cache_key, json, ttl_secs()).await;
     }
 
     Ok(value)
@@ -215,10 +215,10 @@ pub async fn stats_global(redis: &Option<redis::aio::ConnectionManager>) -> Glob
     let mut counts: std::collections::HashMap<String, u64> = std::collections::HashMap::new();
     for k in &keys {
         // key shape: rcache:v1:{site_id}:{suffix}
-        if let Some(rest) = k.strip_prefix(&format!("{CACHE_PREFIX}:")) {
-            if let Some((site, _)) = rest.split_once(':') {
-                *counts.entry(site.to_string()).or_insert(0) += 1;
-            }
+        if let Some(rest) = k.strip_prefix(&format!("{CACHE_PREFIX}:"))
+            && let Some((site, _)) = rest.split_once(':')
+        {
+            *counts.entry(site.to_string()).or_insert(0) += 1;
         }
     }
     let mut per_site: Vec<SiteEntryCount> = counts

@@ -123,8 +123,10 @@ mod tests {
         assert!(
             snippet.contains("https://api.example.com/files/site_favicons/abc/favicon-32x32.png")
         );
-        assert!(snippet
-            .contains("https://api.example.com/files/site_favicons/abc/apple-touch-icon.png"));
+        assert!(
+            snippet
+                .contains("https://api.example.com/files/site_favicons/abc/apple-touch-icon.png")
+        );
         assert!(snippet.contains("content=\"#4a90d9\""));
     }
 

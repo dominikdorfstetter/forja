@@ -19,8 +19,8 @@
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::errors::codes;
 use crate::errors::ApiError;
+use crate::errors::codes;
 use crate::guards::auth_guard::{AuthSource, AuthenticatedKey};
 use crate::models::api_key::ApiKeyPermission;
 use crate::models::site_membership::{SiteMembership, SiteRole};
@@ -164,10 +164,10 @@ impl Actor {
                 permission,
                 site_id: scoped,
             } => {
-                if let Some(scoped) = scoped {
-                    if *scoped != site_id {
-                        return Ok(None);
-                    }
+                if let Some(scoped) = scoped
+                    && *scoped != site_id
+                {
+                    return Ok(None);
                 }
                 let role = match permission {
                     ApiKeyPermission::Master => SiteRole::Owner,

@@ -396,10 +396,12 @@ mod tests {
         };
         let result = request.validate();
         assert!(result.is_err());
-        assert!(result
-            .unwrap_err()
-            .field_errors()
-            .contains_key("cookie_name"));
+        assert!(
+            result
+                .unwrap_err()
+                .field_errors()
+                .contains_key("cookie_name")
+        );
     }
 
     #[test]
@@ -471,10 +473,12 @@ mod tests {
         };
         let result = request.validate();
         assert!(result.is_err());
-        assert!(result
-            .unwrap_err()
-            .field_errors()
-            .contains_key("cookie_name"));
+        assert!(
+            result
+                .unwrap_err()
+                .field_errors()
+                .contains_key("cookie_name")
+        );
     }
 
     #[test]
@@ -533,10 +537,12 @@ mod tests {
         };
         let result = request.validate();
         assert!(result.is_err());
-        assert!(result
-            .unwrap_err()
-            .field_errors()
-            .contains_key("cookie_name"));
+        assert!(
+            result
+                .unwrap_err()
+                .field_errors()
+                .contains_key("cookie_name")
+        );
     }
 
     #[test]

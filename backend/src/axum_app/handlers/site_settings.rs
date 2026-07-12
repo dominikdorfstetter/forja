@@ -7,6 +7,7 @@ use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 use uuid::Uuid;
 
+use crate::AppState;
 use crate::dto::site_settings::{
     PreviewTemplate, SiteOverviewEntry, SiteSettingsResponse, SiteStorageSummary,
     SitesOverviewResponse, StorageUsageResponse, SystemStorageOverviewResponse,
@@ -23,7 +24,6 @@ use crate::models::site_settings::SiteSetting;
 use crate::repos::document_repo::DocumentRepo;
 use crate::services::audited_mutation::AuditedEntity;
 use crate::services::permission_service::{Permission, PermissionService};
-use crate::AppState;
 
 /// Inject built-in preview templates (prepended), deduping by URL so the
 /// stored list never accumulates copies of built-ins from past saves.

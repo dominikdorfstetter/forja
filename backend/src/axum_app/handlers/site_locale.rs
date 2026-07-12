@@ -7,6 +7,7 @@
 //! shape when the handler authorizes by site permissions only — there's
 //! no implicit "you must be at least X role" guard.
 
+use crate::AppState;
 use crate::dto::site_locale::{AddSiteLocaleRequest, SiteLocaleResponse, UpdateSiteLocaleRequest};
 use crate::dto::validated::ValidatedJson;
 use crate::errors::codes;
@@ -15,7 +16,6 @@ use crate::guards::actor::Actor;
 use crate::guards::auth_guard::ReadKey;
 use crate::models::site_locale::SiteLocale;
 use crate::services::permission_service::{Permission, PermissionService};
-use crate::AppState;
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use axum::response::Json;
@@ -168,13 +168,14 @@ async fn update_site_locale(
         let locales = SiteLocale::find_all_for_site(&state.db, site_id).await?;
         let active_count = locales.iter().filter(|l| l.is_active).count();
         let current = locales.iter().find(|l| l.locale_id == locale_id);
-        if let Some(current) = current {
-            if current.is_active && active_count <= 1 {
-                return Err(
-                    ApiError::bad_request("At least one active language is required")
-                        .with_code(codes::BAD_REQUEST),
-                );
-            }
+        if let Some(current) = current
+            && current.is_active
+            && active_count <= 1
+        {
+            return Err(
+                ApiError::bad_request("At least one active language is required")
+                    .with_code(codes::BAD_REQUEST),
+            );
         }
     }
 

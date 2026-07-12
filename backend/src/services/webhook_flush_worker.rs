@@ -7,9 +7,9 @@ use std::time::Duration;
 
 use sqlx::PgPool;
 
+use crate::AppState;
 use crate::models::webhook::{Webhook, WebhookDispatchBuffer};
 use crate::services::{webhook_service, worker_lock};
-use crate::AppState;
 
 const POLL_INTERVAL_SECS: u64 = 5;
 const BATCH_SIZE: i64 = 10;

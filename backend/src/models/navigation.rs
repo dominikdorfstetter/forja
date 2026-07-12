@@ -9,8 +9,8 @@ use uuid::Uuid;
 use crate::dto::navigation::{
     CreateNavigationItemRequest, NavigationTree, UpdateNavigationItemRequest,
 };
-use crate::errors::codes;
 use crate::errors::ApiError;
+use crate::errors::codes;
 
 /// Navigation item model
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]

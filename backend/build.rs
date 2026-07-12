@@ -39,7 +39,9 @@ fn main() {
             );
         }
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-            println!("cargo:warning=npm not found — skipping admin build. Install Node.js to use --features bundle-admin");
+            println!(
+                "cargo:warning=npm not found — skipping admin build. Install Node.js to use --features bundle-admin"
+            );
             return;
         }
         Err(e) => {

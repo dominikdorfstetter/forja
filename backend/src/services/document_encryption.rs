@@ -8,9 +8,9 @@
 
 use aes_gcm::aead::{Aead, KeyInit, OsRng};
 use aes_gcm::{AeadCore, Aes256Gcm, Nonce};
-use argon2::{password_hash::SaltString, Argon2, PasswordHasher};
-use base64::engine::general_purpose::STANDARD as BASE64;
+use argon2::{Argon2, PasswordHasher, password_hash::SaltString};
 use base64::Engine;
+use base64::engine::general_purpose::STANDARD as BASE64;
 use hmac::Mac;
 use sha2::Sha256;
 

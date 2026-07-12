@@ -37,6 +37,7 @@
 //!    different lock slots, so unrelated workers don't block each other.
 //! 3. Register the spawn call in [`spawn_all`] below.
 
+use crate::AppState;
 use crate::services::{
     anomaly_detection::AnomalyDetectionWorker, audit_cleanup::AuditCleanupWorker,
     custom_entry_retention_cleanup::CustomEntryRetentionCleanupWorker, demo_mode::DemoModeFairing,
@@ -45,7 +46,6 @@ use crate::services::{
     usage_aggregation::UsageAggregationWorker, webhook_flush_worker::WebhookFlushWorker,
     webhook_retry_worker::WebhookRetryWorker,
 };
-use crate::AppState;
 
 /// Spawn every long-running background task. Idempotent within one process
 /// — call it exactly once at startup. Calling it twice would register

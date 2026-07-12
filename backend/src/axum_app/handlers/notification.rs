@@ -13,16 +13,16 @@ use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 use uuid::Uuid;
 
+use crate::AppState;
 use crate::dto::notification::{
     BulkDeleteNotificationsRequest, MarkAllReadResponse, NotificationDeleteResponse,
     NotificationResponse, NotificationStatusCounts, PaginatedNotifications, UnreadCountResponse,
 };
-use crate::errors::{codes, ApiError, ProblemDetails};
+use crate::errors::{ApiError, ProblemDetails, codes};
 use crate::guards::actor::Actor;
 use crate::guards::auth_guard::{ReadKey, WriteKey};
 use crate::models::notification::Notification;
 use crate::utils::list_params::ListParams;
-use crate::AppState;
 
 /// Reject API-key identities — notification endpoints are user-scoped.
 fn require_clerk_user_id(auth: &Actor) -> Result<&str, ApiError> {

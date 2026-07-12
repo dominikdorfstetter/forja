@@ -67,8 +67,8 @@ pub(crate) async fn log_changes(
             continue;
         }
         let old_val = old_obj.get(key);
-        if old_val != Some(new_val) {
-            if let Err(e) = ChangeHistory::create(
+        if old_val != Some(new_val)
+            && let Err(e) = ChangeHistory::create(
                 pool,
                 site_id,
                 entity_type,
@@ -79,9 +79,8 @@ pub(crate) async fn log_changes(
                 changed_by,
             )
             .await
-            {
-                tracing::warn!("Failed to write change history for field '{key}': {e}");
-            }
+        {
+            tracing::warn!("Failed to write change history for field '{key}': {e}");
         }
     }
 }

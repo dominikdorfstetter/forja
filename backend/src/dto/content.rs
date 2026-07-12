@@ -238,10 +238,12 @@ mod tests {
         };
         let result = request.validate();
         assert!(result.is_err());
-        assert!(result
-            .unwrap_err()
-            .field_errors()
-            .contains_key("meta_title"));
+        assert!(
+            result
+                .unwrap_err()
+                .field_errors()
+                .contains_key("meta_title")
+        );
     }
 
     #[test]
@@ -257,10 +259,12 @@ mod tests {
         };
         let result = request.validate();
         assert!(result.is_err());
-        assert!(result
-            .unwrap_err()
-            .field_errors()
-            .contains_key("meta_description"));
+        assert!(
+            result
+                .unwrap_err()
+                .field_errors()
+                .contains_key("meta_description")
+        );
     }
 
     #[test]

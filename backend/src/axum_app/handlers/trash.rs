@@ -10,6 +10,7 @@ use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 use uuid::Uuid;
 
+use crate::AppState;
 use crate::dto::trash::{TrashCountResponse, TrashListResponse};
 use crate::errors::{ApiError, ProblemDetails};
 use crate::guards::auth_guard::{AdminKey, ReadKey, WriteKey};
@@ -17,7 +18,6 @@ use crate::repos::trash_repo::TrashRepo;
 use crate::services::permission_service::{Permission, PermissionService};
 use crate::services::trash_service;
 use crate::utils::list_params::ListParams;
-use crate::AppState;
 
 #[derive(Debug, Deserialize)]
 struct EntityTypeQuery {

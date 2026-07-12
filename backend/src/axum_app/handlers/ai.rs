@@ -9,12 +9,13 @@ use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 use uuid::Uuid;
 
+use crate::AppState;
 use crate::dto::ai::{
     AiAction, AiConfigResponse, AiGenerateRequest, AiGenerateResponse, AiTestResponse,
     CreateAiConfigRequest, ListModelsRequest, ListModelsResponse,
 };
 use crate::dto::validated::ValidatedJson;
-use crate::errors::{codes, ApiError, ProblemDetails};
+use crate::errors::{ApiError, ProblemDetails, codes};
 use crate::guards::auth_guard::{AdminKey, ReadKey, WriteKey};
 use crate::guards::module_guard::{AiModule, ModuleGuard};
 use crate::models::ai_config::SiteAiConfig;
@@ -24,7 +25,6 @@ use crate::services::audited_mutation::AuditedEntity;
 use crate::services::permission_service::{Permission, PermissionService};
 use crate::services::url_validation;
 use crate::services::{ai_service, encryption};
-use crate::AppState;
 
 #[utoipa::path(
     get,
@@ -335,47 +335,44 @@ async fn generate_ai_content(
         req.action,
         AiAction::AutoTag | AiAction::AltText | AiAction::ImageCaption | AiAction::ImageTitle
     ) {
-        if let Some(ref image_url) = req.image_url.clone() {
-            if let Ok(Some(media)) = MediaFile::find_by_public_url(&state.db, image_url).await {
-                if let Ok(variants) = MediaVariant::find_for_media(&state.db, media.id).await {
-                    let preferred = [
-                        crate::models::media::MediaVariantType::Medium,
-                        crate::models::media::MediaVariantType::Small,
-                        crate::models::media::MediaVariantType::Thumbnail,
-                    ];
-                    let variant = preferred
-                        .iter()
-                        .find_map(|name| variants.iter().find(|v| &v.variant_name == name));
+        if let Some(ref image_url) = req.image_url.clone()
+            && let Ok(Some(media)) = MediaFile::find_by_public_url(&state.db, image_url).await
+            && let Ok(variants) = MediaVariant::find_for_media(&state.db, media.id).await
+        {
+            let preferred = [
+                crate::models::media::MediaVariantType::Medium,
+                crate::models::media::MediaVariantType::Small,
+                crate::models::media::MediaVariantType::Thumbnail,
+            ];
+            let variant = preferred
+                .iter()
+                .find_map(|name| variants.iter().find(|v| &v.variant_name == name));
 
-                    if let Some(v) = variant {
-                        if let Ok((bytes, content_type)) =
-                            state.storage.fetch(&v.storage_path).await
-                        {
-                            let b64 = base64::engine::general_purpose::STANDARD.encode(&bytes);
-                            let mime = if content_type.is_empty() {
-                                media.mime_type.clone()
-                            } else {
-                                content_type
-                            };
-                            req.image_url = Some(format!("data:{mime};base64,{b64}"));
-                            tracing::debug!(
-                                "Using base64 {:?} variant ({} bytes) instead of full-res URL for vision AI",
-                                v.variant_name,
-                                bytes.len()
-                            );
-                        }
-                    }
-                }
+            if let Some(v) = variant
+                && let Ok((bytes, content_type)) = state.storage.fetch(&v.storage_path).await
+            {
+                let b64 = base64::engine::general_purpose::STANDARD.encode(&bytes);
+                let mime = if content_type.is_empty() {
+                    media.mime_type.clone()
+                } else {
+                    content_type
+                };
+                req.image_url = Some(format!("data:{mime};base64,{b64}"));
+                tracing::debug!(
+                    "Using base64 {:?} variant ({} bytes) instead of full-res URL for vision AI",
+                    v.variant_name,
+                    bytes.len()
+                );
             }
         }
 
         // Internal media was just inlined as a base64 data: URL above. Any URL
         // still pointing outward must pass the SSRF guard before we hand it to
         // the provider — mirrors the base_url check in upsert/test config.
-        if !state.settings.is_development() {
-            if let Some(ref image_url) = req.image_url {
-                validate_vision_image_url(image_url).await?;
-            }
+        if !state.settings.is_development()
+            && let Some(ref image_url) = req.image_url
+        {
+            validate_vision_image_url(image_url).await?;
         }
     }
 

@@ -3,8 +3,8 @@
 //! When `DEMO_MODE=true`, seeds a demo site on liftoff so new users
 //! can explore the CMS immediately.
 
-use crate::services::worker_lock;
 use crate::AppState;
+use crate::services::worker_lock;
 
 /// Rocket fairing that seeds demo data on liftoff when demo mode is enabled.
 pub struct DemoModeFairing;

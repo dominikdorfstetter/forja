@@ -16,7 +16,7 @@
 
 use axum::body::Body;
 use axum::extract::{Path, Query, State};
-use axum::http::{header, HeaderMap, HeaderValue, Response, StatusCode};
+use axum::http::{HeaderMap, HeaderValue, Response, StatusCode, header};
 use axum::response::{IntoResponse, Json};
 use base64::Engine;
 use serde::Deserialize;
@@ -36,7 +36,7 @@ use crate::dto::document::{
     VerifyDocumentAccessResponse,
 };
 use crate::dto::validated::ValidatedJson;
-use crate::errors::{codes, ApiError, ProblemDetails};
+use crate::errors::{ApiError, ProblemDetails, codes};
 use crate::guards::auth_guard::{ReadKey, WriteKey};
 use crate::guards::module_guard::{DocumentsModule, ModuleGuard};
 use crate::models::audit::AuditAction;
@@ -138,9 +138,9 @@ async fn persist_rotation(state: &AppState, document_id: uuid::Uuid, rewrapped: 
         }
     }
 }
+use crate::AppState;
 use crate::utils::csp::generate_nonce;
 use crate::utils::list_params::ListParams;
-use crate::AppState;
 
 #[derive(Debug, Deserialize)]
 struct ListDocumentsQuery {
@@ -835,28 +835,27 @@ async fn authorize_download(
     }
 
     let hmac_secret = hmac_secret_for_state(state)?;
-    if let Some(tok) = token {
-        if let Some(verified) = document_encryption::verify_access_token(tok, &id, &hmac_secret) {
-            let (ciphertext, file_name, mime_type) =
-                DocumentRepo::find_file_data(&state.db, id).await?;
+    if let Some(tok) = token
+        && let Some(verified) = document_encryption::verify_access_token(tok, &id, &hmac_secret)
+    {
+        let (ciphertext, file_name, mime_type) =
+            DocumentRepo::find_file_data(&state.db, id).await?;
 
-            let nonce = meta.encryption_nonce.as_deref().ok_or_else(|| {
-                ApiError::internal("Missing encryption nonce").with_code(codes::INTERNAL_ERROR)
-            })?;
+        let nonce = meta.encryption_nonce.as_deref().ok_or_else(|| {
+            ApiError::internal("Missing encryption nonce").with_code(codes::INTERNAL_ERROR)
+        })?;
 
-            let crypto = DocumentCrypto::from_settings(&state.settings.security)?;
-            let recovered =
-                crypto.decrypt_with_recovery(&ciphertext, nonce, verified.dek, &meta)?;
-            if let Some(rewrapped) = recovered.rewrapped_dek {
-                persist_rotation(state, id, &rewrapped).await;
-            }
-
-            return Ok(DownloadAuthorization::Private {
-                plaintext: recovered.plaintext,
-                file_name,
-                mime_type,
-            });
+        let crypto = DocumentCrypto::from_settings(&state.settings.security)?;
+        let recovered = crypto.decrypt_with_recovery(&ciphertext, nonce, verified.dek, &meta)?;
+        if let Some(rewrapped) = recovered.rewrapped_dek {
+            persist_rotation(state, id, &rewrapped).await;
         }
+
+        return Ok(DownloadAuthorization::Private {
+            plaintext: recovered.plaintext,
+            file_name,
+            mime_type,
+        });
     }
 
     let doc = DocumentRepo::find_by_id(&state.db, id).await?;
@@ -915,11 +914,11 @@ async fn verify_document_access(
     // Precedence: expired (410) → locked (423) → wrong password (403).
     // The expired/locked checks run before Argon2 so a wrong password on
     // an expired/locked doc never reveals timing or correctness data.
-    if let Some(exp) = meta.private_access_expires_at {
-        if exp <= chrono::Utc::now() {
-            return Err(ApiError::gone("This document's access window has expired")
-                .with_code(codes::DOCUMENT_EXPIRED));
-        }
+    if let Some(exp) = meta.private_access_expires_at
+        && exp <= chrono::Utc::now()
+    {
+        return Err(ApiError::gone("This document's access window has expired")
+            .with_code(codes::DOCUMENT_EXPIRED));
     }
     if meta.private_locked_until.is_some() {
         return Err(
@@ -959,10 +958,10 @@ async fn verify_document_access(
     let hmac_secret = hmac_secret_for_state(&state)?;
     let access = document_encryption::generate_access_token(&id, &hmac_secret, 3600, Some(&dek))?;
 
-    if let Ok(crypto) = DocumentCrypto::from_settings(&state.settings.security) {
-        if let Some(rewrapped) = crypto.rewrap_for_rotation(&meta) {
-            persist_rotation(&state, id, &rewrapped).await;
-        }
+    if let Ok(crypto) = DocumentCrypto::from_settings(&state.settings.security)
+        && let Some(rewrapped) = crypto.rewrap_for_rotation(&meta)
+    {
+        persist_rotation(&state, id, &rewrapped).await;
     }
 
     Ok(Json(VerifyDocumentAccessResponse {
@@ -1457,7 +1456,7 @@ pub fn router() -> OpenApiRouter<AppState> {
 
 #[cfg(test)]
 mod tests {
-    use super::{password_banner, resolve_hmac_secret, PasswordPageBanner};
+    use super::{PasswordPageBanner, password_banner, resolve_hmac_secret};
 
     #[test]
     fn banner_is_expired_when_past_expiry() {

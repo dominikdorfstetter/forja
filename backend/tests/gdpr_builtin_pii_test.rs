@@ -13,7 +13,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use forja::models::site_membership::{SiteMembership, SiteRole};
-use forja::models::site_settings::{SiteSetting, KEY_DATA_RETENTION_DAYS};
+use forja::models::site_settings::{KEY_DATA_RETENTION_DAYS, SiteSetting};
 use forja::repos::user_data_repo;
 
 // ── Helpers ──────────────────────────────────────────────────────────────

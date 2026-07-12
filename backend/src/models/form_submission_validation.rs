@@ -12,7 +12,7 @@ use regex::Regex;
 use serde_json::Value as JsonValue;
 
 use crate::dto::forms::{FormFieldResponse, FormFieldType};
-use crate::errors::{codes, ApiError, FieldError};
+use crate::errors::{ApiError, FieldError, codes};
 
 /// Validation error map: `{ field_label: error_message }`.
 pub type FieldErrors = HashMap<String, String>;
@@ -88,15 +88,15 @@ fn validate_field(field: &FormFieldResponse, value: Option<&JsonValue>) -> Resul
         }
         FormFieldType::Number => {
             let n = value_as_f64(&v).ok_or_else(|| "Must be a number".to_string())?;
-            if let Some(min) = rule_f64(&field.validation, "min") {
-                if n < min {
-                    return Err(format!("Must be at least {}", min));
-                }
+            if let Some(min) = rule_f64(&field.validation, "min")
+                && n < min
+            {
+                return Err(format!("Must be at least {}", min));
             }
-            if let Some(max) = rule_f64(&field.validation, "max") {
-                if n > max {
-                    return Err(format!("Must be at most {}", max));
-                }
+            if let Some(max) = rule_f64(&field.validation, "max")
+                && n > max
+            {
+                return Err(format!("Must be at most {}", max));
             }
         }
         FormFieldType::Date => {
@@ -112,10 +112,10 @@ fn validate_field(field: &FormFieldResponse, value: Option<&JsonValue>) -> Resul
         }
         FormFieldType::Select | FormFieldType::Radio => {
             let s = v.as_str().ok_or_else(|| "Must be a string".to_string())?;
-            if let Some(opts) = field.options.as_ref().and_then(option_keys) {
-                if !opts.iter().any(|o| o == s) {
-                    return Err("Value is not one of the allowed options".to_string());
-                }
+            if let Some(opts) = field.options.as_ref().and_then(option_keys)
+                && !opts.iter().any(|o| o == s)
+            {
+                return Err("Value is not one of the allowed options".to_string());
             }
         }
         FormFieldType::Checkbox => {
@@ -140,15 +140,15 @@ fn validate_field(field: &FormFieldResponse, value: Option<&JsonValue>) -> Resul
 
 fn check_length(validation: &JsonValue, s: &str) -> Result<(), String> {
     let len = s.chars().count();
-    if let Some(min) = rule_u64(validation, "min_length") {
-        if (len as u64) < min {
-            return Err(format!("Must be at least {} characters", min));
-        }
+    if let Some(min) = rule_u64(validation, "min_length")
+        && (len as u64) < min
+    {
+        return Err(format!("Must be at least {} characters", min));
     }
-    if let Some(max) = rule_u64(validation, "max_length") {
-        if (len as u64) > max {
-            return Err(format!("Must be at most {} characters", max));
-        }
+    if let Some(max) = rule_u64(validation, "max_length")
+        && (len as u64) > max
+    {
+        return Err(format!("Must be at most {} characters", max));
     }
     Ok(())
 }
@@ -301,14 +301,18 @@ mod tests {
             true,
             json!({"min": 18, "max": 100}),
         )];
-        assert!(validate_submission(&fields, &json!({"Age": 10}))
-            .get("Age")
-            .unwrap()
-            .contains("at least 18"));
-        assert!(validate_submission(&fields, &json!({"Age": 150}))
-            .get("Age")
-            .unwrap()
-            .contains("at most 100"));
+        assert!(
+            validate_submission(&fields, &json!({"Age": 10}))
+                .get("Age")
+                .unwrap()
+                .contains("at least 18")
+        );
+        assert!(
+            validate_submission(&fields, &json!({"Age": 150}))
+                .get("Age")
+                .unwrap()
+                .contains("at most 100")
+        );
         assert!(validate_submission(&fields, &json!({"Age": 42})).is_empty());
     }
 

@@ -124,10 +124,12 @@ mod tests {
         };
         let result = req.validate();
         assert!(result.is_err());
-        assert!(result
-            .unwrap_err()
-            .field_errors()
-            .contains_key("clerk_user_id"));
+        assert!(
+            result
+                .unwrap_err()
+                .field_errors()
+                .contains_key("clerk_user_id")
+        );
     }
 
     #[test]
@@ -138,10 +140,12 @@ mod tests {
         };
         let result = req.validate();
         assert!(result.is_err());
-        assert!(result
-            .unwrap_err()
-            .field_errors()
-            .contains_key("clerk_user_id"));
+        assert!(
+            result
+                .unwrap_err()
+                .field_errors()
+                .contains_key("clerk_user_id")
+        );
     }
 
     #[test]
@@ -168,10 +172,12 @@ mod tests {
         };
         let result = req.validate();
         assert!(result.is_err());
-        assert!(result
-            .unwrap_err()
-            .field_errors()
-            .contains_key("new_owner_clerk_user_id"));
+        assert!(
+            result
+                .unwrap_err()
+                .field_errors()
+                .contains_key("new_owner_clerk_user_id")
+        );
     }
 
     #[test]
@@ -181,10 +187,12 @@ mod tests {
         };
         let result = req.validate();
         assert!(result.is_err());
-        assert!(result
-            .unwrap_err()
-            .field_errors()
-            .contains_key("new_owner_clerk_user_id"));
+        assert!(
+            result
+                .unwrap_err()
+                .field_errors()
+                .contains_key("new_owner_clerk_user_id")
+        );
     }
 
     #[test]

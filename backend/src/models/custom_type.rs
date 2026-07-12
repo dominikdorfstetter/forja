@@ -14,7 +14,7 @@ use crate::dto::custom_type::{
     CreateCustomTypeRequest, CustomContentKind, CustomFieldInput, CustomFieldResponse,
     CustomFieldType, CustomTypeResponse, CustomTypeSummary, UpdateCustomTypeRequest,
 };
-use crate::errors::{codes, ApiError};
+use crate::errors::{ApiError, codes};
 
 /// Structural caps (#791). Hard limits, not per-site configurable.
 pub const MAX_TYPES_PER_SITE: i64 = 100;
@@ -84,14 +84,14 @@ pub fn validate_fields(fields: &[CustomFieldInput]) -> Result<(), ApiError> {
         }
 
         // Patterns must compile with the linear-time `regex` crate.
-        if let Some(pattern) = &f.pattern {
-            if regex::Regex::new(pattern).is_err() {
-                return Err(ApiError::validation(format!(
-                    "Field '{}' has an invalid regex pattern",
-                    f.key
-                ))
-                .with_code(codes::ERR_CUSTOM_FIELD_INVALID_PATTERN));
-            }
+        if let Some(pattern) = &f.pattern
+            && regex::Regex::new(pattern).is_err()
+        {
+            return Err(ApiError::validation(format!(
+                "Field '{}' has an invalid regex pattern",
+                f.key
+            ))
+            .with_code(codes::ERR_CUSTOM_FIELD_INVALID_PATTERN));
         }
     }
 

@@ -10,7 +10,7 @@ use serial_test::serial;
 
 use forja::models::site::Site;
 use forja::models::site_settings::{
-    SiteSetting, KEY_SEO_DEFAULT_DESCRIPTION, KEY_SEO_DEFAULT_OG_IMAGE_ID, KEY_SEO_TITLE_TEMPLATE,
+    KEY_SEO_DEFAULT_DESCRIPTION, KEY_SEO_DEFAULT_OG_IMAGE_ID, KEY_SEO_TITLE_TEMPLATE, SiteSetting,
 };
 use forja::utils::seo::SeoContext;
 

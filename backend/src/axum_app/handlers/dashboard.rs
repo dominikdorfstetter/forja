@@ -19,17 +19,17 @@
 
 use std::path::Path;
 
+use axum::Router;
 use axum::extract::{Request, State};
 use axum::http::header::{CACHE_CONTROL, CONTENT_SECURITY_POLICY, CONTENT_TYPE};
 use axum::http::{HeaderName, HeaderValue, StatusCode};
 use axum::response::IntoResponse;
 use axum::routing::get;
-use axum::Router;
 use tower::ServiceExt;
 use tower_http::services::ServeDir;
 
-use crate::utils::csp::generate_nonce;
 use crate::AppState;
+use crate::utils::csp::generate_nonce;
 
 const NO_CACHE: &str = "no-cache, no-store, must-revalidate";
 const IMMUTABLE_CACHE: &str = "public, max-age=31536000, immutable";

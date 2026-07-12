@@ -10,7 +10,7 @@
 
 use axum::body::Body;
 use axum::extract::{Path, State};
-use axum::http::{header, HeaderValue, Response, StatusCode};
+use axum::http::{HeaderValue, Response, StatusCode, header};
 use axum::response::IntoResponse;
 use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
@@ -133,10 +133,12 @@ mod tests {
             content_type: "image/png".to_string(),
         };
         let response = r.into_response();
-        assert!(response
-            .headers()
-            .get(header::CONTENT_DISPOSITION)
-            .is_none());
+        assert!(
+            response
+                .headers()
+                .get(header::CONTENT_DISPOSITION)
+                .is_none()
+        );
     }
 
     #[test]
