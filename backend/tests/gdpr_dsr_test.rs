@@ -1,0 +1,387 @@
+//! DSR tooling tests (#3): full account erasure covers *every*
+//! identity-bearing built-in field (including media uploads, AI usage and
+//! moderation records), the user-data export includes media + AI usage, and
+//! system admins can fulfil DSRs on behalf of a user with an audit trail.
+//!
+//! Pattern follows `user_data_repo_test.rs`: statements run against the real
+//! schema so wrong table/column names fail here, not in production.
+
+mod common;
+
+use sqlx::PgPool;
+use uuid::Uuid;
+
+use forja::models::site_membership::{SiteMembership, SiteRole};
+use forja::models::user_preferences::UserPreferences;
+use forja::repos::user_data_repo;
+
+// ── Seed helpers ─────────────────────────────────────────────────────────
+
+async fn insert_media_uploaded_by(pool: &PgPool, uploaded_by: Uuid) -> Uuid {
+    let id = Uuid::new_v4();
+    sqlx::query(
+        r#"
+        INSERT INTO media_files (id, filename, original_filename, mime_type,
+                                 file_size, storage_path, uploaded_by)
+        VALUES ($1, 'dsr.png', 'dsr.png', 'image/png', 42, '/tmp/dsr.png', $2)
+        "#,
+    )
+    .bind(id)
+    .bind(uploaded_by)
+    .execute(pool)
+    .await
+    .expect("insert media file");
+    id
+}
+
+async fn insert_ai_usage_by(pool: &PgPool, site_id: Uuid, actor_id: Uuid) -> Uuid {
+    let id = Uuid::new_v4();
+    sqlx::query(
+        r#"
+        INSERT INTO ai_usage_logs (id, site_id, actor_id, action, provider,
+                                   model, input_tokens, output_tokens)
+        VALUES ($1, $2, $3, 'seo', 'openai', 'gpt-test', 10, 20)
+        "#,
+    )
+    .bind(id)
+    .bind(site_id)
+    .bind(actor_id)
+    .execute(pool)
+    .await
+    .expect("insert ai usage log");
+    id
+}
+
+async fn insert_moderation_subject(pool: &PgPool, clerk_user_id: &str) {
+    sqlx::query("INSERT INTO user_moderation (clerk_user_id, status) VALUES ($1, 'active')")
+        .bind(clerk_user_id)
+        .execute(pool)
+        .await
+        .expect("insert moderation subject row");
+}
+
+async fn insert_moderation_actioned_by(pool: &PgPool, actor_clerk_id: &str) -> Uuid {
+    let id = Uuid::new_v4();
+    sqlx::query(
+        r#"
+        INSERT INTO user_moderation (id, clerk_user_id, status, status_changed_by)
+        VALUES ($1, $2, 'suspended', $3)
+        "#,
+    )
+    .bind(id)
+    .bind(format!("clerk_other_{}", Uuid::new_v4()))
+    .bind(actor_clerk_id)
+    .execute(pool)
+    .await
+    .expect("insert moderation actor row");
+    id
+}
+
+// ── Export completeness ──────────────────────────────────────────────────
+
+#[tokio::test]
+async fn export_includes_media_and_ai_usage_sections() {
+    let ctx = common::test_context().await;
+    let site_id = common::create_test_site(&ctx.pool).await;
+    let key = common::create_test_api_key(
+        &ctx.pool,
+        site_id,
+        forja::models::api_key::ApiKeyPermission::Read,
+    )
+    .await;
+
+    // Learn the actor UUID behind the key from the profile endpoint —
+    // media/AI attribution is keyed on it.
+    let profile = ctx
+        .server
+        .get("/api/v1/auth/profile")
+        .add_header("x-api-key", key.as_str())
+        .await;
+    profile.assert_status_ok();
+    let actor_id: Uuid = profile.json::<serde_json::Value>()["id"]
+        .as_str()
+        .expect("profile id")
+        .parse()
+        .expect("actor uuid");
+
+    insert_media_uploaded_by(&ctx.pool, actor_id).await;
+    insert_ai_usage_by(&ctx.pool, site_id, actor_id).await;
+
+    let response = ctx
+        .server
+        .get("/api/v1/auth/export")
+        .add_header("x-api-key", key.as_str())
+        .await;
+    response.assert_status_ok();
+
+    let body: serde_json::Value = response.json();
+    let media = body["media"].as_array().expect("media array in export");
+    assert_eq!(media.len(), 1);
+    assert_eq!(media[0]["filename"], "dsr.png");
+    assert_eq!(media[0]["mime_type"], "image/png");
+
+    let usage = body["ai_usage"]
+        .as_array()
+        .expect("ai_usage array in export");
+    assert_eq!(usage.len(), 1);
+    assert_eq!(usage[0]["provider"], "openai");
+    assert_eq!(usage[0]["action"], "seo");
+}
+
+// ── On-behalf DSR fulfilment ─────────────────────────────────────────────
+
+fn clerk_actor_uuid(clerk_user_id: &str) -> Uuid {
+    Uuid::new_v5(
+        &forja::guards::auth_guard::CLERK_UUID_NAMESPACE,
+        clerk_user_id.as_bytes(),
+    )
+}
+
+async fn audit_rows_with_dsr_action(pool: &PgPool, action: &str, target: &str) -> i64 {
+    sqlx::query_scalar(
+        r#"
+        SELECT COUNT(*) FROM audit_logs
+        WHERE metadata->>'action' = $1 AND metadata->>'target' = $2
+        "#,
+    )
+    .bind(action)
+    .bind(target)
+    .fetch_one(pool)
+    .await
+    .expect("count dsr audit rows")
+}
+
+#[tokio::test]
+async fn admin_can_export_a_users_data_on_their_behalf() {
+    let ctx = common::test_context().await;
+    let site_id = common::create_test_site(&ctx.pool).await;
+    let master_key = common::create_test_api_key(
+        &ctx.pool,
+        site_id,
+        forja::models::api_key::ApiKeyPermission::Master,
+    )
+    .await;
+
+    let target = format!("clerk_target_{}", Uuid::new_v4());
+    SiteMembership::create(&ctx.pool, &target, site_id, &SiteRole::Editor, None)
+        .await
+        .expect("create target membership");
+    insert_media_uploaded_by(&ctx.pool, clerk_actor_uuid(&target)).await;
+    UserPreferences::upsert(&ctx.pool, &target, serde_json::json!({"language": "fr"}))
+        .await
+        .expect("upsert target preferences");
+
+    let response = ctx
+        .server
+        .get(&format!("/api/v1/admin/users/{target}/export"))
+        .add_header("x-api-key", master_key.as_str())
+        .await;
+    response.assert_status_ok();
+
+    let body: serde_json::Value = response.json();
+    assert_eq!(body["profile"]["id"], target.as_str());
+    assert_eq!(body["media"].as_array().expect("media").len(), 1);
+    assert_eq!(
+        body["memberships"].as_array().expect("memberships").len(),
+        1
+    );
+
+    assert_eq!(
+        audit_rows_with_dsr_action(&ctx.pool, "dsr_export", &target).await,
+        1,
+        "on-behalf export must leave an audit trail"
+    );
+}
+
+#[tokio::test]
+async fn non_admin_keys_cannot_use_dsr_endpoints() {
+    let ctx = common::test_context().await;
+    let site_id = common::create_test_site(&ctx.pool).await;
+    let write_key = common::create_test_api_key(
+        &ctx.pool,
+        site_id,
+        forja::models::api_key::ApiKeyPermission::Write,
+    )
+    .await;
+    let target = format!("clerk_target_{}", Uuid::new_v4());
+
+    let export = ctx
+        .server
+        .get(&format!("/api/v1/admin/users/{target}/export"))
+        .add_header("x-api-key", write_key.as_str())
+        .await;
+    export.assert_status_forbidden();
+
+    let delete = ctx
+        .server
+        .delete(&format!("/api/v1/admin/users/{target}/account"))
+        .add_header("x-api-key", write_key.as_str())
+        .await;
+    delete.assert_status_forbidden();
+}
+
+#[tokio::test]
+async fn dsr_delete_erases_the_target_and_writes_an_audit_trail() {
+    let ctx = common::test_context().await;
+    let site_id = common::create_test_site(&ctx.pool).await;
+    let master_key = common::create_test_api_key(
+        &ctx.pool,
+        site_id,
+        forja::models::api_key::ApiKeyPermission::Master,
+    )
+    .await;
+
+    let target = format!("clerk_target_{}", Uuid::new_v4());
+    SiteMembership::create(&ctx.pool, &target, site_id, &SiteRole::Viewer, None)
+        .await
+        .expect("create target membership");
+    let media_id = insert_media_uploaded_by(&ctx.pool, clerk_actor_uuid(&target)).await;
+    UserPreferences::upsert(&ctx.pool, &target, serde_json::json!({"language": "it"}))
+        .await
+        .expect("upsert target preferences");
+
+    let response = ctx
+        .server
+        .delete(&format!("/api/v1/admin/users/{target}/account"))
+        .add_header("x-api-key", master_key.as_str())
+        .await;
+    response.assert_status(axum::http::StatusCode::NO_CONTENT);
+
+    let memberships: i64 =
+        sqlx::query_scalar("SELECT COUNT(*) FROM site_memberships WHERE clerk_user_id = $1")
+            .bind(&target)
+            .fetch_one(&ctx.pool)
+            .await
+            .expect("count memberships");
+    assert_eq!(memberships, 0);
+
+    let preferences: i64 =
+        sqlx::query_scalar("SELECT COUNT(*) FROM user_preferences WHERE clerk_user_id = $1")
+            .bind(&target)
+            .fetch_one(&ctx.pool)
+            .await
+            .expect("count preferences");
+    assert_eq!(preferences, 0);
+
+    let uploaded_by: Option<Uuid> =
+        sqlx::query_scalar("SELECT uploaded_by FROM media_files WHERE id = $1")
+            .bind(media_id)
+            .fetch_one(&ctx.pool)
+            .await
+            .expect("fetch media");
+    assert_eq!(uploaded_by, None);
+
+    assert_eq!(
+        audit_rows_with_dsr_action(&ctx.pool, "dsr_delete", &target).await,
+        1,
+        "on-behalf deletion must leave an audit trail"
+    );
+}
+
+#[tokio::test]
+async fn dsr_delete_refuses_a_sole_site_owner() {
+    let ctx = common::test_context().await;
+    let site_id = common::create_test_site(&ctx.pool).await;
+    let master_key = common::create_test_api_key(
+        &ctx.pool,
+        site_id,
+        forja::models::api_key::ApiKeyPermission::Master,
+    )
+    .await;
+
+    let target = format!("clerk_owner_{}", Uuid::new_v4());
+    SiteMembership::create(&ctx.pool, &target, site_id, &SiteRole::Owner, None)
+        .await
+        .expect("create sole-owner membership");
+
+    let response = ctx
+        .server
+        .delete(&format!("/api/v1/admin/users/{target}/account"))
+        .add_header("x-api-key", master_key.as_str())
+        .await;
+    response.assert_status(axum::http::StatusCode::CONFLICT);
+
+    let memberships: i64 =
+        sqlx::query_scalar("SELECT COUNT(*) FROM site_memberships WHERE clerk_user_id = $1")
+            .bind(&target)
+            .fetch_one(&ctx.pool)
+            .await
+            .expect("count memberships");
+    assert_eq!(memberships, 1, "nothing may be erased on refusal");
+}
+
+// ── Erasure parity ───────────────────────────────────────────────────────
+
+#[tokio::test]
+async fn erasure_covers_media_ai_usage_moderation_preferences_and_memberships() {
+    let pool = common::test_db_pool().await;
+    let site_id = common::create_test_site(&pool).await;
+    let user_id = Uuid::new_v4();
+    let clerk_id = format!("clerk_dsr_{}", Uuid::new_v4());
+
+    let media_id = insert_media_uploaded_by(&pool, user_id).await;
+    let usage_id = insert_ai_usage_by(&pool, site_id, user_id).await;
+    insert_moderation_subject(&pool, &clerk_id).await;
+    let actioned_row = insert_moderation_actioned_by(&pool, &clerk_id).await;
+    SiteMembership::create(&pool, &clerk_id, site_id, &SiteRole::Viewer, None)
+        .await
+        .expect("create membership");
+    UserPreferences::upsert(&pool, &clerk_id, serde_json::json!({"language": "de"}))
+        .await
+        .expect("upsert preferences");
+
+    user_data_repo::erase_user_records(&pool, &clerk_id, user_id)
+        .await
+        .expect("erase user records");
+
+    let uploaded_by: Option<Uuid> =
+        sqlx::query_scalar("SELECT uploaded_by FROM media_files WHERE id = $1")
+            .bind(media_id)
+            .fetch_one(&pool)
+            .await
+            .expect("fetch media");
+    assert_eq!(uploaded_by, None, "media upload attribution must be erased");
+
+    let actor_id: Option<Uuid> =
+        sqlx::query_scalar("SELECT actor_id FROM ai_usage_logs WHERE id = $1")
+            .bind(usage_id)
+            .fetch_one(&pool)
+            .await
+            .expect("fetch ai usage");
+    assert_eq!(actor_id, None, "AI usage attribution must be erased");
+
+    let subject_rows: i64 =
+        sqlx::query_scalar("SELECT COUNT(*) FROM user_moderation WHERE clerk_user_id = $1")
+            .bind(&clerk_id)
+            .fetch_one(&pool)
+            .await
+            .expect("count moderation subject rows");
+    assert_eq!(subject_rows, 0, "moderation record about the user must go");
+
+    let changed_by: Option<String> =
+        sqlx::query_scalar("SELECT status_changed_by FROM user_moderation WHERE id = $1")
+            .bind(actioned_row)
+            .fetch_one(&pool)
+            .await
+            .expect("fetch moderation actor row");
+    assert_eq!(
+        changed_by, None,
+        "moderation-action attribution must be erased"
+    );
+
+    let memberships: i64 =
+        sqlx::query_scalar("SELECT COUNT(*) FROM site_memberships WHERE clerk_user_id = $1")
+            .bind(&clerk_id)
+            .fetch_one(&pool)
+            .await
+            .expect("count memberships");
+    assert_eq!(memberships, 0, "memberships must be deleted");
+
+    let preferences: i64 =
+        sqlx::query_scalar("SELECT COUNT(*) FROM user_preferences WHERE clerk_user_id = $1")
+            .bind(&clerk_id)
+            .fetch_one(&pool)
+            .await
+            .expect("count preferences");
+    assert_eq!(preferences, 0, "preferences row must be deleted");
+}

@@ -1980,6 +1980,23 @@
         "active": "Actief",
         "suspended": "Geschorst",
         "banned": "Geband"
+      },
+      "dsr": {
+        "export": {
+          "label": "Gegevens exporteren (AVG)",
+          "success": "Gebruikersgegevens geëxporteerd",
+          "error": "Exporteren van gebruikersgegevens mislukt"
+        },
+        "delete": {
+          "label": "Account verwijderen (AVG)",
+          "title": "Account verwijderen (AVG)",
+          "warning": "Hiermee wordt het account van de gebruiker permanent verwijderd en worden alle aan hem toegeschreven persoonsgegevens gewist.",
+          "consequences": "Gemaakte inhoud blijft beschikbaar zonder naamsvermelding. Dit voldoet aan een AVG-verwijderingsverzoek en kan niet ongedaan worden gemaakt.",
+          "confirm": "Account verwijderen",
+          "success": "Account verwijderd en persoonsgegevens gewist",
+          "error": "Account verwijderen mislukt",
+          "soleOwnerError": "Deze gebruiker is de enige eigenaar van een site — draag eerst het eigendom over"
+        }
       }
     },
     "cache": {

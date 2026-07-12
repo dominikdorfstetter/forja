@@ -372,6 +372,21 @@ impl SiteMembership {
         Ok(rows.into_iter().map(|(id,)| id).collect())
     }
 
+    /// Sites where the user is the *only* owner — the ones that block
+    /// account deletion until ownership is transferred.
+    pub async fn find_solely_owned_sites(
+        pool: &PgPool,
+        clerk_user_id: &str,
+    ) -> Result<Vec<Uuid>, ApiError> {
+        let mut sole = Vec::new();
+        for site_id in Self::find_owned_sites(pool, clerk_user_id).await? {
+            if !Self::site_has_other_owner(pool, site_id, clerk_user_id).await? {
+                sole.push(site_id);
+            }
+        }
+        Ok(sole)
+    }
+
     /// Check if a site has any other owner besides the given user
     pub async fn site_has_other_owner(
         pool: &PgPool,

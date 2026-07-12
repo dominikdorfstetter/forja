@@ -172,6 +172,44 @@ pub const REGISTRY: &[BuiltinPiiEntity] = &[
             retention_behavior: RetentionBehavior::AnonymizeOnErasure,
         }],
     },
+    BuiltinPiiEntity {
+        table: "media_files",
+        description: "Uploaded media assets",
+        fields: &[BuiltinPiiField {
+            field: "uploaded_by",
+            purpose: "Upload attribution for media-library management and accountability",
+            legal_basis: LEGITIMATE_INTEREST,
+            retention_behavior: RetentionBehavior::AnonymizeOnErasure,
+        }],
+    },
+    BuiltinPiiEntity {
+        table: "ai_usage_logs",
+        description: "Per-request AI usage accounting",
+        fields: &[BuiltinPiiField {
+            field: "actor_id",
+            purpose: "Attributes AI usage to a member for quota enforcement and abuse detection",
+            legal_basis: LEGITIMATE_INTEREST,
+            retention_behavior: RetentionBehavior::AnonymizeOnErasure,
+        }],
+    },
+    BuiltinPiiEntity {
+        table: "user_moderation",
+        description: "Account moderation status (suspensions and bans)",
+        fields: &[
+            BuiltinPiiField {
+                field: "clerk_user_id",
+                purpose: "Identifies the moderated account to enforce suspensions and bans",
+                legal_basis: LEGITIMATE_INTEREST,
+                retention_behavior: RetentionBehavior::AnonymizeOnErasure,
+            },
+            BuiltinPiiField {
+                field: "status_changed_by",
+                purpose: "Moderation-action attribution for administrator accountability",
+                legal_basis: LEGITIMATE_INTEREST,
+                retention_behavior: RetentionBehavior::AnonymizeOnErasure,
+            },
+        ],
+    },
 ];
 
 #[cfg(test)]
@@ -190,6 +228,9 @@ mod tests {
             "notifications",
             "api_keys",
             "sites",
+            "media_files",
+            "ai_usage_logs",
+            "user_moderation",
         ] {
             assert!(tables.contains(table), "missing registry entry for {table}");
         }

@@ -1985,6 +1985,23 @@
         "active": "Active",
         "suspended": "Suspended",
         "banned": "Banned"
+      },
+      "dsr": {
+        "export": {
+          "label": "Export data (GDPR)",
+          "success": "User data exported",
+          "error": "Failed to export user data"
+        },
+        "delete": {
+          "label": "Delete account (GDPR)",
+          "title": "Delete account (GDPR)",
+          "warning": "This permanently deletes the user's account and erases all personal data attributed to them.",
+          "consequences": "Content they created stays available without attribution. This fulfils a GDPR erasure request and cannot be undone.",
+          "confirm": "Delete account",
+          "success": "Account deleted and personal data erased",
+          "error": "Failed to delete the account",
+          "soleOwnerError": "This user is the sole owner of a site — transfer ownership first"
+        }
       }
     },
     "cache": {

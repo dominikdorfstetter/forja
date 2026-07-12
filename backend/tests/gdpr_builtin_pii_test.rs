@@ -172,7 +172,7 @@ async fn tracer_account_deletion_anonymizes_all_authored_identity_columns() {
     // Mixed attribution: created by someone else, last updated by the erased user.
     let mixed = insert_content(&pool, &other_clerk, Some(&clerk_id), None).await;
 
-    user_data_repo::anonymize_user_records(&pool, &clerk_id, Uuid::new_v4())
+    user_data_repo::erase_user_records(&pool, &clerk_id, Uuid::new_v4())
         .await
         .expect("anonymize user records");
 
@@ -236,7 +236,7 @@ async fn account_deletion_erases_membership_invites_site_provenance_and_notifica
     .await
     .expect("insert notifications");
 
-    user_data_repo::anonymize_user_records(&pool, &clerk_id, Uuid::new_v4())
+    user_data_repo::erase_user_records(&pool, &clerk_id, Uuid::new_v4())
         .await
         .expect("anonymize user records");
 

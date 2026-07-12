@@ -5,11 +5,10 @@
 use crate::AppState;
 use crate::dto::audit::{AuditLogResponse, ChangeHistoryResponse};
 use crate::dto::auth::{
-    AuthInfoResponse, AuthoredContentSummary, ExportApiKeyRecord, GuestTokenResponse,
-    ProfileResponse, UserDataExportResponse,
+    AuthInfoResponse, ExportAiUsageRecord, ExportApiKeyRecord, ExportMediaRecord,
+    GuestTokenResponse, ProfileResponse, UserDataExportResponse,
 };
 use crate::dto::help_state::{HelpStateResponse, UpdateHelpStateRequest};
-use crate::dto::notification::NotificationResponse;
 use crate::dto::onboarding::{CompleteOnboardingRequest, OnboardingResponse};
 use crate::dto::pii_inventory::{PiiInventoryEntity, PiiInventoryField, PiiInventoryResponse};
 use crate::dto::site_membership::MembershipSummary;
@@ -17,14 +16,14 @@ use crate::dto::user_preferences::{UpdateUserPreferencesRequest, UserPreferences
 use crate::errors::codes;
 use crate::guards::actor::{Actor, ActorKind};
 use crate::models::api_key::ApiKeyPermission;
-use crate::models::audit::AuditLog;
-use crate::models::notification::Notification;
+use crate::models::audit::{AuditAction, AuditLog};
 use crate::models::site_membership::SiteMembership;
 use crate::models::user_preferences::UserPreferences;
+use crate::services::audited_mutation::AuditedEntity;
 use axum::extract::State;
 use axum::http::StatusCode;
 use axum::response::Json;
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 
@@ -82,10 +81,6 @@ async fn fetch_memberships(
     Ok(rows.into_iter().map(MembershipSummary::from).collect())
 }
 
-fn epoch_millis_to_datetime(ms: i64) -> DateTime<Utc> {
-    DateTime::from_timestamp_millis(ms).unwrap_or_default()
-}
-
 fn build_profile(
     auth: &Actor,
     clerk_user: Option<&crate::services::clerk_service::ClerkApiUser>,
@@ -93,61 +88,40 @@ fn build_profile(
     is_system_admin: Option<bool>,
 ) -> ProfileResponse {
     use crate::guards::actor::ActorKind;
-    let (auth_method, id, email, name, image_url, role, created_at, last_sign_in_at) =
-        match (&auth.kind, clerk_user) {
-            (ActorKind::Clerk { clerk_user_id }, Some(user)) => (
-                "clerk_jwt".to_string(),
-                clerk_user_id.clone(),
-                user.primary_email(),
-                Some(user.display_name()),
-                user.image_url.clone(),
-                user.cms_role(),
-                Some(epoch_millis_to_datetime(user.created_at)),
-                user.last_sign_in_at.map(epoch_millis_to_datetime),
-            ),
-            (ActorKind::Clerk { clerk_user_id }, None) => (
-                "clerk_jwt".to_string(),
-                clerk_user_id.clone(),
-                None,
-                None,
-                None,
-                "read".to_string(),
-                None,
-                None,
-            ),
-            (ActorKind::ApiKey { permission, .. }, _) => (
-                "api_key".to_string(),
-                auth.id.to_string(),
-                None,
-                None,
-                None,
-                format!("{:?}", permission).to_lowercase(),
-                None,
-                None,
-            ),
-            (ActorKind::Preview { .. }, _) => (
-                "preview_token".to_string(),
-                auth.id.to_string(),
-                None,
-                None,
-                None,
-                "read".to_string(),
-                None,
-                None,
-            ),
-        };
+    let (auth_method, id, role) = match &auth.kind {
+        // The Clerk shape is shared with the GDPR export builder so the
+        // self view and an exported profile can never drift apart.
+        ActorKind::Clerk { clerk_user_id } => {
+            return crate::services::user_export::clerk_profile(
+                clerk_user_id,
+                clerk_user,
+                memberships,
+                is_system_admin,
+            );
+        }
+        ActorKind::ApiKey { permission, .. } => (
+            "api_key".to_string(),
+            auth.id.to_string(),
+            format!("{:?}", permission).to_lowercase(),
+        ),
+        ActorKind::Preview { .. } => (
+            "preview_token".to_string(),
+            auth.id.to_string(),
+            "read".to_string(),
+        ),
+    };
 
     ProfileResponse {
         id,
-        email,
-        name,
-        image_url,
+        email: None,
+        name: None,
+        image_url: None,
         role,
         permission: auth.api_key_permission().unwrap_or(ApiKeyPermission::Read),
         site_id: auth.scoped_site_id(),
         auth_method,
-        created_at,
-        last_sign_in_at,
+        created_at: None,
+        last_sign_in_at: None,
         memberships,
         is_system_admin,
     }
@@ -308,97 +282,91 @@ async fn export_user_data(
     State(state): State<AppState>,
     auth: Actor,
 ) -> Result<Json<UserDataExportResponse>, crate::errors::ApiError> {
-    let (clerk_user, memberships, is_system_admin) = match &auth.kind {
+    let export = match &auth.kind {
         ActorKind::Clerk { clerk_user_id } => {
-            let user = if let Some(ref clerk) = state.clerk_service {
-                Some(clerk.get_user(clerk_user_id).await?)
-            } else {
-                None
-            };
-            let memberships = fetch_memberships(&state, clerk_user_id).await?;
-            let is_admin = SiteMembership::is_system_admin(&state.db, clerk_user_id).await?;
-            (user, Some(memberships.clone()), Some(is_admin))
+            crate::services::user_export::build_clerk_user_export(&state, clerk_user_id).await?
         }
-        ActorKind::ApiKey { .. } | ActorKind::Preview { .. } => (None, None, None),
-    };
-    let profile = build_profile(
-        &auth,
-        clerk_user.as_ref(),
-        memberships.clone(),
-        is_system_admin,
-    );
+        // API-key and preview actors are not people Forja stores profile
+        // rows about — export the records attributed to the key itself.
+        ActorKind::ApiKey { .. } | ActorKind::Preview { .. } => {
+            let profile = build_profile(&auth, None, None, None);
 
-    let audit_logs: Vec<AuditLogResponse> = AuditLog::find_for_user(&state.db, auth.id, 1000, 0)
-        .await?
-        .into_iter()
-        .map(AuditLogResponse::from)
-        .collect();
-
-    let api_keys: Vec<ExportApiKeyRecord> =
-        crate::repos::user_data_repo::api_keys_for_user(&state.db, auth.id)
-            .await?
-            .into_iter()
-            .map(|row| ExportApiKeyRecord {
-                id: row.id,
-                name: row.name,
-                permission: row.permission,
-                site_id: row.site_id,
-                status: format!("{:?}", row.status),
-                created_at: row.created_at,
-            })
-            .collect();
-
-    let change_history: Vec<ChangeHistoryResponse> =
-        crate::repos::user_data_repo::change_history_for_user(&state.db, auth.id, 1000)
-            .await?
-            .into_iter()
-            .map(ChangeHistoryResponse::from)
-            .collect();
-
-    let (preferences, notifications, onboarding, help_state, authored_content) = match &auth.kind {
-        ActorKind::Clerk { clerk_user_id } => {
-            let effective = UserPreferences::get_effective(&state.db, clerk_user_id).await?;
-            let prefs = Some(UserPreferencesResponse::from_json(&effective));
-            let onb = Some(OnboardingResponse::from_json(&effective));
-            let help = Some(HelpStateResponse::from_json(&effective));
-
-            let notifs: Vec<NotificationResponse> =
-                Notification::find_recent_for_recipient(&state.db, clerk_user_id, 1000)
-                    .await
-                    .unwrap_or_default()
+            let audit_logs: Vec<AuditLogResponse> =
+                AuditLog::find_for_user(&state.db, auth.id, 1000, 0)
+                    .await?
                     .into_iter()
-                    .map(NotificationResponse::from)
+                    .map(AuditLogResponse::from)
                     .collect();
 
-            let authored =
-                crate::repos::user_data_repo::authored_content_counts(&state.db, clerk_user_id)
-                    .await
-                    .ok()
-                    .map(|counts| AuthoredContentSummary {
-                        blogs: counts.blogs,
-                        pages: counts.pages,
-                        documents: counts.documents,
-                        legal_docs: counts.legal_docs,
-                    });
+            let api_keys: Vec<ExportApiKeyRecord> =
+                crate::repos::user_data_repo::api_keys_for_user(&state.db, auth.id)
+                    .await?
+                    .into_iter()
+                    .map(|row| ExportApiKeyRecord {
+                        id: row.id,
+                        name: row.name,
+                        permission: row.permission,
+                        site_id: row.site_id,
+                        status: format!("{:?}", row.status),
+                        created_at: row.created_at,
+                    })
+                    .collect();
 
-            (prefs, Some(notifs), onb, help, authored)
+            let change_history: Vec<ChangeHistoryResponse> =
+                crate::repos::user_data_repo::change_history_for_user(&state.db, auth.id, 1000)
+                    .await?
+                    .into_iter()
+                    .map(ChangeHistoryResponse::from)
+                    .collect();
+
+            let media: Vec<ExportMediaRecord> =
+                crate::repos::user_data_repo::media_for_user(&state.db, auth.id)
+                    .await?
+                    .into_iter()
+                    .map(ExportMediaRecord::from)
+                    .collect();
+
+            let ai_usage: Vec<ExportAiUsageRecord> =
+                crate::repos::user_data_repo::ai_usage_for_user(&state.db, auth.id, 1000)
+                    .await?
+                    .into_iter()
+                    .map(ExportAiUsageRecord::from)
+                    .collect();
+
+            UserDataExportResponse {
+                profile,
+                audit_logs,
+                api_keys,
+                change_history,
+                media,
+                ai_usage,
+                memberships: None,
+                preferences: None,
+                notifications: None,
+                onboarding: None,
+                help_state: None,
+                authored_content: None,
+                exported_at: Utc::now(),
+            }
         }
-        ActorKind::ApiKey { .. } | ActorKind::Preview { .. } => (None, None, None, None, None),
     };
 
-    Ok(Json(UserDataExportResponse {
-        profile,
-        audit_logs,
-        api_keys,
-        change_history,
-        memberships,
-        preferences,
-        notifications,
-        onboarding,
-        help_state,
-        authored_content,
-        exported_at: Utc::now(),
-    }))
+    // Art. 30 trail: every DSR action is audit-logged, self-service included.
+    AuditedEntity::audit_only("user")
+        .mutate(AuditAction::Read, uuid::Uuid::nil())
+        .actor(auth.id)
+        .metadata(serde_json::json!({
+            "action": "dsr_export",
+            "target": auth
+                .user_identifier()
+                .map(str::to_string)
+                .unwrap_or_else(|| auth.id.to_string()),
+            "on_behalf": false
+        }))
+        .execute(&state.db)
+        .await;
+
+    Ok(Json(export))
 }
 
 /// Resolve the caller to a Clerk user ID or fail with the standard
@@ -677,18 +645,15 @@ async fn delete_account(
         }
     };
 
-    let owned_sites = SiteMembership::find_owned_sites(&state.db, &clerk_user_id).await?;
-    for site_id in &owned_sites {
-        let has_other =
-            SiteMembership::site_has_other_owner(&state.db, *site_id, &clerk_user_id).await?;
-        if !has_other {
-            return Err(crate::errors::ApiError::conflict(
-                format!(
-                    "You are the sole owner of site {}. Transfer ownership before deleting your account.",
-                    site_id
-                ),
-            ).with_code(codes::AUTH_ACCOUNT_SOLE_OWNER));
-        }
+    if let Some(site_id) = SiteMembership::find_solely_owned_sites(&state.db, &clerk_user_id)
+        .await?
+        .first()
+    {
+        return Err(crate::errors::ApiError::conflict(format!(
+            "You are the sole owner of site {}. Transfer ownership before deleting your account.",
+            site_id
+        ))
+        .with_code(codes::AUTH_ACCOUNT_SOLE_OWNER));
     }
 
     let clerk = state.clerk_service.as_ref().ok_or_else(|| {
@@ -698,12 +663,20 @@ async fn delete_account(
 
     clerk.delete_user(&clerk_user_id).await?;
 
-    SiteMembership::delete_all_for_clerk_user(&state.db, &clerk_user_id).await?;
+    crate::repos::user_data_repo::erase_user_records(&state.db, &clerk_user_id, auth.id).await?;
 
-    UserPreferences::delete(&state.db, &clerk_user_id).await?;
-
-    crate::repos::user_data_repo::anonymize_user_records(&state.db, &clerk_user_id, auth.id)
-        .await?;
+    // Art. 30 trail: the deletion event itself is recorded; erasure already
+    // ran, so the row carries only the pseudonymous actor UUID.
+    AuditedEntity::audit_only("user")
+        .mutate(AuditAction::Delete, uuid::Uuid::nil())
+        .actor(auth.id)
+        .metadata(serde_json::json!({
+            "action": "dsr_delete",
+            "target": clerk_user_id,
+            "on_behalf": false
+        }))
+        .execute(&state.db)
+        .await;
 
     Ok(StatusCode::NO_CONTENT)
 }

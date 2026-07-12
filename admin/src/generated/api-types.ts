@@ -72,6 +72,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/users/{clerk_user_id}/account": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** @description Delete a user's account (GDPR Art. 17), fulfilled by a system admin on the user's behalf — same erasure as self-service deletion, no ban required. Refused while the user is the sole owner of a site. Audit-logged with actor and target. */
+        delete: operations["delete_user_account_on_behalf"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/users/{clerk_user_id}/ban": {
         parameters: {
             query?: never;
@@ -83,6 +100,23 @@ export interface paths {
         put?: never;
         /** @description Permanently ban a user. Requires system admin. */
         post: operations["ban_user"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/users/{clerk_user_id}/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Export all data associated with a user (GDPR Art. 20), fulfilled by a system admin on the user's behalf. Every call is audit-logged with actor and target. */
+        get: operations["export_user_data_on_behalf"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -6647,6 +6681,35 @@ export interface components {
              */
             http_status: number;
         };
+        /** @description One AI request attributed to the user, for data export */
+        ExportAiUsageRecord: {
+            /** @example seo */
+            action: string;
+            /**
+             * Format: date-time
+             * @example 2024-01-15T10:30:00Z
+             */
+            created_at: string;
+            /**
+             * Format: int32
+             * @example 512
+             */
+            input_tokens?: number | null;
+            /** @example gpt-4o-mini */
+            model: string;
+            /**
+             * Format: int32
+             * @example 256
+             */
+            output_tokens?: number | null;
+            /** @example openai */
+            provider: string;
+            /**
+             * Format: uuid
+             * @example e3a1f5c2-4b8d-4e0a-9c6f-1d2e3f4a5b6c
+             */
+            site_id: string;
+        };
         /** @description A single API key record for data export */
         ExportApiKeyRecord: {
             /**
@@ -6669,6 +6732,32 @@ export interface components {
             site_id?: string | null;
             /** @example active */
             status: string;
+        };
+        /** @description A media file uploaded by the user, for data export */
+        ExportMediaRecord: {
+            /**
+             * Format: date-time
+             * @example 2024-01-15T10:30:00Z
+             */
+            created_at: string;
+            /**
+             * Format: int64
+             * @example 204800
+             */
+            file_size: number;
+            /** @example hero-1a2b3c.webp */
+            filename: string;
+            /**
+             * Format: uuid
+             * @example e3a1f5c2-4b8d-4e0a-9c6f-1d2e3f4a5b6c
+             */
+            id: string;
+            /** @example image/webp */
+            mime_type: string;
+            /** @example hero.png */
+            original_filename: string;
+            /** @example https://cdn.example.com/media/hero-1a2b3c.webp */
+            public_url?: string | null;
         };
         /** @description Response for GET /api/v1/sites/<site_id>/favicon */
         FaviconResponse: {
@@ -10243,6 +10332,7 @@ export interface components {
         };
         /** @description Response for GET /auth/export — all user-related data */
         UserDataExportResponse: {
+            ai_usage: components["schemas"]["ExportAiUsageRecord"][];
             api_keys: components["schemas"]["ExportApiKeyRecord"][];
             audit_logs: components["schemas"]["AuditLogResponse"][];
             authored_content?: null | components["schemas"]["AuthoredContentSummary"];
@@ -10253,6 +10343,7 @@ export interface components {
              */
             exported_at: string;
             help_state?: null | components["schemas"]["HelpStateResponse"];
+            media: components["schemas"]["ExportMediaRecord"][];
             memberships?: components["schemas"]["MembershipSummary"][] | null;
             notifications?: components["schemas"]["NotificationResponse"][] | null;
             onboarding?: null | components["schemas"]["OnboardingResponse"];
@@ -10543,6 +10634,48 @@ export interface operations {
             };
         };
     };
+    delete_user_account_on_behalf: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Clerk user ID of the data subject */
+                clerk_user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Account deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Forbidden — system admin required */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description User is sole owner of one or more sites */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     ban_user: {
         parameters: {
             query?: never;
@@ -10585,6 +10718,43 @@ export interface operations {
                 content?: never;
             };
             /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    export_user_data_on_behalf: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Clerk user ID of the data subject */
+                clerk_user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description User data export */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserDataExportResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Forbidden — system admin required */
             403: {
                 headers: {
                     [name: string]: unknown;

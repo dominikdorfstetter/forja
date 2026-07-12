@@ -257,6 +257,8 @@ vi.mock('@/services/clerkUsers', () => ({
   banUser: vi.fn(),
   unsuspendUser: vi.fn(),
   deleteBannedUser: vi.fn(),
+  exportUserDataOnBehalf: vi.fn(),
+  deleteUserAccountOnBehalf: vi.fn(),
 }));
 
 vi.mock('@/services/blogs', () => ({

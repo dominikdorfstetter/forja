@@ -3886,6 +3886,23 @@
         "active": "Actif",
         "suspended": "Suspendu",
         "banned": "Banni"
+      },
+      "dsr": {
+        "export": {
+          "label": "Exporter les données (RGPD)",
+          "success": "Données de l'utilisateur exportées",
+          "error": "Échec de l'exportation des données de l'utilisateur"
+        },
+        "delete": {
+          "label": "Supprimer le compte (RGPD)",
+          "title": "Supprimer le compte (RGPD)",
+          "warning": "Cette action supprime définitivement le compte de l'utilisateur et efface toutes les données personnelles qui lui sont attribuées.",
+          "consequences": "Le contenu créé reste disponible sans attribution. Cette action répond à une demande d'effacement RGPD et est irréversible.",
+          "confirm": "Supprimer le compte",
+          "success": "Compte supprimé et données personnelles effacées",
+          "error": "Échec de la suppression du compte",
+          "soleOwnerError": "Cet utilisateur est l'unique propriétaire d'un site — transférez d'abord la propriété"
+        }
       }
     },
     "cache": {
