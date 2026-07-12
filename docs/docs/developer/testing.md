@@ -40,8 +40,8 @@ cargo test --test integration_tests
 
 Before running integration tests, ensure:
 
-1. PostgreSQL is running (start it with `docker compose -f docker-compose.dev.yaml up -d postgres`).
-2. The `TEST_DATABASE_URL` environment variable is set, or the test database is configured in your `.env` file.
+1. **PostgreSQL 16 or later** is running (start it with `docker compose -f docker-compose.dev.yaml up -d postgres`). The migrations use `NULLS NOT DISTINCT` (PostgreSQL 15+ syntax); running against PostgreSQL 14 fails during migration. CI uses `postgres:16`.
+2. The `TEST_DATABASE_URL` environment variable is set, or the test database is configured in your `.env` file. Default: `postgres://forja:forja@localhost:5432/forja_test`.
 3. The required PostgreSQL extensions are installed on the test database:
 
 ```sql

@@ -14,7 +14,7 @@ The Forja admin dashboard is a React single-page application built with Vite. It
 |---------|---------|
 | React 19 | UI framework |
 | Vite 8 | Build tool and dev server |
-| MUI v7 (Material UI) | Component library and theming |
+| MUI v9 (Material UI, Material 3 "expressive") | Component library and theming |
 | React Query (@tanstack/react-query) | Server state management and caching |
 | react-hook-form + zod | Form state management and validation |
 | Clerk (@clerk/clerk-react) | Authentication (sign-in, sign-up, session management) |

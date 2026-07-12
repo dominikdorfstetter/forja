@@ -127,7 +127,7 @@ Frontend templates are standalone projects that consume the Forja API. They are 
 
 ```
 templates/
-└── astro-blog/             # Astro 5 SSR blog/portfolio template
+└── astro-blog/             # Astro 7 SSR blog/portfolio template
     ├── src/
     │   ├── lib/api.ts      # API client
     │   ├── layouts/        # Astro layouts

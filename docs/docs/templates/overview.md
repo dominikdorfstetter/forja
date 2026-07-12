@@ -32,7 +32,7 @@ This means any frontend framework can be used as a template -- Astro, Next.js, N
 
 | Template | Framework | Rendering | Description |
 |----------|-----------|-----------|-------------|
-| [Astro Blog](./astro-blog) | Astro 5 | SSR (Node.js) | Blog and portfolio template with pages, CV, legal docs, and RSS |
+| [Astro Blog](./astro-blog) | Astro 7 | SSR (Node.js) | Blog and portfolio template with pages, CV, legal docs, and RSS |
 
 ## Using a Template
 

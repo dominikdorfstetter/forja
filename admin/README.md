@@ -14,7 +14,7 @@ React-based admin interface for managing Forja CMS content.
 - **Forms**: react-hook-form + zod validation
 - **Auth**: Clerk (@clerk/clerk-react)
 - **i18n**: i18next with 11 languages (en, de, de-AT, fr, es, it, pt, nl, pl, uk, ar) including RTL
-- **Routing**: React Router v7
+- **Routing**: React Router v8
 
 ## Features
 

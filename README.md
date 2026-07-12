@@ -6,6 +6,8 @@ into something useful, Forja lets you shape, manage, and deliver content across 
 **Author:** Dominik Dorfstetter
 **License:** AGPL-3.0-or-later
 
+[![CI](https://github.com/dominikdorfstetter/forja/actions/workflows/ci.yml/badge.svg)](https://github.com/dominikdorfstetter/forja/actions/workflows/ci.yml) [![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue)](LICENSE) [![npm](https://img.shields.io/npm/v/%40forjacms%2Fclient?label=%40forjacms%2Fclient)](https://www.npmjs.com/package/@forjacms/client) [![Docker Pulls](https://img.shields.io/docker/pulls/dominikdorfstetter/forja)](https://hub.docker.com/r/dominikdorfstetter/forja)
+
 > Full documentation: **[forja-docs.dorfstetter.at](https://forja-docs.dorfstetter.at)**
 
 ## Architecture
@@ -14,8 +16,8 @@ into something useful, Forja lets you shape, manage, and deliver content across 
 |------------------------|------------------------------------------------------------------------------|---------------------------------------|
 | **Backend API**        | Rust (Axum 0.8) · SQLx · PostgreSQL                                          | [`backend/`](backend/)                |
 | **Admin Dashboard**    | React 19 · MUI v9 · Vite · Clerk Auth                                        | [`admin/`](admin/)                    |
-| **Frontend Templates** | Astro 5 (SSR)                                                                | [`templates/`](templates/astro-blog/) |
-| **Shared Libraries**   | `@forjacms/analytics`, `@forjacms/client`, `@forjacms/sections` (TypeScript) | [`libs/`](libs/)                      |
+| **Frontend Templates** | Astro 7 (SSR)                                                                | [`templates/`](templates/astro-blog/) |
+| **Shared Libraries**   | `@forjacms/analytics`, `@forjacms/client`, `@forjacms/sections`, `@forjacms/sections-react` — React wrappers for the sections web components (TypeScript) | [`libs/`](libs/)                      |
 | **Docs**               | Docusaurus                                                                   | [`docs/`](docs/)                      |
 
 ### Key Features
@@ -51,7 +53,7 @@ cd forja
 docker compose -f docker-compose.dev.yaml up -d
 ```
 
-This starts PostgreSQL (`localhost:5432`), Redis (`localhost:6379`), and pgAdmin (`http://localhost:5050`).
+This starts PostgreSQL (`localhost:5432`), Redis (`localhost:6379`), pgAdmin (`http://localhost:5050`), and a `preview` service running the astro-blog template (`http://localhost:4321`).
 
 ### 2. Configure and start the backend
 
@@ -63,6 +65,8 @@ sqlx migrate run
 ./scripts/dev_init.sh   # Optional: seed sample content
 cargo run
 ```
+
+`backend/.env.example` documents every environment variable — see the [environment variable reference](https://forja-docs.dorfstetter.at/docs/deployment/environment-variables); `DATABASE_URL` is required for `sqlx migrate run`.
 
 API: `http://localhost:8000` · Swagger UI: `http://localhost:8000/api-docs`
 
@@ -76,15 +80,16 @@ npm run dev
 
 Dashboard: `http://localhost:3000` (proxied to backend). No `.env` needed — config is fetched from the backend.
 
-> See the [Getting Started guide](https://forja-docs.dorfstetter.at/getting-started) for full setup instructions including Clerk configuration.
+> See the [Getting Started guide](https://forja-docs.dorfstetter.at/docs/getting-started/installation) for full setup instructions including Clerk configuration.
 
-## Docker
+## Deployment
 
 ```bash
 docker pull dominikdorfstetter/forja
 ```
 
-See the [Docker deployment guide](https://forja-docs.dorfstetter.at/deployment/docker) for full configuration.
+- **Docker** — run via [`docker-compose.prod.yml`](docker-compose.prod.yml); the multi-arch image is published by [`docker-publish.yml`](.github/workflows/docker-publish.yml) on release tags. See the [Docker deployment guide](https://forja-docs.dorfstetter.at/docs/deployment/docker).
+- **Railway** — the reference production deploy. [`railway.toml`](railway.toml) configures the `/health` healthcheck plus zero-downtime overlap/drain. See the [Railway deployment guide](https://forja-docs.dorfstetter.at/docs/deployment/railway).
 
 ## Project Structure
 
@@ -92,7 +97,7 @@ See the [Docker deployment guide](https://forja-docs.dorfstetter.at/deployment/d
 |----------------------------|----------------------------------------------------|------------------------------------------------------------------|
 | [`backend/`](backend/)     | Rust API — Axum + SQLx + PostgreSQL                | [backend/README.md](backend/README.md)                           |
 | [`admin/`](admin/)         | React admin dashboard — Vite + MUI v9              | [admin/README.md](admin/README.md)                               |
-| [`templates/`](templates/) | Frontend templates — Astro 5 SSR                   | [templates/astro-blog/README.md](templates/astro-blog/README.md) |
+| [`templates/`](templates/) | Frontend templates — Astro 7 SSR                   | [templates/astro-blog/README.md](templates/astro-blog/README.md) |
 | [`libs/`](libs/)           | Shared libraries — analytics, client SDK, sections | [libs/README.md](libs/README.md)                                 |
 | [`e2e/`](e2e/)             | End-to-end tests — Cucumber + Playwright           | [e2e/README.md](e2e/README.md)                                   |
 | [`scripts/`](scripts/)     | Development helper scripts                         | [scripts/README.md](scripts/README.md)                           |
@@ -127,4 +132,4 @@ cd docs && npm install && npm start
 4. Update documentation if adding features or fixing bugs
 5. Submit a pull request
 
-See the [Contributing guide](https://forja-docs.dorfstetter.at/developer/contributing) for details.
+See [CONTRIBUTING.md](CONTRIBUTING.md) and the [Contributing guide](https://forja-docs.dorfstetter.at/docs/developer/contributing) for details. For reporting vulnerabilities, see [SECURITY.md](SECURITY.md).

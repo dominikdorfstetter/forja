@@ -67,6 +67,8 @@ In the Railway dashboard, select your **app service** (not the database services
 | `APP__HOST` | `0.0.0.0` | Required for Railway to route traffic |
 | `APP__PORT` | `8000` | Must match `EXPOSE` in Dockerfile |
 | `PORT` | `8000` | Railway uses this to detect the listening port |
+| `PUBLIC_URL` | `https://<your-domain>` | Public origin (with scheme). Used to build absolute media URLs and the dashboard CSP. Set it to your generated Railway domain or custom domain from step 6. |
+| `ENCRYPTION_KEY` | output of `openssl rand -base64 32` | Base64 32-byte AES-256-GCM key for encrypting AI provider API keys at rest. The production boot guard refuses the built-in dev fallback, so set this before enabling any AI provider. |
 
 ### Optional -- CORS
 
@@ -80,7 +82,13 @@ In the Railway dashboard, select your **app service** (not the database services
 |----------|-------|-------|
 | `CLERK_SECRET_KEY` | `sk_live_...` | From your Clerk dashboard, API Keys |
 | `CLERK_PUBLISHABLE_KEY` | `pk_live_...` | From your Clerk dashboard, API Keys |
+| `CLERK_EXPECTED_AUDIENCE` | your JWT template audience | **Required in production when Clerk is enabled** — the boot guard refuses to start without it |
+| `CLERK_EXPECTED_ISSUER` | `https://clerk.your-app.com` | **Required in production when Clerk is enabled** — the boot guard refuses to start without it. Same host as in `CLERK_JWKS_URL`. |
 | `SYSTEM_ADMIN_CLERK_IDS` | `user_...` | Comma-separated Clerk user IDs for system admins |
+
+:::caution
+If you set `CLERK_SECRET_KEY` with `APP__ENVIRONMENT=production` but omit `CLERK_EXPECTED_AUDIENCE` or `CLERK_EXPECTED_ISSUER`, the deploy will not boot. See [Environment Variables → Clerk](./environment-variables#authentication----clerk) for details and how to derive the issuer value.
+:::
 
 ### Optional -- S3 Storage
 
@@ -148,28 +156,46 @@ If you configured Clerk variables in step 4:
 
 ### Option B: API Key Authentication
 
-Create your first API key by connecting to the database:
+The supported way to create API keys is through the admin dashboard (**API Keys** page) or the `/api/v1/auth/keys` endpoint — both require an existing authenticated identity (Clerk user or a master API key). If you skipped Clerk entirely, you can bootstrap the very first master key with SQL. Connect to the database:
 
 ```bash
 railway connect postgres
 ```
 
-Then insert a master key:
+Two schema rules matter here: `api_keys.site_id` is `NOT NULL` (every key is scoped to a site), and the backend looks keys up by prefix, so the plaintext **must** follow the `dk_<id>_<secret>` format with `key_prefix` set to `dk_<id>`.
 
 ```sql
-INSERT INTO api_keys (id, name, key_hash, key_prefix, permission, status)
-VALUES (
-  gen_random_uuid(),
+-- 1. A site must exist first (api_keys.site_id is NOT NULL).
+--    Skip this if you already created one; note its id instead.
+INSERT INTO sites (name, slug)
+VALUES ('My Site', 'my-site')
+ON CONFLICT (slug) DO NOTHING;
+
+-- 2. Choose your key. Format is mandatory: dk_<id>_<secret>
+--    where <id> is 8 characters. Example plaintext:
+--      dk_bootstrp_<paste-a-long-random-secret>
+--    Generate the secret locally: openssl rand -hex 32
+
+-- 3. Insert the master key, scoped to the site.
+--    Enum values are lowercase ('master', 'active').
+--    hash_version defaults to 1 (SHA-256); the backend transparently
+--    re-hashes the key with Argon2 on first successful use.
+INSERT INTO api_keys (name, key_hash, key_prefix, permission, status, site_id)
+SELECT
   'Initial Master Key',
-  encode(sha256('your-secret-key-here'::bytea), 'hex'),
-  'dk_master_',
-  'Master',
-  'Active'
-);
+  encode(sha256('dk_bootstrp_your-random-secret-here'::bytea), 'hex'),
+  'dk_bootstrp',
+  'master',
+  'active',
+  id
+FROM sites
+WHERE slug = 'my-site';
 ```
 
+Then authenticate with the full plaintext (`dk_bootstrp_your-random-secret-here`) in the `X-API-Key` header. The plaintext is never stored — keep it safe.
+
 :::caution
-For production, generate a proper key through the admin dashboard once you have initial access via Clerk. The manual SQL approach is intended only for bootstrapping.
+The manual SQL approach is intended only for bootstrapping. Once you have access, create proper keys through the admin dashboard and revoke the bootstrap key.
 :::
 
 ## 9. Optional: Seed Demo Content
@@ -182,11 +208,28 @@ railway connect postgres < backend/scripts/dev_init.sql
 
 The seed file is located at `backend/scripts/dev_init.sql` in the repository.
 
+## Zero-Downtime & Health
+
+The repository ships a `railway.toml` that wires deploys for zero downtime:
+
+| Setting | Value | Effect |
+|---------|-------|--------|
+| `healthcheckPath` | `/health` | Railway only routes traffic to a replica once Postgres and Redis report healthy |
+| `overlapSeconds` | `30` | The old deploy keeps serving for 30 s while the new one comes up |
+| `drainingSeconds` | `30` | In-flight requests get 30 s to finish before the old replica is stopped |
+| `restartPolicyType` | `ON_FAILURE` (max 10 retries) | Crashed replicas restart automatically |
+
+The backend cooperates: on `SIGTERM` it stops accepting new connections and drains in-flight requests gracefully with a ~25 s grace period (deliberately below Railway's 30 s draining window). No extra configuration is needed — but if you fork `railway.toml`, keep the health check, overlap, and draining settings, or deploys will drop requests.
+
+## Backups
+
+Railway's managed PostgreSQL supports scheduled backups from the dashboard (service → **Backups**) — enable them for production. For manual dump/restore procedures (`pg_dump` / `pg_restore`), see the [Docker guide's backup section](./docker#backup-and-restore); the same commands work against `railway connect postgres`.
+
 ## Troubleshooting
 
 ### Build Fails with Out-of-Memory (OOM)
 
-The Dockerfile uses `CARGO_PROFILE_RELEASE_LTO=thin` and `CARGO_PROFILE_RELEASE_CODEGEN_UNITS=2` to reduce memory usage during compilation. If builds still OOM on Railway's free tier, try upgrading to a plan with more memory, or push a pre-built image instead:
+The Dockerfile uses `CARGO_PROFILE_RELEASE_LTO=thin` and `CARGO_PROFILE_RELEASE_CODEGEN_UNITS=4` to reduce memory usage during compilation. If builds still OOM on Railway's free tier, try upgrading to a plan with more memory, or push a pre-built image instead:
 
 ```bash
 docker build -t forja .

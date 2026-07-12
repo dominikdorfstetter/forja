@@ -8,9 +8,9 @@ Before setting up Forja, make sure the following tools are installed on your dev
 
 ## Required
 
-### Rust 1.93+
+### Rust 1.97
 
-The backend is written in Rust and requires version **1.93 or later** (the 2021 edition). Install via [rustup](https://rustup.rs/):
+The backend is written in Rust (2024 edition) and requires **Rust 1.97**. The repository pins the toolchain in `rust-toolchain.toml`, so rustup installs the correct version automatically on first build. Install rustup via:
 
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
@@ -19,7 +19,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 Verify your installation:
 
 ```bash
-rustc --version   # should print 1.93.0 or higher
+rustc --version   # inside the repo, should print 1.97.0 (pinned by rust-toolchain.toml)
 cargo --version
 ```
 
@@ -110,7 +110,7 @@ A pgAdmin instance is included in the Docker Compose stack and available at [loc
 
 | Tool | Version | Install |
 |------|---------|---------|
-| Rust | 1.93+ | `rustup` |
+| Rust | 1.97 (pinned via `rust-toolchain.toml`) | `rustup` |
 | Node.js | 24+ | `nvm` or [nodejs.org](https://nodejs.org) |
 | Docker | Latest | [docker.com](https://docs.docker.com/get-docker/) |
 | SQLx CLI | Latest | `cargo install sqlx-cli` |

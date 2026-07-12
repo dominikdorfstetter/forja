@@ -44,7 +44,7 @@ The Dockerfile uses six stages to keep the final image small and speed up iterat
 | Stage | Base Image | Purpose |
 |-------|-----------|---------|
 | **admin-build** | `node:24-alpine` | Installs npm dependencies and builds the React admin dashboard |
-| **chef** | `rust:1.93-bookworm` | Installs `cargo-chef` for dependency caching |
+| **chef** | `rust:1.97-bookworm` | Installs `cargo-chef` for dependency caching |
 | **planner** | (from chef) | Analyzes Cargo.toml/lock to produce a dependency-only recipe |
 | **deps** | (from chef) | Builds and caches Rust dependencies (only rebuilt when Cargo.toml/lock change) |
 | **backend-build** | (from deps) | Compiles the Rust backend in release mode, embedding the admin static files |
@@ -68,7 +68,7 @@ The Dockerfile sets two environment variables to reduce memory usage during Rust
 
 ```dockerfile
 ENV CARGO_PROFILE_RELEASE_LTO=thin
-ENV CARGO_PROFILE_RELEASE_CODEGEN_UNITS=2
+ENV CARGO_PROFILE_RELEASE_CODEGEN_UNITS=4
 ```
 
 These settings prevent out-of-memory errors on machines with limited RAM (e.g., 2 GB CI runners or cloud build environments).
@@ -121,6 +121,8 @@ At minimum, set the following variables for a production deployment:
 | `APP__ENVIRONMENT` | `production` | Enables production behavior |
 | `APP__HOST` | `0.0.0.0` | Bind to all interfaces |
 | `APP__PORT` | `8000` | Application port |
+| `PUBLIC_URL` | `https://yourdomain.com` | Public origin (with scheme) used for absolute media URLs and the dashboard CSP |
+| `ENCRYPTION_KEY` | `openssl rand -base64 32` | Base64 32-byte key for encrypting AI provider credentials at rest. Production refuses the built-in dev fallback. |
 | `CORS_ALLOWED_ORIGINS` | `https://yourdomain.com` | Allowed CORS origins (comma-separated) |
 
 For the full list of environment variables, see [Environment Variables](./environment-variables).

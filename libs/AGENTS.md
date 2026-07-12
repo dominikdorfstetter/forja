@@ -17,3 +17,11 @@ to npm). Templates reference them as local `file:../../libs/*` dependencies.
   types; the admin section picker is a subset of it.
 - Keep packages framework-agnostic where the name implies it — React-specific code
   belongs in `sections-react/`, not `sections/`.
+
+## Publishing
+
+Releases are tag-driven: pushing a `v*` tag triggers
+`.github/workflows/npm-publish.yml`, which sets each package version from the tag
+and publishes with npm Trusted Publishing (OIDC) + `--provenance` — no long-lived
+NPM token. `sections-react` publishes after `sections` (`needs:` ordering), since
+its peer range must resolve against the freshly published version.

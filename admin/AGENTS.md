@@ -14,8 +14,13 @@ npm run typecheck         # tsc (strict)
 npm run lint              # ESLint
 npm test                  # Vitest
 npm run generate:openapi  # regenerate src/generated/api-types.ts from backend
-npm run react-doctor:online  # health score (must be 100)
+npm run react-doctor         # offline gate (what CI runs on PRs)
+npm run react-doctor:verbose # offline, with per-finding detail
+npm run react-doctor:online  # online score gate (must be 100; --fail-on warning --score, so warnings fail too)
 ```
+
+react-doctor is pinned at 0.7.x as a devDependency; CI runs the pinned offline
+`npm run react-doctor` on PRs (not the `@main` marketplace action).
 
 No `.env` — config is fetched from the backend at runtime (`GET /api/v1/config`).
 
@@ -27,7 +32,8 @@ No `.env` — config is fetched from the backend at runtime (`GET /api/v1/config
 | [`src/pages/`](src/pages/AGENTS.md) | Route-level pages (one folder per feature/content type). |
 | [`src/hooks/`](src/hooks/AGENTS.md) | Reusable hooks (data, UI state). |
 | [`src/services/`](src/services/AGENTS.md) | API client functions (one module per resource). |
-| [`src/store/`](src/store/) | React contexts — `AuthContext`, `SiteContext`. |
+| [`src/lib/`](src/lib/) | Shared infrastructure — the lint-enforced query-key factory (`queryKeys.ts`). |
+| [`src/store/`](src/store/) | React contexts — `AuthContext`, `SiteContext`, `SaveBarContext`, `FormChangeContext`. |
 | [`src/i18n/`](src/i18n/AGENTS.md) | i18next config + `locales/*.json` (11 locales). |
 | `src/generated/` | `api-types.ts` — generated from backend OpenAPI; do not hand-edit. |
 | `src/theme/` | MUI theme + Material 3 expressive tokens. |
@@ -42,6 +48,11 @@ No `.env` — config is fetched from the backend at runtime (`GET /api/v1/config
   is a smell.
 - **Layout chrome**: `Layout.tsx` owns outer `maxWidth` + padding; pages must not
   add their own (it stacks).
+- **Saving**: page-level forms use `useFormSaveBar`
+  ([`src/hooks/useFormSaveBar.ts`](src/hooks/useFormSaveBar.ts), backed by
+  [`src/store/SaveBarContext.tsx`](src/store/SaveBarContext.tsx)) — save bar,
+  nav guard, and dirty count in one. `FormChangeProvider` + `DirtyFieldMarker`
+  mark individual dirty fields. Autosave was removed — don't reintroduce it.
 - **i18n**: every user-facing string through `react-i18next`; backfill all 11
   locales. **Test IDs**: add `data-testid` for e2e.
 - **Path alias**: `@/` → `admin/src/`.

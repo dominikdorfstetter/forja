@@ -52,12 +52,22 @@ function LandingPage() {
 
 ```astro
 ---
-import '@forjacms/sections/dist/forja-sections/forja-sections.esm.js';
+import '@forjacms/sections/define';
 ---
 
 <forja-hero section-title="Hello" text="<p>World</p>" />
 <forja-features section-title="Features" items={JSON.stringify(features)} />
 ```
+
+### Entry Points
+
+The package exports map allows exactly three entries — deep imports into `dist/` are blocked:
+
+| Entry | What it gives you |
+|-------|-------------------|
+| `@forjacms/sections` | Component classes and types |
+| `@forjacms/sections/loader` | `defineCustomElements()` — lazy-loading registration |
+| `@forjacms/sections/define` | Side-effect import that registers all custom elements (what `templates/astro-blog` uses) |
 
 ### Vue
 
@@ -189,6 +199,12 @@ document.querySelector('forja-contact').addEventListener('forjaSubmit', (e) => {
 // React
 <ForjaContact onForjaSubmit={(e) => console.log(e.detail)} />
 ```
+
+## Development
+
+`npm run build` runs the Stencil build **and** generates `dist/define-all.js` (the
+`./define` entry). Running `npm test` afterwards rebuilds `dist/` without it —
+always rebuild after running tests, or the `./define` export is broken.
 
 ## License
 

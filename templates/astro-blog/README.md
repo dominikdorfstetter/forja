@@ -6,11 +6,12 @@ A server-rendered blog and portfolio site powered by [Astro](https://astro.build
 
 ## Tech Stack
 
-- **Framework**: Astro 5 with SSR (`output: 'server'`)
-- **Adapter**: @astrojs/node (standalone mode)
-- **Markdown**: marked (GFM + line breaks)
+- **Framework**: Astro 7 with SSR (`output: 'server'`)
+- **Adapter**: @astrojs/node 11 (standalone mode)
+- **Markdown**: marked (GFM + line breaks), output sanitized with sanitize-html
 - **Analytics**: @forjacms/analytics (privacy-first pageview tracking)
-- **Styling**: Minimal CSS with custom properties
+- **Styling**: Tailwind CSS 4 via `@tailwindcss/vite`, with `@theme` tokens in `src/styles/global.css`
+- **Node**: >= 22.12 (see `engines` in package.json)
 
 ## Quick Start
 
@@ -43,6 +44,10 @@ npm run dev
 | `CMS_API_URL` | Backend API base URL | `http://localhost:8000/api/v1` |
 | `CMS_API_KEY` | API key with Read permission | `dk_devread_000...` |
 | `CMS_SITE_ID` | UUID of the site in CMS | `5e3660ff-...` |
+| `SITE_URL` | Public URL for canonical links, OpenGraph, and sitemap | `http://localhost:4321` |
+| `PREVIEW_TOKEN_SECRET` | Shared secret for validating draft preview tokens (must match the backend's `APP__SECURITY__PREVIEW_TOKEN_SECRET`; read at runtime via `process.env`) | `...` |
+| `CMS_SITE_DOMAIN` | Site domain sent as `X-Site-Domain` — required for public Forms endpoints | `example.com` |
+| `CMS_PAGE_COLLECTIONS` | Comma-separated collection keys to publish as pages | `recipes,events` |
 
 ## Pages
 
@@ -60,6 +65,14 @@ npm run dev
 
 This template works with the Forja admin's **Preview** feature. In the admin Settings page, add a preview template pointing to your dev server URL (e.g., `http://localhost:4321`), then use preview buttons in the blog and page editors.
 
+## Testing
+
+```bash
+npm test
+```
+
+Runs the unit tests in `src/lib/__tests__/` with the built-in Node test runner (`node --test` with TypeScript type stripping) — no extra test framework needed.
+
 ## Building for Production
 
 ```bash
@@ -68,5 +81,9 @@ node dist/server/entry.mjs
 ```
 
 Since the template uses SSR, the build output is a Node.js server.
+
+## Deployment
+
+The included `Dockerfile` is a `node:24-slim` multi-stage build. Note that it **rebuilds the three `file:` libs** (`@forjacms/analytics`, `@forjacms/client`, `@forjacms/sections`) inside the image — their `dist/` output is gitignored, so if you customize a lib you must rebuild the image (a local `npm run build` in the lib is not enough for Docker deploys).
 
 See the [Templates guide](https://forja-docs.dorfstetter.at/templates/overview) for customization details.

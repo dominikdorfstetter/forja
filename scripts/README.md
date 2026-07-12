@@ -8,7 +8,7 @@ Helper scripts for managing the local development environment. Run from the repo
 
 | Script | Description |
 |--------|-------------|
-| `dev-start.sh` | Start Docker infrastructure (PostgreSQL, Redis, pgAdmin) |
+| `dev-start.sh` | Start Docker infrastructure (PostgreSQL, Redis, pgAdmin); `--backend`/`--admin`/`--all` also start the Rust backend and/or admin dev server |
 | `dev-stop.sh` | Stop containers (keeps volumes) |
 | `dev-status.sh` | Show status of all development services |
 | `dev-seed.sh` | Run migrations and seed the development database |

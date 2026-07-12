@@ -10,9 +10,11 @@ is spun up per run via Docker Compose.
   content, media, members, navigation, analytics, api-keys, redirects, …).
 - `step-definitions/` — step implementations.
 - `support/` — Cucumber world, hooks, and shared helpers.
-- `fixtures/` — seed data and test users.
+- `fixtures/` — upload test files (`test-image.png`, `test-blocked-ext.exe`) — not seed data.
 - `auth-states/` — stored Clerk sessions per role (so each scenario doesn't re-login).
-- `scripts/run-e2e.sh` — entry point that boots infra + backend and runs the suite.
+- `scripts/run-e2e.sh` — boots the test DB, then **checks** that the backend
+  (`:8000`) and admin (`:3000`) are already running (exits 1 otherwise) and runs
+  the suite — it does not start them itself.
 - `docker-compose.test.yaml` — isolated Postgres/Redis for the run.
 - `reports/` — generated run output (git-ignored).
 
