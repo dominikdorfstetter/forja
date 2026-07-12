@@ -50,6 +50,16 @@ const LEGAL_GROUP: AuditedEntity = AuditedEntity::with_webhooks("legal_group", "
 const LEGAL_ITEM: AuditedEntity = AuditedEntity::with_webhooks("legal_item", "legal");
 const LEGAL_DOCUMENT: AuditedEntity = AuditedEntity::audit_only("legal_document");
 
+/// A published legal document is an immutable record; its text must not be
+/// edited in place. Clients fork a new draft version instead (#140).
+fn published_immutable_error() -> ApiError {
+    ApiError::conflict(
+        "This legal document is published and cannot be edited in place. Create a new version to make changes.",
+    )
+    .with_code(codes::LEGAL_PUBLISHED_IMMUTABLE)
+    .with_entity_type("legal_doc")
+}
+
 #[derive(Debug, Deserialize)]
 struct ListLegalQuery {
     page: Option<i64>,
@@ -883,6 +893,9 @@ async fn create_legal_localization(
     ValidatedJson(body): ValidatedJson<CreateLocalizationRequest>,
 ) -> Result<(StatusCode, Json<LocalizationResponse>), ApiError> {
     let doc = LegalDocumentRepo::find_by_id(&state.db, id).await?;
+    if LegalDocumentRepo::is_published(&state.db, id).await? {
+        return Err(published_immutable_error());
+    }
     let content_id = doc.content_id.ok_or_else(|| {
         ApiError::bad_request("Legal document has no content_id").with_code(codes::BAD_REQUEST)
     })?;
@@ -922,6 +935,9 @@ async fn update_legal_localization(
     auth: Actor,
     ValidatedJson(body): ValidatedJson<UpdateLocalizationRequest>,
 ) -> Result<Json<LocalizationResponse>, ApiError> {
+    if LegalDocumentRepo::is_published_for_localization(&state.db, loc_id).await? {
+        return Err(published_immutable_error());
+    }
     let localization = localization_lifecycle::update::<LegalLocalization>(
         &state.db,
         loc_id,

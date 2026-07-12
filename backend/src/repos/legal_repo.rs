@@ -225,12 +225,21 @@ impl LegalDocumentRepo {
         Ok(document)
     }
 
+    /// Resolve the public legal document for a `(site, slug)` pair.
+    ///
+    /// The canonical slug lives on the version-chain's original row (new
+    /// versions carry a NULL slug). Given that slug owner, this returns the
+    /// **currently-published** version in the chain — the highest version
+    /// number whose content status is `published` — so publishing a new
+    /// version supersedes the old one at the same URL, while the old version
+    /// is preserved as history. Falls back to the slug owner itself when no
+    /// version in the chain is published (e.g. the document is still a draft).
     pub async fn find_by_slug_for_site(
         pool: &PgPool,
         site_id: Uuid,
         slug: &str,
     ) -> Result<LegalDocument, ApiError> {
-        let document = sqlx::query_as::<_, LegalDocument>(
+        let owner = sqlx::query_as::<_, LegalDocument>(
             r#"
             SELECT ld.id, ld.content_id, ld.cookie_name, ld.document_type,
                    ld.version, ld.parent_version_id,
@@ -251,7 +260,37 @@ impl LegalDocumentRepo {
                 .with_entity_type("legal_doc")
         })?;
 
-        Ok(document)
+        // Highest-versioned published document in the slug owner's chain.
+        let published = sqlx::query_as::<_, LegalDocument>(
+            r#"
+            WITH RECURSIVE chain AS (
+                SELECT id, content_id, cookie_name, document_type, version, parent_version_id,
+                       created_at, updated_at, is_deleted, deleted_at
+                FROM legal_documents
+                WHERE id = $1 AND is_deleted = FALSE
+                UNION ALL
+                SELECT ld.id, ld.content_id, ld.cookie_name, ld.document_type, ld.version,
+                       ld.parent_version_id, ld.created_at, ld.updated_at, ld.is_deleted,
+                       ld.deleted_at
+                FROM legal_documents ld
+                INNER JOIN chain ON ld.parent_version_id = chain.id
+                WHERE ld.is_deleted = FALSE
+            )
+            SELECT chain.id, chain.content_id, chain.cookie_name, chain.document_type,
+                   chain.version, chain.parent_version_id,
+                   chain.created_at, chain.updated_at, chain.is_deleted, chain.deleted_at
+            FROM chain
+            INNER JOIN contents c ON chain.content_id = c.id
+            WHERE c.status = 'published'
+            ORDER BY chain.version DESC
+            LIMIT 1
+            "#,
+        )
+        .bind(owner.id)
+        .fetch_optional(pool)
+        .await?;
+
+        Ok(published.unwrap_or(owner))
     }
 
     /// Create a legal document + spine row atomically on the caller's tx
@@ -459,6 +498,9 @@ impl LegalDocumentRepo {
         Ok(row.0)
     }
 
+    /// Duplicate a legal document as a *separate* document (the `/clone`
+    /// endpoint): the copy takes a distinct `_copy` cookie name and its own
+    /// fresh content row, so it is an independent document — not a version.
     pub async fn clone_document(
         pool: &PgPool,
         source_id: Uuid,
@@ -466,11 +508,25 @@ impl LegalDocumentRepo {
         created_by: Option<&str>,
     ) -> Result<LegalDocument, ApiError> {
         let source = Self::find_by_id(pool, source_id).await?;
+        let new_cookie = format!("{}_copy", source.cookie_name);
+        Self::clone_document_with_cookie(pool, source_id, site_ids, created_by, new_cookie).await
+    }
+
+    /// Deep-copy a legal document's content, localizations, groups and items
+    /// into a new Draft content row under `new_cookie`. Shared by the public
+    /// `/clone` (which renames) and version creation (which preserves the
+    /// cookie name so the version keeps the document's identity).
+    async fn clone_document_with_cookie(
+        pool: &PgPool,
+        source_id: Uuid,
+        site_ids: Vec<Uuid>,
+        created_by: Option<&str>,
+        new_cookie: String,
+    ) -> Result<LegalDocument, ApiError> {
+        let source = Self::find_by_id(pool, source_id).await?;
         let source_content_id = source
             .content_id
             .ok_or_else(|| ApiError::bad_request("Source document has no content_id"))?;
-
-        let new_cookie = format!("{}_copy", source.cookie_name);
 
         // Clone is outside #863's create/update scope; preserve its prior
         // semantics (spine row atomic on its own) by committing the spine
@@ -572,6 +628,44 @@ impl LegalDocumentRepo {
         Ok(document)
     }
 
+    /// True when the legal document's content is currently `Published`.
+    /// A published legal document is an immutable record — its text must not
+    /// be edited in place; callers fork a new version instead (#140).
+    pub async fn is_published(pool: &PgPool, document_id: Uuid) -> Result<bool, ApiError> {
+        let published: Option<bool> = sqlx::query_scalar(
+            r#"
+            SELECT c.status = 'published'
+            FROM legal_documents ld
+            INNER JOIN contents c ON ld.content_id = c.id
+            WHERE ld.id = $1 AND ld.is_deleted = FALSE
+            "#,
+        )
+        .bind(document_id)
+        .fetch_optional(pool)
+        .await?;
+        Ok(published.unwrap_or(false))
+    }
+
+    /// Same as [`is_published`], resolved from a content-localization id — the
+    /// legal-text edit endpoints are keyed by localization, not document.
+    pub async fn is_published_for_localization(
+        pool: &PgPool,
+        localization_id: Uuid,
+    ) -> Result<bool, ApiError> {
+        let published: Option<bool> = sqlx::query_scalar(
+            r#"
+            SELECT c.status = 'published'
+            FROM content_localizations cl
+            INNER JOIN contents c ON cl.content_id = c.id
+            WHERE cl.id = $1
+            "#,
+        )
+        .bind(localization_id)
+        .fetch_optional(pool)
+        .await?;
+        Ok(published.unwrap_or(false))
+    }
+
     pub async fn find_versions(pool: &PgPool, id: Uuid) -> Result<Vec<LegalDocument>, ApiError> {
         let doc = Self::find_by_id(pool, id).await?;
         let mut root_id = doc.id;
@@ -618,7 +712,16 @@ impl LegalDocumentRepo {
                     .with_code(codes::LEGAL_VERSION_SOURCE_DELETED),
             );
         }
-        let mut new_doc = Self::clone_document(pool, source_id, site_ids, created_by).await?;
+        // A version preserves the document's identity — same cookie name —
+        // unlike `/clone`, which renames to a distinct `_copy` document.
+        let mut new_doc = Self::clone_document_with_cookie(
+            pool,
+            source_id,
+            site_ids,
+            created_by,
+            source.cookie_name.clone(),
+        )
+        .await?;
         let next_version = source.version + 1;
         sqlx::query(
             "UPDATE legal_documents SET version = $1, parent_version_id = $2 WHERE id = $3",
