@@ -510,8 +510,30 @@ export interface LegalDocumentResponse {
   id: string;
   cookie_name: string;
   document_type: LegalDocType;
+  status: ContentStatus;
+  slug: string | null;
+  version: number;
+  publish_start: string | null;
+  publish_end: string | null;
   created_at: string;
   updated_at: string;
+}
+
+/**
+ * Filters accepted by the legal-document list endpoint, on top of the
+ * shared pagination/search/sort params. Keys are converted to snake_case
+ * query parameters (`excludeStatus` → `exclude_status`).
+ */
+export interface LegalListParams extends SearchablePaginationParams {
+  /** Only documents with this content status. */
+  status?: ContentStatus;
+  /** Exclude documents with this status (e.g. `'Archived'`). */
+  excludeStatus?: ContentStatus;
+  /**
+   * Exclude documents of this type (e.g. `'CookieConsent'`, which has its
+   * own dedicated endpoint and UI surface).
+   */
+  excludeDocumentType?: LegalDocType;
 }
 
 export interface LegalDocLocalizationResponse {

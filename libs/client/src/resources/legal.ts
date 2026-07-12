@@ -8,8 +8,8 @@ import type {
   LegalDocumentWithGroups,
   LegalGroupWithItems,
   LegalItemResponse,
+  LegalListParams,
   LegalVersionResponse,
-  SearchablePaginationParams,
 } from '../types.js';
 
 /**
@@ -34,18 +34,23 @@ export class LegalResource extends ContentResource<
   /**
    * Fetch a paginated list of legal documents for the site.
    *
-   * **Endpoint:** `GET /sites/{siteId}/legal?page=&page_size=&search=&sort_by=&sort_dir=`
+   * **Endpoint:** `GET /sites/{siteId}/legal?page=&page_size=&search=&sort_by=&sort_dir=&status=&exclude_status=&exclude_document_type=`
    *
-   * @param params - Pagination, search, and sort options.
+   * @param params - Pagination, search, sort, and status/type filter options.
    * @returns A paginated result of legal document summaries.
    *
    * @example
    * ```ts
    * const docs = await forja.legal.list();
+   * // Only published documents, without the cookie-consent doc:
+   * const published = await forja.legal.list({
+   *   status: 'Published',
+   *   excludeDocumentType: 'CookieConsent',
+   * });
    * ```
    */
   async list(
-    params?: SearchablePaginationParams,
+    params?: LegalListParams,
   ): Promise<PaginatedResult<LegalDocumentResponse>> {
     return this.paginate<LegalDocumentResponse>(
       `/sites/${this.siteId}/legal`,

@@ -42,6 +42,28 @@ describe('LegalResource', () => {
         page: '1',
       });
     });
+
+    it('maps status and document-type filters to snake_case query params', async () => {
+      const http = createMockHttp();
+      vi.mocked(http.get).mockResolvedValue({
+        data: [],
+        meta: { page: 1, page_size: 10, total_pages: 0, total_items: 0 },
+      });
+
+      const legal = new LegalResource(http, siteId);
+      await legal.list({
+        status: 'Published',
+        excludeStatus: 'Archived',
+        excludeDocumentType: 'CookieConsent',
+      });
+
+      expect(http.get).toHaveBeenCalledWith(`/sites/${siteId}/legal`, {
+        page: '1',
+        status: 'Published',
+        exclude_status: 'Archived',
+        exclude_document_type: 'CookieConsent',
+      });
+    });
   });
 
   describe('get', () => {
