@@ -2,6 +2,7 @@ import type {
   ClerkUser,
   ClerkUserListResponse,
   PaginatedAuditLogs,
+  UserDataExportResponse,
 } from '@/types/api';
 import { apiRequest } from './http';
 
@@ -32,3 +33,9 @@ export const unsuspendUser = (clerkUserId: string) =>
 
 export const deleteBannedUser = (clerkUserId: string) =>
   apiRequest<void>('DELETE', `/admin/users/${clerkUserId}`);
+
+export const exportUserDataOnBehalf = (clerkUserId: string) =>
+  apiRequest<UserDataExportResponse>('GET', `/admin/users/${clerkUserId}/export`);
+
+export const deleteUserAccountOnBehalf = (clerkUserId: string) =>
+  apiRequest<void>('DELETE', `/admin/users/${clerkUserId}/account`);

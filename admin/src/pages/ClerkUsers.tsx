@@ -4,9 +4,16 @@ import { useNavigate } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSnackbar } from 'notistack';
 import { Avatar, Box, CircularProgress, Tooltip } from '@mui/material';
-import { deleteBannedUser, getClerkUsers, unsuspendUser } from '@/services/clerkUsers';
+import {
+  deleteBannedUser,
+  deleteUserAccountOnBehalf,
+  exportUserDataOnBehalf,
+  getClerkUsers,
+  unsuspendUser,
+} from '@/services/clerkUsers';
 import { useAuth } from '@/store/AuthContext';
-import type { ClerkUser } from '@/types/api';
+import { triggerBlobDownload } from '@/utils/downloadBlob';
+import type { ClerkUser, ProblemDetails } from '@/types/api';
 import SuspendUserDialog from '@/pages/system/SuspendUserDialog';
 import BanUserDialog from '@/pages/system/BanUserDialog';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
@@ -66,7 +73,10 @@ export default function ClerkUsersPage() {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(20);
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
-  const [dialog, setDialog] = useState<{ kind: 'suspend' | 'ban' | 'delete'; user: ClerkUser } | null>(null);
+  const [dialog, setDialog] = useState<{
+    kind: 'suspend' | 'ban' | 'delete' | 'dsrDelete';
+    user: ClerkUser;
+  } | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: queryKeys.clerkUsers(page, rowsPerPage),
@@ -90,6 +100,34 @@ export default function ClerkUsersPage() {
       setDialog(null);
     },
     onError: () => enqueueSnackbar(t('system.users.delete.error'), { variant: 'error' }),
+  });
+
+  const dsrExportMutation = useMutation({
+    mutationFn: (userId: string) => exportUserDataOnBehalf(userId),
+    onSuccess: (data, userId) => {
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      triggerBlobDownload(blob, `dsr-export-${userId}-${new Date().toISOString().slice(0, 10)}.json`);
+      enqueueSnackbar(t('system.users.dsr.export.success'), { variant: 'success' });
+    },
+    onError: () => enqueueSnackbar(t('system.users.dsr.export.error'), { variant: 'error' }),
+  });
+
+  const dsrDeleteMutation = useMutation({
+    mutationFn: (userId: string) => deleteUserAccountOnBehalf(userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.clerkUsers() });
+      enqueueSnackbar(t('system.users.dsr.delete.success'), { variant: 'success' });
+      setDialog(null);
+    },
+    onError: (err: unknown) => {
+      const soleOwner = (err as ProblemDetails)?.code === 'AUTH_ACCOUNT_SOLE_OWNER';
+      enqueueSnackbar(
+        soleOwner
+          ? t('system.users.dsr.delete.soleOwnerError')
+          : t('system.users.dsr.delete.error'),
+        { variant: 'error' },
+      );
+    },
   });
 
   const buildMenuItems = useCallback(
@@ -125,9 +163,24 @@ export default function ClerkUsersPage() {
           danger: true,
         });
       }
+      // DSR fulfilment (GDPR): export always; erasure only where the
+      // moderation purge above doesn't already own the deletion path.
+      items.push({
+        icon: 'download',
+        label: t('system.users.dsr.export.label'),
+        onClick: () => dsrExportMutation.mutate(user.id),
+      });
+      if (user.moderation_status !== 'banned') {
+        items.push({
+          icon: 'person_remove',
+          label: t('system.users.dsr.delete.label'),
+          onClick: () => setDialog({ kind: 'dsrDelete', user }),
+          danger: true,
+        });
+      }
       return items;
     },
-    [t, unsuspendMutation],
+    [t, unsuspendMutation, dsrExportMutation],
   );
 
   const columns: DataTableV2Column<ClerkUser>[] = [
@@ -260,6 +313,19 @@ export default function ClerkUsersPage() {
           onClose={() => setDialog(null)}
           userId={dialog.user.id}
           userName={dialog.user.name}
+        />
+      )}
+      {dialog?.kind === 'dsrDelete' && (
+        <ConfirmDialog
+          open
+          title={`${t('system.users.dsr.delete.title')}: ${dialog.user.name}`}
+          message={`${t('system.users.dsr.delete.warning')}\n\n${t('system.users.dsr.delete.consequences')}`}
+          confirmLabel={t('system.users.dsr.delete.confirm')}
+          confirmColor="error"
+          onConfirm={() => dsrDeleteMutation.mutate(dialog.user.id)}
+          onCancel={() => setDialog(null)}
+          loading={dsrDeleteMutation.isPending}
+          confirmationText={t('common.actions.delete')}
         />
       )}
       {dialog?.kind === 'delete' && (

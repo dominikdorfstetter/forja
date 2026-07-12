@@ -1980,6 +1980,23 @@
         "active": "Attivo",
         "suspended": "Sospeso",
         "banned": "Bannato"
+      },
+      "dsr": {
+        "export": {
+          "label": "Esporta dati (GDPR)",
+          "success": "Dati utente esportati",
+          "error": "Impossibile esportare i dati dell'utente"
+        },
+        "delete": {
+          "label": "Elimina account (GDPR)",
+          "title": "Elimina account (GDPR)",
+          "warning": "Questa azione elimina definitivamente l'account dell'utente e cancella tutti i dati personali a lui attribuiti.",
+          "consequences": "I contenuti creati restano disponibili senza attribuzione. Questa azione soddisfa una richiesta di cancellazione GDPR e non può essere annullata.",
+          "confirm": "Elimina account",
+          "success": "Account eliminato e dati personali cancellati",
+          "error": "Impossibile eliminare l'account",
+          "soleOwnerError": "Questo utente è l'unico proprietario di un sito — trasferisci prima la proprietà"
+        }
       }
     },
     "cache": {
