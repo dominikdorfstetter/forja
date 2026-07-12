@@ -6,6 +6,14 @@ Forja is a GDPR-first, multi-tenant headless CMS — a Rust (Axum) backend and a
 
 ## [Unreleased]
 
+## [2.0.7] — 2026-07-12
+
+A follow-up to the 2.0.6 legal-versioning work: legal documents now keep a single live version instead of showing every version as its own row.
+
+### Fixed
+
+- **Legal documents keep one live version at a time.** After 2.0.6, editing and re-publishing a legal document left both the old and new version in the list, each marked "Published", with no way to tell which was actually served or to switch between them. Publishing a version now supersedes (archives) the previously-published version in its chain, so the Legal list collapses to one row per document and exactly one version is ever live. Rolling back is just re-publishing an older version — it becomes live and the newer one is superseded; nothing is lost either way. The list shows a `v{n}` badge on documents that have history, and the version panel marks the live version and explains how to roll back.
+
 ## [2.0.6] — 2026-07-12
 
 GDPR data-subject-request tooling for operators, a rebuilt legal-document versioning flow, and two admin bug fixes.
@@ -199,7 +207,8 @@ _The 0.x milestones below condense the early build-out; development then continu
 - The first Astro-based reference template.
 - Docker and Docker Compose for local development, and the initial CI pipeline.
 
-[Unreleased]: https://github.com/dominikdorfstetter/forja/compare/v2.0.6...HEAD
+[Unreleased]: https://github.com/dominikdorfstetter/forja/compare/v2.0.7...HEAD
+[2.0.7]: https://github.com/dominikdorfstetter/forja/compare/v2.0.6...v2.0.7
 [2.0.6]: https://github.com/dominikdorfstetter/forja/compare/v2.0.5...v2.0.6
 [2.0.5]: https://github.com/dominikdorfstetter/forja/compare/v2.0.3...v2.0.5
 [2.0.4]: https://github.com/dominikdorfstetter/forja/compare/v2.0.3...bea7e8a1646406f5c069bab2d648110be4aec05e

@@ -14,6 +14,14 @@ is the first release published as open source**, so the public version history
 begins at 2.0. The pre-release milestones below condense how the foundation came
 together; precise dates start at the first public release.
 
+## 2.0.7 — 2026-07-12
+
+A follow-up to the 2.0.6 legal-versioning work: legal documents now keep a single live version instead of showing every version as its own row.
+
+### Fixed
+
+- **Legal documents keep one live version at a time.** After 2.0.6, editing and re-publishing a legal document left both the old and new version in the list, each marked "Published", with no way to tell which was actually served or to switch between them. Publishing a version now supersedes (archives) the previously-published version in its chain, so the Legal list collapses to one row per document and exactly one version is ever live. Rolling back is just re-publishing an older version — it becomes live and the newer one is superseded; nothing is lost either way. The list shows a `v{n}` badge on documents that have history, and the version panel marks the live version and explains how to roll back.
+
 ## 2.0.6 — 2026-07-12
 
 GDPR data-subject-request tooling for operators, a rebuilt legal-document versioning flow, and two admin bug fixes.
