@@ -1589,7 +1589,8 @@
       "name": "Nome",
       "status": "Estado",
       "selectAll": "Selecionar todos os documentos",
-      "selectRow": "Selecionar documento {{name}}"
+      "selectRow": "Selecionar documento {{name}}",
+      "versionTooltip": "Este documento tem várias versões"
     },
     "empty": {
       "noSite": "Selecione um site na barra de ferramentas para gerir os seus documentos legais",
@@ -1766,7 +1767,9 @@
       "title": "Histórico de versões",
       "noVersions": "Sem versões anteriores",
       "createNew": "Criar nova versão",
-      "created": "Nova versão criada"
+      "created": "Nova versão criada",
+      "live": "Ativa",
+      "rollbackHint": "A versão ativa é a que é publicada. Abra uma versão anterior e publique-a para reverter — a atual passa a ser substituída."
     }
   },
   "sites": {

@@ -666,6 +666,48 @@ impl LegalDocumentRepo {
         Ok(published.unwrap_or(false))
     }
 
+    /// After a version is published, archive every *other* currently-published
+    /// version in the same chain so exactly one version is ever live
+    /// ("supersede"). Publishing an older version therefore rolls back — it
+    /// becomes live and the newer one is superseded. Returns how many versions
+    /// were superseded. The admin's Active list (which excludes Archived) then
+    /// shows one row per document; superseded versions remain as history.
+    pub async fn supersede_other_published_versions(
+        pool: &PgPool,
+        published_id: Uuid,
+    ) -> Result<u64, ApiError> {
+        // Walk to the chain root so the recursive descent covers every version.
+        let mut root = Self::find_by_id(pool, published_id).await?;
+        while let Some(parent_id) = root.parent_version_id {
+            root = Self::find_by_id(pool, parent_id).await?;
+        }
+
+        let result = sqlx::query(
+            r#"
+            WITH RECURSIVE chain AS (
+                SELECT id, content_id, parent_version_id
+                FROM legal_documents
+                WHERE id = $1 AND is_deleted = FALSE
+                UNION ALL
+                SELECT ld.id, ld.content_id, ld.parent_version_id
+                FROM legal_documents ld
+                INNER JOIN chain ON ld.parent_version_id = chain.id
+                WHERE ld.is_deleted = FALSE
+            )
+            UPDATE contents
+            SET status = 'archived', updated_at = NOW()
+            WHERE id IN (SELECT content_id FROM chain WHERE id <> $2)
+              AND status = 'published'
+            "#,
+        )
+        .bind(root.id)
+        .bind(published_id)
+        .execute(pool)
+        .await?;
+
+        Ok(result.rows_affected())
+    }
+
     pub async fn find_versions(pool: &PgPool, id: Uuid) -> Result<Vec<LegalDocument>, ApiError> {
         let doc = Self::find_by_id(pool, id).await?;
         let mut root_id = doc.id;

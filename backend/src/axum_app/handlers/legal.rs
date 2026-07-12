@@ -324,6 +324,14 @@ async fn update_legal_document(
         &auth.0,
     )
     .await?;
+
+    // Exactly one version of a chain is ever live: publishing this version
+    // supersedes (archives) any previously-published version, so publishing an
+    // older version rolls back to it (#140 follow-up).
+    if LegalDocumentRepo::is_published(&state.db, id).await? {
+        LegalDocumentRepo::supersede_other_published_versions(&state.db, id).await?;
+    }
+
     Ok(Json(LegalDocumentResponse::from(document)))
 }
 

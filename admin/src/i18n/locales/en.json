@@ -1595,7 +1595,8 @@
       "created": "Created",
       "actions": "Actions",
       "selectAll": "Select all documents",
-      "selectRow": "Select document {{name}}"
+      "selectRow": "Select document {{name}}",
+      "versionTooltip": "This document has multiple versions"
     },
     "tabs": {
       "documents": "Documents",
@@ -1766,7 +1767,9 @@
       "title": "Version History",
       "noVersions": "No previous versions",
       "createNew": "Create New Version",
-      "created": "New version created"
+      "created": "New version created",
+      "live": "Live",
+      "rollbackHint": "The live version is served publicly. Open an older version and publish it to roll back — the current one is superseded."
     }
   },
   "sites": {

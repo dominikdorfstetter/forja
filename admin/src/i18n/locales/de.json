@@ -1589,7 +1589,8 @@
       "name": "Name",
       "status": "Status",
       "selectAll": "Alle Dokumente auswählen",
-      "selectRow": "Dokument {{name}} auswählen"
+      "selectRow": "Dokument {{name}} auswählen",
+      "versionTooltip": "Dieses Dokument hat mehrere Versionen"
     },
     "empty": {
       "noSite": "Wählen Sie eine Seite in der Symbolleiste aus, um deren rechtliche Dokumente zu verwalten",
@@ -1766,7 +1767,9 @@
       "title": "Versionsverlauf",
       "noVersions": "Keine früheren Versionen",
       "createNew": "Neue Version erstellen",
-      "created": "Neue Version erstellt"
+      "created": "Neue Version erstellt",
+      "live": "Live",
+      "rollbackHint": "Die Live-Version wird öffentlich ausgeliefert. Öffne eine ältere Version und veröffentliche sie, um zurückzurollen — die aktuelle wird ersetzt."
     }
   },
   "sites": {

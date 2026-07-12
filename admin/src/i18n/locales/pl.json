@@ -1589,7 +1589,8 @@
       "name": "Name",
       "status": "Status",
       "selectAll": "Zaznacz wszystkie dokumenty",
-      "selectRow": "Zaznacz dokument {{name}}"
+      "selectRow": "Zaznacz dokument {{name}}",
+      "versionTooltip": "Ten dokument ma wiele wersji"
     },
     "empty": {
       "noSite": "Wybierz stronę z paska narzędzi, aby zarządzać jej dokumentami prawnymi",
@@ -1766,7 +1767,9 @@
       "title": "Historia wersji",
       "noVersions": "Brak wcześniejszych wersji",
       "createNew": "Utwórz nową wersję",
-      "created": "Utworzono nową wersję"
+      "created": "Utworzono nową wersję",
+      "live": "Na żywo",
+      "rollbackHint": "Wersja na żywo jest publikowana publicznie. Otwórz starszą wersję i opublikuj ją, aby przywrócić — bieżąca zostanie zastąpiona."
     }
   },
   "sites": {
