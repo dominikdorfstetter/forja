@@ -222,7 +222,7 @@ export const ForjaProjects: StencilReactComponent<ForjaProjectsElement, ForjaPro
 
 export type ForjaSectionRendererEvents = NonNullable<unknown>;
 
-export const ForjaSectionRenderer: StencilReactComponent<ForjaSectionRendererElement, ForjaSectionRendererEvents, Components.ForjaSectionRenderer> = /*@__PURE__*/ createComponent<ForjaSectionRendererElement, ForjaSectionRendererEvents, Components.ForjaSectionRenderer>({
+export const ForjaSectionRenderer: StencilReactComponent<ForjaSectionRendererElement, ForjaSectionRendererEvents, Components.ForjaSectionRenderer, 'sectionType'> = /*@__PURE__*/ createComponent<ForjaSectionRendererElement, ForjaSectionRendererEvents, Components.ForjaSectionRenderer, 'sectionType'>({
     tagName: 'forja-section-renderer',
     elementClass: ForjaSectionRendererElement,
     // @ts-ignore - ignore potential React type mismatches between the Stencil Output Target and your project.

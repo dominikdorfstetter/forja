@@ -145,7 +145,7 @@ impl MediaFile {
             order_clause(order_col, sort_dir),
         );
 
-        let media = sqlx::query_as::<_, Self>(&query)
+        let media = sqlx::query_as::<_, Self>(sqlx::AssertSqlSafe(query))
             .bind(site_id)
             .bind(limit)
             .bind(offset)

@@ -187,7 +187,7 @@ where
 /// Run a `SELECT COALESCE(jsonb_agg(...), '[]')` site-scoped query and
 /// return the JSON array. Keeps localization sets out of bespoke structs.
 async fn jsonb_agg(pool: &PgPool, site_id: Uuid, sql: &str) -> Result<serde_json::Value, ApiError> {
-    let v = sqlx::query_scalar::<_, serde_json::Value>(sql)
+    let v = sqlx::query_scalar::<_, serde_json::Value>(sqlx::AssertSqlSafe(sql))
         .bind(site_id)
         .fetch_one(pool)
         .await?;

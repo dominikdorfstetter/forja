@@ -104,7 +104,7 @@ mod tests {
 
     #[test]
     fn alphabet_excludes_ambiguous_chars() {
-        for forbidden in [b'I', b'O', b'0', b'1'] {
+        for forbidden in *b"IO01" {
             assert!(
                 !ALPHABET.contains(&forbidden),
                 "alphabet contains {}",

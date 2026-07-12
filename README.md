@@ -38,7 +38,7 @@ into something useful, Forja lets you shape, manage, and deliver content across 
 
 ### Prerequisites
 
-- **Rust** 1.93+ — install via [rustup](https://rustup.rs/)
+- **Rust** 1.97+ — install via [rustup](https://rustup.rs/)
 - **Node.js** 24+ — install via [nvm](https://github.com/nvm-sh/nvm) or [nodejs.org](https://nodejs.org/)
 - **Docker** — for PostgreSQL and Redis
 - **SQLx CLI** — `cargo install sqlx-cli`

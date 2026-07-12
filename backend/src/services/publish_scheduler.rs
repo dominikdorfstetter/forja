@@ -314,6 +314,26 @@ async fn mark_as_archived(pool: &PgPool, content_id: Uuid) -> Result<(), sqlx::E
     Ok(())
 }
 
+/// Update a content record from scheduled to published.
+async fn mark_as_published(pool: &PgPool, content_id: Uuid) -> Result<(), sqlx::Error> {
+    sqlx::query(
+        r#"
+        UPDATE contents
+        SET status = 'published',
+            published_at = COALESCE(published_at, NOW()),
+            updated_at = NOW()
+        WHERE id = $1
+          AND status = 'scheduled'
+          AND is_deleted = FALSE
+        "#,
+    )
+    .bind(content_id)
+    .execute(pool)
+    .await?;
+
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -353,24 +373,4 @@ mod tests {
         assert_eq!(groups[0].site_ids.len(), 2);
         assert_eq!(groups[1].content_id, c2);
     }
-}
-
-/// Update a content record from scheduled to published.
-async fn mark_as_published(pool: &PgPool, content_id: Uuid) -> Result<(), sqlx::Error> {
-    sqlx::query(
-        r#"
-        UPDATE contents
-        SET status = 'published',
-            published_at = COALESCE(published_at, NOW()),
-            updated_at = NOW()
-        WHERE id = $1
-          AND status = 'scheduled'
-          AND is_deleted = FALSE
-        "#,
-    )
-    .bind(content_id)
-    .execute(pool)
-    .await?;
-
-    Ok(())
 }

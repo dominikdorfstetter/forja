@@ -192,18 +192,13 @@ fn value_as_f64(v: &JsonValue) -> Option<f64> {
 fn option_keys(opts: &JsonValue) -> Option<Vec<String>> {
     // Accept either an array of strings or an array of `{key, label}` objects.
     let arr = opts.as_array()?;
-    let mut out = Vec::with_capacity(arr.len());
-    for item in arr {
-        let key = if let Some(s) = item.as_str() {
-            s.to_string()
-        } else if let Some(k) = item.get("key").and_then(|v| v.as_str()) {
-            k.to_string()
-        } else {
-            return None;
-        };
-        out.push(key);
-    }
-    Some(out)
+    arr.iter()
+        .map(|item| {
+            item.as_str()
+                .or_else(|| item.get("key").and_then(|v| v.as_str()))
+                .map(str::to_string)
+        })
+        .collect()
 }
 
 lazy_static! {

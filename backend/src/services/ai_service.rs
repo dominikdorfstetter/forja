@@ -1332,8 +1332,8 @@ pub async fn test_connection(
         .await
 }
 
-/// Escape literal control characters inside JSON string values.
-/// Local models often produce JSON with raw newlines in strings, which is invalid JSON.
+// Escape literal control characters inside JSON string values.
+// Local models often produce JSON with raw newlines in strings, which is invalid JSON.
 
 #[cfg(test)]
 mod tests {

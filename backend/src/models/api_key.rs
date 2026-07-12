@@ -364,7 +364,7 @@ impl ApiKey {
             "#,
             order_clause(order_col, sort_dir)
         );
-        let keys = sqlx::query_as::<_, Self>(&query)
+        let keys = sqlx::query_as::<_, Self>(sqlx::AssertSqlSafe(query))
             .bind(status)
             .bind(permission)
             .bind(site_id)

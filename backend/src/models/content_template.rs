@@ -71,7 +71,7 @@ impl ContentTemplate {
             params.sort.order_clause(order_col),
         );
 
-        let mut query = sqlx::query_as::<_, Self>(&sql)
+        let mut query = sqlx::query_as::<_, Self>(sqlx::AssertSqlSafe(sql))
             .bind(site_id)
             .bind(limit)
             .bind(offset);
@@ -106,7 +106,7 @@ impl ContentTemplate {
             where_clauses.join(" AND "),
         );
 
-        let mut query = sqlx::query_as::<_, (i64,)>(&sql).bind(site_id);
+        let mut query = sqlx::query_as::<_, (i64,)>(sqlx::AssertSqlSafe(sql)).bind(site_id);
 
         if let Some(s) = search {
             query = query.bind(s);

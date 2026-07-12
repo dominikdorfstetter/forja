@@ -147,7 +147,7 @@ pub async fn test_context_demo() -> TestContext {
 pub async fn cleanup_test_data(pool: &PgPool) {
     let tables = ["api_key_usage", "api_keys", "site_memberships", "sites"];
     for table in tables {
-        let _ = sqlx::query(&format!("DELETE FROM {table}"))
+        let _ = sqlx::query(sqlx::AssertSqlSafe(format!("DELETE FROM {table}")))
             .execute(pool)
             .await;
     }
@@ -156,7 +156,7 @@ pub async fn cleanup_test_data(pool: &PgPool) {
 pub async fn create_test_site(pool: &PgPool) -> Uuid {
     let slug = format!("test-site-{}", &Uuid::new_v4().to_string()[..8]);
     let req = forja::dto::site::CreateSiteRequest {
-        name: format!("Test Site {}", &slug),
+        name: format!("Test Site {}", slug),
         slug,
         description: Some("Integration test site".to_string()),
         logo_url: None,

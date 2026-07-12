@@ -116,7 +116,7 @@ impl PageRepo {
             "#,
             PAGE_WITH_CONTENT_COLUMNS,
         );
-        let page = sqlx::query_as::<_, PageWithContent>(&sql)
+        let page = sqlx::query_as::<_, PageWithContent>(sqlx::AssertSqlSafe(sql))
             .bind(id)
             .fetch_optional(executor)
             .await?
@@ -144,7 +144,7 @@ impl PageRepo {
             "#,
             PAGE_WITH_CONTENT_COLUMNS,
         );
-        let page = sqlx::query_as::<_, PageWithContent>(&sql)
+        let page = sqlx::query_as::<_, PageWithContent>(sqlx::AssertSqlSafe(sql))
             .bind(site_id)
             .bind(route)
             .fetch_optional(pool)
@@ -295,7 +295,7 @@ impl PageRepo {
             "#,
             PAGE_WITH_CONTENT_COLUMNS,
         );
-        let page = sqlx::query_as::<_, PageWithContent>(&sql)
+        let page = sqlx::query_as::<_, PageWithContent>(sqlx::AssertSqlSafe(sql))
             .bind(content_id)
             .fetch_one(&mut *conn)
             .await?;
@@ -405,7 +405,7 @@ impl PageRepo {
             "#,
             PAGE_WITH_CONTENT_COLUMNS,
         );
-        let new_page = sqlx::query_as::<_, PageWithContent>(&sql)
+        let new_page = sqlx::query_as::<_, PageWithContent>(sqlx::AssertSqlSafe(sql))
             .bind(content_id)
             .fetch_one(pool)
             .await?;

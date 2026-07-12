@@ -228,7 +228,7 @@ pub async fn stats_global(redis: &Option<redis::aio::ConnectionManager>) -> Glob
             entry_count,
         })
         .collect();
-    per_site.sort_by(|a, b| b.entry_count.cmp(&a.entry_count));
+    per_site.sort_by_key(|s| std::cmp::Reverse(s.entry_count));
 
     GlobalCacheStats {
         redis_available: true,

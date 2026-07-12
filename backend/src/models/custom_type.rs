@@ -257,11 +257,11 @@ async fn evolve_field(
 
     // optional → required: reject if any live entry lacks the value.
     if input.required && !prior.required {
-        let missing: i64 = sqlx::query_scalar(&format!(
+        let missing: i64 = sqlx::query_scalar(sqlx::AssertSqlSafe(format!(
             "SELECT COUNT(*) FROM contents c
               WHERE c.entity_type_id = $1 AND c.is_deleted = FALSE
                 AND NOT EXISTS (SELECT 1 FROM {table} t WHERE t.content_id = c.id AND t.data ? $2)"
-        ))
+        )))
         .bind(entity_type_id)
         .bind(&prior.key)
         .fetch_one(&mut **tx)
@@ -278,11 +278,11 @@ async fn evolve_field(
     // Retype: allow only when every existing value coerces (PII is encrypted
     // and not inspectable — allowed without a coercion check).
     if input.field_type != prior.field_type && !input.is_pii {
-        let values: Vec<serde_json::Value> = sqlx::query_scalar(&format!(
+        let values: Vec<serde_json::Value> = sqlx::query_scalar(sqlx::AssertSqlSafe(format!(
             "SELECT DISTINCT t.data -> $2 FROM {table} t
                JOIN contents c ON c.id = t.content_id
               WHERE c.entity_type_id = $1 AND t.data ? $2"
-        ))
+        )))
         .bind(entity_type_id)
         .bind(&prior.key)
         .fetch_all(&mut **tx)
@@ -303,12 +303,12 @@ async fn evolve_field(
 
     // Rename: migrate stored JSONB keys + unique bookkeeping.
     if input.key != prior.key {
-        sqlx::query(&format!(
+        sqlx::query(sqlx::AssertSqlSafe(format!(
             "UPDATE {table} t
                 SET data = (t.data - $2) || jsonb_build_object($3, t.data -> $2)
               WHERE t.data ? $2
                 AND t.content_id IN (SELECT id FROM contents WHERE entity_type_id = $1)"
-        ))
+        )))
         .bind(entity_type_id)
         .bind(&prior.key)
         .bind(&input.key)

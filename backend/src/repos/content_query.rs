@@ -325,8 +325,8 @@ impl ContentQuery {
         let resolved = self.resolve()?;
         let plan = self.build_plan();
 
-        let mut data_q = sqlx::query_as::<_, T>(&plan.data_sql);
-        let mut count_q = sqlx::query_as::<_, (i64,)>(&plan.count_sql);
+        let mut data_q = sqlx::query_as::<_, T>(sqlx::AssertSqlSafe(plan.data_sql));
+        let mut count_q = sqlx::query_as::<_, (i64,)>(sqlx::AssertSqlSafe(plan.count_sql));
 
         data_q = data_q.bind(self.site_id);
         count_q = count_q.bind(self.site_id);
@@ -381,7 +381,7 @@ impl ContentQuery {
         let resolved = self.resolve()?;
         let plan = self.build_plan();
 
-        let mut count_q = sqlx::query_as::<_, (i64,)>(&plan.count_sql);
+        let mut count_q = sqlx::query_as::<_, (i64,)>(sqlx::AssertSqlSafe(plan.count_sql));
         count_q = count_q.bind(self.site_id);
 
         if let Some(ref slug) = self.category_slug {
