@@ -82,6 +82,15 @@ export default function ProjectWizardBasicsStep({
         </Box>
       )}
       <TextField
+        label={t('wizard.project.fields.slug')}
+        fullWidth
+        required
+        {...register('slug')}
+        error={!!errors.slug}
+        helperText={errors.slug ? String(errors.slug.message) : t('wizard.project.slugHint')}
+        data-testid="project-wizard.field.slug"
+      />
+      <TextField
         label={t('wizard.project.fields.startDate')}
         type="date"
         fullWidth

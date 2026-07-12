@@ -3973,6 +3973,7 @@
         "linkType": "Type",
         "linkUrl": "URL"
       },
+      "slugHint": "Uzupełniany automatycznie na podstawie tytułu; w razie potrzeby edytuj. Małe litery, cyfry i myślniki.",
       "discardDialog": {
         "title": "Odrzucić Zmiany?",
         "message": "Masz niezapisane zmiany. Czy na pewno chcesz je odrzucić?",

@@ -4451,6 +4451,7 @@
         "linkType": "Type",
         "linkUrl": "URL"
       },
+      "slugHint": "Auto-filled from the title; edit if needed. Lowercase letters, numbers and hyphens.",
       "discardDialog": {
         "title": "Discard Changes?",
         "message": "You have unsaved changes. Are you sure you want to discard them?",

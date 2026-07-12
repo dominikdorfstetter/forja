@@ -3972,6 +3972,7 @@
         "linkType": "Typ",
         "linkUrl": "URL"
       },
+      "slugHint": "Wird aus dem Titel erzeugt; bei Bedarf anpassen. Kleinbuchstaben, Zahlen und Bindestriche.",
       "discardDialog": {
         "title": "Änderungen verwerfen?",
         "message": "Sie haben ungespeicherte Änderungen. Möchten Sie diese wirklich verwerfen?",

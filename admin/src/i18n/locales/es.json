@@ -3971,6 +3971,7 @@
         "linkType": "Tipo",
         "linkUrl": "URL"
       },
+      "slugHint": "Se completa automáticamente a partir del título; edítalo si es necesario. Minúsculas, números y guiones.",
       "discardDialog": {
         "title": "¿Descartar Cambios?",
         "message": "Tiene cambios sin guardar. ¿Está seguro de que desea descartarlos?",

@@ -3971,6 +3971,7 @@
         "linkType": "Tipo",
         "linkUrl": "URL"
       },
+      "slugHint": "Compilato automaticamente dal titolo; modificabile se necessario. Minuscole, numeri e trattini.",
       "discardDialog": {
         "title": "Annullare le modifiche?",
         "message": "Hai delle modifiche non salvate. Sei sicuro di volerle annullare?",
