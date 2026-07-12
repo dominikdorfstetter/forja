@@ -28,6 +28,7 @@ use crate::models::content::{Content, ContentLocalization, ContentStatus};
 use crate::models::legal::{LegalDocType, LegalDocument};
 use crate::repos::legal_repo::{
     LegalDocumentLocalizationRepo, LegalDocumentRepo, LegalGroupRepo, LegalItemRepo,
+    LegalListFilters,
 };
 use crate::services::audited_mutation::AuditedEntity;
 use crate::services::content_lifecycle;
@@ -56,6 +57,9 @@ struct ListLegalQuery {
     search: Option<String>,
     sort_by: Option<String>,
     sort_dir: Option<String>,
+    status: Option<String>,
+    exclude_status: Option<String>,
+    exclude_document_type: Option<String>,
 }
 
 #[utoipa::path(
@@ -70,10 +74,14 @@ struct ListLegalQuery {
         ("page_size" = Option<i64>, Query, description = "Items per page, 1–100 (default: 10)"),
         ("search" = Option<String>, Query, description = "Search by cookie name (case-insensitive partial match)"),
         ("sort_by" = Option<String>, Query, description = "Sort field: created_at, updated_at, document_type (default: created_at)"),
-        ("sort_dir" = Option<String>, Query, description = "Sort direction: asc or desc (default: asc)")
+        ("sort_dir" = Option<String>, Query, description = "Sort direction: asc or desc (default: asc)"),
+        ("status" = Option<String>, Query, description = "Filter by content status: Draft, InReview, Scheduled, Published, Archived"),
+        ("exclude_status" = Option<String>, Query, description = "Exclude items with this status: Draft, InReview, Scheduled, Published, Archived (e.g. Archived)"),
+        ("exclude_document_type" = Option<String>, Query, description = "Exclude documents of this type: CookieConsent, PrivacyPolicy, TermsOfService, Imprint, Disclaimer (e.g. CookieConsent, which has its own UI)")
     ),
     responses(
         (status = 200, description = "List of legal documents", body = PaginatedLegalDocuments),
+        (status = 400, description = "Invalid filter value", body = ProblemDetails),
         (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
         (status = 403, description = "Insufficient permissions for this site", body = ProblemDetails)
     ),
@@ -86,10 +94,15 @@ async fn list_legal_documents(
     _access: AuthorizedSite<LegalDocument, Read>,
 ) -> Result<Json<PaginatedLegalDocuments>, ApiError> {
     let params = ListParams::new(q.page, q.page_size, q.search, q.sort_by, q.sort_dir);
+    let filters = LegalListFilters {
+        search: params.search_ref(),
+        status: q.status.as_deref(),
+        exclude_status: q.exclude_status.as_deref(),
+        exclude_document_type: q.exclude_document_type.as_deref(),
+    };
     let documents =
-        LegalDocumentRepo::find_all_for_site_filtered(&state.db, site_id, &params).await?;
-    let total =
-        LegalDocumentRepo::count_for_site_filtered(&state.db, site_id, params.search_ref()).await?;
+        LegalDocumentRepo::find_all_for_site_filtered(&state.db, site_id, &params, filters).await?;
+    let total = LegalDocumentRepo::count_for_site_filtered(&state.db, site_id, filters).await?;
     let items: Vec<LegalDocumentResponse> = documents
         .into_iter()
         .map(LegalDocumentResponse::from)

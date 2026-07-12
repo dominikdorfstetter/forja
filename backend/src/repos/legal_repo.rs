@@ -23,6 +23,53 @@ use crate::utils::list_params::ListParams;
 /// `ContentQuery` (entity table = `e`). Hard-coded — never user input.
 const LEGAL_SEARCH_COLUMNS: &[&str] = &["e.cookie_name"];
 
+/// Map a legal document type — accepted either as the API PascalCase name
+/// (`"CookieConsent"`) or as the Postgres enum text (`"cookie_consent"`) — to
+/// the canonical enum text. Returns `None` for unrecognised values so
+/// `ContentQuery` can reject them as a 400 at execute time.
+fn normalize_legal_doc_type(raw: &str) -> Option<&'static str> {
+    match raw {
+        "CookieConsent" | "cookie_consent" => Some("cookie_consent"),
+        "PrivacyPolicy" | "privacy_policy" => Some("privacy_policy"),
+        "TermsOfService" | "terms_of_service" => Some("terms_of_service"),
+        "Imprint" | "imprint" => Some("imprint"),
+        "Disclaimer" | "disclaimer" => Some("disclaimer"),
+        _ => None,
+    }
+}
+
+/// Filters accepted by the legal-document admin list (and its count). Bundled
+/// so the list and count paths can't drift apart — both go through
+/// [`apply_legal_filters`], mirroring `apply_blog_filters`.
+#[derive(Debug, Default, Clone, Copy)]
+pub struct LegalListFilters<'a> {
+    pub search: Option<&'a str>,
+    pub status: Option<&'a str>,
+    pub exclude_status: Option<&'a str>,
+    pub exclude_document_type: Option<&'a str>,
+}
+
+/// Apply the shared legal list filters (search, status, exclude-status,
+/// exclude-document-type) onto a `ContentQuery`. Status and document-type
+/// values arrive as the API value and are normalized inside `ContentQuery` at
+/// execute time. Shared by the list and count paths so both stay in lock-step.
+fn apply_legal_filters(mut query: ContentQuery, filters: LegalListFilters<'_>) -> ContentQuery {
+    if let Some(s) = filters.search {
+        query = query.with_search(LEGAL_SEARCH_COLUMNS, s);
+    }
+    if let Some(s) = filters.status {
+        query = query.with_status([s]);
+    }
+    if let Some(s) = filters.exclude_status {
+        query = query.exclude_status(s);
+    }
+    if let Some(t) = filters.exclude_document_type {
+        query =
+            query.exclude_entity_filter_norm("e.document_type::text", t, normalize_legal_doc_type);
+    }
+    query
+}
+
 /// Repository for `LegalDocument` SQL queries.
 pub struct LegalDocumentRepo;
 
@@ -34,17 +81,21 @@ impl LegalDocumentRepo {
             .await
     }
 
+    /// Count legal documents for a site with the admin list filters applied.
+    ///
+    /// Shares filter assembly with [`Self::find_all_for_site_filtered`] via
+    /// [`apply_legal_filters`], so the count always matches the listed rows.
     pub async fn count_for_site_filtered(
         pool: &PgPool,
         site_id: Uuid,
-        search: Option<&str>,
+        filters: LegalListFilters<'_>,
     ) -> Result<i64, ApiError> {
         // legal_documents tracks soft-delete on its own table, so opt into
         // .use_entity_soft_delete() (e.is_deleted, not c.is_deleted).
-        let mut query = ContentQuery::new("legal_documents", site_id).use_entity_soft_delete();
-        if let Some(s) = search {
-            query = query.with_search(LEGAL_SEARCH_COLUMNS, s);
-        }
+        let query = apply_legal_filters(
+            ContentQuery::new("legal_documents", site_id).use_entity_soft_delete(),
+            filters,
+        );
         query.count_only(pool).await
     }
 
@@ -52,6 +103,7 @@ impl LegalDocumentRepo {
         pool: &PgPool,
         site_id: Uuid,
         params: &ListParams,
+        filters: LegalListFilters<'_>,
     ) -> Result<Vec<LegalDocumentWithContent>, ApiError> {
         let (limit, offset) = params.limit_offset();
         let order_col = match params.sort.field_or("created_at") {
@@ -61,13 +113,13 @@ impl LegalDocumentRepo {
             _ => "e.created_at",
         };
 
-        let mut query = ContentQuery::new("legal_documents", site_id)
-            .use_entity_soft_delete()
-            .order_by_dir(order_col, params.sort.sort_dir.as_deref())
-            .paginate(limit, offset);
-        if let Some(s) = params.search_ref() {
-            query = query.with_search(LEGAL_SEARCH_COLUMNS, s);
-        }
+        let query = apply_legal_filters(
+            ContentQuery::new("legal_documents", site_id)
+                .use_entity_soft_delete()
+                .order_by_dir(order_col, params.sort.sort_dir.as_deref())
+                .paginate(limit, offset),
+            filters,
+        );
 
         let (rows, _) = query.execute::<LegalDocumentWithContent>(pool).await?;
         Ok(rows)

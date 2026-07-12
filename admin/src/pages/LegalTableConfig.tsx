@@ -1,5 +1,6 @@
 import type { TFunction } from 'i18next';
 import type { LegalDocumentResponse } from '@/types/api';
+import { StatusPill, type ContentStatus } from '@/components/design-system';
 import type { DataTableV2Column } from '@/components/shared/listPageV2';
 import type { ChipOption, ColumnsDeps } from '@/components/shared/entityListPage';
 
@@ -20,6 +21,12 @@ export function buildLegalColumns({ t, fmt, sortBy, sortDir }: ColumnsDeps): Dat
       width: 'minmax(140px, 1fr)',
       sorted: sortBy === 'document_type' ? sortDir : undefined,
       render: (doc) => t(`legal.documentTypes.${doc.document_type}`),
+    },
+    {
+      key: 'status',
+      label: t('legal.table.status'),
+      width: '120px',
+      render: (doc) => <StatusPill status={doc.status as ContentStatus} size="sm" />,
     },
     {
       key: 'created_at',

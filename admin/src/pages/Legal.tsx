@@ -13,7 +13,6 @@ import type {
   BulkContentResponse,
   ContentStatus,
   LegalDocumentResponse,
-  Paginated,
 } from '@/types/api';
 import { useSiteContext } from '@/store/SiteContext';
 import { PageHeader, pageTabsSx } from '@/components/shared/listPageV2';
@@ -49,20 +48,6 @@ async function legalBulkAction(_siteId: string, request: BulkContentRequest): Pr
   return { succeeded, failed: results.length - succeeded, total: results.length, results };
 }
 
-/**
- * `getLegalDocuments` returns CookieConsent docs alongside other legal docs;
- * the CookieConsent UI lives in its own outer tab, so strip those rows here
- * before they reach the harness.
- */
-async function fetchLegalDocumentsWithoutCookieConsent(
-  siteId: string,
-  params: Parameters<typeof getLegalDocuments>[1],
-): Promise<Paginated<LegalDocumentResponse>> {
-  const result = await getLegalDocuments(siteId, params);
-  const filtered = result.data.filter((d) => d.document_type !== 'CookieConsent');
-  return { ...result, data: filtered };
-}
-
 const legalAdapter: EntityListAdapter<LegalDocumentResponse> = {
   entityKey: 'legal',
   chrome: 'embedded',
@@ -70,11 +55,16 @@ const legalAdapter: EntityListAdapter<LegalDocumentResponse> = {
   queryKeyRoot: 'legal',
   pageHeaderIcon: 'gavel',
   i18nNamespace: 'legal',
+  // CookieConsent is excluded server-side (it lives in its own outer tab), so
+  // pagination totals stay correct — no client-side row stripping.
   fetchList: (siteId, params) =>
-    fetchLegalDocumentsWithoutCookieConsent(siteId, {
+    getLegalDocuments(siteId, {
       page: params.page,
       page_size: params.page_size,
       search: params.search,
+      status: params.status,
+      exclude_status: params.exclude_status,
+      exclude_document_type: 'CookieConsent',
       sort_by: params.sort_by,
       sort_dir: params.sort_dir,
     }),

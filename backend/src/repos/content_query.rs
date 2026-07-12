@@ -82,10 +82,12 @@ enum FilterSpec {
 }
 
 /// An entity-specific equality predicate: a hard-coded column (never user
-/// input) plus the spec that yields its bound value.
+/// input) plus the spec that yields its bound value. `negated` flips the
+/// operator to `!=` (the entity-column counterpart to `exclude_status`).
 struct EntityFilter {
     column: &'static str,
     spec: FilterSpec,
+    negated: bool,
 }
 
 /// The filter values that need normalization/validation, resolved once at
@@ -199,6 +201,7 @@ impl ContentQuery {
         self.entity_filters.push(EntityFilter {
             column,
             spec: FilterSpec::Value(value.into()),
+            negated: false,
         });
         self
     }
@@ -221,6 +224,29 @@ impl ContentQuery {
                 raw: raw.into(),
                 normalizer,
             },
+            negated: false,
+        });
+        self
+    }
+
+    /// Like [`Self::with_entity_filter_norm`], but negated: excludes rows whose
+    /// `{column}` equals the normalized value. The entity-column counterpart to
+    /// [`Self::exclude_status`], used by admin list filters that hide a single
+    /// entity subtype (e.g. legal documents' `CookieConsent`, which has its own
+    /// UI surface).
+    pub fn exclude_entity_filter_norm(
+        mut self,
+        column: &'static str,
+        raw: impl Into<String>,
+        normalizer: fn(&str) -> Option<&'static str>,
+    ) -> Self {
+        self.entity_filters.push(EntityFilter {
+            column,
+            spec: FilterSpec::Norm {
+                raw: raw.into(),
+                normalizer,
+            },
+            negated: true,
         });
         self
     }
@@ -458,7 +484,8 @@ impl ContentQuery {
             // Only the hard-coded `&'static str` column is interpolated; the
             // value is bound at ${placeholder}, matching the bind order in
             // execute()/count_only().
-            where_clauses.push(format!("{} = ${placeholder}", ef.column));
+            let op = if ef.negated { "!=" } else { "=" };
+            where_clauses.push(format!("{} {op} ${placeholder}", ef.column));
             placeholder += 1;
         }
         // Soft-delete is part of the canonical join (see issue #617) and applies
@@ -741,6 +768,44 @@ mod tests {
         assert!(
             matches!(resolved.entity_filters.as_slice(), [FilterValue::Text(t)] if t == "landing"),
             "normalizer should bind the enum-text value"
+        );
+    }
+
+    #[test]
+    fn exclude_entity_filter_norm_generates_not_equal_predicate() {
+        // site_id is $1, so the lone excluded entity filter takes $2 — in both
+        // the data and count plans, with the normalized value bound there.
+        let query = ContentQuery::new("legal_documents", Uuid::nil()).exclude_entity_filter_norm(
+            "e.page_type::text",
+            "Landing",
+            pascal_page_type,
+        );
+        let resolved = query.resolve().expect("known value should resolve");
+        assert!(
+            matches!(resolved.entity_filters.as_slice(), [FilterValue::Text(t)] if t == "landing"),
+            "normalizer should bind the enum-text value"
+        );
+        let plan = query.build_plan();
+        assert!(
+            plan.data_sql.contains("e.page_type::text != $2"),
+            "negated entity predicate missing; got:\n{}",
+            plan.data_sql
+        );
+        assert!(
+            plan.count_sql.contains("e.page_type::text != $2"),
+            "negated entity predicate must also apply to count; got:\n{}",
+            plan.count_sql
+        );
+    }
+
+    #[test]
+    fn exclude_entity_filter_norm_rejects_unknown_value() {
+        let err = ContentQuery::new("legal_documents", Uuid::nil())
+            .exclude_entity_filter_norm("e.page_type::text", "Bogus", pascal_page_type)
+            .resolve();
+        assert!(
+            err.is_err(),
+            "unknown excluded value should be a deferred 400"
         );
     }
 
