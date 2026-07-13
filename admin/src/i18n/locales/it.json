@@ -4712,7 +4712,8 @@
       "filterAll": "Tutti i testi",
       "filterMissing": "Traduzioni mancanti",
       "filterOutdated": "Obsoleti",
-      "noMatches": "Nessun testo corrisponde a questo filtro.",
+      "searchPlaceholder": "Cerca per chiave…",
+      "noMatches": "Nessun testo corrisponde alla ricerca o al filtro.",
       "emptyTitle": "Ancora nessun testo",
       "empty": "Definisci chiavi come blog.min_read e traducile per lingua: i tuoi template le leggono al rendering.",
       "localeStatus": {
@@ -4721,24 +4722,19 @@
         "outdated": "{{locale}}: obsoleto — il valore predefinito è cambiato"
       }
     },
-    "detail": {
-      "newTitle": "Nuovo testo dell'interfaccia",
-      "subtitle": "Chiave e valore predefinito si salvano insieme; le altre lingue si salvano quando lasci il campo",
-      "loading": "Caricamento del testo…",
+    "dialog": {
+      "createTitle": "Nuovo testo dell'interfaccia",
+      "editTitle": "Modifica testo dell'interfaccia",
       "keyLabel": "Chiave",
       "keyHelp": "Segmenti minuscoli uniti da '.', '_' o '-' — ad es. blog.min_read",
       "keyRequired": "La chiave è obbligatoria",
       "keyTooLong": "La chiave non può superare i 128 caratteri",
       "keyInvalid": "Usa lettere minuscole e cifre, unite da '.', '_' o '-'",
-      "valueLabel": "Valore",
-      "valueTooLong": "Il valore non può superare i 1000 caratteri",
-      "valueRequired": "Il valore è obbligatorio: il valore predefinito non può essere svuotato",
       "valueForLocale": "Valore ({{locale}})",
-      "localeHint": "Valore per {{locale}}. Salvato quando lasci il campo; svuotarlo rimuove la traduzione.",
-      "createHint": "Salva prima la chiave con il valore predefinito, poi traducila nelle altre lingue.",
-      "saved": "Testo salvato.",
+      "valueRequired": "Il valore è obbligatorio: il valore predefinito non può essere svuotato",
+      "clearHint": "Svuotandolo, la traduzione viene rimossa al salvataggio.",
       "created": "Testo creato.",
-      "notFound": "Questo testo dell'interfaccia non esiste.",
+      "saved": "Testo salvato.",
       "status": {
         "missing": "mancante",
         "outdated": "obsoleto"

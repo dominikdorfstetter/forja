@@ -314,6 +314,27 @@ pub struct SecurityConfig {
     #[serde(default = "default_anomaly_min_requests")]
     pub anomaly_min_requests: u32,
 
+    /// Hard-block keys on volume spikes (default: false = alert-only).
+    /// Volume is already capped by the quota system (429 when exhausted), so
+    /// auto-blocking on a spike adds no protection but destroys availability:
+    /// a normal SSR build/deploy fans out hundreds of requests and looks like
+    /// a spike against a low-traffic baseline. Enable only if you deliberately
+    /// want spikes to block in addition to quota enforcement.
+    #[serde(default)]
+    pub anomaly_block_on_volume_spike: bool,
+
+    /// Floor for the relative hourly spike threshold (default: 1000).
+    /// A multiplier over a tiny baseline yields a meaningless threshold
+    /// (avg 50/day → naive hourly threshold 10); the effective threshold is
+    /// max(relative, floor) so ordinary build bursts can never trip detection.
+    #[serde(default = "default_anomaly_min_hourly_threshold")]
+    pub anomaly_min_hourly_threshold: u32,
+
+    /// Floor for the relative daily spike threshold (default: 10000).
+    /// Same rationale as `anomaly_min_hourly_threshold`.
+    #[serde(default = "default_anomaly_min_daily_threshold")]
+    pub anomaly_min_daily_threshold: u32,
+
     // ── Auth brute-force rate limiting ────────────────────────────────
     /// Maximum failed auth attempts per IP within the auth rate-limit window.
     /// When exceeded, the IP receives 429 on all auth endpoints until the
@@ -401,6 +422,14 @@ fn default_anomaly_min_requests() -> u32 {
     20
 }
 
+fn default_anomaly_min_hourly_threshold() -> u32 {
+    1000
+}
+
+fn default_anomaly_min_daily_threshold() -> u32 {
+    10000
+}
+
 fn default_auth_rate_limit_max_failures() -> u32 {
     5
 }
@@ -462,6 +491,9 @@ impl Default for SecurityConfig {
             anomaly_daily_multiplier: default_anomaly_daily_multiplier(),
             anomaly_error_rate_threshold: default_anomaly_error_rate_threshold(),
             anomaly_min_requests: default_anomaly_min_requests(),
+            anomaly_block_on_volume_spike: false,
+            anomaly_min_hourly_threshold: default_anomaly_min_hourly_threshold(),
+            anomaly_min_daily_threshold: default_anomaly_min_daily_threshold(),
             auth_rate_limit_max_failures: default_auth_rate_limit_max_failures(),
             auth_rate_limit_window_seconds: default_auth_rate_limit_window_seconds(),
             auth_rate_limit_ban_max_failures: default_auth_rate_limit_ban_max_failures(),

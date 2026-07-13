@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Alert, Box } from '@mui/material';
@@ -9,8 +8,10 @@ import {
   PageHeader,
   Toolbar,
   ToolbarSpacer,
+  SearchField,
   FilterSelect,
   DataTableV2,
+  Pagination,
   type DataTableV2Column,
   type FilterSelectOption,
 } from '@/components/shared/listPageV2';
@@ -21,23 +22,30 @@ import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import { useAuth } from '@/store/AuthContext';
 import { useSiteContext } from '@/store/SiteContext';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
-import { deleteUiString, getUiStringEntries } from '@/services/uiStrings';
+import { createUiString, deleteUiString, getUiStringEntries, updateUiString } from '@/services/uiStrings';
 import { getSiteLocales } from '@/services/siteLocales';
 import { queryKeys } from '@/lib/queryKeys';
-import type { UiStringResponse } from '@/types/api';
+import type { CreateUiStringRequest, UiStringResponse, UpdateUiStringRequest } from '@/types/api';
 import LocaleCoverageChips from './LocaleCoverageChips';
 import UiStringRowActions from './UiStringRowActions';
-import { applyCoverageFilter, orderedActiveLocales, type CoverageFilter } from './localeCoverage';
+import UiStringFormDialog from './UiStringFormDialog';
+import {
+  applyCoverageFilter,
+  applyKeyQuery,
+  orderedActiveLocales,
+  type CoverageFilter,
+} from './localeCoverage';
 
 /**
  * UI strings list (roadmap §1): every key of the site's chrome dictionary
- * with per-locale completeness/status chips, plus "missing translations"
- * and "outdated" coverage filters. Reads are Viewer+, mutations Editor+
- * (backend resource `ui_string`), so write affordances gate on canEditAll.
+ * with per-locale completeness/status chips, a key search, "missing
+ * translations" / "outdated" coverage filters, and client-side pagination
+ * (one fetch returns all entries — the backend caps a site at 500 keys).
+ * Create/edit happen in UiStringFormDialog; reads are Viewer+ (the dialog
+ * opens read-only), mutations Editor+ (backend resource `ui_string`).
  */
 export default function UiStringsPage() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { canEditAll } = useAuth();
   const { selectedSiteId } = useSiteContext();
@@ -45,6 +53,11 @@ export default function UiStringsPage() {
   const { showError, showSuccess } = useErrorSnackbar();
 
   const [filter, setFilter] = useState<CoverageFilter>('all');
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [editing, setEditing] = useState<UiStringResponse | null>(null);
   const [deleting, setDeleting] = useState<UiStringResponse | null>(null);
 
   const { data: entries, isLoading, error } = useQuery({
@@ -59,15 +72,48 @@ export default function UiStringsPage() {
   });
 
   const locales = useMemo(() => orderedActiveLocales(siteLocales ?? []), [siteLocales]);
-  const rows = useMemo(
-    () => applyCoverageFilter(entries ?? [], locales, filter),
-    [entries, locales, filter],
+  const filtered = useMemo(
+    () => applyKeyQuery(applyCoverageFilter(entries ?? [], locales, filter), search),
+    [entries, locales, filter, search],
   );
+  const rows = filtered.slice((page - 1) * perPage, page * perPage);
+
+  const changeSearch = (next: string) => {
+    setSearch(next);
+    setPage(1);
+  };
+  const changeFilter = (next: CoverageFilter) => {
+    setFilter(next);
+    setPage(1);
+  };
+
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: queryKeys.uiStrings(siteId) });
+
+  const createMutation = useMutation({
+    mutationFn: (payload: CreateUiStringRequest) => createUiString(siteId, payload),
+    onSuccess: () => {
+      invalidate();
+      showSuccess(t('uiStrings.dialog.created'));
+      setCreateOpen(false);
+    },
+    onError: showError,
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: UpdateUiStringRequest }) =>
+      updateUiString(siteId, id, payload),
+    onSuccess: () => {
+      invalidate();
+      showSuccess(t('uiStrings.dialog.saved'));
+      setEditing(null);
+    },
+    onError: showError,
+  });
 
   const deleteMutation = useMutation({
     mutationFn: (row: UiStringResponse) => deleteUiString(siteId, row.id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.uiStrings(siteId) });
+      invalidate();
       showSuccess(t('uiStrings.deleted'));
       setDeleting(null);
     },
@@ -76,8 +122,6 @@ export default function UiStringsPage() {
       setDeleting(null);
     },
   });
-
-  const openDetail = (row: UiStringResponse) => navigate(`/ui-strings/${row.id}`);
 
   const filterOptions: FilterSelectOption<CoverageFilter>[] = [
     { value: 'all', label: t('uiStrings.list.filterAll'), icon: 'filter_list' },
@@ -126,7 +170,7 @@ export default function UiStringsPage() {
             <M3Button
               size="md"
               icon="add"
-              onClick={() => navigate('/ui-strings/new')}
+              onClick={() => setCreateOpen(true)}
               data-testid="ui-strings.new"
             >
               {t('uiStrings.newString')}
@@ -144,17 +188,24 @@ export default function UiStringsPage() {
           description={t('uiStrings.list.empty')}
           action={
             canEditAll
-              ? { label: t('uiStrings.newString'), onClick: () => navigate('/ui-strings/new') }
+              ? { label: t('uiStrings.newString'), onClick: () => setCreateOpen(true) }
               : undefined
           }
         />
       ) : (
         <>
           <Toolbar>
+            <SearchField
+              value={search}
+              onChange={changeSearch}
+              placeholder={t('uiStrings.list.searchPlaceholder')}
+              ariaLabel={t('uiStrings.list.searchPlaceholder')}
+              data-testid="ui-strings.search"
+            />
             <ToolbarSpacer />
             <FilterSelect<CoverageFilter>
               value={filter}
-              onChange={setFilter}
+              onChange={changeFilter}
               options={filterOptions}
               ariaLabel={t('uiStrings.list.filterLabel')}
               data-testid="ui-strings.filter"
@@ -165,19 +216,47 @@ export default function UiStringsPage() {
             columns={columns}
             rows={rows}
             getKey={(row) => row.id}
-            onRowClick={openDetail}
+            onRowClick={setEditing}
             emptyMessage={t('uiStrings.list.noMatches')}
             renderActions={
               canEditAll
                 ? (row) => (
-                    <UiStringRowActions row={row} onEdit={openDetail} onDelete={setDeleting} />
+                    <UiStringRowActions row={row} onEdit={setEditing} onDelete={setDeleting} />
                   )
                 : undefined
             }
           />
+          {filtered.length > 0 && (
+            <Pagination
+              total={filtered.length}
+              page={page}
+              perPage={perPage}
+              onPage={setPage}
+              onPerPage={(n) => {
+                setPerPage(n);
+                setPage(1);
+              }}
+            />
+          )}
         </>
       )}
 
+      <UiStringFormDialog
+        open={createOpen}
+        locales={locales}
+        onSubmitCreate={(payload) => createMutation.mutate(payload)}
+        onClose={() => setCreateOpen(false)}
+        loading={createMutation.isPending}
+      />
+      <UiStringFormDialog
+        open={!!editing}
+        row={editing}
+        locales={locales}
+        readOnly={!canEditAll}
+        onSubmitUpdate={(payload) => editing && updateMutation.mutate({ id: editing.id, payload })}
+        onClose={() => setEditing(null)}
+        loading={updateMutation.isPending}
+      />
       <ConfirmDialog
         open={!!deleting}
         title={t('uiStrings.deleteTitle')}
