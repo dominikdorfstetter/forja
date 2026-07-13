@@ -2,7 +2,7 @@
 
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
+use sqlx::{PgExecutor, PgPool};
 use uuid::Uuid;
 
 use crate::dto::navigation_menu::{CreateNavigationMenuRequest, UpdateNavigationMenuRequest};
@@ -157,12 +157,15 @@ impl NavigationMenu {
         Ok(menu)
     }
 
-    /// Update a navigation menu
+    /// Update a navigation menu: the menu row, localization upserts, and
+    /// localization removals commit in one transaction.
     pub async fn update(
         pool: &PgPool,
         id: Uuid,
         req: UpdateNavigationMenuRequest,
     ) -> Result<Self, ApiError> {
+        let mut tx = pool.begin().await?;
+
         let menu = sqlx::query_as::<_, Self>(
             r#"
             UPDATE navigation_menus
@@ -181,7 +184,7 @@ impl NavigationMenu {
         .bind(&req.description)
         .bind(req.max_depth)
         .bind(req.is_active)
-        .fetch_optional(pool)
+        .fetch_optional(&mut *tx)
         .await?
         .ok_or_else(|| {
             ApiError::not_found(format!("Navigation menu with ID {} not found", id))
@@ -189,6 +192,26 @@ impl NavigationMenu {
                 .with_entity_type("nav_menu")
         })?;
 
+        if let Some(locs) = &req.localizations {
+            for loc in locs {
+                NavigationMenuLocalization::upsert(&mut *tx, id, loc.locale_id, &loc.name).await?;
+            }
+        }
+
+        if let Some(removed) = &req.removed_locale_ids
+            && !removed.is_empty()
+        {
+            sqlx::query(
+                "DELETE FROM navigation_menu_localizations
+                 WHERE navigation_menu_id = $1 AND locale_id = ANY($2)",
+            )
+            .bind(id)
+            .bind(removed)
+            .execute(&mut *tx)
+            .await?;
+        }
+
+        tx.commit().await?;
         Ok(menu)
     }
 
@@ -299,13 +322,18 @@ impl NavigationMenuLocalization {
         Ok(locs)
     }
 
-    /// Upsert a localization for a menu
-    pub async fn upsert(
-        pool: &PgPool,
+    /// Upsert a localization for a menu. Generic over the executor so
+    /// [`NavigationMenu::update`] can run it on its transaction; normal
+    /// callers pass `&PgPool`.
+    pub async fn upsert<'e, E>(
+        executor: E,
         menu_id: Uuid,
         locale_id: Uuid,
         name: &str,
-    ) -> Result<Self, ApiError> {
+    ) -> Result<Self, ApiError>
+    where
+        E: PgExecutor<'e>,
+    {
         let loc = sqlx::query_as::<_, Self>(
             r#"
             INSERT INTO navigation_menu_localizations (navigation_menu_id, locale_id, name)
@@ -317,7 +345,7 @@ impl NavigationMenuLocalization {
         .bind(menu_id)
         .bind(locale_id)
         .bind(name)
-        .fetch_one(pool)
+        .fetch_one(executor)
         .await?;
 
         Ok(loc)

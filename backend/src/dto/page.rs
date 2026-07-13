@@ -144,6 +144,18 @@ fn validate_section_settings(
     validate_json_depth(settings, 5)
 }
 
+/// Validate a per-locale `items` override: must be a JSON array (it replaces
+/// the default `settings.items` wholesale), depth-capped like the settings
+/// blob it overrides.
+fn validate_localized_items(items: &serde_json::Value) -> Result<(), validator::ValidationError> {
+    if !items.is_array() {
+        let mut err = validator::ValidationError::new("items_must_be_array");
+        err.message = Some("items must be a JSON array".into());
+        return Err(err);
+    }
+    validate_json_depth(items, 5)
+}
+
 /// Request to update a page section
 #[derive(Debug, Clone, Deserialize, Validate, ValidatedDto, utoipa::ToSchema)]
 #[schema(description = "Update a page section")]
@@ -304,6 +316,9 @@ pub struct SectionLocalizationResponse {
     pub title: Option<String>,
     pub text: Option<String>,
     pub button_text: Option<String>,
+    /// Per-locale override of the section's `settings.items` array.
+    /// `null` = no override — consumers fall back to the default items.
+    pub items: Option<serde_json::Value>,
 }
 
 impl From<PageSectionLocalization> for SectionLocalizationResponse {
@@ -315,6 +330,7 @@ impl From<PageSectionLocalization> for SectionLocalizationResponse {
             title: loc.title,
             text: loc.text,
             button_text: loc.button_text,
+            items: loc.items,
         }
     }
 }
@@ -334,6 +350,12 @@ pub struct UpsertSectionLocalizationRequest {
 
     #[validate(length(max = 200, message = "Button text cannot exceed 200 characters"))]
     pub button_text: Option<String>,
+
+    /// Full per-locale override of the section's `settings.items` array —
+    /// same shape as the default items. Omit (or send `null`) to clear the
+    /// override so the locale falls back to the default items again.
+    #[validate(custom(function = "validate_localized_items"))]
+    pub items: Option<serde_json::Value>,
 }
 
 /// Request to batch-reorder page sections
@@ -517,6 +539,60 @@ mod tests {
             publish_end: None,
         };
         assert!(request.validate().is_ok());
+    }
+
+    #[test]
+    fn test_upsert_section_localization_items_array_valid() {
+        let request = UpsertSectionLocalizationRequest {
+            locale_id: Uuid::new_v4(),
+            title: None,
+            text: None,
+            button_text: None,
+            items: Some(serde_json::json!([{ "title": "Schnell", "icon": "⚡" }])),
+        };
+        assert!(request.validate().is_ok());
+    }
+
+    #[test]
+    fn test_upsert_section_localization_items_none_valid() {
+        let request = UpsertSectionLocalizationRequest {
+            locale_id: Uuid::new_v4(),
+            title: Some("Titel".to_string()),
+            text: None,
+            button_text: None,
+            items: None,
+        };
+        assert!(request.validate().is_ok());
+    }
+
+    #[test]
+    fn test_upsert_section_localization_items_object_rejected() {
+        let request = UpsertSectionLocalizationRequest {
+            locale_id: Uuid::new_v4(),
+            title: None,
+            text: None,
+            button_text: None,
+            items: Some(serde_json::json!({ "title": "not an array" })),
+        };
+        let result = request.validate();
+        assert!(result.is_err());
+        assert!(result.unwrap_err().field_errors().contains_key("items"));
+    }
+
+    #[test]
+    fn test_upsert_section_localization_items_too_deep_rejected() {
+        let mut deep = serde_json::json!("value");
+        for _ in 0..8 {
+            deep = serde_json::json!({ "nested": deep });
+        }
+        let request = UpsertSectionLocalizationRequest {
+            locale_id: Uuid::new_v4(),
+            title: None,
+            text: None,
+            button_text: None,
+            items: Some(serde_json::json!([deep])),
+        };
+        assert!(request.validate().is_err());
     }
 
     #[test]

@@ -3988,6 +3988,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/sites/{site_id}/settings/public": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Curated public subset of site settings (contact email, manifest colors, SEO defaults). Readable by any key tier including Read; operational config stays on the Admin-only raw settings endpoint. */
+        get: operations["get_public_site_settings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/sites/{site_id}/skills": {
         parameters: {
             query?: never;
@@ -4069,6 +4086,59 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sites/{site_id}/strings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Resolved UI strings for one locale as a flat key → value map. One value per key via the ADR 0002 fallback chain (exact match → site default → first-by-code); keys without any localization are omitted. Unknown locale codes fall back silently. */
+        get: operations["get_site_ui_strings"];
+        put?: never;
+        /** @description Create a UI string key with its initial localizations (max 500 keys per site) */
+        post: operations["create_ui_string"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sites/{site_id}/strings/entries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description List every UI string key with all localizations (admin read for per-locale completeness) */
+        get: operations["list_ui_string_entries"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/sites/{site_id}/strings/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** @description Rename a UI string key, upsert localizations, and/or remove localizations by locale. Changing the site-default locale's value flips every other locale to translation_status=outdated; the default locale's row cannot be removed. */
+        put: operations["update_ui_string"];
+        post?: never;
+        /** @description Delete a UI string key and all its localizations */
+        delete: operations["delete_ui_string"];
         options?: never;
         head?: never;
         patch?: never;
@@ -5926,6 +5996,12 @@ export interface components {
             document_type: components["schemas"]["LegalDocType"];
             /** @description Site IDs to associate this legal document with */
             site_ids: string[];
+            /**
+             * @description Canonical public slug (`/legal/{slug}`). Auto-derived from the
+             *     document type (e.g. `privacy-policy`) when omitted; unique per site.
+             * @example privacy-policy
+             */
+            slug?: string | null;
             status?: components["schemas"]["ContentStatus"];
         };
         /** @description Create a legal consent group */
@@ -6005,6 +6081,13 @@ export interface components {
             external_url?: string | null;
             /** @example home */
             icon?: string | null;
+            /**
+             * Format: uuid
+             * @description First-class reference to a legal document (resolves via the version
+             *     chain root's slug in the public tree)
+             * @example 550e8400-e29b-41d4-a716-446655440003
+             */
+            legal_document_id?: string | null;
             /** @description Optional localizations to create with the item */
             localizations?: components["schemas"]["NavigationItemLocalizationInput"][] | null;
             /**
@@ -6017,7 +6100,7 @@ export interface components {
             open_in_new_tab?: boolean;
             /**
              * Format: uuid
-             * @description Either page_id or external_url must be provided (but not both)
+             * @description Exactly one of page_id, external_url, or legal_document_id must be provided
              * @example 550e8400-e29b-41d4-a716-446655440001
              */
             page_id?: string | null;
@@ -6272,6 +6355,12 @@ export interface components {
             site_id?: string | null;
             /** @example rust-programming */
             slug: string;
+        };
+        /** @description Request to create a UI string key with its initial localizations. */
+        CreateUiStringRequest: {
+            /** @example blog.min_read */
+            key: string;
+            localizations?: components["schemas"]["UiStringLocalizationInput"][];
         };
         /** @description Request to create a webhook. */
         CreateWebhookRequest: {
@@ -7522,6 +7611,13 @@ export interface components {
              */
             id: string;
             /**
+             * Format: uuid
+             * @description Referenced legal document; NULL alongside the other targets marks a
+             *     broken link (e.g. after a purge) awaiting repair in the admin
+             * @example 550e8400-e29b-41d4-a716-446655440003
+             */
+            legal_document_id?: string | null;
+            /**
              * Format: int32
              * @description Number of locales that have a translation for this item
              * @example 2
@@ -7596,6 +7692,17 @@ export interface components {
              * @example 550e8400-e29b-41d4-a716-446655440000
              */
             id: string;
+            /**
+             * Format: uuid
+             * @description Referenced legal document
+             * @example 550e8400-e29b-41d4-a716-446655440003
+             */
+            legal_document_id?: string | null;
+            /**
+             * @description Version-chain root slug of the referenced legal document
+             *     (for `/legal/{slug}` URL construction)
+             */
+            legal_slug?: string | null;
             /** @example false */
             open_in_new_tab: boolean;
             /**
@@ -8224,6 +8331,34 @@ export interface components {
             label: string;
             localized: boolean;
         };
+        /** @description Public subset of site settings (Viewer-tier read) */
+        PublicSiteSettingsResponse: {
+            /**
+             * @description Background color for the web manifest (hex)
+             * @example #ffffff
+             */
+            background_color: string;
+            /**
+             * @description Public contact email; empty string when unset
+             * @example hello@example.com
+             */
+            contact_email: string;
+            /**
+             * @description Fallback meta description; empty string when unset
+             * @example
+             */
+            seo_default_description: string;
+            /**
+             * @description SEO title template
+             * @example {{title}} | {{site_name}}
+             */
+            seo_title_template: string;
+            /**
+             * @description Theme color for the web manifest (hex)
+             * @example #ffffff
+             */
+            theme_color: string;
+        };
         /** @description Quota window status */
         QuotaWindowResponse: {
             /** Format: int32 */
@@ -8564,6 +8699,11 @@ export interface components {
              * @example 550e8400-e29b-41d4-a716-446655440000
              */
             id: string;
+            /**
+             * @description Per-locale override of the section's `settings.items` array.
+             *     `null` = no override — consumers fall back to the default items.
+             */
+            items?: unknown;
             /**
              * Format: uuid
              * @example 770e8400-e29b-41d4-a716-446655440000
@@ -9471,6 +9611,32 @@ export interface components {
              */
             unique_visitors: number;
         };
+        /** @description One localized value to upsert for a UI string key. */
+        UiStringLocalizationInput: {
+            /** Format: uuid */
+            locale_id: string;
+            value: string;
+        };
+        /** @description One localized value of a UI string key (admin read shape). */
+        UiStringLocalizationResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            locale_id: string;
+            translation_status: components["schemas"]["TranslationStatus"];
+            value: string;
+        };
+        /** @description A UI string key with every localization (admin read shape). */
+        UiStringResponse: {
+            /** Format: date-time */
+            created_at: string;
+            /** Format: uuid */
+            id: string;
+            key: string;
+            localizations: components["schemas"]["UiStringLocalizationResponse"][];
+            /** Format: date-time */
+            updated_at: string;
+        };
         /** @description Unread notification count response. */
         UnreadCountResponse: {
             /**
@@ -9755,6 +9921,13 @@ export interface components {
             /** @example cookie_consent_v2 */
             cookie_name?: string | null;
             document_type?: null | components["schemas"]["LegalDocType"];
+            /**
+             * @description New canonical slug for the version chain. Editable while no version
+             *     of the chain has ever been published; rejected afterwards
+             *     (`LEGAL_SLUG_IMMUTABLE`).
+             * @example privacy-policy
+             */
+            slug?: string | null;
             status?: null | components["schemas"]["ContentStatus"];
         };
         /** @description Update a legal consent group */
@@ -9879,6 +10052,13 @@ export interface components {
             external_url?: string | null;
             /** @example link */
             icon?: string | null;
+            /**
+             * Format: uuid
+             * @description First-class reference to a legal document. Providing any link target
+             *     switches the item to that target and clears the other two.
+             * @example 550e8400-e29b-41d4-a716-446655440003
+             */
+            legal_document_id?: string | null;
             /** @example true */
             open_in_new_tab?: boolean | null;
             /**
@@ -9905,6 +10085,12 @@ export interface components {
              * @example 3
              */
             max_depth?: number | null;
+            /**
+             * @description Locale IDs whose display-name localizations are deleted in the same
+             *     update transaction — the explicit removal path for a cleared name.
+             *     A locale may not appear in both `localizations` and this list.
+             */
+            removed_locale_ids?: string[] | null;
             /** @example primary */
             slug?: string | null;
         };
@@ -10174,6 +10360,22 @@ export interface components {
             /** @example updated-tag */
             slug?: string | null;
         };
+        /**
+         * @description Request to update a UI string — rename the key, upsert localizations,
+         *     and/or remove localizations by locale.
+         */
+        UpdateUiStringRequest: {
+            /** @description New key; omit to keep the current key. */
+            key?: string | null;
+            localizations?: components["schemas"]["UiStringLocalizationInput"][];
+            /**
+             * @description Locale IDs whose localization rows are deleted in the same update
+             *     transaction. The site-default locale is rejected (it drives the
+             *     fallback chain and the auto-outdated rule), as is a locale that also
+             *     appears in `localizations`.
+             */
+            removed_locale_ids?: string[] | null;
+        };
         /** @description Update user preferences (all fields optional) */
         UpdateUserPreferencesRequest: {
             /**
@@ -10260,6 +10462,12 @@ export interface components {
         /** @description Upsert section localization */
         UpsertSectionLocalizationRequest: {
             button_text?: string | null;
+            /**
+             * @description Full per-locale override of the section's `settings.items` array —
+             *     same shape as the default items. Omit (or send `null`) to clear the
+             *     override so the locale falls back to the default items again.
+             */
+            items?: unknown;
             /**
              * Format: uuid
              * @example 770e8400-e29b-41d4-a716-446655440000
@@ -14998,15 +15206,6 @@ export interface operations {
                     "application/json": components["schemas"]["LegalItemResponse"];
                 };
             };
-            /** @description Validation error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ProblemDetails"];
-                };
-            };
             /** @description Unauthorized */
             401: {
                 headers: {
@@ -15018,6 +15217,15 @@ export interface operations {
             };
             /** @description Forbidden */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Validation error */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -15364,15 +15572,6 @@ export interface operations {
                     "application/json": components["schemas"]["LegalGroupResponse"];
                 };
             };
-            /** @description Validation error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ProblemDetails"];
-                };
-            };
             /** @description Unauthorized */
             401: {
                 headers: {
@@ -15384,6 +15583,15 @@ export interface operations {
             };
             /** @description Forbidden */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Validation error */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -15725,7 +15933,7 @@ export interface operations {
                     "application/json": components["schemas"]["LocalizationResponse"];
                 };
             };
-            /** @description Validation error or duplicate locale */
+            /** @description Duplicate locale for this content */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -15745,6 +15953,15 @@ export interface operations {
             };
             /** @description Forbidden */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Validation error */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -16870,6 +17087,15 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description Validation error or locale in both localizations and removed_locale_ids */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
         };
     };
     delete_navigation_menu: {
@@ -16978,8 +17204,8 @@ export interface operations {
                     "application/json": components["schemas"]["NavigationItemResponse"];
                 };
             };
-            /** @description Validation error */
-            400: {
+            /** @description Unauthorized */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -16987,8 +17213,8 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description Unauthorized */
-            401: {
+            /** @description Validation error or cross-site link target */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -17022,15 +17248,6 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description Validation error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ProblemDetails"];
-                };
-            };
             /** @description Unauthorized */
             401: {
                 headers: {
@@ -17042,6 +17259,15 @@ export interface operations {
             };
             /** @description Navigation item not found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Validation error */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -17216,6 +17442,15 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description Validation error or cross-site link target */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
         };
     };
     delete_navigation_item: {
@@ -17326,6 +17561,15 @@ export interface operations {
             };
             /** @description Unauthorized */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Validation error */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -18278,7 +18522,10 @@ export interface operations {
     };
     get_page_sections: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Optional locale code. When set, each section's `settings.items` carries that locale's items override when one exists; sections without an override (and unknown codes) keep the default items (ADR 0002). */
+                locale?: string;
+            };
             header?: never;
             path: {
                 /** @description The UUID of the page to retrieve sections for */
@@ -22981,15 +23228,6 @@ export interface operations {
                     "application/json": components["schemas"]["LegalDocumentResponse"];
                 };
             };
-            /** @description Validation error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ProblemDetails"];
-                };
-            };
             /** @description Unauthorized */
             401: {
                 headers: {
@@ -23001,6 +23239,15 @@ export interface operations {
             };
             /** @description Forbidden */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Validation error */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23857,7 +24104,7 @@ export interface operations {
                     "application/json": components["schemas"]["NavigationMenuResponse"];
                 };
             };
-            /** @description Validation error */
+            /** @description Menu slug already exists for this site */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -23877,6 +24124,15 @@ export interface operations {
             };
             /** @description Forbidden */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Validation error */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23996,15 +24252,6 @@ export interface operations {
                     "application/json": components["schemas"]["NavigationItemResponse"];
                 };
             };
-            /** @description Validation error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ProblemDetails"];
-                };
-            };
             /** @description Unauthorized */
             401: {
                 headers: {
@@ -24016,6 +24263,15 @@ export interface operations {
             };
             /** @description Forbidden */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Validation error or cross-site link target */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24049,15 +24305,6 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description Validation error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ProblemDetails"];
-                };
-            };
             /** @description Unauthorized */
             401: {
                 headers: {
@@ -24078,6 +24325,15 @@ export interface operations {
             };
             /** @description Navigation item not found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Validation error */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -25299,6 +25555,56 @@ export interface operations {
             };
         };
     };
+    get_public_site_settings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Site UUID */
+                site_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Public site settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicSiteSettingsResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Site not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     list_skills: {
         parameters: {
             query?: {
@@ -25606,6 +25912,291 @@ export interface operations {
                 };
             };
             /** @description Site not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    get_site_ui_strings: {
+        parameters: {
+            query: {
+                /** @description Locale code to resolve values for (required) */
+                locale: string;
+            };
+            header?: never;
+            path: {
+                /** @description The UUID of the site */
+                site_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Flat map of key → resolved value */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: string;
+                    };
+                };
+            };
+            /** @description Missing locale query parameter */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Insufficient permissions for this site */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    create_ui_string: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Site UUID */
+                site_id: string;
+            };
+            cookie?: never;
+        };
+        /** @description UI string data */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateUiStringRequest"];
+            };
+        };
+        responses: {
+            /** @description UI string created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UiStringResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Key already exists on this site */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Validation error or key limit reached */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    list_ui_string_entries: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The UUID of the site */
+                site_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description UI string entries */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UiStringResponse"][];
+                };
+            };
+            /** @description Missing or invalid API key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Insufficient permissions for this site */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    update_ui_string: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Site UUID */
+                site_id: string;
+                /** @description UI string UUID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        /** @description UI string update data */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateUiStringRequest"];
+            };
+        };
+        responses: {
+            /** @description UI string updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UiStringResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description UI string not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Key already exists on this site */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Validation error, removal of the default locale, or locale in both localizations and removed_locale_ids */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    delete_ui_string: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Site UUID */
+                site_id: string;
+                /** @description UI string UUID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description UI string deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description UI string not found */
             404: {
                 headers: {
                     [name: string]: unknown;

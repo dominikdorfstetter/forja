@@ -90,6 +90,14 @@ impl ContentEntity for LegalDocument {
             None => Ok(()),
         }
     }
+
+    /// Exactly one version of a chain is ever live: publishing this version
+    /// supersedes (archives) any previously-published version, so publishing
+    /// an older version rolls back to it (#140 follow-up).
+    async fn on_published(pool: &PgPool, entity_id: Uuid) -> Result<(), ApiError> {
+        LegalDocumentRepo::supersede_other_published_versions(pool, entity_id).await?;
+        Ok(())
+    }
 }
 
 impl ContentUpdate for LegalDocument {

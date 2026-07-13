@@ -156,8 +156,8 @@ use crate::dto::site_membership::{
     UpdateMemberRoleRequest,
 };
 use crate::dto::site_settings::{
-    PreviewTemplate, SiteOverviewEntry, SiteSettingsResponse, SiteStorageSummary,
-    SitesOverviewResponse, StorageUsageResponse, SystemStorageOverviewResponse,
+    PreviewTemplate, PublicSiteSettingsResponse, SiteOverviewEntry, SiteSettingsResponse,
+    SiteStorageSummary, SitesOverviewResponse, StorageUsageResponse, SystemStorageOverviewResponse,
     UpdateSiteSettingsRequest,
 };
 use crate::dto::social::{
@@ -170,6 +170,10 @@ use crate::dto::taxonomy::{
     UpdateCategoryRequest, UpdateTagRequest,
 };
 use crate::dto::trash::{TrashCountResponse, TrashItem, TrashListResponse};
+use crate::dto::ui_strings::{
+    CreateUiStringRequest, UiStringLocalizationInput, UiStringLocalizationResponse,
+    UiStringResponse, UpdateUiStringRequest,
+};
 use crate::dto::user_preferences::{UpdateUserPreferencesRequest, UserPreferencesResponse};
 use crate::dto::webhook::{
     CreateWebhookRequest, PaginatedWebhookDeliveries, PaginatedWebhooks, UpdateWebhookRequest,
@@ -352,6 +356,7 @@ pub mod workers;
             SiteContextModules,
             SiteContextIntegration,
             SiteSettingsResponse,
+            PublicSiteSettingsResponse,
             UpdateSiteSettingsRequest,
             StorageUsageResponse,
             SystemStorageOverviewResponse,
@@ -468,6 +473,11 @@ pub mod workers;
             UserDataExportResponse,
             UserPreferencesResponse,
             UpdateUserPreferencesRequest,
+            CreateUiStringRequest,
+            UpdateUiStringRequest,
+            UiStringLocalizationInput,
+            UiStringLocalizationResponse,
+            UiStringResponse,
             OnboardingResponse,
             CompleteOnboardingRequest,
             HelpStateResponse,

@@ -4,7 +4,8 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use validator::Validate;
 
-use crate::dto::validated::ValidatedDto;
+use crate::dto::validated::{Validated, ValidatedDto};
+use crate::errors::ApiError;
 use crate::models::navigation_menu::NavigationMenuWithCount;
 
 /// Request to create a navigation menu
@@ -35,7 +36,7 @@ pub struct CreateNavigationMenuRequest {
 }
 
 /// Request to update a navigation menu
-#[derive(Debug, Clone, Deserialize, Validate, ValidatedDto, utoipa::ToSchema)]
+#[derive(Debug, Clone, Deserialize, Validate, utoipa::ToSchema)]
 #[schema(description = "Update a navigation menu")]
 pub struct UpdateNavigationMenuRequest {
     #[schema(example = "primary")]
@@ -61,6 +62,37 @@ pub struct UpdateNavigationMenuRequest {
     /// Optional localizations to upsert
     #[validate(nested)]
     pub localizations: Option<Vec<MenuLocalizationInput>>,
+
+    /// Locale IDs whose display-name localizations are deleted in the same
+    /// update transaction — the explicit removal path for a cleared name.
+    /// A locale may not appear in both `localizations` and this list.
+    pub removed_locale_ids: Option<Vec<Uuid>>,
+}
+
+impl UpdateNavigationMenuRequest {
+    /// A locale upserted and removed in the same payload is contradictory.
+    fn validate_removals(&self) -> Result<(), String> {
+        let (Some(localizations), Some(removed)) = (&self.localizations, &self.removed_locale_ids)
+        else {
+            return Ok(());
+        };
+        if localizations.iter().any(|l| removed.contains(&l.locale_id)) {
+            return Err(
+                "A locale cannot appear in both localizations and removed_locale_ids".to_string(),
+            );
+        }
+        Ok(())
+    }
+}
+
+impl ValidatedDto for UpdateNavigationMenuRequest {
+    type Context = ();
+
+    async fn validate_all(self, _: &()) -> Result<Validated<Self>, ApiError> {
+        self.validate().map_err(ApiError::from)?;
+        self.validate_removals().map_err(ApiError::validation)?;
+        Ok(Validated::seal(self))
+    }
 }
 
 /// A localization entry for a menu
@@ -169,5 +201,28 @@ mod tests {
             };
             assert!(req.validate().is_ok(), "Slug '{}' should be valid", slug);
         }
+    }
+
+    #[test]
+    fn update_rejects_a_locale_in_both_upserts_and_removals() {
+        let locale_id = Uuid::new_v4();
+        let base = UpdateNavigationMenuRequest {
+            slug: None,
+            description: None,
+            max_depth: None,
+            is_active: None,
+            localizations: Some(vec![MenuLocalizationInput {
+                locale_id,
+                name: "Footer".to_string(),
+            }]),
+            removed_locale_ids: Some(vec![locale_id]),
+        };
+        assert!(base.validate_removals().is_err());
+
+        let disjoint = UpdateNavigationMenuRequest {
+            removed_locale_ids: Some(vec![Uuid::new_v4()]),
+            ..base
+        };
+        assert!(disjoint.validate_removals().is_ok());
     }
 }

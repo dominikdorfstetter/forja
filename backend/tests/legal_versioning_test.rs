@@ -46,6 +46,7 @@ async fn new_version_preserves_cookie_name_and_bumps_version() {
         CreateLegalDocumentRequest {
             cookie_name: cookie.clone(),
             document_type: LegalDocType::PrivacyPolicy,
+            slug: None,
             status: ContentStatus::Published,
             site_ids: vec![site_id],
         },
@@ -86,6 +87,7 @@ async fn publishing_a_version_supersedes_the_previously_published_one() {
         CreateLegalDocumentRequest {
             cookie_name: format!("imprint-{}", &Uuid::new_v4().to_string()[..8]),
             document_type: LegalDocType::Imprint,
+            slug: None,
             status: ContentStatus::Published,
             site_ids: vec![site_id],
         },
@@ -130,6 +132,7 @@ async fn is_published_reflects_content_status() {
         CreateLegalDocumentRequest {
             cookie_name: format!("imm-{}", &Uuid::new_v4().to_string()[..8]),
             document_type: LegalDocType::Disclaimer,
+            slug: None,
             status: ContentStatus::Draft,
             site_ids: vec![site_id],
         },
@@ -167,6 +170,7 @@ async fn by_slug_resolves_to_the_currently_published_version() {
         CreateLegalDocumentRequest {
             cookie_name: cookie.clone(),
             document_type: LegalDocType::TermsOfService,
+            slug: None,
             status: ContentStatus::Published,
             site_ids: vec![site_id],
         },

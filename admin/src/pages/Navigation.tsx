@@ -9,6 +9,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { createMenuItem, createNavigationItem, createNavigationMenu, deleteNavigationItem, deleteNavigationMenu, getMenuItems, getNavigationMenus, updateNavigationItem, updateNavigationMenu } from '@/services/navigation';
 import { getPages } from '@/services/pages';
+import { getLegalDocuments } from '@/services/legal';
 import { getSiteLocales } from '@/services/siteLocales';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import type {
@@ -93,6 +94,24 @@ export default function NavigationPage() {
     queryFn: () => getMenuItems(selectedMenu!.id),
     enabled: !!selectedMenu?.id,
   });
+
+  // Fetch legal documents to resolve legal_document_id UUIDs → /legal/{slug} routes
+  const hasLegalItems = useMemo(() => (items ?? []).some((i) => i.legal_document_id), [items]);
+  const { data: legalData } = useQuery({
+    queryKey: queryKeys.legalForNav(selectedSiteId),
+    queryFn: () => getLegalDocuments(selectedSiteId, { page_size: 200 }),
+    enabled: !!selectedSiteId && hasLegalItems,
+    staleTime: 60_000,
+  });
+
+  const legalRouteMap = useMemo(() => {
+    const map = new Map<string, string>();
+    legalData?.data.forEach((doc) => {
+      const slug = doc.slug || doc.cookie_name;
+      if (slug) map.set(doc.id, `/legal/${slug}`);
+    });
+    return map;
+  }, [legalData]);
 
   // Sync ordered list from query data and auto-expand parents
   const prevItemsRef = useRef<NavigationItem[] | undefined>(undefined);
@@ -273,6 +292,7 @@ export default function NavigationPage() {
               expandedIds={ui.expandedIds}
               totalLocales={totalLocales}
               pageRouteMap={pageRouteMap}
+              legalRouteMap={legalRouteMap}
               canWrite={canWrite}
               isAdmin={isAdmin}
               sensors={sensors}

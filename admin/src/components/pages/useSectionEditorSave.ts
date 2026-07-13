@@ -12,6 +12,8 @@ interface LocaleFormData {
   title: string;
   text: string;
   buttonText: string;
+  /** Per-locale `settings.items` override — `null` = fall back to default. */
+  items: Record<string, unknown>[] | null;
 }
 
 interface UseSectionEditorSaveOptions {
@@ -51,23 +53,26 @@ export function useSectionEditorSave({ sectionId, pageId }: UseSectionEditorSave
   ) => {
     stashCurrentLocale();
 
+    // Omitting `items` clears the override (full-row upsert semantics), so a
+    // `null` form value maps to an absent field — fall back to the default.
+    const toUpsertPayload = (
+      localeId: string,
+      data: LocaleFormData,
+    ): UpsertSectionLocalizationRequest => ({
+      locale_id: localeId,
+      title: data.title || undefined,
+      text: data.text || undefined,
+      button_text: data.buttonText || undefined,
+      items: data.items ?? undefined,
+    });
+
     const dirtyEntries = Array.from(dirtyLocalesRef.current.entries());
     for (const [localeId, data] of dirtyEntries) {
-      await upsertLocMutation.mutateAsync({
-        locale_id: localeId,
-        title: data.title || undefined,
-        text: data.text || undefined,
-        button_text: data.buttonText || undefined,
-      });
+      await upsertLocMutation.mutateAsync(toUpsertPayload(localeId, data));
     }
 
     if (currentLocaleId && !dirtyLocalesRef.current.has(currentLocaleId)) {
-      await upsertLocMutation.mutateAsync({
-        locale_id: currentLocaleId,
-        title: currentLocaleForm.title || undefined,
-        text: currentLocaleForm.text || undefined,
-        button_text: currentLocaleForm.buttonText || undefined,
-      });
+      await upsertLocMutation.mutateAsync(toUpsertPayload(currentLocaleId, currentLocaleForm));
     }
 
     await updateSectionMutation.mutateAsync({

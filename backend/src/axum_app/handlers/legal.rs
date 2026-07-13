@@ -267,9 +267,9 @@ async fn get_legal_items(
     request_body(content = CreateLegalDocumentRequest, description = "Legal document data"),
     responses(
         (status = 201, description = "Document created", body = LegalDocumentResponse),
-        (status = 400, description = "Validation error", body = ProblemDetails),
         (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 403, description = "Forbidden", body = ProblemDetails)
+        (status = 403, description = "Forbidden", body = ProblemDetails),
+        (status = 422, description = "Validation error", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -325,13 +325,6 @@ async fn update_legal_document(
     )
     .await?;
 
-    // Exactly one version of a chain is ever live: publishing this version
-    // supersedes (archives) any previously-published version, so publishing an
-    // older version rolls back to it (#140 follow-up).
-    if LegalDocumentRepo::is_published(&state.db, id).await? {
-        LegalDocumentRepo::supersede_other_published_versions(&state.db, id).await?;
-    }
-
     Ok(Json(LegalDocumentResponse::from(document)))
 }
 
@@ -370,9 +363,9 @@ async fn delete_legal_document(
     request_body(content = CreateLegalGroupRequest, description = "Group data"),
     responses(
         (status = 201, description = "Group created", body = LegalGroupResponse),
-        (status = 400, description = "Validation error", body = ProblemDetails),
         (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 403, description = "Forbidden", body = ProblemDetails)
+        (status = 403, description = "Forbidden", body = ProblemDetails),
+        (status = 422, description = "Validation error", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -477,9 +470,9 @@ async fn delete_legal_group(
     request_body(content = CreateLegalItemRequest, description = "Item data"),
     responses(
         (status = 201, description = "Item created", body = LegalItemResponse),
-        (status = 400, description = "Validation error", body = ProblemDetails),
         (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 403, description = "Forbidden", body = ProblemDetails)
+        (status = 403, description = "Forbidden", body = ProblemDetails),
+        (status = 422, description = "Validation error", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -886,9 +879,10 @@ async fn get_legal_localizations(
     request_body(content = CreateLocalizationRequest, description = "Localization data"),
     responses(
         (status = 201, description = "Localization created", body = LocalizationResponse),
-        (status = 400, description = "Validation error or duplicate locale", body = ProblemDetails),
+        (status = 400, description = "Duplicate locale for this content", body = ProblemDetails),
         (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 403, description = "Forbidden", body = ProblemDetails)
+        (status = 403, description = "Forbidden", body = ProblemDetails),
+        (status = 422, description = "Validation error", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]

@@ -139,6 +139,7 @@
       "structure": "Struktur",
       "navigation": "Navigation",
       "taxonomy": "Taxonomie",
+      "uiStrings": "UI-Texte",
       "site": "Seitn",
       "socialLinks": "Social Links",
       "activity": "Aktivität",
@@ -1036,7 +1037,11 @@
         "description": "Beschreibung",
         "maxDepth": "Maximale Tiefe",
         "maxDepthHelp": "Maximale Verschachtelungstiefe (1-10)",
-        "active": "Aktiv"
+        "active": "Aktiv",
+        "displayName": "Anzeigename",
+        "displayNames": "Anzeigenamen",
+        "displayNamesHelp": "Optionaler Menüname, der Besuchern in dieser Sprache angezeigt wird (z. B. als Überschrift in der Fußzeile)",
+        "displayNameClearHint": "Wennst des leerst, wird die Übersetzung beim Speichern entfernt"
       },
       "messages": {
         "created": "Menü erstellt",
@@ -1051,7 +1056,9 @@
         "title": "Menü löschen",
         "message": "Dies löscht das Menü und alle Navigationselemente dauerhaft. Diese Aktion kann nicht rückgängig gemacht werden."
       }
-    }
+    },
+    "brokenLink": "Kaputter Link",
+    "brokenLinkHint": "Der Eintrag hat sein Linkziel verloren. Bearbeiten Sie ihn und wählen Sie ein neues Ziel."
   },
   "socialLinks": {
     "title": "Social Links",
@@ -1742,7 +1749,9 @@
       "saved": "Rechtliches Dokument gspeichert",
       "published": "Rechtliches Dokument veröffentlicht",
       "unpublished": "Rechtliches Dokument zruckgnommen",
-      "loadFailed": "Rechtliches Dokument konnt net gladn wern"
+      "loadFailed": "Rechtliches Dokument konnt net gladn wern",
+      "slugUpdated": "Slug aktualisiert",
+      "slugLocked": "Der Slug lässt sich nimmer ändern — eine Version von dem Dokument is scho veröffentlicht."
     },
     "toolbar": {},
     "fields": {
@@ -1750,7 +1759,8 @@
       "intro": "Einleitung",
       "body": "Inhalt",
       "metaTitle": "Meta-Titl",
-      "metaDescription": "Meta-Beschreibung"
+      "metaDescription": "Meta-Beschreibung",
+      "slug": "Slug"
     },
     "seo": {
       "title": "SEO-Einstellungen"
@@ -1770,7 +1780,9 @@
       "created": "Neie Version erstellt",
       "live": "Live",
       "rollbackHint": "Die Live-Version wird öffentlich ausgeliefert. Öffne eine ältere Version und veröffentliche sie, um zurückzurollen — die aktuelle wird ersetzt."
-    }
+    },
+    "slugHint": "Öffentliche URL: /legal/{slug}. Der Slug lässt sich ändern, bis eine Version veröffentlicht is.",
+    "slugLockedHint": "Der Slug is fix — eine Version von dem Dokument wurde scho veröffentlicht."
   },
   "sites": {
     "title": "Websites",
@@ -3711,7 +3723,19 @@
         "action": "Überprüf de Datei und probier's nochmal."
       }
     },
-    "SITE_SETTINGS_INVALID_ORIGIN": "Mindestens ein Ursprung hat ein ungültiges Format. Jeder Ursprung muss Schema://Host sein (z.B. https://beispiel.at)."
+    "SITE_SETTINGS_INVALID_ORIGIN": "Mindestens ein Ursprung hat ein ungültiges Format. Jeder Ursprung muss Schema://Host sein (z.B. https://beispiel.at).",
+    "ERR_STRINGS_KEY_TAKEN": {
+      "message": "Schlüssel existiert scho",
+      "action": "Verwend an anderen Schlüssel für de Site."
+    },
+    "ERR_STRINGS_LIMIT_EXCEEDED": {
+      "message": "Textlimit erreicht",
+      "action": "A Site konn höchstens 500 UI-Text-Schlüssel hom — lösch zerst unbenutzte Schlüssel."
+    },
+    "LEGAL_SLUG_IMMUTABLE": {
+      "message": "Slug is gesperrt",
+      "action": "Veröffentlichte Rechts-URLs bleiben fix; nach dem Veröffentlichen einer Version lässt sich der Slug nimmer ändern."
+    }
   },
   "welcome": {
     "tagline": "Des Open-Source-CMS fia schnölle, sichere, mehrsprochige Websites",
@@ -4152,7 +4176,11 @@
         "description": "Beschreibung",
         "label": "Ereignis",
         "title": "Titel"
-      }
+      },
+      "localizeAction": "Diese Einträge lokalisieren",
+      "removeLocalization": "Lokalisierung entfernen",
+      "fallbackNotice": "Angezeigt werden die Standard-Einträge. Lokalisieren Sie sie, um eine eigene Fassung für {{locale}} zu bearbeiten.",
+      "overrideNotice": "Diese Einträge überschreiben die Standard-Einträge für {{locale}}. Wird die Lokalisierung entfernt, gelten wieder die Standard-Einträge."
     },
     "layout": "Layout",
     "nColumns": "{{n}} Spalten",
@@ -4668,6 +4696,55 @@
     "deleteEntryConfirm": "Den Eintrag „{{title}}“ löschen? Das kann nicht rückgängig gemacht werden.",
     "perLanguage": "Pro Sprache · {{locale}}",
     "dragToReorder": "Zum Neuordnen ziehen"
+  },
+  "uiStrings": {
+    "title": "UI-Texte",
+    "subtitle": "Lokalisiertes Textverzeichnis für de Templates deiner Site — Beschriftungen, Überschriften und Screenreader-Texte",
+    "newString": "Neuer Text",
+    "deleted": "Text glöscht.",
+    "deleteTitle": "Text löschen",
+    "deleteConfirm": "\"{{key}}\" und olle Übersetzungen löschen?",
+    "list": {
+      "loadError": "De UI-Texte hom si ned lodn lossn.",
+      "colKey": "Schlüssel",
+      "colLocales": "Übersetzungen",
+      "colUpdated": "Aktualisiert",
+      "filterLabel": "Texte filtern",
+      "filterAll": "Olle Texte",
+      "filterMissing": "Fehlende Übersetzungen",
+      "filterOutdated": "Veraltet",
+      "noMatches": "Ka Text passt zu dem Filter.",
+      "emptyTitle": "No kane UI-Texte",
+      "empty": "Leg Schlüssel wia blog.min_read au und übersetz es pro Sproch — deine Templates lesen's beim Rendern.",
+      "localeStatus": {
+        "translated": "{{locale}}: übersetzt",
+        "missing": "{{locale}}: fehlt",
+        "outdated": "{{locale}}: veraltet — der Standardwert wurd geändert"
+      }
+    },
+    "detail": {
+      "newTitle": "Neuer UI-Text",
+      "subtitle": "Schlüssel und Standardwert werdn gemeinsam gspeichert; andere Sprochen beim Verlossn vom Feld",
+      "loading": "UI-Text wird glodn…",
+      "keyLabel": "Schlüssel",
+      "keyHelp": "Kleingschriebene Segmente, verbundn mit '.', '_' oder '-' — z. B. blog.min_read",
+      "keyRequired": "Schlüssel brauchst scho",
+      "keyTooLong": "Schlüssel derf höchstens 128 Zeichen hom",
+      "keyInvalid": "Nur Kleinbuchstobn und Ziffern, verbundn mit '.', '_' oder '-'",
+      "valueLabel": "Wert",
+      "valueTooLong": "Wert derf höchstens 1000 Zeichen hom",
+      "valueRequired": "An Wert brauchst scho — den Standardwert kannst ned leern",
+      "valueForLocale": "Wert ({{locale}})",
+      "localeHint": "Wert für {{locale}}. Wird beim Verlossn vom Feld gspeichert; wennst es leerst, wird die Übersetzung entfernt.",
+      "createHint": "Speicher zerst den Schlüssel mit'm Standardwert — donn übersetz eam in de anderen Sprochen.",
+      "saved": "Text gspeichert.",
+      "created": "Text angelegt.",
+      "notFound": "Den UI-Text gibt's ned.",
+      "status": {
+        "missing": "fehlt",
+        "outdated": "veraltet"
+      }
+    }
   },
   "imprint": {
     "title": "Impressum",

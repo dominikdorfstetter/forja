@@ -139,6 +139,7 @@
       "structure": "Struktura",
       "navigation": "Nawigacja",
       "taxonomy": "Taksonomia",
+      "uiStrings": "Teksty interfejsu",
       "site": "Strona",
       "socialLinks": "Linki społecznościowe",
       "activity": "Aktywność",
@@ -1036,7 +1037,11 @@
         "description": "Opis",
         "maxDepth": "Maks. głębokość",
         "maxDepthHelp": "Maksymalna głębokość zagnieżdżenia (1-10)",
-        "active": "Aktywne"
+        "active": "Aktywne",
+        "displayName": "Nazwa wyświetlana",
+        "displayNames": "Nazwy wyświetlane",
+        "displayNamesHelp": "Opcjonalna nazwa menu widoczna dla odwiedzających w tym języku (np. jako nagłówek stopki)",
+        "displayNameClearHint": "Wyczyszczenie usuwa to tłumaczenie przy zapisie"
       },
       "messages": {
         "created": "Menu utworzone",
@@ -1051,7 +1056,9 @@
         "title": "Usuń menu",
         "message": "To trwale usunie to menu i wszystkie jego elementy nawigacji. Tej akcji nie można cofnąć."
       }
-    }
+    },
+    "brokenLink": "Uszkodzony link",
+    "brokenLinkHint": "Ten element utracił cel linku. Edytuj go, aby wybrać nowy."
   },
   "socialLinks": {
     "title": "Linki społecznościowe",
@@ -1742,7 +1749,9 @@
       "saved": "Dokument prawny zapisany",
       "published": "Dokument prawny opublikowany",
       "unpublished": "Dokument prawny wycofany",
-      "loadFailed": "Nie udało się wczytać dokumentu prawnego"
+      "loadFailed": "Nie udało się wczytać dokumentu prawnego",
+      "slugUpdated": "Slug zaktualizowany",
+      "slugLocked": "Sluga nie można już zmienić — wersja tego dokumentu została już opublikowana."
     },
     "toolbar": {},
     "fields": {
@@ -1750,7 +1759,8 @@
       "intro": "Wprowadzenie",
       "body": "Treść",
       "metaTitle": "Meta tytuł",
-      "metaDescription": "Meta opis"
+      "metaDescription": "Meta opis",
+      "slug": "Slug"
     },
     "seo": {
       "title": "Ustawienia SEO"
@@ -1770,7 +1780,9 @@
       "created": "Utworzono nową wersję",
       "live": "Na żywo",
       "rollbackHint": "Wersja na żywo jest publikowana publicznie. Otwórz starszą wersję i opublikuj ją, aby przywrócić — bieżąca zostanie zastąpiona."
-    }
+    },
+    "slugHint": "Publiczny adres URL: /legal/{slug}. Slug można zmieniać do czasu opublikowania wersji.",
+    "slugLockedHint": "Slug jest trwały — wersja tego dokumentu została już opublikowana."
   },
   "sites": {
     "title": "Strony",
@@ -3712,7 +3724,19 @@
         "action": "Sprawdź plik i spróbuj ponownie."
       }
     },
-    "SITE_SETTINGS_INVALID_ORIGIN": "Co najmniej jedno źródło ma nieprawidłowy format. Każde źródło musi być schemat://host (np. https://przyklad.pl)."
+    "SITE_SETTINGS_INVALID_ORIGIN": "Co najmniej jedno źródło ma nieprawidłowy format. Każde źródło musi być schemat://host (np. https://przyklad.pl).",
+    "ERR_STRINGS_KEY_TAKEN": {
+      "message": "Klucz już istnieje",
+      "action": "Wybierz inny klucz dla tej witryny."
+    },
+    "ERR_STRINGS_LIMIT_EXCEEDED": {
+      "message": "Osiągnięto limit tekstów",
+      "action": "Witryna może zawierać najwyżej 500 kluczy — najpierw usuń nieużywane."
+    },
+    "LEGAL_SLUG_IMMUTABLE": {
+      "message": "Slug jest zablokowany",
+      "action": "Opublikowane adresy URL dokumentów prawnych są trwałe; sluga nie można zmienić po opublikowaniu wersji."
+    }
   },
   "welcome": {
     "tagline": "Otwartoźródłowy CMS dla szybkich, bezpiecznych, wielojęzycznych stron",
@@ -4153,7 +4177,11 @@
         "description": "Opis",
         "label": "Wydarzenie",
         "title": "Tytuł"
-      }
+      },
+      "localizeAction": "Zlokalizuj te elementy",
+      "removeLocalization": "Usuń lokalizację",
+      "fallbackNotice": "Wyświetlane są elementy domyślne. Zlokalizuj je, aby edytować osobną kopię dla {{locale}}.",
+      "overrideNotice": "Te elementy zastępują elementy domyślne dla {{locale}}. Usunięcie lokalizacji przywraca elementy domyślne."
     },
     "layout": "Układ",
     "nColumns": "{{n}} kolumn",
@@ -4669,6 +4697,55 @@
     "deleteEntryConfirm": "Usunąć wpis „{{title}}”? Tej operacji nie można cofnąć.",
     "perLanguage": "Na język · {{locale}}",
     "dragToReorder": "Przeciągnij, aby zmienić kolejność"
+  },
+  "uiStrings": {
+    "title": "Teksty interfejsu",
+    "subtitle": "Zlokalizowany słownik tekstów dla szablonów witryny — etykiety, nagłówki i teksty dla czytników ekranu",
+    "newString": "Nowy tekst",
+    "deleted": "Tekst usunięty.",
+    "deleteTitle": "Usuń tekst",
+    "deleteConfirm": "Usunąć \"{{key}}\" i wszystkie jego tłumaczenia?",
+    "list": {
+      "loadError": "Nie udało się wczytać tekstów interfejsu.",
+      "colKey": "Klucz",
+      "colLocales": "Tłumaczenia",
+      "colUpdated": "Zaktualizowano",
+      "filterLabel": "Filtruj teksty",
+      "filterAll": "Wszystkie teksty",
+      "filterMissing": "Brakujące tłumaczenia",
+      "filterOutdated": "Nieaktualne",
+      "noMatches": "Żaden tekst nie pasuje do tego filtra.",
+      "emptyTitle": "Nie ma jeszcze tekstów",
+      "empty": "Zdefiniuj klucze takie jak blog.min_read i przetłumacz je dla każdego języka — szablony odczytują je podczas renderowania.",
+      "localeStatus": {
+        "translated": "{{locale}}: przetłumaczono",
+        "missing": "{{locale}}: brak",
+        "outdated": "{{locale}}: nieaktualne — wartość domyślna się zmieniła"
+      }
+    },
+    "detail": {
+      "newTitle": "Nowy tekst interfejsu",
+      "subtitle": "Klucz i wartość domyślna zapisują się razem; pozostałe języki zapisują się po opuszczeniu pola",
+      "loading": "Wczytywanie tekstu…",
+      "keyLabel": "Klucz",
+      "keyHelp": "Małe litery w segmentach połączonych '.', '_' lub '-' — np. blog.min_read",
+      "keyRequired": "Klucz jest wymagany",
+      "keyTooLong": "Klucz nie może przekraczać 128 znaków",
+      "keyInvalid": "Używaj małych liter i cyfr połączonych '.', '_' lub '-'",
+      "valueLabel": "Wartość",
+      "valueTooLong": "Wartość nie może przekraczać 1000 znaków",
+      "valueRequired": "Wartość jest wymagana — wartości domyślnej nie można wyczyścić",
+      "valueForLocale": "Wartość ({{locale}})",
+      "localeHint": "Wartość dla {{locale}}. Zapisywana po opuszczeniu pola; wyczyszczenie usuwa tłumaczenie.",
+      "createHint": "Najpierw zapisz klucz z wartością domyślną — potem przetłumacz go na pozostałe języki.",
+      "saved": "Tekst zapisany.",
+      "created": "Tekst utworzony.",
+      "notFound": "Ten tekst interfejsu nie istnieje.",
+      "status": {
+        "missing": "brak",
+        "outdated": "nieaktualne"
+      }
+    }
   },
   "imprint": {
     "title": "Nota prawna",

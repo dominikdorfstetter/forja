@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { PagesResource } from '../../resources/pages.js';
 import { ForjaAuthError } from '../../errors.js';
 import type { HttpClient } from '../../http.js';
+import type { SectionLocalizationResponse } from '../../types.js';
 
 function createMockHttp(): HttpClient {
   return { get: vi.fn(), getOrNull: vi.fn(),
@@ -109,8 +110,29 @@ describe('PagesResource', () => {
       const pages = new PagesResource(http, siteId);
       const result = await pages.getSections('page-1');
 
-      expect(http.get).toHaveBeenCalledWith('/pages/page-1/sections');
+      expect(http.get).toHaveBeenCalledWith('/pages/page-1/sections', {
+        locale: undefined,
+      });
       expect(result).toHaveLength(1);
+    });
+
+    it('passes the locale so settings.items resolves server-side', async () => {
+      const http = createMockHttp();
+      vi.mocked(http.get).mockResolvedValue([
+        {
+          id: 's1',
+          section_type: 'Features',
+          settings: { items: [{ title: 'Schnell' }] },
+        },
+      ]);
+
+      const pages = new PagesResource(http, siteId);
+      const result = await pages.getSections('page-1', { locale: 'de' });
+
+      expect(http.get).toHaveBeenCalledWith('/pages/page-1/sections', {
+        locale: 'de',
+      });
+      expect(result[0].settings).toEqual({ items: [{ title: 'Schnell' }] });
     });
   });
 
@@ -125,6 +147,29 @@ describe('PagesResource', () => {
       expect(http.get).toHaveBeenCalledWith(
         '/pages/sections/section-1/localizations',
       );
+    });
+
+    // Pinning the full backend DTO shape (incl. the per-locale `items`
+    // override added by the section-items localization work) so future
+    // drift fails the type checker.
+    it('surfaces every field the backend returns', async () => {
+      const http = createMockHttp();
+      const full: SectionLocalizationResponse = {
+        id: 'l1',
+        page_section_id: 's1',
+        locale_id: 'loc-de',
+        title: 'Funktionen',
+        text: 'Alles drin',
+        button_text: 'Los',
+        items: [{ title: 'Schnell', icon: '⚡' }],
+      };
+      vi.mocked(http.get).mockResolvedValue([full]);
+
+      const pages = new PagesResource(http, siteId);
+      const result = await pages.getSectionLocalizations('s1');
+
+      expect(result[0]).toEqual(full);
+      expect(result[0].items).toEqual([{ title: 'Schnell', icon: '⚡' }]);
     });
   });
 

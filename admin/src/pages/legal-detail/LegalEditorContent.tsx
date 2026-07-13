@@ -12,6 +12,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Controller, type Control } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { ForjaEditor } from '@/components/editor';
+import InlineEditField from '@/components/shared/InlineEditField';
 import type { LegalContentFormData } from './legalDetailSchema';
 
 interface LegalEditorContentProps {
@@ -19,6 +20,9 @@ interface LegalEditorContentProps {
   onSnapshot: () => void;
   canWrite: boolean;
   siteId: string;
+  slug: string;
+  slugLocked: boolean;
+  onSaveSlug: (slug: string) => Promise<void>;
 }
 
 export default function LegalEditorContent({
@@ -26,6 +30,9 @@ export default function LegalEditorContent({
   onSnapshot,
   canWrite,
   siteId,
+  slug,
+  slugLocked,
+  onSaveSlug,
 }: LegalEditorContentProps) {
   const { t } = useTranslation();
   const [seoExpanded, setSeoExpanded] = useState(false);
@@ -132,6 +139,22 @@ export default function LegalEditorContent({
               />
             )}
           />
+          <Box sx={{ mt: 2 }} data-testid="legal-detail.field-slug">
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                {t('legalDetail.fields.slug')}
+              </Typography>
+              <InlineEditField
+                value={slug}
+                variant="body2"
+                disabled={!canWrite || slugLocked}
+                onSave={onSaveSlug}
+              />
+            </Box>
+            <Typography variant="caption" color="text.secondary">
+              {slugLocked ? t('legalDetail.slugLockedHint') : t('legalDetail.slugHint')}
+            </Typography>
+          </Box>
         </AccordionDetails>
       </Accordion>
     </Box>

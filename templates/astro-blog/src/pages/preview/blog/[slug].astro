@@ -12,6 +12,9 @@ import {
   fetchPreviewFavicon,
 } from "../../../lib/preview-api";
 import type { MediaResponse } from "../../../lib/api";
+import { getTranslator } from "../../../lib/ui-strings";
+
+const t = await getTranslator(Astro.locals.locale);
 
 // --- Token validation ---
 const token = Astro.url.searchParams.get("token");
@@ -41,7 +44,7 @@ try {
 }
 
 const loc = blog.localizations[0];
-const title = loc?.title ?? "Untitled";
+const title = loc?.title ?? t("common.untitled");
 const body = renderMarkdown(loc?.body);
 const metaTitle = loc?.meta_title ?? title;
 const metaDescription = loc?.meta_description ?? loc?.excerpt ?? "";
@@ -139,7 +142,7 @@ Astro.response.headers.set("Cache-Control", "no-store");
       {blog.reading_time_minutes && (
         <>
           <span class="text-zinc-300 dark:text-zinc-700">&middot;</span>
-          <span>{blog.reading_time_minutes} min read</span>
+          <span>{blog.reading_time_minutes} {t("blog.min_read")}</span>
         </>
       )}
     </div>

@@ -28,7 +28,6 @@ pub const ENTITY_NOT_FOUND: &str = "ENTITY_NOT_FOUND";
 pub const ENTITY_SLUG_TAKEN: &str = "ENTITY_SLUG_TAKEN";
 pub const ENTITY_LOCALIZATION_EXISTS: &str = "ENTITY_LOCALIZATION_EXISTS";
 pub const ENTITY_LOCALIZATION_NOT_FOUND: &str = "ENTITY_LOCALIZATION_NOT_FOUND";
-pub const LOCALIZATION_COVERAGE_INCOMPLETE: &str = "LOCALIZATION_COVERAGE_INCOMPLETE";
 
 // ── Site ────────────────────────────────────────────────────────────────
 
@@ -51,6 +50,7 @@ pub const BLOG_BULK_STATUS_REQUIRED: &str = "BLOG_BULK_STATUS_REQUIRED";
 // ── Page ────────────────────────────────────────────────────────────────
 
 pub const PAGE_BULK_STATUS_REQUIRED: &str = "PAGE_BULK_STATUS_REQUIRED";
+pub const PAGE_CROSS_SITE: &str = "PAGE_CROSS_SITE";
 
 // ── Content (shared blog/page) ─────────────────────────────────────────
 
@@ -148,6 +148,8 @@ pub const LEGAL_PUBLISH_MISSING_TITLE: &str = "LEGAL_PUBLISH_MISSING_TITLE";
 pub const LEGAL_PUBLISH_MISSING_BODY: &str = "LEGAL_PUBLISH_MISSING_BODY";
 pub const LEGAL_VERSION_SOURCE_DELETED: &str = "LEGAL_VERSION_SOURCE_DELETED";
 pub const LEGAL_PUBLISHED_IMMUTABLE: &str = "LEGAL_PUBLISHED_IMMUTABLE";
+pub const LEGAL_SLUG_IMMUTABLE: &str = "LEGAL_SLUG_IMMUTABLE";
+pub const LEGAL_DOC_CROSS_SITE: &str = "LEGAL_DOC_CROSS_SITE";
 
 // ── CV / Portfolio ──────────────────────────────────────────────────────
 
@@ -280,6 +282,14 @@ pub const ERR_CUSTOM_FIELD_UNIQUE_CONFLICT: &str = "ERR_CUSTOM_FIELD_UNIQUE_CONF
 pub const ERR_CUSTOM_FIELD_REQUIRED_CONFLICT: &str = "ERR_CUSTOM_FIELD_REQUIRED_CONFLICT";
 pub const ERR_CUSTOM_FIELD_RETYPE_INCOMPATIBLE: &str = "ERR_CUSTOM_FIELD_RETYPE_INCOMPATIBLE";
 
+// ── UI Strings (consumer-feedback roadmap §1) ───────────────────────────
+
+pub const ERR_STRINGS_LIMIT_EXCEEDED: &str = "ERR_STRINGS_LIMIT_EXCEEDED";
+pub const ERR_STRINGS_LOCALE_REQUIRED: &str = "ERR_STRINGS_LOCALE_REQUIRED";
+pub const ERR_STRINGS_KEY_TAKEN: &str = "ERR_STRINGS_KEY_TAKEN";
+pub const ERR_STRINGS_NOT_FOUND: &str = "ERR_STRINGS_NOT_FOUND";
+pub const ERR_STRINGS_DEFAULT_LOCALE_REMOVAL: &str = "ERR_STRINGS_DEFAULT_LOCALE_REMOVAL";
+
 // ── Imprint ─────────────────────────────────────────────────────────────
 
 /// The imprint is partially configured (some, but not all, required operator
@@ -392,6 +402,12 @@ pub const ALL: &[ErrorCodeDef] = &[
         domain: "page",
         http_status: 400,
         description: "The status field is required for UpdateStatus bulk action",
+    },
+    ErrorCodeDef {
+        code: PAGE_CROSS_SITE,
+        domain: "page",
+        http_status: 422,
+        description: "The referenced page does not belong to this site",
     },
     // Content (shared)
     ErrorCodeDef {
@@ -727,6 +743,18 @@ pub const ALL: &[ErrorCodeDef] = &[
         domain: "legal",
         http_status: 409,
         description: "A published legal document cannot be edited in place; create a new version",
+    },
+    ErrorCodeDef {
+        code: LEGAL_SLUG_IMMUTABLE,
+        domain: "legal",
+        http_status: 409,
+        description: "The slug of a legal document is locked once any version of its chain has been published",
+    },
+    ErrorCodeDef {
+        code: LEGAL_DOC_CROSS_SITE,
+        domain: "legal",
+        http_status: 422,
+        description: "The referenced legal document does not belong to this site",
     },
     // CV
     ErrorCodeDef {
@@ -1107,6 +1135,37 @@ pub const ALL: &[ErrorCodeDef] = &[
         domain: "custom_types",
         http_status: 422,
         description: "Cannot retype a field: existing values are not coercible",
+    },
+    // UI Strings
+    ErrorCodeDef {
+        code: ERR_STRINGS_LIMIT_EXCEEDED,
+        domain: "ui_strings",
+        http_status: 422,
+        description: "The site has reached the maximum number of UI string keys (500)",
+    },
+    ErrorCodeDef {
+        code: ERR_STRINGS_LOCALE_REQUIRED,
+        domain: "ui_strings",
+        http_status: 400,
+        description: "The public UI strings read requires a locale query parameter",
+    },
+    ErrorCodeDef {
+        code: ERR_STRINGS_KEY_TAKEN,
+        domain: "ui_strings",
+        http_status: 409,
+        description: "Another UI string on this site already uses this key",
+    },
+    ErrorCodeDef {
+        code: ERR_STRINGS_NOT_FOUND,
+        domain: "ui_strings",
+        http_status: 404,
+        description: "No UI string with that ID exists on this site",
+    },
+    ErrorCodeDef {
+        code: ERR_STRINGS_DEFAULT_LOCALE_REMOVAL,
+        domain: "ui_strings",
+        http_status: 422,
+        description: "The site-default locale's value cannot be removed — it drives the fallback chain and the auto-outdated rule",
     },
     // Validation (field-level)
     ErrorCodeDef {

@@ -5,6 +5,9 @@
  * The CSS in sections.css targets these BEM classes identically.
  */
 import { fetchNavTree, type NavigationTree, type SiteLocale } from "../lib/api";
+import { localeCode } from "../lib/locale";
+import { navItemHref } from "../lib/nav";
+import { getTranslator } from "../lib/ui-strings";
 
 interface Props {
   siteName: string;
@@ -13,10 +16,11 @@ interface Props {
 }
 
 const { siteName, locales = [], currentLocaleCode = 'en' } = Astro.props;
+const t = await getTranslator(Astro.locals.locale);
 
 let items: NavigationTree[] = [];
 try {
-  items = await fetchNavTree("primary");
+  items = await fetchNavTree("primary", localeCode(Astro.locals.locale));
 } catch (e) {
   console.warn("[CMS] Failed to fetch primary nav:", e instanceof Error ? e.message : e);
 }
@@ -25,21 +29,15 @@ const fallbackItems: NavigationTree[] =
   items.length > 0
     ? []
     : [
-        { id: "home", parent_id: null, page_id: null, external_url: null, icon: null, display_order: 0, open_in_new_tab: false, title: "Home", page_slug: "", children: [] },
-        { id: "blog", parent_id: null, page_id: null, external_url: null, icon: null, display_order: 1, open_in_new_tab: false, title: "Blog", page_slug: "blog", children: [] },
+        { id: "home", parent_id: null, page_id: null, external_url: null, legal_document_id: null, icon: null, display_order: 0, open_in_new_tab: false, title: t("nav.home"), page_slug: "", legal_slug: null, children: [] },
+        { id: "blog", parent_id: null, page_id: null, external_url: null, legal_document_id: null, icon: null, display_order: 1, open_in_new_tab: false, title: t("nav.blog"), page_slug: "blog", legal_slug: null, children: [] },
       ];
 
-const navItems = items.length > 0 ? items : fallbackItems;
+const navItems: NavigationTree[] = items.length > 0 ? items : fallbackItems;
 const showLocaleSwitcher = locales.length > 1;
-
-function href(item: NavigationTree): string {
-  if (item.external_url) return item.external_url;
-  if (item.page_slug != null) return `/${item.page_slug}`;
-  return "#";
-}
 ---
 
-<nav class="forja-nav" aria-label="Main navigation">
+<nav class="forja-nav" aria-label={t("nav.aria.main")}>
   <div class="forja-nav__container">
     <a href="/" class="forja-nav__brand">{siteName}</a>
 
@@ -49,41 +47,41 @@ function href(item: NavigationTree): string {
         item.children.length > 0 ? (
           <div class="forja-nav__dropdown">
             <a
-              href={href(item)}
+              href={navItemHref(item)}
               target={item.open_in_new_tab ? "_blank" : undefined}
               rel={item.open_in_new_tab ? "noopener noreferrer" : undefined}
               class="forja-nav__link"
             >
-              {item.title ?? "Untitled"}
+              {item.title ?? t("common.untitled")}
             </a>
             <div class="forja-nav__dropdown-menu">
               {item.children.map((child) => (
                 <a
-                  href={href(child)}
+                  href={navItemHref(child)}
                   target={child.open_in_new_tab ? "_blank" : undefined}
                   rel={child.open_in_new_tab ? "noopener noreferrer" : undefined}
                   class="forja-nav__dropdown-item"
                 >
-                  {child.title ?? "Untitled"}
+                  {child.title ?? t("common.untitled")}
                 </a>
               ))}
             </div>
           </div>
         ) : (
           <a
-            href={href(item)}
+            href={navItemHref(item)}
             target={item.open_in_new_tab ? "_blank" : undefined}
             rel={item.open_in_new_tab ? "noopener noreferrer" : undefined}
             class="forja-nav__link"
           >
-            {item.title ?? "Untitled"}
+            {item.title ?? t("common.untitled")}
           </a>
         )
       )}
 
       {showLocaleSwitcher && (
         <div class="forja-nav__locale-switcher" data-lang-switcher>
-          <button type="button" aria-label="Switch language" class="forja-nav__locale-toggle" data-lang-toggle>
+          <button type="button" aria-label={t("nav.aria.switch_language")} class="forja-nav__locale-toggle" data-lang-toggle>
             {currentLocaleCode}
           </button>
           <div class="forja-nav__locale-dropdown hidden" data-lang-dropdown>
@@ -96,21 +94,21 @@ function href(item: NavigationTree): string {
                   locale.code === currentLocaleCode && "forja-nav__locale-option--active",
                 ]}
               >
-                {(locale as any).native_name || locale.name}
+                {locale.native_name || locale.name}
               </button>
             ))}
           </div>
         </div>
       )}
 
-      <button type="button" aria-label="Toggle dark mode" data-theme-toggle class="forja-nav__theme-toggle">
+      <button type="button" aria-label={t("nav.aria.toggle_dark")} data-theme-toggle class="forja-nav__theme-toggle">
         <svg class="forja-nav__icon-moon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/></svg>
         <svg class="forja-nav__icon-sun" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
       </button>
     </div>
 
     {/* Mobile hamburger */}
-    <button class="forja-nav__hamburger" aria-label="Toggle navigation" data-nav-toggle>
+    <button class="forja-nav__hamburger" aria-label={t("nav.aria.toggle_menu")} data-nav-toggle>
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </button>
   </div>
@@ -119,15 +117,15 @@ function href(item: NavigationTree): string {
   <div class="forja-nav__mobile hidden" data-nav-links-mobile>
     {navItems.map((item) => (
       <a
-        href={href(item)}
+        href={navItemHref(item)}
         target={item.open_in_new_tab ? "_blank" : undefined}
         rel={item.open_in_new_tab ? "noopener noreferrer" : undefined}
         class="forja-nav__mobile-link"
       >
-        {item.title ?? "Untitled"}
+        {item.title ?? t("common.untitled")}
       </a>
     ))}
-    <button type="button" aria-label="Toggle dark mode" data-theme-toggle class="forja-nav__theme-toggle">
+    <button type="button" aria-label={t("nav.aria.toggle_dark")} data-theme-toggle class="forja-nav__theme-toggle">
       <svg class="forja-nav__icon-moon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/></svg>
       <svg class="forja-nav__icon-sun" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/></svg>
     </button>

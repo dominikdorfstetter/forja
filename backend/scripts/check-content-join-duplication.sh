@@ -35,11 +35,12 @@ REPOS_DIR="$BACKEND_DIR/src/repos"
 #
 # Format: <file_basename>:<expected_count>
 BASELINES=(
-    "blog_repo.rs:13"
-    "page_repo.rs:7"
-    "legal_repo.rs:5"
-    "cv_repo.rs:4"
-    "project_repo.rs:5"
+    "blog_repo.rs:11"
+    "page_repo.rs:5"
+    "legal_repo.rs:8"
+    "cv_repo.rs:0"
+    "project_repo.rs:3"
+    "trash_repo.rs:6"
 )
 
 PATTERN='INNER JOIN contents c '

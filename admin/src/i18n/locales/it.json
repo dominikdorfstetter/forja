@@ -139,6 +139,7 @@
       "structure": "Struttura",
       "navigation": "Navigazione",
       "taxonomy": "Tassonomia",
+      "uiStrings": "Testi interfaccia",
       "site": "Sito",
       "socialLinks": "Link social",
       "activity": "Attività",
@@ -1036,7 +1037,11 @@
         "description": "Descrizione",
         "maxDepth": "Profondità max.",
         "maxDepthHelp": "Profondità massima di annidamento (1-10)",
-        "active": "Attivo"
+        "active": "Attivo",
+        "displayName": "Nome visualizzato",
+        "displayNames": "Nomi visualizzati",
+        "displayNamesHelp": "Nome del menu facoltativo mostrato ai visitatori in questa lingua (ad es. come intestazione del footer)",
+        "displayNameClearHint": "Svuotando il campo, questa traduzione viene rimossa al salvataggio"
       },
       "messages": {
         "created": "Menu creato",
@@ -1051,7 +1056,9 @@
         "title": "Elimina menu",
         "message": "Questo eliminerà permanentemente questo menu e tutti i suoi elementi di navigazione. Questa azione non può essere annullata."
       }
-    }
+    },
+    "brokenLink": "Collegamento interrotto",
+    "brokenLinkHint": "Questa voce ha perso la destinazione del collegamento. Modificala per sceglierne una nuova."
   },
   "socialLinks": {
     "title": "Link social",
@@ -1742,7 +1749,9 @@
       "saved": "Documento legale salvato",
       "published": "Documento legale pubblicato",
       "unpublished": "Documento legale ritirato",
-      "loadFailed": "Impossibile caricare il documento legale"
+      "loadFailed": "Impossibile caricare il documento legale",
+      "slugUpdated": "Slug aggiornato",
+      "slugLocked": "Lo slug non può più essere modificato — una versione di questo documento è già stata pubblicata."
     },
     "toolbar": {},
     "fields": {
@@ -1750,7 +1759,8 @@
       "intro": "Introduzione",
       "body": "Contenuto",
       "metaTitle": "Meta titolo",
-      "metaDescription": "Meta descrizione"
+      "metaDescription": "Meta descrizione",
+      "slug": "Slug"
     },
     "seo": {
       "title": "Impostazioni SEO"
@@ -1770,7 +1780,9 @@
       "created": "Nuova versione creata",
       "live": "In uso",
       "rollbackHint": "La versione in uso è quella pubblicata. Apri una versione precedente e pubblicala per ripristinarla — quella attuale viene sostituita."
-    }
+    },
+    "slugHint": "URL pubblico: /legal/{slug}. Lo slug può essere modificato finché non viene pubblicata una versione.",
+    "slugLockedHint": "Lo slug è permanente — una versione di questo documento è già stata pubblicata."
   },
   "sites": {
     "title": "Siti",
@@ -3710,7 +3722,19 @@
         "action": "Controlla il file e riprova."
       }
     },
-    "SITE_SETTINGS_INVALID_ORIGIN": "Una o più origini hanno un formato non valido. Ogni origine deve essere schema://host (es. https://esempio.it)."
+    "SITE_SETTINGS_INVALID_ORIGIN": "Una o più origini hanno un formato non valido. Ogni origine deve essere schema://host (es. https://esempio.it).",
+    "ERR_STRINGS_KEY_TAKEN": {
+      "message": "Chiave già in uso",
+      "action": "Scegli un'altra chiave per questo sito."
+    },
+    "ERR_STRINGS_LIMIT_EXCEEDED": {
+      "message": "Limite di testi raggiunto",
+      "action": "Un sito può contenere al massimo 500 chiavi: elimina prima quelle inutilizzate."
+    },
+    "LEGAL_SLUG_IMMUTABLE": {
+      "message": "Slug bloccato",
+      "action": "Gli URL legali pubblicati sono permanenti; lo slug non può cambiare dopo la pubblicazione di una versione."
+    }
   },
   "welcome": {
     "tagline": "Il CMS open-source per siti web veloci, sicuri e multilingue",
@@ -4151,7 +4175,11 @@
         "description": "Descrizione",
         "label": "Evento",
         "title": "Titolo"
-      }
+      },
+      "localizeAction": "Localizza questi elementi",
+      "removeLocalization": "Rimuovi localizzazione",
+      "fallbackNotice": "Sono mostrati gli elementi predefiniti. Localizzali per modificare una copia separata per {{locale}}.",
+      "overrideNotice": "Questi elementi sostituiscono quelli predefiniti per {{locale}}. Rimuovendo la localizzazione si ripristinano gli elementi predefiniti."
     },
     "layout": "Layout",
     "nColumns": "{{n}} colonne",
@@ -4667,6 +4695,55 @@
     "deleteEntryConfirm": "Eliminare la voce «{{title}}»? L'azione non può essere annullata.",
     "perLanguage": "Per lingua · {{locale}}",
     "dragToReorder": "Trascina per riordinare"
+  },
+  "uiStrings": {
+    "title": "Testi dell'interfaccia",
+    "subtitle": "Dizionario di testi localizzati per i template del tuo sito: etichette, intestazioni e testi per screen reader",
+    "newString": "Nuovo testo",
+    "deleted": "Testo eliminato.",
+    "deleteTitle": "Elimina testo",
+    "deleteConfirm": "Eliminare \"{{key}}\" e tutte le sue traduzioni?",
+    "list": {
+      "loadError": "Impossibile caricare i testi dell'interfaccia.",
+      "colKey": "Chiave",
+      "colLocales": "Traduzioni",
+      "colUpdated": "Aggiornato",
+      "filterLabel": "Filtra i testi",
+      "filterAll": "Tutti i testi",
+      "filterMissing": "Traduzioni mancanti",
+      "filterOutdated": "Obsoleti",
+      "noMatches": "Nessun testo corrisponde a questo filtro.",
+      "emptyTitle": "Ancora nessun testo",
+      "empty": "Definisci chiavi come blog.min_read e traducile per lingua: i tuoi template le leggono al rendering.",
+      "localeStatus": {
+        "translated": "{{locale}}: tradotto",
+        "missing": "{{locale}}: mancante",
+        "outdated": "{{locale}}: obsoleto — il valore predefinito è cambiato"
+      }
+    },
+    "detail": {
+      "newTitle": "Nuovo testo dell'interfaccia",
+      "subtitle": "Chiave e valore predefinito si salvano insieme; le altre lingue si salvano quando lasci il campo",
+      "loading": "Caricamento del testo…",
+      "keyLabel": "Chiave",
+      "keyHelp": "Segmenti minuscoli uniti da '.', '_' o '-' — ad es. blog.min_read",
+      "keyRequired": "La chiave è obbligatoria",
+      "keyTooLong": "La chiave non può superare i 128 caratteri",
+      "keyInvalid": "Usa lettere minuscole e cifre, unite da '.', '_' o '-'",
+      "valueLabel": "Valore",
+      "valueTooLong": "Il valore non può superare i 1000 caratteri",
+      "valueRequired": "Il valore è obbligatorio: il valore predefinito non può essere svuotato",
+      "valueForLocale": "Valore ({{locale}})",
+      "localeHint": "Valore per {{locale}}. Salvato quando lasci il campo; svuotarlo rimuove la traduzione.",
+      "createHint": "Salva prima la chiave con il valore predefinito, poi traducila nelle altre lingue.",
+      "saved": "Testo salvato.",
+      "created": "Testo creato.",
+      "notFound": "Questo testo dell'interfaccia non esiste.",
+      "status": {
+        "missing": "mancante",
+        "outdated": "obsoleto"
+      }
+    }
   },
   "imprint": {
     "title": "Note legali",

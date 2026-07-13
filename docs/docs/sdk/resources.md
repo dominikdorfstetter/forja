@@ -255,6 +255,28 @@ function renderNav(nodes: NavigationTree[]) {
 }
 ```
 
+### `getMenuWithTree(slug, opts?)`
+
+Fetch a menu and its navigation tree in one call, with the menu's display name resolved for a locale. Composes `getMenuBySlug` and `getTree` — the locale lookup runs concurrently, and the site-locales listing is fetched once per client instance and reused across calls.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `slug` | `string` | Yes | Slug of the menu (e.g. `primary`, `footer`) |
+| `locale` | `string` | No | Locale code used to resolve the menu name and translate item titles |
+
+**Returns:** `MenuWithTree | null` — returns `null` if no menu has that slug.
+
+`menu.resolvedName` carries the menu localization matching the requested locale, or `null` when no locale was passed, the code isn't configured for the site, or the menu has no localization for it — pick your own fallback (e.g. `resolvedName ?? menu.slug`). The raw `menu.localizations` array stays available. A locale code the site doesn't configure is not forwarded to the tree request — the tree comes back locale-less instead of erroring.
+
+```typescript
+const footer = await forja.navigation.getMenuWithTree('footer', { locale: 'de' });
+
+if (footer) {
+  console.log(footer.menu.resolvedName ?? footer.menu.slug); // "Fußzeile"
+  footer.items.forEach((node) => console.log(node.title));
+}
+```
+
 ### `listItems(menuId)`
 
 Fetch a flat list of all items in a menu.
@@ -730,6 +752,27 @@ for (const locale of locales) {
 }
 ```
 
+### `getSettings()`
+
+Fetch the curated public subset of the site's settings — contact email, web-manifest colors, and SEO defaults.
+
+**Returns:** `PublicSiteSettings`
+
+```typescript
+const settings = await forja.site.getSettings();
+
+console.log(settings.contact_email);
+console.log(settings.theme_color, settings.background_color);
+console.log(settings.seo_title_template);
+console.log(settings.seo_default_description);
+```
+
+:::info Read-tier accessible
+Unlike the raw admin settings endpoint (which requires an Admin key), this read works with a `Read` API key. The shape deliberately excludes operational configuration — allowed origins, storage quotas, data retention, module flags, and code injection (use `getCodeInjection()` for the latter).
+:::
+
+Fields that are not configured on the server fall back to the backend's house defaults: empty strings for `contact_email` and `seo_default_description`, `#ffffff` for both colors, and `{{title}} | {{site_name}}` for the title template.
+
 ---
 
 ## Media
@@ -805,6 +848,42 @@ for (const link of links) {
   console.log(link.title, link.url, link.icon);
 }
 ```
+
+---
+
+## UI Strings
+
+**Accessor:** `forja.strings(locale)`
+
+Site-scoped dictionary of interface chrome strings (labels, headings, aria texts) that site operators manage in the admin panel, resolved for one locale.
+
+### `strings(locale)`
+
+Fetch the resolved UI strings for a locale as a flat `key → value` map.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `locale` | `string` | Yes | Locale code to resolve values for (e.g. `'en'`, `'de-AT'`) |
+
+**Returns:** `UiStringsResponse` — a flat `Record<string, string>` map of key → resolved value.
+
+```typescript
+const strings = await forja.strings('de');
+
+const minRead = strings['blog.min_read'] ?? 'min read';
+const darkModeLabel = strings['nav.aria.toggle_dark'] ?? 'Toggle dark mode';
+```
+
+:::info Locale is required
+The `locale` parameter is mandatory — the API rejects requests without it (`400 ERR_STRINGS_LOCALE_REQUIRED`). Unknown locale codes fall back silently to the site's default locale.
+:::
+
+Resolution and fallback behavior:
+
+- One value per key, resolved server-side via the fallback chain: exact locale match → site default locale → first available localization (lowest locale code).
+- Keys with no localization at all are omitted from the map — keep a template-side default for every key you render (never render an empty string).
+- Keys are dot-namespaced lowercase identifiers (`blog.min_read`, `footer.rights_reserved`, `nav.aria.toggle_dark`).
+- Responses are cached server-side for a short interval, so fetching the map once per page render is cheap.
 
 ---
 

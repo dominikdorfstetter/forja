@@ -136,6 +136,17 @@ export type UpdateLocaleRequest = components['schemas']['UpdateLocaleRequest'];
 // Translation Status
 export type TranslationStatus = components['schemas']['TranslationStatus'];
 
+// UI Strings (site-scoped localized key → string dictionary)
+export type UiStringResponse = components['schemas']['UiStringResponse'];
+
+export type UiStringLocalizationResponse = components['schemas']['UiStringLocalizationResponse'];
+
+export type UiStringLocalizationInput = components['schemas']['UiStringLocalizationInput'];
+
+export type CreateUiStringRequest = components['schemas']['CreateUiStringRequest'];
+
+export type UpdateUiStringRequest = components['schemas']['UpdateUiStringRequest'];
+
 // Content Localization
 export type ContentLocalizationResponse = components['schemas']['LocalizationResponse'];
 

@@ -5,6 +5,9 @@ import SeoHead from "../components/SeoHead.astro";
 import { fetchCvEntries, fetchSkills, fetchSite, getSiteUrl } from "../lib/api";
 import type { CvEntryResponse, SkillResponse } from "../lib/api";
 import { buildSeoMeta } from "../lib/seo";
+import { getTranslator } from "../lib/ui-strings";
+
+const t = await getTranslator(Astro.locals.locale);
 
 let entries: CvEntryResponse[] = [];
 let skills: SkillResponse[] = [];
@@ -35,7 +38,7 @@ try {
 // Group skills by category
 const grouped = new Map<string, SkillResponse[]>();
 for (const skill of skills) {
-  const cat = skill.category ?? "Other";
+  const cat = skill.category ?? t("cv.category_other");
   const arr = grouped.get(cat) ?? [];
   arr.push(skill);
   grouped.set(cat, arr);
@@ -59,17 +62,17 @@ Astro.response.headers.set("Cache-Control", "public, max-age=600, s-maxage=1800"
 <Base title="CV" description="Work experience, education, and skills.">
   <SeoHead seo={seo} slot="head" />
   <div class="max-w-prose mx-auto">
-    <h1 class="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mb-8">Curriculum Vitae</h1>
+    <h1 class="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mb-8">{t("cv.title")}</h1>
 
     {entries.length > 0 ? (
       <CvTimeline entries={entries} />
     ) : (
-      <p class="text-zinc-500 dark:text-zinc-400">No CV entries yet.</p>
+      <p class="text-zinc-500 dark:text-zinc-400">{t("cv.empty")}</p>
     )}
 
     {skills.length > 0 && (
       <section class="mt-16">
-        <h2 class="text-xl font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mb-6">Skills</h2>
+        <h2 class="text-xl font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight mb-6">{t("cv.skills")}</h2>
         {[...grouped.entries()].map(([category, items]) => (
           <div class="mb-6">
             <h3 class="text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-3">

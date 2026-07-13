@@ -2,6 +2,7 @@ export { ForjaClient } from './client.js';
 export { renderCodeInjection } from './code-injection.js';
 export { validateSubmission } from './resources/forms.js';
 export { CollectionsResource } from './resources/collections.js';
+export { StringsResource } from './resources/strings.js';
 export type {
   PublicCollectionEntry,
   PublicCollectionField,
@@ -66,9 +67,12 @@ export type {
   SectionLocalizationResponse,
   // Navigation
   NavigationMenuResponse,
+  MenuLocalizationResponse,
   NavigationItemResponse,
   NavigationTree,
   NavigationItemLocalizationResponse,
+  ResolvedNavigationMenu,
+  MenuWithTree,
   // Taxonomy
   TagResponse,
   CategoryResponse,
@@ -113,6 +117,9 @@ export type {
   // Site
   SiteResponse,
   SiteLocaleResponse,
+  SiteContextResponse,
+  SiteContextIntegration,
+  PublicSiteSettings,
   // Media
   MediaResponse,
   MediaVariantResponse,
@@ -120,6 +127,8 @@ export type {
   MediaListParams,
   // Social
   SocialLinkResponse,
+  // UI strings
+  UiStringsResponse,
 } from './types.js';
 
 export type { HttpClient, PaginatedResult } from './http.js';

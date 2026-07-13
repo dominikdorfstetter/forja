@@ -15,14 +15,17 @@ import type { LegalDocumentResponse } from '@/types/api';
 import { queryKeys } from '@/lib/queryKeys';
 
 interface LegalPickerProps {
+  /** Legal document id. */
   value: string;
-  onChange: (cookieName: string) => void;
+  onChange: (documentId: string) => void;
   label?: string;
   error?: boolean;
   helperText?: string;
   disabled?: boolean;
   siteId?: string;
 }
+
+const documentLabel = (doc: LegalDocumentResponse) => doc.slug || doc.cookie_name;
 
 export default function LegalPicker({
   value,
@@ -63,7 +66,7 @@ export default function LegalPicker({
 
   const selectedOption = useMemo<LegalDocumentResponse | null>(() => {
     if (!value) return null;
-    return docs.find((d) => d.cookie_name === value) ?? null;
+    return docs.find((d) => d.id === value) ?? null;
   }, [value, docs]);
 
   return (
@@ -73,8 +76,8 @@ export default function LegalPicker({
       value={selectedOption}
       inputValue={inputValue}
       onInputChange={(_, newValue) => setInputValue(newValue)}
-      onChange={(_, newValue) => onChange(newValue?.cookie_name ?? '')}
-      getOptionLabel={(option) => option.cookie_name}
+      onChange={(_, newValue) => onChange(newValue?.id ?? '')}
+      getOptionLabel={documentLabel}
       isOptionEqualToValue={(option, val) => option.id === val.id}
       loading={isLoading}
       disabled={disabled}
@@ -85,7 +88,7 @@ export default function LegalPicker({
         <Box component="li" key={key} {...props} sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <Typography variant="body2" noWrap>
-              {option.cookie_name}
+              {documentLabel(option)}
             </Typography>
           </Box>
           <Chip label={t(`legal.documentTypes.${option.document_type}`)} size="small" variant="outlined" />

@@ -81,6 +81,7 @@ const CONSUMER_OPERATION_IDS: &[&str] = &[
     // Sites (public info)
     "get_site_by_slug",
     "get_site_context",
+    "get_public_site_settings",
     // Per-site public assets
     "get_sitemap",
     "get_robots_txt",
@@ -93,6 +94,8 @@ const CONSUMER_OPERATION_IDS: &[&str] = &[
     "list_locales",
     "get_locale",
     "get_locale_by_code",
+    // UI Strings (public locale-resolved read)
+    "get_site_ui_strings",
     // Analytics ingest (write but public)
     "track_pageview",
     // Misc public

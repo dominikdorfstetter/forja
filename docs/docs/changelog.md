@@ -14,6 +14,33 @@ is the first release published as open source**, so the public version history
 begins at 2.0. The pre-release milestones below condense how the foundation came
 together; precise dates start at the first public release.
 
+## 2.1.0 — 2026-07-13
+
+Four features driven by consumer feedback from a live production site: a UI-strings module for localized interface chrome, first-class legal-document references in navigation, a public site-settings read, and completed menu localization.
+
+### Added
+
+- **UI Strings module.** A site-scoped, localized key→value dictionary for interface chrome — the "min read" labels, footer texts, aria-labels, and empty-state copy that used to be hard-coded English in the site template. The admin gains a UI Strings page with per-locale coverage at a glance (missing and outdated filters); editing the default-locale value automatically marks other locales as outdated. Consumers fetch `GET /sites/{id}/strings?locale=` — a flat map with one value per key, resolved through the standard locale fallback chain — or call `forja.strings(locale)` in the SDK. The astro-blog template now renders all of its chrome through this system, shipping translatable defaults for 11 locales, so a site can relabel or translate its entire chrome from the CMS without touching template code. Keys are dot-namespaced and capped at 500 per site.
+- **Legal documents are first-class navigation targets.** Navigation items can now reference a legal document directly (`legal_document_id`) instead of embedding a fragile free-text `/legal/{cookie_name}` URL that broke on rename — and, before this release, was broken even without one: admin-created legal documents had no slug at all and were unreachable via `/legal/{slug}`. Legal documents now always carry a canonical per-site slug (auto-derived from the document type, editable until first publish, then locked), existing NULL slugs are backfilled, and existing `/legal/…` links are converted to real references in-migration. The public navigation tree resolves the slug through the version chain, so publishing a new version never breaks footer links; items whose target disappears are hidden publicly and flagged as repairable broken links in the admin.
+- **Public site-settings read.** New `GET /sites/{id}/settings/public` returns a deliberately small allowlist — contact email, theme colors, SEO title template and default description — to Read-tier API keys, with `forja.site.getSettings()` in the SDK. The raw settings endpoint (operational configuration: CORS origins, quotas, retention) remains Admin-only.
+- **Menu localization, end to end.** Menus always stored per-locale display names, but the admin never wrote them and the SDK never exposed them. The menu dialog now edits display names per locale, `forja.navigation.getMenuWithTree(slug, { locale })` fetches a menu and its tree together with the name resolved for a locale, and the astro-blog footer heading comes from the CMS menu name with a chrome-string fallback.
+- **Per-locale section items.** Section item collections (feature lists, testimonials, FAQ entries, stats, pricing tiers) were single-language. Section localizations now carry an optional per-locale items override — the editor's locale tabs gain "localize these items" (copies the default as a starting point) and "remove localization" (falls back again) — and `GET /pages/{id}/sections?locale=` resolves the right items server-side, so consumers keep reading `settings.items` unchanged. The astro-blog template also renders section items for the first time: they were silently dropped before because array props can't ride custom-element attributes.
+- **Site code injection actually renders.** The template now injects the site's head/footer HTML snippets (analytics etc.) from the CMS — the SDK supported reading them, but no template ever output them.
+- **Localized translations can be removed again.** Menu display names and UI-string translations were upsert-only; updates now accept `removed_locale_ids`, and clearing a value in the admin removes the translation (the UI-strings default locale stays protected).
+
+### Fixed
+
+- **SDK `getCodeInjection()` works with Read keys again.** It called the Admin-only raw settings endpoint and 403'd in production for every Read- and Write-tier key despite documenting Read-tier access; it now uses the Viewer-tier site-context endpoint, which carries the same fields.
+- **Navigation and menu edits reach the public API without a publish.** Menu, item, and localization mutations now invalidate the response cache directly; previously only the publish pipeline did, so edits lagged behind by up to the cache TTL.
+- **Locale-filtered navigation trees no longer blank missing titles.** Requesting a tree in a locale that lacks a translation for an item now falls back to the site-default title instead of rendering an untitled item.
+- **Purging a page no longer errors on navigation items that pointed to it.** The item survives as a repairable broken link instead of violating a database constraint mid-purge.
+- **The astro-blog preview flow fetched settings it could never read** (Admin-only endpoint, plus fields that don't exist in the response) — it now reads the public settings shape.
+- **SDK navigation types match the wire again**: `localizations`, `updated_at`, `legal_document_id`, and `legal_slug` are typed on menu and tree responses.
+- **One live legal version is now enforced by the lifecycle, not one endpoint.** Publishing through the generic content lifecycle (including creating a document directly as Published) previously bypassed the supersede step, allowing two live versions of the same document; the invariant now fires on every publish path.
+- **Navigation items validate their targets belong to the site.** A Write key could point a nav item at another site's page or legal document, producing dead links that leaked the foreign slug; both references are now rejected (`422`), and the public tree is site-scoped as defense in depth.
+- **Forms pages are fully localized.** The public form and self-service lookup pages carried hard-coded English chrome — including messages inside inline scripts ("Submitting…", validation and network errors); everything now flows through the UI-strings system with translatable defaults in 11 locales.
+- **Validation failures are documented as 422 everywhere.** Several write endpoints still documented 400 for body-validation errors while returning 422; the OpenAPI spec now tells the truth.
+
 ## 2.0.7 — 2026-07-12
 
 A follow-up to the 2.0.6 legal-versioning work: legal documents now keep a single live version instead of showing every version as its own row.

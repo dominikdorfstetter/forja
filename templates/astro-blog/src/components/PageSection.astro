@@ -24,6 +24,16 @@ const buttonHref = section.call_to_action_route || undefined;
 const settings = (section.settings || {}) as Record<string, unknown>;
 const columns = (settings.columns as number) || undefined;
 
+// Structured items (feature cards, testimonial quotes, FAQ entries, ...).
+// Already locale-resolved server-side when the fetch passed ?locale= — a
+// locale's items override replaces the default array wholesale. Serialized
+// as a sibling JSON payload because custom-element attributes can't carry
+// arrays; `<` is escaped so content can't break out of the script tag.
+const itemsJson =
+  Array.isArray(settings.items) && settings.items.length > 0
+    ? JSON.stringify(settings.items).replaceAll("<", "\\u003c")
+    : undefined;
+
 let coverUrl: string | undefined;
 if (section.cover_image_id) {
   try {
@@ -37,6 +47,7 @@ if (section.cover_image_id) {
 const sectionType = section.section_type;
 ---
 
+{itemsJson && <script type="application/json" is:inline data-forja-section-items set:html={itemsJson} />}
 {sectionType === 'Hero' && <forja-hero section-title={title} text={text} image-url={coverUrl} button-text={buttonText} button-href={buttonHref} />}
 {sectionType === 'Features' && <forja-features section-title={title} text={text} columns={columns} />}
 {sectionType === 'Cta' && <forja-cta section-title={title} text={text} button-text={buttonText} button-href={buttonHref} />}
@@ -59,3 +70,23 @@ const sectionType = section.section_type;
 {sectionType === 'Blog' && <forja-blog section-title={title} text={text} columns={columns} button-text={buttonText} button-href={buttonHref} />}
 {sectionType === 'Legal' && <forja-legal section-title={title} body={text} />}
 {(sectionType === 'Custom' || !['Hero','Features','Cta','Gallery','Testimonials','Pricing','Faq','Contact','Stats','Team','Timeline','LogoCloud','Newsletter','Video','Divider','Text','Portfolio','TagCloud','Projects','Blog','Legal'].includes(sectionType)) && <forja-section-renderer section-type={sectionType} section-title={title} text={text} />}
+<script>
+  // Assign each JSON payload to the `items` property of the custom element
+  // that follows it, once that element's class is defined. Attributes can't
+  // carry arrays, and Stencil only parses primitive attributes.
+  document
+    .querySelectorAll<HTMLScriptElement>("script[data-forja-section-items]")
+    .forEach((payload) => {
+      const el = payload.nextElementSibling;
+      if (!el || !el.localName.includes("-")) return;
+      try {
+        const items: unknown = JSON.parse(payload.textContent ?? "null");
+        if (!Array.isArray(items)) return;
+        customElements.whenDefined(el.localName).then(() => {
+          (el as HTMLElement & { items?: unknown[] }).items = items;
+        });
+      } catch {
+        // Malformed payload — render the section without items.
+      }
+    });
+</script>

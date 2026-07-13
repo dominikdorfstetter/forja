@@ -139,6 +139,7 @@
       "structure": "Structuur",
       "navigation": "Navigatie",
       "taxonomy": "Taxonomie",
+      "uiStrings": "Interfaceteksten",
       "site": "Site",
       "socialLinks": "Sociale links",
       "activity": "Activiteit",
@@ -1036,7 +1037,11 @@
         "description": "Beschrijving",
         "maxDepth": "Max. diepte",
         "maxDepthHelp": "Maximale nestdiepte (1-10)",
-        "active": "Actief"
+        "active": "Actief",
+        "displayName": "Weergavenaam",
+        "displayNames": "Weergavenamen",
+        "displayNamesHelp": "Optionele menunaam die bezoekers in deze taal te zien krijgen (bijv. als kop in de footer)",
+        "displayNameClearHint": "Leegmaken verwijdert deze vertaling bij het opslaan"
       },
       "messages": {
         "created": "Menu aangemaakt",
@@ -1051,7 +1056,9 @@
         "title": "Menu verwijderen",
         "message": "Dit verwijdert dit menu en alle navigatie-items permanent. Deze actie kan niet ongedaan worden gemaakt."
       }
-    }
+    },
+    "brokenLink": "Verbroken link",
+    "brokenLinkHint": "Dit item is zijn linkdoel kwijt. Bewerk het om een nieuw doel te kiezen."
   },
   "socialLinks": {
     "title": "Sociale links",
@@ -1742,7 +1749,9 @@
       "saved": "Juridisch document opgeslagen",
       "published": "Juridisch document gepubliceerd",
       "unpublished": "Juridisch document gedepubliceerd",
-      "loadFailed": "Kan juridisch document niet laden"
+      "loadFailed": "Kan juridisch document niet laden",
+      "slugUpdated": "Slug bijgewerkt",
+      "slugLocked": "De slug kan niet meer worden gewijzigd — er is al een versie van dit document gepubliceerd."
     },
     "toolbar": {},
     "fields": {
@@ -1750,7 +1759,8 @@
       "intro": "Introductie",
       "body": "Inhoud",
       "metaTitle": "Meta titel",
-      "metaDescription": "Meta beschrijving"
+      "metaDescription": "Meta beschrijving",
+      "slug": "Slug"
     },
     "seo": {
       "title": "SEO-instellingen"
@@ -1770,7 +1780,9 @@
       "created": "Nieuwe versie aangemaakt",
       "live": "Live",
       "rollbackHint": "De live-versie wordt publiek getoond. Open een oudere versie en publiceer die om terug te rollen — de huidige wordt vervangen."
-    }
+    },
+    "slugHint": "Openbare URL: /legal/{slug}. De slug kan worden gewijzigd totdat een versie is gepubliceerd.",
+    "slugLockedHint": "De slug is permanent — er is al een versie van dit document gepubliceerd."
   },
   "sites": {
     "title": "Sites",
@@ -3710,7 +3722,19 @@
         "action": "Controleer het bestand en probeer het opnieuw."
       }
     },
-    "SITE_SETTINGS_INVALID_ORIGIN": "Een of meer bronnen hebben een ongeldig formaat. Elke bron moet schema://host zijn (bijv. https://voorbeeld.nl)."
+    "SITE_SETTINGS_INVALID_ORIGIN": "Een of meer bronnen hebben een ongeldig formaat. Elke bron moet schema://host zijn (bijv. https://voorbeeld.nl).",
+    "ERR_STRINGS_KEY_TAKEN": {
+      "message": "Sleutel al in gebruik",
+      "action": "Kies een andere sleutel voor deze site."
+    },
+    "ERR_STRINGS_LIMIT_EXCEEDED": {
+      "message": "Tekstlimiet bereikt",
+      "action": "Een site kan maximaal 500 sleutels bevatten — verwijder eerst ongebruikte sleutels."
+    },
+    "LEGAL_SLUG_IMMUTABLE": {
+      "message": "Slug is vergrendeld",
+      "action": "Gepubliceerde juridische URL’s zijn permanent; de slug kan niet meer veranderen zodra een versie is gepubliceerd."
+    }
   },
   "welcome": {
     "tagline": "Het open-source CMS voor snelle, veilige, meertalige websites",
@@ -4151,7 +4175,11 @@
         "description": "Beschrijving",
         "label": "Gebeurtenis",
         "title": "Titel"
-      }
+      },
+      "localizeAction": "Deze items lokaliseren",
+      "removeLocalization": "Lokalisatie verwijderen",
+      "fallbackNotice": "De standaarditems worden getoond. Lokaliseer ze om een eigen kopie voor {{locale}} te bewerken.",
+      "overrideNotice": "Deze items vervangen de standaarditems voor {{locale}}. Als je de lokalisatie verwijdert, gelden de standaarditems weer."
     },
     "layout": "Indeling",
     "nColumns": "{{n}} kolommen",
@@ -4667,6 +4695,55 @@
     "deleteEntryConfirm": "Het item \"{{title}}\" verwijderen? Dit kan niet ongedaan worden gemaakt.",
     "perLanguage": "Per taal · {{locale}}",
     "dragToReorder": "Sleep om te herordenen"
+  },
+  "uiStrings": {
+    "title": "Interfaceteksten",
+    "subtitle": "Gelokaliseerd tekstwoordenboek voor de templates van je site — labels, koppen en teksten voor schermlezers",
+    "newString": "Nieuwe tekst",
+    "deleted": "Tekst verwijderd.",
+    "deleteTitle": "Tekst verwijderen",
+    "deleteConfirm": "\"{{key}}\" en alle vertalingen verwijderen?",
+    "list": {
+      "loadError": "Interfaceteksten konden niet worden geladen.",
+      "colKey": "Sleutel",
+      "colLocales": "Vertalingen",
+      "colUpdated": "Bijgewerkt",
+      "filterLabel": "Teksten filteren",
+      "filterAll": "Alle teksten",
+      "filterMissing": "Ontbrekende vertalingen",
+      "filterOutdated": "Verouderd",
+      "noMatches": "Geen teksten voldoen aan dit filter.",
+      "emptyTitle": "Nog geen interfaceteksten",
+      "empty": "Definieer sleutels zoals blog.min_read en vertaal ze per taal — je templates lezen ze tijdens het renderen.",
+      "localeStatus": {
+        "translated": "{{locale}}: vertaald",
+        "missing": "{{locale}}: ontbreekt",
+        "outdated": "{{locale}}: verouderd — de standaardwaarde is gewijzigd"
+      }
+    },
+    "detail": {
+      "newTitle": "Nieuwe interfacetekst",
+      "subtitle": "Sleutel en standaardwaarde worden samen opgeslagen; andere talen bij het verlaten van het veld",
+      "loading": "Tekst laden…",
+      "keyLabel": "Sleutel",
+      "keyHelp": "Kleine letters in segmenten, verbonden met '.', '_' of '-' — bijv. blog.min_read",
+      "keyRequired": "Sleutel is verplicht",
+      "keyTooLong": "Sleutel mag maximaal 128 tekens bevatten",
+      "keyInvalid": "Gebruik kleine letters en cijfers, verbonden met '.', '_' of '-'",
+      "valueLabel": "Waarde",
+      "valueTooLong": "Waarde mag maximaal 1000 tekens bevatten",
+      "valueRequired": "Waarde is verplicht — de standaardwaarde kan niet worden gewist",
+      "valueForLocale": "Waarde ({{locale}})",
+      "localeHint": "Waarde voor {{locale}}. Opgeslagen wanneer je het veld verlaat; leegmaken verwijdert de vertaling.",
+      "createHint": "Sla eerst de sleutel met de standaardwaarde op — vertaal hem daarna naar de andere talen.",
+      "saved": "Tekst opgeslagen.",
+      "created": "Tekst aangemaakt.",
+      "notFound": "Deze interfacetekst bestaat niet.",
+      "status": {
+        "missing": "ontbreekt",
+        "outdated": "verouderd"
+      }
+    }
   },
   "imprint": {
     "title": "Colofon",

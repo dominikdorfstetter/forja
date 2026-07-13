@@ -53,6 +53,9 @@ const ERROR_CODE_MAP: Record<string, ErrorCodeKeys> = {
   LEGAL_PUBLISH_MISSING_TITLE: { messageKey: 'errorCodes.LEGAL_PUBLISH_MISSING_TITLE.message', actionKey: 'errorCodes.LEGAL_PUBLISH_MISSING_TITLE.action' },
   LEGAL_PUBLISH_MISSING_BODY: { messageKey: 'errorCodes.LEGAL_PUBLISH_MISSING_BODY.message', actionKey: 'errorCodes.LEGAL_PUBLISH_MISSING_BODY.action' },
   LEGAL_VERSION_SOURCE_DELETED: { messageKey: 'errorCodes.LEGAL_VERSION_SOURCE_DELETED.message', actionKey: 'errorCodes.LEGAL_VERSION_SOURCE_DELETED.action' },
+  LEGAL_SLUG_IMMUTABLE: { messageKey: 'errorCodes.LEGAL_SLUG_IMMUTABLE.message', actionKey: 'errorCodes.LEGAL_SLUG_IMMUTABLE.action' },
+  ERR_STRINGS_KEY_TAKEN: { messageKey: 'errorCodes.ERR_STRINGS_KEY_TAKEN.message', actionKey: 'errorCodes.ERR_STRINGS_KEY_TAKEN.action' },
+  ERR_STRINGS_LIMIT_EXCEEDED: { messageKey: 'errorCodes.ERR_STRINGS_LIMIT_EXCEEDED.message', actionKey: 'errorCodes.ERR_STRINGS_LIMIT_EXCEEDED.action' },
 };
 
 /**

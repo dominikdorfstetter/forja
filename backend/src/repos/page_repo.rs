@@ -129,6 +129,28 @@ impl PageRepo {
         Ok(page)
     }
 
+    /// True when the page's content is assigned to `site_id` (pages are
+    /// site-scoped through the `content_sites` join table). Mirrors
+    /// `LegalDocumentRepo::chain_root_on_site` for navigation's cross-site
+    /// reference validation.
+    pub async fn on_site(pool: &PgPool, page_id: Uuid, site_id: Uuid) -> Result<bool, ApiError> {
+        let on_site: bool = sqlx::query_scalar(
+            r#"
+            SELECT EXISTS(
+                SELECT 1
+                FROM pages p
+                INNER JOIN content_sites cs ON cs.content_id = p.content_id
+                WHERE p.id = $1 AND cs.site_id = $2
+            )
+            "#,
+        )
+        .bind(page_id)
+        .bind(site_id)
+        .fetch_one(pool)
+        .await?;
+        Ok(on_site)
+    }
+
     pub async fn find_by_route(
         pool: &PgPool,
         site_id: Uuid,
@@ -460,6 +482,7 @@ impl PageRepo {
                     sloc.title.as_deref(),
                     sloc.text.as_deref(),
                     sloc.button_text.as_deref(),
+                    sloc.items.as_ref(),
                 )
                 .await?;
             }
@@ -637,7 +660,7 @@ impl PageSectionLocalizationRepo {
     ) -> Result<Vec<PageSectionLocalization>, ApiError> {
         let localizations = sqlx::query_as::<_, PageSectionLocalization>(
             r#"
-            SELECT id, page_section_id, locale_id, title, text, button_text
+            SELECT id, page_section_id, locale_id, title, text, button_text, items
             FROM page_section_localizations
             WHERE page_section_id = $1
             "#,
@@ -655,7 +678,8 @@ impl PageSectionLocalizationRepo {
     ) -> Result<Vec<PageSectionLocalization>, ApiError> {
         let localizations = sqlx::query_as::<_, PageSectionLocalization>(
             r#"
-            SELECT psl.id, psl.page_section_id, psl.locale_id, psl.title, psl.text, psl.button_text
+            SELECT psl.id, psl.page_section_id, psl.locale_id, psl.title, psl.text,
+                   psl.button_text, psl.items
             FROM page_section_localizations psl
             INNER JOIN page_sections ps ON psl.page_section_id = ps.id
             WHERE ps.page_id = $1
@@ -675,14 +699,15 @@ impl PageSectionLocalizationRepo {
         title: Option<&str>,
         text: Option<&str>,
         button_text: Option<&str>,
+        items: Option<&serde_json::Value>,
     ) -> Result<PageSectionLocalization, ApiError> {
         let localization = sqlx::query_as::<_, PageSectionLocalization>(
             r#"
-            INSERT INTO page_section_localizations (page_section_id, locale_id, title, text, button_text)
-            VALUES ($1, $2, $3, $4, $5)
+            INSERT INTO page_section_localizations (page_section_id, locale_id, title, text, button_text, items)
+            VALUES ($1, $2, $3, $4, $5, $6)
             ON CONFLICT (page_section_id, locale_id)
-            DO UPDATE SET title = $3, text = $4, button_text = $5
-            RETURNING id, page_section_id, locale_id, title, text, button_text
+            DO UPDATE SET title = $3, text = $4, button_text = $5, items = $6
+            RETURNING id, page_section_id, locale_id, title, text, button_text, items
             "#,
         )
         .bind(section_id)
@@ -690,16 +715,41 @@ impl PageSectionLocalizationRepo {
         .bind(title)
         .bind(text)
         .bind(button_text)
+        .bind(items)
         .fetch_one(pool)
         .await?;
 
         Ok(localization)
     }
 
+    /// Non-null `items` overrides for every section of a page in one locale,
+    /// keyed by section ID. Feeds the public `?locale=` resolution of
+    /// `settings.items` — locales without an override simply don't appear.
+    pub async fn items_overrides_for_page(
+        pool: &PgPool,
+        page_id: Uuid,
+        locale_id: Uuid,
+    ) -> Result<std::collections::HashMap<Uuid, serde_json::Value>, ApiError> {
+        let rows: Vec<(Uuid, serde_json::Value)> = sqlx::query_as(
+            r#"
+            SELECT psl.page_section_id, psl.items
+            FROM page_section_localizations psl
+            INNER JOIN page_sections ps ON psl.page_section_id = ps.id
+            WHERE ps.page_id = $1 AND psl.locale_id = $2 AND psl.items IS NOT NULL
+            "#,
+        )
+        .bind(page_id)
+        .bind(locale_id)
+        .fetch_all(pool)
+        .await?;
+
+        Ok(rows.into_iter().collect())
+    }
+
     pub async fn find_by_id(pool: &PgPool, id: Uuid) -> Result<PageSectionLocalization, ApiError> {
         let localization = sqlx::query_as::<_, PageSectionLocalization>(
             r#"
-            SELECT id, page_section_id, locale_id, title, text, button_text
+            SELECT id, page_section_id, locale_id, title, text, button_text, items
             FROM page_section_localizations
             WHERE id = $1
             "#,

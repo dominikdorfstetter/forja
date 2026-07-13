@@ -624,6 +624,13 @@ vi.mock('@/services/imprint', () => ({
   getImprint: vi.fn(),
 }));
 
+vi.mock('@/services/uiStrings', () => ({
+  getUiStringEntries: vi.fn().mockResolvedValue([]),
+  createUiString: vi.fn(),
+  updateUiString: vi.fn(),
+  deleteUiString: vi.fn(),
+}));
+
 vi.mock('@/services/customTypes', () => ({
   listCustomTypes: vi.fn().mockResolvedValue([]),
   getCustomType: vi.fn(),

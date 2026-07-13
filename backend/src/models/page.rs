@@ -104,6 +104,9 @@ pub struct PageSectionLocalization {
     pub title: Option<String>,
     pub text: Option<String>,
     pub button_text: Option<String>,
+    /// Per-locale override of the section's `settings.items` array.
+    /// `None` = fall back to the default items in `page_sections.settings`.
+    pub items: Option<serde_json::Value>,
 }
 
 #[cfg(test)]

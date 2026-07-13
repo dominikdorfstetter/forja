@@ -7,6 +7,7 @@ import {
   ForjaNotFoundError,
   type BlogDetailResponse,
   type BlogListItem,
+  type CodeInjection,
   type MediaResponse,
   type Paginated,
   type PublicCollectionEntry,
@@ -121,13 +122,51 @@ export function getSiteUrl(): string {
   return SITE_URL.replace(/\/+$/, "");
 }
 
-// ---- Site locale type (not in SDK yet) ------------------------------------
+// ---- TTL cache for per-request chrome data ---------------------------------
+
+// The SSR process lives across deploys of CMS content, so chrome caches must
+// expire: successes get a modest TTL (matches the server-side response cache)
+// so CMS edits show up, and failures are only held for a short retry-after so
+// one transient backend error doesn't blank the chrome until redeploy.
+const CHROME_CACHE_TTL_MS = 60_000;
+const CHROME_CACHE_RETRY_AFTER_MS = 5_000;
+
+interface ChromeCacheEntry<T> {
+  value: T;
+  expiresAt: number;
+}
+
+/** Fetch-through cache: serves fresh entries, refreshes expired ones, and
+ * caches `fallback` briefly on failure — it never throws into the page. */
+async function fetchWithTtlCache<T>(
+  cache: Map<string, ChromeCacheEntry<T>>,
+  key: string,
+  fetcher: () => Promise<T>,
+  fallback: T,
+): Promise<T> {
+  const entry = cache.get(key);
+  if (entry && entry.expiresAt > Date.now()) return entry.value;
+
+  try {
+    const value = await fetcher();
+    cache.set(key, { value, expiresAt: Date.now() + CHROME_CACHE_TTL_MS });
+    return value;
+  } catch {
+    cache.set(key, {
+      value: fallback,
+      expiresAt: Date.now() + CHROME_CACHE_RETRY_AFTER_MS,
+    });
+    return fallback;
+  }
+}
+
+// ---- Site locale type (template-facing subset of SiteLocaleResponse) ------
 
 export interface SiteLocale {
   locale_id: string;
   code: string;
   name: string;
-  native_name?: string;
+  native_name?: string | null;
   direction: 'ltr' | 'rtl';
   is_default: boolean;
   is_active: boolean;
@@ -136,7 +175,6 @@ export interface SiteLocale {
 // ---- Site (cached) --------------------------------------------------------
 
 let _cachedSite: SiteResponse | null = null;
-let _cachedLocales: SiteLocale[] | null = null;
 
 /** Fetch site info (cached for the lifetime of the build/dev process). */
 export async function fetchSite(): Promise<SiteResponse> {
@@ -145,18 +183,18 @@ export async function fetchSite(): Promise<SiteResponse> {
   return _cachedSite;
 }
 
-/** Fetch active site locales (cached). */
+// Locales gate chrome on every request — memoize with the chrome TTL and fall
+// back to an empty list, which callers treat as "no locale filtering".
+const _cachedLocales = new Map<string, ChromeCacheEntry<SiteLocale[]>>();
+
+/** Fetch active site locales (cached; empty list if the fetch fails). */
 export async function fetchSiteLocales(): Promise<SiteLocale[]> {
-  if (_cachedLocales) return _cachedLocales;
-  const baseUrl = (import.meta.env.CMS_API_URL as string).replace(/\/+$/, '');
-  const apiKey = import.meta.env.CMS_API_KEY as string;
-  const siteId = import.meta.env.CMS_SITE_ID as string;
-  const res = await fetch(`${baseUrl}/sites/${siteId}/locales`, {
-    headers: { 'X-API-Key': apiKey },
-  });
-  if (!res.ok) throw new Error(`Failed to fetch locales: ${res.status}`);
-  _cachedLocales = (await res.json() as SiteLocale[]).filter((l) => l.is_active);
-  return _cachedLocales;
+  return fetchWithTtlCache(
+    _cachedLocales,
+    'locales',
+    async () => (await client().site.listLocales()).filter((l) => l.is_active),
+    [],
+  );
 }
 
 /** Get the default locale code for the site. */
@@ -243,33 +281,99 @@ export async function fetchPublishedBlogsByCategory(
 
 // ---- Navigation -----------------------------------------------------------
 
-// Per-build cache: nav menus are part of the page chrome, so the same slugs
-// (primary, footer) are requested on every page. Memoize by slug so each menu
-// is fetched once per build instead of once per page.
-const _cachedNavTrees = new Map<
-  string,
-  import("@forjacms/client").NavigationTree[]
->();
+/** A menu's tree plus its CMS-configured display name for one locale. */
+export interface NavMenuData {
+  items: import("@forjacms/client").NavigationTree[];
+  /** Menu name localized for the requested locale — unset when the CMS has
+   * none configured, so chrome falls back to its own default heading. */
+  localizedName?: string;
+}
+
+// Nav menus are part of the page chrome, so the same slugs (primary, footer)
+// are requested on every render — memoize by slug + locale with a TTL.
+const _cachedNavMenus = new Map<string, ChromeCacheEntry<NavMenuData>>();
 
 /**
- * Fetch a navigation menu's tree by its slug (cached per slug).
+ * Fetch a navigation menu (tree + localized display name) by its slug,
+ * cached per slug + locale for a short TTL. Returns empty items if the menu
+ * does not exist or the fetch fails — chrome renders without nav instead of
+ * crashing, and the next render after the retry window tries again.
+ */
+export async function fetchNavMenu(
+  menuSlug: string,
+  locale?: string,
+): Promise<NavMenuData> {
+  return fetchWithTtlCache(
+    _cachedNavMenus,
+    `${menuSlug}:${locale ?? ""}`,
+    async () => {
+      const composed = await client().navigation.getMenuWithTree(
+        menuSlug,
+        locale ? { locale } : undefined,
+      );
+      return composed
+        ? {
+            items: composed.items,
+            localizedName: composed.menu.resolvedName ?? undefined,
+          }
+        : { items: [] };
+    },
+    { items: [] },
+  );
+}
+
+/**
+ * Fetch a navigation menu's tree by its slug (cached per slug + locale).
  * Returns an empty array if the menu does not exist.
  */
 export async function fetchNavTree(
   menuSlug: string,
+  locale?: string,
 ): Promise<import("@forjacms/client").NavigationTree[]> {
-  const cached = _cachedNavTrees.get(menuSlug);
-  if (cached) return cached;
+  return (await fetchNavMenu(menuSlug, locale)).items;
+}
 
-  let result: import("@forjacms/client").NavigationTree[] = [];
-  try {
-    const menu = await client().navigation.getMenuBySlug(menuSlug);
-    if (menu) result = await client().navigation.getTree(menu.id);
-  } catch {
-    // Keep the empty result; cache it so we don't retry on every page.
-  }
-  _cachedNavTrees.set(menuSlug, result);
-  return result;
+// ---- UI strings -------------------------------------------------------------
+
+// The chrome-string dictionary is needed on every page for the same handful
+// of locales — memoize by locale code with a TTL.
+const _cachedUiStrings = new Map<string, ChromeCacheEntry<Record<string, string>>>();
+
+/**
+ * Fetch the resolved UI-string map for a locale (cached per locale code for
+ * a short TTL). Returns an empty map if the fetch fails or the site has no
+ * strings configured — chrome then renders the template defaults, and the
+ * next render after the retry window tries again.
+ */
+export async function fetchUiStrings(
+  locale: string,
+): Promise<Record<string, string>> {
+  return fetchWithTtlCache(_cachedUiStrings, locale, () => client().strings(locale), {});
+}
+
+// ---- Code injection ---------------------------------------------------------
+
+// Operator-configured head/footer HTML is chrome too — same TTL treatment.
+// Failures fall back to empty snippets, so the layout renders nothing instead
+// of crashing and retries after the failure window.
+const EMPTY_CODE_INJECTION: CodeInjection = {
+  code_injection_head: "",
+  code_injection_footer: "",
+};
+
+const _cachedCodeInjection = new Map<string, ChromeCacheEntry<CodeInjection>>();
+
+/**
+ * Fetch the site's code-injection snippets (cached for a short TTL).
+ * Returns empty snippets when unconfigured or when the fetch fails.
+ */
+export async function fetchCodeInjection(): Promise<CodeInjection> {
+  return fetchWithTtlCache(
+    _cachedCodeInjection,
+    "code-injection",
+    () => client().site.getCodeInjection(),
+    EMPTY_CODE_INJECTION,
+  );
 }
 
 // ---- Pages & Sections -----------------------------------------------------
@@ -291,11 +395,14 @@ export async function fetchPageByRoute(
   return result;
 }
 
-/** Fetch all sections for a page by its ID. */
+/** Fetch all sections for a page by its ID. When `locale` is set, each
+ * section's `settings.items` is resolved server-side to that locale's items
+ * override (falling back to the default items — ADR 0002). */
 export async function fetchPageSections(
   pageId: string,
+  locale?: string,
 ): Promise<import("@forjacms/client").PageSectionResponse[]> {
-  return client().pages.getSections(pageId);
+  return client().pages.getSections(pageId, locale ? { locale } : undefined);
 }
 
 /** Fetch all section localizations for a page by its ID. */

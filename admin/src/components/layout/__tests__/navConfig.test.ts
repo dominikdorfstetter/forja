@@ -19,7 +19,13 @@ const commonIcons = {
     assets: null,
   },
   personalIcons: { myDrafts: null, trash: null },
-  structureIcons: { navigation: null, taxonomy: null, socialLinks: null, redirects: null },
+  structureIcons: {
+    navigation: null,
+    taxonomy: null,
+    uiStrings: null,
+    socialLinks: null,
+    redirects: null,
+  },
   analyticsIcon: null,
 };
 

@@ -24,6 +24,7 @@ use crate::models::navigation::NavigationItem;
 use crate::models::navigation_menu::{NavigationMenu, NavigationMenuLocalization};
 use crate::services::audited_mutation::AuditedEntity;
 use crate::services::permission_service::{Permission, PermissionService};
+use crate::services::response_cache;
 
 #[derive(Debug, Deserialize)]
 struct TreeQuery {
@@ -117,9 +118,10 @@ async fn list_navigation_menus(
     request_body(content = CreateNavigationMenuRequest, description = "Menu data"),
     responses(
         (status = 201, description = "Menu created", body = NavigationMenuResponse),
-        (status = 400, description = "Validation error", body = ProblemDetails),
+        (status = 400, description = "Menu slug already exists for this site", body = ProblemDetails),
         (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 403, description = "Forbidden", body = ProblemDetails)
+        (status = 403, description = "Forbidden", body = ProblemDetails),
+        (status = 422, description = "Validation error", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -154,6 +156,7 @@ async fn create_navigation_menu(
         .actor(auth.0.id)
         .execute(&state.db)
         .await;
+    response_cache::invalidate_site(site_id).await;
     Ok((StatusCode::CREATED, Json(resp)))
 }
 
@@ -241,7 +244,8 @@ async fn get_navigation_menu_by_slug(
         (status = 200, description = "Menu updated", body = NavigationMenuResponse),
         (status = 401, description = "Unauthorized", body = ProblemDetails),
         (status = 403, description = "Forbidden", body = ProblemDetails),
-        (status = 404, description = "Menu not found", body = ProblemDetails)
+        (status = 404, description = "Menu not found", body = ProblemDetails),
+        (status = 422, description = "Validation error or locale in both localizations and removed_locale_ids", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -260,14 +264,7 @@ async fn update_navigation_menu(
     )
     .await?;
 
-    let menu = NavigationMenu::update(&state.db, id, body.clone()).await?;
-
-    if let Some(locs) = &body.localizations {
-        for loc in locs {
-            NavigationMenuLocalization::upsert(&state.db, menu.id, loc.locale_id, &loc.name)
-                .await?;
-        }
-    }
+    let menu = NavigationMenu::update(&state.db, id, body.into_inner()).await?;
 
     let resp = build_menu_response(&state, menu).await?;
 
@@ -277,6 +274,7 @@ async fn update_navigation_menu(
         .actor(auth.0.id)
         .execute(&state.db)
         .await;
+    response_cache::invalidate_site(existing_menu.site_id).await;
     Ok(Json(resp))
 }
 
@@ -316,6 +314,7 @@ async fn delete_navigation_menu(
         .metadata(serde_json::json!({ "action": "soft_delete" }))
         .execute(&state.db)
         .await;
+    response_cache::invalidate_site(menu.site_id).await;
     Ok(StatusCode::NO_CONTENT)
 }
 

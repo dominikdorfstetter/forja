@@ -139,6 +139,7 @@
       "structure": "Structure",
       "navigation": "Navigation",
       "taxonomy": "Taxonomie",
+      "uiStrings": "Textes d'interface",
       "site": "Site",
       "socialLinks": "Liens sociaux",
       "activity": "Activité",
@@ -1036,7 +1037,11 @@
         "description": "Description",
         "maxDepth": "Profondeur max.",
         "maxDepthHelp": "Profondeur d'imbrication maximale (1-10)",
-        "active": "Actif"
+        "active": "Actif",
+        "displayName": "Nom d'affichage",
+        "displayNames": "Noms d'affichage",
+        "displayNamesHelp": "Nom de menu facultatif affiché aux visiteurs dans cette langue (p. ex. comme titre du pied de page)",
+        "displayNameClearHint": "Effacer supprime cette traduction lors de l'enregistrement"
       },
       "messages": {
         "created": "Menu créé",
@@ -1051,7 +1056,9 @@
         "title": "Supprimer le menu",
         "message": "Ceci supprimera définitivement ce menu et tous ses éléments de navigation. Cette action est irréversible."
       }
-    }
+    },
+    "brokenLink": "Lien brisé",
+    "brokenLinkHint": "Cet élément a perdu sa cible de lien. Modifiez-le pour en choisir une nouvelle."
   },
   "socialLinks": {
     "title": "Liens sociaux",
@@ -1742,7 +1749,9 @@
       "saved": "Document juridique enregistré",
       "published": "Document juridique publié",
       "unpublished": "Document juridique dépublié",
-      "loadFailed": "Échec du chargement du document juridique"
+      "loadFailed": "Échec du chargement du document juridique",
+      "slugUpdated": "Slug mis à jour",
+      "slugLocked": "Le slug ne peut plus être modifié — une version de ce document a déjà été publiée."
     },
     "toolbar": {},
     "fields": {
@@ -1750,7 +1759,8 @@
       "intro": "Introduction",
       "body": "Contenu",
       "metaTitle": "Méta-titre",
-      "metaDescription": "Méta-description"
+      "metaDescription": "Méta-description",
+      "slug": "Slug"
     },
     "seo": {
       "title": "Paramètres SEO"
@@ -1770,7 +1780,9 @@
       "created": "Nouvelle version créée",
       "live": "En ligne",
       "rollbackHint": "La version en ligne est celle diffusée publiquement. Ouvrez une version antérieure et publiez-la pour revenir en arrière — la version actuelle est remplacée."
-    }
+    },
+    "slugHint": "URL publique : /legal/{slug}. Le slug peut être modifié jusqu’à la publication d’une version.",
+    "slugLockedHint": "Le slug est permanent — une version de ce document a déjà été publiée."
   },
   "sites": {
     "title": "Sites",
@@ -3365,7 +3377,19 @@
         "action": "Vérifiez le fichier et réessayez."
       }
     },
-    "SITE_SETTINGS_INVALID_ORIGIN": "Une ou plusieurs origines ont un format invalide. Chaque origine doit être schéma://hôte (ex. https://exemple.fr)."
+    "SITE_SETTINGS_INVALID_ORIGIN": "Une ou plusieurs origines ont un format invalide. Chaque origine doit être schéma://hôte (ex. https://exemple.fr).",
+    "ERR_STRINGS_KEY_TAKEN": {
+      "message": "Clé déjà utilisée",
+      "action": "Choisissez une autre clé pour ce site."
+    },
+    "ERR_STRINGS_LIMIT_EXCEEDED": {
+      "message": "Limite de textes atteinte",
+      "action": "Un site peut contenir au plus 500 clés — supprimez d'abord les clés inutilisées."
+    },
+    "LEGAL_SLUG_IMMUTABLE": {
+      "message": "Slug verrouillé",
+      "action": "Les URL légales publiées sont permanentes ; le slug ne peut plus changer après la publication d’une version."
+    }
   },
   "welcome": {
     "tagline": "Le CMS open-source pour des sites rapides, sécurisés et multilingues",
@@ -4151,7 +4175,11 @@
         "description": "Description",
         "label": "Événement",
         "title": "Titre"
-      }
+      },
+      "localizeAction": "Localiser ces éléments",
+      "removeLocalization": "Supprimer la localisation",
+      "fallbackNotice": "Les éléments par défaut sont affichés. Localisez-les pour modifier une copie distincte pour {{locale}}.",
+      "overrideNotice": "Ces éléments remplacent les éléments par défaut pour {{locale}}. Supprimer la localisation rétablit les éléments par défaut."
     },
     "layout": "Mise en page",
     "nColumns": "{{n}} colonnes",
@@ -4667,6 +4695,55 @@
     "deleteEntryConfirm": "Supprimer l’entrée « {{title}} » ? Cette action est irréversible.",
     "perLanguage": "Par langue · {{locale}}",
     "dragToReorder": "Glisser pour réordonner"
+  },
+  "uiStrings": {
+    "title": "Textes d'interface",
+    "subtitle": "Dictionnaire de textes localisés pour les templates de votre site — libellés, titres et textes pour lecteurs d'écran",
+    "newString": "Nouveau texte",
+    "deleted": "Texte supprimé.",
+    "deleteTitle": "Supprimer le texte",
+    "deleteConfirm": "Supprimer « {{key}} » et toutes ses traductions ?",
+    "list": {
+      "loadError": "Impossible de charger les textes d'interface.",
+      "colKey": "Clé",
+      "colLocales": "Traductions",
+      "colUpdated": "Mis à jour",
+      "filterLabel": "Filtrer les textes",
+      "filterAll": "Tous les textes",
+      "filterMissing": "Traductions manquantes",
+      "filterOutdated": "Obsolètes",
+      "noMatches": "Aucun texte ne correspond à ce filtre.",
+      "emptyTitle": "Aucun texte d'interface",
+      "empty": "Définissez des clés comme blog.min_read et traduisez-les par langue — vos templates les lisent au rendu.",
+      "localeStatus": {
+        "translated": "{{locale}} : traduit",
+        "missing": "{{locale}} : manquant",
+        "outdated": "{{locale}} : obsolète — la valeur par défaut a changé"
+      }
+    },
+    "detail": {
+      "newTitle": "Nouveau texte d'interface",
+      "subtitle": "La clé et la valeur par défaut s'enregistrent ensemble ; les autres langues s'enregistrent quand vous quittez le champ",
+      "loading": "Chargement du texte…",
+      "keyLabel": "Clé",
+      "keyHelp": "Segments en minuscules reliés par '.', '_' ou '-' — p. ex. blog.min_read",
+      "keyRequired": "La clé est requise",
+      "keyTooLong": "La clé ne peut pas dépasser 128 caractères",
+      "keyInvalid": "Utilisez des lettres minuscules et des chiffres, reliés par '.', '_' ou '-'",
+      "valueLabel": "Valeur",
+      "valueTooLong": "La valeur ne peut pas dépasser 1000 caractères",
+      "valueRequired": "La valeur est requise — la valeur par défaut ne peut pas être vidée",
+      "valueForLocale": "Valeur ({{locale}})",
+      "localeHint": "Valeur pour {{locale}}. Enregistrée quand vous quittez le champ ; l'effacer supprime la traduction.",
+      "createHint": "Enregistrez d'abord la clé et sa valeur par défaut — puis traduisez-la dans les autres langues.",
+      "saved": "Texte enregistré.",
+      "created": "Texte créé.",
+      "notFound": "Ce texte d'interface n'existe pas.",
+      "status": {
+        "missing": "manquant",
+        "outdated": "obsolète"
+      }
+    }
   },
   "imprint": {
     "title": "Mentions légales",

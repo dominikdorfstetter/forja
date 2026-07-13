@@ -61,6 +61,15 @@ export function hasLocale<T extends { locale_id: string }>(
 }
 
 /**
+ * Resolve the locale code from a `SiteLocale`, plain code string, or nothing.
+ * Falls back to `'en'`.
+ */
+export function localeCode(locale?: SiteLocale | string | null): string {
+  if (!locale) return 'en';
+  return typeof locale === 'string' ? locale : locale.code ?? 'en';
+}
+
+/**
  * Format a date string using the active locale.
  *
  * @example
@@ -73,8 +82,7 @@ export function formatDate(
   locale?: SiteLocale | string | null,
   opts?: Intl.DateTimeFormatOptions,
 ): string {
-  const code = !locale ? 'en' : typeof locale === 'string' ? locale : locale.code ?? 'en';
-  return new Date(dateStr).toLocaleDateString(code, {
+  return new Date(dateStr).toLocaleDateString(localeCode(locale), {
     year: 'numeric',
     month: 'long',
     day: 'numeric',

@@ -16,8 +16,10 @@ import {
 import type { BlogDetailResponse, MediaResponse, PageSectionResponse, SectionLocalizationResponse } from "../lib/api";
 import { buildSeoMeta } from "../lib/seo";
 import { hasLocale } from "../lib/locale";
+import { getTranslator } from "../lib/ui-strings";
 
 const locale = Astro.locals.locale ?? { locale_id: '', code: 'en', name: 'English', direction: 'ltr' as const, is_default: true, is_active: true };
+const t = await getTranslator(locale);
 
 const site = await fetchSite().catch(() => null);
 const siteName = site?.name ?? "My Site";
@@ -30,7 +32,7 @@ let homeLocalizations: SectionLocalizationResponse[] = [];
 try {
   const homePage = await fetchPageByRoute("/");
   if (homePage && homePage.status === "Published") {
-    homeSections = await fetchPageSections(homePage.id);
+    homeSections = await fetchPageSections(homePage.id, locale.code);
     homeSections.sort((a, b) => a.display_order - b.display_order);
     homeLocalizations = await fetchPageSectionLocalizations(homePage.id);
   }
@@ -58,7 +60,7 @@ Astro.response.headers.set("Cache-Control", "public, max-age=300, s-maxage=600")
     </div>
   ) : (
     <section class="pt-12 pb-10">
-      <span class="inline-block text-xs font-semibold uppercase tracking-widest bg-gradient-to-r from-violet-600 to-violet-400 bg-clip-text text-transparent mb-3">Welcome</span>
+      <span class="inline-block text-xs font-semibold uppercase tracking-widest bg-gradient-to-r from-violet-600 to-violet-400 bg-clip-text text-transparent mb-3">{t("home.welcome")}</span>
       <h1 class="text-4xl sm:text-5xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 mb-3">{siteName}</h1>
       <p class="text-base text-zinc-500 dark:text-zinc-400 max-w-lg leading-relaxed">{siteDescription}</p>
     </section>
@@ -67,7 +69,7 @@ Astro.response.headers.set("Cache-Control", "public, max-age=300, s-maxage=600")
   {featured.length > 0 && (
     <section>
       <div class="flex items-center gap-3 mb-6">
-        <span class="text-xs font-semibold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">Featured</span>
+        <span class="text-xs font-semibold text-zinc-900 dark:text-zinc-100 uppercase tracking-wider">{t("home.featured")}</span>
         <div class="flex-1 h-px bg-zinc-200 dark:bg-zinc-800"></div>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -76,7 +78,7 @@ Astro.response.headers.set("Cache-Control", "public, max-age=300, s-maxage=600")
         ))}
       </div>
       <p class="mt-8">
-        <a href="/blog" class="text-sm font-medium text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 no-underline hover:no-underline">View all posts &rarr;</a>
+        <a href="/blog" class="text-sm font-medium text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 no-underline hover:no-underline">{t("home.view_all_posts")} &rarr;</a>
       </p>
     </section>
   )}

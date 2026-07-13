@@ -81,6 +81,7 @@ export default function NavigationDialogs({
       <MenuFormDialog
         open={menuFormOpen}
         menu={editingMenu}
+        locales={locales}
         onSubmitCreate={onSubmitCreateMenu}
         onSubmitUpdate={onSubmitUpdateMenu}
         onClose={onCloseMenuForm}

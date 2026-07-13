@@ -1,5 +1,11 @@
 import type { HttpClient } from '../http.js';
-import type { CodeInjection, SiteLocaleResponse, SiteResponse } from '../types.js';
+import type {
+  CodeInjection,
+  PublicSiteSettings,
+  SiteContextResponse,
+  SiteLocaleResponse,
+  SiteResponse,
+} from '../types.js';
 
 /**
  * Site configuration operations.
@@ -71,13 +77,47 @@ export class SiteResource {
   }
 
   /**
+   * Fetch the curated public subset of the site's settings.
+   *
+   * **Endpoint:** `GET /sites/{siteId}/settings/public`
+   *
+   * Returns the contact email, web-manifest colors, and SEO defaults.
+   * Works with an API key that has `Read` permission — unlike the raw
+   * settings endpoint, which is Admin-only.
+   *
+   * The shape deliberately excludes operational configuration (allowed
+   * origins, storage quotas, data retention, module flags, code
+   * injection); use {@link getCodeInjection} for injection snippets.
+   *
+   * Fields that are not configured on the server fall back to the same
+   * defaults the backend uses everywhere (empty strings for email and
+   * description, `#ffffff` colors, `{{title}} | {{site_name}}`).
+   *
+   * @returns The public site settings.
+   *
+   * @example
+   * ```ts
+   * const settings = await forja.site.getSettings();
+   * console.log(settings.contact_email);       // "hello@example.com"
+   * console.log(settings.theme_color);         // "#4a90d9"
+   * console.log(settings.seo_title_template);  // "{{title}} | {{site_name}}"
+   * ```
+   */
+  async getSettings(): Promise<PublicSiteSettings> {
+    return this.http.get<PublicSiteSettings>(
+      `/sites/${this.siteId}/settings/public`,
+    );
+  }
+
+  /**
    * Get code injection scripts configured for this site.
    *
-   * **Endpoint:** `GET /sites/{siteId}/settings`
+   * **Endpoint:** `GET /sites/{siteId}/context`
    *
    * Returns the custom HTML/JS snippets configured for injection into
-   * the site's `<head>` and footer. Use these to embed analytics tags,
-   * chat widgets, or any custom scripts into your template.
+   * the site's `<head>` and footer, read from the site context's
+   * integration payload. Use these to embed analytics tags, chat
+   * widgets, or any custom scripts into your template.
    *
    * Fields that are not configured on the server default to empty strings.
    *
@@ -93,12 +133,12 @@ export class SiteResource {
    * ```
    */
   async getCodeInjection(): Promise<CodeInjection> {
-    const settings = await this.http.get<Record<string, unknown>>(
-      `/sites/${this.siteId}/settings`,
+    const context = await this.http.get<SiteContextResponse>(
+      `/sites/${this.siteId}/context`,
     );
     return {
-      code_injection_head: (settings.code_injection_head as string) ?? '',
-      code_injection_footer: (settings.code_injection_footer as string) ?? '',
+      code_injection_head: context.integration?.code_injection_head ?? '',
+      code_injection_footer: context.integration?.code_injection_footer ?? '',
     };
   }
 }

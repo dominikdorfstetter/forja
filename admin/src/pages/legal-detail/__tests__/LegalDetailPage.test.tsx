@@ -1,8 +1,11 @@
 import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest';
-import { renderWithProviders, screen, waitFor } from '@/test/test-utils';
-import { getLegalDocumentDetail, getLegalVersions } from '@/services/legal';
+import { renderWithProviders, screen, waitFor, within } from '@/test/test-utils';
+import userEvent from '@testing-library/user-event';
+import { QueryClient } from '@tanstack/react-query';
+import { getLegalDocumentDetail, getLegalVersions, updateLegalDocument } from '@/services/legal';
 import { getSiteLocales } from '@/services/siteLocales';
 import { getSiteSettings } from '@/services/sites';
+import { queryKeys } from '@/lib/queryKeys';
 import type { LegalDocumentFullDetailResponse, SiteLocaleResponse } from '@/types/api';
 
 vi.mock('@/store/SiteContext', () => ({
@@ -162,5 +165,98 @@ describe('LegalDetailPage', () => {
       return text.includes('Publish') || text.includes('Submit') || text.includes('Review');
     });
     expect(hasWorkflowAction).toBe(true);
+  });
+
+  describe('slug field', () => {
+    async function openSlugField() {
+      const user = userEvent.setup();
+      renderWithProviders(<LegalDetailPage />);
+      await waitFor(() => {
+        expect(screen.getByTestId('legal-detail.field-slug')).toBeInTheDocument();
+      });
+      await user.click(screen.getByText('SEO Settings'));
+      return { user, slugField: screen.getByTestId('legal-detail.field-slug') };
+    }
+
+    it('lets a draft slug be edited and saved', async () => {
+      vi.mocked(getLegalDocumentDetail).mockResolvedValue(mockDetail);
+      vi.mocked(getSiteLocales).mockResolvedValue([mockLocale]);
+      vi.mocked(updateLegalDocument).mockResolvedValue({} as never);
+
+      const { user, slugField } = await openSlugField();
+      expect(within(slugField).getByText('privacy')).toBeInTheDocument();
+
+      await user.click(within(slugField).getByText('privacy'));
+      const input = within(slugField).getByTestId('inline-edit.input').querySelector('input')!;
+      await user.clear(input);
+      await user.type(input, 'privacy-policy{Enter}');
+
+      await waitFor(() => {
+        expect(updateLegalDocument).toHaveBeenCalledWith('doc-1', { slug: 'privacy-policy' });
+      });
+    });
+
+    it('invalidates every consumer of the slug after saving it', async () => {
+      vi.mocked(getLegalDocumentDetail).mockResolvedValue(mockDetail);
+      vi.mocked(getSiteLocales).mockResolvedValue([mockLocale]);
+      vi.mocked(updateLegalDocument).mockResolvedValue({} as never);
+      const invalidateSpy = vi.spyOn(QueryClient.prototype, 'invalidateQueries');
+
+      const { user, slugField } = await openSlugField();
+      await user.click(within(slugField).getByText('privacy'));
+      const input = within(slugField).getByTestId('inline-edit.input').querySelector('input')!;
+      await user.clear(input);
+      await user.type(input, 'privacy-policy{Enter}');
+
+      // The slug is denormalized into the detail, the legal list, resolved
+      // nav links, and the navigation-item picker — all must refetch.
+      await waitFor(() => {
+        expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: queryKeys.legalDetail('doc-1') });
+      });
+      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: queryKeys.legal('site-1') });
+      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: queryKeys.legalForNav('site-1') });
+      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: queryKeys.legalPicker('site-1') });
+      invalidateSpy.mockRestore();
+    });
+
+    it('disables slug editing once the document is published', async () => {
+      vi.mocked(getLegalDocumentDetail).mockResolvedValue({ ...mockDetail, status: 'Published' });
+      vi.mocked(getSiteLocales).mockResolvedValue([mockLocale]);
+
+      const { slugField } = await openSlugField();
+      expect(within(slugField).getByText('privacy')).toBeInTheDocument();
+      expect(within(slugField).queryByTestId('inline-edit.btn.edit')).not.toBeInTheDocument();
+      expect(within(slugField).getByText(/the slug is permanent/i)).toBeInTheDocument();
+    });
+
+    it('disables slug editing on forks of a published version', async () => {
+      vi.mocked(getLegalDocumentDetail).mockResolvedValue({ ...mockDetail, parent_version_id: 'doc-0', version: 2 });
+      vi.mocked(getSiteLocales).mockResolvedValue([mockLocale]);
+
+      const { slugField } = await openSlugField();
+      expect(within(slugField).queryByTestId('inline-edit.btn.edit')).not.toBeInTheDocument();
+    });
+
+    it('maps the LEGAL_SLUG_IMMUTABLE 409 to a friendly message', async () => {
+      vi.mocked(getLegalDocumentDetail).mockResolvedValue(mockDetail);
+      vi.mocked(getSiteLocales).mockResolvedValue([mockLocale]);
+      vi.mocked(updateLegalDocument).mockRejectedValue({
+        type: 'about:blank',
+        title: 'Conflict',
+        status: 409,
+        code: 'LEGAL_SLUG_IMMUTABLE',
+        detail: 'The slug of a legal document is locked once any version has been published',
+      });
+
+      const { user, slugField } = await openSlugField();
+      await user.click(within(slugField).getByText('privacy'));
+      const input = within(slugField).getByTestId('inline-edit.input').querySelector('input')!;
+      await user.clear(input);
+      await user.type(input, 'new-slug{Enter}');
+
+      await waitFor(() => {
+        expect(screen.getByText(/the slug can no longer be changed/i)).toBeInTheDocument();
+      });
+    });
   });
 });

@@ -270,6 +270,12 @@ export interface SectionLocalizationResponse {
   title: string | null;
   text: string | null;
   button_text: string | null;
+  /**
+   * Per-locale override of the section's `settings.items` array. `null`
+   * means no override — consumers fall back to the default items in
+   * `PageSectionResponse.settings.items`.
+   */
+  items: unknown[] | null;
 }
 
 // ── Navigation types ─────────────────────────────────────────
@@ -283,6 +289,14 @@ export interface NavigationMenuResponse {
   is_active: boolean;
   item_count: number;
   created_at: string;
+  updated_at: string;
+  localizations: MenuLocalizationResponse[];
+}
+
+export interface MenuLocalizationResponse {
+  id: string;
+  locale_id: string;
+  name: string;
 }
 
 export interface NavigationItemResponse {
@@ -291,6 +305,9 @@ export interface NavigationItemResponse {
   parent_id: string | null;
   page_id: string | null;
   external_url: string | null;
+  /** Referenced legal document; `null` alongside the other targets marks a
+   * broken link (e.g. after a purge) awaiting repair in the admin. */
+  legal_document_id: string | null;
   icon: string | null;
   display_order: number;
   open_in_new_tab: boolean;
@@ -302,11 +319,16 @@ export interface NavigationTree {
   parent_id: string | null;
   page_id: string | null;
   external_url: string | null;
+  /** Referenced legal document. */
+  legal_document_id: string | null;
   icon: string | null;
   display_order: number;
   open_in_new_tab: boolean;
   title: string | null;
   page_slug: string | null;
+  /** Version-chain root slug of the referenced legal document
+   * (for `/legal/{slug}` URL construction). */
+  legal_slug: string | null;
   children: NavigationTree[];
 }
 
@@ -315,6 +337,25 @@ export interface NavigationItemLocalizationResponse {
   navigation_item_id: string;
   locale_id: string;
   title: string;
+}
+
+/**
+ * A navigation menu with its display name resolved for a requested locale.
+ *
+ * `resolvedName` is the `localizations` entry matching the requested locale
+ * code, or `null` when no locale was requested, the code is not configured
+ * for the site, or the menu has no localization for it. The menu carries no
+ * base display name on the wire — `slug` is its technical identifier — so
+ * consumers pick their own fallback (e.g. `resolvedName ?? menu.slug`).
+ */
+export interface ResolvedNavigationMenu extends NavigationMenuResponse {
+  resolvedName: string | null;
+}
+
+/** Composed result of `forja.navigation.getMenuWithTree()`. */
+export interface MenuWithTree {
+  menu: ResolvedNavigationMenu;
+  items: NavigationTree[];
 }
 
 // ── Taxonomy types ───────────────────────────────────────────
@@ -607,6 +648,21 @@ export interface CodeInjection {
   code_injection_footer: string;
 }
 
+// ── Site context types ───────────────────────────────────────
+
+/** Integration payload of the site context response. */
+export interface SiteContextIntegration {
+  /** HTML/JS to inject into <head>; empty string when unconfigured. */
+  code_injection_head: string;
+  /** HTML/JS to inject before </body>; empty string when unconfigured. */
+  code_injection_footer: string;
+}
+
+/** Subset of `GET /sites/{siteId}/context` consumed by the SDK. */
+export interface SiteContextResponse {
+  integration: SiteContextIntegration;
+}
+
 // ── Site types ───────────────────────────────────────────────
 
 export interface SiteResponse {
@@ -623,6 +679,27 @@ export interface SiteResponse {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+}
+
+/**
+ * Curated public subset of the site's settings.
+ *
+ * Readable with any API key tier, including `Read` (Viewer). Deliberately
+ * excludes operational configuration — allowed origins, storage quotas,
+ * data retention, module flags, code injection — which stays on the
+ * Admin-only raw settings endpoint.
+ */
+export interface PublicSiteSettings {
+  /** Public contact email; empty string when unset. */
+  contact_email: string;
+  /** Theme color for the web manifest (hex, e.g. `#4a90d9`). */
+  theme_color: string;
+  /** Background color for the web manifest (hex). */
+  background_color: string;
+  /** SEO title template (e.g. `{{title}} | {{site_name}}`). */
+  seo_title_template: string;
+  /** Fallback meta description; empty string when unset. */
+  seo_default_description: string;
 }
 
 // ── Media types ──────────────────────────────────────────────
@@ -663,6 +740,18 @@ export interface SocialLinkResponse {
   alt_text: string | null;
   display_order: number;
 }
+
+// ── UI string types ──────────────────────────────────────────
+
+/**
+ * Resolved UI strings for one locale: a flat `key → value` dictionary.
+ *
+ * Keys are dot-namespaced lowercase identifiers (e.g. `blog.min_read`,
+ * `nav.aria.toggle_dark`). One value per key, resolved by the server's
+ * fallback chain (requested locale → site default → first available);
+ * keys without any localization are omitted.
+ */
+export type UiStringsResponse = Record<string, string>;
 
 // ── Project types ────────────────────────────────────────────
 

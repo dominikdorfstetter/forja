@@ -68,19 +68,34 @@ async fn slug_exists(
     slug: &str,
     site_ids: &[Uuid],
 ) -> Result<bool, ApiError> {
+    slug_in_use(conn, slug, site_ids, None).await
+}
+
+/// Check whether a slug is already claimed by another content row on any of
+/// the given sites. `exclude_content_id` lets update paths ignore the row
+/// being edited. Covers both `contents.slug` and the #762 per-site
+/// `content_sites.site_specific_slug` mirror.
+pub async fn slug_in_use(
+    conn: &mut PgConnection,
+    slug: &str,
+    site_ids: &[Uuid],
+    exclude_content_id: Option<Uuid>,
+) -> Result<bool, ApiError> {
     let exists: bool = sqlx::query_scalar(
         r#"
         SELECT EXISTS(
             SELECT 1 FROM contents c
             JOIN content_sites cs ON cs.content_id = c.id
-            WHERE c.slug = $1
+            WHERE (c.slug = $1 OR cs.site_specific_slug = $1)
               AND cs.site_id = ANY($2)
               AND c.is_deleted = FALSE
+              AND ($3::uuid IS NULL OR c.id <> $3)
         )
         "#,
     )
     .bind(slug)
     .bind(site_ids)
+    .bind(exclude_content_id)
     .fetch_one(&mut *conn)
     .await?;
 

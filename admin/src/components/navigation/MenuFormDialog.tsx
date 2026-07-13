@@ -1,12 +1,22 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  Box,
+  Tab,
+  Tabs,
   TextField,
   FormControlLabel,
   Switch,
+  Typography,
 } from '@mui/material';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
-import type { NavigationMenu, CreateNavigationMenuRequest, UpdateNavigationMenuRequest } from '@/types/api';
+import type {
+  NavigationMenu,
+  CreateNavigationMenuRequest,
+  UpdateNavigationMenuRequest,
+  MenuLocalizationInput,
+  Locale,
+} from '@/types/api';
 import { useTranslation } from 'react-i18next';
 import { formResolver } from '@/utils/validation';
 import FormDialog from '@/components/shared/FormDialog';
@@ -26,19 +36,47 @@ type MenuFormData = z.infer<typeof menuSchema>;
 interface MenuFormDialogProps {
   open: boolean;
   menu?: NavigationMenu | null;
+  locales?: Locale[];
   onSubmitCreate: (data: CreateNavigationMenuRequest) => void;
   onSubmitUpdate: (data: UpdateNavigationMenuRequest) => void;
   onClose: () => void;
   loading?: boolean;
 }
 
-export default function MenuFormDialog({ open, menu, onSubmitCreate, onSubmitUpdate, onClose, loading }: MenuFormDialogProps) {
+const EMPTY_LOCALES: Locale[] = [];
+
+/** Per-locale display names keyed by locale id, from a menu's localizations. */
+function toDisplayNames(menu?: NavigationMenu | null): Record<string, string> {
+  return Object.fromEntries(
+    (menu?.localizations ?? []).map((l) => [l.locale_id, l.name]),
+  );
+}
+
+export default function MenuFormDialog({ open, menu, locales = EMPTY_LOCALES, onSubmitCreate, onSubmitUpdate, onClose, loading }: MenuFormDialogProps) {
   const { t } = useTranslation();
   const { register, handleSubmit, reset, control, formState: { errors, isValid } } = useForm<MenuFormData>({
     resolver: formResolver(menuSchema),
     defaultValues: { slug: '', description: '', max_depth: 3, is_active: true },
     mode: 'onChange',
   });
+
+  const [displayNames, setDisplayNames] = useState<Record<string, string>>({});
+  const [activeLocaleTab, setActiveLocaleTab] = useState(0);
+
+  // A cleared, previously-persisted display name is an explicit removal:
+  // its locale id rides in `removed_locale_ids` on the update payload.
+  const persistedNames = useMemo(() => toDisplayNames(menu), [menu]);
+  const clearedLocaleIds = useMemo(
+    () =>
+      locales
+        .filter(
+          (locale) =>
+            (persistedNames[locale.id] ?? '') !== '' &&
+            (displayNames[locale.id] ?? '').trim() === '',
+        )
+        .map((locale) => locale.id),
+    [locales, persistedNames, displayNames],
+  );
 
   const prevOpenRef = useRef(false);
   useEffect(() => {
@@ -49,23 +87,38 @@ export default function MenuFormDialog({ open, menu, onSubmitCreate, onSubmitUpd
         max_depth: menu.max_depth,
         is_active: menu.is_active,
       } : { slug: '', description: '', max_depth: 3, is_active: true });
+      setDisplayNames(toDisplayNames(menu));
+      setActiveLocaleTab(0);
     }
     prevOpenRef.current = open;
-  });
+  }, [open, menu, reset]);
+
+  const handleDisplayNameChange = useCallback((localeId: string, value: string) => {
+    setDisplayNames((prev) => ({ ...prev, [localeId]: value }));
+  }, []);
 
   const onFormSubmit = (data: MenuFormData) => {
+    const localizationInputs: MenuLocalizationInput[] = locales.flatMap((locale) => {
+      const name = displayNames[locale.id]?.trim();
+      return name ? [{ locale_id: locale.id, name }] : [];
+    });
+    const localizations = localizationInputs.length > 0 ? localizationInputs : undefined;
+
     if (menu) {
       onSubmitUpdate({
         slug: data.slug,
         description: data.description || undefined,
         max_depth: data.max_depth,
         is_active: data.is_active,
+        localizations,
+        removed_locale_ids: clearedLocaleIds.length > 0 ? clearedLocaleIds : undefined,
       });
     } else {
       onSubmitCreate({
         slug: data.slug,
         description: data.description || undefined,
         max_depth: data.max_depth,
+        localizations,
       });
     }
   };
@@ -111,6 +164,14 @@ export default function MenuFormDialog({ open, menu, onSubmitCreate, onSubmitUpd
         error={!!errors.max_depth}
         helperText={errors.max_depth?.message || t('navigation.menus.fields.maxDepthHelp', 'Maximum nesting depth (1-10)')}
       />
+      <DisplayNamesSection
+        locales={locales}
+        displayNames={displayNames}
+        clearedLocaleIds={clearedLocaleIds}
+        activeTab={activeLocaleTab}
+        onTabChange={setActiveLocaleTab}
+        onNameChange={handleDisplayNameChange}
+      />
       {menu && (
         <Controller name="is_active" control={control} render={({ field }) => (
           <FormControlLabel
@@ -120,5 +181,66 @@ export default function MenuFormDialog({ open, menu, onSubmitCreate, onSubmitUpd
         )} />
       )}
     </FormDialog>
+  );
+}
+
+function DisplayNamesSection({
+  locales,
+  displayNames,
+  clearedLocaleIds,
+  activeTab,
+  onTabChange,
+  onNameChange,
+}: {
+  locales: Locale[];
+  displayNames: Record<string, string>;
+  clearedLocaleIds: string[];
+  activeTab: number;
+  onTabChange: (tab: number) => void;
+  onNameChange: (localeId: string, value: string) => void;
+}) {
+  const { t } = useTranslation();
+
+  if (locales.length === 0) return null;
+
+  const currentLocale = locales[activeTab] ?? locales[0];
+  const currentCleared = clearedLocaleIds.includes(currentLocale.id);
+
+  return (
+    <Box>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+        {t('navigation.menus.fields.displayNames', 'Display names')}
+      </Typography>
+      {locales.length > 1 && (
+        <Tabs
+          value={activeTab}
+          onChange={(_, v) => onTabChange(v)}
+          variant="scrollable"
+          scrollButtons="auto"
+          sx={{ mb: 1 }}
+        >
+          {locales.map((locale) => (
+            <Tab
+              key={locale.id}
+              label={locale.code.toUpperCase()}
+              aria-label={locale.code}
+            />
+          ))}
+        </Tabs>
+      )}
+      <TextField
+        label={`${t('navigation.menus.fields.displayName', 'Display name')} (${currentLocale.code})`}
+        fullWidth
+        size="small"
+        value={displayNames[currentLocale.id] ?? ''}
+        onChange={(e) => onNameChange(currentLocale.id, e.target.value)}
+        helperText={
+          currentCleared
+            ? t('navigation.menus.fields.displayNameClearHint', 'Clearing removes this translation when you save')
+            : t('navigation.menus.fields.displayNamesHelp', 'Optional menu name shown to visitors in this language (e.g. as a footer heading)')
+        }
+        slotProps={{ htmlInput: { 'data-testid': 'menu-form.input.display-name', maxLength: 200 } }}
+      />
+    </Box>
   );
 }

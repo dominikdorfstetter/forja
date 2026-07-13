@@ -16,7 +16,7 @@ pub struct CreateNavigationItemRequest {
     #[schema(example = "550e8400-e29b-41d4-a716-446655440000")]
     pub parent_id: Option<Uuid>,
 
-    /// Either page_id or external_url must be provided (but not both)
+    /// Exactly one of page_id, external_url, or legal_document_id must be provided
     #[schema(example = "550e8400-e29b-41d4-a716-446655440001")]
     pub page_id: Option<Uuid>,
 
@@ -24,6 +24,11 @@ pub struct CreateNavigationItemRequest {
     #[validate(length(max = 2000, message = "External URL cannot exceed 2000 characters"))]
     #[validate(custom(function = "validate_nav_url"))]
     pub external_url: Option<String>,
+
+    /// First-class reference to a legal document (resolves via the version
+    /// chain root's slug in the public tree)
+    #[schema(example = "550e8400-e29b-41d4-a716-446655440003")]
+    pub legal_document_id: Option<Uuid>,
 
     #[schema(example = "home")]
     #[validate(length(max = 50, message = "Icon name cannot exceed 50 characters"))]
@@ -63,13 +68,31 @@ fn validate_icon_optional(icon: &str) -> Result<(), validator::ValidationError> 
     validate_icon(icon)
 }
 
+/// Count the link targets set on a write payload. The exactly-one-of-three
+/// invariant (page_id | external_url | legal_document_id) lives here.
+fn link_target_count(
+    page_id: &Option<Uuid>,
+    external_url: &Option<String>,
+    legal_document_id: &Option<Uuid>,
+) -> usize {
+    usize::from(page_id.is_some())
+        + usize::from(external_url.is_some())
+        + usize::from(legal_document_id.is_some())
+}
+
 impl CreateNavigationItemRequest {
-    /// Either page_id or external_url must be provided (but not both).
+    /// Exactly one of page_id, external_url, or legal_document_id.
     fn validate_link(&self) -> Result<(), String> {
-        match (&self.page_id, &self.external_url) {
-            (None, None) => Err("Either page_id or external_url must be provided".to_string()),
-            (Some(_), Some(_)) => Err("Cannot specify both page_id and external_url".to_string()),
-            _ => Ok(()),
+        match link_target_count(&self.page_id, &self.external_url, &self.legal_document_id) {
+            0 => Err(
+                "Exactly one of page_id, external_url, or legal_document_id must be provided"
+                    .to_string(),
+            ),
+            1 => Ok(()),
+            _ => Err(
+                "Only one of page_id, external_url, or legal_document_id may be provided"
+                    .to_string(),
+            ),
         }
     }
 }
@@ -85,7 +108,7 @@ impl ValidatedDto for CreateNavigationItemRequest {
 }
 
 /// Request to update a navigation item
-#[derive(Debug, Clone, Deserialize, Validate, ValidatedDto, utoipa::ToSchema)]
+#[derive(Debug, Clone, Deserialize, Validate, utoipa::ToSchema)]
 #[schema(description = "Update a navigation item")]
 pub struct UpdateNavigationItemRequest {
     #[schema(example = "550e8400-e29b-41d4-a716-446655440000")]
@@ -98,6 +121,11 @@ pub struct UpdateNavigationItemRequest {
     #[validate(length(max = 2000, message = "External URL cannot exceed 2000 characters"))]
     #[validate(custom(function = "validate_nav_url"))]
     pub external_url: Option<String>,
+
+    /// First-class reference to a legal document. Providing any link target
+    /// switches the item to that target and clears the other two.
+    #[schema(example = "550e8400-e29b-41d4-a716-446655440003")]
+    pub legal_document_id: Option<Uuid>,
 
     #[schema(example = "link")]
     #[validate(length(max = 50, message = "Icon name cannot exceed 50 characters"))]
@@ -116,6 +144,34 @@ pub struct UpdateNavigationItemRequest {
     pub open_in_new_tab: Option<bool>,
 }
 
+impl UpdateNavigationItemRequest {
+    /// True when the payload switches the item's link target.
+    pub fn changes_link(&self) -> bool {
+        link_target_count(&self.page_id, &self.external_url, &self.legal_document_id) > 0
+    }
+
+    /// At most one link target on update — none means "leave the link as-is".
+    fn validate_link(&self) -> Result<(), String> {
+        match link_target_count(&self.page_id, &self.external_url, &self.legal_document_id) {
+            0 | 1 => Ok(()),
+            _ => Err(
+                "Only one of page_id, external_url, or legal_document_id may be provided"
+                    .to_string(),
+            ),
+        }
+    }
+}
+
+impl ValidatedDto for UpdateNavigationItemRequest {
+    type Context = ();
+
+    async fn validate_all(self, _: &()) -> Result<Validated<Self>, ApiError> {
+        self.validate().map_err(ApiError::from)?;
+        self.validate_link().map_err(ApiError::validation)?;
+        Ok(Validated::seal(self))
+    }
+}
+
 /// Navigation item response
 #[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 #[schema(description = "Navigation item details")]
@@ -130,6 +186,10 @@ pub struct NavigationItemResponse {
     pub page_id: Option<Uuid>,
     #[schema(example = "https://github.com")]
     pub external_url: Option<String>,
+    /// Referenced legal document; NULL alongside the other targets marks a
+    /// broken link (e.g. after a purge) awaiting repair in the admin
+    #[schema(example = "550e8400-e29b-41d4-a716-446655440003")]
+    pub legal_document_id: Option<Uuid>,
     #[schema(example = "home")]
     pub icon: Option<String>,
     #[schema(example = 1)]
@@ -152,6 +212,7 @@ impl From<NavigationItem> for NavigationItemResponse {
             parent_id: item.parent_id,
             page_id: item.page_id,
             external_url: item.external_url,
+            legal_document_id: item.legal_document_id,
             icon: item.icon,
             display_order: item.display_order,
             open_in_new_tab: item.open_in_new_tab,
@@ -173,6 +234,9 @@ pub struct NavigationTree {
     pub page_id: Option<Uuid>,
     #[schema(example = "https://github.com")]
     pub external_url: Option<String>,
+    /// Referenced legal document
+    #[schema(example = "550e8400-e29b-41d4-a716-446655440003")]
+    pub legal_document_id: Option<Uuid>,
     #[schema(example = "home")]
     pub icon: Option<String>,
     #[schema(example = 1)]
@@ -183,6 +247,9 @@ pub struct NavigationTree {
     pub title: Option<String>,
     /// Page slug (for URL construction)
     pub page_slug: Option<String>,
+    /// Version-chain root slug of the referenced legal document
+    /// (for `/legal/{slug}` URL construction)
+    pub legal_slug: Option<String>,
     pub children: Vec<NavigationTree>,
 }
 
@@ -283,6 +350,7 @@ mod tests {
             parent_id: None,
             page_id: Some(Uuid::new_v4()),
             external_url: None,
+            legal_document_id: None,
             icon: Some("home".to_string()),
             display_order: 1,
             open_in_new_tab: false,
@@ -300,6 +368,7 @@ mod tests {
             parent_id: None,
             page_id: None,
             external_url: Some("https://github.com".to_string()),
+            legal_document_id: None,
             icon: Some("external-link".to_string()),
             display_order: 2,
             open_in_new_tab: true,
@@ -317,6 +386,7 @@ mod tests {
             parent_id: None,
             page_id: None,
             external_url: None,
+            legal_document_id: None,
             icon: None,
             display_order: 1,
             open_in_new_tab: false,
@@ -334,6 +404,42 @@ mod tests {
             parent_id: None,
             page_id: Some(Uuid::new_v4()),
             external_url: Some("https://github.com".to_string()),
+            legal_document_id: None,
+            icon: None,
+            display_order: 1,
+            open_in_new_tab: false,
+            site_id: Uuid::new_v4(),
+            menu_id: Uuid::new_v4(),
+            localizations: None,
+        };
+        assert!(request.validate_link().is_err());
+    }
+
+    #[test]
+    fn test_create_navigation_item_request_with_legal_document() {
+        let request = CreateNavigationItemRequest {
+            parent_id: None,
+            page_id: None,
+            external_url: None,
+            legal_document_id: Some(Uuid::new_v4()),
+            icon: None,
+            display_order: 1,
+            open_in_new_tab: false,
+            site_id: Uuid::new_v4(),
+            menu_id: Uuid::new_v4(),
+            localizations: None,
+        };
+        assert!(request.validate().is_ok());
+        assert!(request.validate_link().is_ok());
+    }
+
+    #[test]
+    fn test_create_navigation_item_legal_and_page_rejected() {
+        let request = CreateNavigationItemRequest {
+            parent_id: None,
+            page_id: Some(Uuid::new_v4()),
+            external_url: None,
+            legal_document_id: Some(Uuid::new_v4()),
             icon: None,
             display_order: 1,
             open_in_new_tab: false,
@@ -350,6 +456,7 @@ mod tests {
             parent_id: None,
             page_id: None,
             external_url: Some("javascript:alert(1)".to_string()),
+            legal_document_id: None,
             icon: None,
             display_order: 1,
             open_in_new_tab: false,
@@ -367,11 +474,14 @@ mod tests {
             parent_id: None,
             page_id: None,
             external_url: Some("https://example.com".to_string()),
+            legal_document_id: None,
             icon: Some("link".to_string()),
             display_order: Some(5),
             open_in_new_tab: Some(true),
         };
         assert!(request.validate().is_ok());
+        assert!(request.validate_link().is_ok());
+        assert!(request.changes_link());
     }
 
     #[test]
@@ -380,11 +490,28 @@ mod tests {
             parent_id: None,
             page_id: None,
             external_url: None,
+            legal_document_id: None,
             icon: None,
             display_order: None,
             open_in_new_tab: None,
         };
         assert!(request.validate().is_ok());
+        assert!(request.validate_link().is_ok(), "no link change is valid");
+        assert!(!request.changes_link());
+    }
+
+    #[test]
+    fn test_update_navigation_item_two_targets_rejected() {
+        let request = UpdateNavigationItemRequest {
+            parent_id: None,
+            page_id: Some(Uuid::new_v4()),
+            external_url: None,
+            legal_document_id: Some(Uuid::new_v4()),
+            icon: None,
+            display_order: None,
+            open_in_new_tab: None,
+        };
+        assert!(request.validate_link().is_err());
     }
 
     #[test]
@@ -393,6 +520,7 @@ mod tests {
             parent_id: None,
             page_id: None,
             external_url: Some("/blog/my-post".to_string()),
+            legal_document_id: None,
             icon: None,
             display_order: 1,
             open_in_new_tab: false,
@@ -410,6 +538,7 @@ mod tests {
             parent_id: None,
             page_id: None,
             external_url: Some("blog/my-post".to_string()),
+            legal_document_id: None,
             icon: None,
             display_order: 1,
             open_in_new_tab: false,
@@ -429,6 +558,7 @@ mod tests {
             parent_id: None,
             page_id: Some(Uuid::new_v4()),
             external_url: None,
+            legal_document_id: None,
             icon: Some("home".to_string()),
             display_order: 1,
             open_in_new_tab: false,

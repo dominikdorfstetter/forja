@@ -18,10 +18,30 @@ use crate::models::legal::{
 use crate::repos::content_query::ContentQuery;
 use crate::services::content_service::ContentService;
 use crate::utils::list_params::ListParams;
+use crate::utils::slugify;
 
 /// Columns the legal-document list free-text search scans, aliased for
 /// `ContentQuery` (entity table = `e`). Hard-coded — never user input.
 const LEGAL_SEARCH_COLUMNS: &[&str] = &["e.cookie_name"];
+
+/// House-style conflict for a per-site legal slug collision.
+fn slug_taken_error(slug: &str) -> ApiError {
+    ApiError::conflict(format!(
+        "A document with slug '{slug}' already exists on this site"
+    ))
+    .with_code(codes::ENTITY_SLUG_TAKEN)
+    .with_entity_type("legal_doc")
+}
+
+/// True when `e` is a Postgres unique violation on the named constraint.
+fn is_unique_violation(e: &sqlx::Error, constraint: &str) -> bool {
+    matches!(
+        e,
+        sqlx::Error::Database(db)
+            if db.code().as_deref() == Some("23505")
+                && db.constraint() == Some(constraint)
+    )
+}
 
 /// Map a legal document type — accepted either as the API PascalCase name
 /// (`"CookieConsent"`) or as the Postgres enum text (`"cookie_consent"`) — to
@@ -294,16 +314,27 @@ impl LegalDocumentRepo {
     }
 
     /// Create a legal document + spine row atomically on the caller's tx
-    /// connection (#863).
+    /// connection (#863). The chain root's canonical slug is the request
+    /// slug, falling back to the document type's kebab-case default; it is
+    /// unique per site and mirrored into `content_sites.site_specific_slug`
+    /// (the #762 join-table uniqueness mechanism).
     pub async fn create(
         conn: &mut PgConnection,
         req: CreateLegalDocumentRequest,
         created_by: Option<&str>,
     ) -> Result<LegalDocument, ApiError> {
+        let slug = req
+            .slug
+            .clone()
+            .unwrap_or_else(|| req.document_type.default_slug().to_string());
+        if slugify::slug_in_use(&mut *conn, &slug, &req.site_ids, None).await? {
+            return Err(slug_taken_error(&slug));
+        }
+
         let content_id = ContentService::create_content(
             &mut *conn,
             "legal_document",
-            None,
+            Some(&slug),
             &req.status,
             &req.site_ids,
             None,
@@ -311,6 +342,7 @@ impl LegalDocumentRepo {
             created_by,
         )
         .await?;
+        Self::mirror_site_slug(&mut *conn, content_id, Some(&slug)).await?;
 
         let document = sqlx::query_as::<_, LegalDocument>(
             r#"
@@ -330,6 +362,116 @@ impl LegalDocumentRepo {
         Ok(document)
     }
 
+    /// Mirror a content's slug into `content_sites.site_specific_slug`, where
+    /// the partial unique index from migration 70 enforces per-site
+    /// uniqueness at the database level. Maps a lost race on that index to
+    /// the same conflict error as the pre-check.
+    async fn mirror_site_slug(
+        conn: &mut PgConnection,
+        content_id: Uuid,
+        slug: Option<&str>,
+    ) -> Result<(), ApiError> {
+        sqlx::query("UPDATE content_sites SET site_specific_slug = $2 WHERE content_id = $1")
+            .bind(content_id)
+            .bind(slug)
+            .execute(conn)
+            .await
+            .map_err(|e| match slug {
+                Some(s) if is_unique_violation(&e, "idx_content_sites_site_slug") => {
+                    slug_taken_error(s)
+                }
+                _ => e.into(),
+            })?;
+        Ok(())
+    }
+
+    /// Walk `parent_version_id` up to the version-chain root. Slug ownership
+    /// and by-slug resolution both hang off the root.
+    async fn chain_root(conn: &mut PgConnection, id: Uuid) -> Result<LegalDocument, ApiError> {
+        let mut root = Self::find_by_id(&mut *conn, id).await?;
+        while let Some(parent_id) = root.parent_version_id {
+            root = Self::find_by_id(&mut *conn, parent_id).await?;
+        }
+        Ok(root)
+    }
+
+    /// True when any version in the chain rooted at `root_id` has ever been
+    /// published (`contents.published_at` survives unpublish, so this is a
+    /// permanent property of the chain).
+    async fn chain_ever_published(
+        conn: &mut PgConnection,
+        root_id: Uuid,
+    ) -> Result<bool, ApiError> {
+        let published: bool = sqlx::query_scalar(
+            r#"
+            WITH RECURSIVE chain AS (
+                SELECT id, content_id, parent_version_id
+                FROM legal_documents
+                WHERE id = $1
+                UNION ALL
+                SELECT ld.id, ld.content_id, ld.parent_version_id
+                FROM legal_documents ld
+                INNER JOIN chain ON ld.parent_version_id = chain.id
+            )
+            SELECT EXISTS(
+                SELECT 1 FROM chain
+                INNER JOIN contents c ON c.id = chain.content_id
+                WHERE c.published_at IS NOT NULL
+            )
+            "#,
+        )
+        .bind(root_id)
+        .fetch_one(conn)
+        .await?;
+        Ok(published)
+    }
+
+    /// Move the chain's canonical slug (owned by the root's content row) to
+    /// `new_slug`. Allowed only while no version of the chain has ever been
+    /// published — published `/legal/{slug}` URLs are permanent.
+    async fn set_chain_slug(
+        conn: &mut PgConnection,
+        id: Uuid,
+        new_slug: &str,
+    ) -> Result<(), ApiError> {
+        let root = Self::chain_root(&mut *conn, id).await?;
+        let content_id = root
+            .content_id
+            .ok_or_else(|| ApiError::bad_request("Legal document has no content_id"))?;
+
+        let current: Option<String> = sqlx::query_scalar("SELECT slug FROM contents WHERE id = $1")
+            .bind(content_id)
+            .fetch_one(&mut *conn)
+            .await?;
+        if current.as_deref() == Some(new_slug) {
+            return Ok(());
+        }
+
+        if Self::chain_ever_published(&mut *conn, root.id).await? {
+            return Err(ApiError::conflict(
+                "The slug of a legal document is locked once any version has been published",
+            )
+            .with_code(codes::LEGAL_SLUG_IMMUTABLE)
+            .with_entity_type("legal_doc"));
+        }
+
+        let site_ids: Vec<Uuid> =
+            sqlx::query_scalar("SELECT site_id FROM content_sites WHERE content_id = $1")
+                .bind(content_id)
+                .fetch_all(&mut *conn)
+                .await?;
+        if slugify::slug_in_use(&mut *conn, new_slug, &site_ids, Some(content_id)).await? {
+            return Err(slug_taken_error(new_slug));
+        }
+
+        sqlx::query("UPDATE contents SET slug = $2, updated_at = NOW() WHERE id = $1")
+            .bind(content_id)
+            .bind(new_slug)
+            .execute(&mut *conn)
+            .await?;
+        Self::mirror_site_slug(&mut *conn, content_id, Some(new_slug)).await
+    }
+
     /// Update a legal document + spine row atomically on the caller's tx
     /// connection (#863).
     pub async fn update(
@@ -338,6 +480,10 @@ impl LegalDocumentRepo {
         req: UpdateLegalDocumentRequest,
     ) -> Result<LegalDocument, ApiError> {
         let existing = Self::find_by_id(&mut *conn, id).await?;
+
+        if let Some(new_slug) = req.slug.as_deref() {
+            Self::set_chain_slug(&mut *conn, id, new_slug).await?;
+        }
 
         if let Some(content_id) = existing.content_id {
             ContentService::update_content(
@@ -401,6 +547,8 @@ impl LegalDocumentRepo {
     }
 
     pub async fn restore(pool: &PgPool, id: Uuid) -> Result<(), ApiError> {
+        let mut tx = pool.begin().await?;
+
         let result = sqlx::query(
             r#"
             UPDATE legal_documents
@@ -409,7 +557,7 @@ impl LegalDocumentRepo {
             "#,
         )
         .bind(id)
-        .execute(pool)
+        .execute(&mut *tx)
         .await?;
 
         if result.rows_affected() == 0 {
@@ -421,7 +569,72 @@ impl LegalDocumentRepo {
             .with_entity_type("legal_doc"));
         }
 
+        Self::backfill_chain_root_slug(&mut tx, id).await?;
+
+        tx.commit().await?;
         Ok(())
+    }
+
+    /// Give a restored chain whose root has no slug the canonical one it
+    /// would have received at create time (migration 076 only backfilled
+    /// live roots, and the post-publish immutability guard blocks a manual
+    /// rename): document-type kebab, per-site collision → cookie_name
+    /// suffix, then an id fragment as a last resort. Mirrors the slug into
+    /// `content_sites.site_specific_slug` like every other slug write.
+    async fn backfill_chain_root_slug(conn: &mut PgConnection, id: Uuid) -> Result<(), ApiError> {
+        let root = sqlx::query_as::<_, (Uuid, Uuid, String, LegalDocType, Option<String>)>(
+            r#"
+            WITH RECURSIVE chain AS (
+                SELECT id, content_id, cookie_name, document_type, parent_version_id
+                FROM legal_documents
+                WHERE id = $1
+                UNION ALL
+                SELECT ld.id, ld.content_id, ld.cookie_name, ld.document_type,
+                       ld.parent_version_id
+                FROM legal_documents ld
+                INNER JOIN chain ON chain.parent_version_id = ld.id
+            )
+            SELECT chain.id, chain.content_id, chain.cookie_name, chain.document_type, c.slug
+            FROM chain
+            INNER JOIN contents c ON c.id = chain.content_id
+            WHERE chain.parent_version_id IS NULL
+            "#,
+        )
+        .bind(id)
+        .fetch_optional(&mut *conn)
+        .await?;
+
+        let Some((root_id, content_id, cookie_name, document_type, slug)) = root else {
+            return Ok(());
+        };
+        if slug.is_some() {
+            return Ok(());
+        }
+
+        let site_ids: Vec<Uuid> =
+            sqlx::query_scalar("SELECT site_id FROM content_sites WHERE content_id = $1")
+                .bind(content_id)
+                .fetch_all(&mut *conn)
+                .await?;
+
+        let base = document_type.default_slug();
+        let mut candidate = base.to_string();
+        if slugify::slug_in_use(&mut *conn, &candidate, &site_ids, Some(content_id)).await? {
+            let cookie_suffix = slugify::slugify(&cookie_name);
+            if !cookie_suffix.is_empty() {
+                candidate = format!("{base}-{cookie_suffix}");
+            }
+        }
+        if slugify::slug_in_use(&mut *conn, &candidate, &site_ids, Some(content_id)).await? {
+            candidate = format!("{candidate}-{}", &root_id.to_string()[..8]);
+        }
+
+        sqlx::query("UPDATE contents SET slug = $2, updated_at = NOW() WHERE id = $1")
+            .bind(content_id)
+            .bind(&candidate)
+            .execute(&mut *conn)
+            .await?;
+        Self::mirror_site_slug(&mut *conn, content_id, Some(&candidate)).await
     }
 
     pub async fn permanent_delete(pool: &PgPool, id: Uuid) -> Result<(), ApiError> {
@@ -498,9 +711,46 @@ impl LegalDocumentRepo {
         Ok(row.0)
     }
 
+    /// True when the version chain containing `id` resolves to a chain root
+    /// associated with `site_id` (the site-scoped match the migration-77
+    /// nav-link conversion used). Soft-deleted versions still count — this
+    /// checks site membership, not visibility, so a reference to a trashed
+    /// same-site document validates while a cross-site one never does.
+    pub async fn chain_root_on_site(
+        pool: &PgPool,
+        id: Uuid,
+        site_id: Uuid,
+    ) -> Result<bool, ApiError> {
+        let on_site: bool = sqlx::query_scalar(
+            r#"
+            WITH RECURSIVE chain AS (
+                SELECT ld.id, ld.content_id, ld.parent_version_id
+                FROM legal_documents ld
+                WHERE ld.id = $1
+                UNION ALL
+                SELECT parent.id, parent.content_id, parent.parent_version_id
+                FROM legal_documents parent
+                INNER JOIN chain ON chain.parent_version_id = parent.id
+            )
+            SELECT EXISTS(
+                SELECT 1
+                FROM chain
+                INNER JOIN content_sites cs ON cs.content_id = chain.content_id
+                WHERE chain.parent_version_id IS NULL AND cs.site_id = $2
+            )
+            "#,
+        )
+        .bind(id)
+        .bind(site_id)
+        .fetch_one(pool)
+        .await?;
+        Ok(on_site)
+    }
+
     /// Duplicate a legal document as a *separate* document (the `/clone`
-    /// endpoint): the copy takes a distinct `_copy` cookie name and its own
-    /// fresh content row, so it is an independent document — not a version.
+    /// endpoint): the copy takes a distinct `_copy` cookie name, a fresh
+    /// `-copy`-suffixed slug (its own chain root), and its own fresh content
+    /// row, so it is an independent document — not a version.
     pub async fn clone_document(
         pool: &PgPool,
         source_id: Uuid,
@@ -509,19 +759,42 @@ impl LegalDocumentRepo {
     ) -> Result<LegalDocument, ApiError> {
         let source = Self::find_by_id(pool, source_id).await?;
         let new_cookie = format!("{}_copy", source.cookie_name);
-        Self::clone_document_with_cookie(pool, source_id, site_ids, created_by, new_cookie).await
+
+        let mut conn = pool.acquire().await?;
+        let root = Self::chain_root(&mut conn, source_id).await?;
+        drop(conn);
+        let root_slug: Option<String> = match root.content_id {
+            Some(cid) => {
+                sqlx::query_scalar("SELECT slug FROM contents WHERE id = $1")
+                    .bind(cid)
+                    .fetch_one(pool)
+                    .await?
+            }
+            None => None,
+        };
+        let new_slug = match root_slug {
+            Some(base) => Some(ContentService::generate_unique_slug(pool, &base, &site_ids).await?),
+            None => None,
+        };
+
+        Self::clone_document_with_cookie(
+            pool, source_id, site_ids, created_by, new_cookie, new_slug,
+        )
+        .await
     }
 
     /// Deep-copy a legal document's content, localizations, groups and items
     /// into a new Draft content row under `new_cookie`. Shared by the public
-    /// `/clone` (which renames) and version creation (which preserves the
-    /// cookie name so the version keeps the document's identity).
+    /// `/clone` (which renames and takes a fresh slug) and version creation
+    /// (which preserves the cookie name and passes no slug — versions resolve
+    /// through their chain root's slug).
     async fn clone_document_with_cookie(
         pool: &PgPool,
         source_id: Uuid,
         site_ids: Vec<Uuid>,
         created_by: Option<&str>,
         new_cookie: String,
+        new_slug: Option<String>,
     ) -> Result<LegalDocument, ApiError> {
         let source = Self::find_by_id(pool, source_id).await?;
         let source_content_id = source
@@ -536,7 +809,7 @@ impl LegalDocumentRepo {
             let cid = ContentService::create_content(
                 &mut tx,
                 "legal_document",
-                None,
+                new_slug.as_deref(),
                 &ContentStatus::Draft,
                 &site_ids,
                 None,
@@ -544,6 +817,7 @@ impl LegalDocumentRepo {
                 created_by,
             )
             .await?;
+            Self::mirror_site_slug(&mut tx, cid, new_slug.as_deref()).await?;
             tx.commit().await?;
             cid
         };
@@ -754,7 +1028,8 @@ impl LegalDocumentRepo {
                     .with_code(codes::LEGAL_VERSION_SOURCE_DELETED),
             );
         }
-        // A version preserves the document's identity — same cookie name —
+        // A version preserves the document's identity — same cookie name,
+        // no slug of its own (resolution goes through the chain root) —
         // unlike `/clone`, which renames to a distinct `_copy` document.
         let mut new_doc = Self::clone_document_with_cookie(
             pool,
@@ -762,6 +1037,7 @@ impl LegalDocumentRepo {
             site_ids,
             created_by,
             source.cookie_name.clone(),
+            None,
         )
         .await?;
         let next_version = source.version + 1;

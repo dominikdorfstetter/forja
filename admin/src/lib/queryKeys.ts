@@ -78,6 +78,7 @@ export const queryKeys = {
   pagesPicker: (siteId: SiteId, ...filters: Filters) =>
     ['pages-picker', siteId, ...filters] as const,
   pagesForNav: (siteId: SiteId) => ['pages-for-nav', siteId] as const,
+  legalForNav: (siteId: SiteId) => ['legal-for-nav', siteId] as const,
   legal: (siteId: SiteId, ...filters: Filters) => ['legal', siteId, ...filters] as const,
   legalPicker: (siteId: SiteId, ...filters: Filters) =>
     ['legal-picker', siteId, ...filters] as const,
@@ -118,6 +119,7 @@ export const queryKeys = {
   cmdSearchPages: (siteId: SiteId, query: unknown) => ['cmd-search-pages', siteId, query] as const,
   cmdSearchMedia: (siteId: SiteId, query: unknown) => ['cmd-search-media', siteId, query] as const,
   ropa: (siteId: SiteId) => ['ropa', siteId] as const,
+  uiStrings: (siteId: SiteId) => ['ui-strings', siteId] as const,
   customTypes: (siteId: SiteId) => ['custom-types', siteId] as const,
   customType: (siteId: SiteId, key: Id) => ['custom-type', siteId, key] as const,
   customEntries: (siteId: SiteId, key: Id, ...filters: Filters) =>

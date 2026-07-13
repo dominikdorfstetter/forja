@@ -144,7 +144,7 @@ export default function LocaleAwareFields<TForm extends FieldValues>({
             key={spec.name}
             name={spec.name as FieldPath<TForm>}
             control={control}
-            render={({ field }) => (
+            render={({ field, fieldState }) => (
               <Box sx={{ mb: 2 }}>
                 <TextField
                   {...field}
@@ -153,6 +153,8 @@ export default function LocaleAwareFields<TForm extends FieldValues>({
                   fullWidth
                   multiline={spec.multiline}
                   rows={spec.rows}
+                  error={!!fieldState.error}
+                  helperText={fieldState.error?.message}
                   onBlur={() => {
                     field.onBlur();
                     onDefaultBlur();

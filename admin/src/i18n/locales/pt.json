@@ -139,6 +139,7 @@
       "structure": "Estrutura",
       "navigation": "Navegação",
       "taxonomy": "Taxonomia",
+      "uiStrings": "Textos da interface",
       "site": "Site",
       "socialLinks": "Ligações Sociais",
       "activity": "Atividade",
@@ -1036,7 +1037,11 @@
         "description": "Descrição",
         "maxDepth": "Profundidade máx.",
         "maxDepthHelp": "Profundidade máxima de aninhamento (1-10)",
-        "active": "Ativo"
+        "active": "Ativo",
+        "displayName": "Nome de exibição",
+        "displayNames": "Nomes de exibição",
+        "displayNamesHelp": "Nome opcional do menu mostrado aos visitantes neste idioma (por ex., como título do rodapé)",
+        "displayNameClearHint": "Ao limpar, esta tradução é removida ao salvar"
       },
       "messages": {
         "created": "Menu criado",
@@ -1051,7 +1056,9 @@
         "title": "Eliminar menu",
         "message": "Isto eliminará permanentemente este menu e todos os seus itens de navegação. Esta ação não pode ser desfeita."
       }
-    }
+    },
+    "brokenLink": "Link quebrado",
+    "brokenLinkHint": "Este item perdeu o destino do link. Edite-o para escolher um novo."
   },
   "socialLinks": {
     "title": "Ligações Sociais",
@@ -1742,7 +1749,9 @@
       "saved": "Documento legal guardado",
       "published": "Documento legal publicado",
       "unpublished": "Documento legal despublicado",
-      "loadFailed": "Falha ao carregar documento legal"
+      "loadFailed": "Falha ao carregar documento legal",
+      "slugUpdated": "Slug atualizado",
+      "slugLocked": "O slug não pode mais ser alterado — uma versão deste documento já foi publicada."
     },
     "toolbar": {},
     "fields": {
@@ -1750,7 +1759,8 @@
       "intro": "Introdução",
       "body": "Conteúdo",
       "metaTitle": "Meta título",
-      "metaDescription": "Meta descrição"
+      "metaDescription": "Meta descrição",
+      "slug": "Slug"
     },
     "seo": {
       "title": "Configurações de SEO"
@@ -1770,7 +1780,9 @@
       "created": "Nova versão criada",
       "live": "Ativa",
       "rollbackHint": "A versão ativa é a que é publicada. Abra uma versão anterior e publique-a para reverter — a atual passa a ser substituída."
-    }
+    },
+    "slugHint": "URL pública: /legal/{slug}. O slug pode ser alterado até que uma versão seja publicada.",
+    "slugLockedHint": "O slug é permanente — uma versão deste documento já foi publicada."
   },
   "sites": {
     "title": "Sites",
@@ -3710,7 +3722,19 @@
         "action": "Verifique o ficheiro e tente novamente."
       }
     },
-    "SITE_SETTINGS_INVALID_ORIGIN": "Uma ou mais origens têm um formato inválido. Cada origem deve ser esquema://host (ex. https://exemplo.pt)."
+    "SITE_SETTINGS_INVALID_ORIGIN": "Uma ou mais origens têm um formato inválido. Cada origem deve ser esquema://host (ex. https://exemplo.pt).",
+    "ERR_STRINGS_KEY_TAKEN": {
+      "message": "Chave já em uso",
+      "action": "Escolha outra chave para este site."
+    },
+    "ERR_STRINGS_LIMIT_EXCEEDED": {
+      "message": "Limite de textos atingido",
+      "action": "Um site pode ter no máximo 500 chaves — exclua primeiro as não utilizadas."
+    },
+    "LEGAL_SLUG_IMMUTABLE": {
+      "message": "Slug bloqueado",
+      "action": "URLs legais publicadas são permanentes; o slug não pode mudar depois que uma versão for publicada."
+    }
   },
   "welcome": {
     "tagline": "O CMS open-source para sites rápidos, seguros e multilíngues",
@@ -4151,7 +4175,11 @@
         "description": "Descrição",
         "label": "Evento",
         "title": "Título"
-      }
+      },
+      "localizeAction": "Localizar estes itens",
+      "removeLocalization": "Remover localização",
+      "fallbackNotice": "A mostrar os itens padrão. Localize-os para editar uma cópia separada para {{locale}}.",
+      "overrideNotice": "Estes itens substituem os itens padrão para {{locale}}. Ao remover a localização, os itens padrão voltam a aplicar-se."
     },
     "layout": "Layout",
     "nColumns": "{{n}} colunas",
@@ -4667,6 +4695,55 @@
     "deleteEntryConfirm": "Eliminar a entrada \"{{title}}\"? Isto não pode ser anulado.",
     "perLanguage": "Por idioma · {{locale}}",
     "dragToReorder": "Arraste para reordenar"
+  },
+  "uiStrings": {
+    "title": "Textos da interface",
+    "subtitle": "Dicionário de textos localizados para os templates do seu site: rótulos, títulos e textos para leitores de tela",
+    "newString": "Novo texto",
+    "deleted": "Texto excluído.",
+    "deleteTitle": "Excluir texto",
+    "deleteConfirm": "Excluir \"{{key}}\" e todas as suas traduções?",
+    "list": {
+      "loadError": "Não foi possível carregar os textos da interface.",
+      "colKey": "Chave",
+      "colLocales": "Traduções",
+      "colUpdated": "Atualizado",
+      "filterLabel": "Filtrar textos",
+      "filterAll": "Todos os textos",
+      "filterMissing": "Traduções em falta",
+      "filterOutdated": "Desatualizados",
+      "noMatches": "Nenhum texto corresponde a este filtro.",
+      "emptyTitle": "Ainda não há textos",
+      "empty": "Defina chaves como blog.min_read e traduza-as por idioma: seus templates as leem na renderização.",
+      "localeStatus": {
+        "translated": "{{locale}}: traduzido",
+        "missing": "{{locale}}: em falta",
+        "outdated": "{{locale}}: desatualizado — o valor padrão mudou"
+      }
+    },
+    "detail": {
+      "newTitle": "Novo texto da interface",
+      "subtitle": "A chave e o valor padrão são salvos juntos; os outros idiomas são salvos ao sair do campo",
+      "loading": "Carregando texto…",
+      "keyLabel": "Chave",
+      "keyHelp": "Segmentos minúsculos unidos por '.', '_' ou '-' — p. ex. blog.min_read",
+      "keyRequired": "A chave é obrigatória",
+      "keyTooLong": "A chave não pode exceder 128 caracteres",
+      "keyInvalid": "Use letras minúsculas e dígitos, unidos por '.', '_' ou '-'",
+      "valueLabel": "Valor",
+      "valueTooLong": "O valor não pode exceder 1000 caracteres",
+      "valueRequired": "O valor é obrigatório — o valor padrão não pode ser apagado",
+      "valueForLocale": "Valor ({{locale}})",
+      "localeHint": "Valor para {{locale}}. Salvo ao sair do campo; ao limpá-lo, a tradução é removida.",
+      "createHint": "Salve primeiro a chave com o valor padrão — depois traduza para os outros idiomas.",
+      "saved": "Texto salvo.",
+      "created": "Texto criado.",
+      "notFound": "Este texto da interface não existe.",
+      "status": {
+        "missing": "em falta",
+        "outdated": "desatualizado"
+      }
+    }
   },
   "imprint": {
     "title": "Informação legal",

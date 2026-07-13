@@ -120,6 +120,10 @@ pub fn role_permissions(role: &SiteRole) -> HashSet<Permission> {
         "custom_type",
         // Custom entries: readable by all members; writable Author+ (below).
         "custom_entry",
+        // UI strings: chrome dictionary readable by every member so the
+        // admin can render completeness views. Writes are Editor+ (below) —
+        // strings are site-wide config, not per-author content.
+        "ui_string",
     ];
     for r in &read_resources {
         perms.insert(perm!(r, "read"));
@@ -208,6 +212,12 @@ pub fn role_permissions(role: &SiteRole) -> HashSet<Permission> {
         perms.insert(perm!("form_template", "read"));
         perms.insert(perm!("form_template", "update"));
         perms.insert(perm!("form_template", "delete"));
+
+        // UI strings are site-wide chrome/config with no :own tier —
+        // create/update/delete start at Editor.
+        perms.insert(perm!("ui_string", "create"));
+        perms.insert(perm!("ui_string", "update", "any"));
+        perms.insert(perm!("ui_string", "delete", "any"));
         // Editors can publish and edit published content
         perms.insert(perm!("blog", "publish"));
         perms.insert(perm!("page", "publish"));

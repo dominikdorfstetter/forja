@@ -337,6 +337,52 @@ impl SiteSettingsResponse {
     }
 }
 
+/// Curated public subset of site settings, readable by Viewer-tier keys.
+///
+/// Sensitivity is this code-side field-pick — the `is_sensitive` DB column
+/// is dead and must not be trusted. Operational config (allowed origins,
+/// quotas, retention, module flags) stays on the Admin-only
+/// [`SiteSettingsResponse`].
+#[derive(Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
+#[schema(description = "Public subset of site settings (Viewer-tier read)")]
+pub struct PublicSiteSettingsResponse {
+    /// Public contact email; empty string when unset
+    #[schema(example = "hello@example.com")]
+    pub contact_email: String,
+    /// Theme color for the web manifest (hex)
+    #[schema(example = "#ffffff")]
+    pub theme_color: String,
+    /// Background color for the web manifest (hex)
+    #[schema(example = "#ffffff")]
+    pub background_color: String,
+    /// SEO title template
+    #[schema(example = "{{title}} | {{site_name}}")]
+    pub seo_title_template: String,
+    /// Fallback meta description; empty string when unset
+    #[schema(example = "")]
+    pub seo_default_description: String,
+}
+
+impl PublicSiteSettingsResponse {
+    /// Field-pick from the effective settings map, using the same house
+    /// defaults as `GET /sites/{id}/context` for absent keys.
+    pub fn from_map(map: &HashMap<String, serde_json::Value>) -> Self {
+        let str_or = |key: &str, default: &str| {
+            map.get(key)
+                .and_then(|v| v.as_str())
+                .unwrap_or(default)
+                .to_string()
+        };
+        Self {
+            contact_email: str_or(KEY_CONTACT_EMAIL, ""),
+            theme_color: str_or(KEY_THEME_COLOR, "#ffffff"),
+            background_color: str_or(KEY_BACKGROUND_COLOR, "#ffffff"),
+            seo_title_template: str_or(KEY_SEO_TITLE_TEMPLATE, "{{title}} | {{site_name}}"),
+            seo_default_description: str_or(KEY_SEO_DEFAULT_DESCRIPTION, ""),
+        }
+    }
+}
+
 /// Request to update site settings (all fields optional)
 #[derive(Debug, Clone, Deserialize, Validate, ValidatedDto, utoipa::ToSchema)]
 #[schema(description = "Update site settings (all fields optional)")]
@@ -1132,6 +1178,49 @@ mod tests {
         assert_eq!(
             SiteSettingsResponse::from_map(&map).data_retention_days,
             Some(180)
+        );
+    }
+
+    #[test]
+    fn test_public_settings_from_map_defaults() {
+        let resp = PublicSiteSettingsResponse::from_map(&crate::models::site_settings::defaults());
+        assert_eq!(resp.contact_email, "");
+        assert_eq!(resp.theme_color, "#ffffff");
+        assert_eq!(resp.background_color, "#ffffff");
+        assert_eq!(resp.seo_title_template, "{{title}} | {{site_name}}");
+        assert_eq!(resp.seo_default_description, "");
+    }
+
+    #[test]
+    fn test_public_settings_from_map_overrides() {
+        let mut map = crate::models::site_settings::defaults();
+        map.insert("contact_email".into(), serde_json::json!("hi@example.com"));
+        map.insert("theme_color".into(), serde_json::json!("#123456"));
+        let resp = PublicSiteSettingsResponse::from_map(&map);
+        assert_eq!(resp.contact_email, "hi@example.com");
+        assert_eq!(resp.theme_color, "#123456");
+    }
+
+    #[test]
+    fn test_public_settings_serializes_exactly_the_allowlist() {
+        let resp = PublicSiteSettingsResponse::from_map(&crate::models::site_settings::defaults());
+        let json = serde_json::to_value(&resp).unwrap();
+        let mut keys: Vec<&str> = json
+            .as_object()
+            .unwrap()
+            .keys()
+            .map(|k| k.as_str())
+            .collect();
+        keys.sort_unstable();
+        assert_eq!(
+            keys,
+            vec![
+                "background_color",
+                "contact_email",
+                "seo_default_description",
+                "seo_title_template",
+                "theme_color",
+            ]
         );
     }
 

@@ -35,7 +35,7 @@ DECLARE
     --        Tags/skills/categories are owned by the demo site and torn
     --        down with it on reseed; catalog inserts no longer use
     --        ON CONFLICT (slug) (the global unique it targeted is gone).
-    v_seed_version CONSTANT TEXT := '6';
+    v_seed_version CONSTANT TEXT := '7';
 
     -- Locale IDs (from migration seed)
     v_locale_en  UUID;
@@ -1176,7 +1176,7 @@ BEGIN
     INSERT INTO contents (entity_type_id, environment_id, slug, status, published_at, current_version, created_by)
     VALUES (v_et_legal, v_env_dev, 'cookie-consent', 'published', NOW() - INTERVAL '30 days', 1, v_user_admin)
     RETURNING id INTO v_content_legal_cookie;
-    INSERT INTO content_sites (content_id, site_id, is_owner) VALUES (v_content_legal_cookie, v_site1, TRUE);
+    INSERT INTO content_sites (content_id, site_id, is_owner, site_specific_slug) VALUES (v_content_legal_cookie, v_site1, TRUE, 'cookie-consent');
 
     INSERT INTO legal_documents (content_id, cookie_name, document_type)
     VALUES (v_content_legal_cookie, 'cookie_consent', 'cookie_consent')
@@ -1206,7 +1206,7 @@ BEGIN
     INSERT INTO contents (entity_type_id, environment_id, slug, status, published_at, current_version, created_by)
     VALUES (v_et_legal, v_env_dev, 'privacy-policy', 'published', NOW() - INTERVAL '30 days', 1, v_user_admin)
     RETURNING id INTO v_content_legal_privacy;
-    INSERT INTO content_sites (content_id, site_id, is_owner) VALUES (v_content_legal_privacy, v_site1, TRUE);
+    INSERT INTO content_sites (content_id, site_id, is_owner, site_specific_slug) VALUES (v_content_legal_privacy, v_site1, TRUE, 'privacy-policy');
 
     INSERT INTO legal_documents (content_id, cookie_name, document_type)
     VALUES (v_content_legal_privacy, 'privacy_policy', 'privacy_policy')
@@ -1220,7 +1220,7 @@ BEGIN
     INSERT INTO contents (entity_type_id, environment_id, slug, status, published_at, current_version, created_by)
     VALUES (v_et_legal, v_env_dev, 'imprint', 'published', NOW() - INTERVAL '30 days', 1, v_user_admin)
     RETURNING id INTO v_content_legal_imprint;
-    INSERT INTO content_sites (content_id, site_id, is_owner) VALUES (v_content_legal_imprint, v_site1, TRUE);
+    INSERT INTO content_sites (content_id, site_id, is_owner, site_specific_slug) VALUES (v_content_legal_imprint, v_site1, TRUE, 'imprint');
 
     INSERT INTO legal_documents (content_id, cookie_name, document_type)
     VALUES (v_content_legal_imprint, 'imprint_main', 'imprint')
@@ -1234,7 +1234,7 @@ BEGIN
     INSERT INTO contents (entity_type_id, environment_id, slug, status, published_at, current_version, created_by)
     VALUES (v_et_legal, v_env_dev, 'terms-of-service', 'published', NOW() - INTERVAL '30 days', 1, v_user_admin)
     RETURNING id INTO v_content_legal_tos;
-    INSERT INTO content_sites (content_id, site_id, is_owner) VALUES (v_content_legal_tos, v_site1, TRUE);
+    INSERT INTO content_sites (content_id, site_id, is_owner, site_specific_slug) VALUES (v_content_legal_tos, v_site1, TRUE, 'terms-of-service');
 
     INSERT INTO legal_documents (content_id, cookie_name, document_type)
     VALUES (v_content_legal_tos, 'terms_of_service', 'terms_of_service')
@@ -1322,14 +1322,15 @@ BEGIN
     INSERT INTO navigation_item_localizations (navigation_item_id, locale_id, title) VALUES
         (v_nav_contact, v_locale_en, 'Contact'), (v_nav_contact, v_locale_de, 'Kontakt');
 
-    -- Navigation Items (Footer Menu)
-    INSERT INTO navigation_items (site_id, menu_id, external_url, display_order)
-    VALUES (v_site1, v_menu_footer, '/legal/privacy-policy', 0) RETURNING id INTO v_tmp_id;
+    -- Navigation Items (Footer Menu) — legal links are first-class references,
+    -- resolved to the chain root's slug by the public tree endpoint
+    INSERT INTO navigation_items (site_id, menu_id, legal_document_id, display_order)
+    VALUES (v_site1, v_menu_footer, v_legal_privacy, 0) RETURNING id INTO v_tmp_id;
     INSERT INTO navigation_item_localizations (navigation_item_id, locale_id, title) VALUES
         (v_tmp_id, v_locale_en, 'Privacy Policy'), (v_tmp_id, v_locale_de, 'Datenschutz');
 
-    INSERT INTO navigation_items (site_id, menu_id, external_url, display_order)
-    VALUES (v_site1, v_menu_footer, '/legal/imprint', 1) RETURNING id INTO v_tmp_id;
+    INSERT INTO navigation_items (site_id, menu_id, legal_document_id, display_order)
+    VALUES (v_site1, v_menu_footer, v_legal_imprint, 1) RETURNING id INTO v_tmp_id;
     INSERT INTO navigation_item_localizations (navigation_item_id, locale_id, title) VALUES
         (v_tmp_id, v_locale_en, 'Imprint'), (v_tmp_id, v_locale_de, 'Impressum');
 

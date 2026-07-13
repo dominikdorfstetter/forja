@@ -87,19 +87,22 @@ export async function fetchPreviewSocialLinks(ctx: PreviewContext): Promise<Soci
   return previewApi(`/sites/${ctx.siteId}/social`, ctx);
 }
 
-/** Fetch site settings (for favicon, SEO defaults, theme). */
+/**
+ * Fetch the public site settings (SEO defaults, manifest colors, contact
+ * email) via the Viewer-accessible `/settings/public` endpoint — the raw
+ * `/settings` endpoint is Admin-only and 403s for preview tokens.
+ * Favicon data comes from `fetchPreviewFavicon`; there is no default OG
+ * image URL in any Viewer-accessible payload, so consumers must degrade
+ * to per-content images.
+ */
 export async function fetchPreviewSiteSettings(ctx: PreviewContext): Promise<{
-  preview_templates: { name: string; url: string }[];
-  favicon_variants: Record<string, string>;
-  theme_color: string | null;
-  background_color: string | null;
-  seo_title_template: string | null;
-  seo_default_description: string | null;
-  seo_default_og_image_url: string | null;
-  code_injection_head: string | null;
-  code_injection_footer: string | null;
+  contact_email: string;
+  theme_color: string;
+  background_color: string;
+  seo_title_template: string;
+  seo_default_description: string;
 }> {
-  return previewApi(`/sites/${ctx.siteId}/settings`, ctx);
+  return previewApi(`/sites/${ctx.siteId}/settings/public`, ctx);
 }
 
 /** Fetch favicon info for the preview context's site. */

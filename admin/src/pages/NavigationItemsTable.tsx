@@ -34,6 +34,7 @@ interface NavigationItemsTableProps {
   expandedIds: Set<string>;
   totalLocales: number;
   pageRouteMap: Map<string, string>;
+  legalRouteMap: Map<string, string>;
   canWrite: boolean;
   isAdmin: boolean;
   sensors: SensorDescriptor<object>[];
@@ -64,6 +65,7 @@ export default function NavigationItemsTable({
   expandedIds,
   totalLocales,
   pageRouteMap,
+  legalRouteMap,
   canWrite,
   isAdmin,
   sensors,
@@ -130,6 +132,7 @@ export default function NavigationItemsTable({
                   isExpanded={expandedIds.has(flatItem.item.id)}
                   totalLocales={totalLocales}
                   pageRouteMap={pageRouteMap}
+                  legalRouteMap={legalRouteMap}
                   canWrite={canWrite}
                   isAdmin={isAdmin}
                   onEdit={onEdit}

@@ -3,6 +3,7 @@ import { renderWithProviders, screen, waitFor } from '@/test/test-utils';
 import userEvent from '@testing-library/user-event';
 import { getMenuItems, getNavigationMenus } from '@/services/navigation';
 import { getPages } from '@/services/pages';
+import { getLegalDocuments } from '@/services/legal';
 import { getSiteLocales } from '@/services/siteLocales';
 import type { NavigationMenu, NavigationItem } from '@/types/api';
 
@@ -229,6 +230,40 @@ describe('NavigationPage', () => {
     expect(localeCells.length).toBe(2);
     expect(localeCells[0]).toHaveTextContent('2/2');
     expect(localeCells[1]).toHaveTextContent('1/2');
+  });
+
+  it('shows a broken-link indicator for target-less items and keeps them editable', async () => {
+    const brokenItems: NavigationItem[] = [
+      { id: 'item-1', menu_id: 'menu-1', display_order: 0, open_in_new_tab: false, title: 'Orphan' },
+    ];
+    vi.mocked(getNavigationMenus).mockResolvedValue([mockMenu]);
+    vi.mocked(getMenuItems).mockResolvedValue(brokenItems);
+    renderWithProviders(<NavigationPage />);
+    await waitFor(() => {
+      expect(screen.getByText('Orphan')).toBeInTheDocument();
+    });
+    expect(screen.getByTestId('broken-link-chip')).toHaveTextContent(/broken link/i);
+    expect(screen.getByTestId('edit-nav-item')).toBeInTheDocument();
+  });
+
+  it('resolves legal items to /legal/{slug} in the link column with a Legal chip', async () => {
+    const legalItems: NavigationItem[] = [
+      { id: 'item-1', menu_id: 'menu-1', legal_document_id: 'legal-1', display_order: 0, open_in_new_tab: false, title: 'Privacy' },
+    ];
+    vi.mocked(getNavigationMenus).mockResolvedValue([mockMenu]);
+    vi.mocked(getMenuItems).mockResolvedValue(legalItems);
+    vi.mocked(getLegalDocuments).mockResolvedValue({
+      data: [{ id: 'legal-1', cookie_name: 'privacy_policy', slug: 'privacy-policy', document_type: 'PrivacyPolicy', status: 'Published', version: 1, created_at: '2025-01-01T00:00:00Z', updated_at: '2025-01-01T00:00:00Z' }],
+      meta: { page: 1, page_size: 200, total_items: 1, total_pages: 1 },
+    });
+    renderWithProviders(<NavigationPage />);
+    await waitFor(() => {
+      expect(screen.getByText('Privacy')).toBeInTheDocument();
+    });
+    await waitFor(() => {
+      expect(screen.getByTestId('link-target')).toHaveTextContent('/legal/privacy-policy');
+    });
+    expect(screen.getByTestId('type-chip')).toHaveTextContent('Legal');
   });
 
   it('shows inactive menu with muted styling', async () => {

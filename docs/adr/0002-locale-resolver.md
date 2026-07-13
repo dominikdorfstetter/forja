@@ -217,6 +217,18 @@ Re-open if any of the following becomes true:
   added as `?locale=fr&strict=1` or a separate endpoint variant without
   breaking the existing contract.
 
+## Addendum — UI-strings dictionary endpoint (2026-07-13)
+
+`GET /sites/{site_id}/strings` (consumer-feedback roadmap, UI strings) reuses
+the resolution chain from Decision §1 but deliberately diverges from this
+ADR's entity contract: `?locale=` is **required**
+(`400 ERR_STRINGS_LOCALE_REQUIRED` without it), and the response is a flat
+`key → value` dictionary rather than a collapsed `localizations[]` array. It
+is a dictionary endpoint, not an entity read — "all localizations when the
+param is absent" has no meaning for a map that by definition carries one
+resolved value per key, so the optional-param rule and the one-element-array
+shape apply to entity endpoints only.
+
 ## References
 
 - ADR 0001 — list/detail asymmetry. Same pattern of recording an API-shape

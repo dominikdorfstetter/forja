@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { SiteResource } from '../../resources/site.js';
 import { renderCodeInjection } from '../../code-injection.js';
 import type { HttpClient } from '../../http.js';
-import type { SiteLocaleResponse } from '../../types.js';
+import type { PublicSiteSettings, SiteLocaleResponse } from '../../types.js';
 
 function createMockHttp(): HttpClient {
   return {
@@ -98,23 +98,63 @@ describe('SiteResource', () => {
     });
   });
 
+  describe('getSettings', () => {
+    // The raw /settings endpoint is Admin-gated; the curated
+    // /settings/public endpoint is Viewer-tier and carries exactly the
+    // public allowlist — no operational config.
+    it('calls the public settings URL', async () => {
+      const http = createMockHttp();
+      vi.mocked(http.get).mockResolvedValue({});
+
+      const resource = new SiteResource(http, siteId);
+      await resource.getSettings();
+
+      expect(http.get).toHaveBeenCalledWith(`/sites/${siteId}/settings/public`);
+    });
+
+    it('returns the curated public settings shape', async () => {
+      const http = createMockHttp();
+      const settings: PublicSiteSettings = {
+        contact_email: 'hello@example.com',
+        theme_color: '#123456',
+        background_color: '#654321',
+        seo_title_template: '{{title}} | {{site_name}}',
+        seo_default_description: 'An example site',
+      };
+      vi.mocked(http.get).mockResolvedValue(settings);
+
+      const resource = new SiteResource(http, siteId);
+      const result = await resource.getSettings();
+
+      expect(result).toEqual(settings);
+      expect(result.contact_email).toBe('hello@example.com');
+      expect(result.theme_color).toBe('#123456');
+    });
+  });
+
   describe('getCodeInjection', () => {
-    it('calls the correct settings URL', async () => {
+    // The raw /settings endpoint is Admin-gated (settings:read) and 403s
+    // for Read and Write keys; the Viewer-tier /context endpoint carries
+    // the same injection fields in its integration payload.
+    it('calls the site context URL', async () => {
       const http = createMockHttp();
       vi.mocked(http.get).mockResolvedValue({});
 
       const resource = new SiteResource(http, siteId);
       await resource.getCodeInjection();
 
-      expect(http.get).toHaveBeenCalledWith(`/sites/${siteId}/settings`);
+      expect(http.get).toHaveBeenCalledWith(`/sites/${siteId}/context`);
     });
 
-    it('extracts code injection fields from settings', async () => {
+    it('extracts code injection fields from the integration payload', async () => {
       const http = createMockHttp();
       vi.mocked(http.get).mockResolvedValue({
-        code_injection_head: '<script>console.log("head")</script>',
-        code_injection_footer: '<script>console.log("footer")</script>',
-        some_other_setting: 'ignored',
+        integration: {
+          code_injection_head: '<script>console.log("head")</script>',
+          code_injection_footer: '<script>console.log("footer")</script>',
+          seo_title_template: 'ignored',
+        },
+        modules: { blog: true },
       });
 
       const resource = new SiteResource(http, siteId);
@@ -126,7 +166,7 @@ describe('SiteResource', () => {
       });
     });
 
-    it('defaults missing fields to empty strings', async () => {
+    it('defaults to empty strings when the integration payload is missing', async () => {
       const http = createMockHttp();
       vi.mocked(http.get).mockResolvedValue({});
 
@@ -142,8 +182,10 @@ describe('SiteResource', () => {
     it('defaults null fields to empty strings', async () => {
       const http = createMockHttp();
       vi.mocked(http.get).mockResolvedValue({
-        code_injection_head: null,
-        code_injection_footer: null,
+        integration: {
+          code_injection_head: null,
+          code_injection_footer: null,
+        },
       });
 
       const resource = new SiteResource(http, siteId);
