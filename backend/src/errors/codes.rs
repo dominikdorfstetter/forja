@@ -280,6 +280,13 @@ pub const ERR_CUSTOM_FIELD_UNIQUE_CONFLICT: &str = "ERR_CUSTOM_FIELD_UNIQUE_CONF
 pub const ERR_CUSTOM_FIELD_REQUIRED_CONFLICT: &str = "ERR_CUSTOM_FIELD_REQUIRED_CONFLICT";
 pub const ERR_CUSTOM_FIELD_RETYPE_INCOMPATIBLE: &str = "ERR_CUSTOM_FIELD_RETYPE_INCOMPATIBLE";
 
+// ── UI Strings (consumer-feedback roadmap §1) ───────────────────────────
+
+pub const ERR_STRINGS_LIMIT_EXCEEDED: &str = "ERR_STRINGS_LIMIT_EXCEEDED";
+pub const ERR_STRINGS_LOCALE_REQUIRED: &str = "ERR_STRINGS_LOCALE_REQUIRED";
+pub const ERR_STRINGS_KEY_TAKEN: &str = "ERR_STRINGS_KEY_TAKEN";
+pub const ERR_STRINGS_NOT_FOUND: &str = "ERR_STRINGS_NOT_FOUND";
+
 // ── Imprint ─────────────────────────────────────────────────────────────
 
 /// The imprint is partially configured (some, but not all, required operator
@@ -1107,6 +1114,31 @@ pub const ALL: &[ErrorCodeDef] = &[
         domain: "custom_types",
         http_status: 422,
         description: "Cannot retype a field: existing values are not coercible",
+    },
+    // UI Strings
+    ErrorCodeDef {
+        code: ERR_STRINGS_LIMIT_EXCEEDED,
+        domain: "ui_strings",
+        http_status: 422,
+        description: "The site has reached the maximum number of UI string keys (500)",
+    },
+    ErrorCodeDef {
+        code: ERR_STRINGS_LOCALE_REQUIRED,
+        domain: "ui_strings",
+        http_status: 400,
+        description: "The public UI strings read requires a locale query parameter",
+    },
+    ErrorCodeDef {
+        code: ERR_STRINGS_KEY_TAKEN,
+        domain: "ui_strings",
+        http_status: 409,
+        description: "Another UI string on this site already uses this key",
+    },
+    ErrorCodeDef {
+        code: ERR_STRINGS_NOT_FOUND,
+        domain: "ui_strings",
+        http_status: 404,
+        description: "No UI string with that ID exists on this site",
     },
     // Validation (field-level)
     ErrorCodeDef {

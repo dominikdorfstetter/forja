@@ -58,6 +58,7 @@ pub mod site_settings;
 pub mod social;
 pub mod taxonomy;
 pub mod trash;
+pub mod ui_strings;
 pub mod user_preferences;
 pub mod validated;
 pub mod webhook;

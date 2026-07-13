@@ -170,6 +170,10 @@ use crate::dto::taxonomy::{
     UpdateCategoryRequest, UpdateTagRequest,
 };
 use crate::dto::trash::{TrashCountResponse, TrashItem, TrashListResponse};
+use crate::dto::ui_strings::{
+    CreateUiStringRequest, UiStringLocalizationInput, UiStringLocalizationResponse,
+    UiStringResponse, UpdateUiStringRequest,
+};
 use crate::dto::user_preferences::{UpdateUserPreferencesRequest, UserPreferencesResponse};
 use crate::dto::webhook::{
     CreateWebhookRequest, PaginatedWebhookDeliveries, PaginatedWebhooks, UpdateWebhookRequest,
@@ -468,6 +472,11 @@ pub mod workers;
             UserDataExportResponse,
             UserPreferencesResponse,
             UpdateUserPreferencesRequest,
+            CreateUiStringRequest,
+            UpdateUiStringRequest,
+            UiStringLocalizationInput,
+            UiStringLocalizationResponse,
+            UiStringResponse,
             OnboardingResponse,
             CompleteOnboardingRequest,
             HelpStateResponse,

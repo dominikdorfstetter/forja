@@ -14,6 +14,7 @@ pub mod legal_repo;
 pub mod page_repo;
 pub mod project_repo;
 pub mod trash_repo;
+pub mod ui_string_repo;
 pub mod user_data_repo;
 
 /// Liveness probe for the health endpoint — round-trips one query.

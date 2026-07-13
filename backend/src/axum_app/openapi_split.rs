@@ -93,6 +93,8 @@ const CONSUMER_OPERATION_IDS: &[&str] = &[
     "list_locales",
     "get_locale",
     "get_locale_by_code",
+    // UI Strings (public locale-resolved read)
+    "get_site_ui_strings",
     // Analytics ingest (write but public)
     "track_pageview",
     // Misc public

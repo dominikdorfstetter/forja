@@ -63,6 +63,7 @@ pub mod social;
 pub mod system;
 pub mod taxonomy;
 pub mod trash;
+pub mod ui_strings;
 pub mod webhook;
 
 /// Aggregate router for everything mounted under `/api/v1`. Each newly
@@ -96,6 +97,7 @@ pub fn api_v1_router() -> OpenApiRouter<AppState> {
         .merge(webhook::router())
         .merge(navigation_menu::router())
         .merge(navigation::router())
+        .merge(ui_strings::router())
         .merge(taxonomy::router())
         .merge(clerk_user::router())
         .merge(site::router())
