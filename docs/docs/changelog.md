@@ -14,6 +14,14 @@ is the first release published as open source**, so the public version history
 begins at 2.0. The pre-release milestones below condense how the foundation came
 together; precise dates start at the first public release.
 
+## 2.1.2 — 2026-07-13
+
+A security fix: the anomaly detector was auto-blocking healthy API keys.
+
+### Fixed
+
+- **API keys are no longer auto-blocked for being used normally.** The anomaly detector compared a key's current traffic against the key's *own* 7-day average, so a low-traffic site ended up with a ceiling of a few dozen requests per hour — and an ordinary site build, which fetches content for every page at once, tripped it. Because the block was permanent and a blocked key serves no traffic, the enforced downtime dragged the average down further, lowering the threshold and making the next block arrive sooner: unblocking the key made the next failure more likely. Volume spikes are now alert-only by default (the quota already caps volume, so blocking on a spike added no protection and only caused outages), spike thresholds have sane floors, and time spent blocked can no longer drag a key's baseline down. A key that starts erroring at scale — a genuine sign of compromise — is still blocked, and site owners and admins are now notified in-app when that happens instead of discovering it through a failed deploy. Operators who want the old behavior can set `APP__SECURITY__ANOMALY_BLOCK_ON_VOLUME_SPIKE=true`.
+
 ## 2.1.1 — 2026-07-13
 
 UX follow-up to the 2.1.0 UI Strings module, from first-use feedback.
