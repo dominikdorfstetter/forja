@@ -27,4 +27,16 @@ npm test        # unit tests (node --test with type stripping)
   files. Use `const t = await getTranslator(Astro.locals.locale)` from
   `src/lib/ui-strings` — it resolves CMS UI Strings → per-locale defaults in
   `src/i18n/defaults/{locale}.json` → key literal. New keys must be backfilled
-  in every default JSON (the files double as the operator-facing key list).
+  in every default JSON (the files double as the operator-facing key list);
+  `src/lib/__tests__/i18n-defaults.test.ts` enforces key-set parity.
+- Inline client-side `<script>` blocks can't call the server-side `t()`.
+  Render the strings a script needs into a `data-i18n` JSON attribute
+  (`data-i18n={JSON.stringify(...)}`) on the script's root element and parse
+  it once with `readI18n` from `src/lib/client-i18n` — its literal fallbacks
+  keep the script working if the attribute is missing. Status-code messages
+  use a `{status}` placeholder filled via `withStatus`.
+- Site chrome data (nav menus, UI strings, locales, code injection) goes
+  through the TTL-cached facades in `src/lib/api.ts` (`fetchWithTtlCache`) —
+  they never throw into a page; failures fall back to empty values and retry
+  after a short window. Operator code injection is rendered verbatim (by
+  design) in `src/layouts/Base.astro` head and footer.

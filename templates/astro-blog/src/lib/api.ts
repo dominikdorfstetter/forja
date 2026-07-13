@@ -7,6 +7,7 @@ import {
   ForjaNotFoundError,
   type BlogDetailResponse,
   type BlogListItem,
+  type CodeInjection,
   type MediaResponse,
   type Paginated,
   type PublicCollectionEntry,
@@ -121,13 +122,51 @@ export function getSiteUrl(): string {
   return SITE_URL.replace(/\/+$/, "");
 }
 
-// ---- Site locale type (not in SDK yet) ------------------------------------
+// ---- TTL cache for per-request chrome data ---------------------------------
+
+// The SSR process lives across deploys of CMS content, so chrome caches must
+// expire: successes get a modest TTL (matches the server-side response cache)
+// so CMS edits show up, and failures are only held for a short retry-after so
+// one transient backend error doesn't blank the chrome until redeploy.
+const CHROME_CACHE_TTL_MS = 60_000;
+const CHROME_CACHE_RETRY_AFTER_MS = 5_000;
+
+interface ChromeCacheEntry<T> {
+  value: T;
+  expiresAt: number;
+}
+
+/** Fetch-through cache: serves fresh entries, refreshes expired ones, and
+ * caches `fallback` briefly on failure — it never throws into the page. */
+async function fetchWithTtlCache<T>(
+  cache: Map<string, ChromeCacheEntry<T>>,
+  key: string,
+  fetcher: () => Promise<T>,
+  fallback: T,
+): Promise<T> {
+  const entry = cache.get(key);
+  if (entry && entry.expiresAt > Date.now()) return entry.value;
+
+  try {
+    const value = await fetcher();
+    cache.set(key, { value, expiresAt: Date.now() + CHROME_CACHE_TTL_MS });
+    return value;
+  } catch {
+    cache.set(key, {
+      value: fallback,
+      expiresAt: Date.now() + CHROME_CACHE_RETRY_AFTER_MS,
+    });
+    return fallback;
+  }
+}
+
+// ---- Site locale type (template-facing subset of SiteLocaleResponse) ------
 
 export interface SiteLocale {
   locale_id: string;
   code: string;
   name: string;
-  native_name?: string;
+  native_name?: string | null;
   direction: 'ltr' | 'rtl';
   is_default: boolean;
   is_active: boolean;
@@ -136,7 +175,6 @@ export interface SiteLocale {
 // ---- Site (cached) --------------------------------------------------------
 
 let _cachedSite: SiteResponse | null = null;
-let _cachedLocales: SiteLocale[] | null = null;
 
 /** Fetch site info (cached for the lifetime of the build/dev process). */
 export async function fetchSite(): Promise<SiteResponse> {
@@ -145,18 +183,18 @@ export async function fetchSite(): Promise<SiteResponse> {
   return _cachedSite;
 }
 
-/** Fetch active site locales (cached). */
+// Locales gate chrome on every request — memoize with the chrome TTL and fall
+// back to an empty list, which callers treat as "no locale filtering".
+const _cachedLocales = new Map<string, ChromeCacheEntry<SiteLocale[]>>();
+
+/** Fetch active site locales (cached; empty list if the fetch fails). */
 export async function fetchSiteLocales(): Promise<SiteLocale[]> {
-  if (_cachedLocales) return _cachedLocales;
-  const baseUrl = (import.meta.env.CMS_API_URL as string).replace(/\/+$/, '');
-  const apiKey = import.meta.env.CMS_API_KEY as string;
-  const siteId = import.meta.env.CMS_SITE_ID as string;
-  const res = await fetch(`${baseUrl}/sites/${siteId}/locales`, {
-    headers: { 'X-API-Key': apiKey },
-  });
-  if (!res.ok) throw new Error(`Failed to fetch locales: ${res.status}`);
-  _cachedLocales = (await res.json() as SiteLocale[]).filter((l) => l.is_active);
-  return _cachedLocales;
+  return fetchWithTtlCache(
+    _cachedLocales,
+    'locales',
+    async () => (await client().site.listLocales()).filter((l) => l.is_active),
+    [],
+  );
 }
 
 /** Get the default locale code for the site. */
@@ -241,44 +279,6 @@ export async function fetchPublishedBlogsByCategory(
   return client().blogs.listByCategory(categorySlug, { page, pageSize, localeId });
 }
 
-// ---- TTL cache for per-request chrome data ---------------------------------
-
-// The SSR process lives across deploys of CMS content, so chrome caches must
-// expire: successes get a modest TTL (matches the server-side response cache)
-// so CMS edits show up, and failures are only held for a short retry-after so
-// one transient backend error doesn't blank the chrome until redeploy.
-const CHROME_CACHE_TTL_MS = 60_000;
-const CHROME_CACHE_RETRY_AFTER_MS = 5_000;
-
-interface ChromeCacheEntry<T> {
-  value: T;
-  expiresAt: number;
-}
-
-/** Fetch-through cache: serves fresh entries, refreshes expired ones, and
- * caches `fallback` briefly on failure — it never throws into the page. */
-async function fetchWithTtlCache<T>(
-  cache: Map<string, ChromeCacheEntry<T>>,
-  key: string,
-  fetcher: () => Promise<T>,
-  fallback: T,
-): Promise<T> {
-  const entry = cache.get(key);
-  if (entry && entry.expiresAt > Date.now()) return entry.value;
-
-  try {
-    const value = await fetcher();
-    cache.set(key, { value, expiresAt: Date.now() + CHROME_CACHE_TTL_MS });
-    return value;
-  } catch {
-    cache.set(key, {
-      value: fallback,
-      expiresAt: Date.now() + CHROME_CACHE_RETRY_AFTER_MS,
-    });
-    return fallback;
-  }
-}
-
 // ---- Navigation -----------------------------------------------------------
 
 /** A menu's tree plus its CMS-configured display name for one locale. */
@@ -349,6 +349,31 @@ export async function fetchUiStrings(
   locale: string,
 ): Promise<Record<string, string>> {
   return fetchWithTtlCache(_cachedUiStrings, locale, () => client().strings(locale), {});
+}
+
+// ---- Code injection ---------------------------------------------------------
+
+// Operator-configured head/footer HTML is chrome too — same TTL treatment.
+// Failures fall back to empty snippets, so the layout renders nothing instead
+// of crashing and retries after the failure window.
+const EMPTY_CODE_INJECTION: CodeInjection = {
+  code_injection_head: "",
+  code_injection_footer: "",
+};
+
+const _cachedCodeInjection = new Map<string, ChromeCacheEntry<CodeInjection>>();
+
+/**
+ * Fetch the site's code-injection snippets (cached for a short TTL).
+ * Returns empty snippets when unconfigured or when the fetch fails.
+ */
+export async function fetchCodeInjection(): Promise<CodeInjection> {
+  return fetchWithTtlCache(
+    _cachedCodeInjection,
+    "code-injection",
+    () => client().site.getCodeInjection(),
+    EMPTY_CODE_INJECTION,
+  );
 }
 
 // ---- Pages & Sections -----------------------------------------------------

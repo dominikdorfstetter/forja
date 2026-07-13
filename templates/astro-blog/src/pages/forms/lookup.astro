@@ -3,6 +3,7 @@ import Base from "../../layouts/Base.astro";
 import SeoHead from "../../components/SeoHead.astro";
 import { fetchSite, getApiBaseUrl, getSiteDomain, getSiteUrl } from "../../lib/api";
 import { buildSeoMeta } from "../../lib/seo";
+import { getTranslator } from "../../lib/ui-strings";
 
 // Self-service lookup page (#591).
 //
@@ -13,16 +14,33 @@ import { buildSeoMeta } from "../../lib/seo";
 //
 // Everything is unauthenticated; the reference code is the sole proof.
 
+const t = await getTranslator(Astro.locals.locale);
+
 const apiBaseUrl = getApiBaseUrl();
 const siteDomain = getSiteDomain() ?? "";
 const siteUrl = getSiteUrl();
 const site = await fetchSite().catch(() => null);
 const siteName = site?.name ?? "My Site";
 
+// Chrome strings for the inline lookup script — it cannot call t() in the
+// browser, so the resolved values ride along on a data-i18n attribute.
+const i18n = {
+  emptyCode: t("forms.lookup.error.empty_code"),
+  notRecognised: t("forms.lookup.error.not_recognised"),
+  alreadyDeleted: t("forms.lookup.error.already_deleted"),
+  rateLimited: t("forms.lookup.error.rate_limited"),
+  lookupFailed: t("forms.lookup.error.lookup_failed"),
+  loadFailed: t("forms.lookup.error.load_failed"),
+  deleteFailed: t("forms.lookup.error.delete_failed"),
+  networkError: t("forms.lookup.error.network"),
+  confirmFallback: t("forms.lookup.confirm.fallback"),
+  yes: t("forms.lookup.value.yes"),
+  no: t("forms.lookup.value.no"),
+};
+
 const seo = buildSeoMeta({
-  title: "Manage Your Submission",
-  description:
-    "Look up, view, or delete a form submission you made - using only your reference code.",
+  title: t("forms.lookup.page_title"),
+  description: t("forms.lookup.meta_description"),
   canonicalUrl: `${siteUrl}/forms/lookup`,
   siteUrl,
   siteName,
@@ -31,26 +49,26 @@ const seo = buildSeoMeta({
 Astro.response.headers.set("Cache-Control", "private, no-store");
 ---
 
-<Base title="Manage Your Submission" description="Look up or delete a submission by reference code.">
+<Base title={t("forms.lookup.page_title")} description={t("forms.lookup.description")}>
   <SeoHead seo={seo} slot="head" />
 
   <section
     class="max-w-2xl mx-auto px-4 py-12"
     data-api-base={apiBaseUrl}
     data-site-domain={siteDomain}
+    data-i18n={JSON.stringify(i18n)}
   >
     <header class="mb-8">
-      <h1 class="text-3xl font-bold text-zinc-900 dark:text-zinc-50">Manage your submission</h1>
+      <h1 class="text-3xl font-bold text-zinc-900 dark:text-zinc-50">{t("forms.lookup.heading")}</h1>
       <p class="mt-2 text-zinc-600 dark:text-zinc-400">
-        Enter the reference code you received when submitting a form to view
-        your data or request its deletion.
+        {t("forms.lookup.intro")}
       </p>
     </header>
 
     <form id="lookup-form" class="space-y-4" novalidate>
       <div>
         <label for="reference-code" class="block text-sm font-medium text-zinc-700 dark:text-zinc-200 mb-1">
-          Reference code
+          {t("forms.lookup.reference_code")}
         </label>
         <input
           id="reference-code"
@@ -71,7 +89,7 @@ Astro.response.headers.set("Cache-Control", "private, no-store");
         id="lookup-submit"
         class="inline-flex items-center justify-center gap-2 rounded-md bg-violet-600 hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2.5 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
       >
-        Look up my submission
+        {t("forms.lookup.submit")}
       </button>
     </form>
 
@@ -79,16 +97,16 @@ Astro.response.headers.set("Cache-Control", "private, no-store");
       <div class="rounded-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40 p-5">
         <div class="flex items-center justify-between gap-4 mb-4">
           <p class="text-sm text-zinc-500 dark:text-zinc-400">
-            Status:
+            {t("forms.lookup.status")}
             <span data-submission-status class="font-medium text-zinc-900 dark:text-zinc-100 ml-1"></span>
           </p>
           <p class="text-sm text-zinc-500 dark:text-zinc-400">
-            Submitted:
+            {t("forms.lookup.submitted")}
             <span data-submission-date class="font-medium text-zinc-900 dark:text-zinc-100 ml-1"></span>
           </p>
         </div>
 
-        <h2 class="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-3">Your submitted data</h2>
+        <h2 class="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-3">{t("forms.lookup.your_data")}</h2>
         <dl id="submission-fields" class="space-y-3"></dl>
 
         <div class="mt-6 pt-5 border-t border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row gap-3">
@@ -97,14 +115,14 @@ Astro.response.headers.set("Cache-Control", "private, no-store");
             id="delete-submission"
             class="inline-flex items-center justify-center gap-2 rounded-md bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
           >
-            Delete my data
+            {t("forms.lookup.delete")}
           </button>
           <button
             type="button"
             id="cancel-view"
             class="inline-flex items-center justify-center rounded-md border border-zinc-300 dark:border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-400"
           >
-            Cancel
+            {t("forms.lookup.cancel")}
           </button>
         </div>
       </div>
@@ -116,10 +134,9 @@ Astro.response.headers.set("Cache-Control", "private, no-store");
       role="status"
       aria-live="polite"
     >
-      <p class="font-medium text-emerald-900 dark:text-emerald-100">Your submission has been deleted.</p>
+      <p class="font-medium text-emerald-900 dark:text-emerald-100">{t("forms.lookup.deleted.title")}</p>
       <p class="text-sm text-emerald-800 dark:text-emerald-200 mt-1">
-        We've removed your data from our systems. The reference code is no
-        longer valid.
+        {t("forms.lookup.deleted.body")}
       </p>
     </div>
   </section>
@@ -131,10 +148,9 @@ Astro.response.headers.set("Cache-Control", "private, no-store");
 >
   <form method="dialog" class="bg-white dark:bg-zinc-900 rounded-lg overflow-hidden">
     <div class="p-5">
-      <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-50">Delete your submission?</h3>
+      <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-50">{t("forms.lookup.confirm.title")}</h3>
       <p class="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-        This permanently removes your data. The reference code will become
-        invalid and you won't be able to recover the submission.
+        {t("forms.lookup.confirm.body")}
       </p>
     </div>
     <div class="bg-zinc-50 dark:bg-zinc-950 px-5 py-3 flex flex-row-reverse gap-2 border-t border-zinc-200 dark:border-zinc-800">
@@ -143,20 +159,22 @@ Astro.response.headers.set("Cache-Control", "private, no-store");
         type="submit"
         class="inline-flex items-center justify-center rounded-md bg-red-600 hover:bg-red-700 text-white px-4 py-2 text-sm font-medium"
       >
-        Delete permanently
+        {t("forms.lookup.confirm.delete")}
       </button>
       <button
         value="cancel"
         type="submit"
         class="inline-flex items-center justify-center rounded-md border border-zinc-300 dark:border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800"
       >
-        Cancel
+        {t("forms.lookup.confirm.cancel")}
       </button>
     </div>
   </form>
 </dialog>
 
 <script>
+  import { readI18n, withStatus } from "../../lib/client-i18n";
+
   type LookupResult = { status: string; created_at: string };
   type SubmissionDetail = {
     reference_code: string;
@@ -165,9 +183,25 @@ Astro.response.headers.set("Cache-Control", "private, no-store");
     created_at: string;
   };
 
+  // Literal fallbacks in case the data-i18n attribute is missing or malformed.
+  const FALLBACK_I18N = {
+    emptyCode: "Please enter your reference code.",
+    notRecognised: "Reference code not recognised.",
+    alreadyDeleted: "This submission has already been deleted.",
+    rateLimited: "Too many lookups in a short period - please wait a minute and try again.",
+    lookupFailed: "Lookup failed (status {status}).",
+    loadFailed: "Unable to load submission (status {status}).",
+    deleteFailed: "Delete failed (status {status}).",
+    networkError: "Network error - please try again.",
+    confirmFallback: "Permanently delete this submission?",
+    yes: "Yes",
+    no: "No",
+  };
+
   const section = document.querySelector<HTMLElement>("[data-api-base]");
   const apiBase = section!.dataset.apiBase!;
   const siteDomain = section!.dataset.siteDomain ?? "";
+  const i18n = readI18n(section!.dataset.i18n, FALLBACK_I18N);
   const headers: HeadersInit = siteDomain ? { "X-Site-Domain": siteDomain } : {};
 
   const lookupForm = document.getElementById("lookup-form") as HTMLFormElement;
@@ -203,26 +237,26 @@ Astro.response.headers.set("Cache-Control", "private, no-store");
       body: JSON.stringify({ reference_code: code }),
     });
     if (lookupRes.status === 404) {
-      showError("Reference code not recognised.");
+      showError(i18n.notRecognised);
       return;
     }
     if (lookupRes.status === 410) {
-      showError("This submission has already been deleted.");
+      showError(i18n.alreadyDeleted);
       return;
     }
     if (lookupRes.status === 429) {
-      showError("Too many lookups in a short period - please wait a minute and try again.");
+      showError(i18n.rateLimited);
       return;
     }
     if (!lookupRes.ok) {
-      showError(`Lookup failed (status ${lookupRes.status}).`);
+      showError(withStatus(i18n.lookupFailed, lookupRes.status));
       return;
     }
     const lookup = (await lookupRes.json()) as LookupResult;
 
     const detailRes = await fetch(`${apiBase}/public/submissions/${encodeURIComponent(code)}`, { headers });
     if (!detailRes.ok) {
-      showError(`Unable to load submission (status ${detailRes.status}).`);
+      showError(withStatus(i18n.loadFailed, detailRes.status));
       return;
     }
     const detail = (await detailRes.json()) as SubmissionDetail;
@@ -262,7 +296,7 @@ Astro.response.headers.set("Cache-Control", "private, no-store");
   function formatValue(v: unknown): string {
     if (v === null || v === undefined) return "-";
     if (Array.isArray(v)) return v.map(formatValue).join(", ");
-    if (typeof v === "boolean") return v ? "Yes" : "No";
+    if (typeof v === "boolean") return v ? i18n.yes : i18n.no;
     if (typeof v === "object") return JSON.stringify(v);
     return String(v);
   }
@@ -282,12 +316,12 @@ Astro.response.headers.set("Cache-Control", "private, no-store");
         return;
       }
       if (res.status === 404) {
-        showError("Reference code not recognised.");
+        showError(i18n.notRecognised);
         return;
       }
-      showError(`Delete failed (status ${res.status}).`);
+      showError(withStatus(i18n.deleteFailed, res.status));
     } catch {
-      showError("Network error - please try again.");
+      showError(i18n.networkError);
     } finally {
       deleteBtn.disabled = false;
     }
@@ -298,7 +332,7 @@ Astro.response.headers.set("Cache-Control", "private, no-store");
     clearError();
     const code = normalizeCode(codeInput.value);
     if (!code) {
-      showError("Please enter your reference code.");
+      showError(i18n.emptyCode);
       return;
     }
     codeInput.value = code;
@@ -314,7 +348,7 @@ Astro.response.headers.set("Cache-Control", "private, no-store");
   deleteBtn.addEventListener("click", () => {
     if (typeof deleteConfirm.showModal === "function") {
       deleteConfirm.showModal();
-    } else if (confirm("Permanently delete this submission?")) {
+    } else if (confirm(i18n.confirmFallback)) {
       performDelete();
     }
   });

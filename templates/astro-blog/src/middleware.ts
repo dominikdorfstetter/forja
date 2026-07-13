@@ -7,12 +7,8 @@ import { fetchSiteLocales, type SiteLocale } from './lib/api';
 import { getLocaleFromRequest } from './lib/locale';
 
 export const onRequest = defineMiddleware(async ({ request, locals }, next) => {
-  let locales: SiteLocale[] = [];
-  try {
-    locales = await fetchSiteLocales();
-  } catch {
-    // Graceful fallback — no locale filtering
-  }
+  // Never throws — a failed fetch degrades to an empty list (no locale filtering).
+  const locales: SiteLocale[] = await fetchSiteLocales();
 
   const current = getLocaleFromRequest(request, locales);
 

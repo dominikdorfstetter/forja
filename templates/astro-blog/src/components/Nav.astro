@@ -94,7 +94,7 @@ const showLocaleSwitcher = locales.length > 1;
                   locale.code === currentLocaleCode && "forja-nav__locale-option--active",
                 ]}
               >
-                {(locale as any).native_name || locale.name}
+                {locale.native_name || locale.name}
               </button>
             ))}
           </div>

@@ -4,7 +4,7 @@ import Footer from "../components/Footer.astro";
 import Analytics from "../components/Analytics.astro";
 import "../styles/global.css";
 import "../styles/sections.css";
-import { fetchSite, type SiteInfo } from "../lib/api";
+import { fetchCodeInjection, fetchSite, type SiteInfo } from "../lib/api";
 
 interface Props {
   title: string;
@@ -19,6 +19,10 @@ const locales = Astro.locals.locales ?? [];
 
 let site: SiteInfo | null = null;
 try { site = await fetchSite(); } catch { /* ignore */ }
+
+// Operator-owned raw HTML snippets (analytics tags, chat widgets, …) —
+// rendered verbatim by design; empty strings render nothing.
+const injection = await fetchCodeInjection();
 
 const siteName = site?.name ?? "My Site";
 const pageTitle = metaTitle ?? title;
@@ -53,6 +57,7 @@ const pageDesc = metaDescription ?? description ?? "";
       import '@forjacms/sections/define';
     </script>
     <slot name="head" />
+    {injection.code_injection_head && <Fragment set:html={injection.code_injection_head} />}
   </head>
   <body>
     <Nav siteName={siteName} locales={locales} currentLocaleCode={locale.code} />
@@ -96,5 +101,6 @@ const pageDesc = metaDescription ?? description ?? "";
         }
       });
     </script>
+    {injection.code_injection_footer && <Fragment set:html={injection.code_injection_footer} />}
   </body>
 </html>

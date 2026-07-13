@@ -11,23 +11,37 @@ import {
   type PublicFormDefinition,
 } from "../../lib/api";
 import { buildSeoMeta } from "../../lib/seo";
-
-const slug = Astro.params.slug;
-if (!slug) {
-  return new Response("Form not found", { status: 404 });
-}
+import { getTranslator } from "../../lib/ui-strings";
 
 // Resolve locale from `?locale=` query (or fall through to no locale,
 // which makes the backend return canonical/default-locale strings).
+// Chrome follows the same choice so the page reads as one language.
 const locale = new URL(Astro.request.url).searchParams.get("locale") ?? undefined;
+const t = await getTranslator(locale ?? Astro.locals.locale);
+
+const slug = Astro.params.slug;
+if (!slug) {
+  return new Response(t("forms.not_found"), { status: 404 });
+}
 
 let form: PublicFormDefinition | null = null;
 let loadError: string | null = null;
 try {
   form = await fetchPublicForm(slug, locale);
 } catch (e) {
-  loadError = e instanceof Error ? e.message : "Unable to load form";
+  loadError = e instanceof Error ? e.message : t("forms.load_error");
 }
+
+// Chrome strings for the inline submit script — it cannot call t() in the
+// browser, so the resolved values ride along on a data-i18n attribute.
+const i18n = {
+  submit: t("forms.submit"),
+  submitting: t("forms.submitting"),
+  consentRequired: t("forms.error.consent_required"),
+  botTokenMissing: t("forms.error.bot_token_missing"),
+  submitFailed: t("forms.error.submit_failed"),
+  networkError: t("forms.error.network"),
+};
 
 const apiBaseUrl = getApiBaseUrl();
 const siteDomain = getSiteDomain() ?? "";
@@ -36,7 +50,7 @@ const site = await fetchSite().catch(() => null);
 const siteName = site?.name ?? "My Site";
 
 const seo = buildSeoMeta({
-  title: form?.name ?? "Form",
+  title: form?.name ?? t("forms.fallback_title"),
   description: form?.description ?? "",
   canonicalUrl: `${siteUrl}/forms/${slug}`,
   siteUrl,
@@ -47,13 +61,13 @@ const seo = buildSeoMeta({
 Astro.response.headers.set("Cache-Control", "public, max-age=300");
 ---
 
-<Base title={form?.name ?? "Form"} description={form?.description ?? ""}>
+<Base title={form?.name ?? t("forms.fallback_title")} description={form?.description ?? ""}>
   <SeoHead seo={seo} slot="head" />
 
   <section class="max-w-2xl mx-auto px-4 py-12">
     {loadError && (
       <div class="rounded-md bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 p-4 text-red-800 dark:text-red-200">
-        <p class="font-medium">Form unavailable</p>
+        <p class="font-medium">{t("forms.unavailable")}</p>
         <p class="text-sm mt-1">{loadError}</p>
       </div>
     )}
@@ -75,6 +89,7 @@ Astro.response.headers.set("Cache-Control", "public, max-age=300");
           data-site-domain={siteDomain}
           data-bot-protection={form.bot_protection}
           data-consent-required={form.consent_required ? "true" : "false"}
+          data-i18n={JSON.stringify(i18n)}
           novalidate
           class="space-y-5"
           aria-describedby="forja-form-error"
@@ -94,7 +109,7 @@ Astro.response.headers.set("Cache-Control", "public, max-age=300");
                   class="mt-0.5 text-violet-600 focus:ring-violet-500"
                 />
                 <span class="text-zinc-700 dark:text-zinc-300">
-                  {form.consent_text ?? "I agree to the terms."}
+                  {form.consent_text ?? t("forms.consent_fallback")}
                 </span>
               </label>
               <p id="forja-consent-error" class="forja-form-field__error hidden mt-1 text-sm text-red-600 dark:text-red-400" role="alert"></p>
@@ -116,7 +131,7 @@ Astro.response.headers.set("Cache-Control", "public, max-age=300");
             id="forja-form-submit"
             class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-md bg-violet-600 hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-2.5 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
           >
-            <span data-submit-label>Submit</span>
+            <span data-submit-label>{t("forms.submit")}</span>
             <svg data-submit-spinner class="hidden animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25" />
               <path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
@@ -125,15 +140,15 @@ Astro.response.headers.set("Cache-Control", "public, max-age=300");
         </form>
 
         <div id="forja-form-success" class="hidden mt-6 rounded-md bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 p-5" role="status" aria-live="polite">
-          <p class="font-medium text-emerald-900 dark:text-emerald-100">Thank you!</p>
+          <p class="font-medium text-emerald-900 dark:text-emerald-100">{t("forms.success.title")}</p>
           <p class="text-sm text-emerald-800 dark:text-emerald-200 mt-1">
-            Your submission has been received. Your reference code is:
+            {t("forms.success.received")}
           </p>
           <p class="mt-2 font-mono text-lg text-emerald-900 dark:text-emerald-100" data-reference-code></p>
           <p class="text-xs text-emerald-700 dark:text-emerald-300 mt-3">
-            Save this code — you can use it on the
-            <a href="/forms/lookup" class="underline">self-service page</a>
-            to view or delete your submission.
+            {t("forms.success.save_code_before")}
+            <a href="/forms/lookup" class="underline">{t("forms.success.save_code_link")}</a>
+            {t("forms.success.save_code_after")}
           </p>
         </div>
       </>
@@ -142,9 +157,21 @@ Astro.response.headers.set("Cache-Control", "public, max-age=300");
 </Base>
 
 <script>
+  import { readI18n, withStatus } from "../../lib/client-i18n";
+
   type SubmitResponse = { submission_id: string; reference_code: string };
   type ValidationErrorBag = { errors?: Array<{ field: string; message: string }> } & {
     errors?: Record<string, string>;
+  };
+
+  // Literal fallbacks in case the data-i18n attribute is missing or malformed.
+  const FALLBACK_I18N = {
+    submit: "Submit",
+    submitting: "Submitting…",
+    consentRequired: "Consent is required to submit this form.",
+    botTokenMissing: "Bot protection token missing. Please complete the challenge.",
+    submitFailed: "Submission failed (status {status}). Please try again.",
+    networkError: "Network error — please check your connection and try again.",
   };
 
   const form = document.getElementById("forja-form") as HTMLFormElement | null;
@@ -161,6 +188,7 @@ Astro.response.headers.set("Cache-Control", "public, max-age=300");
     const siteDomain = form.dataset.siteDomain;
     const consentRequired = form.dataset.consentRequired === "true";
     const botProtection = form.dataset.botProtection;
+    const i18n = readI18n(form.dataset.i18n, FALLBACK_I18N);
 
     function setFieldError(label: string, msg: string | null) {
       const wrapper = form!.querySelector<HTMLElement>(`.forja-form-field[data-field-label="${CSS.escape(label)}"]`);
@@ -224,7 +252,7 @@ Astro.response.headers.set("Cache-Control", "public, max-age=300");
 
     function setSubmitting(submitting: boolean) {
       submitBtn!.disabled = submitting;
-      if (submitLabel) submitLabel.textContent = submitting ? "Submitting…" : "Submit";
+      if (submitLabel) submitLabel.textContent = submitting ? i18n.submitting : i18n.submit;
       submitSpinner?.classList.toggle("hidden", !submitting);
     }
 
@@ -240,7 +268,7 @@ Astro.response.headers.set("Cache-Control", "public, max-age=300");
         if (!consentGiven) {
           const err = document.getElementById("forja-consent-error");
           if (err) {
-            err.textContent = "Consent is required to submit this form.";
+            err.textContent = i18n.consentRequired;
             err.classList.remove("hidden");
           }
           return;
@@ -250,7 +278,7 @@ Astro.response.headers.set("Cache-Control", "public, max-age=300");
       const botToken = botProtection === "mandatory" ? form.dataset.botProtectionToken : undefined;
       if (botProtection === "mandatory" && !botToken) {
         if (formError) {
-          formError.textContent = "Bot protection token missing. Please complete the challenge.";
+          formError.textContent = i18n.botTokenMissing;
           formError.classList.remove("hidden");
         }
         return;
@@ -297,12 +325,12 @@ Astro.response.headers.set("Cache-Control", "public, max-age=300");
           }
         }
         if (!handled && formError) {
-          formError.textContent = `Submission failed (status ${res.status}). Please try again.`;
+          formError.textContent = withStatus(i18n.submitFailed, res.status);
           formError.classList.remove("hidden");
         }
       } catch (e) {
         if (formError) {
-          formError.textContent = "Network error — please check your connection and try again.";
+          formError.textContent = i18n.networkError;
           formError.classList.remove("hidden");
         }
       } finally {
