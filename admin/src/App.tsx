@@ -33,7 +33,6 @@ import MembersPage from '@/pages/Members';
 import ApiKeysPage from '@/pages/ApiKeys';
 import TaxonomyPage from '@/pages/Taxonomy';
 import UiStringsPage from '@/pages/ui-strings/UiStringsPage';
-import UiStringDetailPage from '@/pages/ui-strings/UiStringDetailPage';
 import WebhooksPage from '@/pages/Webhooks';
 import RedirectsPage from '@/pages/Redirects';
 import ContentTemplatesPage from '@/pages/ContentTemplates';
@@ -263,8 +262,6 @@ function App() {
                   <Route path="api-keys" element={<Navigate to="/site-settings/api-keys" replace />} />
                   <Route path="taxonomy" element={<TaxonomyPage />} />
                   <Route path="ui-strings" element={<UiStringsPage />} />
-                  <Route path="ui-strings/new" element={<UiStringDetailPage />} />
-                  <Route path="ui-strings/:id" element={<UiStringDetailPage />} />
                   <Route path="webhooks" element={<Navigate to="/site-settings/webhooks" replace />} />
                   <Route path="redirects" element={<RedirectsPage />} />
                   <Route path="locales" element={<LocalesPage />} />

@@ -4712,7 +4712,8 @@
       "filterAll": "Alle Texte",
       "filterMissing": "Fehlende Übersetzungen",
       "filterOutdated": "Veraltet",
-      "noMatches": "Keine Texte entsprechen diesem Filter.",
+      "searchPlaceholder": "Nach Schlüssel suchen…",
+      "noMatches": "Keine Texte entsprechen der Suche oder dem Filter.",
       "emptyTitle": "Noch keine UI-Texte",
       "empty": "Definieren Sie Schlüssel wie blog.min_read und übersetzen Sie sie pro Sprache — Ihre Templates lesen sie beim Rendern.",
       "localeStatus": {
@@ -4721,24 +4722,19 @@
         "outdated": "{{locale}}: veraltet — der Standardwert wurde geändert"
       }
     },
-    "detail": {
-      "newTitle": "Neuer UI-Text",
-      "subtitle": "Schlüssel und Standardwert werden gemeinsam gespeichert; andere Sprachen beim Verlassen des Felds",
-      "loading": "UI-Text wird geladen…",
+    "dialog": {
+      "createTitle": "Neuer UI-Text",
+      "editTitle": "UI-Text bearbeiten",
       "keyLabel": "Schlüssel",
       "keyHelp": "Kleingeschriebene Segmente, verbunden mit '.', '_' oder '-' — z. B. blog.min_read",
       "keyRequired": "Schlüssel ist erforderlich",
       "keyTooLong": "Schlüssel darf höchstens 128 Zeichen lang sein",
       "keyInvalid": "Nur Kleinbuchstaben und Ziffern, verbunden mit '.', '_' oder '-'",
-      "valueLabel": "Wert",
-      "valueTooLong": "Wert darf höchstens 1000 Zeichen lang sein",
-      "valueRequired": "Wert ist erforderlich — der Standardwert kann nicht geleert werden",
       "valueForLocale": "Wert ({{locale}})",
-      "localeHint": "Wert für {{locale}}. Wird beim Verlassen des Felds gespeichert; Leeren entfernt die Übersetzung.",
-      "createHint": "Speichern Sie zuerst den Schlüssel mit dem Standardwert — danach übersetzen Sie ihn in die anderen Sprachen.",
-      "saved": "Text gespeichert.",
+      "valueRequired": "Wert ist erforderlich — der Standardwert kann nicht geleert werden",
+      "clearHint": "Leeren entfernt die Übersetzung beim Speichern.",
       "created": "Text erstellt.",
-      "notFound": "Dieser UI-Text existiert nicht.",
+      "saved": "Text gespeichert.",
       "status": {
         "missing": "fehlt",
         "outdated": "veraltet"

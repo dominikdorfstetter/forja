@@ -4712,7 +4712,8 @@
       "filterAll": "Tous les textes",
       "filterMissing": "Traductions manquantes",
       "filterOutdated": "Obsolètes",
-      "noMatches": "Aucun texte ne correspond à ce filtre.",
+      "searchPlaceholder": "Rechercher par clé…",
+      "noMatches": "Aucun texte ne correspond à votre recherche ou au filtre.",
       "emptyTitle": "Aucun texte d'interface",
       "empty": "Définissez des clés comme blog.min_read et traduisez-les par langue — vos templates les lisent au rendu.",
       "localeStatus": {
@@ -4721,24 +4722,19 @@
         "outdated": "{{locale}} : obsolète — la valeur par défaut a changé"
       }
     },
-    "detail": {
-      "newTitle": "Nouveau texte d'interface",
-      "subtitle": "La clé et la valeur par défaut s'enregistrent ensemble ; les autres langues s'enregistrent quand vous quittez le champ",
-      "loading": "Chargement du texte…",
+    "dialog": {
+      "createTitle": "Nouveau texte d'interface",
+      "editTitle": "Modifier le texte d'interface",
       "keyLabel": "Clé",
       "keyHelp": "Segments en minuscules reliés par '.', '_' ou '-' — p. ex. blog.min_read",
       "keyRequired": "La clé est requise",
       "keyTooLong": "La clé ne peut pas dépasser 128 caractères",
       "keyInvalid": "Utilisez des lettres minuscules et des chiffres, reliés par '.', '_' ou '-'",
-      "valueLabel": "Valeur",
-      "valueTooLong": "La valeur ne peut pas dépasser 1000 caractères",
-      "valueRequired": "La valeur est requise — la valeur par défaut ne peut pas être vidée",
       "valueForLocale": "Valeur ({{locale}})",
-      "localeHint": "Valeur pour {{locale}}. Enregistrée quand vous quittez le champ ; l'effacer supprime la traduction.",
-      "createHint": "Enregistrez d'abord la clé et sa valeur par défaut — puis traduisez-la dans les autres langues.",
-      "saved": "Texte enregistré.",
+      "valueRequired": "La valeur est requise — la valeur par défaut ne peut pas être vidée",
+      "clearHint": "L'effacer supprime la traduction à l'enregistrement.",
       "created": "Texte créé.",
-      "notFound": "Ce texte d'interface n'existe pas.",
+      "saved": "Texte enregistré.",
       "status": {
         "missing": "manquant",
         "outdated": "obsolète"

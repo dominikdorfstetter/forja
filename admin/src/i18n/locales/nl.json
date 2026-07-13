@@ -4712,7 +4712,8 @@
       "filterAll": "Alle teksten",
       "filterMissing": "Ontbrekende vertalingen",
       "filterOutdated": "Verouderd",
-      "noMatches": "Geen teksten voldoen aan dit filter.",
+      "searchPlaceholder": "Zoeken op sleutel…",
+      "noMatches": "Geen teksten voldoen aan je zoekopdracht of filter.",
       "emptyTitle": "Nog geen interfaceteksten",
       "empty": "Definieer sleutels zoals blog.min_read en vertaal ze per taal — je templates lezen ze tijdens het renderen.",
       "localeStatus": {
@@ -4721,24 +4722,19 @@
         "outdated": "{{locale}}: verouderd — de standaardwaarde is gewijzigd"
       }
     },
-    "detail": {
-      "newTitle": "Nieuwe interfacetekst",
-      "subtitle": "Sleutel en standaardwaarde worden samen opgeslagen; andere talen bij het verlaten van het veld",
-      "loading": "Tekst laden…",
+    "dialog": {
+      "createTitle": "Nieuwe interfacetekst",
+      "editTitle": "Interfacetekst bewerken",
       "keyLabel": "Sleutel",
       "keyHelp": "Kleine letters in segmenten, verbonden met '.', '_' of '-' — bijv. blog.min_read",
       "keyRequired": "Sleutel is verplicht",
       "keyTooLong": "Sleutel mag maximaal 128 tekens bevatten",
       "keyInvalid": "Gebruik kleine letters en cijfers, verbonden met '.', '_' of '-'",
-      "valueLabel": "Waarde",
-      "valueTooLong": "Waarde mag maximaal 1000 tekens bevatten",
-      "valueRequired": "Waarde is verplicht — de standaardwaarde kan niet worden gewist",
       "valueForLocale": "Waarde ({{locale}})",
-      "localeHint": "Waarde voor {{locale}}. Opgeslagen wanneer je het veld verlaat; leegmaken verwijdert de vertaling.",
-      "createHint": "Sla eerst de sleutel met de standaardwaarde op — vertaal hem daarna naar de andere talen.",
-      "saved": "Tekst opgeslagen.",
+      "valueRequired": "Waarde is verplicht — de standaardwaarde kan niet worden gewist",
+      "clearHint": "Leegmaken verwijdert de vertaling bij het opslaan.",
       "created": "Tekst aangemaakt.",
-      "notFound": "Deze interfacetekst bestaat niet.",
+      "saved": "Tekst opgeslagen.",
       "status": {
         "missing": "ontbreekt",
         "outdated": "verouderd"

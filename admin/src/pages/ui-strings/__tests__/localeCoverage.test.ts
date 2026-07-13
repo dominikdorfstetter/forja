@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   applyCoverageFilter,
+  applyKeyQuery,
   hasMissingLocale,
   hasOutdatedLocale,
   localeValueState,
@@ -65,5 +66,27 @@ describe('coverage flags and filter', () => {
     expect(applyCoverageFilter(rows, locales, 'all')).toEqual(rows);
     expect(applyCoverageFilter(rows, locales, 'missing')).toEqual([rowMinRead]);
     expect(applyCoverageFilter(rows, locales, 'outdated')).toEqual([rowMinRead]);
+  });
+});
+
+describe('applyKeyQuery', () => {
+  const rows = [rowMinRead, rowFooterLinks];
+
+  it('matches key substrings case-insensitively', () => {
+    expect(applyKeyQuery(rows, 'FOOTER')).toEqual([rowFooterLinks]);
+    expect(applyKeyQuery(rows, 'min_read')).toEqual([rowMinRead]);
+    expect(applyKeyQuery(rows, 'nope')).toEqual([]);
+  });
+
+  it('passes all rows through on an empty or whitespace-only query', () => {
+    expect(applyKeyQuery(rows, '')).toEqual(rows);
+    expect(applyKeyQuery(rows, '   ')).toEqual(rows);
+  });
+
+  it('composes with the coverage filter', () => {
+    expect(applyKeyQuery(applyCoverageFilter(rows, locales, 'missing'), 'footer')).toEqual([]);
+    expect(applyKeyQuery(applyCoverageFilter(rows, locales, 'missing'), 'blog')).toEqual([
+      rowMinRead,
+    ]);
   });
 });

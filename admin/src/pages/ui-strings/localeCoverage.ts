@@ -39,3 +39,10 @@ export function applyCoverageFilter(
       return rows;
   }
 }
+
+/** Case-insensitive key-substring search; composes after the coverage filter. */
+export function applyKeyQuery(rows: UiStringResponse[], query: string): UiStringResponse[] {
+  const q = query.trim().toLowerCase();
+  if (q.length === 0) return rows;
+  return rows.filter((row) => row.key.toLowerCase().includes(q));
+}
