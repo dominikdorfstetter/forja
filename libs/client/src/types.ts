@@ -700,6 +700,12 @@ export interface PublicSiteSettings {
   seo_title_template: string;
   /** Fallback meta description; empty string when unset. */
   seo_default_description: string;
+  /**
+   * Whether the site is in maintenance mode. SSR frontends should swap
+   * the whole site for a maintenance page (HTTP 503) while it's set.
+   * Optional so consumers stay compatible with pre-2.1.1 backends.
+   */
+  maintenance_mode?: boolean;
 }
 
 // ── Media types ──────────────────────────────────────────────

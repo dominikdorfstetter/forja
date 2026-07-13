@@ -25,9 +25,10 @@ use common::{TestContext, create_test_api_key, create_test_site, test_context};
 
 /// The v1 public-settings allowlist, sorted. The public endpoint must
 /// expose exactly these fields — nothing operational.
-const PUBLIC_SETTINGS_FIELDS: [&str; 5] = [
+const PUBLIC_SETTINGS_FIELDS: [&str; 6] = [
     "background_color",
     "contact_email",
+    "maintenance_mode",
     "seo_default_description",
     "seo_title_template",
     "theme_color",
@@ -200,4 +201,32 @@ async fn public_settings_fall_back_to_house_defaults_when_unset() {
     assert_eq!(body["background_color"], "#ffffff");
     assert_eq!(body["seo_title_template"], "{{title}} | {{site_name}}");
     assert_eq!(body["seo_default_description"], "");
+    assert_eq!(body["maintenance_mode"], false);
+}
+
+#[tokio::test]
+#[serial]
+async fn public_settings_expose_the_maintenance_toggle() {
+    let ctx = test_context().await;
+    let site_id = create_test_site(&ctx.pool).await;
+    let admin_key = create_test_api_key(&ctx.pool, site_id, ApiKeyPermission::Admin).await;
+
+    // Warm the read path first so a stale cache entry would be caught —
+    // an SSR frontend polls this field to swap in its maintenance page,
+    // so the toggle must propagate through the response cache.
+    let warm = get_public_settings_as(&ctx, site_id, ApiKeyPermission::Read).await;
+    assert_eq!(warm.status_code().as_u16(), 200);
+    assert_eq!(warm.json::<serde_json::Value>()["maintenance_mode"], false);
+
+    let put = ctx
+        .server
+        .put(&format!("/api/v1/sites/{site_id}/settings"))
+        .add_header("x-api-key", admin_key.as_str())
+        .json(&serde_json::json!({ "maintenance_mode": true }))
+        .await;
+    assert_eq!(put.status_code().as_u16(), 200);
+
+    let resp = get_public_settings_as(&ctx, site_id, ApiKeyPermission::Read).await;
+    assert_eq!(resp.status_code().as_u16(), 200);
+    assert_eq!(resp.json::<serde_json::Value>()["maintenance_mode"], true);
 }
