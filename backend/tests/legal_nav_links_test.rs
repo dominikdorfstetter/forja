@@ -864,6 +864,163 @@ async fn nav_item_update_rejects_a_cross_site_legal_document() {
     );
 }
 
+// ── Cross-site page references (mirror of the legal FK validation) ──────
+
+/// Insert a published page assigned to `site_id`, returning its id.
+async fn create_page(pool: &PgPool, site_id: Uuid, route: &str) -> Uuid {
+    let mut conn = pool.acquire().await.unwrap();
+    let content_id = ContentService::create_content(
+        &mut conn,
+        "page",
+        Some(&format!("nav-page-{}", &Uuid::new_v4().to_string()[..8])),
+        &ContentStatus::Published,
+        &[site_id],
+        None,
+        None,
+        Some("test-user"),
+    )
+    .await
+    .expect("page content");
+    sqlx::query_scalar::<_, Uuid>(
+        "INSERT INTO pages (content_id, route) VALUES ($1, $2) RETURNING id",
+    )
+    .bind(content_id)
+    .bind(route)
+    .fetch_one(pool)
+    .await
+    .expect("page row")
+}
+
+#[tokio::test]
+#[serial]
+async fn nav_item_create_rejects_a_cross_site_page() {
+    let ctx = test_context().await;
+    let site_a = create_test_site(&ctx.pool).await;
+    let site_b = create_test_site(&ctx.pool).await;
+    let write_key_b = create_test_api_key(&ctx.pool, site_b, ApiKeyPermission::Write).await;
+    let menu_b = create_menu(&ctx, site_b, &write_key_b, "footer-xsite-page").await;
+
+    let foreign_page = create_page(&ctx.pool, site_a, "/foreign-about").await;
+    let own_page = create_page(&ctx.pool, site_b, "/own-about").await;
+
+    let rejected = ctx
+        .server
+        .post(&format!("/api/v1/menus/{menu_b}/items"))
+        .add_header("x-api-key", write_key_b.as_str())
+        .json(&item_body(
+            site_b,
+            menu_b,
+            json!({ "page_id": foreign_page }),
+        ))
+        .await;
+    rejected.assert_status(StatusCode::UNPROCESSABLE_ENTITY);
+    assert_eq!(
+        rejected.json::<serde_json::Value>()["code"],
+        codes::PAGE_CROSS_SITE
+    );
+
+    let accepted = ctx
+        .server
+        .post(&format!("/api/v1/menus/{menu_b}/items"))
+        .add_header("x-api-key", write_key_b.as_str())
+        .json(&item_body(site_b, menu_b, json!({ "page_id": own_page })))
+        .await;
+    accepted.assert_status(StatusCode::CREATED);
+}
+
+#[tokio::test]
+#[serial]
+async fn nav_item_update_rejects_a_cross_site_page() {
+    let ctx = test_context().await;
+    let site_a = create_test_site(&ctx.pool).await;
+    let site_b = create_test_site(&ctx.pool).await;
+    let write_key_b = create_test_api_key(&ctx.pool, site_b, ApiKeyPermission::Write).await;
+    let menu_b = create_menu(&ctx, site_b, &write_key_b, "footer-xsite-page-upd").await;
+
+    let foreign_page = create_page(&ctx.pool, site_a, "/foreign-contact").await;
+    let own_page = create_page(&ctx.pool, site_b, "/own-contact").await;
+
+    let created = ctx
+        .server
+        .post(&format!("/api/v1/menus/{menu_b}/items"))
+        .add_header("x-api-key", write_key_b.as_str())
+        .json(&item_body(
+            site_b,
+            menu_b,
+            json!({ "external_url": "/somewhere" }),
+        ))
+        .await;
+    created.assert_status(StatusCode::CREATED);
+    let item_id = created.json::<serde_json::Value>()["id"]
+        .as_str()
+        .expect("item id")
+        .to_string();
+
+    let rejected = ctx
+        .server
+        .put(&format!("/api/v1/navigation/{item_id}"))
+        .add_header("x-api-key", write_key_b.as_str())
+        .json(&json!({ "page_id": foreign_page }))
+        .await;
+    rejected.assert_status(StatusCode::UNPROCESSABLE_ENTITY);
+    assert_eq!(
+        rejected.json::<serde_json::Value>()["code"],
+        codes::PAGE_CROSS_SITE
+    );
+
+    let switched = ctx
+        .server
+        .put(&format!("/api/v1/navigation/{item_id}"))
+        .add_header("x-api-key", write_key_b.as_str())
+        .json(&json!({ "page_id": own_page }))
+        .await;
+    switched.assert_status_ok();
+    assert_eq!(
+        switched.json::<serde_json::Value>()["page_id"],
+        own_page.to_string()
+    );
+}
+
+/// Defense in depth: a cross-site page row seeded behind the validation
+/// (direct SQL) never leaks a foreign route into the public tree — the
+/// site-scoped page join drops the item, and the admin read keeps it for
+/// repair, mirroring the legal chain-root behaviour.
+#[tokio::test]
+#[serial]
+async fn tree_drops_a_cross_site_page_item() {
+    let ctx = test_context().await;
+    let site_a = create_test_site(&ctx.pool).await;
+    let site_b = create_test_site(&ctx.pool).await;
+    let write_key_b = create_test_api_key(&ctx.pool, site_b, ApiKeyPermission::Write).await;
+    let read_key_b = create_test_api_key(&ctx.pool, site_b, ApiKeyPermission::Read).await;
+    let menu_b = create_menu(&ctx, site_b, &write_key_b, "footer-xsite-tree").await;
+
+    let foreign_page = create_page(&ctx.pool, site_a, "/foreign-leak").await;
+    sqlx::query(
+        "INSERT INTO navigation_items (site_id, menu_id, page_id, display_order)
+         VALUES ($1, $2, $3, 0)",
+    )
+    .bind(site_b)
+    .bind(menu_b)
+    .bind(foreign_page)
+    .execute(&ctx.pool)
+    .await
+    .expect("seed cross-site item behind the validation");
+
+    let public = tree(&ctx, menu_b, &read_key_b).await;
+    assert!(
+        public.as_array().expect("tree array").is_empty(),
+        "a cross-site page must not leak its route into the public tree"
+    );
+
+    let admin = admin_items(&ctx, menu_b, &read_key_b).await;
+    assert_eq!(
+        admin.as_array().expect("items array").len(),
+        1,
+        "admin read keeps the item for repair"
+    );
+}
+
 // ── Locale-mode tree title fallback (ADR 0002) ──────────────────────────
 
 #[tokio::test]

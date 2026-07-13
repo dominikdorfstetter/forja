@@ -135,9 +135,9 @@ describe('MenuFormDialog', () => {
     })));
   });
 
-  // The backend upsert has no delete path — a cleared name would silently
-  // reappear after a "successful" save, so the dialog must refuse instead.
-  it('blocks save with a field error when a saved display name is cleared', async () => {
+  // A cleared, previously-persisted name is an explicit removal: its locale
+  // rides in removed_locale_ids, and a hint explains the consequence.
+  it('sends a cleared saved display name as removed_locale_ids on update', async () => {
     const onSubmitUpdate = vi.fn();
     const user = userEvent.setup();
     renderWithProviders(
@@ -147,13 +147,19 @@ describe('MenuFormDialog', () => {
     await user.clear(screen.getByTestId('menu-form.input.display-name'));
 
     expect(
-      await screen.findByText(/A saved display name can't be removed/),
+      await screen.findByText(/Clearing removes this translation when you save/),
     ).toBeInTheDocument();
-    expect(screen.getByTestId('menu-form.btn.submit')).toBeDisabled();
-    expect(onSubmitUpdate).not.toHaveBeenCalled();
+
+    await waitFor(() => expect(screen.getByTestId('menu-form.btn.submit')).not.toBeDisabled());
+    await user.click(screen.getByTestId('menu-form.btn.submit'));
+
+    await waitFor(() => expect(onSubmitUpdate).toHaveBeenCalledWith(expect.objectContaining({
+      localizations: [{ locale_id: 'loc-de', name: 'Fußzeile' }],
+      removed_locale_ids: ['loc-en'],
+    })));
   });
 
-  it('re-enables save once the cleared display name is restored or replaced', async () => {
+  it('omits removed_locale_ids when the cleared display name is restored or replaced', async () => {
     const onSubmitUpdate = vi.fn();
     const user = userEvent.setup();
     renderWithProviders(
@@ -162,11 +168,9 @@ describe('MenuFormDialog', () => {
 
     const input = screen.getByTestId('menu-form.input.display-name');
     await user.clear(input);
-    expect(screen.getByTestId('menu-form.btn.submit')).toBeDisabled();
-
     await user.type(input, 'Footer navigation');
     expect(
-      screen.queryByText(/A saved display name can't be removed/),
+      screen.queryByText(/Clearing removes this translation when you save/),
     ).not.toBeInTheDocument();
 
     await waitFor(() => expect(screen.getByTestId('menu-form.btn.submit')).not.toBeDisabled());
@@ -177,10 +181,11 @@ describe('MenuFormDialog', () => {
         { locale_id: 'loc-en', name: 'Footer navigation' },
         { locale_id: 'loc-de', name: 'Fußzeile' },
       ],
+      removed_locale_ids: undefined,
     })));
   });
 
-  it('allows clearing a name that was never persisted', async () => {
+  it('does not mark a never-persisted name for removal', async () => {
     const onSubmitCreate = vi.fn();
     const user = userEvent.setup();
     renderWithProviders(
@@ -193,8 +198,13 @@ describe('MenuFormDialog', () => {
     await user.clear(input);
 
     expect(
-      screen.queryByText(/A saved display name can't be removed/),
+      screen.queryByText(/Clearing removes this translation when you save/),
     ).not.toBeInTheDocument();
     await waitFor(() => expect(screen.getByTestId('menu-form.btn.submit')).not.toBeDisabled());
+    await user.click(screen.getByTestId('menu-form.btn.submit'));
+
+    await waitFor(() => expect(onSubmitCreate).toHaveBeenCalledWith(expect.objectContaining({
+      localizations: undefined,
+    })));
   });
 });

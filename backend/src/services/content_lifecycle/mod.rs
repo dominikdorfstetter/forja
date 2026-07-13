@@ -106,6 +106,10 @@ pub async fn create<E: ContentEntity>(
     let entity_id = entity.id();
     let entity_content_id = entity.content_id();
 
+    if requested_status == ContentStatus::Published {
+        E::on_published(pool, entity_id).await?;
+    }
+
     let resolved_site_id = match entity_content_id {
         Some(cid) => Content::find_site_ids(pool, cid)
             .await?
@@ -224,6 +228,13 @@ pub async fn update<E: ContentUpdate>(
     let mut tx = pool.begin().await?;
     let updated = E::update(&mut tx, id, payload).await?;
     tx.commit().await?;
+
+    if transition
+        .as_ref()
+        .is_some_and(|t| t.to == ContentStatus::Published)
+    {
+        E::on_published(pool, id).await?;
+    }
 
     let Some(site_id) = site_ids.into_iter().next() else {
         return Ok(updated);

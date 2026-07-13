@@ -1041,7 +1041,7 @@
         "displayName": "Nombre visible",
         "displayNames": "Nombres visibles",
         "displayNamesHelp": "Nombre opcional del menú que se muestra a los visitantes en este idioma (p. ej., como encabezado del pie de página)",
-        "displayNameClearedError": "Un nombre visible guardado no se puede eliminar: restáuralo o introduce otro nombre"
+        "displayNameClearHint": "Al vaciarlo, esta traducción se elimina al guardar"
       },
       "messages": {
         "created": "Menú creado",
@@ -4730,7 +4730,7 @@
       "valueTooLong": "El valor no puede superar los 1000 caracteres",
       "valueRequired": "El valor es obligatorio: el valor predeterminado no se puede vaciar",
       "valueForLocale": "Valor ({{locale}})",
-      "localeHint": "Valor para {{locale}}. Se guarda al salir del campo; déjalo vacío para conservar el valor actual.",
+      "localeHint": "Valor para {{locale}}. Se guarda al salir del campo; si lo vacías, se elimina la traducción.",
       "createHint": "Guarda primero la clave con su valor predeterminado y después tradúcela a los demás idiomas.",
       "saved": "Texto guardado.",
       "created": "Texto creado.",

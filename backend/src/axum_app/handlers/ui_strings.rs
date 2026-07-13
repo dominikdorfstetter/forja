@@ -209,7 +209,7 @@ async fn create_ui_string(
     path = "/sites/{site_id}/strings/{id}",
     tag = "UI Strings",
     operation_id = "update_ui_string",
-    description = "Rename a UI string key and/or upsert localizations. Changing the site-default locale's value flips every other locale to translation_status=outdated.",
+    description = "Rename a UI string key, upsert localizations, and/or remove localizations by locale. Changing the site-default locale's value flips every other locale to translation_status=outdated; the default locale's row cannot be removed.",
     params(
         ("site_id" = Uuid, Path, description = "Site UUID"),
         ("id" = Uuid, Path, description = "UI string UUID")
@@ -220,7 +220,8 @@ async fn create_ui_string(
         (status = 401, description = "Unauthorized", body = ProblemDetails),
         (status = 403, description = "Forbidden", body = ProblemDetails),
         (status = 404, description = "UI string not found", body = ProblemDetails),
-        (status = 409, description = "Key already exists on this site", body = ProblemDetails)
+        (status = 409, description = "Key already exists on this site", body = ProblemDetails),
+        (status = 422, description = "Validation error, removal of the default locale, or locale in both localizations and removed_locale_ids", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -247,6 +248,7 @@ async fn update_ui_string(
         id,
         body.key.as_deref(),
         &body.localizations,
+        body.removed_locale_ids.as_deref().unwrap_or_default(),
     )
     .await?;
     let locs = UiStringRepo::localizations_for_string(&state.db, row.id).await?;

@@ -28,7 +28,6 @@ pub const ENTITY_NOT_FOUND: &str = "ENTITY_NOT_FOUND";
 pub const ENTITY_SLUG_TAKEN: &str = "ENTITY_SLUG_TAKEN";
 pub const ENTITY_LOCALIZATION_EXISTS: &str = "ENTITY_LOCALIZATION_EXISTS";
 pub const ENTITY_LOCALIZATION_NOT_FOUND: &str = "ENTITY_LOCALIZATION_NOT_FOUND";
-pub const LOCALIZATION_COVERAGE_INCOMPLETE: &str = "LOCALIZATION_COVERAGE_INCOMPLETE";
 
 // ── Site ────────────────────────────────────────────────────────────────
 
@@ -51,6 +50,7 @@ pub const BLOG_BULK_STATUS_REQUIRED: &str = "BLOG_BULK_STATUS_REQUIRED";
 // ── Page ────────────────────────────────────────────────────────────────
 
 pub const PAGE_BULK_STATUS_REQUIRED: &str = "PAGE_BULK_STATUS_REQUIRED";
+pub const PAGE_CROSS_SITE: &str = "PAGE_CROSS_SITE";
 
 // ── Content (shared blog/page) ─────────────────────────────────────────
 
@@ -288,6 +288,7 @@ pub const ERR_STRINGS_LIMIT_EXCEEDED: &str = "ERR_STRINGS_LIMIT_EXCEEDED";
 pub const ERR_STRINGS_LOCALE_REQUIRED: &str = "ERR_STRINGS_LOCALE_REQUIRED";
 pub const ERR_STRINGS_KEY_TAKEN: &str = "ERR_STRINGS_KEY_TAKEN";
 pub const ERR_STRINGS_NOT_FOUND: &str = "ERR_STRINGS_NOT_FOUND";
+pub const ERR_STRINGS_DEFAULT_LOCALE_REMOVAL: &str = "ERR_STRINGS_DEFAULT_LOCALE_REMOVAL";
 
 // ── Imprint ─────────────────────────────────────────────────────────────
 
@@ -401,6 +402,12 @@ pub const ALL: &[ErrorCodeDef] = &[
         domain: "page",
         http_status: 400,
         description: "The status field is required for UpdateStatus bulk action",
+    },
+    ErrorCodeDef {
+        code: PAGE_CROSS_SITE,
+        domain: "page",
+        http_status: 422,
+        description: "The referenced page does not belong to this site",
     },
     // Content (shared)
     ErrorCodeDef {
@@ -1153,6 +1160,12 @@ pub const ALL: &[ErrorCodeDef] = &[
         domain: "ui_strings",
         http_status: 404,
         description: "No UI string with that ID exists on this site",
+    },
+    ErrorCodeDef {
+        code: ERR_STRINGS_DEFAULT_LOCALE_REMOVAL,
+        domain: "ui_strings",
+        http_status: 422,
+        description: "The site-default locale's value cannot be removed — it drives the fallback chain and the auto-outdated rule",
     },
     // Validation (field-level)
     ErrorCodeDef {

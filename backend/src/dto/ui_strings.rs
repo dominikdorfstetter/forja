@@ -12,7 +12,8 @@ use utoipa::ToSchema;
 use uuid::Uuid;
 use validator::Validate;
 
-use crate::dto::validated::ValidatedDto;
+use crate::dto::validated::{Validated, ValidatedDto};
+use crate::errors::ApiError;
 use crate::models::content::TranslationStatus;
 
 /// Maximum number of UI string keys per site (enforced in the create handler).
@@ -61,8 +62,9 @@ pub struct CreateUiStringRequest {
     pub localizations: Vec<UiStringLocalizationInput>,
 }
 
-/// Request to update a UI string — rename the key and/or upsert localizations.
-#[derive(Debug, Clone, Serialize, Deserialize, Validate, ValidatedDto, ToSchema)]
+/// Request to update a UI string — rename the key, upsert localizations,
+/// and/or remove localizations by locale.
+#[derive(Debug, Clone, Serialize, Deserialize, Validate, ToSchema)]
 pub struct UpdateUiStringRequest {
     /// New key; omit to keep the current key.
     #[validate(length(
@@ -78,6 +80,40 @@ pub struct UpdateUiStringRequest {
     #[serde(default)]
     #[validate(nested)]
     pub localizations: Vec<UiStringLocalizationInput>,
+    /// Locale IDs whose localization rows are deleted in the same update
+    /// transaction. The site-default locale is rejected (it drives the
+    /// fallback chain and the auto-outdated rule), as is a locale that also
+    /// appears in `localizations`.
+    pub removed_locale_ids: Option<Vec<Uuid>>,
+}
+
+impl UpdateUiStringRequest {
+    /// A locale upserted and removed in the same payload is contradictory.
+    fn validate_removals(&self) -> Result<(), String> {
+        let Some(removed) = &self.removed_locale_ids else {
+            return Ok(());
+        };
+        if self
+            .localizations
+            .iter()
+            .any(|l| removed.contains(&l.locale_id))
+        {
+            return Err(
+                "A locale cannot appear in both localizations and removed_locale_ids".to_string(),
+            );
+        }
+        Ok(())
+    }
+}
+
+impl ValidatedDto for UpdateUiStringRequest {
+    type Context = ();
+
+    async fn validate_all(self, _: &()) -> Result<Validated<Self>, ApiError> {
+        self.validate().map_err(ApiError::from)?;
+        self.validate_removals().map_err(ApiError::validation)?;
+        Ok(Validated::seal(self))
+    }
 }
 
 /// One localized value of a UI string key (admin read shape).
@@ -163,13 +199,39 @@ mod tests {
         let req = UpdateUiStringRequest {
             key: None,
             localizations: vec![],
+            removed_locale_ids: None,
         };
         assert!(req.validate().is_ok());
 
         let renamed = UpdateUiStringRequest {
             key: Some("UPPER".to_string()),
             localizations: vec![],
+            removed_locale_ids: None,
         };
         assert!(renamed.validate().is_err());
+    }
+
+    #[test]
+    fn update_rejects_a_locale_in_both_upserts_and_removals() {
+        let locale_id = Uuid::new_v4();
+        let conflicted = UpdateUiStringRequest {
+            key: None,
+            localizations: vec![UiStringLocalizationInput {
+                locale_id,
+                value: "value".to_string(),
+            }],
+            removed_locale_ids: Some(vec![locale_id]),
+        };
+        assert!(conflicted.validate_removals().is_err());
+
+        let disjoint = UpdateUiStringRequest {
+            key: None,
+            localizations: vec![UiStringLocalizationInput {
+                locale_id,
+                value: "value".to_string(),
+            }],
+            removed_locale_ids: Some(vec![Uuid::new_v4()]),
+        };
+        assert!(disjoint.validate_removals().is_ok());
     }
 }

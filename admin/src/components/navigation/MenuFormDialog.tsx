@@ -63,8 +63,8 @@ export default function MenuFormDialog({ open, menu, locales = EMPTY_LOCALES, on
   const [displayNames, setDisplayNames] = useState<Record<string, string>>({});
   const [activeLocaleTab, setActiveLocaleTab] = useState(0);
 
-  // The backend upsert has no delete path — a cleared, previously-persisted
-  // display name would silently reappear. Surface it and block the save.
+  // A cleared, previously-persisted display name is an explicit removal:
+  // its locale id rides in `removed_locale_ids` on the update payload.
   const persistedNames = useMemo(() => toDisplayNames(menu), [menu]);
   const clearedLocaleIds = useMemo(
     () =>
@@ -111,6 +111,7 @@ export default function MenuFormDialog({ open, menu, locales = EMPTY_LOCALES, on
         max_depth: data.max_depth,
         is_active: data.is_active,
         localizations,
+        removed_locale_ids: clearedLocaleIds.length > 0 ? clearedLocaleIds : undefined,
       });
     } else {
       onSubmitCreate({
@@ -130,7 +131,7 @@ export default function MenuFormDialog({ open, menu, locales = EMPTY_LOCALES, on
       icon="menu_book"
       title={menu ? t('navigation.menus.editTitle', 'Edit Menu') : t('navigation.menus.createTitle', 'Create Menu')}
       submitLabel={menu ? t('common.actions.save') : t('common.actions.create')}
-      submitDisabled={!isValid || clearedLocaleIds.length > 0}
+      submitDisabled={!isValid}
       submitTestId="menu-form.btn.submit"
       cancelTestId="menu-form.btn.cancel"
       loading={loading}
@@ -233,10 +234,9 @@ function DisplayNamesSection({
         size="small"
         value={displayNames[currentLocale.id] ?? ''}
         onChange={(e) => onNameChange(currentLocale.id, e.target.value)}
-        error={currentCleared}
         helperText={
           currentCleared
-            ? t('navigation.menus.fields.displayNameClearedError', "A saved display name can't be removed — restore it or enter a different name")
+            ? t('navigation.menus.fields.displayNameClearHint', 'Clearing removes this translation when you save')
             : t('navigation.menus.fields.displayNamesHelp', 'Optional menu name shown to visitors in this language (e.g. as a footer heading)')
         }
         slotProps={{ htmlInput: { 'data-testid': 'menu-form.input.display-name', maxLength: 200 } }}

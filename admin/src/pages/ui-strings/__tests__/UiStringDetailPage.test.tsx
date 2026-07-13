@@ -256,6 +256,40 @@ describe('UiStringDetailPage — edit', () => {
     });
   });
 
+  it('removes a cleared persisted non-default localization on blur', async () => {
+    vi.mocked(updateUiString).mockResolvedValue(rowMinRead);
+    const user = userEvent.setup();
+    renderWithProviders(<UiStringDetailPage />);
+
+    await user.click(await screen.findByTestId('ui-strings.tab.de'));
+    const localized = await screen.findByTestId('ui-strings.field.value.localized');
+    expect(localized).toHaveValue('Min. Lesezeit');
+
+    await user.clear(localized);
+    await user.tab();
+
+    await waitFor(() => {
+      expect(updateUiString).toHaveBeenCalledWith('site-1', 'us-1', {
+        localizations: [],
+        removed_locale_ids: ['loc-de'],
+      });
+    });
+  });
+
+  it('does not send a removal for a locale that was never persisted', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<UiStringDetailPage />);
+
+    // fr has no persisted localization on rowMinRead — an empty blur stays a no-op.
+    await user.click(await screen.findByTestId('ui-strings.tab.fr'));
+    await user.click(await screen.findByTestId('ui-strings.field.value.localized'));
+    await user.tab();
+
+    await waitFor(() => {
+      expect(updateUiString).not.toHaveBeenCalled();
+    });
+  });
+
   it('saves a non-default locale value on blur (LocaleAwareFields path)', async () => {
     vi.mocked(updateUiString).mockResolvedValue(rowMinRead);
     const user = userEvent.setup();

@@ -25,6 +25,7 @@ use crate::models::audit::AuditAction;
 use crate::models::navigation::{NavigationItem, NavigationItemLocalization};
 use crate::models::navigation_menu::NavigationMenu;
 use crate::repos::legal_repo::LegalDocumentRepo;
+use crate::repos::page_repo::PageRepo;
 use crate::services::audited_mutation::AuditedEntity;
 
 /// Navigation items audit and fire `navigation.*` webhooks.
@@ -54,6 +55,38 @@ async fn ensure_legal_document_on_site(
             .with_code(codes::LEGAL_DOC_CROSS_SITE)
             .with_entity_type("legal_doc"),
     )
+}
+
+/// Reject a `page_id` that is not assigned to the item's own site — the
+/// mirror of [`ensure_legal_document_on_site`] for page references, which
+/// would otherwise emit a foreign route in the public tree.
+async fn ensure_page_on_site(
+    pool: &PgPool,
+    page_id: Option<Uuid>,
+    site_id: Uuid,
+) -> Result<(), ApiError> {
+    let Some(page_id) = page_id else {
+        return Ok(());
+    };
+    if PageRepo::on_site(pool, page_id, site_id).await? {
+        return Ok(());
+    }
+    Err(
+        ApiError::validation("The referenced page does not belong to this site")
+            .with_code(codes::PAGE_CROSS_SITE)
+            .with_entity_type("page"),
+    )
+}
+
+/// Both cross-site link-target guards for one write payload.
+async fn ensure_link_targets_on_site(
+    pool: &PgPool,
+    page_id: Option<Uuid>,
+    legal_document_id: Option<Uuid>,
+    site_id: Uuid,
+) -> Result<(), ApiError> {
+    ensure_page_on_site(pool, page_id, site_id).await?;
+    ensure_legal_document_on_site(pool, legal_document_id, site_id).await
 }
 
 #[utoipa::path(
@@ -210,9 +243,9 @@ async fn get_navigation_children(
     request_body(content = CreateNavigationItemRequest, description = "Navigation item data"),
     responses(
         (status = 201, description = "Item created", body = NavigationItemResponse),
-        (status = 400, description = "Validation error", body = ProblemDetails),
         (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 403, description = "Forbidden", body = ProblemDetails)
+        (status = 403, description = "Forbidden", body = ProblemDetails),
+        (status = 422, description = "Validation error or cross-site link target", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -231,7 +264,7 @@ async fn create_navigation_item(
     .await?;
     let mut body = body.into_inner();
     body.site_id = site_id;
-    ensure_legal_document_on_site(&state.db, body.legal_document_id, site_id).await?;
+    ensure_link_targets_on_site(&state.db, body.page_id, body.legal_document_id, site_id).await?;
 
     if body.menu_id == Uuid::nil() {
         let primary = NavigationMenu::find_by_slug(&state.db, site_id, "primary").await?;
@@ -271,8 +304,8 @@ async fn create_navigation_item(
     request_body(content = CreateNavigationItemRequest, description = "Navigation item data"),
     responses(
         (status = 201, description = "Item created", body = NavigationItemResponse),
-        (status = 400, description = "Validation error", body = ProblemDetails),
-        (status = 401, description = "Unauthorized", body = ProblemDetails)
+        (status = 401, description = "Unauthorized", body = ProblemDetails),
+        (status = 422, description = "Validation error or cross-site link target", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -293,7 +326,13 @@ async fn create_menu_item(
     let mut body = body.into_inner();
     body.site_id = menu.site_id;
     body.menu_id = menu_id;
-    ensure_legal_document_on_site(&state.db, body.legal_document_id, menu.site_id).await?;
+    ensure_link_targets_on_site(
+        &state.db,
+        body.page_id,
+        body.legal_document_id,
+        menu.site_id,
+    )
+    .await?;
 
     let item = NavigationItem::create(&state.db, body.clone()).await?;
 
@@ -330,7 +369,8 @@ async fn create_menu_item(
         (status = 200, description = "Item updated", body = NavigationItemResponse),
         (status = 401, description = "Unauthorized", body = ProblemDetails),
         (status = 403, description = "Forbidden", body = ProblemDetails),
-        (status = 404, description = "Item not found", body = ProblemDetails)
+        (status = 404, description = "Item not found", body = ProblemDetails),
+        (status = 422, description = "Validation error or cross-site link target", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -350,7 +390,13 @@ async fn update_navigation_item(
     .await?;
     let old = serde_json::to_value(&existing).ok();
     let body = body.into_inner();
-    ensure_legal_document_on_site(&state.db, body.legal_document_id, existing.site_id).await?;
+    ensure_link_targets_on_site(
+        &state.db,
+        body.page_id,
+        body.legal_document_id,
+        existing.site_id,
+    )
+    .await?;
 
     let item = NavigationItem::update(&state.db, id, body).await?;
     let change_diff = match (old, serde_json::to_value(&item)) {
@@ -379,10 +425,10 @@ async fn update_navigation_item(
     request_body(content = ReorderNavigationItemsRequest, description = "New ordering"),
     responses(
         (status = 204, description = "Navigation items reordered"),
-        (status = 400, description = "Validation error", body = ProblemDetails),
         (status = 401, description = "Unauthorized", body = ProblemDetails),
         (status = 403, description = "Forbidden", body = ProblemDetails),
-        (status = 404, description = "Navigation item not found", body = ProblemDetails)
+        (status = 404, description = "Navigation item not found", body = ProblemDetails),
+        (status = 422, description = "Validation error", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -429,9 +475,9 @@ async fn reorder_navigation_items(
     request_body(content = ReorderNavigationTreeRequest, description = "New ordering with parent IDs"),
     responses(
         (status = 204, description = "Navigation items reordered"),
-        (status = 400, description = "Validation error", body = ProblemDetails),
         (status = 401, description = "Unauthorized", body = ProblemDetails),
-        (status = 404, description = "Navigation item not found", body = ProblemDetails)
+        (status = 404, description = "Navigation item not found", body = ProblemDetails),
+        (status = 422, description = "Validation error", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]
@@ -513,7 +559,8 @@ async fn get_navigation_item_localizations(
     request_body(content = Vec<NavigationItemLocalizationInput>, description = "Localizations to upsert"),
     responses(
         (status = 200, description = "Localizations upserted", body = Vec<NavigationItemLocalizationResponse>),
-        (status = 401, description = "Unauthorized", body = ProblemDetails)
+        (status = 401, description = "Unauthorized", body = ProblemDetails),
+        (status = 422, description = "Validation error", body = ProblemDetails)
     ),
     security(("api_key" = []))
 )]

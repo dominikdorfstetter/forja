@@ -1041,7 +1041,7 @@
         "displayName": "Nom d'affichage",
         "displayNames": "Noms d'affichage",
         "displayNamesHelp": "Nom de menu facultatif affiché aux visiteurs dans cette langue (p. ex. comme titre du pied de page)",
-        "displayNameClearedError": "Un nom d'affichage enregistré ne peut pas être supprimé — restaurez-le ou saisissez un autre nom"
+        "displayNameClearHint": "Effacer supprime cette traduction lors de l'enregistrement"
       },
       "messages": {
         "created": "Menu créé",
@@ -4730,7 +4730,7 @@
       "valueTooLong": "La valeur ne peut pas dépasser 1000 caractères",
       "valueRequired": "La valeur est requise — la valeur par défaut ne peut pas être vidée",
       "valueForLocale": "Valeur ({{locale}})",
-      "localeHint": "Valeur pour {{locale}}. Enregistrée quand vous quittez le champ ; laissez vide pour conserver la valeur actuelle.",
+      "localeHint": "Valeur pour {{locale}}. Enregistrée quand vous quittez le champ ; l'effacer supprime la traduction.",
       "createHint": "Enregistrez d'abord la clé et sa valeur par défaut — puis traduisez-la dans les autres langues.",
       "saved": "Texte enregistré.",
       "created": "Texte créé.",

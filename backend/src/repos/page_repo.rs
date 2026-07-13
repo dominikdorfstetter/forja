@@ -129,6 +129,28 @@ impl PageRepo {
         Ok(page)
     }
 
+    /// True when the page's content is assigned to `site_id` (pages are
+    /// site-scoped through the `content_sites` join table). Mirrors
+    /// `LegalDocumentRepo::chain_root_on_site` for navigation's cross-site
+    /// reference validation.
+    pub async fn on_site(pool: &PgPool, page_id: Uuid, site_id: Uuid) -> Result<bool, ApiError> {
+        let on_site: bool = sqlx::query_scalar(
+            r#"
+            SELECT EXISTS(
+                SELECT 1
+                FROM pages p
+                INNER JOIN content_sites cs ON cs.content_id = p.content_id
+                WHERE p.id = $1 AND cs.site_id = $2
+            )
+            "#,
+        )
+        .bind(page_id)
+        .bind(site_id)
+        .fetch_one(pool)
+        .await?;
+        Ok(on_site)
+    }
+
     pub async fn find_by_route(
         pool: &PgPool,
         site_id: Uuid,

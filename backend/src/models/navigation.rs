@@ -166,13 +166,15 @@ impl NavigationItem {
     /// the linked page's slug, and the linked legal document's version-chain
     /// ROOT slug (mirroring `legal_repo::find_by_slug_for_site` — versions
     /// resolve through the root, so the walk goes up `parent_version_id`).
-    /// The chain root must belong to the item's own site (defense in depth
-    /// against cross-site references). Broken links never render publicly:
-    /// target-less items (all three link columns NULL — e.g. after a page or
-    /// legal-document purge) and legal items whose chain-root slug does not
-    /// resolve (soft-deleted document, slug-less root) are both dropped; the
-    /// admin items read (`find_all_for_menu_admin`) keeps them visible for
-    /// repair.
+    /// Both link targets must belong to the item's own site (defense in
+    /// depth against cross-site references): the page join is scoped through
+    /// `content_sites`, the legal chain root through the same table inside
+    /// the LATERAL. Broken links never render publicly: target-less items
+    /// (all three link columns NULL — e.g. after a page or legal-document
+    /// purge), page items whose page does not resolve on-site, and legal
+    /// items whose chain-root slug does not resolve (soft-deleted document,
+    /// slug-less root) are all dropped; the admin items read
+    /// (`find_all_for_menu_admin`) keeps them visible for repair.
     fn tree_query(title_select: &str, locale_join: &str) -> String {
         format!(
             r#"
@@ -183,6 +185,10 @@ impl NavigationItem {
             FROM navigation_items ni
             {locale_join}
             LEFT JOIN pages p ON p.id = ni.page_id
+                AND EXISTS (
+                    SELECT 1 FROM content_sites cs
+                    WHERE cs.content_id = p.content_id AND cs.site_id = ni.site_id
+                )
             LEFT JOIN LATERAL (
                 WITH RECURSIVE chain AS (
                     SELECT ld.id, ld.content_id, ld.parent_version_id
@@ -203,7 +209,8 @@ impl NavigationItem {
                 LIMIT 1
             ) lroot ON TRUE
             WHERE ni.menu_id = $1 AND ni.is_active = TRUE AND ni.is_deleted = FALSE
-              AND (ni.page_id IS NOT NULL OR ni.external_url IS NOT NULL
+              AND ((ni.page_id IS NOT NULL AND p.id IS NOT NULL)
+                   OR ni.external_url IS NOT NULL
                    OR (ni.legal_document_id IS NOT NULL AND lroot.slug IS NOT NULL))
             ORDER BY ni.display_order ASC
             "#

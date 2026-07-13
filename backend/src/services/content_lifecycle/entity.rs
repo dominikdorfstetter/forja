@@ -89,6 +89,20 @@ pub trait ContentEntity: Sized + Send + Sync + 'static {
         let _ = pool;
         async { Ok(()) }
     }
+
+    /// Post-commit hook fired by the generic [`create`](super::create) /
+    /// [`update`](super::update) drivers whenever the entity lands in
+    /// `Published`. The default is a no-op; legal overrides it to supersede
+    /// its chain siblings so exactly one version of a document is ever live —
+    /// owning the rule here means EVERY publish entry point that flows
+    /// through the lifecycle upholds it, not just one handler.
+    fn on_published(
+        pool: &PgPool,
+        entity_id: Uuid,
+    ) -> impl std::future::Future<Output = Result<(), ApiError>> + Send {
+        let _ = (pool, entity_id);
+        async { Ok(()) }
+    }
 }
 
 /// Capability a [`ContentEntity`] gains to flow through the generic

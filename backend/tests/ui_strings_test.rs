@@ -468,6 +468,144 @@ async fn re_upserting_the_same_value_clears_outdated() {
     );
 }
 
+// ── Localization removal ────────────────────────────────────────────────
+
+#[tokio::test]
+#[serial]
+async fn update_with_removed_locale_ids_deletes_the_rows() {
+    let ctx = test_context().await;
+    let (site_id, de, en, es) = site_with_locales(&ctx.pool).await;
+    let write_key = create_test_api_key(&ctx.pool, site_id, ApiKeyPermission::Write).await;
+
+    let created = create_string(
+        &ctx,
+        site_id,
+        &write_key,
+        "remove.me",
+        json!([
+            { "locale_id": de, "value": "Standard" },
+            { "locale_id": en, "value": "Default" },
+            { "locale_id": es, "value": "Predeterminado" },
+        ]),
+    )
+    .await;
+    created.assert_status(axum::http::StatusCode::CREATED);
+    let id = created.json::<serde_json::Value>()["id"]
+        .as_str()
+        .expect("id")
+        .to_string();
+
+    // Removal combined with an upsert in the same PUT: es is dropped while
+    // en is refreshed — both land in one transaction.
+    let updated = ctx
+        .server
+        .put(&format!("/api/v1/sites/{site_id}/strings/{id}"))
+        .add_header("x-api-key", write_key.as_str())
+        .json(&json!({
+            "localizations": [{ "locale_id": en, "value": "Fallback" }],
+            "removed_locale_ids": [es],
+        }))
+        .await;
+    updated.assert_status_ok();
+    let body: serde_json::Value = updated.json();
+    let locales: Vec<String> = body["localizations"]
+        .as_array()
+        .expect("locs")
+        .iter()
+        .map(|l| l["locale_id"].as_str().expect("locale_id").to_string())
+        .collect();
+    assert!(!locales.contains(&es.to_string()), "es row is deleted");
+    assert!(locales.contains(&de.to_string()), "default row survives");
+    assert!(locales.contains(&en.to_string()), "upserted row survives");
+
+    let entries = list_entries(&ctx, site_id, &write_key).await;
+    let entry = &entries.as_array().expect("entries")[0];
+    assert_eq!(
+        entry["localizations"].as_array().expect("locs").len(),
+        2,
+        "the removed localization is gone from the persisted state"
+    );
+}
+
+#[tokio::test]
+#[serial]
+async fn removing_the_default_locale_row_is_rejected() {
+    let ctx = test_context().await;
+    let (site_id, de, en, _es) = site_with_locales(&ctx.pool).await;
+    let write_key = create_test_api_key(&ctx.pool, site_id, ApiKeyPermission::Write).await;
+
+    let created = create_string(
+        &ctx,
+        site_id,
+        &write_key,
+        "keep.default",
+        json!([
+            { "locale_id": de, "value": "Standard" },
+            { "locale_id": en, "value": "Default" },
+        ]),
+    )
+    .await;
+    created.assert_status(axum::http::StatusCode::CREATED);
+    let id = created.json::<serde_json::Value>()["id"]
+        .as_str()
+        .expect("id")
+        .to_string();
+
+    let rejected = ctx
+        .server
+        .put(&format!("/api/v1/sites/{site_id}/strings/{id}"))
+        .add_header("x-api-key", write_key.as_str())
+        .json(&json!({ "removed_locale_ids": [de] }))
+        .await;
+    rejected.assert_status(axum::http::StatusCode::UNPROCESSABLE_ENTITY);
+    let body: serde_json::Value = rejected.json();
+    assert_eq!(body["code"], codes::ERR_STRINGS_DEFAULT_LOCALE_REMOVAL);
+
+    let entries = list_entries(&ctx, site_id, &write_key).await;
+    let entry = &entries.as_array().expect("entries")[0];
+    assert_eq!(
+        entry["localizations"].as_array().expect("locs").len(),
+        2,
+        "nothing was deleted by the rejected request"
+    );
+}
+
+#[tokio::test]
+#[serial]
+async fn locale_in_both_upserts_and_removals_conflicts() {
+    let ctx = test_context().await;
+    let (site_id, de, en, _es) = site_with_locales(&ctx.pool).await;
+    let write_key = create_test_api_key(&ctx.pool, site_id, ApiKeyPermission::Write).await;
+
+    let created = create_string(
+        &ctx,
+        site_id,
+        &write_key,
+        "conflict.key",
+        json!([
+            { "locale_id": de, "value": "Standard" },
+            { "locale_id": en, "value": "Default" },
+        ]),
+    )
+    .await;
+    created.assert_status(axum::http::StatusCode::CREATED);
+    let id = created.json::<serde_json::Value>()["id"]
+        .as_str()
+        .expect("id")
+        .to_string();
+
+    let conflicted = ctx
+        .server
+        .put(&format!("/api/v1/sites/{site_id}/strings/{id}"))
+        .add_header("x-api-key", write_key.as_str())
+        .json(&json!({
+            "localizations": [{ "locale_id": en, "value": "Both" }],
+            "removed_locale_ids": [en],
+        }))
+        .await;
+    conflicted.assert_status(axum::http::StatusCode::UNPROCESSABLE_ENTITY);
+}
+
 // ── Public locale-resolved read ─────────────────────────────────────────
 
 async fn public_read(ctx: &TestContext, site_id: Uuid, api_key: &str, query: &str) -> TestResponse {

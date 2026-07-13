@@ -18,9 +18,10 @@ export interface UiStringFormData {
   value: string;
 }
 
-/** `requireValue` (edit mode): the API can only upsert localizations, never
- *  clear one — an emptied default value would be dropped silently, so block
- *  it client-side instead. Creation may start with just the key. */
+/** `requireValue` (edit mode): the default locale's value drives the
+ *  fallback chain and the auto-outdated rule — the backend rejects its
+ *  removal (422), so block clearing it client-side. Creation may start with
+ *  just the key. */
 export const buildUiStringSchema = (t: TFunction, requireValue = false) => {
   const value = z.string().max(UI_STRING_VALUE_MAX_LEN, t('uiStrings.detail.valueTooLong'));
   return z.object({

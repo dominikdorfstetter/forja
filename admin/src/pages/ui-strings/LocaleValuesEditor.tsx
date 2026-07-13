@@ -67,8 +67,9 @@ function ReadOnlyValues({ locales, row }: { locales: SiteLocaleResponse[]; row?:
  * Per-locale value editing for one UI string, following the house
  * LocaleAwareFields split: the default locale binds to the form and saves
  * with the save bar; every other locale saves on blur through the PUT
- * upsert (`localizations: [{locale_id, value}]`). Empty non-default values
- * are not sent — the API cannot clear a localization, only upsert it.
+ * upsert (`localizations: [{locale_id, value}]`). Clearing a persisted
+ * non-default value removes that localization on blur
+ * (`removed_locale_ids`) — the coverage chip returns to "missing".
  */
 export default function LocaleValuesEditor({
   siteId,
@@ -92,19 +93,31 @@ export default function LocaleValuesEditor({
   const isDefaultLocale = currentLocale === editableLocales[0];
   const currentLoc = row?.localizations.find((l) => l.locale_id === currentLocale.locale_id);
 
+  const putLocaleChange = (row: UiStringResponse, payload: Parameters<typeof updateUiString>[2]) =>
+    updateUiString(siteId, row.id, payload).catch((error) => {
+      showError(error);
+      throw error;
+    });
+
   const saveLocaleValue = (values: Record<string, string>) => {
     const value = values.value ?? '';
-    if (!row || value.trim().length === 0) return Promise.resolve();
+    if (!row) return Promise.resolve();
+    // A cleared, previously-persisted value is an explicit removal; an
+    // empty field with nothing persisted stays a no-op.
+    if (value.trim().length === 0) {
+      if (!currentLoc) return Promise.resolve();
+      return putLocaleChange(row, {
+        localizations: [],
+        removed_locale_ids: [currentLocale.locale_id],
+      });
+    }
     // An unchanged blur is a no-op — unless the row is flagged outdated,
     // where an explicit re-save is the confirm that clears the flag.
     if (value === currentLoc?.value && currentLoc.translation_status !== 'Outdated') {
       return Promise.resolve();
     }
-    return updateUiString(siteId, row.id, {
+    return putLocaleChange(row, {
       localizations: [{ locale_id: currentLocale.locale_id, value }],
-    }).catch((error) => {
-      showError(error);
-      throw error;
     });
   };
 

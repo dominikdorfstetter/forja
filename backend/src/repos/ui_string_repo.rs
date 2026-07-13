@@ -234,16 +234,19 @@ impl UiStringRepo {
         Ok(row)
     }
 
-    /// Rename the key (when `key` is `Some`) and upsert the given
-    /// localizations. When the payload changes the site-default locale's
-    /// value, every locale row NOT upserted in the same payload flips to
-    /// `outdated` in the same transaction.
+    /// Rename the key (when `key` is `Some`), upsert the given
+    /// localizations, and delete the `removed_locale_ids` rows — all in one
+    /// transaction. Removing the site-default locale's row is rejected (it
+    /// drives the fallback chain and the auto-outdated rule). When the
+    /// payload changes the site-default locale's value, every locale row NOT
+    /// upserted in the same payload flips to `outdated`.
     pub async fn update(
         pool: &PgPool,
         site_id: Uuid,
         id: Uuid,
         key: Option<&str>,
         localizations: &[UiStringLocalizationInput],
+        removed_locale_ids: &[Uuid],
     ) -> Result<UiStringRow, ApiError> {
         let mut tx = pool.begin().await?;
 
@@ -264,6 +267,14 @@ impl UiStringRepo {
         .fetch_optional(&mut *tx)
         .await?;
 
+        if default_locale_id.is_some_and(|d| removed_locale_ids.contains(&d)) {
+            return Err(
+                ApiError::validation("The site-default locale's value cannot be removed")
+                    .with_code(codes::ERR_STRINGS_DEFAULT_LOCALE_REMOVAL)
+                    .with_entity_type("ui_string"),
+            );
+        }
+
         let default_input =
             default_locale_id.and_then(|d| localizations.iter().find(|l| l.locale_id == d));
         let default_changed = match default_input {
@@ -283,6 +294,17 @@ impl UiStringRepo {
 
         for input in localizations {
             upsert_localization(&mut tx, id, input).await?;
+        }
+
+        if !removed_locale_ids.is_empty() {
+            sqlx::query(
+                "DELETE FROM ui_string_localizations
+                 WHERE ui_string_id = $1 AND locale_id = ANY($2)",
+            )
+            .bind(id)
+            .bind(removed_locale_ids)
+            .execute(&mut *tx)
+            .await?;
         }
 
         if default_changed {

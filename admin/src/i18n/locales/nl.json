@@ -1041,7 +1041,7 @@
         "displayName": "Weergavenaam",
         "displayNames": "Weergavenamen",
         "displayNamesHelp": "Optionele menunaam die bezoekers in deze taal te zien krijgen (bijv. als kop in de footer)",
-        "displayNameClearedError": "Een opgeslagen weergavenaam kan niet worden verwijderd — herstel de naam of voer een andere in"
+        "displayNameClearHint": "Leegmaken verwijdert deze vertaling bij het opslaan"
       },
       "messages": {
         "created": "Menu aangemaakt",
@@ -4730,7 +4730,7 @@
       "valueTooLong": "Waarde mag maximaal 1000 tekens bevatten",
       "valueRequired": "Waarde is verplicht — de standaardwaarde kan niet worden gewist",
       "valueForLocale": "Waarde ({{locale}})",
-      "localeHint": "Waarde voor {{locale}}. Opgeslagen wanneer je het veld verlaat; laat leeg om de huidige waarde te behouden.",
+      "localeHint": "Waarde voor {{locale}}. Opgeslagen wanneer je het veld verlaat; leegmaken verwijdert de vertaling.",
       "createHint": "Sla eerst de sleutel met de standaardwaarde op — vertaal hem daarna naar de andere talen.",
       "saved": "Tekst opgeslagen.",
       "created": "Tekst aangemaakt.",

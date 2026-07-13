@@ -4134,7 +4134,7 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** @description Rename a UI string key and/or upsert localizations. Changing the site-default locale's value flips every other locale to translation_status=outdated. */
+        /** @description Rename a UI string key, upsert localizations, and/or remove localizations by locale. Changing the site-default locale's value flips every other locale to translation_status=outdated; the default locale's row cannot be removed. */
         put: operations["update_ui_string"];
         post?: never;
         /** @description Delete a UI string key and all its localizations */
@@ -10080,6 +10080,12 @@ export interface components {
              * @example 3
              */
             max_depth?: number | null;
+            /**
+             * @description Locale IDs whose display-name localizations are deleted in the same
+             *     update transaction — the explicit removal path for a cleared name.
+             *     A locale may not appear in both `localizations` and this list.
+             */
+            removed_locale_ids?: string[] | null;
             /** @example primary */
             slug?: string | null;
         };
@@ -10349,11 +10355,21 @@ export interface components {
             /** @example updated-tag */
             slug?: string | null;
         };
-        /** @description Request to update a UI string — rename the key and/or upsert localizations. */
+        /**
+         * @description Request to update a UI string — rename the key, upsert localizations,
+         *     and/or remove localizations by locale.
+         */
         UpdateUiStringRequest: {
             /** @description New key; omit to keep the current key. */
             key?: string | null;
             localizations?: components["schemas"]["UiStringLocalizationInput"][];
+            /**
+             * @description Locale IDs whose localization rows are deleted in the same update
+             *     transaction. The site-default locale is rejected (it drives the
+             *     fallback chain and the auto-outdated rule), as is a locale that also
+             *     appears in `localizations`.
+             */
+            removed_locale_ids?: string[] | null;
         };
         /** @description Update user preferences (all fields optional) */
         UpdateUserPreferencesRequest: {
@@ -15179,15 +15195,6 @@ export interface operations {
                     "application/json": components["schemas"]["LegalItemResponse"];
                 };
             };
-            /** @description Validation error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ProblemDetails"];
-                };
-            };
             /** @description Unauthorized */
             401: {
                 headers: {
@@ -15199,6 +15206,15 @@ export interface operations {
             };
             /** @description Forbidden */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Validation error */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -15545,15 +15561,6 @@ export interface operations {
                     "application/json": components["schemas"]["LegalGroupResponse"];
                 };
             };
-            /** @description Validation error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ProblemDetails"];
-                };
-            };
             /** @description Unauthorized */
             401: {
                 headers: {
@@ -15565,6 +15572,15 @@ export interface operations {
             };
             /** @description Forbidden */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Validation error */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -15906,7 +15922,7 @@ export interface operations {
                     "application/json": components["schemas"]["LocalizationResponse"];
                 };
             };
-            /** @description Validation error or duplicate locale */
+            /** @description Duplicate locale for this content */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -15926,6 +15942,15 @@ export interface operations {
             };
             /** @description Forbidden */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Validation error */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -17051,6 +17076,15 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description Validation error or locale in both localizations and removed_locale_ids */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
         };
     };
     delete_navigation_menu: {
@@ -17159,8 +17193,8 @@ export interface operations {
                     "application/json": components["schemas"]["NavigationItemResponse"];
                 };
             };
-            /** @description Validation error */
-            400: {
+            /** @description Unauthorized */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -17168,8 +17202,8 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
-            /** @description Unauthorized */
-            401: {
+            /** @description Validation error or cross-site link target */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -17203,15 +17237,6 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description Validation error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ProblemDetails"];
-                };
-            };
             /** @description Unauthorized */
             401: {
                 headers: {
@@ -17223,6 +17248,15 @@ export interface operations {
             };
             /** @description Navigation item not found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Validation error */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -17397,6 +17431,15 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description Validation error or cross-site link target */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
         };
     };
     delete_navigation_item: {
@@ -17507,6 +17550,15 @@ export interface operations {
             };
             /** @description Unauthorized */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Validation error */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -23162,15 +23214,6 @@ export interface operations {
                     "application/json": components["schemas"]["LegalDocumentResponse"];
                 };
             };
-            /** @description Validation error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ProblemDetails"];
-                };
-            };
             /** @description Unauthorized */
             401: {
                 headers: {
@@ -23182,6 +23225,15 @@ export interface operations {
             };
             /** @description Forbidden */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Validation error */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24038,7 +24090,7 @@ export interface operations {
                     "application/json": components["schemas"]["NavigationMenuResponse"];
                 };
             };
-            /** @description Validation error */
+            /** @description Menu slug already exists for this site */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -24058,6 +24110,15 @@ export interface operations {
             };
             /** @description Forbidden */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Validation error */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24177,15 +24238,6 @@ export interface operations {
                     "application/json": components["schemas"]["NavigationItemResponse"];
                 };
             };
-            /** @description Validation error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ProblemDetails"];
-                };
-            };
             /** @description Unauthorized */
             401: {
                 headers: {
@@ -24197,6 +24249,15 @@ export interface operations {
             };
             /** @description Forbidden */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Validation error or cross-site link target */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -24230,15 +24291,6 @@ export interface operations {
                 };
                 content?: never;
             };
-            /** @description Validation error */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ProblemDetails"];
-                };
-            };
             /** @description Unauthorized */
             401: {
                 headers: {
@@ -24259,6 +24311,15 @@ export interface operations {
             };
             /** @description Navigation item not found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Validation error */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -26064,6 +26125,15 @@ export interface operations {
             };
             /** @description Key already exists on this site */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Validation error, removal of the default locale, or locale in both localizations and removed_locale_ids */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };

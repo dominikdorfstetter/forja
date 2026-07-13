@@ -1115,6 +1115,81 @@ async fn content_lifecycle_generic_update_legal() {
     );
 }
 
+/// One-live-version invariant: publishing a legal version through the
+/// GENERIC lifecycle drivers — not the legal PUT convenience handler —
+/// supersedes the previously-published version of its chain. The supersede
+/// rule lives on the `ContentEntity::on_published` hook, so every publish
+/// entry point flowing through the lifecycle upholds it.
+#[tokio::test]
+#[serial]
+async fn content_lifecycle_generic_publish_supersedes_previous_legal_version() {
+    use forja::models::legal::{LegalDocType, LegalDocument};
+    use forja::repos::legal_repo::LegalDocumentRepo;
+
+    async fn status_of(pool: &PgPool, content_id: Uuid) -> String {
+        sqlx::query_scalar("SELECT status::text FROM contents WHERE id = $1")
+            .bind(content_id)
+            .fetch_one(pool)
+            .await
+            .expect("fetch content status")
+    }
+
+    let pool = test_db_pool().await;
+    let site_id = create_test_site(&pool).await;
+    let auth = build_test_auth(&pool, site_id).await;
+
+    // v1 lands as Published through the generic create driver (the
+    // create-side hook runs with no chain siblings — a no-op supersede).
+    let v1 = content_lifecycle::create::<LegalDocument>(
+        &pool,
+        CreateLegalDocumentRequest {
+            cookie_name: format!("ck_supersede_{}", &Uuid::new_v4().to_string()[..8]),
+            document_type: LegalDocType::Imprint,
+            slug: None,
+            status: ContentStatus::Published,
+            site_ids: vec![site_id],
+        },
+        &auth,
+    )
+    .await
+    .expect("create published v1");
+    let v1_content_id = v1.content_id.expect("v1 content_id");
+    assert_eq!(status_of(&pool, v1_content_id).await, "published");
+
+    let v2 = LegalDocumentRepo::create_new_version(&pool, v1.id, vec![site_id], Some("test-user"))
+        .await
+        .expect("create v2 draft");
+    let v2_content_id = v2.content_id.expect("v2 content_id");
+    add_default_localization(&pool, v2_content_id).await;
+
+    content_lifecycle::update::<LegalDocument>(
+        &pool,
+        v2.id,
+        UpdateLegalDocumentRequest {
+            cookie_name: None,
+            document_type: None,
+            slug: None,
+            status: Some(ContentStatus::Published),
+        },
+        v2,
+        vec![site_id],
+        &auth,
+    )
+    .await
+    .expect("publish v2 through the generic driver");
+
+    assert_eq!(
+        status_of(&pool, v2_content_id).await,
+        "published",
+        "v2 is live after the generic publish"
+    );
+    assert_eq!(
+        status_of(&pool, v1_content_id).await,
+        "archived",
+        "the previously-published v1 is superseded without the legal PUT handler"
+    );
+}
+
 // ── #895 — project + cv_entry onboarded to the generic update::<E> driver ──
 
 /// A project flows through `update::<ProjectWithContent>`. Project's bespoke
