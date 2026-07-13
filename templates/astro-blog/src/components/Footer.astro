@@ -4,7 +4,8 @@
  * This ensures the footer appears in the initial HTML (no JS needed).
  * The CSS in sections.css targets these BEM classes identically.
  */
-import { fetchNavTree, fetchSocialLinks, type NavigationTree, type SocialLinkResponse } from "../lib/api";
+import { fetchNavMenu, fetchSocialLinks, type NavigationTree, type SocialLinkResponse } from "../lib/api";
+import { localeCode } from "../lib/locale";
 import { navItemHref } from "../lib/nav";
 import { getTranslator } from "../lib/ui-strings";
 
@@ -16,8 +17,11 @@ const { siteName } = Astro.props;
 const t = await getTranslator(Astro.locals.locale);
 
 let items: NavigationTree[] = [];
+let menuHeading: string | undefined;
 try {
-  items = await fetchNavTree("footer");
+  const navMenu = await fetchNavMenu("footer", localeCode(Astro.locals.locale));
+  items = navMenu.items;
+  menuHeading = navMenu.localizedName;
 } catch (e) {
   console.warn("[CMS] Failed to fetch footer nav:", e instanceof Error ? e.message : e);
 }
@@ -62,7 +66,7 @@ function getIcon(slug: string): string {
     {/* Nav links */}
     {items.length > 0 && (
       <nav class="forja-footer__nav" aria-label={t("footer.aria.nav")}>
-        <p class="forja-footer__nav-heading">{t("footer.links")}</p>
+        <p class="forja-footer__nav-heading">{menuHeading ?? t("footer.links")}</p>
         <ul class="forja-footer__nav-list">
           {items.map((item) => (
             <li>

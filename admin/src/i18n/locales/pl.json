@@ -1037,7 +1037,10 @@
         "description": "Opis",
         "maxDepth": "Maks. głębokość",
         "maxDepthHelp": "Maksymalna głębokość zagnieżdżenia (1-10)",
-        "active": "Aktywne"
+        "active": "Aktywne",
+        "displayName": "Nazwa wyświetlana",
+        "displayNames": "Nazwy wyświetlane",
+        "displayNamesHelp": "Opcjonalna nazwa menu widoczna dla odwiedzających w tym języku (np. jako nagłówek stopki)"
       },
       "messages": {
         "created": "Menu utworzone",

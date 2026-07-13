@@ -255,6 +255,28 @@ function renderNav(nodes: NavigationTree[]) {
 }
 ```
 
+### `getMenuWithTree(slug, opts?)`
+
+Fetch a menu and its navigation tree in one call, with the menu's display name resolved for a locale. Composes `getMenuBySlug` and `getTree` — the locale lookup runs concurrently, and the site-locales listing is fetched once per client instance and reused across calls.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `slug` | `string` | Yes | Slug of the menu (e.g. `primary`, `footer`) |
+| `locale` | `string` | No | Locale code used to resolve the menu name and translate item titles |
+
+**Returns:** `MenuWithTree | null` — returns `null` if no menu has that slug.
+
+`menu.resolvedName` carries the menu localization matching the requested locale, or `null` when no locale was passed, the code isn't configured for the site, or the menu has no localization for it — pick your own fallback (e.g. `resolvedName ?? menu.slug`). The raw `menu.localizations` array stays available.
+
+```typescript
+const footer = await forja.navigation.getMenuWithTree('footer', { locale: 'de' });
+
+if (footer) {
+  console.log(footer.menu.resolvedName ?? footer.menu.slug); // "Fußzeile"
+  footer.items.forEach((node) => console.log(node.title));
+}
+```
+
 ### `listItems(menuId)`
 
 Fetch a flat list of all items in a menu.

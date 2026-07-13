@@ -1037,7 +1037,10 @@
         "description": "Description",
         "maxDepth": "Profondeur max.",
         "maxDepthHelp": "Profondeur d'imbrication maximale (1-10)",
-        "active": "Actif"
+        "active": "Actif",
+        "displayName": "Nom d'affichage",
+        "displayNames": "Noms d'affichage",
+        "displayNamesHelp": "Nom de menu facultatif affiché aux visiteurs dans cette langue (p. ex. comme titre du pied de page)"
       },
       "messages": {
         "created": "Menu créé",

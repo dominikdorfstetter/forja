@@ -1037,7 +1037,10 @@
         "description": "Beschrijving",
         "maxDepth": "Max. diepte",
         "maxDepthHelp": "Maximale nestdiepte (1-10)",
-        "active": "Actief"
+        "active": "Actief",
+        "displayName": "Weergavenaam",
+        "displayNames": "Weergavenamen",
+        "displayNamesHelp": "Optionele menunaam die bezoekers in deze taal te zien krijgen (bijv. als kop in de footer)"
       },
       "messages": {
         "created": "Menu aangemaakt",

@@ -1037,7 +1037,10 @@
         "description": "Descripción",
         "maxDepth": "Profundidad máxima",
         "maxDepthHelp": "Profundidad máxima de anidación (1-10)",
-        "active": "Activo"
+        "active": "Activo",
+        "displayName": "Nombre visible",
+        "displayNames": "Nombres visibles",
+        "displayNamesHelp": "Nombre opcional del menú que se muestra a los visitantes en este idioma (p. ej., como encabezado del pie de página)"
       },
       "messages": {
         "created": "Menú creado",

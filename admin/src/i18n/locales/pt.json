@@ -1037,7 +1037,10 @@
         "description": "Descrição",
         "maxDepth": "Profundidade máx.",
         "maxDepthHelp": "Profundidade máxima de aninhamento (1-10)",
-        "active": "Ativo"
+        "active": "Ativo",
+        "displayName": "Nome de exibição",
+        "displayNames": "Nomes de exibição",
+        "displayNamesHelp": "Nome opcional do menu mostrado aos visitantes neste idioma (por ex., como título do rodapé)"
       },
       "messages": {
         "created": "Menu criado",

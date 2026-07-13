@@ -71,6 +71,8 @@ export type {
   NavigationItemResponse,
   NavigationTree,
   NavigationItemLocalizationResponse,
+  ResolvedNavigationMenu,
+  MenuWithTree,
   // Taxonomy
   TagResponse,
   CategoryResponse,

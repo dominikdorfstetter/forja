@@ -1,9 +1,12 @@
 import type { HttpClient } from '../http.js';
 import type {
+  MenuWithTree,
   NavigationItemResponse,
   NavigationMenuResponse,
   NavigationTree,
+  SiteLocaleResponse,
 } from '../types.js';
+import { SiteResource } from './site.js';
 
 /**
  * Navigation menu operations.
@@ -14,9 +17,14 @@ import type {
  * All operations require an API key with `Read` permission.
  */
 export class NavigationResource {
+  /** Memoized site-locales listing, shared by every `getMenuWithTree` call
+   * on this client instance. Cleared on failure so a later call can retry. */
+  private localesPromise?: Promise<SiteLocaleResponse[]>;
+
   constructor(
     private readonly http: HttpClient,
     private readonly siteId: string,
+    private readonly site: SiteResource = new SiteResource(http, siteId),
   ) {}
 
   /**
@@ -105,6 +113,55 @@ export class NavigationResource {
   }
 
   /**
+   * Fetch a menu and its navigation tree in one call, with the menu's
+   * display name resolved for a locale.
+   *
+   * Composes `getMenuBySlug` and `getTree` (the tree request starts as soon
+   * as the menu id is known; the locale lookup runs concurrently with both).
+   * The locale code → id mapping comes from the site-locales listing, fetched
+   * once per client instance and reused across calls.
+   *
+   * `menu.resolvedName` is the localization matching `opts.locale`, or `null`
+   * when no locale is passed, the code isn't configured for the site, or the
+   * menu has no localization for it — fall back to your own default (e.g.
+   * `resolvedName ?? menu.slug`).
+   *
+   * @param slug - The menu's slug (e.g. `"primary"`, `"footer"`).
+   * @param opts.locale - Optional locale code (e.g. `"de"`) used to resolve
+   *   the menu name and localize item titles.
+   * @returns `{ menu, items }`, or `null` if no menu has that slug.
+   *
+   * @example
+   * ```ts
+   * const footer = await forja.navigation.getMenuWithTree('footer', { locale: 'de' });
+   * if (footer) {
+   *   console.log(footer.menu.resolvedName ?? footer.menu.slug);
+   *   footer.items.forEach(node => console.log(node.title));
+   * }
+   * ```
+   */
+  async getMenuWithTree(
+    slug: string,
+    opts?: { locale?: string },
+  ): Promise<MenuWithTree | null> {
+    const menuPromise = this.getMenuBySlug(slug);
+    const [menu, items, localeId] = await Promise.all([
+      menuPromise,
+      menuPromise.then((m) => (m ? this.getTree(m.id, opts) : [])),
+      opts?.locale ? this.localeIdForCode(opts.locale) : null,
+    ]);
+    if (!menu) return null;
+
+    const localization = localeId
+      ? menu.localizations?.find((l) => l.locale_id === localeId)
+      : undefined;
+    return {
+      menu: { ...menu, resolvedName: localization?.name ?? null },
+      items,
+    };
+  }
+
+  /**
    * Fetch all flat (non-hierarchical) items in a menu.
    *
    * **Endpoint:** `GET /menus/{menuId}/items`
@@ -130,5 +187,18 @@ export class NavigationResource {
     return this.http.getOrNull<NavigationItemResponse>(
       `/navigation/${encodeURIComponent(itemId)}`,
     );
+  }
+
+  private listLocalesCached(): Promise<SiteLocaleResponse[]> {
+    this.localesPromise ??= this.site.listLocales().catch((error) => {
+      this.localesPromise = undefined;
+      throw error;
+    });
+    return this.localesPromise;
+  }
+
+  private async localeIdForCode(code: string): Promise<string | null> {
+    const locales = await this.listLocalesCached();
+    return locales.find((l) => l.code === code)?.locale_id ?? null;
   }
 }

@@ -137,6 +137,196 @@ describe('NavigationResource', () => {
     });
   });
 
+  describe('getMenuWithTree', () => {
+    const menu: NavigationMenuResponse = {
+      id: 'm1',
+      site_id: siteId,
+      slug: 'footer',
+      description: null,
+      max_depth: 3,
+      is_active: true,
+      item_count: 1,
+      created_at: '2026-07-13T10:00:00Z',
+      updated_at: '2026-07-13T11:00:00Z',
+      localizations: [
+        { id: 'ml1', locale_id: 'loc-de', name: 'Fußzeile' },
+        { id: 'ml2', locale_id: 'loc-en', name: 'Footer links' },
+      ],
+    };
+    const tree = [{ id: 'n1', children: [] }];
+    const locales = [
+      { locale_id: 'loc-en', code: 'en' },
+      { locale_id: 'loc-de', code: 'de' },
+    ];
+    const localesPath = `/sites/${siteId}/locales`;
+    const treePath = '/menus/m1/tree';
+
+    function mockGetByPath(http: HttpClient) {
+      vi.mocked(http.get).mockImplementation(async (path) => {
+        if (path === localesPath) return locales;
+        if (path === treePath) return tree;
+        throw new Error(`unexpected GET ${path}`);
+      });
+    }
+
+    it('composes menu and tree, resolving the name for the locale', async () => {
+      const http = createMockHttp();
+      vi.mocked(http.getOrNull).mockResolvedValue(menu);
+      mockGetByPath(http);
+
+      const nav = new NavigationResource(http, siteId);
+      const result = await nav.getMenuWithTree('footer', { locale: 'de' });
+
+      expect(http.getOrNull).toHaveBeenCalledWith(
+        `/sites/${siteId}/menus/slug/footer`,
+      );
+      expect(http.get).toHaveBeenCalledWith(treePath, { locale: 'de' });
+      expect(result).toEqual({
+        menu: { ...menu, resolvedName: 'Fußzeile' },
+        items: tree,
+      });
+    });
+
+    it('starts the locale lookup concurrently with the menu fetch', async () => {
+      const http = createMockHttp();
+      let resolveMenu!: (value: NavigationMenuResponse) => void;
+      vi.mocked(http.getOrNull).mockReturnValue(
+        new Promise((resolve) => {
+          resolveMenu = resolve;
+        }),
+      );
+      mockGetByPath(http);
+
+      const nav = new NavigationResource(http, siteId);
+      const pending = nav.getMenuWithTree('footer', { locale: 'de' });
+      await Promise.resolve();
+
+      // Locales are already in flight while the menu request is unresolved;
+      // the tree request waits for the menu id, so it hasn't fired yet.
+      expect(http.get).toHaveBeenCalledWith(localesPath);
+      expect(http.get).not.toHaveBeenCalledWith(treePath, { locale: 'de' });
+
+      resolveMenu(menu);
+      const result = await pending;
+      expect(result?.menu.resolvedName).toBe('Fußzeile');
+    });
+
+    it('resolves null name when no locale is passed, without fetching locales', async () => {
+      const http = createMockHttp();
+      vi.mocked(http.getOrNull).mockResolvedValue(menu);
+      mockGetByPath(http);
+
+      const nav = new NavigationResource(http, siteId);
+      const result = await nav.getMenuWithTree('footer');
+
+      expect(result?.menu.resolvedName).toBeNull();
+      expect(http.get).toHaveBeenCalledWith(treePath, undefined);
+      expect(http.get).not.toHaveBeenCalledWith(localesPath);
+    });
+
+    it('resolves null name for a locale code the site does not configure', async () => {
+      const http = createMockHttp();
+      vi.mocked(http.getOrNull).mockResolvedValue(menu);
+      mockGetByPath(http);
+
+      const nav = new NavigationResource(http, siteId);
+      const result = await nav.getMenuWithTree('footer', { locale: 'fr' });
+
+      expect(result?.menu.resolvedName).toBeNull();
+    });
+
+    it('resolves null name when the menu has no localization for the locale', async () => {
+      const http = createMockHttp();
+      vi.mocked(http.getOrNull).mockResolvedValue({
+        ...menu,
+        localizations: [{ id: 'ml2', locale_id: 'loc-en', name: 'Footer links' }],
+      });
+      mockGetByPath(http);
+
+      const nav = new NavigationResource(http, siteId);
+      const result = await nav.getMenuWithTree('footer', { locale: 'de' });
+
+      expect(result?.menu.resolvedName).toBeNull();
+    });
+
+    it('resolves null name when the menu carries no localizations at all', async () => {
+      const http = createMockHttp();
+      vi.mocked(http.getOrNull).mockResolvedValue({
+        ...menu,
+        localizations: undefined,
+      });
+      mockGetByPath(http);
+
+      const nav = new NavigationResource(http, siteId);
+      const result = await nav.getMenuWithTree('footer', { locale: 'de' });
+
+      expect(result?.menu.resolvedName).toBeNull();
+    });
+
+    it('returns null when the menu does not exist, without fetching the tree', async () => {
+      const http = createMockHttp();
+      vi.mocked(http.getOrNull).mockResolvedValue(null);
+      mockGetByPath(http);
+
+      const nav = new NavigationResource(http, siteId);
+      const result = await nav.getMenuWithTree('missing', { locale: 'de' });
+
+      expect(result).toBeNull();
+      expect(http.get).toHaveBeenCalledTimes(1);
+      expect(http.get).toHaveBeenCalledWith(localesPath);
+    });
+
+    it('rethrows non-404 errors from the menu fetch', async () => {
+      const http = createMockHttp();
+      vi.mocked(http.getOrNull).mockRejectedValue(new ForjaAuthError());
+      mockGetByPath(http);
+
+      const nav = new NavigationResource(http, siteId);
+      await expect(
+        nav.getMenuWithTree('footer', { locale: 'de' }),
+      ).rejects.toThrow(ForjaAuthError);
+    });
+
+    it('reuses the locales listing across calls on the same instance', async () => {
+      const http = createMockHttp();
+      vi.mocked(http.getOrNull).mockResolvedValue(menu);
+      mockGetByPath(http);
+
+      const nav = new NavigationResource(http, siteId);
+      await nav.getMenuWithTree('footer', { locale: 'de' });
+      await nav.getMenuWithTree('footer', { locale: 'en' });
+
+      const localesCalls = vi
+        .mocked(http.get)
+        .mock.calls.filter(([path]) => path === localesPath);
+      expect(localesCalls).toHaveLength(1);
+    });
+
+    it('does not cache a failed locales listing — the next call retries', async () => {
+      const http = createMockHttp();
+      vi.mocked(http.getOrNull).mockResolvedValue(menu);
+      vi.mocked(http.get)
+        .mockRejectedValueOnce(new ForjaAuthError())
+        .mockImplementation(async (path) => {
+          if (path === localesPath) return locales;
+          if (path === treePath) return tree;
+          throw new Error(`unexpected GET ${path}`);
+        });
+
+      const nav = new NavigationResource(http, siteId);
+      await expect(
+        nav.getMenuWithTree('footer', { locale: 'de' }),
+      ).rejects.toThrow(ForjaAuthError);
+
+      const result = await nav.getMenuWithTree('footer', { locale: 'de' });
+      expect(result?.menu.resolvedName).toBe('Fußzeile');
+      const localesCalls = vi
+        .mocked(http.get)
+        .mock.calls.filter(([path]) => path === localesPath);
+      expect(localesCalls).toHaveLength(2);
+    });
+  });
+
   describe('listItems', () => {
     it('fetches items for a menu', async () => {
       const http = createMockHttp();

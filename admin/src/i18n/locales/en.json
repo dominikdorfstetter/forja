@@ -1037,7 +1037,10 @@
         "description": "Description",
         "maxDepth": "Max Depth",
         "maxDepthHelp": "Maximum nesting depth (1-10)",
-        "active": "Active"
+        "active": "Active",
+        "displayName": "Display name",
+        "displayNames": "Display names",
+        "displayNamesHelp": "Optional menu name shown to visitors in this language (e.g. as a footer heading)"
       },
       "messages": {
         "created": "Menu created",

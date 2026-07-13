@@ -243,13 +243,50 @@ export async function fetchPublishedBlogsByCategory(
 
 // ---- Navigation -----------------------------------------------------------
 
+/** A menu's tree plus its CMS-configured display name for one locale. */
+export interface NavMenuData {
+  items: import("@forjacms/client").NavigationTree[];
+  /** Menu name localized for the requested locale — unset when the CMS has
+   * none configured, so chrome falls back to its own default heading. */
+  localizedName?: string;
+}
+
 // Per-build cache: nav menus are part of the page chrome, so the same slugs
-// (primary, footer) are requested on every page. Memoize by slug so each menu
-// is fetched once per build instead of once per page.
-const _cachedNavTrees = new Map<
-  string,
-  import("@forjacms/client").NavigationTree[]
->();
+// (primary, footer) are requested on every page. Memoize by slug + locale so
+// each menu is fetched once per build instead of once per page.
+const _cachedNavMenus = new Map<string, NavMenuData>();
+
+/**
+ * Fetch a navigation menu (tree + localized display name) by its slug,
+ * cached per slug + locale. Returns empty items if the menu does not exist
+ * or the fetch fails — chrome renders without nav instead of crashing.
+ */
+export async function fetchNavMenu(
+  menuSlug: string,
+  locale?: string,
+): Promise<NavMenuData> {
+  const cacheKey = `${menuSlug}:${locale ?? ""}`;
+  const cached = _cachedNavMenus.get(cacheKey);
+  if (cached) return cached;
+
+  let result: NavMenuData = { items: [] };
+  try {
+    const composed = await client().navigation.getMenuWithTree(
+      menuSlug,
+      locale ? { locale } : undefined,
+    );
+    if (composed) {
+      result = {
+        items: composed.items,
+        localizedName: composed.menu.resolvedName ?? undefined,
+      };
+    }
+  } catch {
+    // Keep the empty result; cache it so we don't retry on every page.
+  }
+  _cachedNavMenus.set(cacheKey, result);
+  return result;
+}
 
 /**
  * Fetch a navigation menu's tree by its slug (cached per slug).
@@ -258,18 +295,7 @@ const _cachedNavTrees = new Map<
 export async function fetchNavTree(
   menuSlug: string,
 ): Promise<import("@forjacms/client").NavigationTree[]> {
-  const cached = _cachedNavTrees.get(menuSlug);
-  if (cached) return cached;
-
-  let result: import("@forjacms/client").NavigationTree[] = [];
-  try {
-    const menu = await client().navigation.getMenuBySlug(menuSlug);
-    if (menu) result = await client().navigation.getTree(menu.id);
-  } catch {
-    // Keep the empty result; cache it so we don't retry on every page.
-  }
-  _cachedNavTrees.set(menuSlug, result);
-  return result;
+  return (await fetchNavMenu(menuSlug)).items;
 }
 
 // ---- UI strings -------------------------------------------------------------

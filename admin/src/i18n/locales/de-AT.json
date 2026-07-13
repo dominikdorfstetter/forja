@@ -1037,7 +1037,10 @@
         "description": "Beschreibung",
         "maxDepth": "Maximale Tiefe",
         "maxDepthHelp": "Maximale Verschachtelungstiefe (1-10)",
-        "active": "Aktiv"
+        "active": "Aktiv",
+        "displayName": "Anzeigename",
+        "displayNames": "Anzeigenamen",
+        "displayNamesHelp": "Optionaler Menüname, der Besuchern in dieser Sprache angezeigt wird (z. B. als Überschrift in der Fußzeile)"
       },
       "messages": {
         "created": "Menü erstellt",

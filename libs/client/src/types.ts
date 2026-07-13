@@ -325,6 +325,25 @@ export interface NavigationItemLocalizationResponse {
   title: string;
 }
 
+/**
+ * A navigation menu with its display name resolved for a requested locale.
+ *
+ * `resolvedName` is the `localizations` entry matching the requested locale
+ * code, or `null` when no locale was requested, the code is not configured
+ * for the site, or the menu has no localization for it. The menu carries no
+ * base display name on the wire — `slug` is its technical identifier — so
+ * consumers pick their own fallback (e.g. `resolvedName ?? menu.slug`).
+ */
+export interface ResolvedNavigationMenu extends NavigationMenuResponse {
+  resolvedName: string | null;
+}
+
+/** Composed result of `forja.navigation.getMenuWithTree()`. */
+export interface MenuWithTree {
+  menu: ResolvedNavigationMenu;
+  items: NavigationTree[];
+}
+
 // ── Taxonomy types ───────────────────────────────────────────
 
 export interface TagResponse {

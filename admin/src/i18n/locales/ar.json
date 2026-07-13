@@ -1037,7 +1037,10 @@
         "description": "الوصف",
         "maxDepth": "أقصى عمق",
         "maxDepthHelp": "أقصى عمق تداخل (1-10)",
-        "active": "نشطة"
+        "active": "نشطة",
+        "displayName": "اسم العرض",
+        "displayNames": "أسماء العرض",
+        "displayNamesHelp": "اسم قائمة اختياري يظهر للزوار بهذه اللغة (مثلاً كعنوان في تذييل الصفحة)"
       },
       "messages": {
         "created": "تم إنشاء القائمة",
