@@ -272,6 +272,35 @@ export async function fetchNavTree(
   return result;
 }
 
+// ---- UI strings -------------------------------------------------------------
+
+// Per-build cache: the chrome-string dictionary is needed on every page for
+// the same handful of locales. Memoize by locale code — including failures,
+// so a dead backend doesn't add a fetch per page (t() falls back to the
+// template defaults).
+const _cachedUiStrings = new Map<string, Record<string, string>>();
+
+/**
+ * Fetch the resolved UI-string map for a locale (cached per locale code).
+ * Returns an empty map if the fetch fails or the site has no strings
+ * configured — chrome then renders the template defaults.
+ */
+export async function fetchUiStrings(
+  locale: string,
+): Promise<Record<string, string>> {
+  const cached = _cachedUiStrings.get(locale);
+  if (cached) return cached;
+
+  let result: Record<string, string> = {};
+  try {
+    result = await client().strings(locale);
+  } catch {
+    // Keep the empty result; cache it so we don't retry on every page.
+  }
+  _cachedUiStrings.set(locale, result);
+  return result;
+}
+
 // ---- Pages & Sections -----------------------------------------------------
 
 /** Fetch a paginated list of CMS pages. */

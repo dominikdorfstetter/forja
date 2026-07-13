@@ -5,12 +5,14 @@
  * The CSS in sections.css targets these BEM classes identically.
  */
 import { fetchNavTree, fetchSocialLinks, type NavigationTree, type SocialLinkResponse } from "../lib/api";
+import { getTranslator } from "../lib/ui-strings";
 
 interface Props {
   siteName: string;
 }
 
 const { siteName } = Astro.props;
+const t = await getTranslator(Astro.locals.locale);
 
 let items: NavigationTree[] = [];
 try {
@@ -59,13 +61,13 @@ function getIcon(slug: string): string {
     {/* Brand */}
     <div class="forja-footer__brand">
       <a href="/" class="forja-footer__brand-link">{siteName}</a>
-      <p class="forja-footer__tagline">Built with Forja</p>
+      <p class="forja-footer__tagline">{t("footer.built_with")}</p>
     </div>
 
     {/* Nav links */}
     {items.length > 0 && (
-      <nav class="forja-footer__nav" aria-label="Footer navigation">
-        <p class="forja-footer__nav-heading">Links</p>
+      <nav class="forja-footer__nav" aria-label={t("footer.aria.nav")}>
+        <p class="forja-footer__nav-heading">{t("footer.links")}</p>
         <ul class="forja-footer__nav-list">
           {items.map((item) => (
             <li>
@@ -75,7 +77,7 @@ function getIcon(slug: string): string {
                 rel={item.open_in_new_tab ? "noopener noreferrer" : undefined}
                 class="forja-footer__nav-link"
               >
-                {item.title ?? "Untitled"}
+                {item.title ?? t("common.untitled")}
               </a>
             </li>
           ))}
@@ -86,8 +88,8 @@ function getIcon(slug: string): string {
     {/* Social */}
     {socialLinks.length > 0 && (
       <div class="forja-footer__social">
-        <p class="forja-footer__nav-heading">Connect</p>
-        <div class="forja-footer__social-links" role="list" aria-label="Social links">
+        <p class="forja-footer__nav-heading">{t("footer.connect")}</p>
+        <div class="forja-footer__social-links" role="list" aria-label={t("footer.aria.social")}>
           {socialLinks.map((link) => (
             <a
               href={link.url}
@@ -115,12 +117,12 @@ function getIcon(slug: string): string {
   </div>
 
   <div class="forja-footer__bottom">
-    <p class="forja-footer__copyright">&copy; {year} {siteName}. All rights reserved.</p>
+    <p class="forja-footer__copyright">&copy; {year} {siteName}. {t("footer.rights_reserved")}</p>
     <div class="forja-footer__bottom-links">
-      <a href="/rss.xml" class="forja-footer__bottom-link" aria-label="RSS Feed">
+      <a href="/rss.xml" class="forja-footer__bottom-link" aria-label={t("footer.aria.rss")}>
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
       </a>
-      <a href="/sitemap.xml" class="forja-footer__bottom-link">Sitemap</a>
+      <a href="/sitemap.xml" class="forja-footer__bottom-link">{t("footer.sitemap")}</a>
     </div>
   </div>
 </footer>

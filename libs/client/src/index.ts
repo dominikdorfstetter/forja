@@ -2,6 +2,7 @@ export { ForjaClient } from './client.js';
 export { renderCodeInjection } from './code-injection.js';
 export { validateSubmission } from './resources/forms.js';
 export { CollectionsResource } from './resources/collections.js';
+export { StringsResource } from './resources/strings.js';
 export type {
   PublicCollectionEntry,
   PublicCollectionField,
@@ -123,6 +124,8 @@ export type {
   MediaListParams,
   // Social
   SocialLinkResponse,
+  // UI strings
+  UiStringsResponse,
 } from './types.js';
 
 export type { HttpClient, PaginatedResult } from './http.js';

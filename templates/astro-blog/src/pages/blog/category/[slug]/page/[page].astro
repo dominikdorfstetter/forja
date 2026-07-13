@@ -12,7 +12,9 @@ import {
 } from "../../../../../lib/api";
 import type { BlogDetailResponse, MediaResponse } from "../../../../../lib/api";
 import { buildSeoMeta } from "../../../../../lib/seo";
+import { getTranslator } from "../../../../../lib/ui-strings";
 
+const t = await getTranslator(Astro.locals.locale);
 const PER_PAGE = 12;
 const { slug, page: pageParam } = Astro.params;
 const currentPage = Number(pageParam);
@@ -74,7 +76,7 @@ Astro.response.headers.set("Cache-Control", "public, max-age=300, s-maxage=600")
       ))}
     </div>
   ) : (
-    <p class="text-zinc-500 dark:text-zinc-400">No blog posts yet. Check back soon!</p>
+    <p class="text-zinc-500 dark:text-zinc-400">{t("blog.empty")}</p>
   )}
   <Pagination currentPage={currentPage} totalPages={totalPages} baseUrl={`/blog/category/${slug}`} />
 </Base>

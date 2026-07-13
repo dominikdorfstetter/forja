@@ -12,7 +12,9 @@ import {
 } from "../../../lib/api";
 import type { BlogDetailResponse, MediaResponse } from "../../../lib/api";
 import { buildSeoMeta } from "../../../lib/seo";
+import { getTranslator } from "../../../lib/ui-strings";
 
+const t = await getTranslator(Astro.locals.locale);
 const PER_PAGE = 12;
 const { slug } = Astro.params;
 
@@ -58,7 +60,7 @@ Astro.response.headers.set("Cache-Control", "public, max-age=300, s-maxage=600")
 <Base title={categoryTitle} description={`Posts in ${categoryTitle}.`}>
   <SeoHead seo={seo} slot="head" />
   <div class="flex items-center gap-1.5 text-xs text-zinc-400 dark:text-zinc-500 mb-6">
-    <a href="/blog" class="text-zinc-500 dark:text-zinc-400 no-underline hover:text-violet-600 dark:hover:text-violet-400 hover:no-underline">Blog</a>
+    <a href="/blog" class="text-zinc-500 dark:text-zinc-400 no-underline hover:text-violet-600 dark:hover:text-violet-400 hover:no-underline">{t("blog.title")}</a>
     <span>/</span>
     <span class="text-zinc-500 dark:text-zinc-400">{categoryTitle}</span>
   </div>
@@ -74,7 +76,7 @@ Astro.response.headers.set("Cache-Control", "public, max-age=300, s-maxage=600")
       ))}
     </div>
   ) : (
-    <p class="text-zinc-500 dark:text-zinc-400">No blog posts in this category yet.</p>
+    <p class="text-zinc-500 dark:text-zinc-400">{t("blog.category_empty")}</p>
   )}
   <Pagination currentPage={page} totalPages={totalPages} baseUrl={`/blog/category/${slug}`} useQueryParam />
 </Base>

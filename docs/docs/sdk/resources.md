@@ -808,6 +808,42 @@ for (const link of links) {
 
 ---
 
+## UI Strings
+
+**Accessor:** `forja.strings(locale)`
+
+Site-scoped dictionary of interface chrome strings (labels, headings, aria texts) that site operators manage in the admin panel, resolved for one locale.
+
+### `strings(locale)`
+
+Fetch the resolved UI strings for a locale as a flat `key → value` map.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `locale` | `string` | Yes | Locale code to resolve values for (e.g. `'en'`, `'de-AT'`) |
+
+**Returns:** `UiStringsResponse` — a flat `Record<string, string>` map of key → resolved value.
+
+```typescript
+const strings = await forja.strings('de');
+
+const minRead = strings['blog.min_read'] ?? 'min read';
+const darkModeLabel = strings['nav.aria.toggle_dark'] ?? 'Toggle dark mode';
+```
+
+:::info Locale is required
+The `locale` parameter is mandatory — the API rejects requests without it (`400 ERR_STRINGS_LOCALE_REQUIRED`). Unknown locale codes fall back silently to the site's default locale.
+:::
+
+Resolution and fallback behavior:
+
+- One value per key, resolved server-side via the fallback chain: exact locale match → site default locale → first localization matching the language code.
+- Keys with no localization at all are omitted from the map — keep a template-side default for every key you render (never render an empty string).
+- Keys are dot-namespaced lowercase identifiers (`blog.min_read`, `footer.rights_reserved`, `nav.aria.toggle_dark`).
+- Responses are cached server-side for a short interval, so fetching the map once per page render is cheap.
+
+---
+
 ## Projects
 
 **Accessor:** `forja.projects`

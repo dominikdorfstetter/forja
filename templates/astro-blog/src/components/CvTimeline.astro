@@ -1,11 +1,13 @@
 ---
 import type { CvEntryResponse } from "../lib/api";
+import { getTranslator } from "../lib/ui-strings";
 
 interface Props {
   entries: CvEntryResponse[];
 }
 
 const { entries } = Astro.props;
+const t = await getTranslator(Astro.locals.locale);
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString("en-US", {
@@ -16,7 +18,7 @@ function formatDate(dateStr: string): string {
 
 function dateRange(entry: CvEntryResponse): string {
   const start = formatDate(entry.start_date);
-  if (entry.is_current) return `${start} — Present`;
+  if (entry.is_current) return `${start} — ${t("cv.present")}`;
   if (entry.end_date) return `${start} — ${formatDate(entry.end_date)}`;
   return start;
 }
@@ -46,7 +48,7 @@ function dateRange(entry: CvEntryResponse): string {
           )}
         </span>
         {entry.is_current && (
-          <span class="text-[11px] font-medium bg-gradient-to-r from-violet-600 to-violet-400 text-white px-2 py-0.5 rounded-full">Current</span>
+          <span class="text-[11px] font-medium bg-gradient-to-r from-violet-600 to-violet-400 text-white px-2 py-0.5 rounded-full">{t("cv.current")}</span>
         )}
       </div>
       <div class="text-sm text-zinc-500 dark:text-zinc-400 mt-1">

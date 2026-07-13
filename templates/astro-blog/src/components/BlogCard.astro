@@ -2,6 +2,7 @@
 import type { BlogDetailResponse, MediaResponse } from "../lib/api";
 import { fetchMedia } from "../lib/api";
 import { formatDate } from "../lib/locale";
+import { getTranslator } from "../lib/ui-strings";
 import ResponsiveImage from "./ResponsiveImage.astro";
 
 interface Props {
@@ -11,8 +12,9 @@ interface Props {
 }
 
 const { blog, coverMedia, localeId } = Astro.props;
+const t = await getTranslator(Astro.locals.locale);
 const loc = (localeId ? blog.localizations.find((l) => l.locale_id === localeId) : null) ?? blog.localizations[0];
-const title = loc?.title ?? "Untitled";
+const title = loc?.title ?? t("common.untitled");
 const excerpt = loc?.excerpt ?? "";
 const slug = blog.slug ?? blog.id;
 
@@ -73,7 +75,7 @@ const date = formatDate(blog.published_date, Astro.locals.locale, {
     <div class="flex items-center gap-2 mt-3 text-[11px] text-zinc-400 dark:text-zinc-500">
       <span>{date}</span>
       {blog.author && <><span class="text-zinc-300 dark:text-zinc-700">&middot;</span><span>{blog.author}</span></>}
-      {blog.reading_time_minutes && <><span class="text-zinc-300 dark:text-zinc-700">&middot;</span><span>{blog.reading_time_minutes} min read</span></>}
+      {blog.reading_time_minutes && <><span class="text-zinc-300 dark:text-zinc-700">&middot;</span><span>{blog.reading_time_minutes} {t("blog.min_read")}</span></>}
     </div>
   </div>
 </article>

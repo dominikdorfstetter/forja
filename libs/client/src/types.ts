@@ -687,6 +687,18 @@ export interface SocialLinkResponse {
   display_order: number;
 }
 
+// ── UI string types ──────────────────────────────────────────
+
+/**
+ * Resolved UI strings for one locale: a flat `key → value` dictionary.
+ *
+ * Keys are dot-namespaced lowercase identifiers (e.g. `blog.min_read`,
+ * `nav.aria.toggle_dark`). One value per key, resolved by the server's
+ * fallback chain (requested locale → site default → first available);
+ * keys without any localization are omitted.
+ */
+export type UiStringsResponse = Record<string, string>;
+
 // ── Project types ────────────────────────────────────────────
 
 /** Link type for project resources (repository, demo, docs, etc.). */

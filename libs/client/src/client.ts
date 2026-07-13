@@ -12,8 +12,9 @@ import { ProjectsResource } from './resources/projects.js';
 import { RedirectsResource } from './resources/redirects.js';
 import { SiteResource } from './resources/site.js';
 import { SocialResource } from './resources/social.js';
+import { StringsResource } from './resources/strings.js';
 import { TaxonomyResource } from './resources/taxonomy.js';
-import type { ForjaClientConfig } from './types.js';
+import type { ForjaClientConfig, UiStringsResponse } from './types.js';
 
 /**
  * The main entry point for the Forja CMS content SDK.
@@ -108,5 +109,21 @@ export class ForjaClient {
    */
   collections(typeKey: string): CollectionsResource {
     return new CollectionsResource(this.http, this.siteId, typeKey);
+  }
+
+  /**
+   * Resolved UI strings for one locale as a flat `key → value` map — the
+   * site-scoped dictionary for interface chrome (labels, headings, aria
+   * texts). The locale code is required; the server resolves one value per
+   * key via its fallback chain and omits keys without any localization.
+   *
+   * @example
+   * ```ts
+   * const strings = await forja.strings('de');
+   * console.log(strings['footer.built_with']);
+   * ```
+   */
+  strings(locale: string): Promise<UiStringsResponse> {
+    return new StringsResource(this.http, this.siteId).get(locale);
   }
 }

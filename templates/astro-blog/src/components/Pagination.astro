@@ -1,4 +1,6 @@
 ---
+import { getTranslator } from "../lib/ui-strings";
+
 interface Props {
   currentPage: number;
   totalPages: number;
@@ -10,6 +12,8 @@ interface Props {
 const { currentPage, totalPages, baseUrl, useQueryParam = false } = Astro.props;
 
 if (totalPages <= 1) return;
+
+const t = await getTranslator(Astro.locals.locale);
 
 function pageUrl(page: number): string {
   if (page === 1) return `${baseUrl}/`;
@@ -35,10 +39,10 @@ function pageNumbers(): (number | "...")[] {
 }
 ---
 
-<nav class="flex items-center justify-center gap-1.5 mt-10 flex-wrap" aria-label="Page navigation">
+<nav class="flex items-center justify-center gap-1.5 mt-10 flex-wrap" aria-label={t("pagination.aria.nav")}>
   {currentPage > 1 && (
-    <a href={pageUrl(currentPage - 1)} class="inline-flex items-center px-3 py-1.5 text-sm text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg no-underline hover:no-underline transition-colors" aria-label="Previous page">
-      &larr; Prev
+    <a href={pageUrl(currentPage - 1)} class="inline-flex items-center px-3 py-1.5 text-sm text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg no-underline hover:no-underline transition-colors" aria-label={t("pagination.aria.previous")}>
+      &larr; {t("pagination.previous")}
     </a>
   )}
 
@@ -53,8 +57,8 @@ function pageNumbers(): (number | "...")[] {
   )}
 
   {currentPage < totalPages && (
-    <a href={pageUrl(currentPage + 1)} class="inline-flex items-center px-3 py-1.5 text-sm text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg no-underline hover:no-underline transition-colors" aria-label="Next page">
-      Next &rarr;
+    <a href={pageUrl(currentPage + 1)} class="inline-flex items-center px-3 py-1.5 text-sm text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg no-underline hover:no-underline transition-colors" aria-label={t("pagination.aria.next")}>
+      {t("pagination.next")} &rarr;
     </a>
   )}
 </nav>

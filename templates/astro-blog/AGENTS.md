@@ -23,3 +23,8 @@ npm test        # unit tests (node --test with type stripping)
 - Site URL, API base, and keys come from environment/config, not hardcoded — this
   template must work for any Forja site, so don't bake in site-specific values.
 - Keep it provider-agnostic (analytics, captcha, etc. are configured per site).
+- Never hard-code English chrome (labels, headings, aria texts) in `.astro`
+  files. Use `const t = await getTranslator(Astro.locals.locale)` from
+  `src/lib/ui-strings` — it resolves CMS UI Strings → per-locale defaults in
+  `src/i18n/defaults/{locale}.json` → key literal. New keys must be backfilled
+  in every default JSON (the files double as the operator-facing key list).
