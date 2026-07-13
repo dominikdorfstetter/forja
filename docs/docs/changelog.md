@@ -14,6 +14,12 @@ is the first release published as open source**, so the public version history
 begins at 2.0. The pre-release milestones below condense how the foundation came
 together; precise dates start at the first public release.
 
+## 2.1.3 — 2026-07-13
+
+### Added
+
+- **Maintenance mode is readable by the sites that need it.** The admin could put a site into maintenance mode, but the flag was only visible through the master-key sites overview — an SSR frontend, which holds a Viewer-tier key, had no way to see it, so the toggle was decorative for templates. `GET /sites/{id}/settings/public` now carries `maintenance_mode`, and because the settings save already invalidates the response cache, flipping the toggle in the admin propagates immediately: a frontend can swap the whole site for a maintenance page while you work. `@forjacms/client` types it as optional, so consumers stay compatible with older backends.
+
 ## 2.1.2 — 2026-07-13
 
 A security fix: the anomaly detector was auto-blocking healthy API keys.
