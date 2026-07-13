@@ -66,6 +66,7 @@ export type {
   SectionLocalizationResponse,
   // Navigation
   NavigationMenuResponse,
+  MenuLocalizationResponse,
   NavigationItemResponse,
   NavigationTree,
   NavigationItemLocalizationResponse,
@@ -113,6 +114,8 @@ export type {
   // Site
   SiteResponse,
   SiteLocaleResponse,
+  SiteContextResponse,
+  SiteContextIntegration,
   // Media
   MediaResponse,
   MediaVariantResponse,

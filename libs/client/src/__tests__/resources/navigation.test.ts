@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { NavigationResource } from '../../resources/navigation.js';
 import { ForjaAuthError } from '../../errors.js';
 import type { HttpClient } from '../../http.js';
+import type { NavigationMenuResponse } from '../../types.js';
 
 function createMockHttp(): HttpClient {
   return { get: vi.fn(), getOrNull: vi.fn(),
@@ -80,6 +81,35 @@ describe('NavigationResource', () => {
 
       const nav = new NavigationResource(http, siteId);
       await expect(nav.getMenuBySlug('test')).rejects.toThrow(ForjaAuthError);
+    });
+
+    // SDK had drifted from the backend DTO — localizations and updated_at
+    // were missing even though every menu read endpoint returns them.
+    // Pinning the full shape here so future drift fails the type checker.
+    it('surfaces every field the backend returns', async () => {
+      const http = createMockHttp();
+      const full: NavigationMenuResponse = {
+        id: 'm1',
+        site_id: siteId,
+        slug: 'footer',
+        description: null,
+        max_depth: 3,
+        is_active: true,
+        item_count: 2,
+        created_at: '2026-07-13T10:00:00Z',
+        updated_at: '2026-07-13T11:00:00Z',
+        localizations: [{ id: 'ml1', locale_id: 'loc-de', name: 'Fußzeile' }],
+      };
+      vi.mocked(http.getOrNull).mockResolvedValue(full);
+
+      const nav = new NavigationResource(http, siteId);
+      const result = await nav.getMenuBySlug('footer');
+
+      expect(result).toEqual(full);
+      expect(result?.updated_at).toBe('2026-07-13T11:00:00Z');
+      expect(result?.localizations).toEqual([
+        { id: 'ml1', locale_id: 'loc-de', name: 'Fußzeile' },
+      ]);
     });
   });
 

@@ -1,5 +1,10 @@
 import type { HttpClient } from '../http.js';
-import type { CodeInjection, SiteLocaleResponse, SiteResponse } from '../types.js';
+import type {
+  CodeInjection,
+  SiteContextResponse,
+  SiteLocaleResponse,
+  SiteResponse,
+} from '../types.js';
 
 /**
  * Site configuration operations.
@@ -73,11 +78,12 @@ export class SiteResource {
   /**
    * Get code injection scripts configured for this site.
    *
-   * **Endpoint:** `GET /sites/{siteId}/settings`
+   * **Endpoint:** `GET /sites/{siteId}/context`
    *
    * Returns the custom HTML/JS snippets configured for injection into
-   * the site's `<head>` and footer. Use these to embed analytics tags,
-   * chat widgets, or any custom scripts into your template.
+   * the site's `<head>` and footer, read from the site context's
+   * integration payload. Use these to embed analytics tags, chat
+   * widgets, or any custom scripts into your template.
    *
    * Fields that are not configured on the server default to empty strings.
    *
@@ -93,12 +99,12 @@ export class SiteResource {
    * ```
    */
   async getCodeInjection(): Promise<CodeInjection> {
-    const settings = await this.http.get<Record<string, unknown>>(
-      `/sites/${this.siteId}/settings`,
+    const context = await this.http.get<SiteContextResponse>(
+      `/sites/${this.siteId}/context`,
     );
     return {
-      code_injection_head: (settings.code_injection_head as string) ?? '',
-      code_injection_footer: (settings.code_injection_footer as string) ?? '',
+      code_injection_head: context.integration?.code_injection_head ?? '',
+      code_injection_footer: context.integration?.code_injection_footer ?? '',
     };
   }
 }

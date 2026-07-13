@@ -283,6 +283,14 @@ export interface NavigationMenuResponse {
   is_active: boolean;
   item_count: number;
   created_at: string;
+  updated_at: string;
+  localizations: MenuLocalizationResponse[];
+}
+
+export interface MenuLocalizationResponse {
+  id: string;
+  locale_id: string;
+  name: string;
 }
 
 export interface NavigationItemResponse {
@@ -605,6 +613,21 @@ export interface CodeInjection {
   code_injection_head: string;
   /** HTML/JS to inject before </body> */
   code_injection_footer: string;
+}
+
+// ── Site context types ───────────────────────────────────────
+
+/** Integration payload of the site context response. */
+export interface SiteContextIntegration {
+  /** HTML/JS to inject into <head>; empty string when unconfigured. */
+  code_injection_head: string;
+  /** HTML/JS to inject before </body>; empty string when unconfigured. */
+  code_injection_footer: string;
+}
+
+/** Subset of `GET /sites/{siteId}/context` consumed by the SDK. */
+export interface SiteContextResponse {
+  integration: SiteContextIntegration;
 }
 
 // ── Site types ───────────────────────────────────────────────

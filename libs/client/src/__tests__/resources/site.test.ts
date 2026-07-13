@@ -99,22 +99,28 @@ describe('SiteResource', () => {
   });
 
   describe('getCodeInjection', () => {
-    it('calls the correct settings URL', async () => {
+    // The raw /settings endpoint is Admin-gated (settings:read) and 403s
+    // for Read and Write keys; the Viewer-tier /context endpoint carries
+    // the same injection fields in its integration payload.
+    it('calls the site context URL', async () => {
       const http = createMockHttp();
       vi.mocked(http.get).mockResolvedValue({});
 
       const resource = new SiteResource(http, siteId);
       await resource.getCodeInjection();
 
-      expect(http.get).toHaveBeenCalledWith(`/sites/${siteId}/settings`);
+      expect(http.get).toHaveBeenCalledWith(`/sites/${siteId}/context`);
     });
 
-    it('extracts code injection fields from settings', async () => {
+    it('extracts code injection fields from the integration payload', async () => {
       const http = createMockHttp();
       vi.mocked(http.get).mockResolvedValue({
-        code_injection_head: '<script>console.log("head")</script>',
-        code_injection_footer: '<script>console.log("footer")</script>',
-        some_other_setting: 'ignored',
+        integration: {
+          code_injection_head: '<script>console.log("head")</script>',
+          code_injection_footer: '<script>console.log("footer")</script>',
+          seo_title_template: 'ignored',
+        },
+        modules: { blog: true },
       });
 
       const resource = new SiteResource(http, siteId);
@@ -126,7 +132,7 @@ describe('SiteResource', () => {
       });
     });
 
-    it('defaults missing fields to empty strings', async () => {
+    it('defaults to empty strings when the integration payload is missing', async () => {
       const http = createMockHttp();
       vi.mocked(http.get).mockResolvedValue({});
 
@@ -142,8 +148,10 @@ describe('SiteResource', () => {
     it('defaults null fields to empty strings', async () => {
       const http = createMockHttp();
       vi.mocked(http.get).mockResolvedValue({
-        code_injection_head: null,
-        code_injection_footer: null,
+        integration: {
+          code_injection_head: null,
+          code_injection_footer: null,
+        },
       });
 
       const resource = new SiteResource(http, siteId);
