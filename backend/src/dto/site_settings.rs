@@ -1226,6 +1226,7 @@ mod tests {
             vec![
                 "background_color",
                 "contact_email",
+                "maintenance_mode",
                 "seo_default_description",
                 "seo_title_template",
                 "theme_color",
