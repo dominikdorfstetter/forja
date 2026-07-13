@@ -302,6 +302,7 @@ async fn content_lifecycle_create_legal_via_trait_uses_diverged_webhook_prefix()
     let req = CreateLegalDocumentRequest {
         cookie_name: format!("ck_lifecycle_{}", &Uuid::new_v4().to_string()[..8]),
         document_type: forja::models::legal::LegalDocType::PrivacyPolicy,
+        slug: None,
         status: ContentStatus::Draft,
         site_ids: vec![site_id],
     };
@@ -1061,6 +1062,7 @@ async fn content_lifecycle_generic_update_legal() {
         CreateLegalDocumentRequest {
             cookie_name: format!("ck_generic_{}", &Uuid::new_v4().to_string()[..8]),
             document_type: LegalDocType::PrivacyPolicy,
+            slug: None,
             status: ContentStatus::Draft,
             site_ids: vec![site_id],
         },
@@ -1088,6 +1090,7 @@ async fn content_lifecycle_generic_update_legal() {
         UpdateLegalDocumentRequest {
             cookie_name: Some(renamed.clone()),
             document_type: None,
+            slug: None,
             status: None,
         },
         document,

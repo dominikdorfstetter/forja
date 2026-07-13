@@ -21,6 +21,7 @@ pub struct NavigationItem {
     pub parent_id: Option<Uuid>,
     pub page_id: Option<Uuid>,
     pub external_url: Option<String>,
+    pub legal_document_id: Option<Uuid>,
     pub icon: Option<String>,
     pub display_order: i16,
     pub is_active: bool,
@@ -40,12 +41,14 @@ pub struct NavigationItemFlat {
     pub parent_id: Option<Uuid>,
     pub page_id: Option<Uuid>,
     pub external_url: Option<String>,
+    pub legal_document_id: Option<Uuid>,
     pub icon: Option<String>,
     pub display_order: i16,
     pub is_active: bool,
     pub open_in_new_tab: bool,
     pub title: Option<String>,
     pub page_slug: Option<String>,
+    pub legal_slug: Option<String>,
 }
 
 /// Navigation item with localization
@@ -79,7 +82,8 @@ impl NavigationItem {
     pub async fn find_root_for_site(pool: &PgPool, site_id: Uuid) -> Result<Vec<Self>, ApiError> {
         let items = sqlx::query_as::<_, Self>(
             r#"
-            SELECT ni.id, ni.site_id, ni.menu_id, ni.parent_id, ni.page_id, ni.external_url, ni.icon,
+            SELECT ni.id, ni.site_id, ni.menu_id, ni.parent_id, ni.page_id, ni.external_url,
+                   ni.legal_document_id, ni.icon,
                    ni.display_order, ni.is_active, ni.open_in_new_tab, ni.created_at, ni.updated_at,
                    ni.is_deleted, ni.deleted_at
             FROM navigation_items ni
@@ -99,7 +103,7 @@ impl NavigationItem {
     pub async fn find_root_for_menu(pool: &PgPool, menu_id: Uuid) -> Result<Vec<Self>, ApiError> {
         let items = sqlx::query_as::<_, Self>(
             r#"
-            SELECT id, site_id, menu_id, parent_id, page_id, external_url, icon,
+            SELECT id, site_id, menu_id, parent_id, page_id, external_url, legal_document_id, icon,
                    display_order, is_active, open_in_new_tab, created_at, updated_at,
                    is_deleted, deleted_at
             FROM navigation_items
@@ -121,7 +125,7 @@ impl NavigationItem {
     ) -> Result<Vec<Self>, ApiError> {
         let items = sqlx::query_as::<_, Self>(
             r#"
-            SELECT id, site_id, menu_id, parent_id, page_id, external_url, icon,
+            SELECT id, site_id, menu_id, parent_id, page_id, external_url, legal_document_id, icon,
                    display_order, is_active, open_in_new_tab, created_at, updated_at,
                    is_deleted, deleted_at
             FROM navigation_items
@@ -143,7 +147,7 @@ impl NavigationItem {
     ) -> Result<Vec<Self>, ApiError> {
         let items = sqlx::query_as::<_, Self>(
             r#"
-            SELECT id, site_id, menu_id, parent_id, page_id, external_url, icon,
+            SELECT id, site_id, menu_id, parent_id, page_id, external_url, legal_document_id, icon,
                    display_order, is_active, open_in_new_tab, created_at, updated_at,
                    is_deleted, deleted_at
             FROM navigation_items
@@ -158,43 +162,70 @@ impl NavigationItem {
         Ok(items)
     }
 
-    /// Build a navigation tree for a menu with localized titles and page slugs
+    /// Public tree query for one menu: item columns plus a resolved title,
+    /// the linked page's slug, and the linked legal document's version-chain
+    /// ROOT slug (mirroring `legal_repo::find_by_slug_for_site` — versions
+    /// resolve through the root, so the walk goes up `parent_version_id`).
+    /// Target-less items (all three link columns NULL — e.g. after a page or
+    /// legal-document purge) are broken links and never render publicly;
+    /// the admin items read (`find_all_for_menu_admin`) keeps them visible
+    /// for repair.
+    fn tree_query(title_select: &str, locale_join: &str) -> String {
+        format!(
+            r#"
+            SELECT ni.id, ni.site_id, ni.menu_id, ni.parent_id, ni.page_id, ni.external_url,
+                   ni.legal_document_id, ni.icon, ni.display_order, ni.is_active, ni.open_in_new_tab,
+                   {title_select},
+                   LTRIM(p.route, '/') AS page_slug, lroot.slug AS legal_slug
+            FROM navigation_items ni
+            {locale_join}
+            LEFT JOIN pages p ON p.id = ni.page_id
+            LEFT JOIN LATERAL (
+                WITH RECURSIVE chain AS (
+                    SELECT ld.id, ld.content_id, ld.parent_version_id
+                    FROM legal_documents ld
+                    WHERE ld.id = ni.legal_document_id AND ld.is_deleted = FALSE
+                    UNION ALL
+                    SELECT parent.id, parent.content_id, parent.parent_version_id
+                    FROM legal_documents parent
+                    INNER JOIN chain ON chain.parent_version_id = parent.id
+                    WHERE parent.is_deleted = FALSE
+                )
+                SELECT c.slug
+                FROM chain
+                INNER JOIN contents c ON c.id = chain.content_id
+                WHERE chain.parent_version_id IS NULL
+                LIMIT 1
+            ) lroot ON TRUE
+            WHERE ni.menu_id = $1 AND ni.is_active = TRUE AND ni.is_deleted = FALSE
+              AND (ni.page_id IS NOT NULL OR ni.external_url IS NOT NULL OR ni.legal_document_id IS NOT NULL)
+            ORDER BY ni.display_order ASC
+            "#
+        )
+    }
+
+    /// Build a navigation tree for a menu with localized titles, page slugs,
+    /// and legal chain-root slugs
     pub async fn find_tree_for_menu(
         pool: &PgPool,
         menu_id: Uuid,
         locale_id: Option<Uuid>,
     ) -> Result<Vec<NavigationTree>, ApiError> {
         let flat_items = if let Some(loc_id) = locale_id {
-            sqlx::query_as::<_, NavigationItemFlat>(
-                r#"
-                SELECT ni.id, ni.site_id, ni.menu_id, ni.parent_id, ni.page_id, ni.external_url,
-                       ni.icon, ni.display_order, ni.is_active, ni.open_in_new_tab,
-                       nil.title, LTRIM(p.route, '/') AS page_slug
-                FROM navigation_items ni
-                LEFT JOIN navigation_item_localizations nil ON nil.navigation_item_id = ni.id AND nil.locale_id = $2
-                LEFT JOIN pages p ON p.id = ni.page_id
-                WHERE ni.menu_id = $1 AND ni.is_active = TRUE AND ni.is_deleted = FALSE
-                ORDER BY ni.display_order ASC
-                "#,
-            )
+            sqlx::query_as::<_, NavigationItemFlat>(sqlx::AssertSqlSafe(Self::tree_query(
+                "nil.title",
+                "LEFT JOIN navigation_item_localizations nil ON nil.navigation_item_id = ni.id AND nil.locale_id = $2",
+            )))
             .bind(menu_id)
             .bind(loc_id)
             .fetch_all(pool)
             .await?
         } else {
             // No locale specified - fetch first available localization
-            sqlx::query_as::<_, NavigationItemFlat>(
-                r#"
-                SELECT ni.id, ni.site_id, ni.menu_id, ni.parent_id, ni.page_id, ni.external_url,
-                       ni.icon, ni.display_order, ni.is_active, ni.open_in_new_tab,
-                       (SELECT nil.title FROM navigation_item_localizations nil WHERE nil.navigation_item_id = ni.id LIMIT 1) AS title,
-                       LTRIM(p.route, '/') AS page_slug
-                FROM navigation_items ni
-                LEFT JOIN pages p ON p.id = ni.page_id
-                WHERE ni.menu_id = $1 AND ni.is_active = TRUE AND ni.is_deleted = FALSE
-                ORDER BY ni.display_order ASC
-                "#,
-            )
+            sqlx::query_as::<_, NavigationItemFlat>(sqlx::AssertSqlSafe(Self::tree_query(
+                "(SELECT nil.title FROM navigation_item_localizations nil WHERE nil.navigation_item_id = ni.id LIMIT 1) AS title",
+                "",
+            )))
             .bind(menu_id)
             .fetch_all(pool)
             .await?
@@ -207,7 +238,7 @@ impl NavigationItem {
     pub async fn find_children(pool: &PgPool, parent_id: Uuid) -> Result<Vec<Self>, ApiError> {
         let items = sqlx::query_as::<_, Self>(
             r#"
-            SELECT id, site_id, menu_id, parent_id, page_id, external_url, icon,
+            SELECT id, site_id, menu_id, parent_id, page_id, external_url, legal_document_id, icon,
                    display_order, is_active, open_in_new_tab, created_at, updated_at,
                    is_deleted, deleted_at
             FROM navigation_items
@@ -226,7 +257,7 @@ impl NavigationItem {
     pub async fn find_by_id(pool: &PgPool, id: Uuid) -> Result<Self, ApiError> {
         let item = sqlx::query_as::<_, Self>(
             r#"
-            SELECT id, site_id, menu_id, parent_id, page_id, external_url, icon,
+            SELECT id, site_id, menu_id, parent_id, page_id, external_url, legal_document_id, icon,
                    display_order, is_active, open_in_new_tab, created_at, updated_at,
                    is_deleted, deleted_at
             FROM navigation_items
@@ -249,9 +280,9 @@ impl NavigationItem {
     pub async fn create(pool: &PgPool, req: CreateNavigationItemRequest) -> Result<Self, ApiError> {
         let item = sqlx::query_as::<_, Self>(
             r#"
-            INSERT INTO navigation_items (site_id, menu_id, parent_id, page_id, external_url, icon, display_order, open_in_new_tab)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-            RETURNING id, site_id, menu_id, parent_id, page_id, external_url, icon,
+            INSERT INTO navigation_items (site_id, menu_id, parent_id, page_id, external_url, legal_document_id, icon, display_order, open_in_new_tab)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            RETURNING id, site_id, menu_id, parent_id, page_id, external_url, legal_document_id, icon,
                       display_order, is_active, open_in_new_tab, created_at, updated_at,
                       is_deleted, deleted_at
             "#,
@@ -261,6 +292,7 @@ impl NavigationItem {
         .bind(req.parent_id)
         .bind(req.page_id)
         .bind(&req.external_url)
+        .bind(req.legal_document_id)
         .bind(&req.icon)
         .bind(req.display_order)
         .bind(req.open_in_new_tab)
@@ -270,32 +302,38 @@ impl NavigationItem {
         Ok(item)
     }
 
-    /// Update a navigation item
+    /// Update a navigation item. Providing any link target switches the item
+    /// to exactly that target and clears the other two (validate_link caps
+    /// writes at one target); omitting all three leaves the link untouched.
     pub async fn update(
         pool: &PgPool,
         id: Uuid,
         req: UpdateNavigationItemRequest,
     ) -> Result<Self, ApiError> {
+        let switch_link = req.changes_link();
         let item = sqlx::query_as::<_, Self>(
             r#"
             UPDATE navigation_items
             SET parent_id = COALESCE($2, parent_id),
-                page_id = COALESCE($3, page_id),
-                external_url = COALESCE($4, external_url),
-                icon = COALESCE($5, icon),
-                display_order = COALESCE($6, display_order),
-                open_in_new_tab = COALESCE($7, open_in_new_tab),
+                page_id = CASE WHEN $3 THEN $4 ELSE page_id END,
+                external_url = CASE WHEN $3 THEN $5 ELSE external_url END,
+                legal_document_id = CASE WHEN $3 THEN $6 ELSE legal_document_id END,
+                icon = COALESCE($7, icon),
+                display_order = COALESCE($8, display_order),
+                open_in_new_tab = COALESCE($9, open_in_new_tab),
                 updated_at = NOW()
             WHERE id = $1
-            RETURNING id, site_id, menu_id, parent_id, page_id, external_url, icon,
+            RETURNING id, site_id, menu_id, parent_id, page_id, external_url, legal_document_id, icon,
                       display_order, is_active, open_in_new_tab, created_at, updated_at,
                       is_deleted, deleted_at
             "#,
         )
         .bind(id)
         .bind(req.parent_id)
+        .bind(switch_link)
         .bind(req.page_id)
         .bind(&req.external_url)
+        .bind(req.legal_document_id)
         .bind(&req.icon)
         .bind(req.display_order)
         .bind(req.open_in_new_tab)
@@ -487,7 +525,7 @@ impl NavigationItem {
     pub async fn find_deleted_by_id(pool: &PgPool, id: Uuid) -> Result<Self, ApiError> {
         sqlx::query_as::<_, Self>(
             r#"
-            SELECT id, site_id, menu_id, parent_id, page_id, external_url, icon,
+            SELECT id, site_id, menu_id, parent_id, page_id, external_url, legal_document_id, icon,
                    display_order, is_active, open_in_new_tab, created_at, updated_at,
                    is_deleted, deleted_at
             FROM navigation_items
@@ -594,11 +632,13 @@ fn build_tree(flat_items: Vec<NavigationItemFlat>) -> Vec<NavigationTree> {
                 parent_id: item.parent_id,
                 page_id: item.page_id,
                 external_url: item.external_url.clone(),
+                legal_document_id: item.legal_document_id,
                 icon: item.icon.clone(),
                 display_order: item.display_order,
                 open_in_new_tab: item.open_in_new_tab,
                 title: item.title.clone(),
                 page_slug: item.page_slug.clone(),
+                legal_slug: item.legal_slug.clone(),
                 children: build_children(Some(item.id), children_map),
             })
             .collect()
@@ -620,6 +660,7 @@ mod tests {
             parent_id: None,
             page_id: Some(Uuid::new_v4()),
             external_url: None,
+            legal_document_id: None,
             icon: Some("home".to_string()),
             display_order: 1,
             is_active: true,
@@ -644,12 +685,14 @@ mod tests {
                 parent_id: None,
                 page_id: None,
                 external_url: Some("/".to_string()),
+                legal_document_id: None,
                 icon: None,
                 display_order: 0,
                 is_active: true,
                 open_in_new_tab: false,
                 title: Some("Home".to_string()),
                 page_slug: None,
+                legal_slug: None,
             },
             NavigationItemFlat {
                 id: Uuid::parse_str("00000000-0000-0000-0000-000000000002").unwrap(),
@@ -658,12 +701,14 @@ mod tests {
                 parent_id: Some(Uuid::parse_str("00000000-0000-0000-0000-000000000001").unwrap()),
                 page_id: None,
                 external_url: Some("/about".to_string()),
+                legal_document_id: None,
                 icon: None,
                 display_order: 0,
                 is_active: true,
                 open_in_new_tab: false,
                 title: Some("About".to_string()),
                 page_slug: None,
+                legal_slug: None,
             },
         ];
 

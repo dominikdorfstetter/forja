@@ -22,6 +22,21 @@ pub enum LegalDocType {
     Disclaimer,
 }
 
+impl LegalDocType {
+    /// Kebab-cased canonical slug derived from the document type — the
+    /// default `contents.slug` for a legal chain root when none is given
+    /// (e.g. `PrivacyPolicy` → `privacy-policy`).
+    pub fn default_slug(&self) -> &'static str {
+        match self {
+            Self::CookieConsent => "cookie-consent",
+            Self::PrivacyPolicy => "privacy-policy",
+            Self::TermsOfService => "terms-of-service",
+            Self::Imprint => "imprint",
+            Self::Disclaimer => "disclaimer",
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
 pub struct LegalDocument {
     pub id: Uuid,

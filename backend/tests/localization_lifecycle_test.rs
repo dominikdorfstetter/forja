@@ -614,6 +614,7 @@ async fn create_test_legal(pool: &PgPool, site_id: Uuid, auth: &Actor) -> LegalD
     let req = CreateLegalDocumentRequest {
         cookie_name: format!("ck_loc_{}", &Uuid::new_v4().to_string()[..8]),
         document_type: forja::models::legal::LegalDocType::PrivacyPolicy,
+        slug: None,
         status: ContentStatus::Draft,
         site_ids: vec![site_id],
     };

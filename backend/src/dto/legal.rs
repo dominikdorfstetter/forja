@@ -12,6 +12,7 @@ use crate::models::legal::{
     LegalDocType, LegalDocument, LegalDocumentWithContent, LegalGroup, LegalItem,
 };
 use crate::utils::pagination::Paginated;
+use crate::utils::validation::validate_slug;
 
 /// Request to create a legal document
 #[derive(Debug, Clone, Deserialize, Validate, ValidatedDto, utoipa::ToSchema)]
@@ -27,6 +28,12 @@ pub struct CreateLegalDocumentRequest {
 
     #[schema(example = "CookieConsent")]
     pub document_type: LegalDocType,
+
+    /// Canonical public slug (`/legal/{slug}`). Auto-derived from the
+    /// document type (e.g. `privacy-policy`) when omitted; unique per site.
+    #[schema(example = "privacy-policy")]
+    #[validate(custom(function = "validate_slug"))]
+    pub slug: Option<String>,
 
     #[serde(default)]
     pub status: ContentStatus,
@@ -49,6 +56,13 @@ pub struct UpdateLegalDocumentRequest {
     pub cookie_name: Option<String>,
 
     pub document_type: Option<LegalDocType>,
+
+    /// New canonical slug for the version chain. Editable while no version
+    /// of the chain has ever been published; rejected afterwards
+    /// (`LEGAL_SLUG_IMMUTABLE`).
+    #[schema(example = "privacy-policy")]
+    #[validate(custom(function = "validate_slug"))]
+    pub slug: Option<String>,
 
     pub status: Option<ContentStatus>,
 }
@@ -380,6 +394,7 @@ mod tests {
         let request = CreateLegalDocumentRequest {
             cookie_name: "cookie_consent".to_string(),
             document_type: LegalDocType::CookieConsent,
+            slug: None,
             status: ContentStatus::Draft,
             site_ids: vec![Uuid::new_v4()],
         };
@@ -387,10 +402,39 @@ mod tests {
     }
 
     #[test]
+    fn test_create_legal_document_valid_slug() {
+        let request = CreateLegalDocumentRequest {
+            cookie_name: "cookie_consent".to_string(),
+            document_type: LegalDocType::CookieConsent,
+            slug: Some("cookie-consent-v2".to_string()),
+            status: ContentStatus::Draft,
+            site_ids: vec![Uuid::new_v4()],
+        };
+        assert!(request.validate().is_ok());
+    }
+
+    #[test]
+    fn test_create_legal_document_invalid_slug() {
+        for slug in ["Privacy Policy", "UPPER", "trailing-", ""] {
+            let request = CreateLegalDocumentRequest {
+                cookie_name: "cookie_consent".to_string(),
+                document_type: LegalDocType::CookieConsent,
+                slug: Some(slug.to_string()),
+                status: ContentStatus::Draft,
+                site_ids: vec![Uuid::new_v4()],
+            };
+            let result = request.validate();
+            assert!(result.is_err(), "slug '{slug}' must be rejected");
+            assert!(result.unwrap_err().field_errors().contains_key("slug"));
+        }
+    }
+
+    #[test]
     fn test_create_legal_document_empty_cookie_name() {
         let request = CreateLegalDocumentRequest {
             cookie_name: "".to_string(),
             document_type: LegalDocType::CookieConsent,
+            slug: None,
             status: ContentStatus::Draft,
             site_ids: vec![Uuid::new_v4()],
         };
@@ -409,6 +453,7 @@ mod tests {
         let request = CreateLegalDocumentRequest {
             cookie_name: "a".repeat(101),
             document_type: LegalDocType::CookieConsent,
+            slug: None,
             status: ContentStatus::Draft,
             site_ids: vec![Uuid::new_v4()],
         };
@@ -420,6 +465,7 @@ mod tests {
         let request = CreateLegalDocumentRequest {
             cookie_name: "cookie_consent".to_string(),
             document_type: LegalDocType::CookieConsent,
+            slug: None,
             status: ContentStatus::Draft,
             site_ids: vec![],
         };
@@ -435,6 +481,7 @@ mod tests {
         let request = UpdateLegalDocumentRequest {
             cookie_name: Some("cookie_consent_v2".to_string()),
             document_type: None,
+            slug: None,
             status: Some(ContentStatus::Published),
         };
         assert!(request.validate().is_ok());
@@ -445,6 +492,7 @@ mod tests {
         let request = UpdateLegalDocumentRequest {
             cookie_name: None,
             document_type: None,
+            slug: None,
             status: None,
         };
         assert!(request.validate().is_ok());

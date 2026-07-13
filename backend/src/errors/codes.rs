@@ -148,6 +148,7 @@ pub const LEGAL_PUBLISH_MISSING_TITLE: &str = "LEGAL_PUBLISH_MISSING_TITLE";
 pub const LEGAL_PUBLISH_MISSING_BODY: &str = "LEGAL_PUBLISH_MISSING_BODY";
 pub const LEGAL_VERSION_SOURCE_DELETED: &str = "LEGAL_VERSION_SOURCE_DELETED";
 pub const LEGAL_PUBLISHED_IMMUTABLE: &str = "LEGAL_PUBLISHED_IMMUTABLE";
+pub const LEGAL_SLUG_IMMUTABLE: &str = "LEGAL_SLUG_IMMUTABLE";
 
 // ── CV / Portfolio ──────────────────────────────────────────────────────
 
@@ -734,6 +735,12 @@ pub const ALL: &[ErrorCodeDef] = &[
         domain: "legal",
         http_status: 409,
         description: "A published legal document cannot be edited in place; create a new version",
+    },
+    ErrorCodeDef {
+        code: LEGAL_SLUG_IMMUTABLE,
+        domain: "legal",
+        http_status: 409,
+        description: "The slug of a legal document is locked once any version of its chain has been published",
     },
     // CV
     ErrorCodeDef {

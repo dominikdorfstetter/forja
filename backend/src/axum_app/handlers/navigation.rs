@@ -29,6 +29,7 @@ const NAVIGATION_ITEM: AuditedEntity =
     AuditedEntity::with_webhooks("navigation_item", "navigation");
 use crate::AppState;
 use crate::services::permission_service::{Permission, PermissionService};
+use crate::services::response_cache;
 use crate::services::webhook_service;
 
 #[utoipa::path(
@@ -228,6 +229,7 @@ async fn create_navigation_item(
         .payload(serde_json::json!({"type": "navigation_item"}))
         .execute(&state.db)
         .await;
+    response_cache::invalidate_site(site_id).await;
     Ok((
         StatusCode::CREATED,
         Json(NavigationItemResponse::from(item)),
@@ -283,6 +285,7 @@ async fn create_menu_item(
         .payload(serde_json::json!({"type": "menu_item"}))
         .execute(&state.db)
         .await;
+    response_cache::invalidate_site(menu.site_id).await;
     Ok((
         StatusCode::CREATED,
         Json(NavigationItemResponse::from(item)),
@@ -334,6 +337,7 @@ async fn update_navigation_item(
         .maybe_diff(change_diff)
         .execute(&state.db)
         .await;
+    response_cache::invalidate_site(existing.site_id).await;
     Ok(Json(NavigationItemResponse::from(item)))
 }
 
@@ -383,6 +387,7 @@ async fn reorder_navigation_items(
         &serde_json::json!({"type": "reorder"}),
     )
     .await;
+    response_cache::invalidate_site(site_id).await;
     Ok(StatusCode::NO_CONTENT)
 }
 
@@ -432,6 +437,7 @@ async fn reorder_menu_items(
         &serde_json::json!({"type": "reorder"}),
     )
     .await;
+    response_cache::invalidate_site(menu.site_id).await;
     Ok(StatusCode::NO_CONTENT)
 }
 
@@ -506,6 +512,7 @@ async fn upsert_navigation_item_localizations(
         results.push(NavigationItemLocalizationResponse::from(loc));
     }
 
+    response_cache::invalidate_site(item.site_id).await;
     Ok(Json(results))
 }
 
@@ -548,6 +555,7 @@ async fn delete_navigation_item(
         .webhook("navigation.deleted")
         .execute(&state.db)
         .await;
+    response_cache::invalidate_site(item.site_id).await;
     Ok(StatusCode::NO_CONTENT)
 }
 

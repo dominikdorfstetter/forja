@@ -24,6 +24,7 @@ async fn tracer_legal_repo_round_trip_via_create_and_find_by_id() {
     let req = CreateLegalDocumentRequest {
         cookie_name: format!("tracer-{}", &Uuid::new_v4().to_string()[..8]),
         document_type: LegalDocType::PrivacyPolicy,
+        slug: None,
         status: ContentStatus::Draft,
         site_ids: vec![site_id],
     };
@@ -57,6 +58,7 @@ async fn list_filters_by_status_and_excludes_cookie_consent() {
         CreateLegalDocumentRequest {
             cookie_name: name.to_string(),
             document_type,
+            slug: None,
             status,
             site_ids: vec![site_id],
         }

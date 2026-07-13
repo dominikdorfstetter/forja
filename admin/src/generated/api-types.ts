@@ -5979,6 +5979,12 @@ export interface components {
             document_type: components["schemas"]["LegalDocType"];
             /** @description Site IDs to associate this legal document with */
             site_ids: string[];
+            /**
+             * @description Canonical public slug (`/legal/{slug}`). Auto-derived from the
+             *     document type (e.g. `privacy-policy`) when omitted; unique per site.
+             * @example privacy-policy
+             */
+            slug?: string | null;
             status?: components["schemas"]["ContentStatus"];
         };
         /** @description Create a legal consent group */
@@ -6058,6 +6064,13 @@ export interface components {
             external_url?: string | null;
             /** @example home */
             icon?: string | null;
+            /**
+             * Format: uuid
+             * @description First-class reference to a legal document (resolves via the version
+             *     chain root's slug in the public tree)
+             * @example 550e8400-e29b-41d4-a716-446655440003
+             */
+            legal_document_id?: string | null;
             /** @description Optional localizations to create with the item */
             localizations?: components["schemas"]["NavigationItemLocalizationInput"][] | null;
             /**
@@ -6070,7 +6083,7 @@ export interface components {
             open_in_new_tab?: boolean;
             /**
              * Format: uuid
-             * @description Either page_id or external_url must be provided (but not both)
+             * @description Exactly one of page_id, external_url, or legal_document_id must be provided
              * @example 550e8400-e29b-41d4-a716-446655440001
              */
             page_id?: string | null;
@@ -7581,6 +7594,13 @@ export interface components {
              */
             id: string;
             /**
+             * Format: uuid
+             * @description Referenced legal document; NULL alongside the other targets marks a
+             *     broken link (e.g. after a purge) awaiting repair in the admin
+             * @example 550e8400-e29b-41d4-a716-446655440003
+             */
+            legal_document_id?: string | null;
+            /**
              * Format: int32
              * @description Number of locales that have a translation for this item
              * @example 2
@@ -7655,6 +7675,17 @@ export interface components {
              * @example 550e8400-e29b-41d4-a716-446655440000
              */
             id: string;
+            /**
+             * Format: uuid
+             * @description Referenced legal document
+             * @example 550e8400-e29b-41d4-a716-446655440003
+             */
+            legal_document_id?: string | null;
+            /**
+             * @description Version-chain root slug of the referenced legal document
+             *     (for `/legal/{slug}` URL construction)
+             */
+            legal_slug?: string | null;
             /** @example false */
             open_in_new_tab: boolean;
             /**
@@ -9840,6 +9871,13 @@ export interface components {
             /** @example cookie_consent_v2 */
             cookie_name?: string | null;
             document_type?: null | components["schemas"]["LegalDocType"];
+            /**
+             * @description New canonical slug for the version chain. Editable while no version
+             *     of the chain has ever been published; rejected afterwards
+             *     (`LEGAL_SLUG_IMMUTABLE`).
+             * @example privacy-policy
+             */
+            slug?: string | null;
             status?: null | components["schemas"]["ContentStatus"];
         };
         /** @description Update a legal consent group */
@@ -9964,6 +10002,13 @@ export interface components {
             external_url?: string | null;
             /** @example link */
             icon?: string | null;
+            /**
+             * Format: uuid
+             * @description First-class reference to a legal document. Providing any link target
+             *     switches the item to that target and clears the other two.
+             * @example 550e8400-e29b-41d4-a716-446655440003
+             */
+            legal_document_id?: string | null;
             /** @example true */
             open_in_new_tab?: boolean | null;
             /**

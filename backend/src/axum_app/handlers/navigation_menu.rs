@@ -24,6 +24,7 @@ use crate::models::navigation::NavigationItem;
 use crate::models::navigation_menu::{NavigationMenu, NavigationMenuLocalization};
 use crate::services::audited_mutation::AuditedEntity;
 use crate::services::permission_service::{Permission, PermissionService};
+use crate::services::response_cache;
 
 #[derive(Debug, Deserialize)]
 struct TreeQuery {
@@ -154,6 +155,7 @@ async fn create_navigation_menu(
         .actor(auth.0.id)
         .execute(&state.db)
         .await;
+    response_cache::invalidate_site(site_id).await;
     Ok((StatusCode::CREATED, Json(resp)))
 }
 
@@ -277,6 +279,7 @@ async fn update_navigation_menu(
         .actor(auth.0.id)
         .execute(&state.db)
         .await;
+    response_cache::invalidate_site(existing_menu.site_id).await;
     Ok(Json(resp))
 }
 
@@ -316,6 +319,7 @@ async fn delete_navigation_menu(
         .metadata(serde_json::json!({ "action": "soft_delete" }))
         .execute(&state.db)
         .await;
+    response_cache::invalidate_site(menu.site_id).await;
     Ok(StatusCode::NO_CONTENT)
 }
 
