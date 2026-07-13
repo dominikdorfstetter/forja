@@ -1,6 +1,6 @@
 {
   "name": "@forjacms/client",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "description": "Typed TypeScript SDK for the Forja CMS content API",
   "author": "Dominik Dorfstetter <dominik@dorfstetter.at>",
   "main": "dist/index.cjs",
