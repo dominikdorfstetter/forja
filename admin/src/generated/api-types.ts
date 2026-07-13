@@ -8344,6 +8344,13 @@ export interface components {
              */
             contact_email: string;
             /**
+             * @description Whether the site is in maintenance mode. Public by design: SSR
+             *     frontends need it (with a Viewer-tier key) to swap the whole
+             *     site for a maintenance page while operators work in the admin.
+             * @example false
+             */
+            maintenance_mode: boolean;
+            /**
              * @description Fallback meta description; empty string when unset
              * @example
              */

@@ -361,6 +361,11 @@ pub struct PublicSiteSettingsResponse {
     /// Fallback meta description; empty string when unset
     #[schema(example = "")]
     pub seo_default_description: String,
+    /// Whether the site is in maintenance mode. Public by design: SSR
+    /// frontends need it (with a Viewer-tier key) to swap the whole
+    /// site for a maintenance page while operators work in the admin.
+    #[schema(example = false)]
+    pub maintenance_mode: bool,
 }
 
 impl PublicSiteSettingsResponse {
@@ -379,6 +384,10 @@ impl PublicSiteSettingsResponse {
             background_color: str_or(KEY_BACKGROUND_COLOR, "#ffffff"),
             seo_title_template: str_or(KEY_SEO_TITLE_TEMPLATE, "{{title}} | {{site_name}}"),
             seo_default_description: str_or(KEY_SEO_DEFAULT_DESCRIPTION, ""),
+            maintenance_mode: map
+                .get(KEY_MAINTENANCE_MODE)
+                .and_then(|v| v.as_bool())
+                .unwrap_or(false),
         }
     }
 }
@@ -1217,6 +1226,7 @@ mod tests {
             vec![
                 "background_color",
                 "contact_email",
+                "maintenance_mode",
                 "seo_default_description",
                 "seo_title_template",
                 "theme_color",
