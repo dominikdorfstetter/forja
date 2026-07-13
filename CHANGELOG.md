@@ -6,6 +6,15 @@ Forja is a GDPR-first, multi-tenant headless CMS — a Rust (Axum) backend and a
 
 ## [Unreleased]
 
+## [2.1.1] — 2026-07-13
+
+UX follow-up to the 2.1.0 UI Strings module, from first-use feedback.
+
+### Changed
+
+- **UI Strings are edited in a dialog, like the rest of the admin.** Creating and editing a string now opens a popup with the key and per-locale values behind locale tabs (missing/outdated status chips included), saving everything in one request; the separate detail pages are gone. Clearing a translation removes it on save, the default-locale value stays required, and viewers get the same dialog read-only.
+- **The UI Strings list is searchable and paginated.** A key search (case-insensitive, combines with the missing/outdated filter) and pagination make sites with large dictionaries navigable.
+
 ## [2.1.0] — 2026-07-13
 
 Four features driven by consumer feedback from a live production site: a UI-strings module for localized interface chrome, first-class legal-document references in navigation, a public site-settings read, and completed menu localization.
