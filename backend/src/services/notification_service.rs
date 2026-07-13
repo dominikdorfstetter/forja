@@ -112,6 +112,53 @@ pub(crate) async fn notify_form_submission_received(
     }
 }
 
+/// Notify site Owners/Admins that an API key was auto-blocked by anomaly
+/// detection, so they learn about it from the notification bell instead of
+/// a failed deploy.
+pub(crate) async fn notify_api_key_auto_blocked(
+    pool: &PgPool,
+    site_id: Uuid,
+    api_key_id: Uuid,
+    key_name: &str,
+    detail: &str,
+) {
+    if let Err(e) =
+        notify_api_key_auto_blocked_inner(pool, site_id, api_key_id, key_name, detail).await
+    {
+        tracing::warn!("Notification dispatch (api_key_auto_blocked) failed: {e}");
+    }
+}
+
+async fn notify_api_key_auto_blocked_inner(
+    pool: &PgPool,
+    site_id: Uuid,
+    api_key_id: Uuid,
+    key_name: &str,
+    detail: &str,
+) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    let members = SiteMembership::find_all_for_site(pool, site_id).await?;
+    let title = format!("API key '{}' was auto-blocked", key_name);
+
+    for member in &members {
+        if !member.role.can_manage_members() {
+            continue;
+        }
+        let _ = Notification::create(
+            pool,
+            site_id,
+            &member.clerk_user_id,
+            None, // No actor — blocked by the anomaly detection worker.
+            "api_key_blocked",
+            "api_key",
+            api_key_id,
+            &title,
+            Some(detail),
+        )
+        .await;
+    }
+    Ok(())
+}
+
 async fn notify_form_submission_inner(
     pool: &PgPool,
     site_id: Uuid,
