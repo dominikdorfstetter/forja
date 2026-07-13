@@ -648,6 +648,27 @@ export interface SiteResponse {
   updated_at: string;
 }
 
+/**
+ * Curated public subset of the site's settings.
+ *
+ * Readable with any API key tier, including `Read` (Viewer). Deliberately
+ * excludes operational configuration — allowed origins, storage quotas,
+ * data retention, module flags, code injection — which stays on the
+ * Admin-only raw settings endpoint.
+ */
+export interface PublicSiteSettings {
+  /** Public contact email; empty string when unset. */
+  contact_email: string;
+  /** Theme color for the web manifest (hex, e.g. `#4a90d9`). */
+  theme_color: string;
+  /** Background color for the web manifest (hex). */
+  background_color: string;
+  /** SEO title template (e.g. `{{title}} | {{site_name}}`). */
+  seo_title_template: string;
+  /** Fallback meta description; empty string when unset. */
+  seo_default_description: string;
+}
+
 // ── Media types ──────────────────────────────────────────────
 
 export interface MediaVariantResponse {

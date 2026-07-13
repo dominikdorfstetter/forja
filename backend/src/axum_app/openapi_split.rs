@@ -81,6 +81,7 @@ const CONSUMER_OPERATION_IDS: &[&str] = &[
     // Sites (public info)
     "get_site_by_slug",
     "get_site_context",
+    "get_public_site_settings",
     // Per-site public assets
     "get_sitemap",
     "get_robots_txt",

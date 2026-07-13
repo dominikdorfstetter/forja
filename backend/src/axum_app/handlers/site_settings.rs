@@ -1,5 +1,6 @@
-//! Axum port of `crate::handlers::site_settings`. Five endpoints for
-//! per-site settings + per-site/system storage views.
+//! Axum port of `crate::handlers::site_settings`. Six endpoints for
+//! per-site settings (raw Admin-only read/write plus a curated Viewer-tier
+//! public read) + per-site/system storage views.
 
 use axum::extract::{Path, State};
 use axum::response::Json;
@@ -9,8 +10,8 @@ use uuid::Uuid;
 
 use crate::AppState;
 use crate::dto::site_settings::{
-    PreviewTemplate, SiteOverviewEntry, SiteSettingsResponse, SiteStorageSummary,
-    SitesOverviewResponse, StorageUsageResponse, SystemStorageOverviewResponse,
+    PreviewTemplate, PublicSiteSettingsResponse, SiteOverviewEntry, SiteSettingsResponse,
+    SiteStorageSummary, SitesOverviewResponse, StorageUsageResponse, SystemStorageOverviewResponse,
     UpdateSiteSettingsRequest,
 };
 use crate::dto::validated::ValidatedJson;
@@ -24,6 +25,7 @@ use crate::models::site_settings::SiteSetting;
 use crate::repos::document_repo::DocumentRepo;
 use crate::services::audited_mutation::AuditedEntity;
 use crate::services::permission_service::{Permission, PermissionService};
+use crate::services::response_cache;
 
 /// Inject built-in preview templates (prepended), deduping by URL so the
 /// stored list never accumulates copies of built-ins from past saves.
@@ -99,6 +101,48 @@ async fn get_site_settings(
 }
 
 #[utoipa::path(
+    get,
+    path = "/sites/{site_id}/settings/public",
+    tag = "Site Settings",
+    operation_id = "get_public_site_settings",
+    description = "Curated public subset of site settings (contact email, manifest colors, SEO defaults). Readable by any key tier including Read; operational config stays on the Admin-only raw settings endpoint.",
+    params(("site_id" = Uuid, Path, description = "Site UUID")),
+    responses(
+        (status = 200, description = "Public site settings", body = PublicSiteSettingsResponse),
+        (status = 401, description = "Unauthorized", body = ProblemDetails),
+        (status = 403, description = "Forbidden", body = ProblemDetails),
+        (status = 404, description = "Site not found", body = ProblemDetails)
+    ),
+    security(("api_key" = []))
+)]
+async fn get_public_site_settings(
+    State(state): State<AppState>,
+    Path(site_id): Path<Uuid>,
+    auth: ReadKey,
+) -> Result<Json<PublicSiteSettingsResponse>, ApiError> {
+    PermissionService::require(
+        &state.db,
+        &auth.0,
+        site_id,
+        &Permission::new("site", "read"),
+    )
+    .await?;
+    Site::find_by_id(&state.db, site_id).await?;
+
+    // Identical for every caller of a site → cacheable after the key check.
+    let response = response_cache::cached(
+        &state.redis,
+        &response_cache::key(site_id, "settings:public"),
+        || async {
+            let map = SiteSetting::get_effective_settings(&state.db, site_id).await?;
+            Ok(PublicSiteSettingsResponse::from_map(&map))
+        },
+    )
+    .await?;
+    Ok(Json(response))
+}
+
+#[utoipa::path(
     put,
     path = "/sites/{site_id}/settings",
     tag = "Site Settings",
@@ -149,6 +193,7 @@ async fn update_site_settings(
         .metadata(serde_json::json!({ "changed_keys": changed_keys }))
         .execute(&state.db)
         .await;
+    response_cache::invalidate_site(site_id).await;
 
     let map = SiteSetting::get_effective_settings(&state.db, site_id).await?;
     let mut response = SiteSettingsResponse::from_map(&map);
@@ -353,6 +398,7 @@ async fn get_sites_overview(
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
         .routes(routes!(get_site_settings, update_site_settings))
+        .routes(routes!(get_public_site_settings))
         .routes(routes!(get_storage_usage))
         .routes(routes!(get_system_storage_overview))
         .routes(routes!(get_sites_overview))

@@ -156,8 +156,8 @@ use crate::dto::site_membership::{
     UpdateMemberRoleRequest,
 };
 use crate::dto::site_settings::{
-    PreviewTemplate, SiteOverviewEntry, SiteSettingsResponse, SiteStorageSummary,
-    SitesOverviewResponse, StorageUsageResponse, SystemStorageOverviewResponse,
+    PreviewTemplate, PublicSiteSettingsResponse, SiteOverviewEntry, SiteSettingsResponse,
+    SiteStorageSummary, SitesOverviewResponse, StorageUsageResponse, SystemStorageOverviewResponse,
     UpdateSiteSettingsRequest,
 };
 use crate::dto::social::{
@@ -356,6 +356,7 @@ pub mod workers;
             SiteContextModules,
             SiteContextIntegration,
             SiteSettingsResponse,
+            PublicSiteSettingsResponse,
             UpdateSiteSettingsRequest,
             StorageUsageResponse,
             SystemStorageOverviewResponse,

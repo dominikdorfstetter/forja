@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { SiteResource } from '../../resources/site.js';
 import { renderCodeInjection } from '../../code-injection.js';
 import type { HttpClient } from '../../http.js';
-import type { SiteLocaleResponse } from '../../types.js';
+import type { PublicSiteSettings, SiteLocaleResponse } from '../../types.js';
 
 function createMockHttp(): HttpClient {
   return {
@@ -95,6 +95,40 @@ describe('SiteResource', () => {
       expect(result[0].site_id).toBe('site-1');
       expect(result[0].url_prefix).toBeNull();
       expect(result[0].created_at).toBe('2026-05-21T10:00:00Z');
+    });
+  });
+
+  describe('getSettings', () => {
+    // The raw /settings endpoint is Admin-gated; the curated
+    // /settings/public endpoint is Viewer-tier and carries exactly the
+    // public allowlist — no operational config.
+    it('calls the public settings URL', async () => {
+      const http = createMockHttp();
+      vi.mocked(http.get).mockResolvedValue({});
+
+      const resource = new SiteResource(http, siteId);
+      await resource.getSettings();
+
+      expect(http.get).toHaveBeenCalledWith(`/sites/${siteId}/settings/public`);
+    });
+
+    it('returns the curated public settings shape', async () => {
+      const http = createMockHttp();
+      const settings: PublicSiteSettings = {
+        contact_email: 'hello@example.com',
+        theme_color: '#123456',
+        background_color: '#654321',
+        seo_title_template: '{{title}} | {{site_name}}',
+        seo_default_description: 'An example site',
+      };
+      vi.mocked(http.get).mockResolvedValue(settings);
+
+      const resource = new SiteResource(http, siteId);
+      const result = await resource.getSettings();
+
+      expect(result).toEqual(settings);
+      expect(result.contact_email).toBe('hello@example.com');
+      expect(result.theme_color).toBe('#123456');
     });
   });
 

@@ -730,6 +730,27 @@ for (const locale of locales) {
 }
 ```
 
+### `getSettings()`
+
+Fetch the curated public subset of the site's settings — contact email, web-manifest colors, and SEO defaults.
+
+**Returns:** `PublicSiteSettings`
+
+```typescript
+const settings = await forja.site.getSettings();
+
+console.log(settings.contact_email);
+console.log(settings.theme_color, settings.background_color);
+console.log(settings.seo_title_template);
+console.log(settings.seo_default_description);
+```
+
+:::info Read-tier accessible
+Unlike the raw admin settings endpoint (which requires an Admin key), this read works with a `Read` API key. The shape deliberately excludes operational configuration — allowed origins, storage quotas, data retention, module flags, and code injection (use `getCodeInjection()` for the latter).
+:::
+
+Fields that are not configured on the server fall back to the backend's house defaults: empty strings for `contact_email` and `seo_default_description`, `#ffffff` for both colors, and `{{title}} | {{site_name}}` for the title template.
+
 ---
 
 ## Media

@@ -1,6 +1,7 @@
 import type { HttpClient } from '../http.js';
 import type {
   CodeInjection,
+  PublicSiteSettings,
   SiteContextResponse,
   SiteLocaleResponse,
   SiteResponse,
@@ -72,6 +73,39 @@ export class SiteResource {
   async listLocales(): Promise<SiteLocaleResponse[]> {
     return this.http.get<SiteLocaleResponse[]>(
       `/sites/${this.siteId}/locales`,
+    );
+  }
+
+  /**
+   * Fetch the curated public subset of the site's settings.
+   *
+   * **Endpoint:** `GET /sites/{siteId}/settings/public`
+   *
+   * Returns the contact email, web-manifest colors, and SEO defaults.
+   * Works with an API key that has `Read` permission — unlike the raw
+   * settings endpoint, which is Admin-only.
+   *
+   * The shape deliberately excludes operational configuration (allowed
+   * origins, storage quotas, data retention, module flags, code
+   * injection); use {@link getCodeInjection} for injection snippets.
+   *
+   * Fields that are not configured on the server fall back to the same
+   * defaults the backend uses everywhere (empty strings for email and
+   * description, `#ffffff` colors, `{{title}} | {{site_name}}`).
+   *
+   * @returns The public site settings.
+   *
+   * @example
+   * ```ts
+   * const settings = await forja.site.getSettings();
+   * console.log(settings.contact_email);       // "hello@example.com"
+   * console.log(settings.theme_color);         // "#4a90d9"
+   * console.log(settings.seo_title_template);  // "{{title}} | {{site_name}}"
+   * ```
+   */
+  async getSettings(): Promise<PublicSiteSettings> {
+    return this.http.get<PublicSiteSettings>(
+      `/sites/${this.siteId}/settings/public`,
     );
   }
 

@@ -3988,6 +3988,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/sites/{site_id}/settings/public": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Curated public subset of site settings (contact email, manifest colors, SEO defaults). Readable by any key tier including Read; operational config stays on the Admin-only raw settings endpoint. */
+        get: operations["get_public_site_settings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/sites/{site_id}/skills": {
         parameters: {
             query?: never;
@@ -8313,6 +8330,34 @@ export interface components {
             key: string;
             label: string;
             localized: boolean;
+        };
+        /** @description Public subset of site settings (Viewer-tier read) */
+        PublicSiteSettingsResponse: {
+            /**
+             * @description Background color for the web manifest (hex)
+             * @example #ffffff
+             */
+            background_color: string;
+            /**
+             * @description Public contact email; empty string when unset
+             * @example hello@example.com
+             */
+            contact_email: string;
+            /**
+             * @description Fallback meta description; empty string when unset
+             * @example
+             */
+            seo_default_description: string;
+            /**
+             * @description SEO title template
+             * @example {{title}} | {{site_name}}
+             */
+            seo_title_template: string;
+            /**
+             * @description Theme color for the web manifest (hex)
+             * @example #ffffff
+             */
+            theme_color: string;
         };
         /** @description Quota window status */
         QuotaWindowResponse: {
@@ -25426,6 +25471,56 @@ export interface operations {
             };
             /** @description Validation failed (e.g. data_retention_days outside 30–3650) */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    get_public_site_settings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Site UUID */
+                site_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Public site settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicSiteSettingsResponse"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Site not found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

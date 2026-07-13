@@ -117,6 +117,7 @@ export type {
   SiteLocaleResponse,
   SiteContextResponse,
   SiteContextIntegration,
+  PublicSiteSettings,
   // Media
   MediaResponse,
   MediaVariantResponse,
