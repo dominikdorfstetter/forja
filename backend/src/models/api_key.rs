@@ -915,15 +915,18 @@ impl ApiKeyUsageDaily {
         Ok(records)
     }
 
-    /// Get the 7-day average daily request count for a key.
-    /// Returns `None` if no history exists (new key).
+    /// Get the 7-day average daily request count for a key, counting only
+    /// days with actual usage. Days at zero (key blocked or idle) would drag
+    /// the baseline down, making anomaly thresholds ever more sensitive after
+    /// a block — a death spiral where every unblock re-blocks sooner.
+    /// Returns `None` if no active day exists in the window (new key).
     pub async fn avg_daily_requests(
         pool: &PgPool,
         api_key_id: Uuid,
     ) -> Result<Option<f64>, sqlx::Error> {
         let row: (Option<f64>,) = sqlx::query_as(
             r#"
-            SELECT AVG(total_requests)::FLOAT8
+            SELECT (AVG(total_requests) FILTER (WHERE total_requests > 0))::FLOAT8
             FROM api_key_usage_daily
             WHERE api_key_id = $1
               AND date >= CURRENT_DATE - INTERVAL '7 days'
