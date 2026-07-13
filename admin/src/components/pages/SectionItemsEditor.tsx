@@ -154,9 +154,11 @@ interface SectionItemsEditorProps {
   sectionType: SectionType;
   items: Record<string, unknown>[];
   onChange: (items: Record<string, unknown>[]) => void;
+  /** Render the items as a non-editable preview (no add/move/delete). */
+  readOnly?: boolean;
 }
 
-export default function SectionItemsEditor({ sectionType, items, onChange }: SectionItemsEditorProps) {
+export default function SectionItemsEditor({ sectionType, items, onChange, readOnly }: SectionItemsEditorProps) {
   const { t } = useTranslation();
   const config = SECTION_ITEM_FIELDS[sectionType];
 
@@ -209,7 +211,7 @@ export default function SectionItemsEditor({ sectionType, items, onChange }: Sec
               <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
                 {t('sectionEditor.items.itemNumber', { label: t(config.labelKey), number: index + 1 })}
               </Typography>
-              <Box>
+              {!readOnly && <Box>
                 <Tooltip title={t('common.actions.moveUp', 'Move up')}>
                   <span>
                     <IconButton size="small" onClick={() => moveItem(index, -1)} disabled={index === 0}>
@@ -229,11 +231,12 @@ export default function SectionItemsEditor({ sectionType, items, onChange }: Sec
                     <DeleteIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
-              </Box>
+              </Box>}
             </Box>
             <Stack spacing={1.5}>
               {config.fields.map((field) => {
                 if (field.type === 'media') {
+                  if (readOnly) return null;
                   return (
                     <MediaField
                       key={field.key}
@@ -255,6 +258,7 @@ export default function SectionItemsEditor({ sectionType, items, onChange }: Sec
                     label={t(field.labelKey)}
                     size="small"
                     fullWidth
+                    disabled={readOnly}
                     multiline={field.multiline}
                     minRows={field.multiline ? 2 : undefined}
                     maxRows={field.multiline ? 6 : undefined}
@@ -273,14 +277,16 @@ export default function SectionItemsEditor({ sectionType, items, onChange }: Sec
           </Box>
         ))}
       </Stack>
-      <Button
-        startIcon={<AddIcon />}
-        size="small"
-        onClick={addItem}
-        sx={{ mt: 1 }}
-      >
-        {t('common.actions.add')} {t(config.labelKey)}
-      </Button>
+      {!readOnly && (
+        <Button
+          startIcon={<AddIcon />}
+          size="small"
+          onClick={addItem}
+          sx={{ mt: 1 }}
+        >
+          {t('common.actions.add')} {t(config.labelKey)}
+        </Button>
+      )}
     </Box>
   );
 }

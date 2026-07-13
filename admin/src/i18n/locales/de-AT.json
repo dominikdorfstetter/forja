@@ -4176,7 +4176,11 @@
         "description": "Beschreibung",
         "label": "Ereignis",
         "title": "Titel"
-      }
+      },
+      "localizeAction": "Diese Einträge lokalisieren",
+      "removeLocalization": "Lokalisierung entfernen",
+      "fallbackNotice": "Angezeigt werden die Standard-Einträge. Lokalisieren Sie sie, um eine eigene Fassung für {{locale}} zu bearbeiten.",
+      "overrideNotice": "Diese Einträge überschreiben die Standard-Einträge für {{locale}}. Wird die Lokalisierung entfernt, gelten wieder die Standard-Einträge."
     },
     "layout": "Layout",
     "nColumns": "{{n}} Spalten",

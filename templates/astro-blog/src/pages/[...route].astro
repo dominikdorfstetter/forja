@@ -30,7 +30,7 @@ if (!page || page.status !== "Published") {
 let sections: PageSectionResponse[] = [];
 let localizations: SectionLocalizationResponse[] = [];
 try {
-  sections = await fetchPageSections(page.id);
+  sections = await fetchPageSections(page.id, locale.code);
   sections.sort((a, b) => a.display_order - b.display_order);
   localizations = await fetchPageSectionLocalizations(page.id);
 } catch { /* ignore */ }

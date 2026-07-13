@@ -8700,6 +8700,11 @@ export interface components {
              */
             id: string;
             /**
+             * @description Per-locale override of the section's `settings.items` array.
+             *     `null` = no override — consumers fall back to the default items.
+             */
+            items?: unknown;
+            /**
              * Format: uuid
              * @example 770e8400-e29b-41d4-a716-446655440000
              */
@@ -10457,6 +10462,12 @@ export interface components {
         /** @description Upsert section localization */
         UpsertSectionLocalizationRequest: {
             button_text?: string | null;
+            /**
+             * @description Full per-locale override of the section's `settings.items` array —
+             *     same shape as the default items. Omit (or send `null`) to clear the
+             *     override so the locale falls back to the default items again.
+             */
+            items?: unknown;
             /**
              * Format: uuid
              * @example 770e8400-e29b-41d4-a716-446655440000
@@ -18511,7 +18522,10 @@ export interface operations {
     };
     get_page_sections: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Optional locale code. When set, each section's `settings.items` carries that locale's items override when one exists; sections without an override (and unknown codes) keep the default items (ADR 0002). */
+                locale?: string;
+            };
             header?: never;
             path: {
                 /** @description The UUID of the page to retrieve sections for */

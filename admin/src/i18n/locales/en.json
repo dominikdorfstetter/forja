@@ -3476,7 +3476,11 @@
         "link": "Link (optional)"
       },
       "count": "{{label}}s ({{count}})",
-      "itemNumber": "{{label}} {{number}}"
+      "itemNumber": "{{label}} {{number}}",
+      "localizeAction": "Localize these items",
+      "removeLocalization": "Remove localization",
+      "fallbackNotice": "Showing the default items. Localize them to edit a separate copy for {{locale}}.",
+      "overrideNotice": "These items override the default items for {{locale}}. Removing the localization restores the default items."
     }
   },
   "shared": {

@@ -4175,7 +4175,11 @@
         "description": "Beschrijving",
         "label": "Gebeurtenis",
         "title": "Titel"
-      }
+      },
+      "localizeAction": "Deze items lokaliseren",
+      "removeLocalization": "Lokalisatie verwijderen",
+      "fallbackNotice": "De standaarditems worden getoond. Lokaliseer ze om een eigen kopie voor {{locale}} te bewerken.",
+      "overrideNotice": "Deze items vervangen de standaarditems voor {{locale}}. Als je de lokalisatie verwijdert, gelden de standaarditems weer."
     },
     "layout": "Indeling",
     "nColumns": "{{n}} kolommen",

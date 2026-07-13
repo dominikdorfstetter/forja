@@ -395,11 +395,14 @@ export async function fetchPageByRoute(
   return result;
 }
 
-/** Fetch all sections for a page by its ID. */
+/** Fetch all sections for a page by its ID. When `locale` is set, each
+ * section's `settings.items` is resolved server-side to that locale's items
+ * override (falling back to the default items — ADR 0002). */
 export async function fetchPageSections(
   pageId: string,
+  locale?: string,
 ): Promise<import("@forjacms/client").PageSectionResponse[]> {
-  return client().pages.getSections(pageId);
+  return client().pages.getSections(pageId, locale ? { locale } : undefined);
 }
 
 /** Fetch all section localizations for a page by its ID. */

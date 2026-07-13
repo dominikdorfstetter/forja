@@ -1,5 +1,5 @@
 import type { HttpClient, PaginatedResult } from '../http.js';
-import { ContentResource } from './content-resource.js';
+import { ContentResource, type DetailParams } from './content-resource.js';
 import type {
   PageDetailResponse,
   PageListItem,
@@ -102,17 +102,25 @@ export class PagesResource extends ContentResource<PageListItem, PageDetailRespo
   /**
    * Fetch all sections for a page.
    *
-   * **Endpoint:** `GET /pages/{pageId}/sections`
+   * **Endpoint:** `GET /pages/{pageId}/sections?locale=`
    *
    * Sections are returned in display order and include type, settings,
-   * cover image reference, and call-to-action route.
+   * cover image reference, and call-to-action route. When `locale` is set,
+   * each section's `settings.items` carries that locale's items override
+   * when one exists; sections without an override keep the default items
+   * (ADR 0002 — omitting the param returns the defaults unchanged).
    *
    * @param pageId - The page's UUID.
+   * @param params - Optional locale resolver (`{ locale: 'en' }`).
    * @returns Array of page sections.
    */
-  async getSections(pageId: string): Promise<PageSectionResponse[]> {
+  async getSections(
+    pageId: string,
+    params?: DetailParams,
+  ): Promise<PageSectionResponse[]> {
     return this.http.get<PageSectionResponse[]>(
       `/pages/${encodeURIComponent(pageId)}/sections`,
+      { locale: params?.locale },
     );
   }
 

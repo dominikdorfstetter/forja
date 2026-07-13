@@ -196,13 +196,61 @@ async fn get_page_by_route(
     Ok(Json(response))
 }
 
+/// Substitute each section's `settings.items` with the requested locale's
+/// override when one exists (ADR 0002, opt-in via `?locale=`). A locale's
+/// non-null `items` replaces the default array wholesale; sections without an
+/// override — and unknown locale codes — keep the default `settings.items`,
+/// so consumers read `settings.items` unchanged either way.
+async fn resolve_section_items(
+    pool: &sqlx::PgPool,
+    page_id: Uuid,
+    site_id: Option<Uuid>,
+    locale_code: Option<&str>,
+    sections: Vec<crate::models::page::PageSection>,
+) -> Result<Vec<crate::models::page::PageSection>, ApiError> {
+    let (Some(site_id), Some(code)) = (site_id, locale_code) else {
+        return Ok(sections);
+    };
+    let Some((Some(requested_id), _)) =
+        crate::utils::locale_resolver::resolve_ids_for_site(Some(code), pool, site_id).await?
+    else {
+        return Ok(sections);
+    };
+    let overrides =
+        PageSectionLocalizationRepo::items_overrides_for_page(pool, page_id, requested_id).await?;
+    if overrides.is_empty() {
+        return Ok(sections);
+    }
+
+    Ok(sections
+        .into_iter()
+        .map(|mut section| {
+            if let Some(items) = overrides.get(&section.id) {
+                let mut settings = section
+                    .settings
+                    .take()
+                    .filter(|s| s.is_object())
+                    .unwrap_or_else(|| serde_json::json!({}));
+                if let Some(obj) = settings.as_object_mut() {
+                    obj.insert("items".to_string(), items.clone());
+                }
+                section.settings = Some(settings);
+            }
+            section
+        })
+        .collect())
+}
+
 #[utoipa::path(
     get,
     path = "/pages/{id}/sections",
     tag = "Pages",
     operation_id = "get_page_sections",
     description = "Get all sections for a page",
-    params(("id" = Uuid, Path, description = "The UUID of the page to retrieve sections for")),
+    params(
+        ("id" = Uuid, Path, description = "The UUID of the page to retrieve sections for"),
+        ("locale" = Option<String>, Query, description = "Optional locale code. When set, each section's `settings.items` carries that locale's items override when one exists; sections without an override (and unknown codes) keep the default items (ADR 0002).")
+    ),
     responses(
         (status = 200, description = "Page sections", body = Vec<PageSectionResponse>),
         (status = 401, description = "Missing or invalid API key", body = ProblemDetails),
@@ -214,9 +262,18 @@ async fn get_page_by_route(
 async fn get_page_sections(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
-    _access: AuthorizedContent<PageWithContent, Read>,
+    locale: ResolveLocale,
+    access: AuthorizedContent<PageWithContent, Read>,
 ) -> Result<Json<Vec<PageSectionResponse>>, ApiError> {
     let sections = PageSectionRepo::find_for_page(&state.db, id).await?;
+    let sections = resolve_section_items(
+        &state.db,
+        id,
+        access.site_ids.first().copied(),
+        locale.0.as_deref(),
+        sections,
+    )
+    .await?;
     let responses: Vec<PageSectionResponse> = sections
         .into_iter()
         .map(PageSectionResponse::from)
@@ -531,6 +588,7 @@ async fn upsert_section_localization(
         body.title.as_deref(),
         body.text.as_deref(),
         body.button_text.as_deref(),
+        body.items.as_ref(),
     )
     .await?;
 

@@ -4177,7 +4177,11 @@
         "description": "Opis",
         "label": "Wydarzenie",
         "title": "Tytuł"
-      }
+      },
+      "localizeAction": "Zlokalizuj te elementy",
+      "removeLocalization": "Usuń lokalizację",
+      "fallbackNotice": "Wyświetlane są elementy domyślne. Zlokalizuj je, aby edytować osobną kopię dla {{locale}}.",
+      "overrideNotice": "Te elementy zastępują elementy domyślne dla {{locale}}. Usunięcie lokalizacji przywraca elementy domyślne."
     },
     "layout": "Układ",
     "nColumns": "{{n}} kolumn",

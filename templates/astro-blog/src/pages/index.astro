@@ -32,7 +32,7 @@ let homeLocalizations: SectionLocalizationResponse[] = [];
 try {
   const homePage = await fetchPageByRoute("/");
   if (homePage && homePage.status === "Published") {
-    homeSections = await fetchPageSections(homePage.id);
+    homeSections = await fetchPageSections(homePage.id, locale.code);
     homeSections.sort((a, b) => a.display_order - b.display_order);
     homeLocalizations = await fetchPageSectionLocalizations(homePage.id);
   }

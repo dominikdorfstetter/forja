@@ -4175,7 +4175,11 @@
         "description": "Descripción",
         "label": "Evento",
         "title": "Título"
-      }
+      },
+      "localizeAction": "Localizar estos elementos",
+      "removeLocalization": "Quitar localización",
+      "fallbackNotice": "Se muestran los elementos predeterminados. Localízalos para editar una copia propia para {{locale}}.",
+      "overrideNotice": "Estos elementos reemplazan los predeterminados para {{locale}}. Al quitar la localización se restauran los elementos predeterminados."
     },
     "layout": "Diseño",
     "nColumns": "{{n}} columnas",

@@ -25,7 +25,8 @@ import { getSectionLocalizations } from '@/services/pages';
 import { getSiteLocales } from '@/services/siteLocales';
 import type { PageSectionResponse, SectionLocalizationResponse } from '@/types/api';
 import SectionSettingsForm from './SectionSettingsForm';
-import SectionItemsEditor, { hasItemsEditor } from './SectionItemsEditor';
+import { hasItemsEditor } from './SectionItemsEditor';
+import SectionItemsLocalePanel from './SectionItemsLocalePanel';
 import SectionTranslateDialog, {
   type SectionTranslationPreview,
 } from './SectionTranslateDialog';
@@ -62,6 +63,8 @@ interface LocaleFormData {
   title: string;
   text: string;
   buttonText: string;
+  /** Per-locale `settings.items` override — `null` = fall back to default. */
+  items: Record<string, unknown>[] | null;
 }
 
 // --- Reducer ---
@@ -80,7 +83,8 @@ type EditorAction =
   | { type: 'INIT_SECTION'; coverImageId: string; ctaRoute: string; settings: Record<string, unknown> }
   | { type: 'SET_ACTIVE_TAB'; value: number }
   | { type: 'SET_LOCALE_FORM'; value: LocaleFormData }
-  | { type: 'UPDATE_LOCALE_FIELD'; field: keyof LocaleFormData; value: string }
+  | { type: 'UPDATE_LOCALE_FIELD'; field: 'title' | 'text' | 'buttonText'; value: string }
+  | { type: 'SET_LOCALE_ITEMS'; value: Record<string, unknown>[] | null }
   | { type: 'BUMP_DIRTY_VERSION' }
   | { type: 'SET_COVER_IMAGE_ID'; value: string }
   | { type: 'SET_CTA_ROUTE'; value: string }
@@ -88,7 +92,7 @@ type EditorAction =
   | { type: 'SET_PICKER_OPEN'; value: boolean };
 
 const initialState: EditorState = {
-  activeTab: 0, localeForm: { title: '', text: '', buttonText: '' },
+  activeTab: 0, localeForm: { title: '', text: '', buttonText: '', items: null },
   dirtyVersion: 0, coverImageId: '', ctaRoute: '', settings: {},
   pickerOpen: false,
 };
@@ -99,6 +103,7 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
     case 'SET_ACTIVE_TAB': return { ...state, activeTab: action.value };
     case 'SET_LOCALE_FORM': return { ...state, localeForm: action.value };
     case 'UPDATE_LOCALE_FIELD': return { ...state, localeForm: { ...state.localeForm, [action.field]: action.value } };
+    case 'SET_LOCALE_ITEMS': return { ...state, localeForm: { ...state.localeForm, items: action.value } };
     case 'BUMP_DIRTY_VERSION': return { ...state, dirtyVersion: state.dirtyVersion + 1 };
     case 'SET_COVER_IMAGE_ID': return { ...state, coverImageId: action.value };
     case 'SET_CTA_ROUTE': return { ...state, ctaRoute: action.value };
@@ -161,7 +166,12 @@ export default function SectionEditorDialog({ open, section, onClose, embedded, 
   const [refreshingField, setRefreshingField] = useState<'title' | 'text' | 'button_text' | null>(null);
 
   const populateLocForm = (loc: SectionLocalizationResponse | undefined) => {
-    dispatch({ type: 'SET_LOCALE_FORM', value: { title: loc?.title || '', text: loc?.text || '', buttonText: loc?.button_text || '' } });
+    dispatch({ type: 'SET_LOCALE_FORM', value: {
+      title: loc?.title || '',
+      text: loc?.text || '',
+      buttonText: loc?.button_text || '',
+      items: (loc?.items as Record<string, unknown>[] | null | undefined) ?? null,
+    } });
   };
 
   const markLocaleDirty = useCallback((localeId: string, data: LocaleFormData) => {
@@ -298,6 +308,7 @@ export default function SectionEditorDialog({ open, section, onClose, embedded, 
         title: translationPreview.title ?? state.localeForm.title,
         text: translationPreview.text ?? state.localeForm.text,
         buttonText: translationPreview.button_text ?? state.localeForm.buttonText,
+        items: state.localeForm.items,
       },
     });
     setTranslateOpen(false);
@@ -322,12 +333,13 @@ export default function SectionEditorDialog({ open, section, onClose, embedded, 
           title: result.title ?? '',
           text: result.text ?? '',
           buttonText: result.button_text ?? '',
+          items: state.localeForm.items,
         },
       });
     } catch (err) {
       showError(err);
     }
-  }, [ai, section, currentLocale?.code, pageContext, showError]);
+  }, [ai, section, currentLocale?.code, pageContext, showError, state.localeForm.items]);
 
   useEffect(() => {
     if (currentLocale && open) {
@@ -399,6 +411,21 @@ export default function SectionEditorDialog({ open, section, onClose, embedded, 
 
   if (!section) return null;
 
+  // Items get the locale dimension of the surrounding tabs: the default
+  // locale edits settings.items directly; other locales manage a per-locale
+  // override that falls back to the default when absent.
+  const itemsPanel = hasItemsEditor(section.section_type) ? (
+    <SectionItemsLocalePanel
+      sectionType={section.section_type}
+      defaultItems={(state.settings.items as Record<string, unknown>[]) || []}
+      overrideItems={state.localeForm.items}
+      isDefaultLocale={!currentLocale || isOnDefaultLocale}
+      localeCode={currentLocale?.code ?? ''}
+      onDefaultItemsChange={(items) => dispatch({ type: 'SET_SETTINGS', value: { ...state.settings, items } })}
+      onOverrideChange={(items) => dispatch({ type: 'SET_LOCALE_ITEMS', value: items })}
+    />
+  ) : null;
+
   // Embedded mode: render content without Dialog wrapper (for use inside Drawer)
   if (embedded) {
     return (
@@ -430,14 +457,10 @@ export default function SectionEditorDialog({ open, section, onClose, embedded, 
           )}
           <Divider sx={{ my: 2 }} />
           <SectionSettingsForm sectionType={section.section_type} settings={state.settings} onChange={(s) => dispatch({ type: 'SET_SETTINGS', value: s })} />
-          {hasItemsEditor(section.section_type) && (
+          {itemsPanel && (
             <>
               <Divider sx={{ my: 2 }} />
-              <SectionItemsEditor
-                sectionType={section.section_type}
-                items={(state.settings.items as Record<string, unknown>[]) || []}
-                onChange={(items) => dispatch({ type: 'SET_SETTINGS', value: { ...state.settings, items } })}
-              />
+              {itemsPanel}
             </>
           )}
         </Box>
@@ -543,14 +566,10 @@ export default function SectionEditorDialog({ open, section, onClose, embedded, 
               <TextField label={t('forms.section.fields.ctaRoute')} fullWidth size="small" value={state.ctaRoute} onChange={(e) => dispatch({ type: 'SET_CTA_ROUTE', value: e.target.value })} helperText={t('forms.section.fields.ctaHelperText')} />
               <Divider />
               <SectionSettingsForm sectionType={section.section_type} settings={state.settings} onChange={(val) => dispatch({ type: 'SET_SETTINGS', value: val })} />
-              {hasItemsEditor(section.section_type) && (
+              {itemsPanel && (
                 <>
                   <Divider />
-                  <SectionItemsEditor
-                    sectionType={section.section_type}
-                    items={(state.settings.items as Record<string, unknown>[]) || []}
-                    onChange={(items) => dispatch({ type: 'SET_SETTINGS', value: { ...state.settings, items } })}
-                  />
+                  {itemsPanel}
                 </>
               )}
             </Stack>

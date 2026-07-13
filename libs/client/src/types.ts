@@ -270,6 +270,12 @@ export interface SectionLocalizationResponse {
   title: string | null;
   text: string | null;
   button_text: string | null;
+  /**
+   * Per-locale override of the section's `settings.items` array. `null`
+   * means no override — consumers fall back to the default items in
+   * `PageSectionResponse.settings.items`.
+   */
+  items: unknown[] | null;
 }
 
 // ── Navigation types ─────────────────────────────────────────
