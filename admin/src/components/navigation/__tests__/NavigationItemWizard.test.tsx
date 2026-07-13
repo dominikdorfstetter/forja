@@ -3,13 +3,16 @@ import { renderWithProviders, screen, waitFor } from '@/test/test-utils';
 import userEvent from '@testing-library/user-event';
 import { getNavigationItemLocalizations } from '@/services/navigation';
 import { getPage, getPages } from '@/services/pages';
-import type { NavigationItem, Locale, PageListItem, Paginated } from '@/types/api';
+import { getLegalDocuments } from '@/services/legal';
+import type { NavigationItem, Locale, LegalDocumentResponse, PageListItem, Paginated } from '@/types/api';
 import NavigationItemWizard from '../NavigationItemWizard';
+
+const mockModules = { blog: true, pages: true, cv: true, legal: true, documents: false, ai: false };
 
 vi.mock('@/hooks/useSiteContextData', () => ({
   useSiteContextData: () => ({
-    modules: { blog: true, pages: true, cv: true, legal: false, documents: false, ai: false },
-    context: { modules: { blog: true, pages: true, cv: true, legal: false, documents: false, ai: false } },
+    modules: mockModules,
+    context: { modules: mockModules },
   }),
 }));
 
@@ -63,6 +66,14 @@ const mockPages: Paginated<PageListItem> = {
   meta: { page: 1, page_size: 20, total_items: 1, total_pages: 1 },
 };
 
+const mockLegalDocs: Paginated<LegalDocumentResponse> = {
+  data: [
+    { id: 'legal-1', cookie_name: 'privacy_policy', slug: 'privacy-policy', document_type: 'PrivacyPolicy', status: 'Published', version: 1, created_at: '2025-01-01T00:00:00Z', updated_at: '2025-01-01T00:00:00Z' },
+    { id: 'legal-2', cookie_name: 'imprint', slug: 'imprint', document_type: 'Imprint', status: 'Published', version: 1, created_at: '2025-01-01T00:00:00Z', updated_at: '2025-01-01T00:00:00Z' },
+  ],
+  meta: { page: 1, page_size: 50, total_items: 2, total_pages: 1 },
+};
+
 const existingItem: NavigationItem = {
   id: 'nav-1',
   menu_id: 'menu-1',
@@ -73,6 +84,32 @@ const existingItem: NavigationItem = {
   display_order: 0,
   open_in_new_tab: false,
   title: 'About',
+};
+
+const legalItem: NavigationItem = {
+  id: 'nav-2',
+  menu_id: 'menu-1',
+  parent_id: undefined,
+  page_id: undefined,
+  external_url: undefined,
+  legal_document_id: 'legal-1',
+  icon: undefined,
+  display_order: 0,
+  open_in_new_tab: false,
+  title: 'Privacy',
+};
+
+const brokenItem: NavigationItem = {
+  id: 'nav-3',
+  menu_id: 'menu-1',
+  parent_id: undefined,
+  page_id: undefined,
+  external_url: undefined,
+  legal_document_id: undefined,
+  icon: undefined,
+  display_order: 0,
+  open_in_new_tab: false,
+  title: 'Orphaned',
 };
 
 const defaultProps = {
@@ -95,6 +132,7 @@ beforeEach(() => {
     is_in_navigation: true, status: 'Published', created_at: '2025-01-01T00:00:00Z', updated_at: '2025-01-01T00:00:00Z',
   });
   vi.mocked(getNavigationItemLocalizations).mockResolvedValue([]);
+  vi.mocked(getLegalDocuments).mockResolvedValue(mockLegalDocs);
 });
 
 describe('NavigationItemWizard', () => {
@@ -251,5 +289,54 @@ describe('NavigationItemWizard', () => {
   it('shows edit title for existing items', () => {
     renderWithProviders(<NavigationItemWizard {...defaultProps} item={existingItem} />);
     expect(screen.getByText(/edit navigation item/i)).toBeInTheDocument();
+  });
+
+  it('legal link type submits legal_document_id instead of a /legal/ external_url', async () => {
+    const onSubmit = vi.fn();
+    const user = userEvent.setup();
+    renderWithProviders(
+      <NavigationItemWizard {...defaultProps} onSubmit={onSubmit} locales={[mockLocales[0]]} />,
+    );
+
+    await user.click(screen.getByRole('combobox', { name: /content type/i }));
+    await user.click(await screen.findByRole('option', { name: /^legal$/i }));
+
+    const pickerInput = screen.getByTestId('legal-picker').querySelector('input')!;
+    await user.click(pickerInput);
+    await user.click(await screen.findByText('privacy-policy'));
+
+    const nextBtn = screen.getByTestId('navigation-wizard.btn.next');
+    await waitFor(() => expect(nextBtn).not.toBeDisabled());
+    await user.click(nextBtn);
+
+    await waitFor(() => expect(screen.getByTestId('navigation-wizard.title-input')).toBeInTheDocument());
+    await user.type(screen.getByTestId('navigation-wizard.title-input').querySelector('input')!, 'Privacy');
+    await waitFor(() => expect(screen.getByTestId('navigation-wizard.btn.next')).not.toBeDisabled());
+    await user.click(screen.getByTestId('navigation-wizard.btn.next'));
+
+    await user.click(screen.getByTestId('navigation-wizard.btn.submit'));
+    expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({
+      legal_document_id: 'legal-1',
+      external_url: undefined,
+      page_id: undefined,
+    }));
+  });
+
+  it('preselects the legal link type when editing an item with legal_document_id', async () => {
+    renderWithProviders(<NavigationItemWizard {...defaultProps} item={legalItem} />);
+
+    await waitFor(() => {
+      const pickerInput = screen.getByTestId('legal-picker').querySelector('input')!;
+      expect(pickerInput).toHaveValue('privacy-policy');
+    });
+  });
+
+  it('lets a broken item (no link target) be repaired by picking a new target', () => {
+    renderWithProviders(<NavigationItemWizard {...defaultProps} item={brokenItem} />);
+
+    // Falls back to the default link type with nothing selected — Next stays
+    // disabled until a new target is picked
+    expect(screen.getByTestId('page-picker')).toBeInTheDocument();
+    expect(screen.getByTestId('navigation-wizard.btn.next')).toBeDisabled();
   });
 });

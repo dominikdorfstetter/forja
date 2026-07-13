@@ -1052,7 +1052,9 @@
         "title": "Menü löschen",
         "message": "Dies löscht das Menü und alle Navigationselemente dauerhaft. Diese Aktion kann nicht rückgängig gemacht werden."
       }
-    }
+    },
+    "brokenLink": "Kaputter Link",
+    "brokenLinkHint": "Der Eintrag hat sein Linkziel verloren. Bearbeiten Sie ihn und wählen Sie ein neues Ziel."
   },
   "socialLinks": {
     "title": "Social Links",
@@ -1743,7 +1745,9 @@
       "saved": "Rechtliches Dokument gspeichert",
       "published": "Rechtliches Dokument veröffentlicht",
       "unpublished": "Rechtliches Dokument zruckgnommen",
-      "loadFailed": "Rechtliches Dokument konnt net gladn wern"
+      "loadFailed": "Rechtliches Dokument konnt net gladn wern",
+      "slugUpdated": "Slug aktualisiert",
+      "slugLocked": "Der Slug lässt sich nimmer ändern — eine Version von dem Dokument is scho veröffentlicht."
     },
     "toolbar": {},
     "fields": {
@@ -1751,7 +1755,8 @@
       "intro": "Einleitung",
       "body": "Inhalt",
       "metaTitle": "Meta-Titl",
-      "metaDescription": "Meta-Beschreibung"
+      "metaDescription": "Meta-Beschreibung",
+      "slug": "Slug"
     },
     "seo": {
       "title": "SEO-Einstellungen"
@@ -1771,7 +1776,9 @@
       "created": "Neie Version erstellt",
       "live": "Live",
       "rollbackHint": "Die Live-Version wird öffentlich ausgeliefert. Öffne eine ältere Version und veröffentliche sie, um zurückzurollen — die aktuelle wird ersetzt."
-    }
+    },
+    "slugHint": "Öffentliche URL: /legal/{slug}. Der Slug lässt sich ändern, bis eine Version veröffentlicht is.",
+    "slugLockedHint": "Der Slug is fix — eine Version von dem Dokument wurde scho veröffentlicht."
   },
   "sites": {
     "title": "Websites",
@@ -3720,6 +3727,10 @@
     "ERR_STRINGS_LIMIT_EXCEEDED": {
       "message": "Textlimit erreicht",
       "action": "A Site konn höchstens 500 UI-Text-Schlüssel hom — lösch zerst unbenutzte Schlüssel."
+    },
+    "LEGAL_SLUG_IMMUTABLE": {
+      "message": "Slug is gesperrt",
+      "action": "Veröffentlichte Rechts-URLs bleiben fix; nach dem Veröffentlichen einer Version lässt sich der Slug nimmer ändern."
     }
   },
   "welcome": {

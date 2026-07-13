@@ -1052,7 +1052,9 @@
         "title": "Eliminar menú",
         "message": "Esto eliminará permanentemente este menú y todos sus elementos de navegación. Esta acción no se puede deshacer."
       }
-    }
+    },
+    "brokenLink": "Enlace roto",
+    "brokenLinkHint": "Este elemento perdió su destino de enlace. Edítelo para elegir uno nuevo."
   },
   "socialLinks": {
     "title": "Redes sociales",
@@ -1743,7 +1745,9 @@
       "saved": "Documento legal guardado",
       "published": "Documento legal publicado",
       "unpublished": "Documento legal despublicado",
-      "loadFailed": "No se pudo cargar el documento legal"
+      "loadFailed": "No se pudo cargar el documento legal",
+      "slugUpdated": "Slug actualizado",
+      "slugLocked": "El slug ya no puede cambiarse — ya se publicó una versión de este documento."
     },
     "toolbar": {},
     "fields": {
@@ -1751,7 +1755,8 @@
       "intro": "Introducción",
       "body": "Contenido",
       "metaTitle": "Meta título",
-      "metaDescription": "Meta descripción"
+      "metaDescription": "Meta descripción",
+      "slug": "Slug"
     },
     "seo": {
       "title": "Ajustes de SEO"
@@ -1771,7 +1776,9 @@
       "created": "Nueva versión creada",
       "live": "En vivo",
       "rollbackHint": "La versión en vivo es la que se publica. Abre una versión anterior y publícala para revertir — la actual queda reemplazada."
-    }
+    },
+    "slugHint": "URL pública: /legal/{slug}. El slug puede cambiarse hasta que se publique una versión.",
+    "slugLockedHint": "El slug es permanente — ya se publicó una versión de este documento."
   },
   "sites": {
     "title": "Sitios",
@@ -3719,6 +3726,10 @@
     "ERR_STRINGS_LIMIT_EXCEEDED": {
       "message": "Límite de textos alcanzado",
       "action": "Un sitio puede contener como máximo 500 claves; elimina primero las que no uses."
+    },
+    "LEGAL_SLUG_IMMUTABLE": {
+      "message": "Slug bloqueado",
+      "action": "Las URL legales publicadas son permanentes; el slug no puede cambiar una vez publicada una versión."
     }
   },
   "welcome": {

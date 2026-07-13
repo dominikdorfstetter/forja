@@ -1052,7 +1052,9 @@
         "title": "Eliminar menu",
         "message": "Isto eliminará permanentemente este menu e todos os seus itens de navegação. Esta ação não pode ser desfeita."
       }
-    }
+    },
+    "brokenLink": "Link quebrado",
+    "brokenLinkHint": "Este item perdeu o destino do link. Edite-o para escolher um novo."
   },
   "socialLinks": {
     "title": "Ligações Sociais",
@@ -1743,7 +1745,9 @@
       "saved": "Documento legal guardado",
       "published": "Documento legal publicado",
       "unpublished": "Documento legal despublicado",
-      "loadFailed": "Falha ao carregar documento legal"
+      "loadFailed": "Falha ao carregar documento legal",
+      "slugUpdated": "Slug atualizado",
+      "slugLocked": "O slug não pode mais ser alterado — uma versão deste documento já foi publicada."
     },
     "toolbar": {},
     "fields": {
@@ -1751,7 +1755,8 @@
       "intro": "Introdução",
       "body": "Conteúdo",
       "metaTitle": "Meta título",
-      "metaDescription": "Meta descrição"
+      "metaDescription": "Meta descrição",
+      "slug": "Slug"
     },
     "seo": {
       "title": "Configurações de SEO"
@@ -1771,7 +1776,9 @@
       "created": "Nova versão criada",
       "live": "Ativa",
       "rollbackHint": "A versão ativa é a que é publicada. Abra uma versão anterior e publique-a para reverter — a atual passa a ser substituída."
-    }
+    },
+    "slugHint": "URL pública: /legal/{slug}. O slug pode ser alterado até que uma versão seja publicada.",
+    "slugLockedHint": "O slug é permanente — uma versão deste documento já foi publicada."
   },
   "sites": {
     "title": "Sites",
@@ -3719,6 +3726,10 @@
     "ERR_STRINGS_LIMIT_EXCEEDED": {
       "message": "Limite de textos atingido",
       "action": "Um site pode ter no máximo 500 chaves — exclua primeiro as não utilizadas."
+    },
+    "LEGAL_SLUG_IMMUTABLE": {
+      "message": "Slug bloqueado",
+      "action": "URLs legais publicadas são permanentes; o slug não pode mudar depois que uma versão for publicada."
     }
   },
   "welcome": {

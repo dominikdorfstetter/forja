@@ -93,7 +93,7 @@ export default function NavigationItemWizard({
   const [linkType, setLinkType] = useState<LinkType>(defaultLinkType);
   const [pageId, setPageId] = useState('');
   const [blogSlug, setBlogSlug] = useState('');
-  const [legalSlug, setLegalSlug] = useState('');
+  const [legalDocumentId, setLegalDocumentId] = useState('');
   const [externalUrl, setExternalUrl] = useState('');
 
   // --- Step 2: Translations ---
@@ -119,13 +119,17 @@ export default function NavigationItemWizard({
       if (item) {
         const isBlogLink = item.external_url?.startsWith('/blog/') ?? false;
         const isCvLink = item.external_url === '/cv';
-        const isLegalLink = item.external_url?.startsWith('/legal/') ?? false;
-        const detectedType: LinkType = isCvLink ? 'cv' : isBlogLink ? 'blog' : isLegalLink ? 'legal' : item.external_url ? 'external' : 'page';
+        const detectedType: LinkType = item.legal_document_id ? 'legal'
+          : item.page_id ? 'page'
+          : isCvLink ? 'cv'
+          : isBlogLink ? 'blog'
+          : item.external_url ? 'external'
+          : defaultLinkType; // broken link (no target) — repair by picking a new one
         setLinkType(detectedType);
         setPageId(item.page_id || '');
         setBlogSlug(isBlogLink ? item.external_url!.replace('/blog/', '') : '');
-        setLegalSlug(isLegalLink ? item.external_url!.replace('/legal/', '') : '');
-        setExternalUrl((isBlogLink || isCvLink || isLegalLink) ? '' : (item.external_url || ''));
+        setLegalDocumentId(item.legal_document_id || '');
+        setExternalUrl((isBlogLink || isCvLink) ? '' : (item.external_url || ''));
         setParentId(item.parent_id || '');
         setIcon(item.icon || '');
         setOpenInNewTab(item.open_in_new_tab);
@@ -136,7 +140,7 @@ export default function NavigationItemWizard({
         setLinkType(defaultLinkType);
         setPageId('');
         setBlogSlug('');
-        setLegalSlug('');
+        setLegalDocumentId('');
         setExternalUrl('');
         setParentId('');
         setIcon('');
@@ -202,7 +206,7 @@ export default function NavigationItemWizard({
   // --- Step validation ---
   const isStep1Valid = linkType === 'page' ? !!pageId
     : linkType === 'blog' ? !!blogSlug
-    : linkType === 'legal' ? !!legalSlug
+    : linkType === 'legal' ? !!legalDocumentId
     : linkType === 'cv' ? true
     : !!externalUrl && isValidUrl(externalUrl);
   const isStep2Valid = locales.length === 0 || Object.values(titles).some((t) => t.trim());
@@ -228,15 +232,14 @@ export default function NavigationItemWizard({
 
     const resolvedExternalUrl = linkType === 'cv'
       ? '/cv'
-      : linkType === 'legal'
-        ? `/legal/${legalSlug}`
-        : linkType === 'blog' && blogSlug
-          ? `/blog/${blogSlug}`
-          : linkType === 'external' && externalUrl ? externalUrl : undefined;
+      : linkType === 'blog' && blogSlug
+        ? `/blog/${blogSlug}`
+        : linkType === 'external' && externalUrl ? externalUrl : undefined;
 
     onSubmit({
       page_id: linkType === 'page' && pageId ? pageId : undefined,
       external_url: resolvedExternalUrl,
+      legal_document_id: linkType === 'legal' && legalDocumentId ? legalDocumentId : undefined,
       icon: icon || undefined,
       display_order: item?.display_order ?? 0,
       open_in_new_tab: openInNewTab,
@@ -245,7 +248,7 @@ export default function NavigationItemWizard({
       menu_id: menuId,
       localizations: localizationInputs.length > 0 ? localizationInputs : undefined,
     });
-  }, [linkType, pageId, blogSlug, legalSlug, externalUrl, icon, openInNewTab, parentId, siteId, menuId, locales, titles, item, onSubmit]);
+  }, [linkType, pageId, blogSlug, legalDocumentId, externalUrl, icon, openInNewTab, parentId, siteId, menuId, locales, titles, item, onSubmit]);
 
   const handleTitleChange = useCallback((localeId: string, value: string) => {
     setTitles((prev) => ({ ...prev, [localeId]: value }));
@@ -312,13 +315,13 @@ export default function NavigationItemWizard({
           availableLinkTypes={availableLinkTypes}
           pageId={pageId}
           blogSlug={blogSlug}
-          legalSlug={legalSlug}
+          legalDocumentId={legalDocumentId}
           externalUrl={externalUrl}
           siteId={siteId}
           onLinkTypeChange={setLinkType}
           onPageIdChange={setPageId}
           onBlogSlugChange={setBlogSlug}
-          onLegalSlugChange={setLegalSlug}
+          onLegalDocumentIdChange={setLegalDocumentId}
           onExternalUrlChange={setExternalUrl}
         />
       )}
@@ -355,26 +358,26 @@ function LinkTargetStep({
   availableLinkTypes,
   pageId,
   blogSlug,
-  legalSlug,
+  legalDocumentId,
   externalUrl,
   siteId,
   onLinkTypeChange,
   onPageIdChange,
   onBlogSlugChange,
-  onLegalSlugChange,
+  onLegalDocumentIdChange,
   onExternalUrlChange,
 }: {
   linkType: LinkType;
   availableLinkTypes: LinkType[];
   pageId: string;
   blogSlug: string;
-  legalSlug: string;
+  legalDocumentId: string;
   externalUrl: string;
   siteId: string;
   onLinkTypeChange: (type: LinkType) => void;
   onPageIdChange: (id: string) => void;
   onBlogSlugChange: (slug: string) => void;
-  onLegalSlugChange: (slug: string) => void;
+  onLegalDocumentIdChange: (id: string) => void;
   onExternalUrlChange: (url: string) => void;
 }) {
   const { t } = useTranslation();
@@ -456,8 +459,8 @@ function LinkTargetStep({
 
       {linkType === 'legal' && (
         <LegalPicker
-          value={legalSlug}
-          onChange={onLegalSlugChange}
+          value={legalDocumentId}
+          onChange={onLegalDocumentIdChange}
           siteId={siteId}
           label={t('navigation.wizard.legalDocType', 'Legal document')}
           helperText={t('navigation.wizard.legalHelp', 'Link will point to /legal/{slug}')}

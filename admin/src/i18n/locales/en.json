@@ -1052,7 +1052,9 @@
         "title": "Delete Menu",
         "message": "This will permanently delete this menu and all its navigation items. This action cannot be undone."
       }
-    }
+    },
+    "brokenLink": "Broken link",
+    "brokenLinkHint": "This item lost its link target. Edit it to pick a new one."
   },
   "socialLinks": {
     "title": "Social Links",
@@ -1743,7 +1745,9 @@
       "saved": "Legal document saved",
       "published": "Legal document published",
       "unpublished": "Legal document unpublished",
-      "loadFailed": "Failed to load legal document"
+      "loadFailed": "Failed to load legal document",
+      "slugUpdated": "Slug updated",
+      "slugLocked": "The slug can no longer be changed — a version of this document has already been published."
     },
     "toolbar": {},
     "fields": {
@@ -1751,7 +1755,8 @@
       "intro": "Introduction",
       "body": "Content",
       "metaTitle": "Meta Title",
-      "metaDescription": "Meta Description"
+      "metaDescription": "Meta Description",
+      "slug": "Slug"
     },
     "seo": {
       "title": "SEO Settings"
@@ -1771,7 +1776,9 @@
       "created": "New version created",
       "live": "Live",
       "rollbackHint": "The live version is served publicly. Open an older version and publish it to roll back — the current one is superseded."
-    }
+    },
+    "slugHint": "Public URL: /legal/{slug}. The slug can be changed until a version is published.",
+    "slugLockedHint": "The slug is permanent — a version of this document has been published."
   },
   "sites": {
     "title": "Sites",
@@ -4199,6 +4206,10 @@
     "ERR_STRINGS_LIMIT_EXCEEDED": {
       "message": "String limit reached",
       "action": "A site can hold at most 500 UI string keys — delete unused keys first."
+    },
+    "LEGAL_SLUG_IMMUTABLE": {
+      "message": "Slug is locked",
+      "action": "Published legal URLs are permanent; the slug cannot change once any version has been published."
     }
   },
   "welcome": {

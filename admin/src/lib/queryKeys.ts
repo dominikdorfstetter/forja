@@ -78,6 +78,7 @@ export const queryKeys = {
   pagesPicker: (siteId: SiteId, ...filters: Filters) =>
     ['pages-picker', siteId, ...filters] as const,
   pagesForNav: (siteId: SiteId) => ['pages-for-nav', siteId] as const,
+  legalForNav: (siteId: SiteId) => ['legal-for-nav', siteId] as const,
   legal: (siteId: SiteId, ...filters: Filters) => ['legal', siteId, ...filters] as const,
   legalPicker: (siteId: SiteId, ...filters: Filters) =>
     ['legal-picker', siteId, ...filters] as const,

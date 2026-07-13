@@ -1052,7 +1052,9 @@
         "title": "Elimina menu",
         "message": "Questo eliminerà permanentemente questo menu e tutti i suoi elementi di navigazione. Questa azione non può essere annullata."
       }
-    }
+    },
+    "brokenLink": "Collegamento interrotto",
+    "brokenLinkHint": "Questa voce ha perso la destinazione del collegamento. Modificala per sceglierne una nuova."
   },
   "socialLinks": {
     "title": "Link social",
@@ -1743,7 +1745,9 @@
       "saved": "Documento legale salvato",
       "published": "Documento legale pubblicato",
       "unpublished": "Documento legale ritirato",
-      "loadFailed": "Impossibile caricare il documento legale"
+      "loadFailed": "Impossibile caricare il documento legale",
+      "slugUpdated": "Slug aggiornato",
+      "slugLocked": "Lo slug non può più essere modificato — una versione di questo documento è già stata pubblicata."
     },
     "toolbar": {},
     "fields": {
@@ -1751,7 +1755,8 @@
       "intro": "Introduzione",
       "body": "Contenuto",
       "metaTitle": "Meta titolo",
-      "metaDescription": "Meta descrizione"
+      "metaDescription": "Meta descrizione",
+      "slug": "Slug"
     },
     "seo": {
       "title": "Impostazioni SEO"
@@ -1771,7 +1776,9 @@
       "created": "Nuova versione creata",
       "live": "In uso",
       "rollbackHint": "La versione in uso è quella pubblicata. Apri una versione precedente e pubblicala per ripristinarla — quella attuale viene sostituita."
-    }
+    },
+    "slugHint": "URL pubblico: /legal/{slug}. Lo slug può essere modificato finché non viene pubblicata una versione.",
+    "slugLockedHint": "Lo slug è permanente — una versione di questo documento è già stata pubblicata."
   },
   "sites": {
     "title": "Siti",
@@ -3719,6 +3726,10 @@
     "ERR_STRINGS_LIMIT_EXCEEDED": {
       "message": "Limite di testi raggiunto",
       "action": "Un sito può contenere al massimo 500 chiavi: elimina prima quelle inutilizzate."
+    },
+    "LEGAL_SLUG_IMMUTABLE": {
+      "message": "Slug bloccato",
+      "action": "Gli URL legali pubblicati sono permanenti; lo slug non può cambiare dopo la pubblicazione di una versione."
     }
   },
   "welcome": {

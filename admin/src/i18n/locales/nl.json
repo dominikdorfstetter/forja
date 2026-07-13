@@ -1052,7 +1052,9 @@
         "title": "Menu verwijderen",
         "message": "Dit verwijdert dit menu en alle navigatie-items permanent. Deze actie kan niet ongedaan worden gemaakt."
       }
-    }
+    },
+    "brokenLink": "Verbroken link",
+    "brokenLinkHint": "Dit item is zijn linkdoel kwijt. Bewerk het om een nieuw doel te kiezen."
   },
   "socialLinks": {
     "title": "Sociale links",
@@ -1743,7 +1745,9 @@
       "saved": "Juridisch document opgeslagen",
       "published": "Juridisch document gepubliceerd",
       "unpublished": "Juridisch document gedepubliceerd",
-      "loadFailed": "Kan juridisch document niet laden"
+      "loadFailed": "Kan juridisch document niet laden",
+      "slugUpdated": "Slug bijgewerkt",
+      "slugLocked": "De slug kan niet meer worden gewijzigd — er is al een versie van dit document gepubliceerd."
     },
     "toolbar": {},
     "fields": {
@@ -1751,7 +1755,8 @@
       "intro": "Introductie",
       "body": "Inhoud",
       "metaTitle": "Meta titel",
-      "metaDescription": "Meta beschrijving"
+      "metaDescription": "Meta beschrijving",
+      "slug": "Slug"
     },
     "seo": {
       "title": "SEO-instellingen"
@@ -1771,7 +1776,9 @@
       "created": "Nieuwe versie aangemaakt",
       "live": "Live",
       "rollbackHint": "De live-versie wordt publiek getoond. Open een oudere versie en publiceer die om terug te rollen — de huidige wordt vervangen."
-    }
+    },
+    "slugHint": "Openbare URL: /legal/{slug}. De slug kan worden gewijzigd totdat een versie is gepubliceerd.",
+    "slugLockedHint": "De slug is permanent — er is al een versie van dit document gepubliceerd."
   },
   "sites": {
     "title": "Sites",
@@ -3719,6 +3726,10 @@
     "ERR_STRINGS_LIMIT_EXCEEDED": {
       "message": "Tekstlimiet bereikt",
       "action": "Een site kan maximaal 500 sleutels bevatten — verwijder eerst ongebruikte sleutels."
+    },
+    "LEGAL_SLUG_IMMUTABLE": {
+      "message": "Slug is vergrendeld",
+      "action": "Gepubliceerde juridische URL’s zijn permanent; de slug kan niet meer veranderen zodra een versie is gepubliceerd."
     }
   },
   "welcome": {

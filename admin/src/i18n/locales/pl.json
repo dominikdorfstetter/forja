@@ -1052,7 +1052,9 @@
         "title": "Usuń menu",
         "message": "To trwale usunie to menu i wszystkie jego elementy nawigacji. Tej akcji nie można cofnąć."
       }
-    }
+    },
+    "brokenLink": "Uszkodzony link",
+    "brokenLinkHint": "Ten element utracił cel linku. Edytuj go, aby wybrać nowy."
   },
   "socialLinks": {
     "title": "Linki społecznościowe",
@@ -1743,7 +1745,9 @@
       "saved": "Dokument prawny zapisany",
       "published": "Dokument prawny opublikowany",
       "unpublished": "Dokument prawny wycofany",
-      "loadFailed": "Nie udało się wczytać dokumentu prawnego"
+      "loadFailed": "Nie udało się wczytać dokumentu prawnego",
+      "slugUpdated": "Slug zaktualizowany",
+      "slugLocked": "Sluga nie można już zmienić — wersja tego dokumentu została już opublikowana."
     },
     "toolbar": {},
     "fields": {
@@ -1751,7 +1755,8 @@
       "intro": "Wprowadzenie",
       "body": "Treść",
       "metaTitle": "Meta tytuł",
-      "metaDescription": "Meta opis"
+      "metaDescription": "Meta opis",
+      "slug": "Slug"
     },
     "seo": {
       "title": "Ustawienia SEO"
@@ -1771,7 +1776,9 @@
       "created": "Utworzono nową wersję",
       "live": "Na żywo",
       "rollbackHint": "Wersja na żywo jest publikowana publicznie. Otwórz starszą wersję i opublikuj ją, aby przywrócić — bieżąca zostanie zastąpiona."
-    }
+    },
+    "slugHint": "Publiczny adres URL: /legal/{slug}. Slug można zmieniać do czasu opublikowania wersji.",
+    "slugLockedHint": "Slug jest trwały — wersja tego dokumentu została już opublikowana."
   },
   "sites": {
     "title": "Strony",
@@ -3721,6 +3728,10 @@
     "ERR_STRINGS_LIMIT_EXCEEDED": {
       "message": "Osiągnięto limit tekstów",
       "action": "Witryna może zawierać najwyżej 500 kluczy — najpierw usuń nieużywane."
+    },
+    "LEGAL_SLUG_IMMUTABLE": {
+      "message": "Slug jest zablokowany",
+      "action": "Opublikowane adresy URL dokumentów prawnych są trwałe; sluga nie można zmienić po opublikowaniu wersji."
     }
   },
   "welcome": {

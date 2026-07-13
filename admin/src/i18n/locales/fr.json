@@ -1052,7 +1052,9 @@
         "title": "Supprimer le menu",
         "message": "Ceci supprimera définitivement ce menu et tous ses éléments de navigation. Cette action est irréversible."
       }
-    }
+    },
+    "brokenLink": "Lien brisé",
+    "brokenLinkHint": "Cet élément a perdu sa cible de lien. Modifiez-le pour en choisir une nouvelle."
   },
   "socialLinks": {
     "title": "Liens sociaux",
@@ -1743,7 +1745,9 @@
       "saved": "Document juridique enregistré",
       "published": "Document juridique publié",
       "unpublished": "Document juridique dépublié",
-      "loadFailed": "Échec du chargement du document juridique"
+      "loadFailed": "Échec du chargement du document juridique",
+      "slugUpdated": "Slug mis à jour",
+      "slugLocked": "Le slug ne peut plus être modifié — une version de ce document a déjà été publiée."
     },
     "toolbar": {},
     "fields": {
@@ -1751,7 +1755,8 @@
       "intro": "Introduction",
       "body": "Contenu",
       "metaTitle": "Méta-titre",
-      "metaDescription": "Méta-description"
+      "metaDescription": "Méta-description",
+      "slug": "Slug"
     },
     "seo": {
       "title": "Paramètres SEO"
@@ -1771,7 +1776,9 @@
       "created": "Nouvelle version créée",
       "live": "En ligne",
       "rollbackHint": "La version en ligne est celle diffusée publiquement. Ouvrez une version antérieure et publiez-la pour revenir en arrière — la version actuelle est remplacée."
-    }
+    },
+    "slugHint": "URL publique : /legal/{slug}. Le slug peut être modifié jusqu’à la publication d’une version.",
+    "slugLockedHint": "Le slug est permanent — une version de ce document a déjà été publiée."
   },
   "sites": {
     "title": "Sites",
@@ -3374,6 +3381,10 @@
     "ERR_STRINGS_LIMIT_EXCEEDED": {
       "message": "Limite de textes atteinte",
       "action": "Un site peut contenir au plus 500 clés — supprimez d'abord les clés inutilisées."
+    },
+    "LEGAL_SLUG_IMMUTABLE": {
+      "message": "Slug verrouillé",
+      "action": "Les URL légales publiées sont permanentes ; le slug ne peut plus changer après la publication d’une version."
     }
   },
   "welcome": {

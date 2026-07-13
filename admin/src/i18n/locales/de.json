@@ -1052,7 +1052,9 @@
         "title": "Menü löschen",
         "message": "Dies löscht das Menü und alle Navigationselemente dauerhaft. Diese Aktion kann nicht rückgängig gemacht werden."
       }
-    }
+    },
+    "brokenLink": "Defekter Link",
+    "brokenLinkHint": "Dieser Eintrag hat sein Linkziel verloren. Bearbeiten Sie ihn, um ein neues Ziel zu wählen."
   },
   "socialLinks": {
     "title": "Social Links",
@@ -1743,7 +1745,9 @@
       "saved": "Rechtliches Dokument gespeichert",
       "published": "Rechtliches Dokument veröffentlicht",
       "unpublished": "Rechtliches Dokument zurückgezogen",
-      "loadFailed": "Rechtliches Dokument konnte nicht geladen werden"
+      "loadFailed": "Rechtliches Dokument konnte nicht geladen werden",
+      "slugUpdated": "Slug aktualisiert",
+      "slugLocked": "Der Slug kann nicht mehr geändert werden — eine Version dieses Dokuments wurde bereits veröffentlicht."
     },
     "toolbar": {},
     "fields": {
@@ -1751,7 +1755,8 @@
       "intro": "Einleitung",
       "body": "Inhalt",
       "metaTitle": "Meta-Titel",
-      "metaDescription": "Meta-Beschreibung"
+      "metaDescription": "Meta-Beschreibung",
+      "slug": "Slug"
     },
     "seo": {
       "title": "SEO-Einstellungen"
@@ -1771,7 +1776,9 @@
       "created": "Neue Version erstellt",
       "live": "Live",
       "rollbackHint": "Die Live-Version wird öffentlich ausgeliefert. Öffne eine ältere Version und veröffentliche sie, um zurückzurollen — die aktuelle wird ersetzt."
-    }
+    },
+    "slugHint": "Öffentliche URL: /legal/{slug}. Der Slug kann geändert werden, bis eine Version veröffentlicht wurde.",
+    "slugLockedHint": "Der Slug ist dauerhaft — eine Version dieses Dokuments wurde bereits veröffentlicht."
   },
   "sites": {
     "title": "Websites",
@@ -3988,6 +3995,10 @@
     "ERR_STRINGS_LIMIT_EXCEEDED": {
       "message": "Textlimit erreicht",
       "action": "Eine Site kann höchstens 500 UI-Text-Schlüssel enthalten — löschen Sie zuerst ungenutzte Schlüssel."
+    },
+    "LEGAL_SLUG_IMMUTABLE": {
+      "message": "Slug ist gesperrt",
+      "action": "Veröffentlichte Rechts-URLs sind dauerhaft; der Slug kann nach der Veröffentlichung einer Version nicht mehr geändert werden."
     }
   },
   "welcome": {

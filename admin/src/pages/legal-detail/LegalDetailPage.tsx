@@ -1,12 +1,13 @@
+import { useCallback } from 'react';
 import { Box } from '@mui/material';
 import { useNavigate } from 'react-router';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { createLegalLocalization, createLegalVersion, getLegalDocumentDetail, updateLegalDocument, updateLegalLocalization } from '@/services/legal';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import ContentDetailPage from '@/components/shared/contentDetailPage';
 import type { ContentDetailAdapter } from '@/components/shared/contentDetailPage';
-import type { ContentLocalizationResponse, LegalDocumentFullDetailResponse } from '@/types/api';
+import type { ContentLocalizationResponse, LegalDocumentFullDetailResponse, ProblemDetails } from '@/types/api';
 import { legalContentSchema, type LegalContentFormData } from './legalDetailSchema';
 import LegalEditorToolbar from './LegalEditorToolbar';
 import LegalEditorContent from './LegalEditorContent';
@@ -77,10 +78,33 @@ const legalAdapter: ContentDetailAdapter<LegalDocumentFullDetailResponse, LegalC
   pageTestId: 'legal-detail.page',
 };
 
+// The canonical `/legal/{slug}` URL is permanent once any version of the
+// chain has been published; forks (parent_version_id) only exist after a
+// publish. The server 409s (LEGAL_SLUG_IMMUTABLE) on the cases the client
+// cannot see, e.g. unpublished-after-publish.
+const isSlugLocked = (detail: LegalDocumentFullDetailResponse) =>
+  detail.status === 'Published' || !!detail.parent_version_id;
+
 export default function LegalDetailPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { showError, showSuccess } = useErrorSnackbar();
+  const queryClient = useQueryClient();
+  const { showError, showSuccess, enqueueSnackbar } = useErrorSnackbar();
+
+  const saveSlug = useCallback(async (documentId: string, slug: string) => {
+    try {
+      await updateLegalDocument(documentId, { slug });
+      queryClient.invalidateQueries({ queryKey: queryKeys.legalDetail(documentId) });
+      showSuccess(t('legalDetail.messages.slugUpdated'));
+    } catch (error) {
+      if ((error as ProblemDetails)?.code === 'LEGAL_SLUG_IMMUTABLE') {
+        enqueueSnackbar(t('legalDetail.messages.slugLocked'), { variant: 'error' });
+      } else {
+        showError(error);
+      }
+      throw error;
+    }
+  }, [queryClient, showSuccess, showError, enqueueSnackbar, t]);
 
   const createVersionMutation = useMutation({
     mutationFn: (id: string) => createLegalVersion(id),
@@ -123,12 +147,15 @@ export default function LegalDetailPage() {
           onCreateVersion={() => createVersionMutation.mutate(detail.id)}
         />
       )}
-      renderEditor={({ control, canWrite, selectedSiteId, takeSnapshot }) => (
+      renderEditor={({ control, canWrite, selectedSiteId, takeSnapshot, detail }) => (
         <LegalEditorContent
           control={control}
           onSnapshot={takeSnapshot}
           canWrite={canWrite}
           siteId={selectedSiteId}
+          slug={detail.slug ?? ''}
+          slugLocked={isSlugLocked(detail)}
+          onSaveSlug={(slug) => saveSlug(detail.id, slug)}
         />
       )}
       renderExtraPanels={({ detail }) => (

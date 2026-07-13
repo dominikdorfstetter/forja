@@ -26,6 +26,7 @@ interface SortableNavigationRowProps {
   isExpanded: boolean;
   totalLocales: number;
   pageRouteMap: Map<string, string>;
+  legalRouteMap: Map<string, string>;
   canWrite: boolean;
   isAdmin: boolean;
   onEdit: (item: NavigationItem) => void;
@@ -38,6 +39,7 @@ export default function SortableNavigationRow({
   isExpanded,
   totalLocales,
   pageRouteMap,
+  legalRouteMap,
   canWrite,
   isAdmin,
   onEdit,
@@ -61,12 +63,17 @@ export default function SortableNavigationRow({
     opacity: isDragging ? 0.4 : 1,
   };
 
-  const displayTitle = item.title || (item.page_id && pageRouteMap.get(item.page_id)) || item.external_url || '\u2014';
-  const linkTarget = (item.page_id && (pageRouteMap.get(item.page_id) || item.page_id)) || item.external_url || '\u2014';
+  const legalRoute = item.legal_document_id && legalRouteMap.get(item.legal_document_id);
+  const displayTitle = item.title || (item.page_id && pageRouteMap.get(item.page_id)) || item.external_url || legalRoute || '\u2014';
+  const linkTarget = (item.page_id && (pageRouteMap.get(item.page_id) || item.page_id))
+    || (item.legal_document_id && (legalRoute || item.legal_document_id))
+    || item.external_url
+    || '\u2014';
   const isInternal = !!item.page_id;
+  const isLegalLink = !!item.legal_document_id;
   const isBlogLink = !isInternal && item.external_url?.startsWith('/blog/');
   const isCvLink = !isInternal && item.external_url === '/cv';
-  const isLegalLink = !isInternal && item.external_url?.startsWith('/legal/');
+  const isBroken = !item.page_id && !item.external_url && !item.legal_document_id;
 
   return (
     <TableRow ref={setNodeRef} style={style} {...attributes} data-testid="nav-row">
@@ -181,36 +188,42 @@ export default function SortableNavigationRow({
       {/* Type chip */}
       <TableCell>
         {(() => {
-          const paint = isInternal
-            ? { bg: 'var(--primary-container)', fg: 'var(--on-primary-container)', label: t('common.labels.internal') }
-            : isLegalLink
-              ? {
-                  bg: 'var(--warn-container)',
-                  fg: 'var(--on-warn-container)',
-                  label: t('common.labels.legal', 'Legal'),
-                }
-              : isCvLink
+          const paint = isBroken
+            ? {
+                bg: 'color-mix(in oklch, var(--err) 18%, transparent)',
+                fg: 'var(--err)',
+                label: t('navigation.brokenLink', 'Broken link'),
+              }
+            : isInternal
+              ? { bg: 'var(--primary-container)', fg: 'var(--on-primary-container)', label: t('common.labels.internal') }
+              : isLegalLink
                 ? {
-                    bg: 'var(--tertiary-container)',
-                    fg: 'var(--on-tertiary-container)',
-                    label: t('common.labels.cv', 'CV'),
+                    bg: 'var(--warn-container)',
+                    fg: 'var(--on-warn-container)',
+                    label: t('common.labels.legal', 'Legal'),
                   }
-                : isBlogLink
+                : isCvLink
                   ? {
-                      bg: 'color-mix(in oklch, var(--info) 18%, transparent)',
-                      fg: 'var(--info)',
-                      label: t('common.labels.blog', 'Blog'),
+                      bg: 'var(--tertiary-container)',
+                      fg: 'var(--on-tertiary-container)',
+                      label: t('common.labels.cv', 'CV'),
                     }
-                  : {
-                      bg: 'transparent',
-                      fg: 'var(--on-surface-variant)',
-                      border: '1px solid var(--outline-variant)',
-                      label: t('common.labels.external'),
-                    };
-          return (
+                  : isBlogLink
+                    ? {
+                        bg: 'color-mix(in oklch, var(--info) 18%, transparent)',
+                        fg: 'var(--info)',
+                        label: t('common.labels.blog', 'Blog'),
+                      }
+                    : {
+                        bg: 'transparent',
+                        fg: 'var(--on-surface-variant)',
+                        border: '1px solid var(--outline-variant)',
+                        label: t('common.labels.external'),
+                      };
+          const chip = (
             <Box
               component="span"
-              data-testid="type-chip"
+              data-testid={isBroken ? 'broken-link-chip' : 'type-chip'}
               sx={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -229,6 +242,11 @@ export default function SortableNavigationRow({
               {paint.label}
             </Box>
           );
+          return isBroken ? (
+            <Tooltip title={t('navigation.brokenLinkHint', 'This item lost its link target. Edit it to pick a new one.')}>
+              {chip}
+            </Tooltip>
+          ) : chip;
         })()}
       </TableCell>
       {/* Locale coverage */}

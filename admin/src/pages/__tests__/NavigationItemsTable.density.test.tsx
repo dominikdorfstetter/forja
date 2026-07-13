@@ -32,6 +32,7 @@ function renderTable() {
           expandedIds={new Set()}
           totalLocales={0}
           pageRouteMap={new Map()}
+          legalRouteMap={new Map()}
           canWrite
           isAdmin
           sensors={[]}

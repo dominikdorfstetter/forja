@@ -5,6 +5,7 @@
  * The CSS in sections.css targets these BEM classes identically.
  */
 import { fetchNavTree, fetchSocialLinks, type NavigationTree, type SocialLinkResponse } from "../lib/api";
+import { navItemHref } from "../lib/nav";
 import { getTranslator } from "../lib/ui-strings";
 
 interface Props {
@@ -26,12 +27,6 @@ try {
   socialLinks = await fetchSocialLinks();
 } catch (e) {
   console.warn("[CMS] Failed to fetch social links:", e instanceof Error ? e.message : e);
-}
-
-function href(item: NavigationTree): string {
-  if (item.external_url) return item.external_url;
-  if (item.page_slug) return `/${item.page_slug}`;
-  return "#";
 }
 
 const year = new Date().getFullYear();
@@ -72,7 +67,7 @@ function getIcon(slug: string): string {
           {items.map((item) => (
             <li>
               <a
-                href={href(item)}
+                href={navItemHref(item)}
                 target={item.open_in_new_tab ? "_blank" : undefined}
                 rel={item.open_in_new_tab ? "noopener noreferrer" : undefined}
                 class="forja-footer__nav-link"
