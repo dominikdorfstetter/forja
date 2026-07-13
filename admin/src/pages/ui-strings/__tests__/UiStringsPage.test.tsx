@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderWithProviders, screen, waitFor, userEvent } from '@/test/test-utils';
 import { deleteUiString, getUiStringEntries } from '@/services/uiStrings';
 import { getSiteLocales } from '@/services/siteLocales';
-import { localeDe, localeEn, localeFr, rowFooterLinks, rowMinRead } from './fixtures';
+import { localeDe, localeEn, localeFr, manyUiStrings, rowFooterLinks, rowMinRead } from './fixtures';
 
 vi.mock('@/store/SiteContext', () => ({
   useSiteContext: () => ({
@@ -84,7 +84,7 @@ describe('UiStringsPage', () => {
     renderWithProviders(<UiStringsPage />);
     await screen.findByText('blog.min_read');
 
-    await user.click(screen.getByRole('combobox'));
+    await user.click(screen.getByRole('combobox', { name: 'Filter strings' }));
     await user.click(await screen.findByRole('option', { name: 'Missing translations' }));
 
     expect(screen.getByText('blog.min_read')).toBeInTheDocument();
@@ -96,11 +96,91 @@ describe('UiStringsPage', () => {
     renderWithProviders(<UiStringsPage />);
     await screen.findByText('blog.min_read');
 
-    await user.click(screen.getByRole('combobox'));
+    await user.click(screen.getByRole('combobox', { name: 'Filter strings' }));
     await user.click(await screen.findByRole('option', { name: 'Outdated' }));
 
     expect(screen.getByText('blog.min_read')).toBeInTheDocument();
     expect(screen.queryByText('footer.links')).not.toBeInTheDocument();
+  });
+
+  it('filters rows by key substring, case-insensitively', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<UiStringsPage />);
+    await screen.findByText('blog.min_read');
+
+    await user.type(screen.getByTestId('ui-strings.search'), 'FOOTER');
+
+    expect(screen.getByText('footer.links')).toBeInTheDocument();
+    expect(screen.queryByText('blog.min_read')).not.toBeInTheDocument();
+  });
+
+  it('composes the key search with the coverage filter', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<UiStringsPage />);
+    await screen.findByText('blog.min_read');
+
+    await user.click(screen.getByRole('combobox', { name: 'Filter strings' }));
+    await user.click(await screen.findByRole('option', { name: 'Missing translations' }));
+    await user.type(screen.getByTestId('ui-strings.search'), 'footer');
+
+    // footer.links is fully translated — nothing matches missing + "footer".
+    expect(screen.getByText('No strings match your search or filter.')).toBeInTheDocument();
+    expect(screen.queryByText('footer.links')).not.toBeInTheDocument();
+  });
+
+  it('paginates the list and navigates between pages', async () => {
+    vi.mocked(getUiStringEntries).mockResolvedValue(manyUiStrings(12));
+    const user = userEvent.setup();
+    renderWithProviders(<UiStringsPage />);
+
+    expect(await screen.findByText('bulk.key_01')).toBeInTheDocument();
+    expect(screen.getByText('bulk.key_10')).toBeInTheDocument();
+    expect(screen.queryByText('bulk.key_11')).not.toBeInTheDocument();
+    expect(screen.getByText('1–10 of 12')).toBeInTheDocument();
+
+    await user.click(screen.getByLabelText('Next page'));
+
+    expect(await screen.findByText('bulk.key_11')).toBeInTheDocument();
+    expect(screen.getByText('bulk.key_12')).toBeInTheDocument();
+    expect(screen.queryByText('bulk.key_01')).not.toBeInTheDocument();
+    expect(screen.getByText('11–12 of 12')).toBeInTheDocument();
+  });
+
+  it('resets to page 1 when the search changes', async () => {
+    vi.mocked(getUiStringEntries).mockResolvedValue(manyUiStrings(12));
+    const user = userEvent.setup();
+    renderWithProviders(<UiStringsPage />);
+    await screen.findByText('bulk.key_01');
+
+    await user.click(screen.getByLabelText('Next page'));
+    expect(await screen.findByText('bulk.key_11')).toBeInTheDocument();
+
+    await user.type(screen.getByTestId('ui-strings.search'), 'key_01');
+
+    // Back on page 1 — the match is visible instead of an empty page 2.
+    expect(await screen.findByText('bulk.key_01')).toBeInTheDocument();
+    expect(screen.getByText('1–1 of 1')).toBeInTheDocument();
+  });
+
+  it('opens the edit dialog with the row prefilled on row click', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<UiStringsPage />);
+
+    await user.click(await screen.findByText('blog.min_read'));
+
+    expect(await screen.findByTestId('ui-strings.dialog')).toBeInTheDocument();
+    expect(screen.getByTestId('ui-strings.field.key')).toHaveValue('blog.min_read');
+  });
+
+  it('opens the create dialog from the header action', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<UiStringsPage />);
+    await screen.findByText('blog.min_read');
+
+    await user.click(screen.getByTestId('ui-strings.new'));
+
+    expect(await screen.findByTestId('ui-strings.dialog')).toBeInTheDocument();
+    expect(screen.getByTestId('ui-strings.field.key')).toHaveValue('');
   });
 
   it('deletes a string after the confirm dialog', async () => {
@@ -125,6 +205,20 @@ describe('UiStringsPage', () => {
 
     expect(screen.queryByTestId('ui-strings.new')).not.toBeInTheDocument();
     expect(screen.queryAllByTestId('ui-strings.row-actions')).toHaveLength(0);
+  });
+
+  it('opens a read-only dialog for viewers: disabled fields, no submit', async () => {
+    mockAuth.canEditAll = false;
+    const user = userEvent.setup();
+    renderWithProviders(<UiStringsPage />);
+
+    await user.click(await screen.findByText('blog.min_read'));
+
+    expect(await screen.findByTestId('ui-strings.dialog')).toBeInTheDocument();
+    expect(screen.getByTestId('ui-strings.field.key')).toBeDisabled();
+    expect(screen.getByTestId('ui-strings.dialog.value')).toBeDisabled();
+    expect(screen.queryByTestId('ui-strings.dialog.submit')).not.toBeInTheDocument();
+    expect(screen.getByTestId('ui-strings.dialog.close')).toBeInTheDocument();
   });
 
   it('shows the empty state when the site has no strings', async () => {

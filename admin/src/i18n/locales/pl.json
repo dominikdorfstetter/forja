@@ -4714,7 +4714,8 @@
       "filterAll": "Wszystkie teksty",
       "filterMissing": "Brakujące tłumaczenia",
       "filterOutdated": "Nieaktualne",
-      "noMatches": "Żaden tekst nie pasuje do tego filtra.",
+      "searchPlaceholder": "Szukaj po kluczu…",
+      "noMatches": "Żaden tekst nie pasuje do wyszukiwania ani filtra.",
       "emptyTitle": "Nie ma jeszcze tekstów",
       "empty": "Zdefiniuj klucze takie jak blog.min_read i przetłumacz je dla każdego języka — szablony odczytują je podczas renderowania.",
       "localeStatus": {
@@ -4723,24 +4724,19 @@
         "outdated": "{{locale}}: nieaktualne — wartość domyślna się zmieniła"
       }
     },
-    "detail": {
-      "newTitle": "Nowy tekst interfejsu",
-      "subtitle": "Klucz i wartość domyślna zapisują się razem; pozostałe języki zapisują się po opuszczeniu pola",
-      "loading": "Wczytywanie tekstu…",
+    "dialog": {
+      "createTitle": "Nowy tekst interfejsu",
+      "editTitle": "Edytuj tekst interfejsu",
       "keyLabel": "Klucz",
       "keyHelp": "Małe litery w segmentach połączonych '.', '_' lub '-' — np. blog.min_read",
       "keyRequired": "Klucz jest wymagany",
       "keyTooLong": "Klucz nie może przekraczać 128 znaków",
       "keyInvalid": "Używaj małych liter i cyfr połączonych '.', '_' lub '-'",
-      "valueLabel": "Wartość",
-      "valueTooLong": "Wartość nie może przekraczać 1000 znaków",
-      "valueRequired": "Wartość jest wymagana — wartości domyślnej nie można wyczyścić",
       "valueForLocale": "Wartość ({{locale}})",
-      "localeHint": "Wartość dla {{locale}}. Zapisywana po opuszczeniu pola; wyczyszczenie usuwa tłumaczenie.",
-      "createHint": "Najpierw zapisz klucz z wartością domyślną — potem przetłumacz go na pozostałe języki.",
-      "saved": "Tekst zapisany.",
+      "valueRequired": "Wartość jest wymagana — wartości domyślnej nie można wyczyścić",
+      "clearHint": "Wyczyszczenie usuwa tłumaczenie przy zapisie.",
       "created": "Tekst utworzony.",
-      "notFound": "Ten tekst interfejsu nie istnieje.",
+      "saved": "Tekst zapisany.",
       "status": {
         "missing": "brak",
         "outdated": "nieaktualne"

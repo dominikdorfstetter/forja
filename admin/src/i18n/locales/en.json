@@ -4717,7 +4717,8 @@
       "filterAll": "All strings",
       "filterMissing": "Missing translations",
       "filterOutdated": "Outdated",
-      "noMatches": "No strings match this filter.",
+      "searchPlaceholder": "Search by key…",
+      "noMatches": "No strings match your search or filter.",
       "emptyTitle": "No UI strings yet",
       "empty": "Define keys like blog.min_read and translate them per locale — your templates read them at render time.",
       "localeStatus": {
@@ -4726,24 +4727,19 @@
         "outdated": "{{locale}}: outdated — the default value changed"
       }
     },
-    "detail": {
-      "newTitle": "New UI string",
-      "subtitle": "Key and default value save together; other locales save as you leave the field",
-      "loading": "Loading UI string…",
+    "dialog": {
+      "createTitle": "New UI string",
+      "editTitle": "Edit UI string",
       "keyLabel": "Key",
       "keyHelp": "Lowercase segments joined by '.', '_' or '-' — e.g. blog.min_read",
       "keyRequired": "Key is required",
       "keyTooLong": "Key cannot exceed 128 characters",
       "keyInvalid": "Use lowercase letters and digits, joined by '.', '_' or '-'",
-      "valueLabel": "Value",
-      "valueTooLong": "Value cannot exceed 1000 characters",
-      "valueRequired": "Value is required — the default value cannot be cleared",
       "valueForLocale": "Value ({{locale}})",
-      "localeHint": "Value for {{locale}}. Saved when you leave the field; clearing it removes the translation.",
-      "createHint": "Save the key and its default value first — then translate it into the other locales.",
-      "saved": "String saved.",
+      "valueRequired": "Value is required — the default value cannot be cleared",
+      "clearHint": "Clearing this removes the translation when you save.",
       "created": "String created.",
-      "notFound": "This UI string does not exist.",
+      "saved": "String saved.",
       "status": {
         "missing": "missing",
         "outdated": "outdated"

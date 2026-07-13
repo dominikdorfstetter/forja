@@ -75,6 +75,18 @@ export const rowFooterLinks = uiString({
   ],
 });
 
+/** `count` fully-translated (en) rows for pagination scenarios — keys
+ *  bulk.key_01 … bulk.key_NN in list order. */
+export const manyUiStrings = (count: number): UiStringResponse[] =>
+  Array.from({ length: count }, (_, i) => {
+    const n = String(i + 1).padStart(2, '0');
+    return uiString({
+      id: `us-bulk-${n}`,
+      key: `bulk.key_${n}`,
+      localizations: [localization(`l-bulk-${n}`, 'loc-en', `Value ${n}`)],
+    });
+  });
+
 export const problemDetails = (code: string, status: number) => ({
   type: 'about:blank',
   title: 'Error',

@@ -44,6 +44,11 @@ describe('uiStrings i18n coverage (all 11 locales)', () => {
 
   it('derives the key list from the canonical en catalog', () => {
     expect(keys.length).toBeGreaterThan(30);
+    // The dialog editor + key search replaced the detail-page flow.
+    expect(keys).toContain('uiStrings.dialog.createTitle');
+    expect(keys).toContain('uiStrings.dialog.clearHint');
+    expect(keys).toContain('uiStrings.list.searchPlaceholder');
+    expect(keys.some((key) => key.startsWith('uiStrings.detail.'))).toBe(false);
   });
 
   it('every locale defines a non-empty string for every uiStrings key', () => {

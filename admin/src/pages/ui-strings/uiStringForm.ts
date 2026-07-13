@@ -2,7 +2,9 @@ import { z } from 'zod';
 import type { TFunction } from 'i18next';
 import type {
   CreateUiStringRequest,
+  SiteLocaleResponse,
   UiStringLocalizationInput,
+  UiStringResponse,
   UpdateUiStringRequest,
 } from '@/types/api';
 
@@ -12,54 +14,101 @@ export const UI_STRING_KEY_MAX_LEN = 128;
 export const UI_STRING_VALUE_MAX_LEN = 1000;
 export const UI_STRING_KEY_PATTERN = /^[a-z0-9]+(?:[._-][a-z0-9]+)*$/;
 
-export interface UiStringFormData {
+/** RHF shape of the dialog: only the key rides in the form — the per-locale
+ *  values are a draft map keyed by locale id (MenuFormDialog pattern). */
+export interface UiStringKeyFormData {
   key: string;
-  /** Default-locale value; non-default locales persist per-locale on blur. */
-  value: string;
 }
 
-/** `requireValue` (edit mode): the default locale's value drives the
- *  fallback chain and the auto-outdated rule — the backend rejects its
- *  removal (422), so block clearing it client-side. Creation may start with
- *  just the key. */
-export const buildUiStringSchema = (t: TFunction, requireValue = false) => {
-  const value = z.string().max(UI_STRING_VALUE_MAX_LEN, t('uiStrings.detail.valueTooLong'));
-  return z.object({
+export const buildUiStringKeySchema = (t: TFunction) =>
+  z.object({
     key: z
       .string()
-      .min(1, t('uiStrings.detail.keyRequired'))
-      .max(UI_STRING_KEY_MAX_LEN, t('uiStrings.detail.keyTooLong'))
-      .regex(UI_STRING_KEY_PATTERN, t('uiStrings.detail.keyInvalid')),
-    value: requireValue ? value.min(1, t('uiStrings.detail.valueRequired')) : value,
+      .min(1, t('uiStrings.dialog.keyRequired'))
+      .max(UI_STRING_KEY_MAX_LEN, t('uiStrings.dialog.keyTooLong'))
+      .regex(UI_STRING_KEY_PATTERN, t('uiStrings.dialog.keyInvalid')),
   });
-};
 
-const defaultLocalization = (values: UiStringFormData, defaultLocaleId: string | undefined) =>
-  defaultLocaleId && values.value.trim().length > 0
-    ? [{ locale_id: defaultLocaleId, value: values.value }]
-    : [];
+/** Draft values per locale id, as edited in the dialog. */
+export type LocaleValueDraft = Record<string, string>;
 
+/** Persisted values keyed by locale id — the dialog's edit-mode baseline. */
+export const persistedLocaleValues = (row?: UiStringResponse | null): LocaleValueDraft =>
+  Object.fromEntries((row?.localizations ?? []).map((l) => [l.locale_id, l.value]));
+
+const draftValue = (draft: LocaleValueDraft, localeId: string) => draft[localeId] ?? '';
+
+/** Create ships the key plus a localization for every locale the user filled. */
 export function buildCreatePayload(
-  values: UiStringFormData,
-  defaultLocaleId: string | undefined,
+  key: string,
+  draft: LocaleValueDraft,
+  locales: SiteLocaleResponse[],
 ): CreateUiStringRequest {
-  return { key: values.key, localizations: defaultLocalization(values, defaultLocaleId) };
+  return {
+    key,
+    localizations: locales.flatMap((locale) => {
+      const value = draftValue(draft, locale.locale_id);
+      return value.trim().length > 0 ? [{ locale_id: locale.locale_id, value }] : [];
+    }),
+  };
 }
 
-/** `pendingLocalizations` ride in the same PUT as the default value so the
- *  backend's auto-outdated flip exempts them — a translation edited in this
- *  session is not instantly flagged outdated by its own save. */
+export interface UpdateDelta {
+  localizations: UiStringLocalizationInput[];
+  removedLocaleIds: string[];
+}
+
+export const deltaHasChanges = (delta: UpdateDelta): boolean =>
+  delta.localizations.length > 0 || delta.removedLocaleIds.length > 0;
+
+/**
+ * Diff the draft against the persisted row. Only actual edits ride in the
+ * PUT — locales present in the payload are exempt from the backend's
+ * auto-outdated flip, so sending unchanged values would silently confirm
+ * translations nobody looked at. The exception: an unchanged-but-outdated
+ * value the user explicitly touched is re-sent as the confirm that clears
+ * the flag. A cleared, previously-persisted value becomes a removal
+ * (`removed_locale_ids`); clearing the default is blocked in the dialog.
+ */
+export function computeUpdateDelta(
+  row: UiStringResponse,
+  draft: LocaleValueDraft,
+  touchedLocaleIds: ReadonlySet<string>,
+  locales: SiteLocaleResponse[],
+): UpdateDelta {
+  return locales.reduce<UpdateDelta>(
+    (delta, locale) => {
+      const value = draftValue(draft, locale.locale_id);
+      const persisted = row.localizations.find((l) => l.locale_id === locale.locale_id);
+      if (value.trim().length === 0) {
+        return persisted && persisted.value.length > 0
+          ? { ...delta, removedLocaleIds: [...delta.removedLocaleIds, locale.locale_id] }
+          : delta;
+      }
+      const changed = value !== (persisted?.value ?? '');
+      const outdatedConfirm =
+        !changed &&
+        persisted?.translation_status === 'Outdated' &&
+        touchedLocaleIds.has(locale.locale_id);
+      return changed || outdatedConfirm
+        ? {
+            ...delta,
+            localizations: [...delta.localizations, { locale_id: locale.locale_id, value }],
+          }
+        : delta;
+    },
+    { localizations: [], removedLocaleIds: [] },
+  );
+}
+
 export function buildUpdatePayload(
-  values: UiStringFormData,
-  dirty: { key?: boolean; value?: boolean },
-  defaultLocaleId: string | undefined,
-  pendingLocalizations: UiStringLocalizationInput[] = [],
+  key: string,
+  keyDirty: boolean,
+  delta: UpdateDelta,
 ): UpdateUiStringRequest {
   return {
-    key: dirty.key ? values.key : undefined,
-    localizations: [
-      ...(dirty.value ? defaultLocalization(values, defaultLocaleId) : []),
-      ...pendingLocalizations,
-    ],
+    key: keyDirty ? key : undefined,
+    localizations: delta.localizations,
+    removed_locale_ids: delta.removedLocaleIds.length > 0 ? delta.removedLocaleIds : undefined,
   };
 }

@@ -4712,7 +4712,8 @@
       "filterAll": "Todos los textos",
       "filterMissing": "Traducciones faltantes",
       "filterOutdated": "Obsoletos",
-      "noMatches": "Ningún texto coincide con este filtro.",
+      "searchPlaceholder": "Buscar por clave…",
+      "noMatches": "Ningún texto coincide con tu búsqueda o el filtro.",
       "emptyTitle": "Aún no hay textos de interfaz",
       "empty": "Define claves como blog.min_read y tradúcelas por idioma: tus plantillas las leen al renderizar.",
       "localeStatus": {
@@ -4721,24 +4722,19 @@
         "outdated": "{{locale}}: obsoleto — el valor predeterminado cambió"
       }
     },
-    "detail": {
-      "newTitle": "Nuevo texto de interfaz",
-      "subtitle": "La clave y el valor predeterminado se guardan juntos; los demás idiomas se guardan al salir del campo",
-      "loading": "Cargando texto…",
+    "dialog": {
+      "createTitle": "Nuevo texto de interfaz",
+      "editTitle": "Editar texto de interfaz",
       "keyLabel": "Clave",
       "keyHelp": "Segmentos en minúsculas unidos por '.', '_' o '-' — p. ej. blog.min_read",
       "keyRequired": "La clave es obligatoria",
       "keyTooLong": "La clave no puede superar los 128 caracteres",
       "keyInvalid": "Usa letras minúsculas y dígitos, unidos por '.', '_' o '-'",
-      "valueLabel": "Valor",
-      "valueTooLong": "El valor no puede superar los 1000 caracteres",
-      "valueRequired": "El valor es obligatorio: el valor predeterminado no se puede vaciar",
       "valueForLocale": "Valor ({{locale}})",
-      "localeHint": "Valor para {{locale}}. Se guarda al salir del campo; si lo vacías, se elimina la traducción.",
-      "createHint": "Guarda primero la clave con su valor predeterminado y después tradúcela a los demás idiomas.",
-      "saved": "Texto guardado.",
+      "valueRequired": "El valor es obligatorio: el valor predeterminado no se puede vaciar",
+      "clearHint": "Si lo vacías, la traducción se elimina al guardar.",
       "created": "Texto creado.",
-      "notFound": "Este texto de interfaz no existe.",
+      "saved": "Texto guardado.",
       "status": {
         "missing": "falta",
         "outdated": "obsoleto"
