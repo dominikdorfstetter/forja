@@ -22,10 +22,10 @@ export class StringsResource {
    * **Endpoint:** `GET /sites/{siteId}/strings?locale={code}`
    *
    * The server resolves one value per key via its fallback chain
-   * (exact locale → site default → first localization matching the code);
-   * keys without any localization are omitted. Unknown locale codes fall
-   * back silently. The `locale` parameter is required — the API responds
-   * with `400 ERR_STRINGS_LOCALE_REQUIRED` without it.
+   * (exact locale → site default → first available localization, lowest
+   * locale code); keys without any localization are omitted. Unknown locale
+   * codes fall back silently. The `locale` parameter is required — the API
+   * responds with `400 ERR_STRINGS_LOCALE_REQUIRED` without it.
    *
    * @param locale - Locale code to resolve values for (e.g. `"en"`, `"de-AT"`).
    * @returns Flat map of key → resolved value.

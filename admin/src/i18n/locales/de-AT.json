@@ -1040,7 +1040,8 @@
         "active": "Aktiv",
         "displayName": "Anzeigename",
         "displayNames": "Anzeigenamen",
-        "displayNamesHelp": "Optionaler Menüname, der Besuchern in dieser Sprache angezeigt wird (z. B. als Überschrift in der Fußzeile)"
+        "displayNamesHelp": "Optionaler Menüname, der Besuchern in dieser Sprache angezeigt wird (z. B. als Überschrift in der Fußzeile)",
+        "displayNameClearedError": "An gspeicherten Anzeigenamen kannst ned entfernen — stell eam wieder her oder gib an anderen Namen ein"
       },
       "messages": {
         "created": "Menü erstellt",
@@ -4728,6 +4729,7 @@
       "keyInvalid": "Nur Kleinbuchstobn und Ziffern, verbundn mit '.', '_' oder '-'",
       "valueLabel": "Wert",
       "valueTooLong": "Wert derf höchstens 1000 Zeichen hom",
+      "valueRequired": "An Wert brauchst scho — den Standardwert kannst ned leern",
       "valueForLocale": "Wert ({{locale}})",
       "localeHint": "Wert für {{locale}}. Wird beim Verlossn vom Feld gspeichert; loss es leer, damit der aktuelle Wert bleibt.",
       "createHint": "Speicher zerst den Schlüssel mit'm Standardwert — donn übersetz eam in de anderen Sprochen.",

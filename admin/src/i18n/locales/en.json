@@ -1040,7 +1040,8 @@
         "active": "Active",
         "displayName": "Display name",
         "displayNames": "Display names",
-        "displayNamesHelp": "Optional menu name shown to visitors in this language (e.g. as a footer heading)"
+        "displayNamesHelp": "Optional menu name shown to visitors in this language (e.g. as a footer heading)",
+        "displayNameClearedError": "A saved display name can't be removed — restore it or enter a different name"
       },
       "messages": {
         "created": "Menu created",
@@ -4732,6 +4733,7 @@
       "keyInvalid": "Use lowercase letters and digits, joined by '.', '_' or '-'",
       "valueLabel": "Value",
       "valueTooLong": "Value cannot exceed 1000 characters",
+      "valueRequired": "Value is required — the default value cannot be cleared",
       "valueForLocale": "Value ({{locale}})",
       "localeHint": "Value for {{locale}}. Saved when you leave the field; leave empty to keep the current value.",
       "createHint": "Save the key and its default value first — then translate it into the other locales.",

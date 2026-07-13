@@ -5,6 +5,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { createLegalLocalization, createLegalVersion, getLegalDocumentDetail, updateLegalDocument, updateLegalLocalization } from '@/services/legal';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
+import { useSiteContext } from '@/store/SiteContext';
 import ContentDetailPage from '@/components/shared/contentDetailPage';
 import type { ContentDetailAdapter } from '@/components/shared/contentDetailPage';
 import type { ContentLocalizationResponse, LegalDocumentFullDetailResponse, ProblemDetails } from '@/types/api';
@@ -89,12 +90,21 @@ export default function LegalDetailPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { selectedSiteId } = useSiteContext();
   const { showError, showSuccess, enqueueSnackbar } = useErrorSnackbar();
 
   const saveSlug = useCallback(async (documentId: string, slug: string) => {
     try {
       await updateLegalDocument(documentId, { slug });
-      queryClient.invalidateQueries({ queryKey: queryKeys.legalDetail(documentId) });
+      // The slug is denormalized into every legal read: detail, list,
+      // nav-link resolution, and the navigation-item picker.
+      const staleKeys = [
+        queryKeys.legalDetail(documentId),
+        queryKeys.legal(selectedSiteId),
+        queryKeys.legalForNav(selectedSiteId),
+        queryKeys.legalPicker(selectedSiteId),
+      ];
+      staleKeys.forEach((queryKey) => queryClient.invalidateQueries({ queryKey }));
       showSuccess(t('legalDetail.messages.slugUpdated'));
     } catch (error) {
       if ((error as ProblemDetails)?.code === 'LEGAL_SLUG_IMMUTABLE') {
@@ -104,7 +114,7 @@ export default function LegalDetailPage() {
       }
       throw error;
     }
-  }, [queryClient, showSuccess, showError, enqueueSnackbar, t]);
+  }, [queryClient, selectedSiteId, showSuccess, showError, enqueueSnackbar, t]);
 
   const createVersionMutation = useMutation({
     mutationFn: (id: string) => createLegalVersion(id),

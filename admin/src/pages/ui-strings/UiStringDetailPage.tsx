@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
@@ -17,6 +17,7 @@ import { createUiString, deleteUiString, getUiStringEntries, updateUiString } fr
 import { getSiteLocales } from '@/services/siteLocales';
 import { queryKeys } from '@/lib/queryKeys';
 import { formResolver } from '@/utils/validation';
+import type { UiStringLocalizationInput, UiStringResponse } from '@/types/api';
 import LocaleValuesEditor from './LocaleValuesEditor';
 import { orderedActiveLocales } from './localeCoverage';
 import {
@@ -60,7 +61,20 @@ export default function UiStringDetailPage() {
   const locales = useMemo(() => orderedActiveLocales(siteLocales ?? []), [siteLocales]);
   const defaultLocale = locales[0];
 
-  const schema = useMemo(() => buildUiStringSchema(t), [t]);
+  // Live non-default edits by locale id — batched into the save-bar PUT so
+  // the backend's outdated flip exempts translations edited this session.
+  const editedLocaleValuesRef = useRef<Record<string, string>>({});
+  const pendingLocalizations = (): UiStringLocalizationInput[] => {
+    if (!row) return [];
+    return Object.entries(editedLocaleValuesRef.current).flatMap(([localeId, value]) => {
+      const persisted = row.localizations.find((l) => l.locale_id === localeId)?.value ?? '';
+      return value.trim().length > 0 && value !== persisted
+        ? [{ locale_id: localeId, value }]
+        : [];
+    });
+  };
+
+  const schema = useMemo(() => buildUiStringSchema(t, !isNew), [t, isNew]);
   const { register, control, handleSubmit, reset, getValues, watch, formState } =
     useForm<UiStringFormData>({
       resolver: formResolver(schema),
@@ -81,6 +95,12 @@ export default function UiStringDetailPage() {
     mutationFn: (values: UiStringFormData) =>
       createUiString(siteId, buildCreatePayload(values, defaultLocale?.locale_id)),
     onSuccess: (created) => {
+      // Seed the list cache before navigating so the detail route finds the
+      // row immediately instead of flashing "not found" during the refetch.
+      queryClient.setQueryData<UiStringResponse[]>(queryKeys.uiStrings(siteId), (old) => [
+        ...(old ?? []),
+        created,
+      ]);
       invalidate();
       reset(getValues());
       showSuccess(t('uiStrings.detail.created'));
@@ -94,7 +114,12 @@ export default function UiStringDetailPage() {
       updateUiString(
         siteId,
         id ?? '',
-        buildUpdatePayload(values, { key: !!dirtyFields.key, value: !!dirtyFields.value }, defaultLocale?.locale_id),
+        buildUpdatePayload(
+          values,
+          { key: !!dirtyFields.key, value: !!dirtyFields.value },
+          defaultLocale?.locale_id,
+          pendingLocalizations(),
+        ),
       ),
     onSuccess: () => {
       invalidate();
@@ -191,6 +216,9 @@ export default function UiStringDetailPage() {
           control={control}
           defaultValue={watch('value')}
           readOnly={!canEditAll}
+          onLocaleValueEdited={(localeId, value) => {
+            editedLocaleValuesRef.current[localeId] = value;
+          }}
         />
       </Box>
 

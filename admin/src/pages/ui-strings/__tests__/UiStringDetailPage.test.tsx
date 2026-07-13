@@ -6,6 +6,7 @@ import {
   localeDe,
   localeEn,
   localeFr,
+  localization,
   problemDetails,
   rowMinRead,
   uiString,
@@ -165,6 +166,92 @@ describe('UiStringDetailPage — edit', () => {
       expect(updateUiString).toHaveBeenCalledWith('site-1', 'us-1', {
         key: undefined,
         localizations: [{ locale_id: 'loc-en', value: 'minutes to read' }],
+      });
+    });
+  });
+
+  it('batches an in-flight non-default edit into the save-bar PUT alongside the default value', async () => {
+    vi.mocked(updateUiString).mockResolvedValue(rowMinRead);
+    const user = userEvent.setup();
+    renderWithProviders(<UiStringDetailPage />);
+
+    const valueField = await screen.findByTestId('ui-strings.field.value');
+    await user.clear(valueField);
+    await user.type(valueField, 'minutes to read');
+
+    await user.click(screen.getByTestId('ui-strings.tab.de'));
+    const localized = await screen.findByTestId('ui-strings.field.value.localized');
+    await user.clear(localized);
+    await user.type(localized, 'Minuten Lesezeit');
+
+    await user.click(await screen.findByTestId('ui-strings.detail.save'));
+
+    // The fresh de translation rides in the same PUT as the changed default
+    // value, so the backend's auto-outdated flip exempts it.
+    await waitFor(() => {
+      expect(updateUiString).toHaveBeenCalledWith('site-1', 'us-1', {
+        key: undefined,
+        localizations: [
+          { locale_id: 'loc-en', value: 'minutes to read' },
+          { locale_id: 'loc-de', value: 'Minuten Lesezeit' },
+        ],
+      });
+    });
+  });
+
+  it('blocks clearing the default-locale value with a validation error instead of a silent no-op', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<UiStringDetailPage />);
+
+    const valueField = await screen.findByTestId('ui-strings.field.value');
+    await user.clear(valueField);
+
+    expect(
+      await screen.findByText('Value is required — the default value cannot be cleared'),
+    ).toBeInTheDocument();
+
+    await user.click(await screen.findByTestId('ui-strings.detail.save'));
+    await waitFor(() => {
+      expect(updateUiString).not.toHaveBeenCalled();
+    });
+  });
+
+  it('does not PUT when a non-default value is blurred unchanged', async () => {
+    vi.mocked(getUiStringEntries).mockResolvedValue([
+      uiString({
+        id: 'us-1',
+        key: 'blog.min_read',
+        localizations: [
+          localization('l-1', 'loc-en', 'min read'),
+          localization('l-2', 'loc-de', 'Min. Lesezeit'),
+        ],
+      }),
+    ]);
+    const user = userEvent.setup();
+    renderWithProviders(<UiStringDetailPage />);
+
+    await user.click(await screen.findByTestId('ui-strings.tab.de'));
+    await user.click(await screen.findByTestId('ui-strings.field.value.localized'));
+    await user.tab();
+
+    await waitFor(() => {
+      expect(updateUiString).not.toHaveBeenCalled();
+    });
+  });
+
+  it('re-upserts an unchanged but outdated value on blur so the confirm-save clears the flag', async () => {
+    vi.mocked(updateUiString).mockResolvedValue(rowMinRead);
+    const user = userEvent.setup();
+    renderWithProviders(<UiStringDetailPage />);
+
+    // rowMinRead's de localization is flagged Outdated.
+    await user.click(await screen.findByTestId('ui-strings.tab.de'));
+    await user.click(await screen.findByTestId('ui-strings.field.value.localized'));
+    await user.tab();
+
+    await waitFor(() => {
+      expect(updateUiString).toHaveBeenCalledWith('site-1', 'us-1', {
+        localizations: [{ locale_id: 'loc-de', value: 'Min. Lesezeit' }],
       });
     });
   });

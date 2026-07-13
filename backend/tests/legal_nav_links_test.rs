@@ -19,10 +19,19 @@ use forja::models::api_key::ApiKeyPermission;
 use forja::models::content::ContentStatus;
 use forja::models::legal::{LegalDocType, LegalDocument};
 use forja::models::navigation::NavigationItem;
+use forja::models::site_locale::SiteLocale;
 use forja::repos::legal_repo::LegalDocumentRepo;
 use forja::services::content_service::ContentService;
 
 use common::{TestContext, create_test_api_key, create_test_site, enable_module, test_context};
+
+async fn locale_id(pool: &PgPool, code: &str) -> Uuid {
+    sqlx::query_scalar("SELECT id FROM locales WHERE code = $1")
+        .bind(code)
+        .fetch_one(pool)
+        .await
+        .expect("seeded locale row")
+}
 
 fn create_req(
     site_id: Uuid,
@@ -657,6 +666,402 @@ async fn page_purge_leaves_a_page_only_item_target_less() {
             .expect("items array")
             .len(),
         1
+    );
+}
+
+#[tokio::test]
+#[serial]
+async fn soft_deleted_legal_document_drops_from_the_public_tree_until_restored() {
+    let ctx = test_context().await;
+    let site_id = create_test_site(&ctx.pool).await;
+    let write_key = create_test_api_key(&ctx.pool, site_id, ApiKeyPermission::Write).await;
+    let read_key = create_test_api_key(&ctx.pool, site_id, ApiKeyPermission::Read).await;
+    let menu_id = create_menu(&ctx, site_id, &write_key, "footer-trash").await;
+
+    let doc = create_doc(
+        &ctx.pool,
+        create_req(
+            site_id,
+            LegalDocType::PrivacyPolicy,
+            None,
+            ContentStatus::Published,
+        ),
+    )
+    .await;
+    let created = ctx
+        .server
+        .post(&format!("/api/v1/menus/{menu_id}/items"))
+        .add_header("x-api-key", write_key.as_str())
+        .json(&item_body(
+            site_id,
+            menu_id,
+            json!({ "legal_document_id": doc.id }),
+        ))
+        .await;
+    created.assert_status(StatusCode::CREATED);
+    let item_id = created.json::<serde_json::Value>()["id"]
+        .as_str()
+        .expect("item id")
+        .to_string();
+
+    LegalDocumentRepo::soft_delete(&ctx.pool, doc.id)
+        .await
+        .expect("trash the document");
+
+    let public = tree(&ctx, menu_id, &read_key).await;
+    assert!(
+        public.as_array().expect("tree array").is_empty(),
+        "a trashed target must not leave a dead link in the public tree"
+    );
+
+    let admin = admin_items(&ctx, menu_id, &read_key).await;
+    let rows = admin.as_array().expect("items array");
+    assert_eq!(rows.len(), 1, "admin read keeps the item for repair");
+    assert_eq!(rows[0]["id"], item_id);
+    assert_eq!(
+        rows[0]["legal_document_id"],
+        doc.id.to_string(),
+        "the reference itself survives the trash"
+    );
+
+    LegalDocumentRepo::restore(&ctx.pool, doc.id)
+        .await
+        .expect("restore the document");
+
+    let public = tree(&ctx, menu_id, &read_key).await;
+    let items = public.as_array().expect("tree array");
+    assert_eq!(items.len(), 1, "restore brings the public link back");
+    assert_eq!(items[0]["legal_slug"], "privacy-policy");
+}
+
+#[tokio::test]
+#[serial]
+async fn nav_item_create_rejects_a_cross_site_legal_document() {
+    let ctx = test_context().await;
+    let site_a = create_test_site(&ctx.pool).await;
+    let site_b = create_test_site(&ctx.pool).await;
+    let write_key_b = create_test_api_key(&ctx.pool, site_b, ApiKeyPermission::Write).await;
+    let menu_b = create_menu(&ctx, site_b, &write_key_b, "footer-xsite").await;
+
+    let foreign_doc = create_doc(
+        &ctx.pool,
+        create_req(
+            site_a,
+            LegalDocType::PrivacyPolicy,
+            None,
+            ContentStatus::Published,
+        ),
+    )
+    .await;
+    let own_doc = create_doc(
+        &ctx.pool,
+        create_req(
+            site_b,
+            LegalDocType::Imprint,
+            None,
+            ContentStatus::Published,
+        ),
+    )
+    .await;
+
+    let rejected = ctx
+        .server
+        .post(&format!("/api/v1/menus/{menu_b}/items"))
+        .add_header("x-api-key", write_key_b.as_str())
+        .json(&item_body(
+            site_b,
+            menu_b,
+            json!({ "legal_document_id": foreign_doc.id }),
+        ))
+        .await;
+    rejected.assert_status(StatusCode::UNPROCESSABLE_ENTITY);
+    assert_eq!(
+        rejected.json::<serde_json::Value>()["code"],
+        codes::LEGAL_DOC_CROSS_SITE
+    );
+
+    let accepted = ctx
+        .server
+        .post(&format!("/api/v1/menus/{menu_b}/items"))
+        .add_header("x-api-key", write_key_b.as_str())
+        .json(&item_body(
+            site_b,
+            menu_b,
+            json!({ "legal_document_id": own_doc.id }),
+        ))
+        .await;
+    accepted.assert_status(StatusCode::CREATED);
+}
+
+#[tokio::test]
+#[serial]
+async fn nav_item_update_rejects_a_cross_site_legal_document() {
+    let ctx = test_context().await;
+    let site_a = create_test_site(&ctx.pool).await;
+    let site_b = create_test_site(&ctx.pool).await;
+    let write_key_b = create_test_api_key(&ctx.pool, site_b, ApiKeyPermission::Write).await;
+    let menu_b = create_menu(&ctx, site_b, &write_key_b, "footer-xsite-upd").await;
+
+    let foreign_doc = create_doc(
+        &ctx.pool,
+        create_req(
+            site_a,
+            LegalDocType::Disclaimer,
+            None,
+            ContentStatus::Published,
+        ),
+    )
+    .await;
+    let own_doc = create_doc(
+        &ctx.pool,
+        create_req(
+            site_b,
+            LegalDocType::TermsOfService,
+            None,
+            ContentStatus::Published,
+        ),
+    )
+    .await;
+
+    let created = ctx
+        .server
+        .post(&format!("/api/v1/menus/{menu_b}/items"))
+        .add_header("x-api-key", write_key_b.as_str())
+        .json(&item_body(
+            site_b,
+            menu_b,
+            json!({ "external_url": "/contact" }),
+        ))
+        .await;
+    created.assert_status(StatusCode::CREATED);
+    let item_id = created.json::<serde_json::Value>()["id"]
+        .as_str()
+        .expect("item id")
+        .to_string();
+
+    let rejected = ctx
+        .server
+        .put(&format!("/api/v1/navigation/{item_id}"))
+        .add_header("x-api-key", write_key_b.as_str())
+        .json(&json!({ "legal_document_id": foreign_doc.id }))
+        .await;
+    rejected.assert_status(StatusCode::UNPROCESSABLE_ENTITY);
+    assert_eq!(
+        rejected.json::<serde_json::Value>()["code"],
+        codes::LEGAL_DOC_CROSS_SITE
+    );
+
+    let switched = ctx
+        .server
+        .put(&format!("/api/v1/navigation/{item_id}"))
+        .add_header("x-api-key", write_key_b.as_str())
+        .json(&json!({ "legal_document_id": own_doc.id }))
+        .await;
+    switched.assert_status_ok();
+    assert_eq!(
+        switched.json::<serde_json::Value>()["legal_document_id"],
+        own_doc.id.to_string()
+    );
+}
+
+// ── Locale-mode tree title fallback (ADR 0002) ──────────────────────────
+
+#[tokio::test]
+#[serial]
+async fn tree_locale_mode_titles_fall_back_to_default_then_first() {
+    let ctx = test_context().await;
+    let site_id = create_test_site(&ctx.pool).await;
+    let write_key = create_test_api_key(&ctx.pool, site_id, ApiKeyPermission::Write).await;
+    let read_key = create_test_api_key(&ctx.pool, site_id, ApiKeyPermission::Read).await;
+    let menu_id = create_menu(&ctx, site_id, &write_key, "footer-l10n").await;
+
+    let de = locale_id(&ctx.pool, "de").await;
+    let en = locale_id(&ctx.pool, "en").await;
+    let es = locale_id(&ctx.pool, "es").await;
+    SiteLocale::add(&ctx.pool, site_id, de, true, Some("de"))
+        .await
+        .expect("add de");
+    SiteLocale::add(&ctx.pool, site_id, en, false, Some("en"))
+        .await
+        .expect("add en");
+    SiteLocale::add(&ctx.pool, site_id, es, false, Some("es"))
+        .await
+        .expect("add es");
+
+    for (url, order, localizations) in [
+        (
+            "/exact",
+            0,
+            json!([
+                { "locale_id": de, "title": "Genau (DE)" },
+                { "locale_id": en, "title": "Exact (EN)" },
+            ]),
+        ),
+        (
+            "/default-only",
+            1,
+            json!([{ "locale_id": de, "title": "Nur Standard (DE)" }]),
+        ),
+        (
+            "/no-default",
+            2,
+            json!([{ "locale_id": es, "title": "Sin defecto (ES)" }]),
+        ),
+    ] {
+        let created = ctx
+            .server
+            .post(&format!("/api/v1/menus/{menu_id}/items"))
+            .add_header("x-api-key", write_key.as_str())
+            .json(&item_body(
+                site_id,
+                menu_id,
+                json!({
+                    "external_url": url,
+                    "display_order": order,
+                    "localizations": localizations,
+                }),
+            ))
+            .await;
+        created.assert_status(StatusCode::CREATED);
+    }
+
+    let resp = ctx
+        .server
+        .get(&format!("/api/v1/menus/{menu_id}/tree?locale=en"))
+        .add_header("x-api-key", read_key.as_str())
+        .await;
+    resp.assert_status_ok();
+    let tree: serde_json::Value = resp.json();
+    let items = tree.as_array().expect("tree array");
+    assert_eq!(items.len(), 3);
+
+    let title_of = |url: &str| -> serde_json::Value {
+        items
+            .iter()
+            .find(|i| i["external_url"] == url)
+            .unwrap_or_else(|| panic!("item {url}"))["title"]
+            .clone()
+    };
+    assert_eq!(
+        title_of("/exact"),
+        "Exact (EN)",
+        "requested locale wins when present"
+    );
+    assert_eq!(
+        title_of("/default-only"),
+        "Nur Standard (DE)",
+        "missing requested locale falls back to the site default"
+    );
+    assert_eq!(
+        title_of("/no-default"),
+        "Sin defecto (ES)",
+        "no requested or default localization falls back to the first available"
+    );
+}
+
+// ── Restore backfills a pre-slug-era chain root ─────────────────────────
+
+/// Insert a chain root the way the pre-076 create path did: a
+/// `legal_document` content row with a NULL slug.
+async fn create_slug_less_root(
+    pool: &PgPool,
+    site_id: Uuid,
+    cookie_name: &str,
+    document_type: &str,
+) -> Uuid {
+    let mut conn = pool.acquire().await.unwrap();
+    let content_id = ContentService::create_content(
+        &mut conn,
+        "legal_document",
+        None,
+        &ContentStatus::Published,
+        &[site_id],
+        None,
+        None,
+        Some("test-user"),
+    )
+    .await
+    .expect("slug-less content row");
+    sqlx::query_scalar::<_, Uuid>(
+        "INSERT INTO legal_documents (content_id, cookie_name, document_type)
+         VALUES ($1, $2, $3::legal_doc_type) RETURNING id",
+    )
+    .bind(content_id)
+    .bind(cookie_name)
+    .bind(document_type)
+    .fetch_one(pool)
+    .await
+    .expect("legal root row")
+}
+
+#[tokio::test]
+#[serial]
+async fn restore_backfills_a_missing_chain_root_slug() {
+    let ctx = test_context().await;
+    let site_id = create_test_site(&ctx.pool).await;
+
+    let doc_id = create_slug_less_root(&ctx.pool, site_id, "pre_slug_era", "privacy_policy").await;
+
+    LegalDocumentRepo::soft_delete(&ctx.pool, doc_id)
+        .await
+        .expect("trash the document");
+    LegalDocumentRepo::restore(&ctx.pool, doc_id)
+        .await
+        .expect("restore the document");
+
+    let doc = LegalDocumentRepo::find_by_id(&ctx.pool, doc_id)
+        .await
+        .expect("restored document");
+    assert_eq!(
+        content_slug(&ctx.pool, &doc).await.as_deref(),
+        Some("privacy-policy"),
+        "restore derives the canonical slug the create path would have set"
+    );
+    assert_eq!(
+        site_specific_slug(&ctx.pool, &doc).await.as_deref(),
+        Some("privacy-policy"),
+        "slug is mirrored into the #762 per-site uniqueness join table"
+    );
+    let resolved = LegalDocumentRepo::find_by_slug_for_site(&ctx.pool, site_id, "privacy-policy")
+        .await
+        .expect("backfilled slug resolves");
+    assert_eq!(resolved.id, doc_id);
+}
+
+#[tokio::test]
+#[serial]
+async fn restore_slug_backfill_suffixes_on_a_per_site_collision() {
+    let ctx = test_context().await;
+    let site_id = create_test_site(&ctx.pool).await;
+
+    // A live document already owns the canonical slug on this site.
+    create_doc(
+        &ctx.pool,
+        create_req(
+            site_id,
+            LegalDocType::PrivacyPolicy,
+            None,
+            ContentStatus::Published,
+        ),
+    )
+    .await;
+
+    let doc_id = create_slug_less_root(&ctx.pool, site_id, "essential", "privacy_policy").await;
+
+    LegalDocumentRepo::soft_delete(&ctx.pool, doc_id)
+        .await
+        .expect("trash the document");
+    LegalDocumentRepo::restore(&ctx.pool, doc_id)
+        .await
+        .expect("restore the document");
+
+    let doc = LegalDocumentRepo::find_by_id(&ctx.pool, doc_id)
+        .await
+        .expect("restored document");
+    assert_eq!(
+        content_slug(&ctx.pool, &doc).await.as_deref(),
+        Some("privacy-policy-essential"),
+        "collision falls back to the cookie_name suffix"
     );
 }
 

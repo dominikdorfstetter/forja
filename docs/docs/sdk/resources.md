@@ -266,7 +266,7 @@ Fetch a menu and its navigation tree in one call, with the menu's display name r
 
 **Returns:** `MenuWithTree | null` — returns `null` if no menu has that slug.
 
-`menu.resolvedName` carries the menu localization matching the requested locale, or `null` when no locale was passed, the code isn't configured for the site, or the menu has no localization for it — pick your own fallback (e.g. `resolvedName ?? menu.slug`). The raw `menu.localizations` array stays available.
+`menu.resolvedName` carries the menu localization matching the requested locale, or `null` when no locale was passed, the code isn't configured for the site, or the menu has no localization for it — pick your own fallback (e.g. `resolvedName ?? menu.slug`). The raw `menu.localizations` array stays available. A locale code the site doesn't configure is not forwarded to the tree request — the tree comes back locale-less instead of erroring.
 
 ```typescript
 const footer = await forja.navigation.getMenuWithTree('footer', { locale: 'de' });
@@ -880,7 +880,7 @@ The `locale` parameter is mandatory — the API rejects requests without it (`40
 
 Resolution and fallback behavior:
 
-- One value per key, resolved server-side via the fallback chain: exact locale match → site default locale → first localization matching the language code.
+- One value per key, resolved server-side via the fallback chain: exact locale match → site default locale → first available localization (lowest locale code).
 - Keys with no localization at all are omitted from the map — keep a template-side default for every key you render (never render an empty string).
 - Keys are dot-namespaced lowercase identifiers (`blog.min_read`, `footer.rights_reserved`, `nav.aria.toggle_dark`).
 - Responses are cached server-side for a short interval, so fetching the map once per page render is cheap.

@@ -166,10 +166,13 @@ impl NavigationItem {
     /// the linked page's slug, and the linked legal document's version-chain
     /// ROOT slug (mirroring `legal_repo::find_by_slug_for_site` — versions
     /// resolve through the root, so the walk goes up `parent_version_id`).
-    /// Target-less items (all three link columns NULL — e.g. after a page or
-    /// legal-document purge) are broken links and never render publicly;
-    /// the admin items read (`find_all_for_menu_admin`) keeps them visible
-    /// for repair.
+    /// The chain root must belong to the item's own site (defense in depth
+    /// against cross-site references). Broken links never render publicly:
+    /// target-less items (all three link columns NULL — e.g. after a page or
+    /// legal-document purge) and legal items whose chain-root slug does not
+    /// resolve (soft-deleted document, slug-less root) are both dropped; the
+    /// admin items read (`find_all_for_menu_admin`) keeps them visible for
+    /// repair.
     fn tree_query(title_select: &str, locale_join: &str) -> String {
         format!(
             r#"
@@ -194,18 +197,23 @@ impl NavigationItem {
                 SELECT c.slug
                 FROM chain
                 INNER JOIN contents c ON c.id = chain.content_id
+                INNER JOIN content_sites cs
+                    ON cs.content_id = chain.content_id AND cs.site_id = ni.site_id
                 WHERE chain.parent_version_id IS NULL
                 LIMIT 1
             ) lroot ON TRUE
             WHERE ni.menu_id = $1 AND ni.is_active = TRUE AND ni.is_deleted = FALSE
-              AND (ni.page_id IS NOT NULL OR ni.external_url IS NOT NULL OR ni.legal_document_id IS NOT NULL)
+              AND (ni.page_id IS NOT NULL OR ni.external_url IS NOT NULL
+                   OR (ni.legal_document_id IS NOT NULL AND lroot.slug IS NOT NULL))
             ORDER BY ni.display_order ASC
             "#
         )
     }
 
     /// Build a navigation tree for a menu with localized titles, page slugs,
-    /// and legal chain-root slugs
+    /// and legal chain-root slugs. Locale mode resolves titles through the
+    /// ADR 0002 chain: requested locale → site default locale → first
+    /// available localization.
     pub async fn find_tree_for_menu(
         pool: &PgPool,
         menu_id: Uuid,
@@ -213,8 +221,20 @@ impl NavigationItem {
     ) -> Result<Vec<NavigationTree>, ApiError> {
         let flat_items = if let Some(loc_id) = locale_id {
             sqlx::query_as::<_, NavigationItemFlat>(sqlx::AssertSqlSafe(Self::tree_query(
-                "nil.title",
-                "LEFT JOIN navigation_item_localizations nil ON nil.navigation_item_id = ni.id AND nil.locale_id = $2",
+                r#"COALESCE(
+                    (SELECT nil.title FROM navigation_item_localizations nil
+                     WHERE nil.navigation_item_id = ni.id AND nil.locale_id = $2),
+                    (SELECT nil.title FROM navigation_item_localizations nil
+                     INNER JOIN site_locales sl
+                         ON sl.locale_id = nil.locale_id
+                        AND sl.site_id = ni.site_id
+                        AND sl.is_default = TRUE
+                     WHERE nil.navigation_item_id = ni.id
+                     LIMIT 1),
+                    (SELECT nil.title FROM navigation_item_localizations nil
+                     WHERE nil.navigation_item_id = ni.id LIMIT 1)
+                ) AS title"#,
+                "",
             )))
             .bind(menu_id)
             .bind(loc_id)

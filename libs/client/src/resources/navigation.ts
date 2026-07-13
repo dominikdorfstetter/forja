@@ -116,10 +116,14 @@ export class NavigationResource {
    * Fetch a menu and its navigation tree in one call, with the menu's
    * display name resolved for a locale.
    *
-   * Composes `getMenuBySlug` and `getTree` (the tree request starts as soon
-   * as the menu id is known; the locale lookup runs concurrently with both).
-   * The locale code → id mapping comes from the site-locales listing, fetched
-   * once per client instance and reused across calls.
+   * Composes `getMenuBySlug` and `getTree`. The menu fetch and the locale
+   * lookup run concurrently; the tree request starts once both are known,
+   * because `opts.locale` is first resolved against the site's configured
+   * locales — a code the site doesn't configure is not forwarded to
+   * `getTree` (the tree endpoint rejects unknown codes), so the tree is
+   * fetched locale-less instead. The locale code → id mapping comes from the
+   * site-locales listing, fetched once per client instance and reused across
+   * calls.
    *
    * `menu.resolvedName` is the localization matching `opts.locale`, or `null`
    * when no locale is passed, the code isn't configured for the site, or the
@@ -144,14 +148,16 @@ export class NavigationResource {
     slug: string,
     opts?: { locale?: string },
   ): Promise<MenuWithTree | null> {
-    const menuPromise = this.getMenuBySlug(slug);
-    const [menu, items, localeId] = await Promise.all([
-      menuPromise,
-      menuPromise.then((m) => (m ? this.getTree(m.id, opts) : [])),
+    const [menu, localeId] = await Promise.all([
+      this.getMenuBySlug(slug),
       opts?.locale ? this.localeIdForCode(opts.locale) : null,
     ]);
     if (!menu) return null;
 
+    const items = await this.getTree(
+      menu.id,
+      opts?.locale && localeId ? { locale: opts.locale } : undefined,
+    );
     const localization = localeId
       ? menu.localizations?.find((l) => l.locale_id === localeId)
       : undefined;

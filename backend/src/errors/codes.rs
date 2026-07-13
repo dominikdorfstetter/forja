@@ -149,6 +149,7 @@ pub const LEGAL_PUBLISH_MISSING_BODY: &str = "LEGAL_PUBLISH_MISSING_BODY";
 pub const LEGAL_VERSION_SOURCE_DELETED: &str = "LEGAL_VERSION_SOURCE_DELETED";
 pub const LEGAL_PUBLISHED_IMMUTABLE: &str = "LEGAL_PUBLISHED_IMMUTABLE";
 pub const LEGAL_SLUG_IMMUTABLE: &str = "LEGAL_SLUG_IMMUTABLE";
+pub const LEGAL_DOC_CROSS_SITE: &str = "LEGAL_DOC_CROSS_SITE";
 
 // ── CV / Portfolio ──────────────────────────────────────────────────────
 
@@ -741,6 +742,12 @@ pub const ALL: &[ErrorCodeDef] = &[
         domain: "legal",
         http_status: 409,
         description: "The slug of a legal document is locked once any version of its chain has been published",
+    },
+    ErrorCodeDef {
+        code: LEGAL_DOC_CROSS_SITE,
+        domain: "legal",
+        http_status: 422,
+        description: "The referenced legal document does not belong to this site",
     },
     // CV
     ErrorCodeDef {

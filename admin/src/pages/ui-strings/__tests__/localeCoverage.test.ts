@@ -45,8 +45,19 @@ describe('coverage flags and filter', () => {
   it('flags rows with missing or outdated locales', () => {
     expect(hasMissingLocale(rowMinRead, locales)).toBe(true);
     expect(hasMissingLocale(rowFooterLinks, locales)).toBe(false);
-    expect(hasOutdatedLocale(rowMinRead)).toBe(true);
-    expect(hasOutdatedLocale(rowFooterLinks)).toBe(false);
+    expect(hasOutdatedLocale(rowMinRead, locales)).toBe(true);
+    expect(hasOutdatedLocale(rowFooterLinks, locales)).toBe(false);
+  });
+
+  it('ignores outdated localizations of locales no longer active on the site', () => {
+    const row = uiString({
+      localizations: [
+        localization('l-1', 'loc-en', 'min read'),
+        localization('l-9', 'loc-pl', 'Min. czytania', 'Outdated'),
+      ],
+    });
+    expect(hasOutdatedLocale(row, locales)).toBe(false);
+    expect(applyCoverageFilter([row], locales, 'outdated')).toEqual([]);
   });
 
   it('applyCoverageFilter narrows rows by missing / outdated and passes all through', () => {

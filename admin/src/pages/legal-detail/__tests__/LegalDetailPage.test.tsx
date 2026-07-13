@@ -1,9 +1,11 @@
 import { describe, it, expect, vi, beforeAll, beforeEach } from 'vitest';
 import { renderWithProviders, screen, waitFor, within } from '@/test/test-utils';
 import userEvent from '@testing-library/user-event';
+import { QueryClient } from '@tanstack/react-query';
 import { getLegalDocumentDetail, getLegalVersions, updateLegalDocument } from '@/services/legal';
 import { getSiteLocales } from '@/services/siteLocales';
 import { getSiteSettings } from '@/services/sites';
+import { queryKeys } from '@/lib/queryKeys';
 import type { LegalDocumentFullDetailResponse, SiteLocaleResponse } from '@/types/api';
 
 vi.mock('@/store/SiteContext', () => ({
@@ -192,6 +194,29 @@ describe('LegalDetailPage', () => {
       await waitFor(() => {
         expect(updateLegalDocument).toHaveBeenCalledWith('doc-1', { slug: 'privacy-policy' });
       });
+    });
+
+    it('invalidates every consumer of the slug after saving it', async () => {
+      vi.mocked(getLegalDocumentDetail).mockResolvedValue(mockDetail);
+      vi.mocked(getSiteLocales).mockResolvedValue([mockLocale]);
+      vi.mocked(updateLegalDocument).mockResolvedValue({} as never);
+      const invalidateSpy = vi.spyOn(QueryClient.prototype, 'invalidateQueries');
+
+      const { user, slugField } = await openSlugField();
+      await user.click(within(slugField).getByText('privacy'));
+      const input = within(slugField).getByTestId('inline-edit.input').querySelector('input')!;
+      await user.clear(input);
+      await user.type(input, 'privacy-policy{Enter}');
+
+      // The slug is denormalized into the detail, the legal list, resolved
+      // nav links, and the navigation-item picker — all must refetch.
+      await waitFor(() => {
+        expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: queryKeys.legalDetail('doc-1') });
+      });
+      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: queryKeys.legal('site-1') });
+      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: queryKeys.legalForNav('site-1') });
+      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: queryKeys.legalPicker('site-1') });
+      invalidateSpy.mockRestore();
     });
 
     it('disables slug editing once the document is published', async () => {

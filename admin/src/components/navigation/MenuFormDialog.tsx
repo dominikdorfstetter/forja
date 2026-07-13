@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Box,
   Tab,
@@ -63,6 +63,21 @@ export default function MenuFormDialog({ open, menu, locales = EMPTY_LOCALES, on
   const [displayNames, setDisplayNames] = useState<Record<string, string>>({});
   const [activeLocaleTab, setActiveLocaleTab] = useState(0);
 
+  // The backend upsert has no delete path — a cleared, previously-persisted
+  // display name would silently reappear. Surface it and block the save.
+  const persistedNames = useMemo(() => toDisplayNames(menu), [menu]);
+  const clearedLocaleIds = useMemo(
+    () =>
+      locales
+        .filter(
+          (locale) =>
+            (persistedNames[locale.id] ?? '') !== '' &&
+            (displayNames[locale.id] ?? '').trim() === '',
+        )
+        .map((locale) => locale.id),
+    [locales, persistedNames, displayNames],
+  );
+
   const prevOpenRef = useRef(false);
   useEffect(() => {
     if (open && !prevOpenRef.current) {
@@ -115,7 +130,7 @@ export default function MenuFormDialog({ open, menu, locales = EMPTY_LOCALES, on
       icon="menu_book"
       title={menu ? t('navigation.menus.editTitle', 'Edit Menu') : t('navigation.menus.createTitle', 'Create Menu')}
       submitLabel={menu ? t('common.actions.save') : t('common.actions.create')}
-      submitDisabled={!isValid}
+      submitDisabled={!isValid || clearedLocaleIds.length > 0}
       submitTestId="menu-form.btn.submit"
       cancelTestId="menu-form.btn.cancel"
       loading={loading}
@@ -151,6 +166,7 @@ export default function MenuFormDialog({ open, menu, locales = EMPTY_LOCALES, on
       <DisplayNamesSection
         locales={locales}
         displayNames={displayNames}
+        clearedLocaleIds={clearedLocaleIds}
         activeTab={activeLocaleTab}
         onTabChange={setActiveLocaleTab}
         onNameChange={handleDisplayNameChange}
@@ -170,12 +186,14 @@ export default function MenuFormDialog({ open, menu, locales = EMPTY_LOCALES, on
 function DisplayNamesSection({
   locales,
   displayNames,
+  clearedLocaleIds,
   activeTab,
   onTabChange,
   onNameChange,
 }: {
   locales: Locale[];
   displayNames: Record<string, string>;
+  clearedLocaleIds: string[];
   activeTab: number;
   onTabChange: (tab: number) => void;
   onNameChange: (localeId: string, value: string) => void;
@@ -185,6 +203,7 @@ function DisplayNamesSection({
   if (locales.length === 0) return null;
 
   const currentLocale = locales[activeTab] ?? locales[0];
+  const currentCleared = clearedLocaleIds.includes(currentLocale.id);
 
   return (
     <Box>
@@ -214,7 +233,12 @@ function DisplayNamesSection({
         size="small"
         value={displayNames[currentLocale.id] ?? ''}
         onChange={(e) => onNameChange(currentLocale.id, e.target.value)}
-        helperText={t('navigation.menus.fields.displayNamesHelp', 'Optional menu name shown to visitors in this language (e.g. as a footer heading)')}
+        error={currentCleared}
+        helperText={
+          currentCleared
+            ? t('navigation.menus.fields.displayNameClearedError', "A saved display name can't be removed — restore it or enter a different name")
+            : t('navigation.menus.fields.displayNamesHelp', 'Optional menu name shown to visitors in this language (e.g. as a footer heading)')
+        }
         slotProps={{ htmlInput: { 'data-testid': 'menu-form.input.display-name', maxLength: 200 } }}
       />
     </Box>

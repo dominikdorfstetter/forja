@@ -1040,7 +1040,8 @@
         "active": "Aktywne",
         "displayName": "Nazwa wyświetlana",
         "displayNames": "Nazwy wyświetlane",
-        "displayNamesHelp": "Opcjonalna nazwa menu widoczna dla odwiedzających w tym języku (np. jako nagłówek stopki)"
+        "displayNamesHelp": "Opcjonalna nazwa menu widoczna dla odwiedzających w tym języku (np. jako nagłówek stopki)",
+        "displayNameClearedError": "Zapisanej nazwy wyświetlanej nie można usunąć — przywróć ją lub wpisz inną nazwę"
       },
       "messages": {
         "created": "Menu utworzone",
@@ -4729,6 +4730,7 @@
       "keyInvalid": "Używaj małych liter i cyfr połączonych '.', '_' lub '-'",
       "valueLabel": "Wartość",
       "valueTooLong": "Wartość nie może przekraczać 1000 znaków",
+      "valueRequired": "Wartość jest wymagana — wartości domyślnej nie można wyczyścić",
       "valueForLocale": "Wartość ({{locale}})",
       "localeHint": "Wartość dla {{locale}}. Zapisywana po opuszczeniu pola; pozostaw puste, aby zachować obecną wartość.",
       "createHint": "Najpierw zapisz klucz z wartością domyślną — potem przetłumacz go na pozostałe języki.",

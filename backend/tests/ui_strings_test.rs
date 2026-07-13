@@ -352,6 +352,122 @@ async fn non_default_locale_update_does_not_flip_others() {
     }
 }
 
+#[tokio::test]
+#[serial]
+async fn mixed_payload_update_keeps_payload_translations_pending() {
+    let ctx = test_context().await;
+    let (site_id, de, en, es) = site_with_locales(&ctx.pool).await;
+    let write_key = create_test_api_key(&ctx.pool, site_id, ApiKeyPermission::Write).await;
+
+    let created = create_string(
+        &ctx,
+        site_id,
+        &write_key,
+        "hero.tagline",
+        json!([
+            { "locale_id": de, "value": "Schmiede" },
+            { "locale_id": en, "value": "Forge" },
+            { "locale_id": es, "value": "Fragua" },
+        ]),
+    )
+    .await;
+    created.assert_status(axum::http::StatusCode::CREATED);
+    let id = created.json::<serde_json::Value>()["id"]
+        .as_str()
+        .expect("id")
+        .to_string();
+
+    // New default value + a fresh translation in the same payload: the
+    // fresh translation is current against the new default and must not
+    // flip, while the untouched locale does.
+    let updated = ctx
+        .server
+        .put(&format!("/api/v1/sites/{site_id}/strings/{id}"))
+        .add_header("x-api-key", write_key.as_str())
+        .json(&json!({
+            "localizations": [
+                { "locale_id": de, "value": "Werkstatt" },
+                { "locale_id": en, "value": "Workshop" },
+            ],
+        }))
+        .await;
+    updated.assert_status_ok();
+
+    let entries = list_entries(&ctx, site_id, &write_key).await;
+    let entry = &entries.as_array().expect("entries")[0];
+    assert_eq!(status_of(entry, de), "Pending");
+    assert_eq!(
+        status_of(entry, en),
+        "Pending",
+        "a translation upserted alongside the default change stays fresh"
+    );
+    assert_eq!(
+        status_of(entry, es),
+        "Outdated",
+        "untouched locales still flip"
+    );
+}
+
+#[tokio::test]
+#[serial]
+async fn re_upserting_the_same_value_clears_outdated() {
+    let ctx = test_context().await;
+    let (site_id, de, en, _es) = site_with_locales(&ctx.pool).await;
+    let write_key = create_test_api_key(&ctx.pool, site_id, ApiKeyPermission::Write).await;
+
+    let created = create_string(
+        &ctx,
+        site_id,
+        &write_key,
+        "footer.tagline",
+        json!([
+            { "locale_id": de, "value": "Handgemacht" },
+            { "locale_id": en, "value": "Handmade" },
+        ]),
+    )
+    .await;
+    created.assert_status(axum::http::StatusCode::CREATED);
+    let id = created.json::<serde_json::Value>()["id"]
+        .as_str()
+        .expect("id")
+        .to_string();
+
+    let default_changed = ctx
+        .server
+        .put(&format!("/api/v1/sites/{site_id}/strings/{id}"))
+        .add_header("x-api-key", write_key.as_str())
+        .json(&json!({
+            "localizations": [{ "locale_id": de, "value": "Von Hand gefertigt" }],
+        }))
+        .await;
+    default_changed.assert_status_ok();
+
+    let entries = list_entries(&ctx, site_id, &write_key).await;
+    assert_eq!(
+        status_of(&entries.as_array().expect("entries")[0], en),
+        "Outdated"
+    );
+
+    // A translator confirming the translation is current: same value,
+    // explicit upsert — outdated must clear.
+    let confirmed = ctx
+        .server
+        .put(&format!("/api/v1/sites/{site_id}/strings/{id}"))
+        .add_header("x-api-key", write_key.as_str())
+        .json(&json!({
+            "localizations": [{ "locale_id": en, "value": "Handmade" }],
+        }))
+        .await;
+    confirmed.assert_status_ok();
+
+    let entries = list_entries(&ctx, site_id, &write_key).await;
+    assert_eq!(
+        status_of(&entries.as_array().expect("entries")[0], en),
+        "Pending",
+        "an explicit upsert of an unchanged value confirms the translation"
+    );
+}
+
 // ── Public locale-resolved read ─────────────────────────────────────────
 
 async fn public_read(ctx: &TestContext, site_id: Uuid, api_key: &str, query: &str) -> TestResponse {

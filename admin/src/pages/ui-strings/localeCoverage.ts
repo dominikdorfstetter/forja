@@ -21,8 +21,8 @@ export function hasMissingLocale(row: UiStringResponse, locales: SiteLocaleRespo
   return locales.some((l) => localeValueState(row, l.locale_id) === 'missing');
 }
 
-export function hasOutdatedLocale(row: UiStringResponse): boolean {
-  return row.localizations.some((l) => l.translation_status === 'Outdated');
+export function hasOutdatedLocale(row: UiStringResponse, locales: SiteLocaleResponse[]): boolean {
+  return locales.some((l) => localeValueState(row, l.locale_id) === 'outdated');
 }
 
 export function applyCoverageFilter(
@@ -34,7 +34,7 @@ export function applyCoverageFilter(
     case 'missing':
       return rows.filter((row) => hasMissingLocale(row, locales));
     case 'outdated':
-      return rows.filter(hasOutdatedLocale);
+      return rows.filter((row) => hasOutdatedLocale(row, locales));
     default:
       return rows;
   }

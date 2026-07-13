@@ -547,6 +547,8 @@ impl LegalDocumentRepo {
     }
 
     pub async fn restore(pool: &PgPool, id: Uuid) -> Result<(), ApiError> {
+        let mut tx = pool.begin().await?;
+
         let result = sqlx::query(
             r#"
             UPDATE legal_documents
@@ -555,7 +557,7 @@ impl LegalDocumentRepo {
             "#,
         )
         .bind(id)
-        .execute(pool)
+        .execute(&mut *tx)
         .await?;
 
         if result.rows_affected() == 0 {
@@ -567,7 +569,72 @@ impl LegalDocumentRepo {
             .with_entity_type("legal_doc"));
         }
 
+        Self::backfill_chain_root_slug(&mut tx, id).await?;
+
+        tx.commit().await?;
         Ok(())
+    }
+
+    /// Give a restored chain whose root has no slug the canonical one it
+    /// would have received at create time (migration 076 only backfilled
+    /// live roots, and the post-publish immutability guard blocks a manual
+    /// rename): document-type kebab, per-site collision → cookie_name
+    /// suffix, then an id fragment as a last resort. Mirrors the slug into
+    /// `content_sites.site_specific_slug` like every other slug write.
+    async fn backfill_chain_root_slug(conn: &mut PgConnection, id: Uuid) -> Result<(), ApiError> {
+        let root = sqlx::query_as::<_, (Uuid, Uuid, String, LegalDocType, Option<String>)>(
+            r#"
+            WITH RECURSIVE chain AS (
+                SELECT id, content_id, cookie_name, document_type, parent_version_id
+                FROM legal_documents
+                WHERE id = $1
+                UNION ALL
+                SELECT ld.id, ld.content_id, ld.cookie_name, ld.document_type,
+                       ld.parent_version_id
+                FROM legal_documents ld
+                INNER JOIN chain ON chain.parent_version_id = ld.id
+            )
+            SELECT chain.id, chain.content_id, chain.cookie_name, chain.document_type, c.slug
+            FROM chain
+            INNER JOIN contents c ON c.id = chain.content_id
+            WHERE chain.parent_version_id IS NULL
+            "#,
+        )
+        .bind(id)
+        .fetch_optional(&mut *conn)
+        .await?;
+
+        let Some((root_id, content_id, cookie_name, document_type, slug)) = root else {
+            return Ok(());
+        };
+        if slug.is_some() {
+            return Ok(());
+        }
+
+        let site_ids: Vec<Uuid> =
+            sqlx::query_scalar("SELECT site_id FROM content_sites WHERE content_id = $1")
+                .bind(content_id)
+                .fetch_all(&mut *conn)
+                .await?;
+
+        let base = document_type.default_slug();
+        let mut candidate = base.to_string();
+        if slugify::slug_in_use(&mut *conn, &candidate, &site_ids, Some(content_id)).await? {
+            let cookie_suffix = slugify::slugify(&cookie_name);
+            if !cookie_suffix.is_empty() {
+                candidate = format!("{base}-{cookie_suffix}");
+            }
+        }
+        if slugify::slug_in_use(&mut *conn, &candidate, &site_ids, Some(content_id)).await? {
+            candidate = format!("{candidate}-{}", &root_id.to_string()[..8]);
+        }
+
+        sqlx::query("UPDATE contents SET slug = $2, updated_at = NOW() WHERE id = $1")
+            .bind(content_id)
+            .bind(&candidate)
+            .execute(&mut *conn)
+            .await?;
+        Self::mirror_site_slug(&mut *conn, content_id, Some(&candidate)).await
     }
 
     pub async fn permanent_delete(pool: &PgPool, id: Uuid) -> Result<(), ApiError> {
@@ -642,6 +709,42 @@ impl LegalDocumentRepo {
         })?;
 
         Ok(row.0)
+    }
+
+    /// True when the version chain containing `id` resolves to a chain root
+    /// associated with `site_id` (the site-scoped match the migration-77
+    /// nav-link conversion used). Soft-deleted versions still count — this
+    /// checks site membership, not visibility, so a reference to a trashed
+    /// same-site document validates while a cross-site one never does.
+    pub async fn chain_root_on_site(
+        pool: &PgPool,
+        id: Uuid,
+        site_id: Uuid,
+    ) -> Result<bool, ApiError> {
+        let on_site: bool = sqlx::query_scalar(
+            r#"
+            WITH RECURSIVE chain AS (
+                SELECT ld.id, ld.content_id, ld.parent_version_id
+                FROM legal_documents ld
+                WHERE ld.id = $1
+                UNION ALL
+                SELECT parent.id, parent.content_id, parent.parent_version_id
+                FROM legal_documents parent
+                INNER JOIN chain ON chain.parent_version_id = parent.id
+            )
+            SELECT EXISTS(
+                SELECT 1
+                FROM chain
+                INNER JOIN content_sites cs ON cs.content_id = chain.content_id
+                WHERE chain.parent_version_id IS NULL AND cs.site_id = $2
+            )
+            "#,
+        )
+        .bind(id)
+        .bind(site_id)
+        .fetch_one(pool)
+        .await?;
+        Ok(on_site)
     }
 
     /// Duplicate a legal document as a *separate* document (the `/clone`

@@ -1040,7 +1040,8 @@
         "active": "Actief",
         "displayName": "Weergavenaam",
         "displayNames": "Weergavenamen",
-        "displayNamesHelp": "Optionele menunaam die bezoekers in deze taal te zien krijgen (bijv. als kop in de footer)"
+        "displayNamesHelp": "Optionele menunaam die bezoekers in deze taal te zien krijgen (bijv. als kop in de footer)",
+        "displayNameClearedError": "Een opgeslagen weergavenaam kan niet worden verwijderd — herstel de naam of voer een andere in"
       },
       "messages": {
         "created": "Menu aangemaakt",
@@ -4727,6 +4728,7 @@
       "keyInvalid": "Gebruik kleine letters en cijfers, verbonden met '.', '_' of '-'",
       "valueLabel": "Waarde",
       "valueTooLong": "Waarde mag maximaal 1000 tekens bevatten",
+      "valueRequired": "Waarde is verplicht — de standaardwaarde kan niet worden gewist",
       "valueForLocale": "Waarde ({{locale}})",
       "localeHint": "Waarde voor {{locale}}. Opgeslagen wanneer je het veld verlaat; laat leeg om de huidige waarde te behouden.",
       "createHint": "Sla eerst de sleutel met de standaardwaarde op — vertaal hem daarna naar de andere talen.",

@@ -299,6 +299,9 @@ export interface NavigationItemResponse {
   parent_id: string | null;
   page_id: string | null;
   external_url: string | null;
+  /** Referenced legal document; `null` alongside the other targets marks a
+   * broken link (e.g. after a purge) awaiting repair in the admin. */
+  legal_document_id: string | null;
   icon: string | null;
   display_order: number;
   open_in_new_tab: boolean;
@@ -310,11 +313,16 @@ export interface NavigationTree {
   parent_id: string | null;
   page_id: string | null;
   external_url: string | null;
+  /** Referenced legal document. */
+  legal_document_id: string | null;
   icon: string | null;
   display_order: number;
   open_in_new_tab: boolean;
   title: string | null;
   page_slug: string | null;
+  /** Version-chain root slug of the referenced legal document
+   * (for `/legal/{slug}` URL construction). */
+  legal_slug: string | null;
   children: NavigationTree[];
 }
 

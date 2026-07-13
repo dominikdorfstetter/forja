@@ -19,6 +19,7 @@ const KEYS = [
   'navigation.menus.fields.displayName',
   'navigation.menus.fields.displayNames',
   'navigation.menus.fields.displayNamesHelp',
+  'navigation.menus.fields.displayNameClearedError',
 ];
 
 function get(obj: unknown, path: string): unknown {

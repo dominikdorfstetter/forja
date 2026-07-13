@@ -25,7 +25,7 @@ use crate::errors::{ApiError, ProblemDetails};
 use crate::guards::auth_guard::{ReadKey, WriteKey};
 use crate::models::audit::AuditAction;
 use crate::repos::ui_string_repo::{
-    UiStringLocalizationRow, UiStringRepo, UiStringRow, resolve_flat_map,
+    UiStringLocalizationRow, UiStringRepo, UiStringRow, limit_exceeded, resolve_flat_map,
 };
 use crate::services::audited_mutation::AuditedEntity;
 use crate::services::permission_service::{Permission, PermissionService};
@@ -183,11 +183,10 @@ async fn create_ui_string(
         &Permission::new("ui_string", "create"),
     )
     .await?;
+    // Fast path only — the authoritative, race-free check runs inside the
+    // repo's create transaction under a per-site advisory lock.
     if UiStringRepo::count_for_site(&state.db, site_id).await? >= UI_STRINGS_MAX_KEYS_PER_SITE {
-        return Err(ApiError::validation(format!(
-            "A site can hold at most {UI_STRINGS_MAX_KEYS_PER_SITE} UI string keys"
-        ))
-        .with_code(codes::ERR_STRINGS_LIMIT_EXCEEDED));
+        return Err(limit_exceeded());
     }
     let body = body.into_inner();
 

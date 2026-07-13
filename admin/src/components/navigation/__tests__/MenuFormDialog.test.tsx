@@ -135,7 +135,9 @@ describe('MenuFormDialog', () => {
     })));
   });
 
-  it('drops locales whose display name was cleared from the payload', async () => {
+  // The backend upsert has no delete path — a cleared name would silently
+  // reappear after a "successful" save, so the dialog must refuse instead.
+  it('blocks save with a field error when a saved display name is cleared', async () => {
     const onSubmitUpdate = vi.fn();
     const user = userEvent.setup();
     renderWithProviders(
@@ -144,11 +146,55 @@ describe('MenuFormDialog', () => {
 
     await user.clear(screen.getByTestId('menu-form.input.display-name'));
 
+    expect(
+      await screen.findByText(/A saved display name can't be removed/),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId('menu-form.btn.submit')).toBeDisabled();
+    expect(onSubmitUpdate).not.toHaveBeenCalled();
+  });
+
+  it('re-enables save once the cleared display name is restored or replaced', async () => {
+    const onSubmitUpdate = vi.fn();
+    const user = userEvent.setup();
+    renderWithProviders(
+      <MenuFormDialog {...defaultProps} menu={existingMenu} onSubmitUpdate={onSubmitUpdate} />,
+    );
+
+    const input = screen.getByTestId('menu-form.input.display-name');
+    await user.clear(input);
+    expect(screen.getByTestId('menu-form.btn.submit')).toBeDisabled();
+
+    await user.type(input, 'Footer navigation');
+    expect(
+      screen.queryByText(/A saved display name can't be removed/),
+    ).not.toBeInTheDocument();
+
     await waitFor(() => expect(screen.getByTestId('menu-form.btn.submit')).not.toBeDisabled());
     await user.click(screen.getByTestId('menu-form.btn.submit'));
 
     await waitFor(() => expect(onSubmitUpdate).toHaveBeenCalledWith(expect.objectContaining({
-      localizations: [{ locale_id: 'loc-de', name: 'Fußzeile' }],
+      localizations: [
+        { locale_id: 'loc-en', name: 'Footer navigation' },
+        { locale_id: 'loc-de', name: 'Fußzeile' },
+      ],
     })));
+  });
+
+  it('allows clearing a name that was never persisted', async () => {
+    const onSubmitCreate = vi.fn();
+    const user = userEvent.setup();
+    renderWithProviders(
+      <MenuFormDialog {...defaultProps} onSubmitCreate={onSubmitCreate} />,
+    );
+
+    await user.type(screen.getByLabelText(/slug/i), 'footer');
+    const input = screen.getByTestId('menu-form.input.display-name');
+    await user.type(input, 'Draft name');
+    await user.clear(input);
+
+    expect(
+      screen.queryByText(/A saved display name can't be removed/),
+    ).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.getByTestId('menu-form.btn.submit')).not.toBeDisabled());
   });
 });

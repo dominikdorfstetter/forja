@@ -2,9 +2,11 @@
 //!
 //! Owns every SQL query touching `ui_strings` and
 //! `ui_string_localizations`, including the auto-outdated rule: when an
-//! update changes the site-default locale's value for a key, every other
-//! locale's row for that key flips to `translation_status = 'outdated'`
-//! inside the same transaction. Localization reads are ordered
+//! update changes the site-default locale's value for a key, every locale
+//! row for that key NOT in the same payload flips to
+//! `translation_status = 'outdated'` inside the same transaction (payload
+//! locales are fresh against the new default by definition). Localization
+//! reads are ordered
 //! `locale.code ASC` so `utils::locale_resolver` can apply the ADR 0002
 //! chain (exact → site default → first-by-code) without re-sorting.
 
@@ -12,10 +14,10 @@ use std::collections::BTreeMap;
 
 use chrono::{DateTime, Utc};
 use serde::Serialize;
-use sqlx::{PgPool, Postgres, Transaction};
+use sqlx::{PgExecutor, PgPool, Postgres, Transaction};
 use uuid::Uuid;
 
-use crate::dto::ui_strings::UiStringLocalizationInput;
+use crate::dto::ui_strings::{UI_STRINGS_MAX_KEYS_PER_SITE, UiStringLocalizationInput};
 use crate::errors::{ApiError, codes};
 use crate::models::content::TranslationStatus;
 use crate::utils::locale_resolver::{LocaleResolution, resolve_localization};
@@ -54,6 +56,15 @@ fn not_found(id: Uuid) -> ApiError {
         .with_entity_type("ui_string")
 }
 
+/// The 500-key-per-site cap error, shared by the handler's fast-path check
+/// and the authoritative in-transaction re-check in [`UiStringRepo::create`].
+pub fn limit_exceeded() -> ApiError {
+    ApiError::validation(format!(
+        "A site can hold at most {UI_STRINGS_MAX_KEYS_PER_SITE} UI string keys"
+    ))
+    .with_code(codes::ERR_STRINGS_LIMIT_EXCEEDED)
+}
+
 fn map_key_taken(e: sqlx::Error) -> ApiError {
     match &e {
         sqlx::Error::Database(db)
@@ -67,6 +78,9 @@ fn map_key_taken(e: sqlx::Error) -> ApiError {
     }
 }
 
+/// Insert or update one localization row. A changed value resets the status
+/// to `pending`; so does an unchanged value on an `outdated` row — an
+/// explicit upsert is a translator confirming the translation is current.
 async fn upsert_localization(
     tx: &mut Transaction<'_, Postgres>,
     ui_string_id: Uuid,
@@ -80,6 +94,7 @@ async fn upsert_localization(
             value = EXCLUDED.value,
             translation_status = CASE
                 WHEN ui_string_localizations.value IS DISTINCT FROM EXCLUDED.value
+                    OR ui_string_localizations.translation_status = 'outdated'::translation_status
                     THEN 'pending'::translation_status
                 ELSE ui_string_localizations.translation_status
             END,
@@ -97,10 +112,15 @@ async fn upsert_localization(
 pub struct UiStringRepo;
 
 impl UiStringRepo {
-    pub async fn count_for_site(pool: &PgPool, site_id: Uuid) -> Result<i64, ApiError> {
+    /// Generic over the executor so [`Self::create`] can re-check the key
+    /// cap on its own transaction; normal callers pass `&PgPool`.
+    pub async fn count_for_site<'e, E>(executor: E, site_id: Uuid) -> Result<i64, ApiError>
+    where
+        E: PgExecutor<'e>,
+    {
         let count: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM ui_strings WHERE site_id = $1")
             .bind(site_id)
-            .fetch_one(pool)
+            .fetch_one(executor)
             .await?;
         Ok(count)
     }
@@ -175,6 +195,11 @@ impl UiStringRepo {
         Ok(rows)
     }
 
+    /// Create a key with its initial localizations. The 500-key cap is
+    /// enforced here, inside the transaction, behind a per-site
+    /// `pg_advisory_xact_lock` — concurrent creates on the same site
+    /// serialize, so racing requests can never overshoot the cap (the
+    /// handler's pool-side pre-check is only a fast path).
     pub async fn create(
         pool: &PgPool,
         site_id: Uuid,
@@ -182,6 +207,14 @@ impl UiStringRepo {
         localizations: &[UiStringLocalizationInput],
     ) -> Result<UiStringRow, ApiError> {
         let mut tx = pool.begin().await?;
+
+        sqlx::query("SELECT pg_advisory_xact_lock(hashtext($1)::bigint)")
+            .bind(format!("ui_strings:{site_id}"))
+            .execute(&mut *tx)
+            .await?;
+        if Self::count_for_site(&mut *tx, site_id).await? >= UI_STRINGS_MAX_KEYS_PER_SITE {
+            return Err(limit_exceeded());
+        }
 
         let row = sqlx::query_as::<_, UiStringRow>(
             "INSERT INTO ui_strings (site_id, key) VALUES ($1, $2)
@@ -203,8 +236,8 @@ impl UiStringRepo {
 
     /// Rename the key (when `key` is `Some`) and upsert the given
     /// localizations. When the payload changes the site-default locale's
-    /// value, every other locale's row flips to `outdated` in the same
-    /// transaction.
+    /// value, every locale row NOT upserted in the same payload flips to
+    /// `outdated` in the same transaction.
     pub async fn update(
         pool: &PgPool,
         site_id: Uuid,
@@ -252,14 +285,15 @@ impl UiStringRepo {
             upsert_localization(&mut tx, id, input).await?;
         }
 
-        if default_changed && let Some(default_id) = default_locale_id {
+        if default_changed {
+            let payload_locale_ids: Vec<Uuid> = localizations.iter().map(|l| l.locale_id).collect();
             sqlx::query(
                 "UPDATE ui_string_localizations
                  SET translation_status = 'outdated', updated_at = NOW()
-                 WHERE ui_string_id = $1 AND locale_id <> $2",
+                 WHERE ui_string_id = $1 AND locale_id <> ALL($2)",
             )
             .bind(id)
-            .bind(default_id)
+            .bind(&payload_locale_ids)
             .execute(&mut *tx)
             .await?;
         }

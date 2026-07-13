@@ -2,7 +2,11 @@ import { describe, expect, it, vi } from 'vitest';
 import { NavigationResource } from '../../resources/navigation.js';
 import { ForjaAuthError } from '../../errors.js';
 import type { HttpClient } from '../../http.js';
-import type { NavigationMenuResponse } from '../../types.js';
+import type {
+  NavigationItemResponse,
+  NavigationMenuResponse,
+  NavigationTree,
+} from '../../types.js';
 
 function createMockHttp(): HttpClient {
   return { get: vi.fn(), getOrNull: vi.fn(),
@@ -135,6 +139,35 @@ describe('NavigationResource', () => {
         locale: 'de',
       });
     });
+
+    // Drift-pin: the tree DTO gained first-class legal-document fields
+    // (legal_document_id FK + resolved legal_slug). Pinning the full node
+    // shape so future backend drift fails the type checker.
+    it('surfaces every field the backend returns per tree node', async () => {
+      const http = createMockHttp();
+      const node: NavigationTree = {
+        id: 'n1',
+        parent_id: null,
+        page_id: null,
+        external_url: null,
+        legal_document_id: 'legal-1',
+        icon: 'gavel',
+        display_order: 0,
+        open_in_new_tab: false,
+        title: 'Imprint',
+        page_slug: null,
+        legal_slug: 'imprint',
+        children: [],
+      };
+      vi.mocked(http.get).mockResolvedValue([node]);
+
+      const nav = new NavigationResource(http, siteId);
+      const result = await nav.getTree('m1');
+
+      expect(result).toEqual([node]);
+      expect(result[0].legal_document_id).toBe('legal-1');
+      expect(result[0].legal_slug).toBe('imprint');
+    });
   });
 
   describe('getMenuWithTree', () => {
@@ -224,7 +257,7 @@ describe('NavigationResource', () => {
       expect(http.get).not.toHaveBeenCalledWith(localesPath);
     });
 
-    it('resolves null name for a locale code the site does not configure', async () => {
+    it('does not forward an unconfigured locale code to the tree fetch and resolves null name', async () => {
       const http = createMockHttp();
       vi.mocked(http.getOrNull).mockResolvedValue(menu);
       mockGetByPath(http);
@@ -232,7 +265,13 @@ describe('NavigationResource', () => {
       const nav = new NavigationResource(http, siteId);
       const result = await nav.getMenuWithTree('footer', { locale: 'fr' });
 
-      expect(result?.menu.resolvedName).toBeNull();
+      // An unknown code would 400 on /tree — the tree is fetched locale-less.
+      expect(http.get).toHaveBeenCalledWith(treePath, undefined);
+      expect(http.get).not.toHaveBeenCalledWith(treePath, { locale: 'fr' });
+      expect(result).toEqual({
+        menu: { ...menu, resolvedName: null },
+        items: tree,
+      });
     });
 
     it('resolves null name when the menu has no localization for the locale', async () => {
@@ -365,6 +404,32 @@ describe('NavigationResource', () => {
 
       const nav = new NavigationResource(http, siteId);
       await expect(nav.getItem('test')).rejects.toThrow(ForjaAuthError);
+    });
+
+    // Drift-pin: the item DTO gained legal_document_id on the legal-link
+    // feature branch. Pinning the full shape so future drift fails the
+    // type checker.
+    it('surfaces every field the backend returns', async () => {
+      const http = createMockHttp();
+      const full: NavigationItemResponse = {
+        id: 'i1',
+        menu_id: 'm1',
+        parent_id: null,
+        page_id: null,
+        external_url: null,
+        legal_document_id: 'legal-1',
+        icon: null,
+        display_order: 2,
+        open_in_new_tab: false,
+        title: 'Privacy',
+      };
+      vi.mocked(http.getOrNull).mockResolvedValue(full);
+
+      const nav = new NavigationResource(http, siteId);
+      const result = await nav.getItem('i1');
+
+      expect(result).toEqual(full);
+      expect(result?.legal_document_id).toBe('legal-1');
     });
   });
 });

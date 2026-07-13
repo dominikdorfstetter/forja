@@ -5,7 +5,8 @@
  * The CSS in sections.css targets these BEM classes identically.
  */
 import { fetchNavTree, type NavigationTree, type SiteLocale } from "../lib/api";
-import { navItemHref, type NavItem } from "../lib/nav";
+import { localeCode } from "../lib/locale";
+import { navItemHref } from "../lib/nav";
 import { getTranslator } from "../lib/ui-strings";
 
 interface Props {
@@ -19,20 +20,20 @@ const t = await getTranslator(Astro.locals.locale);
 
 let items: NavigationTree[] = [];
 try {
-  items = await fetchNavTree("primary");
+  items = await fetchNavTree("primary", localeCode(Astro.locals.locale));
 } catch (e) {
   console.warn("[CMS] Failed to fetch primary nav:", e instanceof Error ? e.message : e);
 }
 
-const fallbackItems: NavItem[] =
+const fallbackItems: NavigationTree[] =
   items.length > 0
     ? []
     : [
-        { id: "home", parent_id: null, page_id: null, external_url: null, icon: null, display_order: 0, open_in_new_tab: false, title: t("nav.home"), page_slug: "", children: [] },
-        { id: "blog", parent_id: null, page_id: null, external_url: null, icon: null, display_order: 1, open_in_new_tab: false, title: t("nav.blog"), page_slug: "blog", children: [] },
+        { id: "home", parent_id: null, page_id: null, external_url: null, legal_document_id: null, icon: null, display_order: 0, open_in_new_tab: false, title: t("nav.home"), page_slug: "", legal_slug: null, children: [] },
+        { id: "blog", parent_id: null, page_id: null, external_url: null, legal_document_id: null, icon: null, display_order: 1, open_in_new_tab: false, title: t("nav.blog"), page_slug: "blog", legal_slug: null, children: [] },
       ];
 
-const navItems: NavItem[] = items.length > 0 ? items : fallbackItems;
+const navItems: NavigationTree[] = items.length > 0 ? items : fallbackItems;
 const showLocaleSwitcher = locales.length > 1;
 ---
 

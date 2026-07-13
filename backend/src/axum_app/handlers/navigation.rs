@@ -7,6 +7,7 @@
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use axum::response::Json;
+use sqlx::PgPool;
 use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 use uuid::Uuid;
@@ -17,11 +18,13 @@ use crate::dto::navigation::{
     ReorderNavigationTreeRequest, UpdateNavigationItemRequest,
 };
 use crate::dto::validated::ValidatedJson;
+use crate::errors::codes;
 use crate::errors::{ApiError, ProblemDetails};
 use crate::guards::auth_guard::{ReadKey, WriteKey};
 use crate::models::audit::AuditAction;
 use crate::models::navigation::{NavigationItem, NavigationItemLocalization};
 use crate::models::navigation_menu::NavigationMenu;
+use crate::repos::legal_repo::LegalDocumentRepo;
 use crate::services::audited_mutation::AuditedEntity;
 
 /// Navigation items audit and fire `navigation.*` webhooks.
@@ -31,6 +34,27 @@ use crate::AppState;
 use crate::services::permission_service::{Permission, PermissionService};
 use crate::services::response_cache;
 use crate::services::webhook_service;
+
+/// Reject a `legal_document_id` whose version chain does not resolve to the
+/// item's own site — a foreign reference would emit another site's slug in
+/// the public tree and 404 there.
+async fn ensure_legal_document_on_site(
+    pool: &PgPool,
+    legal_document_id: Option<Uuid>,
+    site_id: Uuid,
+) -> Result<(), ApiError> {
+    let Some(doc_id) = legal_document_id else {
+        return Ok(());
+    };
+    if LegalDocumentRepo::chain_root_on_site(pool, doc_id, site_id).await? {
+        return Ok(());
+    }
+    Err(
+        ApiError::validation("The referenced legal document does not belong to this site")
+            .with_code(codes::LEGAL_DOC_CROSS_SITE)
+            .with_entity_type("legal_doc"),
+    )
+}
 
 #[utoipa::path(
     get,
@@ -207,6 +231,7 @@ async fn create_navigation_item(
     .await?;
     let mut body = body.into_inner();
     body.site_id = site_id;
+    ensure_legal_document_on_site(&state.db, body.legal_document_id, site_id).await?;
 
     if body.menu_id == Uuid::nil() {
         let primary = NavigationMenu::find_by_slug(&state.db, site_id, "primary").await?;
@@ -268,6 +293,7 @@ async fn create_menu_item(
     let mut body = body.into_inner();
     body.site_id = menu.site_id;
     body.menu_id = menu_id;
+    ensure_legal_document_on_site(&state.db, body.legal_document_id, menu.site_id).await?;
 
     let item = NavigationItem::create(&state.db, body.clone()).await?;
 
@@ -323,8 +349,10 @@ async fn update_navigation_item(
     )
     .await?;
     let old = serde_json::to_value(&existing).ok();
+    let body = body.into_inner();
+    ensure_legal_document_on_site(&state.db, body.legal_document_id, existing.site_id).await?;
 
-    let item = NavigationItem::update(&state.db, id, body.into_inner()).await?;
+    let item = NavigationItem::update(&state.db, id, body).await?;
     let change_diff = match (old, serde_json::to_value(&item)) {
         (Some(old), Ok(new)) => Some((old, new)),
         _ => None,

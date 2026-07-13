@@ -21,6 +21,9 @@ interface LocaleValuesEditorProps {
   /** Default-locale value, used as placeholder on non-default locales. */
   defaultValue: string;
   readOnly: boolean;
+  /** Live non-default edits, so the page can batch them into the save-bar
+   *  PUT (the backend exempts payload locales from the outdated flip). */
+  onLocaleValueEdited?: (localeId: string, value: string) => void;
 }
 
 function TabStateChip({ state }: { state: 'missing' | 'outdated' }) {
@@ -74,6 +77,7 @@ export default function LocaleValuesEditor({
   control,
   defaultValue,
   readOnly,
+  onLocaleValueEdited,
 }: LocaleValuesEditorProps) {
   const { t } = useTranslation();
   const { showError } = useErrorSnackbar();
@@ -91,6 +95,11 @@ export default function LocaleValuesEditor({
   const saveLocaleValue = (values: Record<string, string>) => {
     const value = values.value ?? '';
     if (!row || value.trim().length === 0) return Promise.resolve();
+    // An unchanged blur is a no-op — unless the row is flagged outdated,
+    // where an explicit re-save is the confirm that clears the flag.
+    if (value === currentLoc?.value && currentLoc.translation_status !== 'Outdated') {
+      return Promise.resolve();
+    }
     return updateUiString(siteId, row.id, {
       localizations: [{ locale_id: currentLocale.locale_id, value }],
     }).catch((error) => {
@@ -148,6 +157,9 @@ export default function LocaleValuesEditor({
         localization={currentLoc ? { id: currentLoc.id, value: currentLoc.value } : undefined}
         createLocalization={(_localeId, values) => saveLocaleValue(values)}
         updateLocalization={(_locId, values) => saveLocaleValue(values)}
+        onLocaleValuesChange={(values) =>
+          onLocaleValueEdited?.(currentLocale.locale_id, values.value ?? '')
+        }
         invalidateKey={queryKeys.uiStrings(siteId)}
         placeholders={{ value: defaultValue }}
         localeHint={

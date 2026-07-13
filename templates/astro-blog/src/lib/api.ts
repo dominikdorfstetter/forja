@@ -241,6 +241,44 @@ export async function fetchPublishedBlogsByCategory(
   return client().blogs.listByCategory(categorySlug, { page, pageSize, localeId });
 }
 
+// ---- TTL cache for per-request chrome data ---------------------------------
+
+// The SSR process lives across deploys of CMS content, so chrome caches must
+// expire: successes get a modest TTL (matches the server-side response cache)
+// so CMS edits show up, and failures are only held for a short retry-after so
+// one transient backend error doesn't blank the chrome until redeploy.
+const CHROME_CACHE_TTL_MS = 60_000;
+const CHROME_CACHE_RETRY_AFTER_MS = 5_000;
+
+interface ChromeCacheEntry<T> {
+  value: T;
+  expiresAt: number;
+}
+
+/** Fetch-through cache: serves fresh entries, refreshes expired ones, and
+ * caches `fallback` briefly on failure — it never throws into the page. */
+async function fetchWithTtlCache<T>(
+  cache: Map<string, ChromeCacheEntry<T>>,
+  key: string,
+  fetcher: () => Promise<T>,
+  fallback: T,
+): Promise<T> {
+  const entry = cache.get(key);
+  if (entry && entry.expiresAt > Date.now()) return entry.value;
+
+  try {
+    const value = await fetcher();
+    cache.set(key, { value, expiresAt: Date.now() + CHROME_CACHE_TTL_MS });
+    return value;
+  } catch {
+    cache.set(key, {
+      value: fallback,
+      expiresAt: Date.now() + CHROME_CACHE_RETRY_AFTER_MS,
+    });
+    return fallback;
+  }
+}
+
 // ---- Navigation -----------------------------------------------------------
 
 /** A menu's tree plus its CMS-configured display name for one locale. */
@@ -251,80 +289,66 @@ export interface NavMenuData {
   localizedName?: string;
 }
 
-// Per-build cache: nav menus are part of the page chrome, so the same slugs
-// (primary, footer) are requested on every page. Memoize by slug + locale so
-// each menu is fetched once per build instead of once per page.
-const _cachedNavMenus = new Map<string, NavMenuData>();
+// Nav menus are part of the page chrome, so the same slugs (primary, footer)
+// are requested on every render — memoize by slug + locale with a TTL.
+const _cachedNavMenus = new Map<string, ChromeCacheEntry<NavMenuData>>();
 
 /**
  * Fetch a navigation menu (tree + localized display name) by its slug,
- * cached per slug + locale. Returns empty items if the menu does not exist
- * or the fetch fails — chrome renders without nav instead of crashing.
+ * cached per slug + locale for a short TTL. Returns empty items if the menu
+ * does not exist or the fetch fails — chrome renders without nav instead of
+ * crashing, and the next render after the retry window tries again.
  */
 export async function fetchNavMenu(
   menuSlug: string,
   locale?: string,
 ): Promise<NavMenuData> {
-  const cacheKey = `${menuSlug}:${locale ?? ""}`;
-  const cached = _cachedNavMenus.get(cacheKey);
-  if (cached) return cached;
-
-  let result: NavMenuData = { items: [] };
-  try {
-    const composed = await client().navigation.getMenuWithTree(
-      menuSlug,
-      locale ? { locale } : undefined,
-    );
-    if (composed) {
-      result = {
-        items: composed.items,
-        localizedName: composed.menu.resolvedName ?? undefined,
-      };
-    }
-  } catch {
-    // Keep the empty result; cache it so we don't retry on every page.
-  }
-  _cachedNavMenus.set(cacheKey, result);
-  return result;
+  return fetchWithTtlCache(
+    _cachedNavMenus,
+    `${menuSlug}:${locale ?? ""}`,
+    async () => {
+      const composed = await client().navigation.getMenuWithTree(
+        menuSlug,
+        locale ? { locale } : undefined,
+      );
+      return composed
+        ? {
+            items: composed.items,
+            localizedName: composed.menu.resolvedName ?? undefined,
+          }
+        : { items: [] };
+    },
+    { items: [] },
+  );
 }
 
 /**
- * Fetch a navigation menu's tree by its slug (cached per slug).
+ * Fetch a navigation menu's tree by its slug (cached per slug + locale).
  * Returns an empty array if the menu does not exist.
  */
 export async function fetchNavTree(
   menuSlug: string,
+  locale?: string,
 ): Promise<import("@forjacms/client").NavigationTree[]> {
-  return (await fetchNavMenu(menuSlug)).items;
+  return (await fetchNavMenu(menuSlug, locale)).items;
 }
 
 // ---- UI strings -------------------------------------------------------------
 
-// Per-build cache: the chrome-string dictionary is needed on every page for
-// the same handful of locales. Memoize by locale code — including failures,
-// so a dead backend doesn't add a fetch per page (t() falls back to the
-// template defaults).
-const _cachedUiStrings = new Map<string, Record<string, string>>();
+// The chrome-string dictionary is needed on every page for the same handful
+// of locales — memoize by locale code with a TTL.
+const _cachedUiStrings = new Map<string, ChromeCacheEntry<Record<string, string>>>();
 
 /**
- * Fetch the resolved UI-string map for a locale (cached per locale code).
- * Returns an empty map if the fetch fails or the site has no strings
- * configured — chrome then renders the template defaults.
+ * Fetch the resolved UI-string map for a locale (cached per locale code for
+ * a short TTL). Returns an empty map if the fetch fails or the site has no
+ * strings configured — chrome then renders the template defaults, and the
+ * next render after the retry window tries again.
  */
 export async function fetchUiStrings(
   locale: string,
 ): Promise<Record<string, string>> {
-  const cached = _cachedUiStrings.get(locale);
-  if (cached) return cached;
-
-  let result: Record<string, string> = {};
-  try {
-    result = await client().strings(locale);
-  } catch {
-    // Keep the empty result; cache it so we don't retry on every page.
-  }
-  _cachedUiStrings.set(locale, result);
-  return result;
+  return fetchWithTtlCache(_cachedUiStrings, locale, () => client().strings(locale), {});
 }
 
 // ---- Pages & Sections -----------------------------------------------------
