@@ -140,6 +140,7 @@
       "structure": "Structure",
       "navigation": "Navigation",
       "taxonomy": "Taxonomy",
+      "uiStrings": "UI strings",
       "site": "Site",
       "socialLinks": "Social Links",
       "activity": "Activity",
@@ -4190,7 +4191,15 @@
         "action": "Check the file and try again."
       }
     },
-    "SITE_SETTINGS_INVALID_ORIGIN": "One or more origins have an invalid format. Each origin must be scheme://host (e.g. https://example.com)."
+    "SITE_SETTINGS_INVALID_ORIGIN": "One or more origins have an invalid format. Each origin must be scheme://host (e.g. https://example.com).",
+    "ERR_STRINGS_KEY_TAKEN": {
+      "message": "Key already in use",
+      "action": "Choose a different key for this site."
+    },
+    "ERR_STRINGS_LIMIT_EXCEEDED": {
+      "message": "String limit reached",
+      "action": "A site can hold at most 500 UI string keys — delete unused keys first."
+    }
   },
   "welcome": {
     "tagline": "The privacy-first CMS built in Rust",
@@ -4672,6 +4681,54 @@
     "deleteEntryConfirm": "Delete the entry \"{{title}}\"? This can't be undone.",
     "perLanguage": "Per language · {{locale}}",
     "dragToReorder": "Drag to reorder"
+  },
+  "uiStrings": {
+    "title": "UI strings",
+    "subtitle": "Localized text dictionary for your site's templates — labels, headings, and screen-reader texts",
+    "newString": "New string",
+    "deleted": "String deleted.",
+    "deleteTitle": "Delete string",
+    "deleteConfirm": "Delete \"{{key}}\" and all its translations?",
+    "list": {
+      "loadError": "Failed to load UI strings.",
+      "colKey": "Key",
+      "colLocales": "Translations",
+      "colUpdated": "Updated",
+      "filterLabel": "Filter strings",
+      "filterAll": "All strings",
+      "filterMissing": "Missing translations",
+      "filterOutdated": "Outdated",
+      "noMatches": "No strings match this filter.",
+      "emptyTitle": "No UI strings yet",
+      "empty": "Define keys like blog.min_read and translate them per locale — your templates read them at render time.",
+      "localeStatus": {
+        "translated": "{{locale}}: translated",
+        "missing": "{{locale}}: missing",
+        "outdated": "{{locale}}: outdated — the default value changed"
+      }
+    },
+    "detail": {
+      "newTitle": "New UI string",
+      "subtitle": "Key and default value save together; other locales save as you leave the field",
+      "loading": "Loading UI string…",
+      "keyLabel": "Key",
+      "keyHelp": "Lowercase segments joined by '.', '_' or '-' — e.g. blog.min_read",
+      "keyRequired": "Key is required",
+      "keyTooLong": "Key cannot exceed 128 characters",
+      "keyInvalid": "Use lowercase letters and digits, joined by '.', '_' or '-'",
+      "valueLabel": "Value",
+      "valueTooLong": "Value cannot exceed 1000 characters",
+      "valueForLocale": "Value ({{locale}})",
+      "localeHint": "Value for {{locale}}. Saved when you leave the field; leave empty to keep the current value.",
+      "createHint": "Save the key and its default value first — then translate it into the other locales.",
+      "saved": "String saved.",
+      "created": "String created.",
+      "notFound": "This UI string does not exist.",
+      "status": {
+        "missing": "missing",
+        "outdated": "outdated"
+      }
+    }
   },
   "imprint": {
     "title": "Imprint",

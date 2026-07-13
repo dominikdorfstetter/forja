@@ -139,6 +139,7 @@
       "structure": "Estrutura",
       "navigation": "Navegação",
       "taxonomy": "Taxonomia",
+      "uiStrings": "Textos da interface",
       "site": "Site",
       "socialLinks": "Ligações Sociais",
       "activity": "Atividade",
@@ -3710,7 +3711,15 @@
         "action": "Verifique o ficheiro e tente novamente."
       }
     },
-    "SITE_SETTINGS_INVALID_ORIGIN": "Uma ou mais origens têm um formato inválido. Cada origem deve ser esquema://host (ex. https://exemplo.pt)."
+    "SITE_SETTINGS_INVALID_ORIGIN": "Uma ou mais origens têm um formato inválido. Cada origem deve ser esquema://host (ex. https://exemplo.pt).",
+    "ERR_STRINGS_KEY_TAKEN": {
+      "message": "Chave já em uso",
+      "action": "Escolha outra chave para este site."
+    },
+    "ERR_STRINGS_LIMIT_EXCEEDED": {
+      "message": "Limite de textos atingido",
+      "action": "Um site pode ter no máximo 500 chaves — exclua primeiro as não utilizadas."
+    }
   },
   "welcome": {
     "tagline": "O CMS open-source para sites rápidos, seguros e multilíngues",
@@ -4667,6 +4676,54 @@
     "deleteEntryConfirm": "Eliminar a entrada \"{{title}}\"? Isto não pode ser anulado.",
     "perLanguage": "Por idioma · {{locale}}",
     "dragToReorder": "Arraste para reordenar"
+  },
+  "uiStrings": {
+    "title": "Textos da interface",
+    "subtitle": "Dicionário de textos localizados para os templates do seu site: rótulos, títulos e textos para leitores de tela",
+    "newString": "Novo texto",
+    "deleted": "Texto excluído.",
+    "deleteTitle": "Excluir texto",
+    "deleteConfirm": "Excluir \"{{key}}\" e todas as suas traduções?",
+    "list": {
+      "loadError": "Não foi possível carregar os textos da interface.",
+      "colKey": "Chave",
+      "colLocales": "Traduções",
+      "colUpdated": "Atualizado",
+      "filterLabel": "Filtrar textos",
+      "filterAll": "Todos os textos",
+      "filterMissing": "Traduções em falta",
+      "filterOutdated": "Desatualizados",
+      "noMatches": "Nenhum texto corresponde a este filtro.",
+      "emptyTitle": "Ainda não há textos",
+      "empty": "Defina chaves como blog.min_read e traduza-as por idioma: seus templates as leem na renderização.",
+      "localeStatus": {
+        "translated": "{{locale}}: traduzido",
+        "missing": "{{locale}}: em falta",
+        "outdated": "{{locale}}: desatualizado — o valor padrão mudou"
+      }
+    },
+    "detail": {
+      "newTitle": "Novo texto da interface",
+      "subtitle": "A chave e o valor padrão são salvos juntos; os outros idiomas são salvos ao sair do campo",
+      "loading": "Carregando texto…",
+      "keyLabel": "Chave",
+      "keyHelp": "Segmentos minúsculos unidos por '.', '_' ou '-' — p. ex. blog.min_read",
+      "keyRequired": "A chave é obrigatória",
+      "keyTooLong": "A chave não pode exceder 128 caracteres",
+      "keyInvalid": "Use letras minúsculas e dígitos, unidos por '.', '_' ou '-'",
+      "valueLabel": "Valor",
+      "valueTooLong": "O valor não pode exceder 1000 caracteres",
+      "valueForLocale": "Valor ({{locale}})",
+      "localeHint": "Valor para {{locale}}. Salvo ao sair do campo; deixe vazio para manter o valor atual.",
+      "createHint": "Salve primeiro a chave com o valor padrão — depois traduza para os outros idiomas.",
+      "saved": "Texto salvo.",
+      "created": "Texto criado.",
+      "notFound": "Este texto da interface não existe.",
+      "status": {
+        "missing": "em falta",
+        "outdated": "desatualizado"
+      }
+    }
   },
   "imprint": {
     "title": "Informação legal",

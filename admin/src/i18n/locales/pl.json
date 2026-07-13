@@ -139,6 +139,7 @@
       "structure": "Struktura",
       "navigation": "Nawigacja",
       "taxonomy": "Taksonomia",
+      "uiStrings": "Teksty interfejsu",
       "site": "Strona",
       "socialLinks": "Linki społecznościowe",
       "activity": "Aktywność",
@@ -3712,7 +3713,15 @@
         "action": "Sprawdź plik i spróbuj ponownie."
       }
     },
-    "SITE_SETTINGS_INVALID_ORIGIN": "Co najmniej jedno źródło ma nieprawidłowy format. Każde źródło musi być schemat://host (np. https://przyklad.pl)."
+    "SITE_SETTINGS_INVALID_ORIGIN": "Co najmniej jedno źródło ma nieprawidłowy format. Każde źródło musi być schemat://host (np. https://przyklad.pl).",
+    "ERR_STRINGS_KEY_TAKEN": {
+      "message": "Klucz już istnieje",
+      "action": "Wybierz inny klucz dla tej witryny."
+    },
+    "ERR_STRINGS_LIMIT_EXCEEDED": {
+      "message": "Osiągnięto limit tekstów",
+      "action": "Witryna może zawierać najwyżej 500 kluczy — najpierw usuń nieużywane."
+    }
   },
   "welcome": {
     "tagline": "Otwartoźródłowy CMS dla szybkich, bezpiecznych, wielojęzycznych stron",
@@ -4669,6 +4678,54 @@
     "deleteEntryConfirm": "Usunąć wpis „{{title}}”? Tej operacji nie można cofnąć.",
     "perLanguage": "Na język · {{locale}}",
     "dragToReorder": "Przeciągnij, aby zmienić kolejność"
+  },
+  "uiStrings": {
+    "title": "Teksty interfejsu",
+    "subtitle": "Zlokalizowany słownik tekstów dla szablonów witryny — etykiety, nagłówki i teksty dla czytników ekranu",
+    "newString": "Nowy tekst",
+    "deleted": "Tekst usunięty.",
+    "deleteTitle": "Usuń tekst",
+    "deleteConfirm": "Usunąć \"{{key}}\" i wszystkie jego tłumaczenia?",
+    "list": {
+      "loadError": "Nie udało się wczytać tekstów interfejsu.",
+      "colKey": "Klucz",
+      "colLocales": "Tłumaczenia",
+      "colUpdated": "Zaktualizowano",
+      "filterLabel": "Filtruj teksty",
+      "filterAll": "Wszystkie teksty",
+      "filterMissing": "Brakujące tłumaczenia",
+      "filterOutdated": "Nieaktualne",
+      "noMatches": "Żaden tekst nie pasuje do tego filtra.",
+      "emptyTitle": "Nie ma jeszcze tekstów",
+      "empty": "Zdefiniuj klucze takie jak blog.min_read i przetłumacz je dla każdego języka — szablony odczytują je podczas renderowania.",
+      "localeStatus": {
+        "translated": "{{locale}}: przetłumaczono",
+        "missing": "{{locale}}: brak",
+        "outdated": "{{locale}}: nieaktualne — wartość domyślna się zmieniła"
+      }
+    },
+    "detail": {
+      "newTitle": "Nowy tekst interfejsu",
+      "subtitle": "Klucz i wartość domyślna zapisują się razem; pozostałe języki zapisują się po opuszczeniu pola",
+      "loading": "Wczytywanie tekstu…",
+      "keyLabel": "Klucz",
+      "keyHelp": "Małe litery w segmentach połączonych '.', '_' lub '-' — np. blog.min_read",
+      "keyRequired": "Klucz jest wymagany",
+      "keyTooLong": "Klucz nie może przekraczać 128 znaków",
+      "keyInvalid": "Używaj małych liter i cyfr połączonych '.', '_' lub '-'",
+      "valueLabel": "Wartość",
+      "valueTooLong": "Wartość nie może przekraczać 1000 znaków",
+      "valueForLocale": "Wartość ({{locale}})",
+      "localeHint": "Wartość dla {{locale}}. Zapisywana po opuszczeniu pola; pozostaw puste, aby zachować obecną wartość.",
+      "createHint": "Najpierw zapisz klucz z wartością domyślną — potem przetłumacz go na pozostałe języki.",
+      "saved": "Tekst zapisany.",
+      "created": "Tekst utworzony.",
+      "notFound": "Ten tekst interfejsu nie istnieje.",
+      "status": {
+        "missing": "brak",
+        "outdated": "nieaktualne"
+      }
+    }
   },
   "imprint": {
     "title": "Nota prawna",

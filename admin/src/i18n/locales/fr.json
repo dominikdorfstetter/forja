@@ -139,6 +139,7 @@
       "structure": "Structure",
       "navigation": "Navigation",
       "taxonomy": "Taxonomie",
+      "uiStrings": "Textes d'interface",
       "site": "Site",
       "socialLinks": "Liens sociaux",
       "activity": "Activité",
@@ -3365,7 +3366,15 @@
         "action": "Vérifiez le fichier et réessayez."
       }
     },
-    "SITE_SETTINGS_INVALID_ORIGIN": "Une ou plusieurs origines ont un format invalide. Chaque origine doit être schéma://hôte (ex. https://exemple.fr)."
+    "SITE_SETTINGS_INVALID_ORIGIN": "Une ou plusieurs origines ont un format invalide. Chaque origine doit être schéma://hôte (ex. https://exemple.fr).",
+    "ERR_STRINGS_KEY_TAKEN": {
+      "message": "Clé déjà utilisée",
+      "action": "Choisissez une autre clé pour ce site."
+    },
+    "ERR_STRINGS_LIMIT_EXCEEDED": {
+      "message": "Limite de textes atteinte",
+      "action": "Un site peut contenir au plus 500 clés — supprimez d'abord les clés inutilisées."
+    }
   },
   "welcome": {
     "tagline": "Le CMS open-source pour des sites rapides, sécurisés et multilingues",
@@ -4667,6 +4676,54 @@
     "deleteEntryConfirm": "Supprimer l’entrée « {{title}} » ? Cette action est irréversible.",
     "perLanguage": "Par langue · {{locale}}",
     "dragToReorder": "Glisser pour réordonner"
+  },
+  "uiStrings": {
+    "title": "Textes d'interface",
+    "subtitle": "Dictionnaire de textes localisés pour les templates de votre site — libellés, titres et textes pour lecteurs d'écran",
+    "newString": "Nouveau texte",
+    "deleted": "Texte supprimé.",
+    "deleteTitle": "Supprimer le texte",
+    "deleteConfirm": "Supprimer « {{key}} » et toutes ses traductions ?",
+    "list": {
+      "loadError": "Impossible de charger les textes d'interface.",
+      "colKey": "Clé",
+      "colLocales": "Traductions",
+      "colUpdated": "Mis à jour",
+      "filterLabel": "Filtrer les textes",
+      "filterAll": "Tous les textes",
+      "filterMissing": "Traductions manquantes",
+      "filterOutdated": "Obsolètes",
+      "noMatches": "Aucun texte ne correspond à ce filtre.",
+      "emptyTitle": "Aucun texte d'interface",
+      "empty": "Définissez des clés comme blog.min_read et traduisez-les par langue — vos templates les lisent au rendu.",
+      "localeStatus": {
+        "translated": "{{locale}} : traduit",
+        "missing": "{{locale}} : manquant",
+        "outdated": "{{locale}} : obsolète — la valeur par défaut a changé"
+      }
+    },
+    "detail": {
+      "newTitle": "Nouveau texte d'interface",
+      "subtitle": "La clé et la valeur par défaut s'enregistrent ensemble ; les autres langues s'enregistrent quand vous quittez le champ",
+      "loading": "Chargement du texte…",
+      "keyLabel": "Clé",
+      "keyHelp": "Segments en minuscules reliés par '.', '_' ou '-' — p. ex. blog.min_read",
+      "keyRequired": "La clé est requise",
+      "keyTooLong": "La clé ne peut pas dépasser 128 caractères",
+      "keyInvalid": "Utilisez des lettres minuscules et des chiffres, reliés par '.', '_' ou '-'",
+      "valueLabel": "Valeur",
+      "valueTooLong": "La valeur ne peut pas dépasser 1000 caractères",
+      "valueForLocale": "Valeur ({{locale}})",
+      "localeHint": "Valeur pour {{locale}}. Enregistrée quand vous quittez le champ ; laissez vide pour conserver la valeur actuelle.",
+      "createHint": "Enregistrez d'abord la clé et sa valeur par défaut — puis traduisez-la dans les autres langues.",
+      "saved": "Texte enregistré.",
+      "created": "Texte créé.",
+      "notFound": "Ce texte d'interface n'existe pas.",
+      "status": {
+        "missing": "manquant",
+        "outdated": "obsolète"
+      }
+    }
   },
   "imprint": {
     "title": "Mentions légales",

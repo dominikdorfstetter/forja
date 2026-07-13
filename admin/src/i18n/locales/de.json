@@ -140,6 +140,7 @@
       "structure": "Struktur",
       "navigation": "Navigation",
       "taxonomy": "Taxonomie",
+      "uiStrings": "UI-Texte",
       "site": "Seite",
       "socialLinks": "Social Links",
       "activity": "Aktivität",
@@ -3979,7 +3980,15 @@
         "action": "Überprüfen Sie die Datei und versuchen Sie es erneut."
       }
     },
-    "SITE_SETTINGS_INVALID_ORIGIN": "Mindestens ein Ursprung hat ein ungültiges Format. Jeder Ursprung muss Schema://Host sein (z.B. https://beispiel.de)."
+    "SITE_SETTINGS_INVALID_ORIGIN": "Mindestens ein Ursprung hat ein ungültiges Format. Jeder Ursprung muss Schema://Host sein (z.B. https://beispiel.de).",
+    "ERR_STRINGS_KEY_TAKEN": {
+      "message": "Schlüssel existiert bereits",
+      "action": "Verwenden Sie einen anderen Schlüssel für diese Site."
+    },
+    "ERR_STRINGS_LIMIT_EXCEEDED": {
+      "message": "Textlimit erreicht",
+      "action": "Eine Site kann höchstens 500 UI-Text-Schlüssel enthalten — löschen Sie zuerst ungenutzte Schlüssel."
+    }
   },
   "welcome": {
     "tagline": "Das Open-Source-CMS für schnelle, sichere, mehrsprachige Websites",
@@ -4667,6 +4676,54 @@
     "deleteEntryConfirm": "Den Eintrag „{{title}}“ löschen? Das kann nicht rückgängig gemacht werden.",
     "perLanguage": "Pro Sprache · {{locale}}",
     "dragToReorder": "Zum Neuordnen ziehen"
+  },
+  "uiStrings": {
+    "title": "UI-Texte",
+    "subtitle": "Lokalisiertes Textverzeichnis für die Templates Ihrer Site — Beschriftungen, Überschriften und Screenreader-Texte",
+    "newString": "Neuer Text",
+    "deleted": "Text gelöscht.",
+    "deleteTitle": "Text löschen",
+    "deleteConfirm": "\"{{key}}\" und alle Übersetzungen löschen?",
+    "list": {
+      "loadError": "UI-Texte konnten nicht geladen werden.",
+      "colKey": "Schlüssel",
+      "colLocales": "Übersetzungen",
+      "colUpdated": "Aktualisiert",
+      "filterLabel": "Texte filtern",
+      "filterAll": "Alle Texte",
+      "filterMissing": "Fehlende Übersetzungen",
+      "filterOutdated": "Veraltet",
+      "noMatches": "Keine Texte entsprechen diesem Filter.",
+      "emptyTitle": "Noch keine UI-Texte",
+      "empty": "Definieren Sie Schlüssel wie blog.min_read und übersetzen Sie sie pro Sprache — Ihre Templates lesen sie beim Rendern.",
+      "localeStatus": {
+        "translated": "{{locale}}: übersetzt",
+        "missing": "{{locale}}: fehlt",
+        "outdated": "{{locale}}: veraltet — der Standardwert wurde geändert"
+      }
+    },
+    "detail": {
+      "newTitle": "Neuer UI-Text",
+      "subtitle": "Schlüssel und Standardwert werden gemeinsam gespeichert; andere Sprachen beim Verlassen des Felds",
+      "loading": "UI-Text wird geladen…",
+      "keyLabel": "Schlüssel",
+      "keyHelp": "Kleingeschriebene Segmente, verbunden mit '.', '_' oder '-' — z. B. blog.min_read",
+      "keyRequired": "Schlüssel ist erforderlich",
+      "keyTooLong": "Schlüssel darf höchstens 128 Zeichen lang sein",
+      "keyInvalid": "Nur Kleinbuchstaben und Ziffern, verbunden mit '.', '_' oder '-'",
+      "valueLabel": "Wert",
+      "valueTooLong": "Wert darf höchstens 1000 Zeichen lang sein",
+      "valueForLocale": "Wert ({{locale}})",
+      "localeHint": "Wert für {{locale}}. Wird beim Verlassen des Felds gespeichert; leer lassen, um den aktuellen Wert zu behalten.",
+      "createHint": "Speichern Sie zuerst den Schlüssel mit dem Standardwert — danach übersetzen Sie ihn in die anderen Sprachen.",
+      "saved": "Text gespeichert.",
+      "created": "Text erstellt.",
+      "notFound": "Dieser UI-Text existiert nicht.",
+      "status": {
+        "missing": "fehlt",
+        "outdated": "veraltet"
+      }
+    }
   },
   "imprint": {
     "title": "Impressum",

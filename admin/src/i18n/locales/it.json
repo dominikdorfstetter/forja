@@ -139,6 +139,7 @@
       "structure": "Struttura",
       "navigation": "Navigazione",
       "taxonomy": "Tassonomia",
+      "uiStrings": "Testi interfaccia",
       "site": "Sito",
       "socialLinks": "Link social",
       "activity": "Attività",
@@ -3710,7 +3711,15 @@
         "action": "Controlla il file e riprova."
       }
     },
-    "SITE_SETTINGS_INVALID_ORIGIN": "Una o più origini hanno un formato non valido. Ogni origine deve essere schema://host (es. https://esempio.it)."
+    "SITE_SETTINGS_INVALID_ORIGIN": "Una o più origini hanno un formato non valido. Ogni origine deve essere schema://host (es. https://esempio.it).",
+    "ERR_STRINGS_KEY_TAKEN": {
+      "message": "Chiave già in uso",
+      "action": "Scegli un'altra chiave per questo sito."
+    },
+    "ERR_STRINGS_LIMIT_EXCEEDED": {
+      "message": "Limite di testi raggiunto",
+      "action": "Un sito può contenere al massimo 500 chiavi: elimina prima quelle inutilizzate."
+    }
   },
   "welcome": {
     "tagline": "Il CMS open-source per siti web veloci, sicuri e multilingue",
@@ -4667,6 +4676,54 @@
     "deleteEntryConfirm": "Eliminare la voce «{{title}}»? L'azione non può essere annullata.",
     "perLanguage": "Per lingua · {{locale}}",
     "dragToReorder": "Trascina per riordinare"
+  },
+  "uiStrings": {
+    "title": "Testi dell'interfaccia",
+    "subtitle": "Dizionario di testi localizzati per i template del tuo sito: etichette, intestazioni e testi per screen reader",
+    "newString": "Nuovo testo",
+    "deleted": "Testo eliminato.",
+    "deleteTitle": "Elimina testo",
+    "deleteConfirm": "Eliminare \"{{key}}\" e tutte le sue traduzioni?",
+    "list": {
+      "loadError": "Impossibile caricare i testi dell'interfaccia.",
+      "colKey": "Chiave",
+      "colLocales": "Traduzioni",
+      "colUpdated": "Aggiornato",
+      "filterLabel": "Filtra i testi",
+      "filterAll": "Tutti i testi",
+      "filterMissing": "Traduzioni mancanti",
+      "filterOutdated": "Obsoleti",
+      "noMatches": "Nessun testo corrisponde a questo filtro.",
+      "emptyTitle": "Ancora nessun testo",
+      "empty": "Definisci chiavi come blog.min_read e traducile per lingua: i tuoi template le leggono al rendering.",
+      "localeStatus": {
+        "translated": "{{locale}}: tradotto",
+        "missing": "{{locale}}: mancante",
+        "outdated": "{{locale}}: obsoleto — il valore predefinito è cambiato"
+      }
+    },
+    "detail": {
+      "newTitle": "Nuovo testo dell'interfaccia",
+      "subtitle": "Chiave e valore predefinito si salvano insieme; le altre lingue si salvano quando lasci il campo",
+      "loading": "Caricamento del testo…",
+      "keyLabel": "Chiave",
+      "keyHelp": "Segmenti minuscoli uniti da '.', '_' o '-' — ad es. blog.min_read",
+      "keyRequired": "La chiave è obbligatoria",
+      "keyTooLong": "La chiave non può superare i 128 caratteri",
+      "keyInvalid": "Usa lettere minuscole e cifre, unite da '.', '_' o '-'",
+      "valueLabel": "Valore",
+      "valueTooLong": "Il valore non può superare i 1000 caratteri",
+      "valueForLocale": "Valore ({{locale}})",
+      "localeHint": "Valore per {{locale}}. Salvato quando lasci il campo; lascialo vuoto per mantenere il valore attuale.",
+      "createHint": "Salva prima la chiave con il valore predefinito, poi traducila nelle altre lingue.",
+      "saved": "Testo salvato.",
+      "created": "Testo creato.",
+      "notFound": "Questo testo dell'interfaccia non esiste.",
+      "status": {
+        "missing": "mancante",
+        "outdated": "obsoleto"
+      }
+    }
   },
   "imprint": {
     "title": "Note legali",

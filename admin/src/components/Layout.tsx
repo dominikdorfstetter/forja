@@ -29,6 +29,7 @@ import HistoryIcon from '@mui/icons-material/History';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import TuneIcon from '@mui/icons-material/Tune';
 import AltRouteIcon from '@mui/icons-material/AltRoute';
+import TranslateIcon from '@mui/icons-material/Translate';
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
 import { Fade } from '@mui/material';
@@ -220,6 +221,7 @@ export default function Layout() {
     structureIcons: {
       navigation: <MenuBookIcon />,
       taxonomy: <LocalOfferIcon />,
+      uiStrings: <TranslateIcon />,
       socialLinks: <ShareIcon />,
       redirects: <AltRouteIcon />,
     },

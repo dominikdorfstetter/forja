@@ -55,6 +55,7 @@ export interface WorkspaceDeps {
   structureIcons: {
     navigation: ReactNode;
     taxonomy: ReactNode;
+    uiStrings: ReactNode;
     socialLinks: ReactNode;
     redirects: ReactNode;
   };
@@ -126,6 +127,11 @@ export function buildWorkspaceSections(deps: WorkspaceDeps): NavMenuSection[] {
           text: t('layout.sidebar.taxonomy'),
           icon: deps.structureIcons.taxonomy,
           path: '/taxonomy',
+        },
+        {
+          text: t('layout.sidebar.uiStrings'),
+          icon: deps.structureIcons.uiStrings,
+          path: '/ui-strings',
         },
         {
           text: t('layout.sidebar.socialLinks'),

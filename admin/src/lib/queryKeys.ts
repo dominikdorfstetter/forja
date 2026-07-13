@@ -118,6 +118,7 @@ export const queryKeys = {
   cmdSearchPages: (siteId: SiteId, query: unknown) => ['cmd-search-pages', siteId, query] as const,
   cmdSearchMedia: (siteId: SiteId, query: unknown) => ['cmd-search-media', siteId, query] as const,
   ropa: (siteId: SiteId) => ['ropa', siteId] as const,
+  uiStrings: (siteId: SiteId) => ['ui-strings', siteId] as const,
   customTypes: (siteId: SiteId) => ['custom-types', siteId] as const,
   customType: (siteId: SiteId, key: Id) => ['custom-type', siteId, key] as const,
   customEntries: (siteId: SiteId, key: Id, ...filters: Filters) =>
