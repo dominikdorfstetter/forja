@@ -100,7 +100,7 @@ url = "2"
 
 # Image processing (only codecs we actually encode/decode — no AVIF encoder, no rayon)
 image = { version = "0.25", default-features = false, features = ["jpeg", "png", "gif", "webp", "ico"] }
-infer = "0.19"
+infer = "0.22"
 slug = "0.1"
 zip = { version = "8", default-features = false, features = ["deflate"] }
 
