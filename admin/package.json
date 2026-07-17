@@ -58,7 +58,7 @@
     "react-dom": "^19.2.7",
     "react-easy-crop": "^6.2.2",
     "react-hook-form": "^7.81.0",
-    "react-i18next": "^17.0.9",
+    "react-i18next": "^17.0.10",
     "react-markdown": "^10.1.0",
     "react-router": "^8.2.0",
     "recharts": "^3.9.2",
