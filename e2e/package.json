@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@clerk/testing": "^2.2.7",
-    "@cucumber/cucumber": "^13.0.0",
+    "@cucumber/cucumber": "^13.2.1",
     "dotenv": "^17.4.2",
     "playwright": "^1.60.0",
     "ts-node": "^10.9.2"
