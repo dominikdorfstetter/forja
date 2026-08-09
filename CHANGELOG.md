@@ -6,6 +6,19 @@ Forja is a GDPR-first, multi-tenant headless CMS — a Rust (Axum) backend and a
 
 ## [Unreleased]
 
+## [2.1.4] — 2026-08-09
+
+A monorepo-wide dependency sweep (PR #214) — no feature changes, but two security-relevant upgrades and a batch of hardening fixes.
+
+### Changed
+
+- **jsonwebtoken 9 → 11 (backend).** The JWT library had been pinned to 9.x because v10 rejected Clerk session tokens carrying non-string custom header fields (the 2.0.1 outage). v11 defers header-extras deserialization, so unknown fields are tolerated again; the migration is guarded by the existing regression test and ships on the `aws_lc_rs` crypto backend already in the dependency tree.
+- **Dependency refresh everywhere.** Backend: aes-gcm 0.11 (new RustCrypto AEAD stack, wire format unchanged), infer 0.22, redis 1.5, uuid 1.24, aws-sdk-s3 1.141. npm: tiptap 3.29, MUI 9.3, React 19.2.8, Vite 8.2, Astro 7.2, Playwright 1.62, and all transitive advisory fixes (brace-expansion, fast-uri, postcss, undici, nanoid) — `npm audit` and `cargo audit` are clean, with a new `sharp >=0.35.3` override in docs closing the libvips CVEs.
+
+### Fixed
+
+- **React correctness findings from the react-doctor 0.9 upgrade.** Impure state updaters in the list-page sort toggle and locale-aware fields were restructured, image-preview object URLs are now created and revoked in effect scope via a shared `useImagePreviewUrl` hook, preview windows open with `noopener,noreferrer`, and the auth/help/preferences context values are memoized to stop needless re-renders of every consumer.
+
 ## [2.1.3] — 2026-07-13
 
 ### Added
