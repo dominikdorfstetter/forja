@@ -110,24 +110,22 @@ export default function LocaleAwareFields<TForm extends FieldValues>({
 
   const handleLocaleChange = useCallback(
     (name: string, value: string) => {
-      setEdited((prev) => {
-        const next = { ...prev, [name]: value };
-        if (onLocaleValuesChange) {
-          const merged: Record<string, string> = {};
-          for (const spec of fields) {
-            merged[spec.name] =
-              spec.name in next
-                ? next[spec.name]
-                : typeof localization?.[spec.name] === 'string'
-                  ? (localization[spec.name] as string)
-                  : '';
-          }
-          onLocaleValuesChange(merged);
+      const next = { ...edited, [name]: value };
+      setEdited(next);
+      if (onLocaleValuesChange) {
+        const merged: Record<string, string> = {};
+        for (const spec of fields) {
+          merged[spec.name] =
+            spec.name in next
+              ? next[spec.name]
+              : typeof localization?.[spec.name] === 'string'
+                ? (localization[spec.name] as string)
+                : '';
         }
-        return next;
-      });
+        onLocaleValuesChange(merged);
+      }
     },
-    [fields, localization, onLocaleValuesChange],
+    [edited, fields, localization, onLocaleValuesChange],
   );
 
   const handleLocaleBlur = useCallback(() => {

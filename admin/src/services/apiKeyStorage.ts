@@ -12,6 +12,7 @@ export function migrateApiKeyStorage(): void {
   try {
     const key = localStorage.getItem(API_KEY);
     if (key) {
+      // react-doctor-disable-next-line auth-token-in-web-storage -- deliberate: API-key auth has no cookie session; sessionStorage (tab-scoped) is the documented defense-in-depth choice over localStorage
       sessionStorage.setItem(API_KEY, key);
       localStorage.removeItem(API_KEY);
     }
@@ -32,6 +33,7 @@ export function getApiKey(): string | null {
 /** Store an API key in sessionStorage. */
 export function setApiKey(key: string): void {
   try {
+    // react-doctor-disable-next-line auth-token-in-web-storage -- deliberate: see migrateApiKeyStorage rationale
     sessionStorage.setItem(API_KEY, key);
   } catch {
     // Storage access may fail in sandboxed/private environments
@@ -54,6 +56,7 @@ export function clearApiKey(): void {
  *  rendering the welcome screen. */
 export function markCurrentKeyAsGuest(): void {
   try {
+    // react-doctor-disable-next-line auth-token-in-web-storage -- boolean guest-mode marker, not a credential
     sessionStorage.setItem(GUEST_FLAG, '1');
   } catch {
     // Storage access may fail in sandboxed/private environments

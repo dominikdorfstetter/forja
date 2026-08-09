@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import {
   Alert,
   Box,
@@ -14,6 +14,7 @@ import LinkIcon from '@mui/icons-material/Link';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import type { UseFormRegister, FieldErrors } from 'react-hook-form';
 import type { DocumentResponse } from '@/types/api';
+import { useImagePreviewUrl } from '@/hooks/useImagePreviewUrl';
 import { useTranslation } from 'react-i18next';
 
 function formatFileSize(bytes: number): string {
@@ -56,13 +57,7 @@ export default function DocumentSourceSection({
   const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const preview = useMemo(
-    () => selectedFile?.type.startsWith('image/') ? URL.createObjectURL(selectedFile) : null,
-    [selectedFile],
-  );
-  useEffect(() => {
-    return () => { if (preview) URL.revokeObjectURL(preview); };
-  }, [preview]);
+  const preview = useImagePreviewUrl(selectedFile);
 
   const handleSourceTypeChange = (_: React.MouseEvent<HTMLElement>, value: string | null) => {
     if (value === 'link' || value === 'upload') {

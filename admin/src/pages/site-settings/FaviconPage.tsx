@@ -130,6 +130,7 @@ export default function FaviconPage() {
         return;
       }
       const img = new Image();
+      // react-doctor-disable-next-line no-create-object-url-without-revoke -- revoked on every path: square-image (139), decode-error (144), crop-complete (174), crop-cancel (184)
       const url = URL.createObjectURL(file);
       img.onload = () => {
         if (img.width !== img.height) {

@@ -1,4 +1,4 @@
-import { createContext, useContext, useCallback, useState, type ReactNode } from 'react';
+import { createContext, useContext, useCallback, useMemo, useState, type ReactNode } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/store/AuthContext';
 import { getHelpState, resetHelpState, updateHelpState } from '@/services/auth';
@@ -128,18 +128,32 @@ export function HelpStateProvider({ children }: { children: ReactNode }) {
     [helpState.field_help_seen],
   );
 
-  const value: HelpStateContextValue = {
-    state: helpState,
-    isLoading,
-    tourActive,
-    startTour,
-    completeTour,
-    resetTour,
-    dismissHotspot,
-    dismissFieldHelp,
-    isHotspotSeen,
-    isFieldHelpSeen,
-  };
+  const value: HelpStateContextValue = useMemo(
+    () => ({
+      state: helpState,
+      isLoading,
+      tourActive,
+      startTour,
+      completeTour,
+      resetTour,
+      dismissHotspot,
+      dismissFieldHelp,
+      isHotspotSeen,
+      isFieldHelpSeen,
+    }),
+    [
+      helpState,
+      isLoading,
+      tourActive,
+      startTour,
+      completeTour,
+      resetTour,
+      dismissHotspot,
+      dismissFieldHelp,
+      isHotspotSeen,
+      isFieldHelpSeen,
+    ],
+  );
 
   return (
     <HelpStateContext.Provider value={value}>

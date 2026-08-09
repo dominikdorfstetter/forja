@@ -1,4 +1,4 @@
-import { createContext, useContext, useCallback, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useCallback, useEffect, useMemo, type ReactNode } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/store/AuthContext';
@@ -100,12 +100,15 @@ export function UserPreferencesProvider({ children }: { children: ReactNode }) {
     [mutation, queryClient, i18n, setThemeId],
   );
 
-  const value: UserPreferencesContextValue = {
-    preferences: data ?? getDefaultPreferences(),
-    isLoading,
-    updatePreferences,
-    isUpdating: mutation.isPending,
-  };
+  const value: UserPreferencesContextValue = useMemo(
+    () => ({
+      preferences: data ?? getDefaultPreferences(),
+      isLoading,
+      updatePreferences,
+      isUpdating: mutation.isPending,
+    }),
+    [data, isLoading, updatePreferences, mutation.isPending],
+  );
 
   return (
     <UserPreferencesContext.Provider value={value}>
