@@ -25,10 +25,18 @@ export function usePreviewUrl() {
     try {
       const { token } = await getPreviewToken(selectedSiteId);
       const separator = cleanPath.includes('?') ? '&' : '?';
-      window.open(`${cleanBase}${cleanPath}${separator}token=${encodeURIComponent(token)}`, '_blank');
+      window.open(
+        `${cleanBase}${cleanPath}${separator}token=${encodeURIComponent(token)}`,
+        '_blank',
+        'noopener,noreferrer',
+      );
     } catch {
       // Fall back to direct URL without token if token generation fails
-      window.open(cleanBase + (path ? '/' + path.replace(/^\/+/, '') : ''), '_blank');
+      window.open(
+        cleanBase + (path ? '/' + path.replace(/^\/+/, '') : ''),
+        '_blank',
+        'noopener,noreferrer',
+      );
     }
   }, [templates, selectedSiteId]);
 

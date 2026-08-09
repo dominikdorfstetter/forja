@@ -23,9 +23,13 @@ export function useListPageState<T>(options?: UseListPageStateOptions) {
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebouncedValue(search);
 
-  // Sort state
-  const [sortBy, setSortBy] = useState(options?.initialSortBy ?? '');
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>(options?.initialSortDir ?? 'asc');
+  // Sort state — one atomic value so toggling direction on the active column
+  // never needs a nested updater (updaters must stay pure).
+  const [sort, setSort] = useState<{ sortBy: string; sortDir: 'asc' | 'desc' }>({
+    sortBy: options?.initialSortBy ?? '',
+    sortDir: options?.initialSortDir ?? 'asc',
+  });
+  const { sortBy, sortDir } = sort;
 
   // Chip filter state (list-page kit v2)
   const [chipFilter, setChipFilterState] = useState(options?.initialChipFilter ?? 'all');
@@ -60,12 +64,10 @@ export function useListPageState<T>(options?: UseListPageStateOptions) {
   );
 
   const handleSort = useCallback((column: string) => {
-    setSortBy((prevSortBy) => {
-      setSortDir((prevSortDir) =>
-        prevSortBy === column ? (prevSortDir === 'asc' ? 'desc' : 'asc') : 'asc'
-      );
-      return column;
-    });
+    setSort((prev) => ({
+      sortBy: column,
+      sortDir: prev.sortBy === column ? (prev.sortDir === 'asc' ? 'desc' : 'asc') : 'asc',
+    }));
     setPage(1);
   }, []);
 

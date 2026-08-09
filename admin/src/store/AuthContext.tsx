@@ -197,8 +197,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const perm = state.permission;
-
   const getRoleForSite = useCallback(
     (siteId: string): SiteRole | null => {
       if (state.isSystemAdmin) return 'owner';
@@ -214,12 +212,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return getRoleForSite(siteId);
   }, [state.siteId, activeSiteId, getRoleForSite]);
 
-  const hasAtLeast = (min: SiteRole): boolean => {
-    if (!currentSiteRole) return false;
-    return ROLE_RANK[currentSiteRole] >= ROLE_RANK[min];
-  };
-
-  const value: AuthContextValue = {
+  const value: AuthContextValue = useMemo(() => {
+    const perm = state.permission;
+    const hasAtLeast = (min: SiteRole): boolean => {
+      if (!currentSiteRole) return false;
+      return ROLE_RANK[currentSiteRole] >= ROLE_RANK[min];
+    };
+    return {
     ...state,
     logout,
     refreshAuth,
@@ -240,7 +239,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     userImageUrl: user?.imageUrl ?? null,
     getRoleForSite,
     demoMode: state.demoMode,
-  };
+    };
+  }, [state, logout, refreshAuth, currentSiteRole, user, getRoleForSite]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

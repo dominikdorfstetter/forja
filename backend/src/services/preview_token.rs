@@ -54,8 +54,10 @@ pub fn generate(site_id: Uuid, secret: &str) -> Result<(String, i64), ApiError> 
 
 /// Validate a preview token and return the site ID it grants access to.
 pub fn validate(token: &str, secret: &str) -> Result<Uuid, ApiError> {
-    let mut validation = Validation::default();
-    validation.validate_aud = false;
+    let validation = Validation {
+        validate_aud: false,
+        ..Validation::default()
+    };
 
     let data = jsonwebtoken::decode::<PreviewTokenClaims>(
         token,

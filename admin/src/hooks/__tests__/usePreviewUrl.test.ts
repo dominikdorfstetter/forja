@@ -62,6 +62,7 @@ describe('usePreviewUrl', () => {
     expect(openSpy).toHaveBeenCalledWith(
       'https://example.com/preview/blog/hello?token=test-jwt-token',
       '_blank',
+      'noopener,noreferrer',
     );
   });
 
@@ -92,6 +93,7 @@ describe('usePreviewUrl', () => {
     expect(openSpy).toHaveBeenCalledWith(
       'https://other.com/preview/page/about?token=abc123',
       '_blank',
+      'noopener,noreferrer',
     );
   });
 
@@ -109,6 +111,7 @@ describe('usePreviewUrl', () => {
     expect(openSpy).toHaveBeenCalledWith(
       'https://example.com/blog/hello',
       '_blank',
+      'noopener,noreferrer',
     );
   });
 });

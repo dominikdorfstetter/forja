@@ -44,7 +44,7 @@ serde_json = "1.0.149"
 chrono = { version = "0.4.44", features = ["serde"] }
 
 # UUID
-uuid = { version = "1.23.4", features = ["v4", "v5", "serde"] }
+uuid = { version = "1.24.0", features = ["v4", "v5", "serde"] }
 
 # Validation
 validator = { version = "0.20.0", features = ["derive"] }
@@ -74,22 +74,21 @@ rand = "0.10"
 
 # Security
 sha2 = "0.11"
-aes-gcm = "0.10"
+aes-gcm = "0.11"
 argon2 = "0.5"
 bcrypt = "0.19.0"
 hmac = "0.13"
-# Pinned to 9.x: jsonwebtoken 10 deserialises unknown JWT header parameters
-# into a flattened `extras: HashMap<String, String>` and rejects any
-# non-string value. Clerk session tokens carry an integer custom header field,
-# so `decode_header` failed for every real token under 10 — 401-ing all
-# authenticated requests (the 2.0.1 production outage). 9.x ignores unknown
-# header fields; see the regression test in guards::auth_guard. Revisit a v10
-# move only with a custom lenient header parse.
-jsonwebtoken = "9"
+# v11 fixed the v10 header regression that caused the 2.0.1 production outage
+# (v10's flattened `extras: HashMap<String, String>` rejected Clerk's integer
+# custom header fields; v11 defers extras deserialization so unknown fields
+# are tolerated again — pinned by the regression test in guards::auth_guard).
+# `aws_lc_rs` backend: aws-lc-rs is already in-tree via rustls, so this adds
+# no second crypto stack. No PEM parsing needed (JWK + HMAC secrets only).
+jsonwebtoken = { version = "11", default-features = false, features = ["aws_lc_rs"] }
 reqwest = { version = "0.13", features = ["json", "rustls", "query", "charset", "http2"], default-features = false }
 
 # Redis (rate limiting)
-redis = { version = "1.0", features = ["tokio-comp", "connection-manager"] }
+redis = { version = "1.4", features = ["tokio-comp", "connection-manager"] }
 
 # Encoding
 base64 = "0.22"
@@ -100,7 +99,7 @@ url = "2"
 
 # Image processing (only codecs we actually encode/decode — no AVIF encoder, no rayon)
 image = { version = "0.25", default-features = false, features = ["jpeg", "png", "gif", "webp", "ico"] }
-infer = "0.19"
+infer = "0.22"
 slug = "0.1"
 zip = { version = "8", default-features = false, features = ["deflate"] }
 
@@ -110,7 +109,7 @@ zip = { version = "8", default-features = false, features = ["deflate"] }
 # feature (used pre-cutover) brought in hyper-rustls 0.24 → rustls 0.21 →
 # rustls-webpki 0.101.7 (RUSTSEC-2026-0104, DoS panic on malformed CRL).
 # `rt-tokio` enables ByteStream::from_path for streamed (bounded-memory) uploads.
-aws-sdk-s3 = { version = "1.125", default-features = false, features = ["default-https-client", "rt-tokio"] }
+aws-sdk-s3 = { version = "1.138", default-features = false, features = ["default-https-client", "rt-tokio"] }
 aws-config = { version = "1.8", default-features = false, features = ["default-https-client", "rt-tokio"] }
 
 # Filesystem stats (disk usage for health checks)

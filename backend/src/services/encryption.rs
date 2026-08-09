@@ -1,7 +1,7 @@
 //! AES-256-GCM encryption for sensitive configuration values (e.g. AI API keys).
 
-use aes_gcm::aead::{Aead, KeyInit, OsRng};
-use aes_gcm::{AeadCore, Aes256Gcm};
+use aes_gcm::aead::{Aead, Generate, KeyInit};
+use aes_gcm::{Aes256Gcm, Nonce};
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD as BASE64;
 
@@ -36,7 +36,7 @@ pub fn resolve_key(config_value: &str) -> Result<[u8; 32], ApiError> {
 pub fn encrypt(plaintext: &str, key: &[u8; 32]) -> Result<(Vec<u8>, Vec<u8>), ApiError> {
     let cipher = Aes256Gcm::new_from_slice(key)
         .map_err(|e| ApiError::internal(format!("Cipher init failed: {e}")))?;
-    let nonce = Aes256Gcm::generate_nonce(&mut OsRng);
+    let nonce = Nonce::generate();
     let ciphertext = cipher
         .encrypt(&nonce, plaintext.as_bytes())
         .map_err(|e| ApiError::internal(format!("Encryption failed: {e}")))?;
@@ -47,8 +47,8 @@ pub fn encrypt(plaintext: &str, key: &[u8; 32]) -> Result<(Vec<u8>, Vec<u8>), Ap
 pub fn decrypt(ciphertext: &[u8], nonce: &[u8], key: &[u8; 32]) -> Result<String, ApiError> {
     let cipher = Aes256Gcm::new_from_slice(key)
         .map_err(|e| ApiError::internal(format!("Cipher init failed: {e}")))?;
-    let nonce = aes_gcm::Nonce::from_slice(nonce);
-    let plaintext = cipher.decrypt(nonce, ciphertext).map_err(|_| {
+    let nonce = Nonce::try_from(nonce).map_err(|_| ApiError::internal("Invalid nonce length"))?;
+    let plaintext = cipher.decrypt(&nonce, ciphertext).map_err(|_| {
         ApiError::internal(
             "API key decryption failed — key may be corrupted or encryption key changed",
         )
@@ -83,7 +83,7 @@ mod tests {
     #[test]
     fn test_decrypt_wrong_key_fails() {
         let key1 = resolve_key("").unwrap();
-        let key2: [u8; 32] = Aes256Gcm::generate_key(&mut OsRng).into();
+        let key2: [u8; 32] = aes_gcm::Key::<Aes256Gcm>::generate().into();
         let (ciphertext, nonce) = encrypt("secret", &key1).unwrap();
         let result = decrypt(&ciphertext, &nonce, &key2);
         assert!(result.is_err());

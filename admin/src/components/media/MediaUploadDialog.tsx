@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
+import { useCallback, useEffect, useReducer, useRef } from 'react';
 import {
   Box,
   FormControlLabel,
@@ -10,6 +10,7 @@ import {
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import FormDialog from '@/components/shared/FormDialog';
+import { useImagePreviewUrl } from '@/hooks/useImagePreviewUrl';
 import { useTranslation } from 'react-i18next';
 import type { MediaResponse } from '@/types/api';
 
@@ -92,14 +93,7 @@ export default function MediaUploadDialog({ open, onSubmit, onClose, loading }: 
     prevOpenRef.current = open;
   });
 
-  // Derive image preview URL from selected file (with cleanup for object URLs)
-  const preview = useMemo(
-    () => state.selectedFile?.type.startsWith('image/') ? URL.createObjectURL(state.selectedFile) : null,
-    [state.selectedFile],
-  );
-  useEffect(() => {
-    return () => { if (preview) URL.revokeObjectURL(preview); };
-  }, [preview]);
+  const preview = useImagePreviewUrl(state.selectedFile);
 
   const validateFile = useCallback((file: File): boolean => {
     if (file.size > MAX_FILE_SIZE) {

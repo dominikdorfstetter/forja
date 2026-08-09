@@ -6,8 +6,8 @@
 //! - DEK is also wrapped with the server's DOCUMENT_ENCRYPTION_KEY for admin recovery
 //! - Key rotation: supports current + old server key, lazy re-wrapping on access
 
-use aes_gcm::aead::{Aead, KeyInit, OsRng};
-use aes_gcm::{AeadCore, Aes256Gcm, Nonce};
+use aes_gcm::aead::{Aead, Generate, KeyInit};
+use aes_gcm::{Aes256Gcm, Nonce};
 use argon2::{Argon2, PasswordHasher, password_hash::SaltString};
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD as BASE64;
@@ -76,9 +76,9 @@ pub fn derive_key(password: &str, salt: &[u8]) -> Result<[u8; 32], ApiError> {
 
 /// Generate a random 16-byte salt for Argon2id.
 fn generate_salt() -> Vec<u8> {
-    use aes_gcm::aead::rand_core::RngCore;
+    use rand::Rng;
     let mut salt = vec![0u8; 16];
-    OsRng.fill_bytes(&mut salt);
+    rand::rng().fill_bytes(&mut salt);
     salt
 }
 
@@ -88,7 +88,7 @@ fn generate_salt() -> Vec<u8> {
 fn aes_encrypt(key: &[u8; 32], plaintext: &[u8]) -> Result<(Vec<u8>, Vec<u8>), ApiError> {
     let cipher = Aes256Gcm::new_from_slice(key)
         .map_err(|e| ApiError::internal(format!("Cipher init failed: {e}")))?;
-    let nonce = Aes256Gcm::generate_nonce(&mut OsRng);
+    let nonce = Nonce::generate();
     let ciphertext = cipher
         .encrypt(&nonce, plaintext)
         .map_err(|e| ApiError::internal(format!("Encryption failed: {e}")))?;
@@ -99,9 +99,9 @@ fn aes_encrypt(key: &[u8; 32], plaintext: &[u8]) -> Result<(Vec<u8>, Vec<u8>), A
 fn aes_decrypt(key: &[u8; 32], nonce: &[u8], ciphertext: &[u8]) -> Result<Vec<u8>, ApiError> {
     let cipher = Aes256Gcm::new_from_slice(key)
         .map_err(|e| ApiError::internal(format!("Cipher init failed: {e}")))?;
-    let nonce = Nonce::from_slice(nonce);
+    let nonce = Nonce::try_from(nonce).map_err(|_| ApiError::internal("Invalid nonce length"))?;
     cipher
-        .decrypt(nonce, ciphertext)
+        .decrypt(&nonce, ciphertext)
         .map_err(|_| ApiError::internal("Decryption failed — wrong key or corrupted data"))
 }
 
