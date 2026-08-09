@@ -60,8 +60,8 @@
     "sanitize-html": "^2.17.6"
   },
   "devDependencies": {
-    "@stencil/react-output-target": "^1.5.3",
-    "@stencil/vitest": "^1.13.0",
+    "@stencil/react-output-target": "^1.6.1",
+    "@stencil/vitest": "^1.14.0",
     "@types/sanitize-html": "^2.16.1",
     "vitest": "^4.1.10"
   }

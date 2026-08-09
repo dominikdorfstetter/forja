@@ -33,6 +33,6 @@
     "react-dom": "^19.2.7"
   },
   "dependencies": {
-    "@stencil/react-output-target": "^1.6.0"
+    "@stencil/react-output-target": "^1.6.1"
   }
 }
