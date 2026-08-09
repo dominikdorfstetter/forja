@@ -1,6 +1,6 @@
 //! API Key model
 
-use argon2::password_hash::{SaltString, rand_core::OsRng};
+use argon2::password_hash::SaltString;
 use argon2::{Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -143,7 +143,14 @@ impl ApiKey {
 
     /// Hash an API key using Argon2id (current algorithm).
     pub fn hash_key(key: &str) -> String {
-        let salt = SaltString::generate(&mut OsRng);
+        // OS-CSPRNG salt via rand::rng() — password-hash's own OsRng re-export
+        // (rand_core 0.6) is no longer feature-enabled since the aead 0.6 stack.
+        let salt = {
+            use rand::Rng;
+            let mut bytes = [0u8; 16];
+            rand::rng().fill_bytes(&mut bytes);
+            SaltString::encode_b64(&bytes).expect("16-byte salt fits SaltString")
+        };
         let argon2 = Argon2::default();
         argon2
             .hash_password(key.as_bytes(), &salt)
