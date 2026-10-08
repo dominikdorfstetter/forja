@@ -14,6 +14,21 @@ is the first release published as open source**, so the public version history
 begins at 2.0. The pre-release milestones below condense how the foundation came
 together; precise dates start at the first public release.
 
+## 2.1.5 — 2026-10-08
+
+A monorepo-wide dependency sweep (PR #295) that closes every open security alert. There are no feature changes and no migration.
+
+### Security
+
+- **All 80 open Dependabot alerts resolved.** This includes a critical Astro advisory (GHSA-26w7-cxv4-gfx2, fixed by moving the astro-blog template to Astro 7.3.5) and the docs `image-size` alerts, which were previously dismissed because no fix existed and now have one upstream. The rest were across axios, undici, fast-uri, js-yaml, sharp, svgo, devalue, sanitize-html, vitest and others.
+- **`cargo audit` is clean again.** h2 0.4.19 fixes RUSTSEC-2026-0258 and rustls 0.23.45 fixes RUSTSEC-2026-0285. The unsound `lru` and the yanked `chacha20` are gone from the tree. All advisory ignores in `backend/.cargo/audit.toml` were removed, because none of the affected crates remain.
+
+### Changed
+
+- **Backend.** utoipa 6 / utoipa-axum 0.3 / utoipa-swagger-ui 10, argon2 0.6, validator 0.21, base64 0.23, fancy-regex 0.19 and aws-sdk-s3 1.152. The toolchain moves from Rust 1.97 to 1.99. The OpenAPI contract is unchanged; regenerated client types differ only in formatting. Stored API-key hashes and encrypted documents keep verifying across the argon2 upgrade, and regression tests pinning argon2 0.5.3 output guard that.
+- **Frontend and libraries.** Vitest 5 (admin, analytics, client), tiptap 3.31, MUI 9.4, React 19.3, react-router 8.4, Angular 22.2, Stencil 4.45, Playwright 1.63, and the artifact and Pages GitHub Actions on their latest majors.
+- **Development now needs Node 24.15 or later.** Several upgraded tools (jsdom 30.1, Angular 22.2) require it. CI already uses the latest Node 24.
+
 ## 2.1.4 — 2026-08-09
 
 A monorepo-wide dependency sweep (PR #214) — no feature changes, but two security-relevant upgrades and a batch of hardening fixes.
