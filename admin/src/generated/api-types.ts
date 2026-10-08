@@ -4744,7 +4744,7 @@ export interface components {
         /** @description Request to generate AI content */
         AiGenerateRequest: {
             action: components["schemas"]["AiAction"];
-            blog_tag_context?: null | components["schemas"]["BlogTagContext"];
+            blog_tag_context?: components["schemas"]["BlogTagContext"] | null;
             /**
              * @description Content to process. Required for text actions; optional for vision actions (auto_tag, alt_text).
              * @example # My Blog Post
@@ -4757,7 +4757,7 @@ export interface components {
              * @example https://example.com/image.jpg
              */
             image_url?: string | null;
-            section_context?: null | components["schemas"]["SectionContext"];
+            section_context?: components["schemas"]["SectionContext"] | null;
             /**
              * @description Required for translate action — the target locale code (e.g. "de", "fr")
              * @example de
@@ -5377,7 +5377,7 @@ export interface components {
              *     ]
              */
             ids: string[];
-            status?: null | components["schemas"]["ContentStatus"];
+            status?: components["schemas"]["ContentStatus"] | null;
         };
         /** @description Bulk operation response with per-item results */
         BulkContentResponse: {
@@ -6193,7 +6193,7 @@ export interface components {
             icon?: string | null;
             /** @example GitHub Repository */
             label: string;
-            link_type?: null | components["schemas"]["ProjectLinkType"];
+            link_type?: components["schemas"]["ProjectLinkType"] | null;
             /** @example https://github.com/example/project */
             url: string;
         };
@@ -6296,7 +6296,7 @@ export interface components {
         };
         /** @description Create a skill */
         CreateSkillRequest: {
-            category?: null | components["schemas"]["SkillCategory"];
+            category?: components["schemas"]["SkillCategory"] | null;
             /** @example devicon-rust-plain */
             icon?: string | null;
             /** @example false */
@@ -7048,7 +7048,7 @@ export interface components {
              * @example healthy
              */
             status: string;
-            storage?: null | components["schemas"]["StorageHealth"];
+            storage?: components["schemas"]["StorageHealth"] | null;
             /**
              * @description API version. Omitted on the public response to avoid pinning the binary
              *     for CVE lookups; present only when the caller authenticates as an admin.
@@ -9259,7 +9259,7 @@ export interface components {
         };
         /** @description Skill details, including per-locale display names */
         SkillResponse: {
-            category?: null | components["schemas"]["SkillCategory"];
+            category?: components["schemas"]["SkillCategory"] | null;
             /** @example devicon-rust-plain */
             icon?: string | null;
             /**
@@ -9437,7 +9437,7 @@ export interface components {
             changed_by?: string | null;
             /** Format: date-time */
             created_at: string;
-            from_status?: null | components["schemas"]["FormSubmissionStatus"];
+            from_status?: components["schemas"]["FormSubmissionStatus"] | null;
             to_status: components["schemas"]["FormSubmissionStatus"];
         };
         SubmitFormRequest: {
@@ -9663,7 +9663,7 @@ export interface components {
             expires_at?: string | null;
             /** @example Updated API Key Name */
             name?: string | null;
-            permission?: null | components["schemas"]["ApiKeyPermission"];
+            permission?: components["schemas"]["ApiKeyPermission"] | null;
             /**
              * Format: int32
              * @description Quota: max requests per day
@@ -9738,7 +9738,7 @@ export interface components {
             reading_time_minutes?: number | null;
             /** @example updated-post-slug */
             slug?: string | null;
-            status?: null | components["schemas"]["ContentStatus"];
+            status?: components["schemas"]["ContentStatus"] | null;
         };
         /** @description Update a category */
         UpdateCategoryRequest: {
@@ -9816,7 +9816,7 @@ export interface components {
              * @example 2024-01-01
              */
             end_date?: string | null;
-            entry_type?: null | components["schemas"]["CvEntryType"];
+            entry_type?: components["schemas"]["CvEntryType"] | null;
             /** @example true */
             is_current?: boolean | null;
             localizations?: components["schemas"]["CvEntryLocalizationInput"][] | null;
@@ -9828,7 +9828,7 @@ export interface components {
              * @example 2020-03-01
              */
             start_date?: string | null;
-            status?: null | components["schemas"]["ContentStatus"];
+            status?: components["schemas"]["ContentStatus"] | null;
         };
         /** @description Update a document folder */
         UpdateDocumentFolderRequest: {
@@ -9875,7 +9875,7 @@ export interface components {
             url?: string | null;
         };
         UpdateFormRequest: {
-            bot_protection?: null | components["schemas"]["FormBotProtection"];
+            bot_protection?: components["schemas"]["FormBotProtection"] | null;
             consent_required?: boolean | null;
             consent_text?: string | null;
             description?: string | null;
@@ -9894,7 +9894,7 @@ export interface components {
             /** Format: int32 */
             retention_days?: number | null;
             slug?: string | null;
-            storage_mode?: null | components["schemas"]["FormStorageMode"];
+            storage_mode?: components["schemas"]["FormStorageMode"] | null;
         };
         UpdateFormTemplateRequest: {
             consent_required?: boolean | null;
@@ -9927,7 +9927,7 @@ export interface components {
         UpdateLegalDocumentRequest: {
             /** @example cookie_consent_v2 */
             cookie_name?: string | null;
-            document_type?: null | components["schemas"]["LegalDocType"];
+            document_type?: components["schemas"]["LegalDocType"] | null;
             /**
              * @description New canonical slug for the version chain. Editable while no version
              *     of the chain has ever been published; rejected afterwards
@@ -9935,7 +9935,7 @@ export interface components {
              * @example privacy-policy
              */
             slug?: string | null;
-            status?: null | components["schemas"]["ContentStatus"];
+            status?: components["schemas"]["ContentStatus"] | null;
         };
         /** @description Update a legal consent group */
         UpdateLegalGroupRequest: {
@@ -9965,7 +9965,7 @@ export interface components {
         };
         /** @description Update a locale */
         UpdateLocaleRequest: {
-            direction?: null | components["schemas"]["TextDirection"];
+            direction?: components["schemas"]["TextDirection"] | null;
             /** @example true */
             is_active?: boolean | null;
             /** @example English (Updated) */
@@ -9983,7 +9983,7 @@ export interface components {
             subtitle?: string | null;
             /** @example Updated Blog Post Title */
             title?: string | null;
-            translation_status?: null | components["schemas"]["TranslationStatus"];
+            translation_status?: components["schemas"]["TranslationStatus"] | null;
         };
         /** @description Update a media folder */
         UpdateMediaFolderRequest: {
@@ -10110,7 +10110,7 @@ export interface components {
              * @example 2
              */
             navigation_order?: number | null;
-            page_type?: null | components["schemas"]["PageType"];
+            page_type?: components["schemas"]["PageType"] | null;
             /**
              * Format: uuid
              * @example 550e8400-e29b-41d4-a716-446655440000
@@ -10124,7 +10124,7 @@ export interface components {
             route?: string | null;
             /** @example about-us */
             slug?: string | null;
-            status?: null | components["schemas"]["ContentStatus"];
+            status?: components["schemas"]["ContentStatus"] | null;
             /** @example default */
             template?: string | null;
         };
@@ -10142,7 +10142,7 @@ export interface components {
              * @example 1
              */
             display_order?: number | null;
-            section_type?: null | components["schemas"]["SectionType"];
+            section_type?: components["schemas"]["SectionType"] | null;
             settings?: unknown;
         };
         /** @description Update a project */
@@ -10183,7 +10183,7 @@ export interface components {
              * @example 2023-03-01
              */
             start_date?: string | null;
-            status?: null | components["schemas"]["ContentStatus"];
+            status?: components["schemas"]["ContentStatus"] | null;
         };
         /** @description Update a URL redirect */
         UpdateRedirectRequest: {
@@ -10326,7 +10326,7 @@ export interface components {
         };
         /** @description Update a skill */
         UpdateSkillRequest: {
-            category?: null | components["schemas"]["SkillCategory"];
+            category?: components["schemas"]["SkillCategory"] | null;
             /** @example devicon-typescript-plain */
             icon?: string | null;
             /** @example true */
@@ -10529,9 +10529,9 @@ export interface components {
             daily: components["schemas"]["DailyUsageSummary"][];
         };
         UsageSummaryQuota: {
-            daily?: null | components["schemas"]["QuotaWindowResponse"];
-            hourly?: null | components["schemas"]["QuotaWindowResponse"];
-            monthly?: null | components["schemas"]["QuotaWindowResponse"];
+            daily?: components["schemas"]["QuotaWindowResponse"] | null;
+            hourly?: components["schemas"]["QuotaWindowResponse"] | null;
+            monthly?: components["schemas"]["QuotaWindowResponse"] | null;
         };
         /** @description API key usage summary with quota tracking */
         UsageSummaryResponse: {
@@ -10550,19 +10550,19 @@ export interface components {
             ai_usage: components["schemas"]["ExportAiUsageRecord"][];
             api_keys: components["schemas"]["ExportApiKeyRecord"][];
             audit_logs: components["schemas"]["AuditLogResponse"][];
-            authored_content?: null | components["schemas"]["AuthoredContentSummary"];
+            authored_content?: components["schemas"]["AuthoredContentSummary"] | null;
             change_history: components["schemas"]["ChangeHistoryResponse"][];
             /**
              * Format: date-time
              * @example 2024-06-15T12:00:00Z
              */
             exported_at: string;
-            help_state?: null | components["schemas"]["HelpStateResponse"];
+            help_state?: components["schemas"]["HelpStateResponse"] | null;
             media: components["schemas"]["ExportMediaRecord"][];
             memberships?: components["schemas"]["MembershipSummary"][] | null;
             notifications?: components["schemas"]["NotificationResponse"][] | null;
-            onboarding?: null | components["schemas"]["OnboardingResponse"];
-            preferences?: null | components["schemas"]["UserPreferencesResponse"];
+            onboarding?: components["schemas"]["OnboardingResponse"] | null;
+            preferences?: components["schemas"]["UserPreferencesResponse"] | null;
             profile: components["schemas"]["ProfileResponse"];
         };
         /** @description User preferences (defaults merged with stored values) */
@@ -14812,6 +14812,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Form template */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -14820,6 +14821,7 @@ export interface operations {
                     "application/json": components["schemas"]["FormTemplateResponse"];
                 };
             };
+            /** @description Form template not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -14847,6 +14849,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Form template updated */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -14855,6 +14858,7 @@ export interface operations {
                     "application/json": components["schemas"]["FormTemplateResponse"];
                 };
             };
+            /** @description Validation error */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -14863,6 +14867,7 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description Forbidden */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -14871,6 +14876,7 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description Form template not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -14879,6 +14885,7 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description A form template with this name already exists on this site */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -14901,12 +14908,14 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Form template deleted */
             204: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
+            /** @description Form template not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -14936,6 +14945,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Paginated submissions */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -14944,6 +14954,7 @@ export interface operations {
                     "application/json": components["schemas"]["Paginated"];
                 };
             };
+            /** @description Forbidden */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -14952,6 +14963,7 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description Form not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -14974,6 +14986,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Submission counts by status */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -14982,6 +14995,7 @@ export interface operations {
                     "application/json": components["schemas"]["SubmissionStatusCounts"];
                 };
             };
+            /** @description Forbidden */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -14990,6 +15004,7 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description Form not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -15012,6 +15027,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Form with its fields */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -15020,6 +15036,7 @@ export interface operations {
                     "application/json": components["schemas"]["FormDetailResponse"];
                 };
             };
+            /** @description Form not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -15047,6 +15064,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Form updated */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -15055,6 +15073,7 @@ export interface operations {
                     "application/json": components["schemas"]["FormDetailResponse"];
                 };
             };
+            /** @description Validation error */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -15063,6 +15082,7 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description Forbidden */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -15071,6 +15091,7 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description Form not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -15079,6 +15100,7 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description A form with this slug already exists on this site */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -15101,12 +15123,14 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Form deleted */
             204: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
+            /** @description Form not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -19069,6 +19093,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Form definition for rendering */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -19077,6 +19102,7 @@ export interface operations {
                     "application/json": components["schemas"]["PublicFormResponse"];
                 };
             };
+            /** @description Form not found or inactive */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -19085,6 +19111,7 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description Rate limited */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -19107,6 +19134,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description ALTCHA challenge */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -19115,6 +19143,7 @@ export interface operations {
                     "application/json": components["schemas"]["AltchaChallengeResponse"];
                 };
             };
+            /** @description Form not found or inactive */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -19132,6 +19161,7 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description Rate limited */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -19159,6 +19189,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Submission received */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -19176,6 +19207,7 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description Form not found or inactive */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -19184,6 +19216,7 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description Rate limited */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -19208,6 +19241,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Submission status and submitted-at */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -19216,6 +19250,7 @@ export interface operations {
                     "application/json": components["schemas"]["SelfServiceLookupResponse"];
                 };
             };
+            /** @description Submission not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -19224,6 +19259,7 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description Submission has been deleted */
             410: {
                 headers: {
                     [name: string]: unknown;
@@ -19232,6 +19268,7 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description Rate limited */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -19254,6 +19291,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Submission */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -19262,6 +19300,7 @@ export interface operations {
                     "application/json": components["schemas"]["SelfServiceSubmissionResponse"];
                 };
             };
+            /** @description Submission not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -19270,6 +19309,7 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description Submission has been deleted */
             410: {
                 headers: {
                     [name: string]: unknown;
@@ -19278,6 +19318,7 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description Rate limited */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -19300,12 +19341,14 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Submission deleted */
             204: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
+            /** @description Submission not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -19314,6 +19357,7 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description Submission has already been deleted */
             410: {
                 headers: {
                     [name: string]: unknown;
@@ -19322,6 +19366,7 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description Rate limited */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -20220,7 +20265,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": null | components["schemas"]["AiConfigResponse"];
+                    "application/json": components["schemas"]["AiConfigResponse"] | null;
                 };
             };
             /** @description Unauthorized */
@@ -21245,6 +21290,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Bot-protection config (secret omitted) */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -21253,6 +21299,7 @@ export interface operations {
                     "application/json": components["schemas"]["SiteBotProtectionResponse"];
                 };
             };
+            /** @description Forbidden */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -21261,6 +21308,7 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description Site has no bot-protection config */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -21287,6 +21335,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Bot-protection config saved */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -21295,6 +21344,7 @@ export interface operations {
                     "application/json": components["schemas"]["SiteBotProtectionResponse"];
                 };
             };
+            /** @description Validation error */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -21303,6 +21353,7 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description Forbidden */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -21325,12 +21376,14 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Bot-protection config removed */
             204: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
+            /** @description Forbidden */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -22920,6 +22973,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Paginated form templates */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -22928,6 +22982,7 @@ export interface operations {
                     "application/json": components["schemas"]["Paginated"];
                 };
             };
+            /** @description Forbidden */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -22955,6 +23010,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Form template created */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -22963,6 +23019,7 @@ export interface operations {
                     "application/json": components["schemas"]["FormTemplateResponse"];
                 };
             };
+            /** @description Validation error */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -22971,6 +23028,7 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description Forbidden */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -22979,6 +23037,7 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description A form template with this name already exists on this site */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -23006,6 +23065,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Paginated forms */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -23014,6 +23074,7 @@ export interface operations {
                     "application/json": components["schemas"]["Paginated"];
                 };
             };
+            /** @description Forbidden */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -23041,6 +23102,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Form created */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -23049,6 +23111,7 @@ export interface operations {
                     "application/json": components["schemas"]["FormDetailResponse"];
                 };
             };
+            /** @description Validation error */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -23057,6 +23120,7 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description Forbidden */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -23065,6 +23129,7 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description A form with this slug already exists on this site */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -23089,6 +23154,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Form with its fields */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -23097,6 +23163,7 @@ export interface operations {
                     "application/json": components["schemas"]["FormDetailResponse"];
                 };
             };
+            /** @description Form not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -27035,6 +27102,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Submission with notes and status history */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -27043,6 +27111,7 @@ export interface operations {
                     "application/json": components["schemas"]["SubmissionDetailResponse"];
                 };
             };
+            /** @description Submission not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -27065,12 +27134,14 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Submission deleted */
             204: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
+            /** @description Submission not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -27098,6 +27169,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Note created */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -27106,6 +27178,7 @@ export interface operations {
                     "application/json": components["schemas"]["SubmissionNoteResponse"];
                 };
             };
+            /** @description Submission not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -27130,12 +27203,14 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
+            /** @description Note deleted */
             204: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
+            /** @description Note not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -27163,6 +27238,7 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Submission status updated */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -27171,6 +27247,7 @@ export interface operations {
                     "application/json": components["schemas"]["SubmissionDetailResponse"];
                 };
             };
+            /** @description Validation error or invalid status transition */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -27179,6 +27256,7 @@ export interface operations {
                     "application/json": components["schemas"]["ProblemDetails"];
                 };
             };
+            /** @description Submission not found */
             404: {
                 headers: {
                     [name: string]: unknown;

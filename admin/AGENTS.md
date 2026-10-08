@@ -19,8 +19,11 @@ npm run react-doctor:verbose # offline, with per-finding detail
 npm run react-doctor:online  # online score gate (must be 100; --fail-on warning --score, so warnings fail too)
 ```
 
-react-doctor is pinned at 0.7.x as a devDependency; CI runs the pinned offline
-`npm run react-doctor` on PRs (not the `@main` marketplace action).
+react-doctor is pinned exactly (0.9.12) as a devDependency; CI runs the pinned
+offline `npm run react-doctor` on PRs (not the `@main` marketplace action).
+0.9.13+ adds the `no-high-complexity-react-function` and `duplicate-jsx-subtree`
+maintainability rules (score drops to 90), so bumping it needs a refactor wave or
+an explicit owner decision about those rules.
 
 No `.env` — config is fetched from the backend at runtime (`GET /api/v1/config`).
 
