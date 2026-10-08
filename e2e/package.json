@@ -13,7 +13,7 @@
     "e2e": "./scripts/run-e2e.sh"
   },
   "dependencies": {
-    "@clerk/testing": "^2.2.42",
+    "@clerk/testing": "^2.2.43",
     "@cucumber/cucumber": "^13.3.0",
     "dotenv": "^18.0.5",
     "playwright": "^1.63.0",
