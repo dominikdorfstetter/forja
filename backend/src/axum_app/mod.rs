@@ -925,6 +925,31 @@ mod tests {
         );
     }
 
+    /// OpenAPI 3.1 requires `description` on every Response Object, but
+    /// utoipa 6 omits it when an annotation gives none (5.x emitted `""`).
+    /// Every `(status = …)` must therefore carry a `description = "…"`.
+    #[tokio::test]
+    async fn openapi_every_response_has_description() {
+        let doc = build_openapi_doc();
+        let mut missing = Vec::new();
+        for (path, item) in doc["paths"].as_object().expect("paths object") {
+            for (method, op) in item.as_object().expect("path item object") {
+                let Some(responses) = op["responses"].as_object() else {
+                    continue;
+                };
+                for (status, response) in responses {
+                    if response["description"].as_str().is_none_or(str::is_empty) {
+                        missing.push(format!("{method} {path} {status}"));
+                    }
+                }
+            }
+        }
+        assert!(
+            missing.is_empty(),
+            "responses without description: {missing:#?}"
+        );
+    }
+
     #[tokio::test]
     async fn openapi_registers_all_phase4_schemas() {
         let doc = build_openapi_doc();

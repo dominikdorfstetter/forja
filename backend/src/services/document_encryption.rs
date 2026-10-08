@@ -8,7 +8,7 @@
 
 use aes_gcm::aead::{Aead, Generate, KeyInit};
 use aes_gcm::{Aes256Gcm, Nonce};
-use argon2::{Argon2, PasswordHasher, password_hash::SaltString};
+use argon2::{Argon2, PasswordHasher};
 use base64::Engine;
 use base64::engine::general_purpose::STANDARD as BASE64;
 use hmac::Mac;
@@ -57,10 +57,8 @@ pub fn verify_password(password: &str, hash: &str) -> Result<bool, ApiError> {
 /// Derive a 32-byte AES key from a password and salt using Argon2id.
 pub fn derive_key(password: &str, salt: &[u8]) -> Result<[u8; 32], ApiError> {
     let argon2 = Argon2::default();
-    let salt_str = SaltString::encode_b64(salt)
-        .map_err(|e| ApiError::internal(format!("Salt encoding failed: {e}")))?;
     let hash = argon2
-        .hash_password(password.as_bytes(), &salt_str)
+        .hash_password_with_salt(password.as_bytes(), salt)
         .map_err(|e| ApiError::internal(format!("Key derivation failed: {e}")))?;
     let output = hash
         .hash
@@ -396,6 +394,18 @@ mod tests {
         let result = encrypt_document(plaintext, "correct", None, None).unwrap();
         let decrypted = decrypt_document(&result.ciphertext, "wrong", &result.salt, &result.nonce);
         assert!(decrypted.is_err());
+    }
+
+    /// Pins the Argon2id KDF output captured with argon2 0.5.3. Documents
+    /// encrypted before an argon2 upgrade stay decryptable only if the derived
+    /// DEK is byte-identical for the stored salt.
+    #[test]
+    fn test_derive_key_matches_argon2_v0_5_output() {
+        let key = derive_key("correct horse battery staple", b"forja-legacy-slt").unwrap();
+        assert_eq!(
+            hex::encode(key),
+            "6267f0a73aa341beda03924dd716f9a51622bfe85d8def57d00089920a624a72"
+        );
     }
 
     #[test]

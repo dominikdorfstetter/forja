@@ -11,7 +11,7 @@ Multi-site CMS REST API built with Rust and Axum.
 - **Cache / Rate Limiting**: [Redis](https://redis.io/) 7
 - **Async Runtime**: Tokio
 - **Documentation**: Utoipa (OpenAPI / Swagger UI)
-- **Toolchain**: Rust 1.97 (pinned via `rust-toolchain.toml`), edition 2024
+- **Toolchain**: Rust 1.99 (pinned via `rust-toolchain.toml`), edition 2024
 
 ## Features
 
@@ -32,7 +32,7 @@ Multi-site CMS REST API built with Rust and Axum.
 
 ### Prerequisites
 
-- Rust 1.97 (install via [rustup](https://rustup.rs/) — the version is pinned via `rust-toolchain.toml`, edition 2024)
+- Rust 1.99 (install via [rustup](https://rustup.rs/) — the version is pinned via `rust-toolchain.toml`, edition 2024)
 - PostgreSQL 16+
 - Redis 7+
 - SQLx CLI: `cargo install sqlx-cli`

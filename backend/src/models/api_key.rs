@@ -1,6 +1,5 @@
 //! API Key model
 
-use argon2::password_hash::SaltString;
 use argon2::{Argon2, PasswordHash, PasswordHasher, PasswordVerifier};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -143,17 +142,10 @@ impl ApiKey {
 
     /// Hash an API key using Argon2id (current algorithm).
     pub fn hash_key(key: &str) -> String {
-        // OS-CSPRNG salt via rand::rng() — password-hash's own OsRng re-export
-        // (rand_core 0.6) is no longer feature-enabled since the aead 0.6 stack.
-        let salt = {
-            use rand::Rng;
-            let mut bytes = [0u8; 16];
-            rand::rng().fill_bytes(&mut bytes);
-            SaltString::encode_b64(&bytes).expect("16-byte salt fits SaltString")
-        };
+        // `hash_password` draws a 16-byte salt from the OS CSPRNG (getrandom).
         let argon2 = Argon2::default();
         argon2
-            .hash_password(key.as_bytes(), &salt)
+            .hash_password(key.as_bytes())
             .expect("Argon2 hashing should not fail")
             .to_string()
     }
@@ -1003,6 +995,20 @@ mod tests {
         let hash = ApiKey::hash_key(key);
         assert!(ApiKey::verify_key(key, &hash, HASH_VERSION_ARGON2));
         assert!(!ApiKey::verify_key("wrong_key", &hash, HASH_VERSION_ARGON2));
+    }
+
+    /// PHC string produced by `hash_key` under argon2 0.5.3. Hashes already
+    /// stored in `api_keys.key_hash` must keep verifying across argon2 bumps.
+    #[test]
+    fn test_verify_key_argon2_v0_5_legacy_hash() {
+        let key = "dk_legacy05_0123456789abcdef0123456789abcdef";
+        let legacy_hash = "$argon2id$v=19$m=19456,t=2,p=1$v517z2KHPa3gnqd66Sx6ng$s4CCx6AtNy2lL2lYpbZJfPTWU4Uial+0gsRqkjXMz/U";
+        assert!(ApiKey::verify_key(key, legacy_hash, HASH_VERSION_ARGON2));
+        assert!(!ApiKey::verify_key(
+            "dk_legacy05_wrong",
+            legacy_hash,
+            HASH_VERSION_ARGON2
+        ));
     }
 
     #[test]

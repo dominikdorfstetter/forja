@@ -69,8 +69,8 @@ struct ListQuery {
         ("page_size" = Option<i64>, Query, description = "Page size (default 10)")
     ),
     responses(
-        (status = 200, body = PaginatedForms),
-        (status = 403, body = ProblemDetails),
+        (status = 200, body = PaginatedForms, description = "Paginated forms"),
+        (status = 403, body = ProblemDetails, description = "Forbidden"),
     ),
     security(("api_key" = []))
 )]
@@ -102,10 +102,10 @@ async fn list_forms(
     params(("site_id" = Uuid, Path, description = "Site UUID")),
     request_body(content = CreateFormRequest, description = "Form definition"),
     responses(
-        (status = 201, body = FormDetailResponse),
-        (status = 400, body = ProblemDetails),
-        (status = 403, body = ProblemDetails),
-        (status = 409, body = ProblemDetails),
+        (status = 201, body = FormDetailResponse, description = "Form created"),
+        (status = 400, body = ProblemDetails, description = "Validation error"),
+        (status = 403, body = ProblemDetails, description = "Forbidden"),
+        (status = 409, body = ProblemDetails, description = "A form with this slug already exists on this site"),
     ),
     security(("api_key" = []))
 )]
@@ -142,8 +142,8 @@ async fn create_form(
     description = "Get a form with its fields",
     params(("id" = Uuid, Path, description = "Form UUID")),
     responses(
-        (status = 200, body = FormDetailResponse),
-        (status = 404, body = ProblemDetails),
+        (status = 200, body = FormDetailResponse, description = "Form with its fields"),
+        (status = 404, body = ProblemDetails, description = "Form not found"),
     ),
     security(("api_key" = []))
 )]
@@ -175,8 +175,8 @@ async fn get_form(
         ("slug" = String, Path, description = "Form slug")
     ),
     responses(
-        (status = 200, body = FormDetailResponse),
-        (status = 404, body = ProblemDetails),
+        (status = 200, body = FormDetailResponse, description = "Form with its fields"),
+        (status = 404, body = ProblemDetails, description = "Form not found"),
     ),
     security(("api_key" = []))
 )]
@@ -206,11 +206,11 @@ async fn get_form_by_slug(
     params(("id" = Uuid, Path, description = "Form UUID")),
     request_body(content = UpdateFormRequest, description = "Partial form update"),
     responses(
-        (status = 200, body = FormDetailResponse),
-        (status = 400, body = ProblemDetails),
-        (status = 403, body = ProblemDetails),
-        (status = 404, body = ProblemDetails),
-        (status = 409, body = ProblemDetails),
+        (status = 200, body = FormDetailResponse, description = "Form updated"),
+        (status = 400, body = ProblemDetails, description = "Validation error"),
+        (status = 403, body = ProblemDetails, description = "Forbidden"),
+        (status = 404, body = ProblemDetails, description = "Form not found"),
+        (status = 409, body = ProblemDetails, description = "A form with this slug already exists on this site"),
     ),
     security(("api_key" = []))
 )]
@@ -250,8 +250,8 @@ async fn update_form(
     description = "Soft-delete a form",
     params(("id" = Uuid, Path, description = "Form UUID")),
     responses(
-        (status = 204),
-        (status = 404, body = ProblemDetails),
+        (status = 204, description = "Form deleted"),
+        (status = 404, body = ProblemDetails, description = "Form not found"),
     ),
     security(("api_key" = []))
 )]
@@ -290,8 +290,8 @@ async fn delete_form(
     description = "List form templates for a site",
     params(("site_id" = Uuid, Path, description = "Site UUID")),
     responses(
-        (status = 200, body = PaginatedFormTemplates),
-        (status = 403, body = ProblemDetails),
+        (status = 200, body = PaginatedFormTemplates, description = "Paginated form templates"),
+        (status = 403, body = ProblemDetails, description = "Forbidden"),
     ),
     security(("api_key" = []))
 )]
@@ -323,10 +323,10 @@ async fn list_form_templates(
     params(("site_id" = Uuid, Path, description = "Site UUID")),
     request_body(content = CreateFormTemplateRequest, description = "Template definition"),
     responses(
-        (status = 201, body = FormTemplateResponse),
-        (status = 400, body = ProblemDetails),
-        (status = 403, body = ProblemDetails),
-        (status = 409, body = ProblemDetails),
+        (status = 201, body = FormTemplateResponse, description = "Form template created"),
+        (status = 400, body = ProblemDetails, description = "Validation error"),
+        (status = 403, body = ProblemDetails, description = "Forbidden"),
+        (status = 409, body = ProblemDetails, description = "A form template with this name already exists on this site"),
     ),
     security(("api_key" = []))
 )]
@@ -362,8 +362,8 @@ async fn create_form_template(
     operation_id = "get_form_template",
     params(("id" = Uuid, Path, description = "Template UUID")),
     responses(
-        (status = 200, body = FormTemplateResponse),
-        (status = 404, body = ProblemDetails),
+        (status = 200, body = FormTemplateResponse, description = "Form template"),
+        (status = 404, body = ProblemDetails, description = "Form template not found"),
     ),
     security(("api_key" = []))
 )]
@@ -392,11 +392,11 @@ async fn get_form_template(
     params(("id" = Uuid, Path, description = "Template UUID")),
     request_body(content = UpdateFormTemplateRequest, description = "Partial update"),
     responses(
-        (status = 200, body = FormTemplateResponse),
-        (status = 400, body = ProblemDetails),
-        (status = 403, body = ProblemDetails),
-        (status = 404, body = ProblemDetails),
-        (status = 409, body = ProblemDetails),
+        (status = 200, body = FormTemplateResponse, description = "Form template updated"),
+        (status = 400, body = ProblemDetails, description = "Validation error"),
+        (status = 403, body = ProblemDetails, description = "Forbidden"),
+        (status = 404, body = ProblemDetails, description = "Form template not found"),
+        (status = 409, body = ProblemDetails, description = "A form template with this name already exists on this site"),
     ),
     security(("api_key" = []))
 )]
@@ -433,8 +433,8 @@ async fn update_form_template(
     operation_id = "delete_form_template",
     params(("id" = Uuid, Path, description = "Template UUID")),
     responses(
-        (status = 204),
-        (status = 404, body = ProblemDetails),
+        (status = 204, description = "Form template deleted"),
+        (status = 404, body = ProblemDetails, description = "Form template not found"),
     ),
     security(("api_key" = []))
 )]
@@ -488,9 +488,9 @@ struct PublicFormQuery {
         ("locale" = Option<String>, Query, description = "Locale code or UUID"),
     ),
     responses(
-        (status = 200, body = PublicFormResponse),
-        (status = 404, body = ProblemDetails),
-        (status = 429, body = ProblemDetails),
+        (status = 200, body = PublicFormResponse, description = "Form definition for rendering"),
+        (status = 404, body = ProblemDetails, description = "Form not found or inactive"),
+        (status = 429, body = ProblemDetails, description = "Rate limited"),
     ),
 )]
 async fn public_get_form(
@@ -589,10 +589,10 @@ async fn resolve_locale_id(
     params(("slug" = String, Path, description = "Form slug")),
     request_body(content = SubmitFormRequest, description = "Submission payload"),
     responses(
-        (status = 201, body = SubmitFormResponse),
+        (status = 201, body = SubmitFormResponse, description = "Submission received"),
         (status = 400, body = ProblemDetails, description = "Validation, consent, or bot-protection failure"),
-        (status = 404, body = ProblemDetails),
-        (status = 429, body = ProblemDetails),
+        (status = 404, body = ProblemDetails, description = "Form not found or inactive"),
+        (status = 429, body = ProblemDetails, description = "Rate limited"),
     ),
 )]
 async fn public_submit_form(
@@ -737,10 +737,10 @@ impl crate::services::form_submission_service::BotProtectionCheck for SiteBotPro
                    ALTCHA mode.",
     params(("slug" = String, Path, description = "Form slug")),
     responses(
-        (status = 200, body = AltchaChallengeResponse),
-        (status = 404, body = ProblemDetails),
+        (status = 200, body = AltchaChallengeResponse, description = "ALTCHA challenge"),
+        (status = 404, body = ProblemDetails, description = "Form not found or inactive"),
         (status = 409, body = ProblemDetails, description = "Site is not configured for self-hosted ALTCHA"),
-        (status = 429, body = ProblemDetails),
+        (status = 429, body = ProblemDetails, description = "Rate limited"),
     ),
 )]
 async fn public_altcha_challenge(
@@ -795,9 +795,9 @@ async fn public_altcha_challenge(
                    Returns 404 when the site has not configured one yet.",
     params(("site_id" = Uuid, Path, description = "Site UUID")),
     responses(
-        (status = 200, body = SiteBotProtectionResponse),
-        (status = 403, body = ProblemDetails),
-        (status = 404, body = ProblemDetails),
+        (status = 200, body = SiteBotProtectionResponse, description = "Bot-protection config (secret omitted)"),
+        (status = 403, body = ProblemDetails, description = "Forbidden"),
+        (status = 404, body = ProblemDetails, description = "Site has no bot-protection config"),
     ),
     security(("api_key" = []))
 )]
@@ -851,9 +851,9 @@ fn bot_protection_response(row: SiteBotProtection) -> SiteBotProtectionResponse 
     params(("site_id" = Uuid, Path, description = "Site UUID")),
     request_body(content = UpsertSiteBotProtectionRequest),
     responses(
-        (status = 200, body = SiteBotProtectionResponse),
-        (status = 400, body = ProblemDetails),
-        (status = 403, body = ProblemDetails),
+        (status = 200, body = SiteBotProtectionResponse, description = "Bot-protection config saved"),
+        (status = 400, body = ProblemDetails, description = "Validation error"),
+        (status = 403, body = ProblemDetails, description = "Forbidden"),
     ),
     security(("api_key" = []))
 )]
@@ -943,8 +943,8 @@ async fn upsert_site_bot_protection(
     description = "Remove the site's captcha verifier config. Idempotent.",
     params(("site_id" = Uuid, Path, description = "Site UUID")),
     responses(
-        (status = 204),
-        (status = 403, body = ProblemDetails),
+        (status = 204, description = "Bot-protection config removed"),
+        (status = 403, body = ProblemDetails, description = "Forbidden"),
     ),
     security(("api_key" = []))
 )]
@@ -985,10 +985,10 @@ async fn delete_site_bot_protection(
                    cross-tenant probes return 404.",
     request_body(content = LookupSubmissionRequest, description = "Reference code lookup"),
     responses(
-        (status = 200, body = SelfServiceLookupResponse),
-        (status = 404, body = ProblemDetails),
-        (status = 410, body = ProblemDetails),
-        (status = 429, body = ProblemDetails),
+        (status = 200, body = SelfServiceLookupResponse, description = "Submission status and submitted-at"),
+        (status = 404, body = ProblemDetails, description = "Submission not found"),
+        (status = 410, body = ProblemDetails, description = "Submission has been deleted"),
+        (status = 429, body = ProblemDetails, description = "Rate limited"),
     ),
 )]
 async fn public_lookup_submission(
@@ -1013,10 +1013,10 @@ async fn public_lookup_submission(
                    read from another.",
     params(("reference_code" = String, Path, description = "Reference code")),
     responses(
-        (status = 200, body = SelfServiceSubmissionResponse),
-        (status = 404, body = ProblemDetails),
-        (status = 410, body = ProblemDetails),
-        (status = 429, body = ProblemDetails),
+        (status = 200, body = SelfServiceSubmissionResponse, description = "Submission"),
+        (status = 404, body = ProblemDetails, description = "Submission not found"),
+        (status = 410, body = ProblemDetails, description = "Submission has been deleted"),
+        (status = 429, body = ProblemDetails, description = "Rate limited"),
     ),
 )]
 async fn public_get_submission(
@@ -1047,10 +1047,10 @@ async fn public_get_submission(
                    cross-tenant codes return 404.",
     params(("reference_code" = String, Path, description = "Reference code")),
     responses(
-        (status = 204),
-        (status = 404, body = ProblemDetails),
-        (status = 410, body = ProblemDetails),
-        (status = 429, body = ProblemDetails),
+        (status = 204, description = "Submission deleted"),
+        (status = 404, body = ProblemDetails, description = "Submission not found"),
+        (status = 410, body = ProblemDetails, description = "Submission has already been deleted"),
+        (status = 429, body = ProblemDetails, description = "Rate limited"),
     ),
 )]
 async fn public_delete_submission(
@@ -1084,9 +1084,9 @@ struct ListSubmissionsQuery {
         ("status" = Option<String>, Query, description = "Filter by status: new, in_review, resolved, archived")
     ),
     responses(
-        (status = 200, body = PaginatedSubmissions),
-        (status = 403, body = ProblemDetails),
-        (status = 404, body = ProblemDetails),
+        (status = 200, body = PaginatedSubmissions, description = "Paginated submissions"),
+        (status = 403, body = ProblemDetails, description = "Forbidden"),
+        (status = 404, body = ProblemDetails, description = "Form not found"),
     ),
     security(("api_key" = []))
 )]
@@ -1120,9 +1120,9 @@ async fn list_submissions(
     description = "Counts of submissions by status for a form",
     params(("form_id" = Uuid, Path, description = "Form UUID")),
     responses(
-        (status = 200, body = SubmissionStatusCounts),
-        (status = 403, body = ProblemDetails),
-        (status = 404, body = ProblemDetails),
+        (status = 200, body = SubmissionStatusCounts, description = "Submission counts by status"),
+        (status = 403, body = ProblemDetails, description = "Forbidden"),
+        (status = 404, body = ProblemDetails, description = "Form not found"),
     ),
     security(("api_key" = []))
 )]
@@ -1153,8 +1153,8 @@ async fn submission_status_counts(
     description = "Get a single submission with its notes and status history",
     params(("id" = Uuid, Path, description = "Submission UUID")),
     responses(
-        (status = 200, body = SubmissionDetailResponse),
-        (status = 404, body = ProblemDetails),
+        (status = 200, body = SubmissionDetailResponse, description = "Submission with notes and status history"),
+        (status = 404, body = ProblemDetails, description = "Submission not found"),
     ),
     security(("api_key" = []))
 )]
@@ -1185,9 +1185,9 @@ async fn get_submission(
     params(("id" = Uuid, Path, description = "Submission UUID")),
     request_body(content = UpdateSubmissionStatusRequest, description = "Target status"),
     responses(
-        (status = 200, body = SubmissionDetailResponse),
-        (status = 400, body = ProblemDetails),
-        (status = 404, body = ProblemDetails),
+        (status = 200, body = SubmissionDetailResponse, description = "Submission status updated"),
+        (status = 400, body = ProblemDetails, description = "Validation error or invalid status transition"),
+        (status = 404, body = ProblemDetails, description = "Submission not found"),
     ),
     security(("api_key" = []))
 )]
@@ -1222,8 +1222,8 @@ async fn update_submission_status(
     description = "Soft-delete a submission",
     params(("id" = Uuid, Path, description = "Submission UUID")),
     responses(
-        (status = 204),
-        (status = 404, body = ProblemDetails),
+        (status = 204, description = "Submission deleted"),
+        (status = 404, body = ProblemDetails, description = "Submission not found"),
     ),
     security(("api_key" = []))
 )]
@@ -1255,8 +1255,8 @@ async fn delete_submission(
     params(("id" = Uuid, Path, description = "Submission UUID")),
     request_body(content = CreateSubmissionNoteRequest, description = "Note body"),
     responses(
-        (status = 201, body = SubmissionNoteResponse),
-        (status = 404, body = ProblemDetails),
+        (status = 201, body = SubmissionNoteResponse, description = "Note created"),
+        (status = 404, body = ProblemDetails, description = "Submission not found"),
     ),
     security(("api_key" = []))
 )]
@@ -1294,8 +1294,8 @@ async fn create_submission_note(
         ("note_id" = Uuid, Path, description = "Note UUID")
     ),
     responses(
-        (status = 204),
-        (status = 404, body = ProblemDetails),
+        (status = 204, description = "Note deleted"),
+        (status = 404, body = ProblemDetails, description = "Note not found"),
     ),
     security(("api_key" = []))
 )]

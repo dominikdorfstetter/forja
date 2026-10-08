@@ -113,8 +113,10 @@ mod tests {
         let site_id = Uuid::new_v4();
         let (token, _) = generate(site_id, TEST_SECRET).unwrap();
 
-        let mut validation = Validation::default();
-        validation.validate_aud = false;
+        let validation = Validation {
+            validate_aud: false,
+            ..Validation::default()
+        };
         let data = jsonwebtoken::decode::<PreviewTokenClaims>(
             &token,
             &DecodingKey::from_secret(TEST_SECRET.as_bytes()),
