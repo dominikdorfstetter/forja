@@ -31,7 +31,7 @@ entity, Site, Actor, publish lifecycle, validation seam).
 
 Other top-level files: `docker-compose.dev.yaml`, `docker-compose.yml`,
 `docker-compose.prod.yml` (local infra + prod), `Dockerfile`,
-`railway.toml` (deploy), `rust-toolchain.toml` (Rust 1.97), `.nvmrc` (Node 24).
+`railway.toml` (deploy), `rust-toolchain.toml` (Rust 1.99), `.nvmrc` (Node 24).
 
 ## Cross-cutting conventions
 

@@ -23,7 +23,7 @@ forja-macros = { path = "macros" }
 hyper = { version = "1", features = ["server"] }
 
 # Async Runtime — bumped `signal` feature for graceful Axum shutdown
-tokio = { version = "1.50.0", features = ["rt-multi-thread", "macros", "time", "sync", "fs", "signal"] }
+tokio = { version = "1.53.2", features = ["rt-multi-thread", "macros", "time", "sync", "fs", "signal"] }
 
 # Database
 sqlx = { version = "0.9", features = [
@@ -37,35 +37,35 @@ sqlx = { version = "0.9", features = [
 ] }
 
 # Serialization
-serde = { version = "1.0.228", features = ["derive"] }
-serde_json = "1.0.149"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
 
 # Date/Time
-chrono = { version = "0.4.44", features = ["serde"] }
+chrono = { version = "0.4.45", features = ["serde"] }
 
 # UUID
-uuid = { version = "1.24.0", features = ["v4", "v5", "serde"] }
+uuid = { version = "1.27.0", features = ["v4", "v5", "serde"] }
 
 # Validation
-validator = { version = "0.20.0", features = ["derive"] }
+validator = { version = "0.21.0", features = ["derive"] }
 
 # Environment & Config
 dotenvy = "0.15.7"
-config = "0.15.19"
+config = "0.15.27"
 
 # Logging & Tracing
 tracing = "0.1.44"
-tracing-subscriber = { version = "0.3.22", features = ["env-filter", "json"] }
+tracing-subscriber = { version = "0.3.23", features = ["env-filter", "json"] }
 tracing-error = "0.2"
 
 # Error Handling
-thiserror = "2.0.18"
-anyhow = "1.0.103"
+thiserror = "2.0.21"
+anyhow = "1.0.104"
 
 # API Documentation
-utoipa = { version = "5.4.0", features = ["axum_extras", "uuid", "chrono"] }
-utoipa-axum = "0.2"
-utoipa-swagger-ui = { version = "9.0.2", features = ["axum"] }
+utoipa = { version = "6.0.0", features = ["axum_extras", "uuid", "chrono"] }
+utoipa-axum = "0.3.0"
+utoipa-swagger-ui = { version = "10.0.1", features = ["axum"] }
 
 # Cryptographic randomness — used for crypto-random reference codes on
 # form submissions (#582). OsRng (rand_core::OsRng) sources entropy from
@@ -75,8 +75,8 @@ rand = "0.10"
 # Security
 sha2 = "0.11"
 aes-gcm = "0.11"
-argon2 = "0.5"
-bcrypt = "0.19.0"
+argon2 = "0.6"
+bcrypt = "0.19.3"
 hmac = "0.13"
 # v11 fixed the v10 header regression that caused the 2.0.1 production outage
 # (v10's flattened `extras: HashMap<String, String>` rejected Clerk's integer
@@ -88,10 +88,10 @@ jsonwebtoken = { version = "11", default-features = false, features = ["aws_lc_r
 reqwest = { version = "0.13", features = ["json", "rustls", "query", "charset", "http2"], default-features = false }
 
 # Redis (rate limiting)
-redis = { version = "1.4", features = ["tokio-comp", "connection-manager"] }
+redis = { version = "1.7", features = ["tokio-comp", "connection-manager"] }
 
 # Encoding
-base64 = "0.22"
+base64 = "0.23"
 hex = "0.4"
 
 # URL parsing
@@ -109,8 +109,8 @@ zip = { version = "8", default-features = false, features = ["deflate"] }
 # feature (used pre-cutover) brought in hyper-rustls 0.24 → rustls 0.21 →
 # rustls-webpki 0.101.7 (RUSTSEC-2026-0104, DoS panic on malformed CRL).
 # `rt-tokio` enables ByteStream::from_path for streamed (bounded-memory) uploads.
-aws-sdk-s3 = { version = "1.138", default-features = false, features = ["default-https-client", "rt-tokio"] }
-aws-config = { version = "1.8", default-features = false, features = ["default-https-client", "rt-tokio"] }
+aws-sdk-s3 = { version = "1.152", default-features = false, features = ["default-https-client", "rt-tokio"] }
+aws-config = { version = "1.12", default-features = false, features = ["default-https-client", "rt-tokio"] }
 
 # Filesystem stats (disk usage for health checks)
 nix = { version = "0.31", features = ["fs"] }
@@ -119,11 +119,11 @@ nix = { version = "0.31", features = ["fs"] }
 rss = "2"
 
 # Utilities
-async-trait = "0.1.89"
-futures = { version = "0.3.32", default-features = false, features = ["alloc"] }
-lazy_static = "1.5.0"
-regex = "1.12.3"
-fancy-regex = "0.18.0"
+async-trait = "0.1.92"
+futures = { version = "0.3.34", default-features = false, features = ["alloc"] }
+lazy_static = "1.5.1"
+regex = "1.13.1"
+fancy-regex = "0.19.2"
 subtle = "2.6.1"
 altcha-lib-rs = { version = "0.3.3", default-features = false, features = ["json"] }
 
@@ -133,8 +133,8 @@ bundle-admin = []
 
 [dev-dependencies]
 # Testing
-tokio-test = "0.4.5"
-serial_test = "3.4.0"
+tokio-test = "0.4.6"
+serial_test = "4.0.1"
 fake = { version = "5.1.0", features = ["derive"] }
 axum-test = "21"
 tower = { version = "0.5", features = ["util"] }

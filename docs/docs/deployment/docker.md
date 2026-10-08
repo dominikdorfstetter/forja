@@ -44,7 +44,7 @@ The Dockerfile uses six stages to keep the final image small and speed up iterat
 | Stage | Base Image | Purpose |
 |-------|-----------|---------|
 | **admin-build** | `node:24-alpine` | Installs npm dependencies and builds the React admin dashboard |
-| **chef** | `rust:1.97-bookworm` | Installs `cargo-chef` for dependency caching |
+| **chef** | `rust:1.99-bookworm` | Installs `cargo-chef` for dependency caching |
 | **planner** | (from chef) | Analyzes Cargo.toml/lock to produce a dependency-only recipe |
 | **deps** | (from chef) | Builds and caches Rust dependencies (only rebuilt when Cargo.toml/lock change) |
 | **backend-build** | (from deps) | Compiles the Rust backend in release mode, embedding the admin static files |

@@ -162,7 +162,7 @@ Make sure `DATABASE_URL` in `backend/.env` matches the Docker Compose credential
 
 ### Cargo build failures
 
-Run `rustup update` to ensure your toolchain is current. The project requires Rust 1.97 — it is pinned in `rust-toolchain.toml`, so rustup installs the right version automatically when you build inside the repository.
+Run `rustup update` to ensure your toolchain is current. The project requires Rust 1.99 — it is pinned in `rust-toolchain.toml`, so rustup installs the right version automatically when you build inside the repository.
 
 ### Admin dashboard not loading
 

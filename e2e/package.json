@@ -13,17 +13,16 @@
     "e2e": "./scripts/run-e2e.sh"
   },
   "dependencies": {
-    "@clerk/testing": "^2.2.19",
-    "@cucumber/cucumber": "^13.2.1",
-    "dotenv": "^17.4.2",
-    "playwright": "^1.62.1",
+    "@clerk/testing": "^2.2.42",
+    "@cucumber/cucumber": "^13.3.0",
+    "dotenv": "^18.0.5",
+    "playwright": "^1.63.0",
     "ts-node": "^10.9.2"
   },
   "devDependencies": {
     "typescript": "^6.0.3"
   },
   "overrides": {
-    "typescript": "^6.0.3",
-    "js-cookie": "^3.0.7"
+    "typescript": "^6.0.3"
   }
 }

@@ -119,7 +119,7 @@ fn forbidden_html() -> axum::response::Response {
 async fn validate_admin_session(
     headers: &HeaderMap,
     state: &AppState,
-) -> Result<(), axum::response::Response> {
+) -> Result<(), Box<axum::response::Response>> {
     // ── CSRF defense-in-depth: reject cross-origin requests ────────
     // Clerk's production __session cookie has SameSite=Lax, which the
     // browser enforces.  This server-side check catches edge-cases:
@@ -131,7 +131,7 @@ async fn validate_admin_session(
         .and_then(|v| v.to_str().ok())
     {
         if origin != public_url {
-            return Err(forbidden_html());
+            return Err(Box::new(forbidden_html()));
         }
     } else if let Some(referer) = headers
         .get(axum::http::header::REFERER)
@@ -140,7 +140,7 @@ async fn validate_admin_session(
         // Referer must exactly equal public_url OR start with public_url + "/"
         // (prevents http://public.url.evil.com bypass)
         if referer != public_url && !referer.starts_with(&format!("{public_url}/")) {
-            return Err(forbidden_html());
+            return Err(Box::new(forbidden_html()));
         }
     }
     let session = cookie_value(headers, "__session").ok_or_else(forbidden_html)?;
@@ -158,7 +158,7 @@ async fn validate_admin_session(
         })?;
 
     if !is_admin {
-        return Err(forbidden_html());
+        return Err(Box::new(forbidden_html()));
     }
     Ok(())
 }
@@ -181,7 +181,7 @@ async fn admin_docs_index(
     headers: HeaderMap,
 ) -> axum::response::Response {
     if let Err(resp) = validate_admin_session(&headers, &state).await {
-        return resp;
+        return *resp;
     }
     let (html, nonce) = admin_swagger_html();
     let csp = admin_csp(&nonce);
@@ -213,7 +213,7 @@ async fn admin_openapi_json(
     headers: HeaderMap,
 ) -> axum::response::Response {
     if let Err(resp) = validate_admin_session(&headers, &state).await {
-        return resp;
+        return *resp;
     }
     let json = serde_json::to_string(&*spec).expect("OpenAPI spec serializes to JSON");
     (
