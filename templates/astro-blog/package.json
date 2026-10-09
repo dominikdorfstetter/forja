@@ -20,7 +20,7 @@
     "@forjacms/client": "file:../../libs/client",
     "@forjacms/sections": "file:../../libs/sections",
     "@tailwindcss/vite": "^4.3.3",
-    "astro": "^7.3.5",
+    "astro": "^7.3.6",
     "marked": "^18.1.0",
     "sanitize-html": "^2.18.0"
   },
