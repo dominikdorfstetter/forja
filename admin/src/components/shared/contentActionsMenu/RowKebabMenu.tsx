@@ -14,7 +14,7 @@ export interface RowKebabMenuEntry<T> {
 export interface RowKebabMenuProps<T> {
   item: T;
   isAdmin: boolean;
-  /** data-testid of the kebab trigger, e.g. `blog-actions.btn.menu`. */
+  /** data-testid of the kebab trigger, e.g. `project-actions.btn.menu`. */
   testId: string;
   entries: RowKebabMenuEntry<T>[];
   /** Admin-only, rendered below a divider in the error colour. */
