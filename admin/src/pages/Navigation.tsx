@@ -1,40 +1,25 @@
 import { useReducer, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Box,
-  Alert,
-} from '@mui/material';
+import { Box } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import MenuIcon from '@mui/icons-material/Menu';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { createMenuItem, createNavigationItem, createNavigationMenu, deleteNavigationItem, deleteNavigationMenu, getMenuItems, getNavigationMenus, updateNavigationItem, updateNavigationMenu } from '@/services/navigation';
-import { getPages } from '@/services/pages';
-import { getLegalDocuments } from '@/services/legal';
-import { getSiteLocales } from '@/services/siteLocales';
-import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
-import type {
-  NavigationItem,
-  CreateNavigationItemRequest,
-  UpdateNavigationItemRequest,
-  CreateNavigationMenuRequest,
-  UpdateNavigationMenuRequest,
-} from '@/types/api';
+import type { NavigationItem } from '@/types/api';
 import { useSiteContext } from '@/store/SiteContext';
 import { useAuth } from '@/store/AuthContext';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
 import NavigationMenuTabs from '@/pages/NavigationMenuTabs';
+import NavigationMenuBody from '@/pages/NavigationMenuBody';
 import NavigationDialogs from '@/pages/NavigationDialogs';
 import NavigationItemsTable from '@/pages/NavigationItemsTable';
 import { uiReducer, initialUIState, flattenItemsWithDepth, getParentIds } from '@/pages/NavigationReducer';
 import { useNavigationDragDrop } from '@/pages/useNavigationDragDrop';
-import { queryKeys } from '@/lib/queryKeys';
+import { useNavigationQueries } from '@/pages/useNavigationQueries';
+import { useNavigationMutations } from '@/pages/useNavigationMutations';
 
 export default function NavigationPage() {
   const { t } = useTranslation();
-  const queryClient = useQueryClient();
-  const { showError, showSuccess } = useErrorSnackbar();
   const { selectedSiteId } = useSiteContext();
   const { canWrite, isAdmin } = useAuth();
 
@@ -54,64 +39,16 @@ export default function NavigationPage() {
     return () => window.removeEventListener('command-palette:action', handler);
   }, []);
 
-  // Fetch menus
-  const { data: menus, isLoading: menusLoading } = useQuery({
-    queryKey: queryKeys.navigationMenus(selectedSiteId),
-    queryFn: () => getNavigationMenus(selectedSiteId),
-    enabled: !!selectedSiteId,
-  });
-
-  // Fetch site-specific locales for title fields
-  const { data: siteLocalesRaw } = useQuery({
-    queryKey: queryKeys.siteLocales(selectedSiteId),
-    queryFn: () => getSiteLocales(selectedSiteId),
-    enabled: !!selectedSiteId,
-  });
-
-  const locales = (siteLocalesRaw || [])
-    .filter((sl) => sl.is_active)
-    .map((sl) => ({ id: sl.locale_id, code: sl.code, name: sl.name, native_name: sl.native_name, direction: sl.direction, is_active: sl.is_active, created_at: sl.created_at, site_count: 0 }));
-
-  // Fetch pages to resolve page UUIDs → routes
-  const { data: pagesData } = useQuery({
-    queryKey: queryKeys.pagesForNav(selectedSiteId),
-    queryFn: () => getPages(selectedSiteId, { page_size: 200 }),
-    enabled: !!selectedSiteId,
-    staleTime: 60_000,
-  });
-
-  const pageRouteMap = useMemo(() => {
-    const map = new Map<string, string>();
-    pagesData?.data.forEach((page) => map.set(page.id, page.route));
-    return map;
-  }, [pagesData]);
-
-  const selectedMenu = menus?.[ui.selectedMenuIndex] ?? null;
-
-  // Fetch items for selected menu
-  const { data: items, isLoading: itemsLoading, error: itemsError } = useQuery({
-    queryKey: queryKeys.navigationItems(selectedMenu?.id),
-    queryFn: () => getMenuItems(selectedMenu!.id),
-    enabled: !!selectedMenu?.id,
-  });
-
-  // Fetch legal documents to resolve legal_document_id UUIDs → /legal/{slug} routes
-  const hasLegalItems = useMemo(() => (items ?? []).some((i) => i.legal_document_id), [items]);
-  const { data: legalData } = useQuery({
-    queryKey: queryKeys.legalForNav(selectedSiteId),
-    queryFn: () => getLegalDocuments(selectedSiteId, { page_size: 200 }),
-    enabled: !!selectedSiteId && hasLegalItems,
-    staleTime: 60_000,
-  });
-
-  const legalRouteMap = useMemo(() => {
-    const map = new Map<string, string>();
-    legalData?.data.forEach((doc) => {
-      const slug = doc.slug || doc.cookie_name;
-      if (slug) map.set(doc.id, `/legal/${slug}`);
-    });
-    return map;
-  }, [legalData]);
+  const {
+    menus,
+    selectedMenu,
+    items,
+    itemsError,
+    isLoading,
+    locales,
+    pageRouteMap,
+    legalRouteMap,
+  } = useNavigationQueries(selectedSiteId, ui.selectedMenuIndex);
 
   // Sync ordered list from query data and auto-expand parents
   const prevItemsRef = useRef<NavigationItem[] | undefined>(undefined);
@@ -150,77 +87,14 @@ export default function NavigationPage() {
     onDragEnded,
   });
 
-  // Menu mutations
-  const createMenuMutation = useMutation({
-    mutationFn: (data: CreateNavigationMenuRequest) => createNavigationMenu(selectedSiteId, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.navigationMenus(selectedSiteId) });
-      dispatch({ type: 'closeMenuForm' });
-      showSuccess(t('navigation.menus.messages.created', 'Menu created'));
-      if (menus) dispatch({ type: 'setSelectedMenuIndex', value: menus.length });
-    },
-    onError: showError,
-  });
-
-  const updateMenuMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateNavigationMenuRequest }) => updateNavigationMenu(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.navigationMenus(selectedSiteId) });
-      dispatch({ type: 'setEditingMenu', menu: null });
-      dispatch({ type: 'closeMenuForm' });
-      showSuccess(t('navigation.menus.messages.updated', 'Menu updated'));
-    },
-    onError: showError,
-  });
-
-  const deleteMenuMutation = useMutation({
-    mutationFn: (id: string) => deleteNavigationMenu(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.navigationMenus(selectedSiteId) });
-      dispatch({ type: 'closeDeleteMenu' });
-      dispatch({ type: 'setSelectedMenuIndex', value: 0 });
-      showSuccess(t('navigation.menus.messages.deleted', 'Menu deleted'));
-    },
-    onError: showError,
-  });
-
-  // Item mutations
-  const createItemMutation = useMutation({
-    mutationFn: (data: CreateNavigationItemRequest) => {
-      if (selectedMenu) {
-        return createMenuItem(selectedMenu.id, data);
-      }
-      return createNavigationItem(selectedSiteId, data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.navigationItems() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.navigationMenus(selectedSiteId) });
-      dispatch({ type: 'closeItemForm' });
-      showSuccess(t('navigation.messages.created'));
-    },
-    onError: showError,
-  });
-
-  const updateItemMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateNavigationItemRequest }) => updateNavigationItem(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.navigationItems() });
-      dispatch({ type: 'setEditingItem', item: null });
-      showSuccess(t('navigation.messages.updated'));
-    },
-    onError: showError,
-  });
-
-  const deleteItemMutation = useMutation({
-    mutationFn: (id: string) => deleteNavigationItem(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.navigationItems() });
-      queryClient.invalidateQueries({ queryKey: queryKeys.navigationMenus(selectedSiteId) });
-      dispatch({ type: 'closeDeleteItem' });
-      showSuccess(t('navigation.messages.deleted'));
-    },
-    onError: showError,
-  });
+  const {
+    createMenuMutation,
+    updateMenuMutation,
+    deleteMenuMutation,
+    createItemMutation,
+    updateItemMutation,
+    deleteItemMutation,
+  } = useNavigationMutations({ selectedSiteId, menus, selectedMenu, dispatch });
 
   // Flatten items for display with depth and tree metadata
   const flattenedItems = useMemo(
@@ -228,8 +102,7 @@ export default function NavigationPage() {
     [orderedItems, ui.expandedIds],
   );
 
-  const totalLocales = locales.length;
-  const isLoading = menusLoading || itemsLoading;
+  const openItemForm = () => dispatch({ type: 'openItemForm' });
 
   return (
     <Box data-testid="navigation.page">
@@ -244,7 +117,7 @@ export default function NavigationPage() {
         action={selectedSiteId && selectedMenu ? {
           label: t('navigation.addItem'),
           icon: <AddIcon />,
-          onClick: () => dispatch({ type: 'openItemForm' }),
+          onClick: openItemForm,
           hidden: !canWrite,
           testId: 'add-nav-item',
         } : undefined}
@@ -268,29 +141,20 @@ export default function NavigationPage() {
             onDeleteMenu={() => selectedMenu && dispatch({ type: 'openDeleteMenu', menu: selectedMenu })}
           />
 
-          {!selectedMenu ? (
-            <EmptyState
-              icon={<MenuIcon sx={{ fontSize: 64 }} />}
-              title={t('navigation.menus.empty.title', 'No menus yet')}
-              description={t('navigation.menus.empty.description', 'Create a navigation menu to get started')}
-              action={canWrite ? { label: t('navigation.menus.addMenu', 'Add Menu'), onClick: () => dispatch({ type: 'openMenuForm' }) } : undefined}
-            />
-          ) : itemsError ? (
-            <Alert severity="error">{t('navigation.loadError')}</Alert>
-          ) : !orderedItems || orderedItems.length === 0 ? (
-            <EmptyState
-              icon={<MenuIcon sx={{ fontSize: 64 }} />}
-              title={t('navigation.empty.title')}
-              description={t('navigation.empty.description')}
-              action={canWrite ? { label: t('navigation.addItem'), onClick: () => dispatch({ type: 'openItemForm' }) } : undefined}
-            />
-          ) : (
+          <NavigationMenuBody
+            selectedMenu={selectedMenu}
+            itemsError={itemsError}
+            itemCount={orderedItems.length}
+            canWrite={canWrite}
+            onAddMenu={() => dispatch({ type: 'openMenuForm' })}
+            onAddItem={openItemForm}
+          >
             <NavigationItemsTable
               flattenedItems={flattenedItems}
               orderedItems={orderedItems}
               activeId={ui.activeId}
               expandedIds={ui.expandedIds}
-              totalLocales={totalLocales}
+              totalLocales={locales.length}
               pageRouteMap={pageRouteMap}
               legalRouteMap={legalRouteMap}
               canWrite={canWrite}
@@ -302,7 +166,7 @@ export default function NavigationPage() {
               onDelete={(i) => dispatch({ type: 'openDeleteItem', item: i })}
               onToggleExpand={(id) => dispatch({ type: 'toggleExpanded', id })}
             />
-          )}
+          </NavigationMenuBody>
         </>
       )}
 
@@ -319,7 +183,7 @@ export default function NavigationPage() {
         menuId={selectedMenu?.id || ''}
         orderedItems={orderedItems}
         maxDepth={selectedMenu?.max_depth || 3}
-        locales={locales || []}
+        locales={locales}
         onSubmitCreateItem={(data) => createItemMutation.mutate(data)}
         onSubmitUpdateItem={(data) => ui.editingItem && updateItemMutation.mutate({ id: ui.editingItem.id, data })}
         onCloseItemForm={() => dispatch({ type: 'closeItemForm' })}

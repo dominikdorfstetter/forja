@@ -53,6 +53,7 @@ export const queryKeys = {
   siteStorage: (siteId: SiteId) => ['site', siteId, 'storage'] as const,
   siteDetailSettings: (siteId: SiteId) => ['site', siteId, 'settings'] as const,
   siteSettings: (siteId: SiteId) => ['site-settings', siteId] as const,
+  siteBotProtection: (siteId: SiteId) => ['site-bot-protection', siteId] as const,
   siteContext: (siteId: SiteId) => ['siteContext', siteId] as const,
   siteLocales: (siteId: SiteId) => ['site-locales', siteId] as const,
   /** Dashboard locale summary (legacy 'siteLocales' key, distinct cache). */

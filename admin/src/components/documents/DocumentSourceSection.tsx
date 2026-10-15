@@ -1,27 +1,19 @@
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 import {
   Alert,
   Box,
-  Stack,
   TextField,
   ToggleButton,
   ToggleButtonGroup,
   Typography,
 } from '@mui/material';
-import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import LinkIcon from '@mui/icons-material/Link';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import type { UseFormRegister, FieldErrors } from 'react-hook-form';
 import type { DocumentResponse } from '@/types/api';
-import { useImagePreviewUrl } from '@/hooks/useImagePreviewUrl';
+import FileDropZone, { DropZoneFileContent } from '@/components/shared/FileDropZone';
+import { formatBytes } from '@/utils/formatBytes';
 import { useTranslation } from 'react-i18next';
-
-function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
 
@@ -55,9 +47,6 @@ export default function DocumentSourceSection({
   errors,
 }: DocumentSourceSectionProps) {
   const { t } = useTranslation();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const preview = useImagePreviewUrl(selectedFile);
 
   const handleSourceTypeChange = (_: React.MouseEvent<HTMLElement>, value: string | null) => {
     if (value === 'link' || value === 'upload') {
@@ -66,42 +55,6 @@ export default function DocumentSourceSection({
       onFileError(null);
     }
   };
-
-  const validateAndSelect = useCallback((file: File) => {
-    onFileError(null);
-    if (file.size > MAX_FILE_SIZE) {
-      onFileError(t('media.upload.tooLarge', { maxSize: formatFileSize(MAX_FILE_SIZE) }));
-      onFileSelect(null);
-      return;
-    }
-    onFileSelect(file);
-  }, [onFileSelect, onFileError, t]);
-
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onDragOver(true);
-  }, [onDragOver]);
-
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onDragOver(false);
-  }, [onDragOver]);
-
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onDragOver(false);
-    const file = e.dataTransfer.files[0];
-    if (file) validateAndSelect(file);
-  }, [validateAndSelect, onDragOver]);
-
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) validateAndSelect(file);
-    if (fileInputRef.current) fileInputRef.current.value = '';
-  }, [validateAndSelect]);
 
   return (
     <>
@@ -139,74 +92,80 @@ export default function DocumentSourceSection({
       )}
 
       {sourceType === 'upload' && (
-        <Box>
-          {isEditing && document?.has_file && document?.file_name && !selectedFile && (
-            <Alert severity="info" sx={{ mb: 1 }}>
-              {t('forms.document.currentFile')}: <strong>{document.file_name}</strong>
-              {document.file_size && ` (${formatFileSize(document.file_size)})`}
-            </Alert>
-          )}
-
-          <Box
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            onClick={() => fileInputRef.current?.click()}
-            sx={{
-              border: '2px dashed',
-              borderColor: dragOver ? 'primary.main' : fileError ? 'error.main' : 'divider',
-              borderRadius: 2,
-              p: 3,
-              textAlign: 'center',
-              cursor: 'pointer',
-              bgcolor: dragOver ? 'action.hover' : 'background.default',
-              transition: 'all 0.2s ease',
-              '&:hover': { borderColor: 'primary.main', bgcolor: 'action.hover' },
-            }}
-          >
-            {selectedFile ? (
-              <Stack spacing={1} sx={{ alignItems: "center" }}>
-                {preview ? (
-                  <Box
-                    component="img"
-                    src={preview}
-                    alt={selectedFile.name}
-                    sx={{ maxWidth: 200, maxHeight: 120, objectFit: 'contain', borderRadius: 1 }}
-                  />
-                ) : (
-                  <InsertDriveFileIcon sx={{ fontSize: 48 }} color="action" />
-                )}
-                <Typography variant="body2" sx={{ fontWeight: 500 }}>{selectedFile.name}</Typography>
-                <Typography variant="caption" color="text.secondary">
-                  {formatFileSize(selectedFile.size)} &middot; {selectedFile.type || 'unknown type'}
-                </Typography>
-              </Stack>
-            ) : (
-              <Stack spacing={1} sx={{ alignItems: "center" }}>
-                <CloudUploadIcon sx={{ fontSize: 48 }} color={dragOver ? 'primary' : 'action'} />
-                <Typography variant="body1" color="text.secondary">
-                  {t('media.upload.dragDrop')}
-                </Typography>
-              </Stack>
-            )}
-          </Box>
-
-          <input
-            ref={fileInputRef}
-            type="file"
-            style={{ display: 'none' }}
-            onChange={handleInputChange}
-            aria-label={t('common.actions.selectFile')}
-            data-testid="document-upload-input"
-          />
-
-          {fileError && (
-            <Typography variant="body2" color="error" sx={{ mt: 1 }}>
-              {fileError}
-            </Typography>
-          )}
-        </Box>
+        <DocumentUploadField
+          selectedFile={selectedFile}
+          onFileSelect={onFileSelect}
+          fileError={fileError}
+          onFileError={onFileError}
+          dragOver={dragOver}
+          onDragOver={onDragOver}
+          currentFile={isEditing && !selectedFile ? storedFileOf(document) : null}
+        />
       )}
     </>
+  );
+}
+
+/** The already-stored file of a document, when it has one with a name. */
+function storedFileOf(document: DocumentResponse | null | undefined): { name: string; size?: number | null } | null {
+  if (!document?.has_file || !document.file_name) return null;
+  return { name: document.file_name, size: document.file_size };
+}
+
+type DocumentUploadFieldProps = Pick<
+  DocumentSourceSectionProps,
+  'selectedFile' | 'onFileSelect' | 'fileError' | 'onFileError' | 'dragOver' | 'onDragOver'
+> & {
+  /** File already stored on the document being edited (shown until replaced). */
+  currentFile: { name: string; size?: number | null } | null;
+};
+
+function DocumentUploadField({
+  selectedFile,
+  onFileSelect,
+  fileError,
+  onFileError,
+  dragOver,
+  onDragOver,
+  currentFile,
+}: DocumentUploadFieldProps) {
+  const { t } = useTranslation();
+
+  const validateAndSelect = useCallback((file: File) => {
+    onFileError(null);
+    if (file.size > MAX_FILE_SIZE) {
+      onFileError(t('media.upload.tooLarge', { maxSize: formatBytes(MAX_FILE_SIZE) }));
+      onFileSelect(null);
+      return;
+    }
+    onFileSelect(file);
+  }, [onFileSelect, onFileError, t]);
+
+  return (
+    <Box>
+      {currentFile && (
+        <Alert severity="info" sx={{ mb: 1 }}>
+          {t('forms.document.currentFile')}: <strong>{currentFile.name}</strong>
+          {currentFile.size && ` (${formatBytes(currentFile.size)})`}
+        </Alert>
+      )}
+
+      <FileDropZone
+        onFile={validateAndSelect}
+        dragOver={dragOver}
+        onDragOverChange={onDragOver}
+        hasError={!!fileError}
+        padding={3}
+        inputTestId="document-upload-input"
+      >
+        <DropZoneFileContent file={selectedFile} dragOver={dragOver} previewMaxHeight={120} />
+      </FileDropZone>
+
+      {fileError && (
+        <Typography variant="body2" color="error" sx={{ mt: 1 }}>
+          {fileError}
+        </Typography>
+      )}
+    </Box>
   );
 }

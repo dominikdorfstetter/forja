@@ -1,54 +1,18 @@
-import { type CSSProperties } from 'react';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { TableRow, TableCell, IconButton } from '@mui/material';
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import { TableRow, TableCell } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import type { CvEntryResponse } from '@/types/api';
 import { useLocalizedFormat } from '@/utils/dateFnsLocale';
-import CvEntryActionsMenu from './CvEntryActionsMenu';
+import CvEntryActionsMenu, { type CvEntryActionsMenuProps } from './CvEntryActionsMenu';
+import { DragHandleCell, useSortableRow } from '@/components/shared/listPageV2';
 
-interface SortableCvEntryRowProps {
-  entry: CvEntryResponse;
-  canWrite: boolean;
-  isAdmin: boolean;
-  onEdit: (entry: CvEntryResponse) => void;
-  onDelete: (entry: CvEntryResponse) => void;
-}
-
-export default function SortableCvEntryRow({
-  entry,
-  canWrite,
-  isAdmin,
-  onEdit,
-  onDelete,
-}: SortableCvEntryRowProps) {
+export default function SortableCvEntryRow(props: CvEntryActionsMenuProps) {
+  const { entry, canWrite } = props;
   const { t } = useTranslation();
   const fmt = useLocalizedFormat();
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: entry.id });
-
-  const style: CSSProperties = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.4 : 1,
-  };
+  const { attributes, listeners, setNodeRef, style } = useSortableRow(entry.id);
 
   return (
     <TableRow ref={setNodeRef} style={style} {...attributes} data-testid="cv-entry-row">
-      {canWrite && (
-        <TableCell sx={{ width: 48, px: 1 }}>
-          <IconButton size="small" sx={{ cursor: 'grab' }} {...listeners} aria-label="Drag to reorder">
-            <DragIndicatorIcon fontSize="small" />
-          </IconButton>
-        </TableCell>
-      )}
+      {canWrite && <DragHandleCell listeners={listeners} />}
       <TableCell>{entry.company}</TableCell>
       <TableCell>{entry.location}</TableCell>
       <TableCell>
@@ -78,13 +42,7 @@ export default function SortableCvEntryRow({
         {entry.is_current ? t('common.labels.yes') : t('common.labels.no')}
       </TableCell>
       <TableCell align="right">
-        <CvEntryActionsMenu
-          entry={entry}
-          canWrite={canWrite}
-          isAdmin={isAdmin}
-          onEdit={onEdit}
-          onDelete={onDelete}
-        />
+        <CvEntryActionsMenu {...props} />
       </TableCell>
     </TableRow>
   );

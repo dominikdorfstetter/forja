@@ -7,14 +7,7 @@ import type {
   UpsertSectionLocalizationRequest,
 } from '@/types/api';
 import { queryKeys } from '@/lib/queryKeys';
-
-interface LocaleFormData {
-  title: string;
-  text: string;
-  buttonText: string;
-  /** Per-locale `settings.items` override — `null` = fall back to default. */
-  items: Record<string, unknown>[] | null;
-}
+import type { LocaleFormData } from './sectionEditorState';
 
 interface UseSectionEditorSaveOptions {
   sectionId: string | undefined;

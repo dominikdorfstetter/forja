@@ -1,20 +1,14 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Grid,
-  Card,
   CardContent,
-  CardActionArea,
   Typography,
   Chip,
   Checkbox,
   Box,
-  TextField,
-  InputAdornment,
   Link,
-  CircularProgress,
 } from '@mui/material';
 import FormDialog from '@/components/shared/FormDialog';
-import SearchIcon from '@mui/icons-material/Search';
 import LinkIcon from '@mui/icons-material/Link';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { useQuery } from '@tanstack/react-query';
@@ -23,6 +17,8 @@ import { useSiteContext } from '@/store/SiteContext';
 import type { DocumentListItem, DocumentResponse } from '@/types/api';
 import { useTranslation } from 'react-i18next';
 import { queryKeys } from '@/lib/queryKeys';
+import { getDocumentDisplayName } from '@/components/documents/documentDisplayName';
+import { PickerCard, PickerSearchResults } from '@/components/shared/library';
 
 interface DocumentPickerDialogProps {
   open: boolean;
@@ -72,33 +68,18 @@ export default function DocumentPickerDialog({
     return map;
   }, [documentDetails]);
 
-  // Get the display name for a document
-  const getDocumentName = useCallback((doc: DocumentListItem): string => {
-    const detail = detailsMap.get(doc.id);
-    if (detail && detail.localizations && detail.localizations.length > 0) {
-      return detail.localizations[0].name;
-    }
-    if (doc.has_file && doc.file_name) {
-      return doc.file_name;
-    }
-    if (doc.url) {
-      return doc.url.split('/').pop() || 'Untitled';
-    }
-    return 'Untitled';
-  }, [detailsMap]);
-
   // Filter by search term
   const filteredDocuments = useMemo(() => {
     if (!search.trim()) return availableDocuments;
     const lower = search.toLowerCase();
     return availableDocuments.filter((doc) => {
-      const name = getDocumentName(doc).toLowerCase();
+      const name = getDocumentDisplayName(doc, detailsMap).toLowerCase();
       const url = (doc.url || '').toLowerCase();
       const type = doc.document_type.toLowerCase();
       const fileName = (doc.file_name || '').toLowerCase();
       return name.includes(lower) || url.includes(lower) || type.includes(lower) || fileName.includes(lower);
     });
-  }, [availableDocuments, search, getDocumentName]);
+  }, [availableDocuments, search, detailsMap]);
 
   const toggleSelection = (id: string) => {
     setSelected((prev) => {
@@ -124,8 +105,6 @@ export default function DocumentPickerDialog({
     onClose();
   };
 
-  const isLoading = isListLoading || isDetailsLoading;
-
   return (
     <FormDialog
       open={open}
@@ -140,129 +119,106 @@ export default function DocumentPickerDialog({
       maxWidth="md"
       data-testid="document-picker.dialog"
     >
-        <TextField
-          autoFocus
-          placeholder={t('common.actions.search')}
-          size="small"
-          fullWidth
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon fontSize="small" />
-                </InputAdornment>
-              ),
-            }
-          }}
-        />
-
-        {isLoading && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-            <CircularProgress />
-          </Box>
-        )}
-
-        {!isLoading && filteredDocuments.length === 0 && (
-          <Typography variant="body2" color="text.secondary" sx={{ py: 4, textAlign: 'center' }}>
-            {availableDocuments.length === 0
-              ? 'No documents available for this site'
-              : 'No documents match your search'}
-          </Typography>
-        )}
-
-        {!isLoading && filteredDocuments.length > 0 && (
-          <Grid container spacing={1.5}>
-            {filteredDocuments.map((doc) => {
-              const isSelected = selected.has(doc.id);
-              const name = getDocumentName(doc);
-              return (
-                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={doc.id}>
-                  <Card
-                    variant="outlined"
-                    sx={{
-                      borderColor: isSelected ? 'primary.main' : 'divider',
-                      borderWidth: isSelected ? 2 : 1,
-                      transition: 'border-color 0.15s',
-                    }}
-                  >
-                    <CardActionArea onClick={() => toggleSelection(doc.id)}>
-                      <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
-                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
-                          <Checkbox
-                            checked={isSelected}
-                            size="small"
-                            tabIndex={-1}
-                            sx={{ p: 0, mt: 0.2 }}
-                          />
-                          <Box sx={{ minWidth: 0, flex: 1 }}>
-                            <Typography variant="body2" noWrap sx={{ fontWeight: 500 }}>
-                              {name}
-                            </Typography>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
-                              <Chip
-                                label={doc.document_type}
-                                size="small"
-                                variant="outlined"
-                                sx={{ fontSize: '0.65rem', height: 18 }}
-                              />
-                              {doc.has_file && (
-                                <Chip
-                                  label="File"
-                                  size="small"
-                                  color="secondary"
-                                  variant="outlined"
-                                  sx={{ fontSize: '0.6rem', height: 16 }}
-                                />
-                              )}
-                            </Box>
-                            {doc.has_file ? (
-                              <Typography
-                                variant="caption"
-                                color="text.secondary"
-                                sx={{
-                                  display: 'inline-flex',
-                                  alignItems: 'center',
-                                  gap: 0.3,
-                                  mt: 0.5,
-                                }}
-                              >
-                                <UploadFileIcon sx={{ fontSize: 12 }} />
-                                {doc.file_name}
-                              </Typography>
-                            ) : doc.url ? (
-                              <Link
-                                href={doc.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                variant="caption"
-                                onClick={(e) => e.stopPropagation()}
-                                sx={{
-                                  display: 'inline-flex',
-                                  alignItems: 'center',
-                                  gap: 0.3,
-                                  mt: 0.5,
-                                  maxWidth: '100%',
-                                  overflow: 'hidden',
-                                  textOverflow: 'ellipsis',
-                                  whiteSpace: 'nowrap',
-                                }}
-                              >
-                                <LinkIcon sx={{ fontSize: 12 }} />
-                                {doc.url}
-                              </Link>
-                            ) : null}
-                          </Box>
-                        </Box>
-                      </CardContent>
-                    </CardActionArea>
-                  </Card>
-                </Grid>
-              );
-            })}
+      <PickerSearchResults
+        search={search}
+        onSearchChange={setSearch}
+        placeholder={t('common.actions.search')}
+        isLoading={isListLoading || isDetailsLoading}
+        isEmpty={filteredDocuments.length === 0}
+        emptyMessage={availableDocuments.length === 0
+          ? 'No documents available for this site'
+          : 'No documents match your search'}
+      >
+        {filteredDocuments.map((doc) => (
+          <Grid size={{ xs: 12, sm: 6, md: 4 }} key={doc.id}>
+            <PickerCard selected={selected.has(doc.id)} onClick={() => toggleSelection(doc.id)}>
+              <DocumentPickerCardContent doc={doc} name={getDocumentDisplayName(doc, detailsMap)} checked={selected.has(doc.id)} />
+            </PickerCard>
           </Grid>
-        )}
+        ))}
+      </PickerSearchResults>
     </FormDialog>
+  );
+}
+
+function DocumentPickerCardContent({ doc, name, checked }: { doc: DocumentListItem; name: string; checked: boolean }) {
+  return (
+    <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+        <Checkbox
+          checked={checked}
+          size="small"
+          tabIndex={-1}
+          sx={{ p: 0, mt: 0.2 }}
+        />
+        <Box sx={{ minWidth: 0, flex: 1 }}>
+          <Typography variant="body2" noWrap sx={{ fontWeight: 500 }}>
+            {name}
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
+            <Chip
+              label={doc.document_type}
+              size="small"
+              variant="outlined"
+              sx={{ fontSize: '0.65rem', height: 18 }}
+            />
+            {doc.has_file && (
+              <Chip
+                label="File"
+                size="small"
+                color="secondary"
+                variant="outlined"
+                sx={{ fontSize: '0.6rem', height: 16 }}
+              />
+            )}
+          </Box>
+          <DocumentPickerSource doc={doc} />
+        </Box>
+      </Box>
+    </CardContent>
+  );
+}
+
+/** Uploaded file name, or the external link (opens in a new tab without toggling selection). */
+function DocumentPickerSource({ doc }: { doc: DocumentListItem }) {
+  if (doc.has_file) {
+    return (
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 0.3,
+          mt: 0.5,
+        }}
+      >
+        <UploadFileIcon sx={{ fontSize: 12 }} />
+        {doc.file_name}
+      </Typography>
+    );
+  }
+  if (!doc.url) return null;
+  return (
+    <Link
+      href={doc.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      variant="caption"
+      onClick={(e) => e.stopPropagation()}
+      sx={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 0.3,
+        mt: 0.5,
+        maxWidth: '100%',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      <LinkIcon sx={{ fontSize: 12 }} />
+      {doc.url}
+    </Link>
   );
 }

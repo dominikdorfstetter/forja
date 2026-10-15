@@ -1,12 +1,9 @@
-import { type CSSProperties } from 'react';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import { TableRow, TableCell, IconButton, Tooltip } from '@mui/material';
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import type { SocialLink } from '@/types/api';
 import { useTranslation } from 'react-i18next';
+import { DragHandleCell, useSortableRow } from '@/components/shared/listPageV2';
 
 interface SortableSocialRowProps {
   link: SocialLink;
@@ -18,30 +15,11 @@ interface SortableSocialRowProps {
 
 export default function SortableSocialRow({ link, canWrite, isAdmin, onEdit, onDelete }: SortableSocialRowProps) {
   const { t } = useTranslation();
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: link.id });
-
-  const style: CSSProperties = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.4 : 1,
-  };
+  const { attributes, listeners, setNodeRef, style } = useSortableRow(link.id);
 
   return (
     <TableRow ref={setNodeRef} style={style} {...attributes} data-testid="social-link-row">
-      {canWrite && (
-        <TableCell sx={{ width: 48, px: 1 }}>
-          <IconButton size="small" sx={{ cursor: 'grab' }} {...listeners} aria-label="Drag to reorder">
-            <DragIndicatorIcon fontSize="small" />
-          </IconButton>
-        </TableCell>
-      )}
+      {canWrite && <DragHandleCell listeners={listeners} />}
       <TableCell>{link.title}</TableCell>
       <TableCell sx={{ maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis' }}>{link.url}</TableCell>
       <TableCell>{link.icon}</TableCell>

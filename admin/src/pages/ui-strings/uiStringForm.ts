@@ -112,3 +112,54 @@ export function buildUpdatePayload(
     removed_locale_ids: delta.removedLocaleIds.length > 0 ? delta.removedLocaleIds : undefined,
   };
 }
+
+const isBlank = (value: string) => value.trim().length === 0;
+
+/** The default locale's value drives the fallback chain — saving without it is blocked. */
+export const defaultValueMissing = (draft: LocaleValueDraft, defaultLocaleId: string): boolean =>
+  isBlank(draftValue(draft, defaultLocaleId));
+
+/**
+ * Whether the dialog's submit is blocked: an invalid key or a missing default
+ * value always blocks; in edit mode (`delta` present) a save also needs a
+ * changed key or at least one value change/removal.
+ */
+export function isSubmitBlocked({
+  isValid,
+  keyDirty,
+  defaultMissing,
+  delta,
+}: {
+  isValid: boolean;
+  keyDirty: boolean;
+  defaultMissing: boolean;
+  delta: UpdateDelta | undefined;
+}): boolean {
+  if (!isValid || defaultMissing) return true;
+  return delta ? !keyDirty && !deltaHasChanges(delta) : false;
+}
+
+export interface LocaleValueFieldState {
+  value: string;
+  /** A previously persisted value was cleared — saving removes it. */
+  cleared: boolean;
+  /** The (default-locale) value is required but empty, and the user has seen the field. */
+  showRequiredError: boolean;
+}
+
+/** Display state of one locale's value input in the dialog. */
+export function localeValueFieldState(
+  row: UiStringResponse | null | undefined,
+  draft: LocaleValueDraft,
+  touchedLocaleIds: ReadonlySet<string>,
+  localeId: string,
+  isDefault: boolean,
+): LocaleValueFieldState {
+  const value = draftValue(draft, localeId);
+  const persisted = row?.localizations.find((l) => l.locale_id === localeId);
+  return {
+    value,
+    cleared: !!persisted && persisted.value.length > 0 && isBlank(value),
+    showRequiredError: isDefault && isBlank(value) && (!!row || touchedLocaleIds.has(localeId)),
+  };
+}

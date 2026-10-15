@@ -35,7 +35,8 @@
       "more": "Więcej",
       "remove": "Usuń",
       "showSecret": "Pokaż sekret",
-      "hideSecret": "Ukryj sekret"
+      "hideSecret": "Ukryj sekret",
+      "dragToReorder": "Przeciągnij, aby zmienić kolejność"
     },
     "status": {
       "active": "Aktywny",

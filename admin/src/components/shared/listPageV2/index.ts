@@ -18,3 +18,7 @@ export { pageTabsSx } from './pageTabsSx';
 export { useTableDensity } from './useTableDensity';
 export type { TableDensity } from './useTableDensity';
 export { sortableContentTableSx } from './sortableTableSx';
+export { DragHandleCell, DragPreviewCard } from './SortableTableParts';
+export { useReorderSensors, useSortableRow } from './sortableHooks';
+export { SortableTableShell } from './SortableTableShell';
+export type { SortableTableShellProps } from './SortableTableShell';

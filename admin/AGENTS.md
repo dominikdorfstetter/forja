@@ -19,11 +19,14 @@ npm run react-doctor:verbose # offline, with per-finding detail
 npm run react-doctor:online  # online score gate (must be 100; --fail-on warning --score, so warnings fail too)
 ```
 
-react-doctor is pinned exactly (0.9.12) as a devDependency; CI runs the pinned
+react-doctor is pinned exactly (0.9.18) as a devDependency; CI runs the pinned
 offline `npm run react-doctor` on PRs (not the `@main` marketplace action).
-0.9.13+ adds the `no-high-complexity-react-function` and `duplicate-jsx-subtree`
-maintainability rules (score drops to 90), so bumping it needs a refactor wave or
-an explicit owner decision about those rules.
+Since 0.9.13 it enforces `no-high-complexity-react-function` (a component or hook
+fails above cyclomatic **or** cognitive complexity 15; inline callbacks don't count
+toward the parent) and `duplicate-jsx-subtree`. Keep components small: push
+derivations into pure helpers, state/effect clusters into hooks, independent render
+branches into sub-components, and repeated conditional buttons/menu items into
+descriptor arrays — don't hide logic in IIFEs/`useMemo` to dodge the metric.
 
 No `.env` — config is fetched from the backend at runtime (`GET /api/v1/config`).
 

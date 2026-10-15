@@ -1,6 +1,6 @@
 {
   "name": "@forjacms/sections",
-  "version": "2.1.5",
+  "version": "2.1.6",
   "description": "Framework-agnostic Web Components for rendering Forja page sections. Zero CSS — bring your own styles via BEM class hooks.",
   "author": "Dominik Dorfstetter <dominik@dorfstetter.at>",
   "type": "module",
@@ -60,9 +60,9 @@
     "sanitize-html": "^2.18.0"
   },
   "devDependencies": {
-    "@stencil/react-output-target": "^1.6.2",
-    "@stencil/vitest": "^1.15.1",
+    "@stencil/react-output-target": "^1.6.5",
+    "@stencil/vitest": "^1.16.1",
     "@types/sanitize-html": "^2.16.2",
-    "vitest": "^4.1.11"
+    "vitest": "^5.0.4"
   }
 }

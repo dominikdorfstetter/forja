@@ -35,7 +35,8 @@
       "more": "Más",
       "remove": "Eliminar",
       "showSecret": "Mostrar secreto",
-      "hideSecret": "Ocultar secreto"
+      "hideSecret": "Ocultar secreto",
+      "dragToReorder": "Arrastrar para reordenar"
     },
     "status": {
       "active": "Activo",

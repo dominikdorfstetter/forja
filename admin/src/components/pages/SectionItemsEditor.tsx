@@ -19,6 +19,7 @@ import { useSiteContext } from '@/store/SiteContext';
 import { useMediaUrl } from '@/hooks/useMediaUrl';
 import MediaPickerDialog from '@/components/media/MediaPickerDialog';
 import type { SectionType } from '@/types/api';
+import ImagePickActions from './ImagePickActions';
 
 interface ItemField {
   key: string;
@@ -123,8 +124,7 @@ function MediaField({ mediaId, label, onSelect }: { mediaId: string | undefined;
             <Box component="img" src={imageUrl} alt="" sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </Card>
           <Stack spacing={0.5}>
-            <Button size="small" variant="outlined" onClick={() => setPickerOpen(true)}>{t('blogDetail.images.changeImage')}</Button>
-            <Button size="small" color="error" onClick={() => onSelect(null)}>{t('blogDetail.images.removeImage')}</Button>
+            <ImagePickActions onChange={() => setPickerOpen(true)} onRemove={() => onSelect(null)} />
           </Stack>
         </Box>
       ) : (

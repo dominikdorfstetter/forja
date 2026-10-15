@@ -1,63 +1,20 @@
-import { type CSSProperties } from 'react';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { TableRow, TableCell, IconButton } from '@mui/material';
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import { TableRow, TableCell } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import type { ProjectResponse, ContentStatus } from '@/types/api';
+import type { ContentStatus } from '@/types/api';
 import { useLocalizedFormat } from '@/utils/dateFnsLocale';
 import { StatusPill } from '@/components/design-system';
-import ProjectActionsMenu from './ProjectActionsMenu';
+import ProjectActionsMenu, { type ProjectActionsMenuProps } from './ProjectActionsMenu';
+import { DragHandleCell, useSortableRow } from '@/components/shared/listPageV2';
 
-interface SortableProjectRowProps {
-  project: ProjectResponse;
-  canWrite: boolean;
-  isAdmin: boolean;
-  onEdit: (project: ProjectResponse) => void;
-  onPublish: (project: ProjectResponse) => void;
-  onUnpublish: (project: ProjectResponse) => void;
-  onDelete: (project: ProjectResponse) => void;
-  onArchive?: (project: ProjectResponse) => void;
-  onRestore?: (project: ProjectResponse) => void;
-}
-
-export default function SortableProjectRow({
-  project,
-  canWrite,
-  isAdmin,
-  onEdit,
-  onPublish,
-  onUnpublish,
-  onDelete,
-  onArchive,
-  onRestore,
-}: SortableProjectRowProps) {
+export default function SortableProjectRow(props: ProjectActionsMenuProps) {
+  const { project, canWrite } = props;
   const { t } = useTranslation();
   const fmt = useLocalizedFormat();
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: project.id });
-
-  const style: CSSProperties = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.4 : 1,
-  };
+  const { attributes, listeners, setNodeRef, style } = useSortableRow(project.id);
 
   return (
     <TableRow ref={setNodeRef} style={style} {...attributes} data-testid="project-row">
-      {canWrite && (
-        <TableCell sx={{ width: 48, px: 1 }}>
-          <IconButton size="small" sx={{ cursor: 'grab' }} {...listeners} aria-label="Drag to reorder">
-            <DragIndicatorIcon fontSize="small" />
-          </IconButton>
-        </TableCell>
-      )}
+      {canWrite && <DragHandleCell listeners={listeners} />}
       <TableCell>{project.slug}</TableCell>
       <TableCell>
         <span data-testid={`project-status-${project.id}`}>
@@ -95,17 +52,7 @@ export default function SortableProjectRow({
           : (project.end_date ? fmt(project.end_date, 'PP') : '\u2014')}
       </TableCell>
       <TableCell align="right">
-        <ProjectActionsMenu
-          project={project}
-          canWrite={canWrite}
-          isAdmin={isAdmin}
-          onEdit={onEdit}
-          onPublish={onPublish}
-          onUnpublish={onUnpublish}
-          onDelete={onDelete}
-          onArchive={onArchive}
-          onRestore={onRestore}
-        />
+        <ProjectActionsMenu {...props} />
       </TableCell>
     </TableRow>
   );

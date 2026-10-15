@@ -1,73 +1,23 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
-import {
-  Alert,
-  Box,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TableSortLabel,
-  Typography,
-} from '@mui/material';
-import { Pagination, Toolbar, ToolbarSpacer, SearchField, FilterSelect, useTableDensity, sortableContentTableSx } from '@/components/shared/listPageV2';
+import { Alert, Box, TableCell } from '@mui/material';
+import { Toolbar, ToolbarSpacer, SearchField, FilterSelect, SortableTableShell } from '@/components/shared/listPageV2';
 import WorkIcon from '@mui/icons-material/Work';
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import {
-  DndContext,
-  closestCenter,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragOverlay,
-  type DragStartEvent,
-  type DragEndEvent,
-} from '@dnd-kit/core';
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-  arrayMove,
-} from '@dnd-kit/sortable';
 import { useTranslation } from 'react-i18next';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { reorderCvEntries } from '@/services/cv';
-import type { CvEntryResponse, CvEntryType, ReorderItem } from '@/types/api';
-import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
+import type { CvEntryResponse, CvEntryType } from '@/types/api';
 import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
 import SortableCvEntryRow from './SortableCvEntryRow';
+import type { CvEntryRowHandlers } from './CvEntryActionsMenu';
+import type { PortfolioListSectionProps } from './portfolioListTypes';
+import { PortfolioPagination, SortHeaderCell } from './PortfolioListParts';
+import { usePortfolioReorder } from './usePortfolioReorder';
 import { queryKeys } from '@/lib/queryKeys';
 
 const ENTRY_TYPES: CvEntryType[] = ['Work', 'Education', 'Volunteer', 'Certification', 'Project'];
 
-interface PaginationMeta {
-  total_items: number;
-  page: number;
-  page_size: number;
-}
-
-interface CvEntriesSectionProps {
+interface CvEntriesSectionProps extends PortfolioListSectionProps, CvEntryRowHandlers {
   entries: CvEntryResponse[] | undefined;
-  meta: PaginationMeta | undefined;
-  loading: boolean;
-  error: Error | null;
-  page: number;
-  rowsPerPage: number;
-  canWrite: boolean;
-  isAdmin: boolean;
   siteId: string;
-  onPage: (page: number) => void;
-  onPerPage: (pageSize: number) => void;
-  onOpenCreate: () => void;
-  onEdit: (entry: CvEntryResponse) => void;
-  onDelete: (entry: CvEntryResponse) => void;
-  searchValue: string;
-  onSearchChange: (value: string) => void;
-  sortBy: string;
-  sortDir: 'asc' | 'desc';
-  onSort: (column: string) => void;
   entryTypeFilter: string;
   onEntryTypeFilterChange: (value: string) => void;
 }
@@ -96,56 +46,12 @@ export default function CvEntriesSection({
   onEntryTypeFilterChange,
 }: CvEntriesSectionProps) {
   const { t } = useTranslation();
-  const queryClient = useQueryClient();
-  const { showError } = useErrorSnackbar();
-  const { size, rowHeight } = useTableDensity();
-
-  const [orderedEntries, setOrderedEntries] = useState<CvEntryResponse[]>([]);
-  const [activeId, setActiveId] = useState<string | null>(null);
-
-  const prevEntriesRef = useRef<CvEntryResponse[] | undefined>(undefined);
-  useEffect(() => {
-    if (entries && entries !== prevEntriesRef.current) {
-      setOrderedEntries(entries);
-    }
-    prevEntriesRef.current = entries;
-  }, [entries]);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+  const { ordered: orderedEntries, activeItem: activeEntry, handleDragStart, handleDragEnd } = usePortfolioReorder(
+    entries,
+    (items) => reorderCvEntries(siteId, items),
+    queryKeys.cvEntries(siteId),
   );
-
-  const reorderMutation = useMutation({
-    mutationFn: (items: ReorderItem[]) => reorderCvEntries(siteId, items),
-    onError: (err) => {
-      showError(err);
-      queryClient.invalidateQueries({ queryKey: queryKeys.cvEntries(siteId) });
-    },
-  });
-
-  const handleDragStart = useCallback((event: DragStartEvent) => {
-    setActiveId(event.active.id as string);
-  }, []);
-
-  const handleDragEnd = useCallback((event: DragEndEvent) => {
-    setActiveId(null);
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-
-    setOrderedEntries((prev) => {
-      const oldIndex = prev.findIndex((e) => e.id === active.id);
-      const newIndex = prev.findIndex((e) => e.id === over.id);
-      const reordered = arrayMove(prev, oldIndex, newIndex);
-      const items: ReorderItem[] = reordered.map((entry, index) => ({
-        id: entry.id,
-        display_order: index,
-      }));
-      reorderMutation.mutate(items);
-      return reordered;
-    });
-  }, [reorderMutation]);
-
-  const activeEntry = activeId ? orderedEntries.find((e) => e.id === activeId) : null;
+  const sort = { sortBy, sortDir, onSort };
 
   if (loading) {
     return <LoadingState label={t('cv.entries.loading')} />;
@@ -155,7 +61,7 @@ export default function CvEntriesSection({
     return <Alert severity="error">{t('cv.entries.loadError')}</Alert>;
   }
 
-  if (!orderedEntries || orderedEntries.length === 0) {
+  if (orderedEntries.length === 0) {
     return (
       <EmptyState
         icon={<WorkIcon sx={{ fontSize: 64 }} />}
@@ -186,81 +92,35 @@ export default function CvEntriesSection({
         <ToolbarSpacer />
       </Toolbar>
 
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-        <TableContainer data-density={size === 'small' ? 'compact' : 'comfortable'} sx={sortableContentTableSx(rowHeight)}>
-          <Table size={size}>
-            <TableHead>
-              <TableRow>
-                {canWrite && <TableCell scope="col" sx={{ width: 48, px: 1 }} />}
-                <TableCell scope="col">
-                  <TableSortLabel
-                    active={sortBy === 'company'}
-                    direction={sortBy === 'company' ? sortDir : 'asc'}
-                    onClick={() => onSort('company')}
-                  >
-                    {t('cv.entries.table.company')}
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell scope="col">{t('cv.entries.table.location')}</TableCell>
-                <TableCell scope="col">
-                  <TableSortLabel
-                    active={sortBy === 'entry_type'}
-                    direction={sortBy === 'entry_type' ? sortDir : 'asc'}
-                    onClick={() => onSort('entry_type')}
-                  >
-                    {t('cv.entries.table.type')}
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell scope="col">
-                  <TableSortLabel
-                    active={sortBy === 'start_date'}
-                    direction={sortBy === 'start_date' ? sortDir : 'asc'}
-                    onClick={() => onSort('start_date')}
-                  >
-                    {t('cv.entries.table.dates')}
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell scope="col">{t('cv.entries.table.current')}</TableCell>
-                <TableCell scope="col" align="right">{t('cv.entries.table.actions')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <SortableContext items={orderedEntries.map((e) => e.id)} strategy={verticalListSortingStrategy}>
-              <TableBody>
-                {orderedEntries.map((entry) => (
-                  <SortableCvEntryRow
-                    key={entry.id}
-                    entry={entry}
-                    canWrite={canWrite}
-                    isAdmin={isAdmin}
-                    onEdit={onEdit}
-                    onDelete={onDelete}
-                  />
-                ))}
-              </TableBody>
-            </SortableContext>
-          </Table>
-        </TableContainer>
-        <DragOverlay dropAnimation={{ duration: 200, easing: 'ease' }}>
-          {activeEntry ? (
-            <Paper elevation={12} sx={{ display: 'flex', alignItems: 'center', gap: 1, px: 2, py: 1, borderRadius: 2, bgcolor: 'background.paper', border: '1px solid', borderColor: 'primary.main', pointerEvents: 'none' }}>
-              <DragIndicatorIcon fontSize="small" color="primary" />
-              <Typography variant="body2" noWrap sx={{ fontWeight: 500 }}>{activeEntry.company}</Typography>
-            </Paper>
-          ) : null}
-        </DragOverlay>
-      </DndContext>
-      {meta && (
-        <Pagination
-          total={meta.total_items}
-          page={page}
-          perPage={rowsPerPage}
-          onPage={onPage}
-          onPerPage={(n) => {
-            onPerPage(n);
-            onPage(1);
-          }}
-        />
-      )}
+      <SortableTableShell
+        itemIds={orderedEntries.map((e) => e.id)}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        canWrite={canWrite}
+        dragPreview={activeEntry?.company}
+        headCells={
+          <>
+            <SortHeaderCell column="company" {...sort}>{t('cv.entries.table.company')}</SortHeaderCell>
+            <TableCell scope="col">{t('cv.entries.table.location')}</TableCell>
+            <SortHeaderCell column="entry_type" {...sort}>{t('cv.entries.table.type')}</SortHeaderCell>
+            <SortHeaderCell column="start_date" {...sort}>{t('cv.entries.table.dates')}</SortHeaderCell>
+            <TableCell scope="col">{t('cv.entries.table.current')}</TableCell>
+            <TableCell scope="col" align="right">{t('cv.entries.table.actions')}</TableCell>
+          </>
+        }
+      >
+        {orderedEntries.map((entry) => (
+          <SortableCvEntryRow
+            key={entry.id}
+            entry={entry}
+            canWrite={canWrite}
+            isAdmin={isAdmin}
+            onEdit={onEdit}
+            onDelete={onDelete}
+          />
+        ))}
+      </SortableTableShell>
+      {meta && <PortfolioPagination total={meta.total_items} page={page} rowsPerPage={rowsPerPage} onPage={onPage} onPerPage={onPerPage} />}
     </Box>
   );
 }

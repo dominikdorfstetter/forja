@@ -35,7 +35,8 @@
       "open": "Open",
       "remove": "Remove",
       "showSecret": "Show secret",
-      "hideSecret": "Hide secret"
+      "hideSecret": "Hide secret",
+      "dragToReorder": "Drag to reorder"
     },
     "status": {
       "active": "Active",

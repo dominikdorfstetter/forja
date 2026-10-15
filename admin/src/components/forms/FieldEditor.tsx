@@ -11,6 +11,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
 import type { FormFieldInput, FormFieldOption, FormFieldValidation } from '@/types/api';
+import { fieldEditorSections, parseFloatOrUndef, parseIntOrUndef } from './fieldEditorRules';
 
 interface FieldEditorProps {
   field: FormFieldInput;
@@ -18,30 +19,18 @@ interface FieldEditorProps {
 }
 
 /**
- * One field's editor surface. Shape depends on field type:
- * - text / custom: label, placeholder, help, required, min/max length, pattern
- * - textarea: label, placeholder, help, required, min/max length
- * - email: label, placeholder, help, required
- * - number: label, placeholder, help, required, min, max
- * - date: label, help, required
- * - select / radio / checkbox: label, help, required, options list
- *
- * Splitting per type would balloon the component count; the conditional
- * blocks here are cheap and the conditions are small enough to read.
+ * One field's editor surface. Which rows render depends on the field type
+ * (see `fieldEditorSections`): every type gets label, help and required;
+ * free-text types add placeholder / length / pattern rules, numbers add
+ * min/max, and choice types add an options list.
  */
 export default function FieldEditor({ field, onChange }: FieldEditorProps) {
   const { t } = useTranslation();
-  const type = field.field_type;
+  const sections = fieldEditorSections(field.field_type);
 
   const v: FormFieldValidation = useMemo(() => (field.validation as FormFieldValidation | null | undefined) ?? {}, [field.validation]);
   const setValidation = (patch: Partial<FormFieldValidation>) =>
     onChange({ validation: { ...v, ...patch } });
-
-  const showPlaceholder = type !== 'date' && !isOptionType(type);
-  const showLenRules = type === 'text' || type === 'textarea' || type === 'custom';
-  const showPattern = type === 'text' || type === 'custom';
-  const showMinMax = type === 'number';
-  const showOptions = isOptionType(type);
 
   return (
     <Box sx={{ display: 'grid', gap: 2 }}>
@@ -53,7 +42,7 @@ export default function FieldEditor({ field, onChange }: FieldEditorProps) {
         size="small"
       />
 
-      {showPlaceholder && (
+      {sections.placeholder && (
         <TextField
           label={t('formsModule.builder.field.placeholder', 'Placeholder')}
           value={field.placeholder ?? ''}
@@ -87,26 +76,18 @@ export default function FieldEditor({ field, onChange }: FieldEditorProps) {
         label={t('formsModule.builder.field.required', 'Required')}
       />
 
-      {showLenRules && (
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <TextField
-            label={t('formsModule.builder.field.minLength', 'Min length')}
-            type="number"
-            size="small"
-            value={v.min_length ?? ''}
-            onChange={(e) => setValidation({ min_length: parseIntOrUndef(e.target.value) })}
-          />
-          <TextField
-            label={t('formsModule.builder.field.maxLength', 'Max length')}
-            type="number"
-            size="small"
-            value={v.max_length ?? ''}
-            onChange={(e) => setValidation({ max_length: parseIntOrUndef(e.target.value) })}
-          />
-        </Box>
+      {sections.lengthRules && (
+        <NumberRangeFields
+          minLabel={t('formsModule.builder.field.minLength', 'Min length')}
+          maxLabel={t('formsModule.builder.field.maxLength', 'Max length')}
+          min={v.min_length}
+          max={v.max_length}
+          onMinChange={(raw) => setValidation({ min_length: parseIntOrUndef(raw) })}
+          onMaxChange={(raw) => setValidation({ max_length: parseIntOrUndef(raw) })}
+        />
       )}
 
-      {showPattern && (
+      {sections.pattern && (
         <TextField
           label={t('formsModule.builder.field.pattern', 'Regex pattern')}
           value={v.pattern ?? ''}
@@ -120,26 +101,50 @@ export default function FieldEditor({ field, onChange }: FieldEditorProps) {
         />
       )}
 
-      {showMinMax && (
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <TextField
-            label={t('formsModule.builder.field.min', 'Min')}
-            type="number"
-            size="small"
-            value={v.min ?? ''}
-            onChange={(e) => setValidation({ min: parseFloatOrUndef(e.target.value) })}
-          />
-          <TextField
-            label={t('formsModule.builder.field.max', 'Max')}
-            type="number"
-            size="small"
-            value={v.max ?? ''}
-            onChange={(e) => setValidation({ max: parseFloatOrUndef(e.target.value) })}
-          />
-        </Box>
+      {sections.minMax && (
+        <NumberRangeFields
+          minLabel={t('formsModule.builder.field.min', 'Min')}
+          maxLabel={t('formsModule.builder.field.max', 'Max')}
+          min={v.min}
+          max={v.max}
+          onMinChange={(raw) => setValidation({ min: parseFloatOrUndef(raw) })}
+          onMaxChange={(raw) => setValidation({ max: parseFloatOrUndef(raw) })}
+        />
       )}
 
-      {showOptions && <OptionsEditor field={field} onChange={onChange} />}
+      {sections.options && <OptionsEditor field={field} onChange={onChange} />}
+    </Box>
+  );
+}
+
+interface NumberRangeFieldsProps {
+  minLabel: string;
+  maxLabel: string;
+  min: number | null | undefined;
+  max: number | null | undefined;
+  /** Receives the raw input string; the caller parses it. */
+  onMinChange: (raw: string) => void;
+  onMaxChange: (raw: string) => void;
+}
+
+/** Side-by-side min/max number inputs for a validation rule pair. */
+function NumberRangeFields({ minLabel, maxLabel, min, max, onMinChange, onMaxChange }: NumberRangeFieldsProps) {
+  return (
+    <Box sx={{ display: 'flex', gap: 2 }}>
+      <TextField
+        label={minLabel}
+        type="number"
+        size="small"
+        value={min ?? ''}
+        onChange={(e) => onMinChange(e.target.value)}
+      />
+      <TextField
+        label={maxLabel}
+        type="number"
+        size="small"
+        value={max ?? ''}
+        onChange={(e) => onMaxChange(e.target.value)}
+      />
     </Box>
   );
 }
@@ -223,20 +228,4 @@ function OptionsEditor({ field, onChange }: OptionsEditorProps) {
       </Box>
     </Box>
   );
-}
-
-function isOptionType(t: FormFieldInput['field_type']): boolean {
-  return t === 'select' || t === 'radio' || t === 'checkbox';
-}
-
-function parseIntOrUndef(v: string): number | undefined {
-  if (v === '') return undefined;
-  const n = parseInt(v, 10);
-  return Number.isNaN(n) ? undefined : n;
-}
-
-function parseFloatOrUndef(v: string): number | undefined {
-  if (v === '') return undefined;
-  const n = parseFloat(v);
-  return Number.isNaN(n) ? undefined : n;
 }

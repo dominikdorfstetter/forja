@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getDocumentDisplayName } from '@/pages/DocumentCardGrid';
+import { getDocumentDisplayName } from '@/components/documents/documentDisplayName';
 import type { DocumentListItem, DocumentResponse } from '@/types/api';
 
 const baseDoc: DocumentListItem = {

@@ -10,13 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { updateSiteSettings } from '@/services/sites';
 import type { StorageUsageResponse } from '@/types/api';
 import { queryKeys } from '@/lib/queryKeys';
-
-function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 B';
-  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(1024));
-  return `${(bytes / Math.pow(1024, i)).toFixed(1)} ${units[i]}`;
-}
+import { formatBytes } from '@/utils/formatBytes';
 
 const QUOTA_PRESETS = [
   { label: '100 MB', value: 104_857_600 },

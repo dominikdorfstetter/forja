@@ -1,25 +1,20 @@
 import { useMemo, useState } from 'react';
 import {
   FormControl,
-  IconButton,
-  InputAdornment,
   InputLabel,
   MenuItem,
   Select,
   TextField,
   Alert,
-  Tooltip,
   Typography,
 } from '@mui/material';
-import AutorenewIcon from '@mui/icons-material/Autorenew';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import { removeDocumentPrivacy, setDocumentPrivacy } from '@/services/documents';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import type { DocumentResponse } from '@/types/api';
+import PasswordAdornment from './PasswordAdornment';
 import { generatePassword, validatePassword, type PasswordPolicy } from './passwordUtils';
 import { TTL_PRESETS, ttlPresetToIso } from './privacyState';
 import { formResolver } from '@/utils/validation';
@@ -147,16 +142,11 @@ function SetPrivacyForm({
         slotProps={{
           input: {
             endAdornment: (
-              <InputAdornment position="end">
-                <IconButton size="small" onClick={() => setShowPassword(!showPassword)}>
-                  {showPassword ? <VisibilityOffIcon fontSize="small" /> : <VisibilityIcon fontSize="small" />}
-                </IconButton>
-                <Tooltip title={t('documents.privacy.generate')}>
-                  <IconButton size="small" onClick={handleGenerate}>
-                    <AutorenewIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              </InputAdornment>
+              <PasswordAdornment
+                visible={showPassword}
+                onToggleVisible={() => setShowPassword(!showPassword)}
+                onGenerate={handleGenerate}
+              />
             ),
           },
         }}

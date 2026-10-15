@@ -7,10 +7,11 @@ import type { PreviewTemplate } from '@/types/api';
 import StatusChip from '@/components/shared/StatusChip';
 import SchedulePopover from '@/components/shared/SchedulePopover';
 import WorkflowActions from '@/components/shared/WorkflowActions';
+import { pickWorkflowControls, type WorkflowActionControls } from '@/components/shared/workflowActionSpecs';
 import { M3IconButton } from '@/components/design-system';
 import type { BlogContentFormData } from './blogDetailSchema';
 
-interface BlogEditorToolbarProps {
+interface BlogEditorToolbarProps extends WorkflowActionControls {
   control: Control<BlogContentFormData>;
   watch: UseFormWatch<BlogContentFormData>;
   setValue: UseFormSetValue<BlogContentFormData>;
@@ -21,22 +22,7 @@ interface BlogEditorToolbarProps {
   onToggleHistory: () => void;
   isSaving: boolean;
   canWrite: boolean;
-  // Workflow action props
-  canSubmitForReview?: boolean;
-  canApprove?: boolean;
-  canRequestChanges?: boolean;
-  canPublish?: boolean;
-  canUnpublish?: boolean;
-  canArchive?: boolean;
-  canRestore?: boolean;
   canSchedule?: boolean;
-  onSubmitForReview?: () => void;
-  onApprove?: () => void;
-  onRequestChanges?: () => void;
-  onPublish?: () => void;
-  onUnpublish?: () => void;
-  onArchive?: () => void;
-  onRestore?: () => void;
   previewTemplates?: PreviewTemplate[];
   onPreview?: (templateUrl: string) => void;
   sidebarOpen?: boolean;
@@ -55,27 +41,14 @@ export default function BlogEditorToolbar({
   onToggleHistory,
   isSaving,
   canWrite,
-  canSubmitForReview,
-  canApprove,
-  canRequestChanges,
-  canPublish,
-  canUnpublish,
-  canArchive,
-  canRestore,
   canSchedule,
-  onSubmitForReview,
-  onApprove,
-  onRequestChanges,
-  onPublish,
-  onUnpublish,
-  onArchive,
-  onRestore,
   previewTemplates,
   onPreview,
   sidebarOpen,
   onToggleSidebar,
   showAiTranslate,
   onAiTranslate,
+  ...workflowProps
 }: BlogEditorToolbarProps) {
   const { t } = useTranslation();
   const fmt = useLocalizedFormat();
@@ -231,20 +204,7 @@ export default function BlogEditorToolbar({
       <WorkflowActions
         currentStatus={currentStatus}
         isSaving={isSaving}
-        canSubmitForReview={canSubmitForReview}
-        canApprove={canApprove}
-        canRequestChanges={canRequestChanges}
-        canPublish={canPublish}
-        canUnpublish={canUnpublish}
-        canArchive={canArchive}
-        canRestore={canRestore}
-        onSubmitForReview={onSubmitForReview}
-        onApprove={onApprove}
-        onRequestChanges={onRequestChanges}
-        onPublish={onPublish}
-        onUnpublish={onUnpublish}
-        onArchive={onArchive}
-        onRestore={onRestore}
+        {...pickWorkflowControls(workflowProps)}
       />
 
       {/* Save is owned by the global save bar (useFormSaveBar). The toolbar no

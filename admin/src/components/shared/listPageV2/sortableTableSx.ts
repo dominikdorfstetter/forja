@@ -1,11 +1,10 @@
 import type { SxProps, Theme } from '@mui/material';
 
 /**
- * Shared M3 table chrome for the hand-built sortable content tables (Portfolio
- * CV + Projects) that can't use DataTableV2 (no row reordering). Previously
- * duplicated byte-for-byte across both hosts. `rowHeight` comes from
- * useTableDensity so the body rows track the Density toggle and match
- * DataTableV2's 40/52px variants.
+ * Shared M3 table chrome for the hand-built sortable tables (Portfolio CV +
+ * Projects, Navigation items, Social links) that can't use DataTableV2 (no row
+ * reordering). `rowHeight` comes from useTableDensity so the body rows track
+ * the Density toggle and match DataTableV2's 40/52px variants.
  */
 export function sortableContentTableSx(rowHeight: number): SxProps<Theme> {
   return {
@@ -23,6 +22,7 @@ export function sortableContentTableSx(rowHeight: number): SxProps<Theme> {
       color: 'var(--on-surface-variant)',
       background: 'transparent',
       borderBottom: '1px solid var(--outline-variant)',
+      fontVariationSettings: '"wght" 600, "opsz" 11',
       height: 44,
       py: 0,
     },
@@ -32,6 +32,7 @@ export function sortableContentTableSx(rowHeight: number): SxProps<Theme> {
       fontSize: 14,
       background: 'transparent',
       height: rowHeight,
+      transition: 'background 160ms cubic-bezier(0.2, 0, 0, 1)',
     },
     '& .MuiTableBody-root .MuiTableRow-root:last-of-type .MuiTableCell-root': {
       borderBottom: 'none',

@@ -1,34 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useCallback, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Box,
-  Alert,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-} from '@mui/material';
+import { Box, Alert } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import ShareIcon from '@mui/icons-material/Share';
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import {
-  DndContext,
-  closestCenter,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragOverlay,
-  type DragStartEvent,
-  type DragEndEvent,
-} from '@dnd-kit/core';
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { createSocialLink, deleteSocialLink, getSocialLinks, reorderSocialLinks, updateSocialLink } from '@/services/social';
 import type { SocialLink, CreateSocialLinkRequest, UpdateSocialLinkRequest, ReorderItem } from '@/types/api';
 import { useSiteContext } from '@/store/SiteContext';
@@ -42,9 +17,7 @@ import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import SocialLinkFormDialog from '@/components/social/SocialLinkFormDialog';
-import SortableSocialRow from '@/components/social/SortableSocialRow';
-import { useTableDensity } from '@/components/shared/listPageV2';
-import { useQueryClient } from '@tanstack/react-query';
+import SocialLinksTable from '@/components/social/SocialLinksTable';
 import { queryKeys } from '@/lib/queryKeys';
 
 export default function SocialLinksPage() {
@@ -53,14 +26,11 @@ export default function SocialLinksPage() {
   const { selectedSiteId } = useSiteContext();
   const { canWrite, isAdmin } = useAuth();
   const { showError } = useErrorSnackbar();
-  const { size, rowHeight } = useTableDensity();
 
   const {
     formOpen, editing, deleting,
     openCreate, closeForm, openEdit, closeEdit, openDelete, closeDelete,
   } = useListPageState<SocialLink>();
-
-  const [activeId, setActiveId] = useState<string | null>(null);
 
   // Command palette action listener
   useEffect(() => {
@@ -78,10 +48,6 @@ export default function SocialLinksPage() {
   });
 
   const { orderedItems: orderedLinks, reorder, resetOrder } = useReorderableList(links);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-  );
 
   const { createMutation, updateMutation, deleteMutation } = useCrudMutations<
     CreateSocialLinkRequest, UpdateSocialLinkRequest
@@ -113,25 +79,11 @@ export default function SocialLinksPage() {
     },
   });
 
-  const handleDragStart = useCallback((event: DragStartEvent) => {
-    setActiveId(event.active.id as string);
-  }, []);
-
-  const handleDragEnd = useCallback((event: DragEndEvent) => {
-    setActiveId(null);
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-
-    const reordered = reorder(active.id as string, over.id as string);
+  const handleReorder = useCallback((activeId: string, overId: string) => {
+    const reordered = reorder(activeId, overId);
     if (!reordered) return;
-    const items: ReorderItem[] = reordered.map((link, index) => ({
-      id: link.id,
-      display_order: index,
-    }));
-    reorderMutation.mutate(items);
+    reorderMutation.mutate(reordered.map((link, index) => ({ id: link.id, display_order: index })));
   }, [reorder, reorderMutation]);
-
-  const activeLink = activeId ? orderedLinks.find((l) => l.id === activeId) : null;
 
   return (
     <Box data-testid="social-links.page">
@@ -146,103 +98,55 @@ export default function SocialLinksPage() {
         action={selectedSiteId ? { label: t('socialLinks.addLink'), icon: <AddIcon />, onClick: openCreate, hidden: !canWrite, testId: 'add-social-link' } : undefined}
       />
 
-      {!selectedSiteId ? (
-        <EmptyState icon={<ShareIcon sx={{ fontSize: 64 }} />} title={t('common.noSiteSelected')} description={t('socialLinks.empty.noSite')} />
-      ) : isLoading ? (
-        <LoadingState label={t('socialLinks.loading')} />
-      ) : error ? (
-        <Alert severity="error">{t('socialLinks.loadError')}</Alert>
-      ) : orderedLinks.length === 0 ? (
-        <EmptyState icon={<ShareIcon sx={{ fontSize: 64 }} />} title={t('socialLinks.empty.title')} description={t('socialLinks.empty.description')} action={{ label: t('socialLinks.addLink'), onClick: openCreate }} />
-      ) : (
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-          <TableContainer
-            data-density={size === 'small' ? 'compact' : 'comfortable'}
-            sx={{
-              bgcolor: 'var(--surface-container-low)',
-              border: '1px solid var(--outline-variant)',
-              borderRadius: '20px',
-              overflow: 'hidden',
-            }}
-          >
-            <Table
-              size={size}
-              sx={{
-                '& td': {
-                  borderBottom: '1px solid var(--outline-variant)',
-                  color: 'var(--on-surface)',
-                  height: rowHeight,
-                },
-                '& tbody tr': {
-                  transition: 'background 160ms cubic-bezier(0.2, 0, 0, 1)',
-                  '&:hover': { bgcolor: 'var(--surface-container)' },
-                },
-                '& tbody tr:last-of-type td': { borderBottom: 'none' },
-                '& th': {
-                  color: 'var(--on-surface-variant)',
-                  fontSize: 11,
-                  fontWeight: 600,
-                  letterSpacing: 1,
-                  textTransform: 'uppercase',
-                  borderBottom: '1px solid var(--outline-variant)',
-                  fontVariationSettings: '"wght" 600, "opsz" 11',
-                  height: 44,
-                  py: 0,
-                },
-              }}
-            >
-              <TableHead>
-                <TableRow>
-                  {canWrite && <TableCell scope="col" sx={{ width: 48, px: 1 }} />}
-                  <TableCell scope="col">{t('socialLinks.table.title')}</TableCell>
-                  <TableCell scope="col">{t('socialLinks.table.url')}</TableCell>
-                  <TableCell scope="col">{t('socialLinks.table.icon')}</TableCell>
-                  <TableCell scope="col" align="right">{t('socialLinks.table.actions')}</TableCell>
-                </TableRow>
-              </TableHead>
-              <SortableContext items={orderedLinks.map((l) => l.id)} strategy={verticalListSortingStrategy}>
-                <TableBody>
-                  {orderedLinks.map((link) => (
-                    <SortableSocialRow key={link.id} link={link} canWrite={canWrite} isAdmin={isAdmin} onEdit={openEdit} onDelete={openDelete} />
-                  ))}
-                </TableBody>
-              </SortableContext>
-            </Table>
-          </TableContainer>
-          <DragOverlay dropAnimation={{ duration: 200, easing: 'ease' }}>
-            {activeLink ? (
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  px: 2,
-                  py: 1,
-                  borderRadius: '14px',
-                  bgcolor: 'var(--surface-container-highest)',
-                  border: '1px solid var(--primary)',
-                  boxShadow: '0 12px 24px -6px rgb(0 0 0 / 0.45)',
-                  pointerEvents: 'none',
-                  color: 'var(--on-surface)',
-                }}
-              >
-                <DragIndicatorIcon fontSize="small" sx={{ color: 'var(--primary)' }} />
-                <Typography
-                  variant="body2"
-                  noWrap
-                  sx={{ fontWeight: 600, fontVariationSettings: '"wght" 600, "opsz" 14' }}
-                >
-                  {activeLink.title}
-                </Typography>
-              </Box>
-            ) : null}
-          </DragOverlay>
-        </DndContext>
-      )}
+      <SocialLinksContent
+        hasSite={!!selectedSiteId}
+        isLoading={isLoading}
+        error={error}
+        isEmpty={orderedLinks.length === 0}
+        onCreate={openCreate}
+      >
+        <SocialLinksTable
+          links={orderedLinks}
+          canWrite={canWrite}
+          isAdmin={isAdmin}
+          onEdit={openEdit}
+          onDelete={openDelete}
+          onReorder={handleReorder}
+        />
+      </SocialLinksContent>
 
       <SocialLinkFormDialog open={formOpen} siteId={selectedSiteId} onSubmit={(data) => createMutation.mutate(data)} onClose={closeForm} loading={createMutation.isPending} />
       <SocialLinkFormDialog open={!!editing} siteId={selectedSiteId} link={editing} onSubmit={(data) => editing && updateMutation.mutate({ id: editing.id, data })} onClose={closeEdit} loading={updateMutation.isPending} />
       <ConfirmDialog open={!!deleting} title={t('socialLinks.deleteDialog.title')} message={t('socialLinks.deleteDialog.message', { title: deleting?.title })} confirmLabel={t('common.actions.delete')} onConfirm={() => deleting && deleteMutation.mutate(deleting.id)} onCancel={closeDelete} loading={deleteMutation.isPending} confirmationText={t('common.actions.delete')} />
     </Box>
   );
+}
+
+interface SocialLinksContentProps {
+  hasSite: boolean;
+  isLoading: boolean;
+  error: unknown;
+  isEmpty: boolean;
+  onCreate: () => void;
+  /** The links table, rendered once links have loaded. */
+  children: ReactNode;
+}
+
+/** Page body: no-site / loading / error / empty states, else the table. */
+function SocialLinksContent({ hasSite, isLoading, error, isEmpty, onCreate, children }: SocialLinksContentProps) {
+  const { t } = useTranslation();
+
+  if (!hasSite) {
+    return <EmptyState icon={<ShareIcon sx={{ fontSize: 64 }} />} title={t('common.noSiteSelected')} description={t('socialLinks.empty.noSite')} />;
+  }
+  if (isLoading) {
+    return <LoadingState label={t('socialLinks.loading')} />;
+  }
+  if (error) {
+    return <Alert severity="error">{t('socialLinks.loadError')}</Alert>;
+  }
+  if (isEmpty) {
+    return <EmptyState icon={<ShareIcon sx={{ fontSize: 64 }} />} title={t('socialLinks.empty.title')} description={t('socialLinks.empty.description')} action={{ label: t('socialLinks.addLink'), onClick: onCreate }} />;
+  }
+  return children;
 }

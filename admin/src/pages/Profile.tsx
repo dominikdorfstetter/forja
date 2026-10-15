@@ -1,55 +1,24 @@
 import { useState } from 'react';
-import {
-  Box,
-  Paper,
-  Typography,
-  Avatar,
-  Chip,
-  Button,
-  Grid,
-  Stack,
-  CircularProgress,
-  Alert,
-  Dialog,
-  DialogContent,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Tooltip,
-} from '@mui/material';
-import DownloadIcon from '@mui/icons-material/Download';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
-import SecurityIcon from '@mui/icons-material/Security';
-import ShieldIcon from '@mui/icons-material/Shield';
+import { Box, Grid, Dialog, DialogContent } from '@mui/material';
 import { UserProfile } from '@clerk/clerk-react';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { useSnackbar } from 'notistack';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { deleteAccount, exportUserData, getPiiInventory, getProfile } from '@/services/auth';
+import { getPiiInventory, getProfile } from '@/services/auth';
 import { useAuth } from '@/store/AuthContext';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
 import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import { queryKeys } from '@/lib/queryKeys';
-
-const PERMISSION_COLORS: Record<string, 'error' | 'warning' | 'info' | 'success'> = {
-  Master: 'error',
-  Admin: 'warning',
-  Write: 'info',
-  Read: 'success',
-};
+import { AccountInfoCard, SecurityCard } from './profile/ProfileCards';
+import DataPrivacyCard from './profile/DataPrivacyCard';
+import { resolveProfileIdentity } from './profile/profileUtils';
+import { useAccountDataActions } from './profile/useAccountDataActions';
 
 export default function ProfilePage() {
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
-  const navigate = useNavigate();
-  const { logout, permission, userFullName, userImageUrl, userEmail } = useAuth();
-  const [deleteOpen, setDeleteOpen] = useState(false);
+  const { permission, userFullName, userImageUrl, userEmail } = useAuth();
   const [clerkProfileOpen, setClerkProfileOpen] = useState(false);
+  const { exportMutation, deleteMutation, deleteOpen, setDeleteOpen } = useAccountDataActions();
 
   const { data: profile, isLoading } = useQuery({
     queryKey: queryKeys.profile(),
@@ -64,46 +33,10 @@ export default function ProfilePage() {
     retry: false,
   });
 
-  const erasureLabel = (behavior: string) =>
-    behavior === 'retention_purged'
-      ? t('profile.piiInventory.retentionPurged')
-      : t('profile.piiInventory.anonymizeOnErasure');
-
-  const exportMutation = useMutation({
-    mutationFn: () => exportUserData(),
-    onSuccess: (data) => {
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `user-data-export-${new Date().toISOString().slice(0, 10)}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      enqueueSnackbar(t('profile.exportSuccess'), { variant: 'success' });
-    },
-    onError: () => {
-      enqueueSnackbar(t('profile.exportError'), { variant: 'error' });
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: () => deleteAccount(),
-    onSuccess: async () => {
-      enqueueSnackbar(t('profile.deleteSuccess'), { variant: 'success' });
-      setDeleteOpen(false);
-      await logout();
-      navigate('/login');
-    },
-    onError: () => {
-      enqueueSnackbar(t('profile.deleteError'), { variant: 'error' });
-    },
-  });
-
   if (isLoading) return <LoadingState />;
 
   const isClerkUser = profile?.auth_method === 'clerk_jwt';
+  const identity = resolveProfileIdentity(profile, { permission, userFullName, userImageUrl, userEmail });
 
   return (
     <Box data-testid="profile.page">
@@ -114,202 +47,27 @@ export default function ProfilePage() {
       />
 
       <Grid container spacing={3}>
-        {/* Account Info Card */}
         <Grid size={{ xs: 12, md: 6 }}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              {t('profile.accountInfo')}
-            </Typography>
-            <Stack direction="row" spacing={3} sx={{ mb: 3, alignItems: "center" }}>
-              <Avatar
-                src={profile?.image_url || userImageUrl || undefined}
-                alt={profile?.name || userFullName || 'User'}
-                sx={{ width: 80, height: 80, fontSize: '2rem' }}
-              >
-                {(profile?.name || userFullName || 'U').charAt(0).toUpperCase()}
-              </Avatar>
-              <Box>
-                <Typography variant="h6">
-                  {profile?.name || userFullName || t('profile.unknownUser')}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {profile?.email || userEmail || ''}
-                </Typography>
-                <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-                  <Chip
-                    label={profile?.role || permission || 'read'}
-                    color={PERMISSION_COLORS[permission || 'Read'] || 'default'}
-                    size="small"
-                  />
-                  <Chip
-                    label={isClerkUser ? 'Clerk SSO' : 'API Key'}
-                    variant="outlined"
-                    size="small"
-                  />
-                </Stack>
-              </Box>
-            </Stack>
-            {isClerkUser && (
-              <Button
-                variant="outlined"
-                startIcon={<ManageAccountsIcon />}
-                onClick={() => setClerkProfileOpen(true)}
-                fullWidth
-              >
-                {t('profile.manageAccount')}
-              </Button>
-            )}
-          </Paper>
+          <AccountInfoCard
+            identity={identity}
+            permission={permission}
+            isClerkUser={isClerkUser}
+            onManageAccount={() => setClerkProfileOpen(true)}
+          />
         </Grid>
 
-        {/* Security & Sessions Card */}
         <Grid size={{ xs: 12, md: 6 }}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              <SecurityIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
-              {t('profile.security')}
-            </Typography>
-            <Stack spacing={2}>
-              <Box>
-                <Typography variant="body2" color="text.secondary">
-                  {t('profile.authMethod')}
-                </Typography>
-                <Typography variant="body1">
-                  {isClerkUser ? 'Clerk JWT (SSO)' : 'API Key'}
-                </Typography>
-              </Box>
-              <Box>
-                <Typography variant="body2" color="text.secondary">
-                  {t('profile.permissionLevel')}
-                </Typography>
-                <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
-                  <ShieldIcon fontSize="small" color={PERMISSION_COLORS[permission || 'Read'] || 'inherit'} />
-                  <Typography variant="body1">{permission}</Typography>
-                </Stack>
-              </Box>
-              {profile?.site_id && (
-                <Box>
-                  <Typography variant="body2" color="text.secondary">
-                    {t('profile.siteScope')}
-                  </Typography>
-                  <Typography variant="body1" sx={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>
-                    {profile.site_id}
-                  </Typography>
-                </Box>
-              )}
-              {profile?.created_at && (
-                <Box>
-                  <Typography variant="body2" color="text.secondary">
-                    {t('profile.memberSince')}
-                  </Typography>
-                  <Typography variant="body1">
-                    {new Date(profile.created_at).toLocaleDateString()}
-                  </Typography>
-                </Box>
-              )}
-              {profile?.last_sign_in_at && (
-                <Box>
-                  <Typography variant="body2" color="text.secondary">
-                    {t('profile.lastSignIn')}
-                  </Typography>
-                  <Typography variant="body1">
-                    {new Date(profile.last_sign_in_at).toLocaleString()}
-                  </Typography>
-                </Box>
-              )}
-            </Stack>
-          </Paper>
+          <SecurityCard profile={profile} permission={permission} isClerkUser={isClerkUser} />
         </Grid>
 
-        {/* Data & Privacy Card */}
         <Grid size={12}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
-              {t('profile.dataPrivacy')}
-            </Typography>
-            <Alert severity="info" sx={{ mb: 3 }}>
-              {t('profile.dataPrivacyInfo')}
-            </Alert>
-            {piiInventory && piiInventory.entities.length > 0 && (
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="subtitle2" gutterBottom>
-                  {t('profile.piiInventory.title')}
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-                  {t('profile.piiInventory.description')}
-                </Typography>
-                <Table size="small" data-testid="pii-inventory.table">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell scope="col">{t('profile.piiInventory.colField')}</TableCell>
-                      <TableCell scope="col">{t('profile.piiInventory.colPurpose')}</TableCell>
-                      <TableCell scope="col">{t('profile.piiInventory.colLegalBasis')}</TableCell>
-                      <TableCell scope="col" align="right">
-                        {t('profile.piiInventory.colRecords')}
-                      </TableCell>
-                      <TableCell scope="col">{t('profile.piiInventory.colErasure')}</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {piiInventory.entities.flatMap((entity) =>
-                      entity.fields.map((field) => (
-                        <TableRow key={`${entity.table}.${field.field}`}>
-                          <TableCell>
-                            <Tooltip title={entity.description}>
-                              <Typography
-                                component="span"
-                                sx={{ fontFamily: 'monospace', fontSize: '0.8rem' }}
-                              >
-                                {entity.table}.{field.field}
-                              </Typography>
-                            </Tooltip>
-                          </TableCell>
-                          <TableCell>{field.purpose}</TableCell>
-                          <TableCell>
-                            <Typography variant="body2" color="text.secondary" component="span">
-                              {field.legal_basis}
-                            </Typography>
-                          </TableCell>
-                          <TableCell align="right">
-                            {field.record_count ?? '—'}
-                          </TableCell>
-                          <TableCell>
-                            <Chip
-                              size="small"
-                              variant="outlined"
-                              label={erasureLabel(field.retention_behavior)}
-                            />
-                          </TableCell>
-                        </TableRow>
-                      )),
-                    )}
-                  </TableBody>
-                </Table>
-              </Box>
-            )}
-            <Stack direction="row" spacing={2}>
-              <Button
-                variant="outlined"
-                startIcon={exportMutation.isPending ? <CircularProgress size={20} /> : <DownloadIcon />}
-                onClick={() => exportMutation.mutate()}
-                disabled={exportMutation.isPending}
-                data-testid="export-data-btn"
-              >
-                {exportMutation.isPending ? t('profile.exporting') : t('profile.exportData')}
-              </Button>
-              {isClerkUser && (
-                <Button
-                  variant="outlined"
-                  color="error"
-                  startIcon={<DeleteForeverIcon />}
-                  onClick={() => setDeleteOpen(true)}
-                  data-testid="confirm-delete-account"
-                >
-                  {t('profile.deleteAccount')}
-                </Button>
-              )}
-            </Stack>
-          </Paper>
+          <DataPrivacyCard
+            piiInventory={piiInventory}
+            isClerkUser={isClerkUser}
+            exporting={exportMutation.isPending}
+            onExport={() => exportMutation.mutate()}
+            onDeleteAccount={() => setDeleteOpen(true)}
+          />
         </Grid>
       </Grid>
 
