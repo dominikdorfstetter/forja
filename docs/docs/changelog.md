@@ -14,6 +14,25 @@ is the first release published as open source**, so the public version history
 begins at 2.0. The pre-release milestones below condense how the foundation came
 together; precise dates start at the first public release.
 
+## 2.1.6 — 2026-10-16
+
+A dependency sweep that closes the newest security advisories, plus an internal refactor of the admin dashboard. There are no feature changes, no API changes and no migration.
+
+### Security
+
+- **rustls 0.23.46 fixes four advisories published on 2026-10-14** (RUSTSEC-2026-0346 to 0349). They cover TLS secrets exposed through `Debug` output, buffered data sent after an ECH rejection, a pre-authentication allocation of up to 1 GiB in Brotli certificate decompression, and a ServerHello downgrade to classical key exchange. `cargo audit` reports no vulnerabilities.
+- **`braces` (GHSA-vfj7-8cjw-p6xm, no patched release) is gone from the admin dependency tree.** The unused `@mui/codemod` devDependency was removed, and react-doctor 0.9.18 no longer pulls the package in. The docs site still carries it through Docusaurus's webpack tooling, at build time only, until upstream ships a fix.
+
+### Changed
+
+- **Dependencies.** Backend: hyper 1.12, tokio 1.53.3, serde_json 1.0.154 and aws-lc-rs 1.18.2. Admin: MUI 9.5, MUI X Date Pickers 9.15, tiptap 3.32, react-hook-form 7.90 and Vite 8.3.4. The astro-blog template moves to Astro 7.3.8 and @astrojs/node 11.1.7, and e2e to Playwright 1.64. `libs/sections` now runs Vitest 5 like the other packages (@stencil/vitest 1.16). npm resolutions used a two-day minimum release age as a supply-chain precaution.
+- **Admin code health.** react-doctor moves to 0.9.18, which flags components and hooks with complexity above 15 and duplicated JSX. All 49 findings were fixed by splitting large components into hooks, pure helpers and sub-components. Copy-pasted UI was consolidated into shared building blocks: sortable tables, Documents and Media library cards, content-wizard steps, the AI drafting flow and byte formatting. The admin test suite grew from 1,152 to 1,495 tests.
+
+### Fixed
+
+- **Drag handles have a translated accessible label.** The social links, portfolio and cookie consent tables used a hard-coded English label; they now use the same translated label and tooltip as navigation.
+- **Large file sizes read correctly.** Files of 1 GB and above now show in GB instead of thousands of MB.
+
 ## 2.1.5 — 2026-10-08
 
 A monorepo-wide dependency sweep (PR #295) that closes every open security alert. There are no feature changes and no migration.
