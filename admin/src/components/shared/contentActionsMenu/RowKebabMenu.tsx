@@ -9,7 +9,6 @@ export interface RowKebabMenuEntry<T> {
   icon: ReactNode;
   label: string;
   handler: (item: T) => void;
-  disabled?: boolean;
 }
 
 export interface RowKebabMenuProps<T> {
@@ -39,8 +38,8 @@ export function RowKebabMenu<T>({ item, isAdmin, testId, entries, onDelete }: Ro
         <MoreVertIcon />
       </IconButton>
       <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={handleClose}>
-        {entries.map(({ id, icon, label, handler, disabled }) => (
-          <MenuItem key={id} onClick={() => select(handler)} disabled={disabled}>
+        {entries.map(({ id, icon, label, handler }) => (
+          <MenuItem key={id} onClick={() => select(handler)}>
             <ListItemIcon>{icon}</ListItemIcon>
             <ListItemText>{label}</ListItemText>
           </MenuItem>

@@ -1,15 +1,8 @@
 import type { ContentStatus } from '@/types/api';
 import { transitionsByKind } from '@/components/shared/contentEntityActionMenu';
 
-/** Row-menu actions for publishable content (blogs, pages, portfolio projects). */
-export type ContentMenuActionId =
-  | 'view'
-  | 'edit'
-  | 'publish'
-  | 'unpublish'
-  | 'clone'
-  | 'archive'
-  | 'restore';
+/** Row-menu lifecycle actions for publishable content (portfolio projects). */
+export type ContentMenuActionId = 'edit' | 'publish' | 'unpublish' | 'archive' | 'restore';
 
 export type ContentMenuHandlers<T> = Partial<Record<ContentMenuActionId, (item: T) => void>>;
 
@@ -19,25 +12,15 @@ export interface ContentMenuAction<T> {
 }
 
 /** Display order of the menu; delete is rendered separately below a divider. */
-const MENU_ORDER: readonly ContentMenuActionId[] = [
-  'view',
-  'edit',
-  'publish',
-  'unpublish',
-  'clone',
-  'archive',
-  'restore',
-];
+const MENU_ORDER: readonly ContentMenuActionId[] = ['edit', 'publish', 'unpublish', 'archive', 'restore'];
 
-// Blogs, pages and portfolio projects share the same publish lifecycle.
+// Portfolio projects share the blog publish lifecycle.
 const rules = transitionsByKind.blog;
 
 const isAllowed: Record<ContentMenuActionId, (status: ContentStatus, canWrite: boolean) => boolean> = {
-  view: () => true,
   edit: (_status, canWrite) => canWrite,
   publish: (status, canWrite) => canWrite && rules.canPublishFrom.includes(status),
   unpublish: (status, canWrite) => canWrite && rules.canUnpublishFrom.includes(status),
-  clone: (_status, canWrite) => canWrite,
   archive: (status, canWrite) => canWrite && rules.canArchiveFrom.includes(status),
   restore: (status, canWrite) => canWrite && rules.canRestoreFrom.includes(status),
 };
