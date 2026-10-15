@@ -1,9 +1,8 @@
 import { useReducer, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import ArticleIcon from '@mui/icons-material/Article';
-import { M3Button } from '@/components/design-system';
 import {
   DndContext,
   PointerSensor,
@@ -26,9 +25,8 @@ import { useAuth } from '@/store/AuthContext';
 import PageHeader from '@/components/shared/PageHeader';
 import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
-import { getDocumentDisplayName } from '@/pages/DocumentCardGrid';
+import { getDocumentDisplayName } from '@/components/documents/documentDisplayName';
 import DocumentContentArea from '@/pages/DocumentContentArea';
-import DocumentFolderSidebar from '@/pages/DocumentFolderSidebar';
 import DocumentDialogs from '@/pages/DocumentDialogs';
 import DocumentPasswordDialog from '@/components/documents/DocumentPasswordDialog';
 import DocumentPrivacyDialog from '@/components/documents/DocumentPrivacyDialog';
@@ -38,6 +36,8 @@ import ConfirmDialog from '@/components/shared/ConfirmDialog';
 import { useBulkSelection } from '@/hooks/useBulkSelection';
 import { useDocumentMutations } from '@/pages/useDocumentMutations';
 import { queryKeys } from '@/lib/queryKeys';
+import { LibraryBulkBar, LibraryFolderSidebar } from '@/components/shared/library';
+import { activeSiteLocalesAsLocales } from '@/utils/siteLocales';
 
 function DocumentsPage({ embedded = false }: { embedded?: boolean }) {
   const { t } = useTranslation();
@@ -87,9 +87,7 @@ function DocumentsPage({ embedded = false }: { embedded?: boolean }) {
     enabled: !!selectedSiteId,
   });
 
-  const locales = siteLocalesRaw
-    .filter((sl) => sl.is_active)
-    .map((sl) => ({ id: sl.locale_id, code: sl.code, name: sl.name, native_name: sl.native_name, direction: sl.direction, is_active: sl.is_active, created_at: sl.created_at, site_count: 0 }));
+  const locales = activeSiteLocalesAsLocales(siteLocalesRaw);
 
   const { data: documentDetailsData, error: documentDetailsError } = useQuery({
     queryKey: queryKeys.documentDetails(documents?.map((d) => d.id)),
@@ -244,7 +242,7 @@ function DocumentsPage({ embedded = false }: { embedded?: boolean }) {
               selectedIds={bulk.selectedIds}
               onToggleSelect={bulk.toggle}
             />
-            <DocumentFolderSidebar
+            <LibraryFolderSidebar
               folders={folders ?? []}
               selectedFolderId={ui.selectedFolderId}
               onSelectFolder={(id) => dispatch({ type: 'setSelectedFolder', id })}
@@ -302,47 +300,12 @@ function DocumentsPage({ embedded = false }: { embedded?: boolean }) {
         loading={unlockMutation.isPending}
       />
 
-      {bulk.count > 0 && (
-        <Box
-          data-testid="documents-bulk-bar"
-          sx={{
-            position: 'fixed',
-            bottom: 24,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 1300,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1.5,
-            px: 2,
-            py: 1,
-            borderRadius: '999px',
-            bgcolor: 'var(--surface-container-highest)',
-            border: '1px solid var(--outline-variant)',
-            boxShadow: '0 8px 24px -6px rgb(0 0 0 / 0.35)',
-            backdropFilter: 'blur(12px)',
-            animation: 'var(--motion-fade-in-up)',
-          }}
-        >
-          <Typography
-            variant="body2"
-            sx={{
-              fontWeight: 600,
-              color: 'var(--on-surface)',
-              px: 1,
-              fontVariationSettings: '"wght" 600, "opsz" 14',
-            }}
-          >
-            {t('bulk.selectedCount', { count: bulk.count })}
-          </Typography>
-          <M3Button variant="filled" size="sm" icon="delete" danger onClick={() => setBulkDeleteConfirmOpen(true)}>
-            {t('common.actions.delete')}
-          </M3Button>
-          <M3Button variant="ghost" size="sm" onClick={bulk.clear}>
-            {t('bulk.clearSelection')}
-          </M3Button>
-        </Box>
-      )}
+      <LibraryBulkBar
+        count={bulk.count}
+        onDelete={() => setBulkDeleteConfirmOpen(true)}
+        onClear={bulk.clear}
+        testId="documents-bulk-bar"
+      />
     </Box>
   );
 }

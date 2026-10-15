@@ -1,17 +1,12 @@
 import { useCallback } from 'react';
-import {
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragStartEvent,
-  type DragEndEvent,
-} from '@dnd-kit/core';
+import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { reorderMenuItems, reorderNavigationItems } from '@/services/navigation';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import type { NavigationItem, NavigationMenu, ReorderTreeItem } from '@/types/api';
 import { flattenItemsWithDepth } from '@/pages/NavigationReducer';
 import { queryKeys } from '@/lib/queryKeys';
+import { useReorderSensors } from '@/components/shared/listPageV2';
 
 interface UseNavigationDragDropArgs {
   selectedSiteId: string;
@@ -31,9 +26,7 @@ export function useNavigationDragDrop({
   const queryClient = useQueryClient();
   const { showError } = useErrorSnackbar();
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-  );
+  const sensors = useReorderSensors();
 
   const reorderMutation = useMutation({
     mutationFn: (reorderItems: ReorderTreeItem[]) => {

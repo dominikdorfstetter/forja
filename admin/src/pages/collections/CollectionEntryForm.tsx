@@ -13,18 +13,7 @@
  */
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Box,
-  Chip,
-  FormControlLabel,
-  MenuItem,
-  Stack,
-  Switch,
-  Tab,
-  Tabs,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Box, Stack, Tab, Tabs, Typography } from '@mui/material';
 import LanguageIcon from '@mui/icons-material/Language';
 
 import { useFormSaveBar } from '@/hooks/useFormSaveBar';
@@ -33,6 +22,7 @@ import type {
   CustomFieldResponse,
   CustomTypeResponse,
 } from '@/types/customTypes';
+import { FieldControl } from './CollectionEntryFieldControl';
 
 const REDACTED = '__redacted__';
 
@@ -67,111 +57,6 @@ function entryFingerprint(
     Object.entries(req.localized).filter(([, v]) => Object.keys(v).length > 0),
   );
   return JSON.stringify({ shared: req.shared, localized: nonEmptyLocalized });
-}
-
-interface FieldControlProps {
-  field: CustomFieldResponse;
-  value: unknown;
-  onChange: (v: unknown) => void;
-}
-
-function FieldControl({ field, value, onChange }: FieldControlProps) {
-  const { t } = useTranslation();
-  const testId = `field-${field.key}`;
-  const redacted = field.is_pii && value === null;
-
-  const label = (
-    <Stack direction="row" spacing={1} component="span" sx={{ alignItems: 'center' }}>
-      <span>{field.label}</span>
-      {field.is_pii && <Chip size="small" color="warning" label={t('collections.piiBadge')} />}
-    </Stack>
-  );
-
-  if (redacted) {
-    return (
-      <TextField
-        label={field.label}
-        value={t('collections.piiBadge')}
-        disabled
-        fullWidth
-        slotProps={{ htmlInput: { 'data-testid': testId, 'aria-label': field.label } }}
-      />
-    );
-  }
-
-  switch (field.field_type) {
-    case 'boolean':
-      return (
-        <FormControlLabel
-          control={
-            <Switch
-              checked={!!value}
-              onChange={(e) => onChange(e.target.checked)}
-              data-testid={testId}
-            />
-          }
-          label={label}
-        />
-      );
-    case 'number':
-      return (
-        <TextField
-          type="number"
-          label={field.label}
-          value={value ?? ''}
-          onChange={(e) => onChange(e.target.value === '' ? null : Number(e.target.value))}
-          required={field.required}
-          fullWidth
-          slotProps={{ htmlInput: { 'data-testid': testId } }}
-        />
-      );
-    case 'date':
-      return (
-        <TextField
-          type="date"
-          label={field.label}
-          value={value ?? ''}
-          onChange={(e) => onChange(e.target.value || null)}
-          required={field.required}
-          fullWidth
-          slotProps={{ htmlInput: { 'data-testid': testId }, inputLabel: { shrink: true } }}
-        />
-      );
-    case 'enum':
-      return (
-        <TextField
-          select
-          label={field.label}
-          value={value ?? ''}
-          onChange={(e) => onChange(e.target.value)}
-          required={field.required}
-          fullWidth
-          slotProps={{ htmlInput: { 'data-testid': testId } }}
-        >
-          {(field.enum_options ?? []).map((opt) => (
-            <MenuItem key={opt} value={opt}>
-              {opt}
-            </MenuItem>
-          ))}
-        </TextField>
-      );
-    case 'richtext':
-    case 'text':
-    case 'media':
-    default:
-      return (
-        <TextField
-          label={field.label}
-          value={value ?? ''}
-          onChange={(e) => onChange(e.target.value || null)}
-          required={field.required}
-          fullWidth
-          multiline={field.field_type === 'richtext'}
-          minRows={field.field_type === 'richtext' ? 4 : undefined}
-          slotProps={{ htmlInput: { 'data-testid': testId } }}
-        />
-      );
-  }
 }
 
 export interface CollectionEntryFormProps {

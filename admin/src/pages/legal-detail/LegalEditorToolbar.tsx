@@ -16,9 +16,10 @@ import { useLocalizedFormat } from '@/utils/dateFnsLocale';
 import StatusChip from '@/components/shared/StatusChip';
 import SchedulePopover from '@/components/shared/SchedulePopover';
 import WorkflowActions from '@/components/shared/WorkflowActions';
+import { pickWorkflowControls, type WorkflowActionControls } from '@/components/shared/workflowActionSpecs';
 import type { LegalContentFormData } from './legalDetailSchema';
 
-interface LegalEditorToolbarProps {
+interface LegalEditorToolbarProps extends WorkflowActionControls {
   watch: UseFormWatch<LegalContentFormData>;
   setValue: UseFormSetValue<LegalContentFormData>;
   version: number;
@@ -29,21 +30,7 @@ interface LegalEditorToolbarProps {
   onToggleHistory: () => void;
   isSaving: boolean;
   canWrite: boolean;
-  canSubmitForReview?: boolean;
-  canApprove?: boolean;
-  canRequestChanges?: boolean;
-  canPublish?: boolean;
-  canUnpublish?: boolean;
-  canArchive?: boolean;
-  canRestore?: boolean;
   canSchedule?: boolean;
-  onSubmitForReview?: () => void;
-  onApprove?: () => void;
-  onRequestChanges?: () => void;
-  onPublish?: () => void;
-  onUnpublish?: () => void;
-  onArchive?: () => void;
-  onRestore?: () => void;
   canCreateVersion?: boolean;
   onCreateVersion?: () => void;
 }
@@ -59,23 +46,10 @@ export default function LegalEditorToolbar({
   onToggleHistory,
   isSaving,
   canWrite,
-  canSubmitForReview,
-  canApprove,
-  canRequestChanges,
-  canPublish,
-  canUnpublish,
-  canArchive,
-  canRestore,
   canSchedule,
-  onSubmitForReview,
-  onApprove,
-  onRequestChanges,
-  onPublish,
-  onUnpublish,
-  onArchive,
-  onRestore,
   canCreateVersion,
   onCreateVersion,
+  ...workflowProps
 }: LegalEditorToolbarProps) {
   const { t } = useTranslation();
   const fmt = useLocalizedFormat();
@@ -187,20 +161,7 @@ export default function LegalEditorToolbar({
       <WorkflowActions
         currentStatus={currentStatus}
         isSaving={isSaving}
-        canSubmitForReview={canSubmitForReview}
-        canApprove={canApprove}
-        canRequestChanges={canRequestChanges}
-        canPublish={canPublish}
-        canUnpublish={canUnpublish}
-        canArchive={canArchive}
-        canRestore={canRestore}
-        onSubmitForReview={onSubmitForReview}
-        onApprove={onApprove}
-        onRequestChanges={onRequestChanges}
-        onPublish={onPublish}
-        onUnpublish={onUnpublish}
-        onArchive={onArchive}
-        onRestore={onRestore}
+        {...pickWorkflowControls(workflowProps)}
       />
 
       {/* Save is owned by the global save bar (useFormSaveBar). The toolbar no

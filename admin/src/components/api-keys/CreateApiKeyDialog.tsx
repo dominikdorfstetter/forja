@@ -1,11 +1,9 @@
 import { useState, useMemo } from 'react';
 import {
   TextField,
-  Stack,
   MenuItem,
   Alert,
   Typography,
-  Box,
   IconButton,
   InputAdornment,
 } from '@mui/material';
@@ -18,6 +16,7 @@ import type { CreateApiKeyRequest, CreateApiKeyResponse, ApiKeyPermission } from
 import { useTranslation } from 'react-i18next';
 import FormDialog from '@/components/shared/FormDialog';
 import { M3Button } from '@/components/design-system';
+import ApiKeyQuotaFields from './ApiKeyQuotaFields';
 
 const ALL_PERMISSIONS: { value: ApiKeyPermission; label: string; rank: number }[] = [
   { value: 'Read', label: 'Read', rank: 1 },
@@ -219,43 +218,7 @@ export default function CreateApiKeyDialog({ open, siteId, maxPermission = 'Admi
         {...register('expires_at')}
         slotProps={{ inputLabel: { shrink: true } }}
       />
-      <Box>
-        <Typography variant="subtitle2" sx={{ mb: 1 }}>
-          {t('apiKeys.createDialog.quotas.title')}
-        </Typography>
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
-          {t('apiKeys.createDialog.quotas.hint')}
-        </Typography>
-        <Stack direction="row" spacing={1}>
-          <TextField
-            label={t('apiKeys.createDialog.quotas.hourly')}
-            type="number"
-            size="small"
-            data-testid="field-quota-hourly"
-            {...register('quota_hourly')}
-            error={!!errors.quota_hourly}
-            helperText={errors.quota_hourly?.message}
-          />
-          <TextField
-            label={t('apiKeys.createDialog.quotas.daily')}
-            type="number"
-            size="small"
-            data-testid="field-quota-daily"
-            {...register('quota_daily')}
-            error={!!errors.quota_daily}
-            helperText={errors.quota_daily?.message}
-          />
-          <TextField
-            label={t('apiKeys.createDialog.quotas.monthly')}
-            type="number"
-            size="small"
-            data-testid="field-quota-monthly"
-            {...register('quota_monthly')}
-            error={!!errors.quota_monthly}
-            helperText={errors.quota_monthly?.message}
-          />
-        </Stack>
-      </Box>
+      <ApiKeyQuotaFields register={register} errors={errors} />
     </FormDialog>
   );
 }

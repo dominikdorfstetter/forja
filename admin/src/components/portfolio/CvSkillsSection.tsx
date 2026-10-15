@@ -11,37 +11,17 @@ import {
   SearchField,
   DataTableV2,
   type DataTableV2Column,
-  Pagination,
   RowActionBtn,
   ActionMenu,
   type ActionMenuItem,
 } from '@/components/shared/listPageV2';
+import type { PortfolioListSectionProps } from './portfolioListTypes';
+import { PortfolioPagination } from './PortfolioListParts';
 
-interface PaginationMeta {
-  total_items: number;
-  page: number;
-  page_size: number;
-}
-
-interface CvSkillsSectionProps {
+interface CvSkillsSectionProps extends PortfolioListSectionProps {
   skills: SkillResponse[] | undefined;
-  meta: PaginationMeta | undefined;
-  loading: boolean;
-  error: Error | null;
-  page: number;
-  rowsPerPage: number;
-  canWrite: boolean;
-  isAdmin: boolean;
-  onPage: (page: number) => void;
-  onPerPage: (pageSize: number) => void;
-  onOpenCreate: () => void;
   onEdit: (skill: SkillResponse) => void;
   onDelete: (skill: SkillResponse) => void;
-  searchValue: string;
-  onSearchChange: (value: string) => void;
-  sortBy: string;
-  sortDir: 'asc' | 'desc';
-  onSort: (column: string) => void;
 }
 
 function SkillRowActions({
@@ -214,16 +194,7 @@ export default function CvSkillsSection({
               />
             )}
           />
-          <Pagination
-            total={total}
-            page={page}
-            perPage={rowsPerPage}
-            onPage={onPage}
-            onPerPage={(n) => {
-              onPerPage(n);
-              onPage(1);
-            }}
-          />
+          <PortfolioPagination total={total} page={page} rowsPerPage={rowsPerPage} onPage={onPage} onPerPage={onPerPage} />
         </>
       )}
     </Box>

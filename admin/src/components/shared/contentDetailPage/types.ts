@@ -3,17 +3,10 @@ import type { Control, FieldValues, UseFormGetValues, UseFormReset, UseFormSetVa
 import type { QueryKey } from '@tanstack/react-query';
 import type { ZodSchema } from 'zod';
 import type { TFunction } from 'i18next';
-import type { ContentStatus, PreviewTemplate, ReviewActionRequest, SiteLocaleResponse } from '@/types/api';
+import type { ContentStatus, PreviewTemplate, ReviewActionRequest } from '@/types/api';
+import type { ActiveSiteLocale } from '@/utils/siteLocales';
 
-export interface ActiveLocale {
-  id: string;
-  code: string;
-  name: string;
-  native_name?: string | null;
-  direction: SiteLocaleResponse['direction'];
-  is_active: boolean;
-  created_at: string;
-}
+export type ActiveLocale = ActiveSiteLocale;
 
 export interface BreadcrumbEntry {
   label: string;

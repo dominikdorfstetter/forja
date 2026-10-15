@@ -1,6 +1,7 @@
 import { Box, Chip, Paper, Typography, Button, Stack } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import type { PageSectionResponse, SectionLocalizationResponse, SectionType } from '@/types/api';
+import { previewSettingsChips } from './sectionSettingsSummary';
 
 const SECTION_TYPE_COLORS: Record<SectionType, string> = {
   Hero: '#1976d2',
@@ -22,6 +23,40 @@ const SECTION_TYPE_COLORS: Record<SectionType, string> = {
   Text: '#4e342e',
 };
 
+/** Title / excerpt / button of the localization shown in the preview card. */
+function SectionPreviewContent({ loc }: { loc: SectionLocalizationResponse }) {
+  return (
+    <Box>
+      {loc.title && (
+        <Typography variant="h6" gutterBottom>
+          {loc.title}
+        </Typography>
+      )}
+      {loc.text && (
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: 'vertical',
+            mb: 1,
+          }}
+        >
+          {loc.text}
+        </Typography>
+      )}
+      {loc.button_text && (
+        <Button variant="outlined" size="small" disabled>
+          {loc.button_text}
+        </Button>
+      )}
+    </Box>
+  );
+}
+
 interface SectionPreviewProps {
   section: PageSectionResponse;
   localizations: SectionLocalizationResponse[];
@@ -36,21 +71,7 @@ export default function SectionPreview({ section, localizations, selectedLocaleI
 
   const borderColor = SECTION_TYPE_COLORS[section.section_type] || '#757575';
 
-  // Build settings summary chips
-  const settingsChips: string[] = [];
-  if (section.settings) {
-    const s = section.settings as Record<string, unknown>;
-    if (s.fullWidth) settingsChips.push('Full Width');
-    if (typeof s.columns === 'number') settingsChips.push(`${s.columns} columns`);
-    if (typeof s.gradient === 'string' && s.gradient) settingsChips.push('Gradient');
-    if (typeof s.style === 'string') settingsChips.push(s.style);
-    if (typeof s.layout === 'string') settingsChips.push(s.layout);
-    if (s.showCaptions) settingsChips.push('Captions');
-    if (s.showAvatar) settingsChips.push('Avatar');
-    if (s.showToggle) settingsChips.push('Pricing Toggle');
-    if (s.accordion) settingsChips.push('Accordion');
-    if (s.showMap) settingsChips.push('Map');
-  }
+  const settingsChips = previewSettingsChips(section.settings);
 
   return (
     <Paper
@@ -78,34 +99,7 @@ export default function SectionPreview({ section, localizations, selectedLocaleI
       </Box>
 
       {loc ? (
-        <Box>
-          {loc.title && (
-            <Typography variant="h6" gutterBottom>
-              {loc.title}
-            </Typography>
-          )}
-          {loc.text && (
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                display: '-webkit-box',
-                WebkitLineClamp: 3,
-                WebkitBoxOrient: 'vertical',
-                mb: 1,
-              }}
-            >
-              {loc.text}
-            </Typography>
-          )}
-          {loc.button_text && (
-            <Button variant="outlined" size="small" disabled>
-              {loc.button_text}
-            </Button>
-          )}
-        </Box>
+        <SectionPreviewContent loc={loc} />
       ) : (
         <Typography variant="body2" color="text.secondary" sx={{ fontStyle: "italic" }}>
           No content for selected locale

@@ -1,30 +1,26 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { Box, Chip, Tab, Tabs, TextField } from '@mui/material';
-import { useForm } from 'react-hook-form';
+import { Box, TextField } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
 import FormDialog from '@/components/shared/FormDialog';
 import { M3Button } from '@/components/design-system';
-import { formResolver } from '@/utils/validation';
 import type {
   CreateUiStringRequest,
   SiteLocaleResponse,
   UiStringResponse,
   UpdateUiStringRequest,
 } from '@/types/api';
-import { localeValueState, type LocaleValueState } from './localeCoverage';
 import {
   UI_STRING_KEY_MAX_LEN,
-  UI_STRING_VALUE_MAX_LEN,
   buildCreatePayload,
-  buildUiStringKeySchema,
   buildUpdatePayload,
   computeUpdateDelta,
-  deltaHasChanges,
-  persistedLocaleValues,
-  type LocaleValueDraft,
+  defaultValueMissing,
+  isSubmitBlocked,
+  localeValueFieldState,
   type UiStringKeyFormData,
 } from './uiStringForm';
+import { useUiStringDialogForm } from './useUiStringDialogForm';
+import { UiStringLocaleTabs, UiStringValueField } from './UiStringLocaleFields';
 
 interface UiStringFormDialogProps {
   open: boolean;
@@ -38,20 +34,6 @@ interface UiStringFormDialogProps {
   onSubmitCreate?: (payload: CreateUiStringRequest) => void;
   onSubmitUpdate?: (payload: UpdateUiStringRequest) => void;
   onClose: () => void;
-}
-
-function TabStatusChip({ code, state }: { code: string; state: Exclude<LocaleValueState, 'translated'> }) {
-  const { t } = useTranslation();
-  return (
-    <Chip
-      label={t(`uiStrings.dialog.status.${state}`)}
-      size="small"
-      color={state === 'outdated' ? 'warning' : 'default'}
-      variant="outlined"
-      data-testid={`ui-strings.dialog.status.${code}.${state}`}
-      sx={{ height: 20, fontSize: '0.65rem' }}
-    />
-  );
 }
 
 /**
@@ -74,68 +56,35 @@ export default function UiStringFormDialog({
   onClose,
 }: UiStringFormDialogProps) {
   const { t } = useTranslation();
-  const schema = useMemo(() => buildUiStringKeySchema(t), [t]);
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isValid, dirtyFields },
-  } = useForm<UiStringKeyFormData>({
-    resolver: formResolver(schema),
-    defaultValues: { key: '' },
-    mode: 'onChange',
-  });
+  const form = useUiStringDialogForm(open, row);
+  const { draft, touched } = form;
 
-  const [draft, setDraft] = useState<LocaleValueDraft>({});
-  const [touched, setTouched] = useState<ReadonlySet<string>>(new Set());
-  const [activeTab, setActiveTab] = useState(0);
-
-  const prevOpenRef = useRef(false);
-  useEffect(() => {
-    if (open && !prevOpenRef.current) {
-      reset({ key: row?.key ?? '' });
-      setDraft(persistedLocaleValues(row));
-      setTouched(new Set());
-      setActiveTab(0);
-    }
-    prevOpenRef.current = open;
-  }, [open, row, reset]);
-
+  const tabIndex = Math.min(form.activeTab, locales.length - 1);
   const defaultLocale = locales[0];
-  const currentLocale = locales[Math.min(activeTab, locales.length - 1)];
+  const currentLocale = locales[tabIndex];
   if (!defaultLocale || !currentLocale) return null;
 
-  const setLocaleValue = (localeId: string, value: string) => {
-    setDraft((prev) => ({ ...prev, [localeId]: value }));
-    setTouched((prev) => (prev.has(localeId) ? prev : new Set(prev).add(localeId)));
-  };
-
-  const defaultValueEmpty = (draft[defaultLocale.locale_id] ?? '').trim().length === 0;
-  const keyDirty = !!dirtyFields.key;
   const delta = row ? computeUpdateDelta(row, draft, touched, locales) : undefined;
-  const submitDisabled =
-    !isValid || defaultValueEmpty || (delta ? !keyDirty && !deltaHasChanges(delta) : false);
+  const submitDisabled = isSubmitBlocked({
+    isValid: form.isValid,
+    keyDirty: form.keyDirty,
+    defaultMissing: defaultValueMissing(draft, defaultLocale.locale_id),
+    delta,
+  });
 
   const onFormSubmit = ({ key }: UiStringKeyFormData) => {
-    if (delta) onSubmitUpdate?.(buildUpdatePayload(key, keyDirty, delta));
+    if (delta) onSubmitUpdate?.(buildUpdatePayload(key, form.keyDirty, delta));
     else onSubmitCreate?.(buildCreatePayload(key, draft, locales));
   };
 
   const isDefault = currentLocale.locale_id === defaultLocale.locale_id;
-  const currentValue = draft[currentLocale.locale_id] ?? '';
-  const currentPersisted = row?.localizations.find(
-    (l) => l.locale_id === currentLocale.locale_id,
-  );
-  const currentCleared =
-    !!currentPersisted && currentPersisted.value.length > 0 && currentValue.trim().length === 0;
-  const showDefaultError =
-    isDefault && defaultValueEmpty && (!!row || touched.has(currentLocale.locale_id));
+  const valueField = localeValueFieldState(row, draft, touched, currentLocale.locale_id, isDefault);
 
   return (
     <FormDialog
       open={open}
       onClose={onClose}
-      onSubmit={readOnly ? undefined : handleSubmit(onFormSubmit)}
+      onSubmit={readOnly ? undefined : form.handleSubmit(onFormSubmit)}
       icon="translate"
       title={row ? t('uiStrings.dialog.editTitle') : t('uiStrings.dialog.createTitle')}
       submitLabel={row ? t('common.actions.save') : t('common.actions.create')}
@@ -164,69 +113,28 @@ export default function UiStringFormDialog({
         required
         size="small"
         disabled={readOnly}
-        {...register('key')}
-        error={!!errors.key}
-        helperText={errors.key?.message || t('uiStrings.dialog.keyHelp')}
+        {...form.register('key')}
+        error={!!form.errors.key}
+        helperText={form.errors.key?.message || t('uiStrings.dialog.keyHelp')}
         slotProps={{
           htmlInput: { maxLength: UI_STRING_KEY_MAX_LEN, 'data-testid': 'ui-strings.field.key' },
         }}
       />
 
       <Box>
-        {locales.length > 1 && (
-          <Tabs
-            value={Math.min(activeTab, locales.length - 1)}
-            onChange={(_, v) => setActiveTab(v)}
-            variant="scrollable"
-            scrollButtons="auto"
-            sx={{ mb: 1 }}
-            data-testid="ui-strings.locale-tabs"
-          >
-            {locales.map((locale) => {
-              const state = row ? localeValueState(row, locale.locale_id) : undefined;
-              return (
-                <Tab
-                  key={locale.locale_id}
-                  data-testid={`ui-strings.tab.${locale.code}`}
-                  label={
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      {locale.code.toUpperCase()}
-                      {state && state !== 'translated' && (
-                        <TabStatusChip code={locale.code} state={state} />
-                      )}
-                    </Box>
-                  }
-                />
-              );
-            })}
-          </Tabs>
-        )}
-        <TextField
+        <UiStringLocaleTabs
+          locales={locales}
+          row={row}
+          value={tabIndex}
+          onChange={form.setActiveTab}
+        />
+        <UiStringValueField
           key={currentLocale.locale_id}
-          label={t('uiStrings.dialog.valueForLocale', {
-            locale: currentLocale.code.toUpperCase(),
-          })}
-          fullWidth
-          multiline
-          rows={3}
-          required={isDefault}
-          disabled={readOnly}
-          value={currentValue}
-          onChange={(e) => setLocaleValue(currentLocale.locale_id, e.target.value)}
-          error={showDefaultError}
-          helperText={
-            showDefaultError
-              ? t('uiStrings.dialog.valueRequired')
-              : currentCleared
-                ? t('uiStrings.dialog.clearHint')
-                : undefined
-          }
-          slotProps={{
-            htmlInput: {
-              maxLength: UI_STRING_VALUE_MAX_LEN,
-              'data-testid': 'ui-strings.dialog.value',
-            },
-          }}
+          locale={currentLocale}
+          field={valueField}
+          isDefault={isDefault}
+          readOnly={readOnly}
+          onChange={(value) => form.setLocaleValue(currentLocale.locale_id, value)}
         />
       </Box>
     </FormDialog>

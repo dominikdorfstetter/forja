@@ -1,11 +1,12 @@
 import { useEffect } from 'react';
-import { TextField, Stack, Box, Typography } from '@mui/material';
+import { TextField } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { requiredString, optionalString, positiveInt, formResolver } from '@/utils/validation';
 import type { ApiKeyListItem, UpdateApiKeyRequest } from '@/types/api';
 import { useTranslation } from 'react-i18next';
 import FormDialog from '@/components/shared/FormDialog';
+import ApiKeyQuotaFields from './ApiKeyQuotaFields';
 
 const editApiKeySchema = z.object({
   name: requiredString(100),
@@ -93,43 +94,7 @@ export default function EditApiKeyDialog({ open, apiKey, onSubmit, onClose }: Ed
         error={!!errors.description}
         helperText={errors.description?.message}
       />
-      <Box>
-        <Typography variant="subtitle2" sx={{ mb: 1 }}>
-          {t('apiKeys.createDialog.quotas.title')}
-        </Typography>
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
-          {t('apiKeys.createDialog.quotas.hint')}
-        </Typography>
-        <Stack direction="row" spacing={1}>
-          <TextField
-            label={t('apiKeys.createDialog.quotas.hourly')}
-            type="number"
-            size="small"
-            data-testid="field-quota-hourly"
-            {...register('quota_hourly')}
-            error={!!errors.quota_hourly}
-            helperText={errors.quota_hourly?.message}
-          />
-          <TextField
-            label={t('apiKeys.createDialog.quotas.daily')}
-            type="number"
-            size="small"
-            data-testid="field-quota-daily"
-            {...register('quota_daily')}
-            error={!!errors.quota_daily}
-            helperText={errors.quota_daily?.message}
-          />
-          <TextField
-            label={t('apiKeys.createDialog.quotas.monthly')}
-            type="number"
-            size="small"
-            data-testid="field-quota-monthly"
-            {...register('quota_monthly')}
-            error={!!errors.quota_monthly}
-            helperText={errors.quota_monthly?.message}
-          />
-        </Stack>
-      </Box>
+      <ApiKeyQuotaFields register={register} errors={errors} />
     </FormDialog>
   );
 }

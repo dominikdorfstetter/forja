@@ -35,7 +35,8 @@
       "more": "Meer",
       "remove": "Verwijderen",
       "showSecret": "Secret tonen",
-      "hideSecret": "Secret verbergen"
+      "hideSecret": "Secret verbergen",
+      "dragToReorder": "Sleep om te herordenen"
     },
     "status": {
       "active": "Actief",

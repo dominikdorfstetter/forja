@@ -7,12 +7,10 @@
  */
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
-import { useQuery } from '@tanstack/react-query';
-import { Box, Chip, Stack } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 
 import { useSiteContext } from '@/store/SiteContext';
-import { getSiteLocales } from '@/services/siteLocales';
-import { useCustomEntry, useCustomEntryMutations, useCustomType } from '@/hooks/useCustomTypes';
+import { useCustomEntryMutations } from '@/hooks/useCustomTypes';
 import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
 import type { CustomEntryRequest } from '@/types/customTypes';
 import { PageHeader } from '@/components/shared/listPageV2';
@@ -20,7 +18,8 @@ import { M3Button } from '@/components/design-system';
 import LoadingState from '@/components/shared/LoadingState';
 import { CollectionEntryForm } from './CollectionEntryForm';
 import { CollectionsBreadcrumb } from './CollectionsBreadcrumb';
-import { queryKeys } from '@/lib/queryKeys';
+import { EntryPublishToggle, EntryStatusChip } from './CollectionEntryPublishControls';
+import { useCollectionEntryData } from './useCollectionEntryData';
 
 export default function CollectionEntryEditPage() {
   const { t } = useTranslation();
@@ -31,17 +30,11 @@ export default function CollectionEntryEditPage() {
   const isNew = entryId === 'new';
   const { showError, showSuccess } = useErrorSnackbar();
 
-  const { data: type, isLoading: typeLoading } = useCustomType(siteId, typeKey);
-  const { data: entry, isLoading: entryLoading } = useCustomEntry(
+  const { type, entry, isLoading, locales } = useCollectionEntryData(
     siteId,
     typeKey,
     isNew ? undefined : entryId,
   );
-  const { data: siteLocales } = useQuery({
-    queryKey: queryKeys.siteLocales(siteId),
-    queryFn: () => getSiteLocales(siteId),
-    enabled: !!siteId,
-  });
   const mutations = useCustomEntryMutations(siteId, typeKey);
 
   const back = () => navigate(`/collections/${encodeURIComponent(typeKey)}`);
@@ -66,14 +59,12 @@ export default function CollectionEntryEditPage() {
     });
   };
 
-  if (typeLoading || (!isNew && entryLoading) || !type) {
+  if (isLoading || !type) {
     return <LoadingState />;
   }
 
   const typeName = type.name ?? typeKey;
   const pageTitle = isNew ? t('collections.newEntry') : t('common.actions.edit');
-  const locales = (siteLocales ?? []).map((l) => l.code);
-  const isPublished = entry?.status === 'published';
 
   return (
     <Box data-testid="collections.entry-edit.page">
@@ -91,29 +82,16 @@ export default function CollectionEntryEditPage() {
         title={
           <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }} component="span">
             <span>{pageTitle}</span>
-            {!isNew && entry && (
-              <Chip
-                size="small"
-                label={isPublished ? t('collections.statusPublished') : t('collections.statusDraft')}
-                color={isPublished ? 'success' : 'default'}
-              />
-            )}
+            <EntryStatusChip entry={entry} />
           </Stack>
         }
         actions={
           <>
-            {!isNew && entry && (
-              <M3Button
-                variant="outlined"
-                size="md"
-                icon={isPublished ? 'unpublished' : 'publish'}
-                onClick={togglePublish}
-                loading={mutations.publish.isPending || mutations.unpublish.isPending}
-                data-testid="toggle-publish"
-              >
-                {isPublished ? t('collections.unpublish') : t('collections.publish')}
-              </M3Button>
-            )}
+            <EntryPublishToggle
+              entry={entry}
+              loading={mutations.publish.isPending || mutations.unpublish.isPending}
+              onToggle={togglePublish}
+            />
             <M3Button
               variant="text"
               size="md"
@@ -128,7 +106,7 @@ export default function CollectionEntryEditPage() {
       />
       <CollectionEntryForm
         schema={type}
-        locales={locales.length ? locales : ['en']}
+        locales={locales}
         initialShared={entry?.shared}
         initialLocalized={entry?.localized}
         onSubmit={onSubmit}

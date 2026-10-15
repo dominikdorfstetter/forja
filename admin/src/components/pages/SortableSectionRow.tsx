@@ -1,6 +1,4 @@
-import { type CSSProperties, useState } from 'react';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+import { useState } from 'react';
 import {
   Box,
   Chip,
@@ -23,6 +21,8 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useTranslation } from 'react-i18next';
 import type { PageSectionResponse } from '@/types/api';
+import { rowSettingsSummary } from './sectionSettingsSummary';
+import { useSortableRow } from '@/components/shared/listPageV2';
 
 interface SortableSectionRowProps {
   section: PageSectionResponse;
@@ -57,30 +57,9 @@ export default function SortableSectionRow({
 }: SortableSectionRowProps) {
   const { t } = useTranslation();
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: section.id });
+  const { attributes, listeners, setNodeRef, style } = useSortableRow(section.id);
 
-  const style: CSSProperties = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.4 : 1,
-  };
-
-  // Build settings summary
-  const settingsSummary: string[] = [];
-  if (section.settings) {
-    const s = section.settings as Record<string, unknown>;
-    if (typeof s.columns === 'number') settingsSummary.push(t('sectionEditor.nColumns', { n: s.columns }));
-    if (typeof s.style === 'string') settingsSummary.push(s.style);
-    if (typeof s.layout === 'string') settingsSummary.push(s.layout);
-    if (s.fullWidth) settingsSummary.push(t('sectionEditor.fullWidth'));
-  }
+  const settingsSummary = rowSettingsSummary(section.settings, t);
 
   return (
     <Paper

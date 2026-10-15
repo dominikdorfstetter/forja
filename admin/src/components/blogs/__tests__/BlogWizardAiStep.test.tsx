@@ -105,6 +105,19 @@ describe('BlogWizardAiStep', () => {
       expect(onRegen).toHaveBeenCalled();
     });
 
+    it('updates and removes outline items', async () => {
+      const onOutlineChange = vi.fn();
+      const user = userEvent.setup();
+      renderWithProviders(
+        <BlogWizardAiStep {...outlineProps} onOutlineChange={onOutlineChange} />,
+      );
+      await user.click(screen.getAllByRole('button', { name: 'Delete' })[1]);
+      expect(onOutlineChange).toHaveBeenLastCalledWith([
+        { id: 1, value: 'Point 1' },
+        { id: 3, value: 'Point 3' },
+      ]);
+    });
+
     it('disables insert and regenerate buttons when generating', () => {
       renderWithProviders(
         <BlogWizardAiStep {...outlineProps} isGenerating={true} />,
@@ -112,5 +125,77 @@ describe('BlogWizardAiStep', () => {
       expect(screen.getByTestId('outline-insert-0')).toBeDisabled();
       expect(screen.getByTestId('regenerate-outline-btn')).toBeDisabled();
     });
+  });
+});
+
+describe('BlogWizardAiStep post phase', () => {
+  const postProps = {
+    ...defaultProps,
+    aiPhase: 'post' as const,
+    aiTitle: 'Post Title',
+    aiBody: 'Body',
+    aiExcerpt: 'Excerpt',
+    aiMetaTitle: 'Meta',
+    aiMetaDescription: 'Meta description',
+  };
+
+  const field = (value: string) => screen.getByDisplayValue(value);
+
+  it('enables every field and regenerate control when idle', () => {
+    renderWithProviders(<BlogWizardAiStep {...postProps} />);
+    for (const value of ['Post Title', 'Body', 'Excerpt', 'Meta', 'Meta description']) {
+      expect(field(value)).toBeEnabled();
+    }
+    for (const button of screen.getAllByRole('button', { name: 'Regenerate' })) {
+      expect(button).toBeEnabled();
+    }
+    expect(screen.getByRole('button', { name: 'Regenerate All' })).toBeEnabled();
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+  });
+
+  it('keeps unrelated fields editable while one section regenerates', () => {
+    renderWithProviders(<BlogWizardAiStep {...postProps} regeneratingField="seo" />);
+    expect(field('Post Title')).toBeDisabled();
+    expect(field('Body')).toBeEnabled();
+    expect(field('Excerpt')).toBeEnabled();
+    expect(field('Meta')).toBeDisabled();
+    expect(field('Meta description')).toBeDisabled();
+    for (const button of screen.getAllByRole('button', { name: 'Regenerate' })) {
+      expect(button).toBeDisabled();
+    }
+  });
+
+  it('locks body while excerpt regenerates and seo stays editable while body regenerates', () => {
+    const { unmount } = renderWithProviders(<BlogWizardAiStep {...postProps} regeneratingField="excerpt" />);
+    expect(field('Body')).toBeEnabled();
+    expect(field('Excerpt')).toBeDisabled();
+    expect(field('Meta')).toBeEnabled();
+    unmount();
+
+    renderWithProviders(<BlogWizardAiStep {...postProps} regeneratingField="body" />);
+    expect(field('Body')).toBeDisabled();
+    expect(field('Excerpt')).toBeEnabled();
+    expect(field('Meta')).toBeEnabled();
+  });
+
+  it('shows a progress bar and disables everything while regenerating all', () => {
+    renderWithProviders(<BlogWizardAiStep {...postProps} regeneratingField="all" />);
+    // linear bar on top + spinner inside the Regenerate All button
+    expect(screen.getAllByRole('progressbar')).toHaveLength(2);
+    for (const value of ['Post Title', 'Body', 'Excerpt', 'Meta', 'Meta description']) {
+      expect(field(value)).toBeDisabled();
+    }
+  });
+
+  it('requests regeneration for the clicked section', async () => {
+    const onRegenerate = vi.fn();
+    const user = userEvent.setup();
+    renderWithProviders(<BlogWizardAiStep {...postProps} onRegenerate={onRegenerate} />);
+    const [body, excerpt, seo] = screen.getAllByRole('button', { name: 'Regenerate' });
+    await user.click(body);
+    await user.click(excerpt);
+    await user.click(seo);
+    await user.click(screen.getByRole('button', { name: 'Regenerate All' }));
+    expect(onRegenerate.mock.calls.map(([f]) => f)).toEqual(['body', 'excerpt', 'seo', 'all']);
   });
 });

@@ -6,6 +6,7 @@ import type { PageSectionResponse, SectionLocalizationResponse } from '@/types/a
 import { useSiteContext } from '@/store/SiteContext';
 import SectionPreview from './SectionPreview';
 import { queryKeys } from '@/lib/queryKeys';
+import { activeSiteLocales } from '@/utils/siteLocales';
 
 interface PagePreviewProps {
   sections: PageSectionResponse[];
@@ -21,9 +22,7 @@ export default function PagePreview({ sections, localizations }: PagePreviewProp
     enabled: !!selectedSiteId,
   });
 
-  const activeLocales = (siteLocalesRaw || [])
-    .filter((sl) => sl.is_active)
-    .map((sl) => ({ id: sl.locale_id, code: sl.code, name: sl.name, native_name: sl.native_name, direction: sl.direction, is_active: sl.is_active, created_at: sl.created_at }));
+  const activeLocales = activeSiteLocales(siteLocalesRaw);
   const [selectedLocaleId, setSelectedLocaleId] = useState('');
 
   // Auto-select first locale if none selected

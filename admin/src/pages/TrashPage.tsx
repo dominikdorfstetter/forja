@@ -1,140 +1,27 @@
-import { Box, Alert, Stack, Chip } from '@mui/material';
+import { Box, Alert } from '@mui/material';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
-import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useState, useCallback } from 'react';
-import { getTrash, permanentDeleteTrashItem, restoreTrashItem } from '@/services/sites';
+import { getTrash } from '@/services/sites';
 import { useSiteContext } from '@/store/SiteContext';
 import { useAuth } from '@/store/AuthContext';
-import { useErrorSnackbar } from '@/hooks/useErrorSnackbar';
-import { useLocalizedFormat } from '@/utils/dateFnsLocale';
 import LoadingState from '@/components/shared/LoadingState';
 import EmptyState from '@/components/shared/EmptyState';
-import ConfirmDialog from '@/components/shared/ConfirmDialog';
-import {
-  PageHeader,
-  DataTableV2,
-  type DataTableV2Column,
-  RowActionBtn,
-  ActionMenu,
-  type ActionMenuItem,
-  Pagination,
-} from '@/components/shared/listPageV2';
-import { M3Button, Icon } from '@/components/design-system';
+import { PageHeader, DataTableV2, Pagination } from '@/components/shared/listPageV2';
+import { M3Button } from '@/components/design-system';
 import { queryKeys } from '@/lib/queryKeys';
-
-const TYPE_ICONS: Record<string, string> = {
-  blog: 'article',
-  page: 'description',
-  project: 'work',
-  cv_entry: 'badge',
-  skill: 'psychology',
-  media: 'image',
-  document: 'insert_drive_file',
-  legal: 'gavel',
-  social: 'share',
-  menu: 'menu',
-  menu_item: 'segment',
-};
-
-const TYPE_COLORS: Record<string, string> = {
-  blog: '#b8a4ff',
-  page: '#8ec5ff',
-  project: '#9fd8c4',
-  cv_entry: '#a4b8ff',
-  skill: '#ffcf8a',
-  media: '#ffc98a',
-  document: '#7edac6',
-  legal: '#ff9e9e',
-  social: '#ff9e9e',
-  menu: '#a59fb0',
-  menu_item: '#a59fb0',
-};
-
-interface TrashItem {
-  id: string;
-  entity_type: string;
-  title?: string | null;
-  slug?: string | null;
-  deleted_at?: string | null;
-}
-
-function daysUntilPurge(deletedAt: string | null | undefined): number {
-  if (!deletedAt) return 30;
-  const deleted = new Date(deletedAt);
-  const purgeDate = new Date(deleted.getTime() + 30 * 24 * 60 * 60 * 1000);
-  const now = new Date();
-  return Math.max(0, Math.ceil((purgeDate.getTime() - now.getTime()) / (24 * 60 * 60 * 1000)));
-}
-
-function TrashRowActions({
-  item,
-  isAdmin,
-  canWrite,
-  busy,
-  onRestore,
-  onDeleteOne,
-}: {
-  item: TrashItem;
-  isAdmin: boolean;
-  canWrite: boolean;
-  busy: boolean;
-  onRestore: (i: TrashItem) => void;
-  onDeleteOne: (i: TrashItem) => void;
-}) {
-  const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
-
-  // Restore re-creates content on the site — a write, gated by canWrite (#6).
-  // Permanent delete stays admin-only.
-  const items: ActionMenuItem[] = [
-    ...(canWrite
-      ? [
-          {
-            icon: 'restore',
-            label: t('trash.restore'),
-            disabled: busy,
-            onClick: () => onRestore(item),
-          },
-        ]
-      : []),
-    ...(isAdmin
-      ? [
-          {
-            icon: 'delete_forever',
-            label: t('trash.permanentDelete'),
-            danger: true,
-            onClick: () => onDeleteOne(item),
-          },
-        ]
-      : []),
-  ];
-
-  // Nothing actionable for read-only viewers — don't render an empty menu.
-  if (items.length === 0) return null;
-
-  return (
-    <div style={{ position: 'relative' }}>
-      <RowActionBtn
-        open={open}
-        ariaLabel={t('common.table.actions')}
-        data-testid={`trash.actions.${item.id}`}
-        onClick={() => setOpen((p) => !p)}
-      />
-      {open && <ActionMenu items={items} onClose={() => setOpen(false)} />}
-    </div>
-  );
-}
+import type { TrashItem } from './trash/trashItem';
+import { useTrashColumns } from './trash/useTrashColumns';
+import { useTrashActions } from './trash/useTrashActions';
+import TrashRowActions from './trash/TrashRowActions';
+import TrashBatchBar from './trash/TrashBatchBar';
+import TrashConfirmDialog from './trash/TrashConfirmDialog';
 
 export default function TrashPage() {
   const { t } = useTranslation();
-  const fmt = useLocalizedFormat();
   const { selectedSiteId } = useSiteContext();
   const { isAdmin, canWrite } = useAuth();
-  const queryClient = useQueryClient();
-  const { showError, showSuccess } = useErrorSnackbar();
-  const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [confirmAction, setConfirmAction] = useState<'delete' | 'deleteAll' | null>(null);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [prevSiteId, setPrevSiteId] = useState(selectedSiteId);
@@ -163,164 +50,11 @@ export default function TrashPage() {
     setPage(1);
   }, []);
 
-  const invalidateTrash = useCallback(() => {
-    queryClient.invalidateQueries({ queryKey: queryKeys.trash(selectedSiteId) });
-    queryClient.invalidateQueries({ queryKey: queryKeys.trashCount(selectedSiteId) });
-    queryClient.invalidateQueries({ queryKey: queryKeys.blogs(selectedSiteId) });
-    queryClient.invalidateQueries({ queryKey: queryKeys.pages(selectedSiteId) });
-    queryClient.invalidateQueries({ queryKey: queryKeys.media(selectedSiteId) });
-    queryClient.invalidateQueries({ queryKey: queryKeys.documents(selectedSiteId) });
-    queryClient.invalidateQueries({ queryKey: queryKeys.legal(selectedSiteId) });
-    queryClient.invalidateQueries({ queryKey: queryKeys.socialLinks(selectedSiteId) });
-    queryClient.invalidateQueries({ queryKey: queryKeys.navigationMenus(selectedSiteId) });
-    queryClient.invalidateQueries({ queryKey: queryKeys.navigationItems() });
-    queryClient.invalidateQueries({ queryKey: queryKeys.projects(selectedSiteId) });
-    queryClient.invalidateQueries({ queryKey: queryKeys.cvEntries(selectedSiteId) });
-    queryClient.invalidateQueries({ queryKey: queryKeys.skills(selectedSiteId) });
-  }, [queryClient, selectedSiteId]);
-
-  const restoreMutation = useMutation({
-    mutationFn: async (targets: { id: string; entityType: string }[]) => {
-      await Promise.all(
-        targets.map(({ id, entityType }) => restoreTrashItem(id, entityType)),
-      );
-    },
-    onSuccess: (_data, targets) => {
-      invalidateTrash();
-      setSelected((prev) => {
-        const next = new Set(prev);
-        targets.forEach(({ id }) => next.delete(id));
-        return next;
-      });
-      showSuccess(t('trash.restored'));
-    },
-    onError: (err) => showError(err),
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (targets: { id: string; entityType: string }[]) => {
-      await Promise.all(
-        targets.map(({ id, entityType }) => permanentDeleteTrashItem(id, entityType)),
-      );
-    },
-    onSuccess: () => {
-      invalidateTrash();
-      setSelected(new Set());
-      setConfirmAction(null);
-      showSuccess(t('trash.deleted'));
-    },
-    onError: (err) => {
-      setConfirmAction(null);
-      showError(err);
-    },
-  });
-
-  const toggleSelect = (id: string) =>
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-
-  const toggleSelectAll = (next: boolean) => {
-    if (next) setSelected(new Set(items.map((i) => i.id)));
-    else setSelected(new Set());
-  };
-
-  const toTargets = (ids: Iterable<string>) =>
-    [...ids].map((id) => {
-      const item = items.find((i) => i.id === id);
-      return { id, entityType: item?.entity_type ?? 'content' };
-    });
-
-  const handleBatchRestore = () => restoreMutation.mutate(toTargets(selected));
-  const handleBatchDelete = () => setConfirmAction('delete');
-  const handleDeleteAll = () => setConfirmAction('deleteAll');
-
-  const executeConfirmedDelete = () => {
-    if (confirmAction === 'deleteAll') {
-      deleteMutation.mutate(items.map((i) => ({ id: i.id, entityType: i.entity_type })));
-    } else {
-      deleteMutation.mutate(toTargets(selected));
-    }
-  };
-
-  const isBusy = restoreMutation.isPending || deleteMutation.isPending;
+  const actions = useTrashActions(selectedSiteId, items);
+  const columns = useTrashColumns();
 
   if (isLoading) return <LoadingState />;
   if (error) return <Alert severity="error">{t('common.errors.loadFailed')}</Alert>;
-
-  const columns: DataTableV2Column<TrashItem>[] = [
-    {
-      key: 'name',
-      label: t('common.table.name'),
-      width: '1.4fr',
-      render: (item) => {
-        const iconName = TYPE_ICONS[item.entity_type] ?? 'inventory_2';
-        const color = TYPE_COLORS[item.entity_type] ?? 'var(--on-surface-variant)';
-        return (
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-            <span
-              aria-hidden="true"
-              style={{
-                width: 26,
-                height: 26,
-                borderRadius: 8,
-                background: color + '26',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-              }}
-            >
-              <Icon name={iconName} size={16} color={color} />
-            </span>
-            <span
-              style={{
-                fontWeight: 500,
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-            >
-              {item.title || item.slug || item.id}
-            </span>
-          </span>
-        );
-      },
-    },
-    {
-      key: 'type',
-      label: t('common.table.type'),
-      width: '120px',
-      render: (item) => (
-        <Chip label={t(`trash.type.${item.entity_type}`)} size="small" variant="outlined" />
-      ),
-    },
-    {
-      key: 'deleted_at',
-      label: t('trash.columnDeleted'),
-      width: '160px',
-      muted: true,
-      render: (item) => (item.deleted_at ? fmt(item.deleted_at, 'PPp') : '\u2014'),
-    },
-    {
-      key: 'purge',
-      label: t('trash.columnAutoPurge'),
-      width: '140px',
-      render: (item) => {
-        const days = daysUntilPurge(item.deleted_at);
-        return (
-          <Chip
-            label={t('trash.daysRemaining', { days })}
-            size="small"
-            color={days <= 7 ? 'warning' : 'default'}
-          />
-        );
-      },
-    },
-  ];
 
   const headerActions = isAdmin && items.length > 0 ? (
     <M3Button
@@ -328,8 +62,8 @@ export default function TrashPage() {
       size="md"
       icon="delete_sweep"
       danger
-      onClick={handleDeleteAll}
-      disabled={isBusy}
+      onClick={actions.requestDeleteAll}
+      disabled={actions.isBusy}
       data-testid="trash.delete-all"
     >
       {t('trash.emptyTrash')}
@@ -350,55 +84,31 @@ export default function TrashPage() {
         <EmptyState icon={<DeleteOutlineIcon sx={{ fontSize: 48 }} />} title={t('trash.empty')} />
       ) : (
         <>
-          {selected.size > 0 && canWrite && (
-            <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-              <M3Button
-                variant="outlined"
-                size="sm"
-                icon="restore"
-                onClick={handleBatchRestore}
-                disabled={isBusy}
-                data-testid="trash.batch-restore"
-              >
-                {t('trash.restore')} ({selected.size})
-              </M3Button>
-              {isAdmin && (
-                <M3Button
-                  variant="outlined"
-                  size="sm"
-                  icon="delete_forever"
-                  danger
-                  onClick={handleBatchDelete}
-                  disabled={isBusy}
-                  data-testid="trash.batch-delete"
-                >
-                  {t('trash.permanentDelete')} ({selected.size})
-                </M3Button>
-              )}
-            </Stack>
-          )}
+          <TrashBatchBar
+            selectedCount={actions.selected.size}
+            canWrite={canWrite}
+            isAdmin={isAdmin}
+            busy={actions.isBusy}
+            onRestore={actions.restoreSelected}
+            onDelete={actions.requestDeleteSelected}
+          />
 
           <DataTableV2<TrashItem>
             data-testid="trash.table"
             columns={columns}
             rows={items}
             getKey={(item) => item.id}
-            selected={selected}
-            onToggleSelect={toggleSelect}
-            onToggleAll={toggleSelectAll}
+            selected={actions.selected}
+            onToggleSelect={actions.toggleSelect}
+            onToggleAll={actions.toggleSelectAll}
             renderActions={(item) => (
               <TrashRowActions
                 item={item}
                 isAdmin={isAdmin}
                 canWrite={canWrite}
-                busy={isBusy}
-                onRestore={(i) =>
-                  restoreMutation.mutate([{ id: i.id, entityType: i.entity_type }])
-                }
-                onDeleteOne={(i) => {
-                  setSelected(new Set([i.id]));
-                  setConfirmAction('delete');
-                }}
+                busy={actions.isBusy}
+                onRestore={actions.restoreOne}
+                onDeleteOne={actions.requestDeleteOne}
               />
             )}
           />
@@ -413,20 +123,12 @@ export default function TrashPage() {
         </>
       )}
 
-      <ConfirmDialog
-        open={!!confirmAction}
-        title={confirmAction === 'deleteAll' ? t('trash.emptyTrash') : t('trash.permanentDelete')}
-        message={
-          confirmAction === 'deleteAll'
-            ? t('trash.emptyTrashConfirm', { count: items.length })
-            : t('trash.permanentDeleteConfirm')
-        }
-        confirmLabel={
-          confirmAction === 'deleteAll' ? t('trash.emptyTrash') : t('trash.permanentDelete')
-        }
-        onConfirm={executeConfirmedDelete}
-        onCancel={() => setConfirmAction(null)}
-        loading={deleteMutation.isPending}
+      <TrashConfirmDialog
+        action={actions.confirmAction}
+        itemCount={items.length}
+        loading={actions.isDeleting}
+        onConfirm={actions.executeConfirmedDelete}
+        onCancel={actions.cancelConfirm}
       />
     </Box>
   );
