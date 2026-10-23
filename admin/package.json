@@ -55,7 +55,7 @@
     "lowlight": "^3.3.0",
     "notistack": "^3.0.2",
     "react": "^19.3.0",
-    "react-dom": "^19.3.0",
+    "react-dom": "^19.3.1",
     "react-easy-crop": "^6.2.4",
     "react-hook-form": "^7.90.0",
     "react-i18next": "^17.0.16",
