@@ -12,17 +12,17 @@
     "test": "node --test --experimental-strip-types src/lib/__tests__/*.test.ts"
   },
   "dependencies": {
-    "@astrojs/check": "^0.9.10",
-    "@astrojs/node": "^11.1.7",
+    "@astrojs/check": "^0.9.12",
+    "@astrojs/node": "^11.1.9",
     "@fontsource/inter": "^5.3.0",
     "@fontsource/jetbrains-mono": "^5.3.0",
     "@forjacms/analytics": "file:../../libs/analytics",
     "@forjacms/client": "file:../../libs/client",
     "@forjacms/sections": "file:../../libs/sections",
     "@tailwindcss/vite": "^4.3.3",
-    "astro": "^7.3.8",
+    "astro": "^7.4.2",
     "marked": "^18.1.1",
-    "sanitize-html": "^2.18.0"
+    "sanitize-html": "^2.18.1"
   },
   "engines": {
     "node": ">=22.12.0"

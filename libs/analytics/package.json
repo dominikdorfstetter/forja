@@ -44,11 +44,11 @@
   "homepage": "https://github.com/dominikdorfstetter/forja/tree/main/libs/analytics#readme",
   "bugs": "https://github.com/dominikdorfstetter/forja/issues",
   "devDependencies": {
-    "@vitest/coverage-v8": "^5.0.4",
-    "happy-dom": "^20.14.6",
+    "@vitest/coverage-v8": "^5.0.5",
+    "happy-dom": "^21.0.4",
     "tsdown": "^0.23.1",
     "typescript": "^6.0.3",
-    "vitest": "^5.0.4"
+    "vitest": "^5.0.5"
   },
   "overrides": {
     "typescript": "^6.0.3"

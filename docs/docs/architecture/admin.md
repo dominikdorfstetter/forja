@@ -163,7 +163,8 @@ TypeScript interfaces in `types/api.ts` mirror the backend DTOs. This ensures ty
 
 ## Forms
 
-Forms use `react-hook-form` for state management and `zod` for schema validation:
+Forms use `react-hook-form` for state management and `zod` for schema validation,
+wired together by the admin's own `formResolver` (`@/utils/validation`):
 
 ```typescript
 const schema = z.object({
@@ -173,7 +174,7 @@ const schema = z.object({
 });
 
 const { register, handleSubmit, formState: { errors } } = useForm({
-  resolver: zodResolver(schema),
+  resolver: formResolver(schema),
 });
 ```
 

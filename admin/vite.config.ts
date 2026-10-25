@@ -79,7 +79,7 @@ export default defineConfig({
             'vendor-react': ['react', 'react-dom', 'react-router'],
             'vendor-mui': ['@mui/material', '@mui/icons-material', '@emotion/react', '@emotion/styled'],
             'vendor-query': ['@tanstack/react-query'],
-            'vendor-form': ['react-hook-form', '@hookform/resolvers', 'zod'],
+            'vendor-form': ['react-hook-form', 'zod'],
             'vendor-editor': [
               '@tiptap/react', '@tiptap/starter-kit', '@tiptap/suggestion',
               '@tiptap/extension-image', '@tiptap/extension-link',
