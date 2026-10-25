@@ -179,12 +179,15 @@ import BookmarksPage from './pages/BookmarksPage';
 
 ## Forms with react-hook-form and zod
 
-For create/edit forms, use react-hook-form with zod schema validation:
+For create/edit forms, use react-hook-form with zod schema validation. Use the
+admin's own `formResolver` (in `@/utils/validation`) rather than a third-party
+resolver: it types the form by the schema's *output*, so it handles Zod 4's
+coerced fields correctly.
 
 ```tsx
 import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { formResolver } from '@/utils/validation';
 
 const bookmarkSchema = z.object({
   title: z.string().min(1, 'Title is required').max(255),
@@ -200,7 +203,7 @@ function BookmarkForm({ onSubmit }: { onSubmit: (data: BookmarkFormData) => void
     handleSubmit,
     formState: { errors },
   } = useForm<BookmarkFormData>({
-    resolver: zodResolver(bookmarkSchema),
+    resolver: formResolver(bookmarkSchema),
   });
 
   return (
@@ -257,7 +260,7 @@ function BookmarkForm({ onClose }: { onClose: () => void }) {
     handleSubmit,
     formState: { errors },
   } = useForm<BookmarkFormData>({
-    resolver: zodResolver(bookmarkSchema),
+    resolver: formResolver(bookmarkSchema),
   });
 
   const createMutation = useMutation({
