@@ -57,12 +57,12 @@
   "bugs": "https://github.com/dominikdorfstetter/forja/issues",
   "dependencies": {
     "@stencil/core": "^4.45.2",
-    "sanitize-html": "^2.18.0"
+    "sanitize-html": "^2.18.1"
   },
   "devDependencies": {
     "@stencil/react-output-target": "^1.6.5",
     "@stencil/vitest": "^1.16.1",
     "@types/sanitize-html": "^2.16.2",
-    "vitest": "^5.0.4"
+    "vitest": "^5.0.5"
   }
 }
