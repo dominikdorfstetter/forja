@@ -101,7 +101,7 @@ url = "2"
 image = { version = "0.25", default-features = false, features = ["jpeg", "png", "gif", "webp", "ico"] }
 infer = "0.22"
 slug = "0.1"
-zip = { version = "8", default-features = false, features = ["deflate"] }
+zip = { version = "9", default-features = false, features = ["deflate"] }
 
 # S3 storage (optional — disable default features to reduce compile time)
 # `default-https-client` selects aws-smithy-http-client's `rustls-aws-lc` backend
