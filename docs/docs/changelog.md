@@ -14,6 +14,23 @@ is the first release published as open source**, so the public version history
 begins at 2.0. The pre-release milestones below condense how the foundation came
 together; precise dates start at the first public release.
 
+## 2.1.7 — 2026-10-25
+
+A dependency sweep that closes every open security finding (#336). There are no feature changes, no API changes and no migration.
+
+### Security
+
+- **zip 9 fixes three advisories in archive extraction** (RUSTSEC-2026-0367 to 0369). They cover SUID/SGID bits kept on extracted files, symlinks pointing outside the destination directory, and permissions applied through symlinks. Forja only creates ZIP archives (site export, favicon bundle) and never extracts them, so it was not exposed, but the advisories failed the dependency audit.
+- **TLS certificate validation stops trusting distrusted emSign intermediates.** This comes from rustls-webpki 0.103.16 (RUSTSEC-2026-0382) and webpki-roots / webpki-root-certs 1.0.10 (RUSTSEC-2026-0381 and 0383). ctutils 0.4.5 fixes non-constant-time comparisons (RUSTSEC-2026-0385). `cargo audit` reports no vulnerabilities.
+- **markdown-it 14.3.3** in the admin fixes two quadratic-time denial-of-service issues (GHSA-gfr2-rv44-r23c, GHSA-vfgh-jcmw-g37q).
+- **`@forjacms/sections` now requires sanitize-html 2.18.1 or later**, which fixes unbounded recursion when re-sanitizing a discarded iframe's fallback (GHSA-c9rx-x947-fp3h). The astro-blog template moves to it too.
+- **Transitive fixes** for undici, fast-uri, body-parser, serialize-javascript and happy-dom (test-only, in `libs/analytics`). `npm audit` reports no vulnerabilities in any package.
+
+### Changed
+
+- **Dependencies.** Backend: zip 9, tokio 1.54, aws-sdk-s3 1.154 and utoipa-swagger-ui 10.0.2. Admin: React 19.3.1, react-router 8.5, MUI X Date Pickers 9.16 and Vitest 5.0.5. Elsewhere: Angular 22.2.3 (client), happy-dom 21 (analytics), Astro 7.4.2 and @astrojs/node 11.1.9 (astro-blog), and Playwright 1.64.1 (e2e). Routine updates used a 72-hour minimum release age as a supply-chain precaution; advisory fixes were exempt.
+- **The admin no longer depends on `@hookform/resolvers`.** Nothing imported it, because forms use the admin's own `formResolver`. The developer docs now show that pattern.
+
 ## 2.1.6 — 2026-10-16
 
 A dependency sweep that closes the newest security advisories, plus an internal refactor of the admin dashboard. There are no feature changes, no API changes and no migration.
