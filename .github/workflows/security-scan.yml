@@ -7,6 +7,7 @@ on:
     branches: [main]
   schedule:
     - cron: '0 6 * * 1' # Weekly on Monday
+  workflow_dispatch:
 
 concurrency:
   group: security-${{ github.ref }}
@@ -17,9 +18,12 @@ permissions:
   pull-requests: read
 
 jobs:
+  # Scheduled and manual runs skip change detection and scan everything.
+  # A job whose `needs` was skipped is itself skipped unless its `if` opts out
+  # with a status function, hence the `!cancelled()` on every scan job.
   changes:
     name: Detect changes
-    if: github.event_name != 'schedule'
+    if: github.event_name != 'schedule' && github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-latest
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
@@ -42,8 +46,10 @@ jobs:
     name: Rust dependency audit
     needs: changes
     if: >-
+      !cancelled() && (
       github.event_name == 'schedule' ||
-      needs.changes.outputs.backend == 'true'
+      github.event_name == 'workflow_dispatch' ||
+      needs.changes.outputs.backend == 'true')
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -61,8 +67,10 @@ jobs:
     name: Node dependency audit
     needs: changes
     if: >-
+      !cancelled() && (
       github.event_name == 'schedule' ||
-      needs.changes.outputs.admin == 'true'
+      github.event_name == 'workflow_dispatch' ||
+      needs.changes.outputs.admin == 'true')
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -88,9 +96,11 @@ jobs:
     name: Trivy filesystem scan
     needs: changes
     if: >-
+      !cancelled() && (
       github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch' ||
       needs.changes.outputs.backend == 'true' ||
-      needs.changes.outputs.admin == 'true'
+      needs.changes.outputs.admin == 'true')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
