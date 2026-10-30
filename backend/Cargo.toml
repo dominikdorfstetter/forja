@@ -123,7 +123,7 @@ async-trait = "0.1.92"
 futures = { version = "0.3.34", default-features = false, features = ["alloc"] }
 lazy_static = "1.5.1"
 regex = "1.13.1"
-fancy-regex = "0.19.2"
+fancy-regex = "0.20.0"
 subtle = "2.6.1"
 altcha-lib-rs = { version = "0.3.3", default-features = false, features = ["json"] }
 
