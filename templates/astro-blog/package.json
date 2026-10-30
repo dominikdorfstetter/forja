@@ -21,7 +21,7 @@
     "@forjacms/sections": "file:../../libs/sections",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.4.2",
-    "marked": "^18.1.1",
+    "marked": "^18.1.2",
     "sanitize-html": "^2.18.1"
   },
   "engines": {
